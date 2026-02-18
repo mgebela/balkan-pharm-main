@@ -261,6 +261,27 @@
         })
         .join('');
     }
+
+    const MIN_CHART_ENTRIES = 2;
+    const chartsSection = document.getElementById('dashboard-charts-section');
+    const chartsContainer = document.getElementById('dashboard-charts');
+    if (chartsSection && chartsContainer && typeof getToolboxData === 'function') {
+      const toolbox = getToolboxData();
+      const watering = toolbox.watering || [];
+      const environment = toolbox.environment || [];
+      const hasWatering = watering.length >= MIN_CHART_ENTRIES;
+      const hasEnv = environment.length >= MIN_CHART_ENTRIES;
+      if (!hasWatering && !hasEnv) {
+        chartsSection.style.display = 'none';
+      } else {
+        chartsSection.style.display = 'block';
+        chartsContainer.innerHTML = '';
+        if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Zalijevanje</h4><div id="dashboard-chart-watering"></div></div>';
+        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Okoliš (temperatura)</h4><div id="dashboard-chart-environment"></div></div>';
+        if (hasWatering && typeof renderToolboxChart === 'function') renderToolboxChart('watering', document.getElementById('dashboard-chart-watering'));
+        if (hasEnv && typeof renderToolboxChart === 'function') renderToolboxChart('environment', document.getElementById('dashboard-chart-environment'));
+      }
+    }
   }
 
   function escapeHtml(s) {
