@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Balkan-pharm – Dnevnik uzgoja CBD</title>
-  <link rel="icon" type="image/svg+xml" href="images/bp.svg" />
+  <link rel="icon" type="image/png" href="images/bp.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/landing.css" />
 </head>
 <body>
   <header class="header">
     <div class="container header-inner">
-      <a href="index.html" class="logo"><img src="images/bp.svg" alt="Balkan-pharm" class="logo-img" /></a>
+      <a href="index.html" class="logo"><img src="images/bp.png" alt="Balkan-pharm" class="logo-img" /></a>
       <button type="button" class="nav-toggle" aria-label="Izbornik" aria-expanded="false">
         <span class="nav-toggle-bar"></span>
         <span class="nav-toggle-bar"></span>
@@ -31,27 +31,34 @@
 
   <main>
     <section class="hero">
-      <div class="container">
-        <h1>Vaše iskustvo uzgoja CBD<br />sve na jednom mjestu</h1>
-        <p class="hero-sub">Uzgajajte, učite i dijelite s zajednicom. Stručni savjeti, moćni alati i inspirativni ljudi.</p>
-        <div class="hero-cta">
-          <a href="app/" class="btn btn-primary btn-lg">Pokreni dnevnik besplatno</a>
-        </div>
-        <div class="hero-stats">
-          <div class="stat"><strong>#1</strong> CBD dnevnik</div>
-          <div class="stat">Praćenje biljaka od sjeme do žetve</div>
-          <div class="stat">Privatnost pod vašom kontrolom</div>
-          <div class="stat">Vodiči za početnike i napredne</div>
+      <div class="hero-bg" aria-hidden="true">
+        <img src="images/1.jpg" alt="" />
+      </div>
+      <div class="container hero-inner">
+        <div class="hero-content hero-card">
+          <h1>Vaše iskustvo uzgoja CBD<br />sve na jednom mjestu</h1>
+          <p class="hero-sub">Uzgajajte, učite i dijelite s zajednicom. Stručni savjeti, moćni alati i inspirativni ljudi.</p>
+          <div class="hero-cta">
+            <a href="app/" class="btn btn-primary btn-lg">Pokreni dnevnik besplatno</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><strong>#1</strong> CBD dnevnik</div>
+            <div class="stat">Praćenje biljaka od sjeme do žetve</div>
+            <div class="stat">Privatnost pod vašom kontrolom</div>
+            <div class="stat">Vodiči za početnike i napredne</div>
+          </div>
         </div>
       </div>
     </section>
 
     <section id="o-aplikaciji" class="section section-alt">
       <div class="container">
-        <h2>Uzgajajte s najboljim CBD dnevnikom</h2>
-        <p class="section-lead">
-          Jednostavno kreirajte biljke i okoliše, pratite putovanje uzgoja i dobivajte podršku od sjemena do žetve.
-        </p>
+        <div class="section-header">
+          <h2>Uzgajajte s najboljim CBD dnevnikom</h2>
+          <p class="section-lead">
+            Jednostavno kreirajte biljke i okoliše, pratite putovanje uzgoja i dobivajte podršku od sjemena do žetve.
+          </p>
+        </div>
         <div class="features-grid">
           <div class="feature-card">
             <span class="feature-icon">🌱</span>
@@ -80,16 +87,24 @@
 
     <section id="mogucnosti" class="section">
       <div class="container">
-        <h2>Zamijenite nagađanje pouzdanošću</h2>
-        <p class="section-lead">
-          Vodiči za uzgoj CBD-a pružaju stručno znanje o uzgoju. Idealan za početnike.
-        </p>
+        <div class="section-header">
+          <h2>Zamijenite nagađanje pouzdanošću</h2>
+          <p class="section-lead">
+            Vodiči za uzgoj CBD-a pružaju stručno znanje o uzgoju. Idealan za početnike.
+          </p>
+        </div>
         <div class="use-cases">
-          <div class="use-case">
+          <div class="use-case use-case-image">
+            <div class="use-case-img-wrap">
+              <img src="images/3.jpg" alt="Praćenje rasta i zdravlja biljke" />
+            </div>
             <h3>Vaš partner u uzgoju</h3>
             <p>Najučinkovitija metoda praćenja rasta i zdravlja biljke. S dnevnicima, podsjetnicima, gnojidbom i više – uspjeh od sjemena do žetve. Intuitivan dnevnik uzgoja CBD biljaka koji vam olakšava cijeli proces i vodi vas kroz žetvu. Idealno za početnike i iskusne uzgajivače. Zamijenite papirnati dnevnik; fokusirajte se na biljke dok Balkan-pharm prati vaš napredak.</p>
           </div>
           <div class="use-case">
+            <div class="use-case-img-wrap use-case-img-small">
+              <img src="images/4.jpg" alt="Planiranje uzgoja" />
+            </div>
             <h3>Koristite Balkan-pharm da biste:</h3>
             <ul>
               <li>Kreirali koliko god želite CBD biljaka i okoliša – u zatvorenom ili na otvorenom.</li>
@@ -105,8 +120,10 @@
 
     <section id="vodiči" class="section section-alt">
       <div class="container">
-        <h2>Vodiči za uzgoj CBD-a</h2>
-        <p class="section-lead">Kratki vodiči za početnike i napredne.</p>
+        <div class="section-header">
+          <h2>Vodiči za uzgoj CBD-a</h2>
+          <p class="section-lead">Kratki vodiči za početnike i napredne.</p>
+        </div>
         <ul class="guide-list">
           <li><strong>Što mi treba za početak uzgoja CBD?</strong> – Checklist za početnike.</li>
           <li><strong>Klijanje sjemena</strong> – Korak po korak za početnike.</li>
@@ -118,9 +135,14 @@
     </section>
 
     <section class="section cta-section">
-      <div class="container">
-        <h2>Krenite besplatno</h2>
-        <p class="section-lead">Bez registracije. Podaci ostaju na vašem uređaju.</p>
+      <div class="cta-bg" aria-hidden="true">
+        <img src="images/5.jpg" alt="" />
+      </div>
+      <div class="container cta-inner">
+        <div class="section-header">
+          <h2>Krenite besplatno</h2>
+          <p class="section-lead">Bez registracije. Podaci ostaju na vašem uređaju.</p>
+        </div>
         <a href="app/" class="btn btn-primary btn-lg">Otvori CBD dnevnik</a>
       </div>
     </section>

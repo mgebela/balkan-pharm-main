@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Balkan-pharm – Dnevnik uzgoja</title>
-  <link rel="icon" type="image/svg+xml" href="../images/bp.svg" />
+  <link rel="icon" type="image/png" href="../images/bp.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/app.css" />
 </head>
 <body>
   <div class="app">
     <aside class="sidebar">
-      <a href="../index.html" class="sidebar-logo"><img src="../images/bp.svg" alt="Balkan-pharm" class="sidebar-logo-img" /></a>
+      <a href="../index.html" class="sidebar-logo"><img src="../images/bp.png" alt="Balkan-pharm" class="sidebar-logo-img" /></a>
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-view="dashboard">
           <span class="nav-icon">📊</span>
@@ -140,6 +140,12 @@
           <input type="date" id="plant-start-date" />
         </label>
         <label>
+          Fotografija biljke
+          <input type="file" id="plant-photo" accept="image/*" class="input-file" />
+          <input type="hidden" id="plant-photo-data" />
+          <span class="media-preview" id="plant-photo-preview"></span>
+        </label>
+        <label>
           Bilješke
           <textarea id="plant-notes" rows="3" placeholder="Opcionalne bilješke..."></textarea>
         </label>
@@ -180,6 +186,18 @@
         <label>
           Bilješka *
           <textarea id="entry-note" rows="4" required placeholder="Što ste danas napravili?"></textarea>
+        </label>
+        <label>
+          Fotografija
+          <input type="file" id="entry-photo" accept="image/*" class="input-file" />
+          <input type="hidden" id="entry-photo-data" />
+          <span class="media-preview" id="entry-photo-preview"></span>
+        </label>
+        <label>
+          Video
+          <input type="file" id="entry-video" accept="video/*" class="input-file" />
+          <input type="hidden" id="entry-video-data" />
+          <span class="media-preview" id="entry-video-preview"></span>
         </label>
         <div class="modal-actions">
           <button type="button" class="btn btn-ghost modal-cancel">Odustani</button>
