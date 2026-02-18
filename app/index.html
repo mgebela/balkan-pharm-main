@@ -85,6 +85,48 @@
         <div id="journal-entries" class="journal-entries"></div>
       </div>
 
+      <div id="view-growlog" class="view view-growlog">
+        <div class="growlog-header-bar">
+          <span class="growlog-updated" id="growlog-updated"></span>
+          <span class="growlog-views" id="growlog-views"></span>
+        </div>
+        <div class="growlog-metrics" id="growlog-metrics"></div>
+        <div class="growlog-layout">
+          <aside class="growlog-sidebar">
+            <section class="growlog-section growlog-photos">
+              <h3 class="growlog-section-title">Fotografije growloga</h3>
+              <div class="growlog-photo-grid" id="growlog-photo-grid"></div>
+              <button type="button" class="link-btn" id="growlog-view-all-photos">Pogledaj sve fotografije</button>
+            </section>
+            <section class="growlog-section">
+              <h3 class="growlog-section-title">Sorta</h3>
+              <div class="growlog-strain" id="growlog-strain"></div>
+            </section>
+            <section class="growlog-section">
+              <h3 class="growlog-section-title">Faze uzgoja</h3>
+              <div class="tree-stages" id="growlog-tree-stages"></div>
+            </section>
+            <section class="growlog-section">
+              <h3 class="growlog-section-title">Okoliš</h3>
+              <div class="growlog-environment" id="growlog-environment"></div>
+            </section>
+          </aside>
+          <div class="growlog-main">
+            <button type="button" class="btn-back" id="growlog-back">← Natrag na biljke</button>
+            <div class="growlog-hero-image" id="growlog-hero-image"></div>
+            <h2 class="growlog-plant-name" id="growlog-plant-name"></h2>
+            <section class="growlog-timeline-section">
+              <h3 class="growlog-section-title">Vremenska crta growloga</h3>
+              <div class="growlog-timeline" id="growlog-timeline"></div>
+            </section>
+            <section class="growlog-new-photos">
+              <h3 class="growlog-section-title">Nedavne fotografije</h3>
+              <div class="growlog-photo-strip" id="growlog-photo-strip"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+
       <div id="view-toolbox" class="view">
         <div class="toolbox-grid">
           <div class="toolbox-card">
@@ -138,6 +180,21 @@
         <label>
           Datum početka
           <input type="date" id="plant-start-date" />
+        </label>
+        <label>
+          Okoliš (npr. Grow tent)
+          <input type="text" id="plant-environment-name" placeholder="npr. Grow tent, Staklenik" />
+        </label>
+        <label>
+          Tip uzgoja
+          <select id="plant-environment-type">
+            <option value="indoor">U zatvorenom</option>
+            <option value="outdoor">Na otvorenom</option>
+          </select>
+        </label>
+        <label>
+          Sati osvjetljenja (dnevno)
+          <input type="number" id="plant-exposure-hours" min="0" max="24" placeholder="npr. 18" />
         </label>
         <label>
           Fotografija biljke
