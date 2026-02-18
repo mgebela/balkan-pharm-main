@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Balkan-pharm – Dnevnik uzgoja</title>
+  <link rel="icon" type="image/svg+xml" href="../images/bp.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/app.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a href="../index.html" class="sidebar-logo"><img src="../images/bp.svg" alt="Balkan-pharm" class="sidebar-logo-img" /></a>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span>
+          <span>Nadzorna ploča</span>
+        </a>
+        <a href="#" class="nav-item" data-view="plants">
+          <span class="nav-icon">🌱</span>
+          <span>Moje biljke</span>
+        </a>
+        <a href="#" class="nav-item" data-view="journal">
+          <span class="nav-icon">📔</span>
+          <span>Dnevnik</span>
+        </a>
+        <a href="#" class="nav-item" data-view="toolbox">
+          <span class="nav-icon">🧰</span>
+          <span>Alati</span>
+        </a>
+      </nav>
+    </aside>
+
+    <nav class="bottom-nav" aria-label="Glavna navigacija">
+      <a href="#" class="nav-item active" data-view="dashboard">
+        <span class="nav-icon">📊</span>
+        <span class="bottom-nav-label">Nadzorna ploča</span>
+      </a>
+      <a href="#" class="nav-item" data-view="plants">
+        <span class="nav-icon">🌱</span>
+        <span class="bottom-nav-label">Biljke</span>
+      </a>
+      <a href="#" class="nav-item" data-view="journal">
+        <span class="nav-icon">📔</span>
+        <span class="bottom-nav-label">Dnevnik</span>
+      </a>
+      <a href="#" class="nav-item" data-view="toolbox">
+        <span class="nav-icon">🧰</span>
+        <span class="bottom-nav-label">Alati</span>
+      </a>
+    </nav>
+
+    <main class="main">
+      <header class="main-header">
+        <h1 class="view-title">Nadzorna ploča</h1>
+      </header>
+
+      <div id="view-dashboard" class="view active">
+        <div class="dashboard-cards" id="dashboard-cards"></div>
+        <section class="recent-section">
+          <h2>Nedavne bilješke</h2>
+          <div id="recent-notes" class="recent-notes"></div>
+        </section>
+      </div>
+
+      <div id="view-plants" class="view">
+        <div class="toolbar">
+          <button type="button" class="btn btn-primary" id="btn-add-plant">+ Nova biljka</button>
+        </div>
+        <div id="plants-list" class="plants-list"></div>
+      </div>
+
+      <div id="view-journal" class="view">
+        <div class="journal-filters">
+          <select id="journal-plant-filter">
+            <option value="">Sve biljke</option>
+          </select>
+        </div>
+        <div class="toolbar">
+          <button type="button" class="btn btn-primary" id="btn-add-entry">+ Nova bilješka</button>
+        </div>
+        <div id="journal-entries" class="journal-entries"></div>
+      </div>
+
+      <div id="view-toolbox" class="view">
+        <div class="toolbox-grid">
+          <div class="toolbox-card">
+            <h3>Zalijevanje</h3>
+            <p>Zabilježite kada ste zalijevali biljku.</p>
+          </div>
+          <div class="toolbox-card">
+            <h3>Gnojidba</h3>
+            <p>Pratite hraniva i doze.</p>
+          </div>
+          <div class="toolbox-card">
+            <h3>Okoliš</h3>
+            <p>Temperature, vlažnost, pH.</p>
+          </div>
+          <div class="toolbox-card">
+            <h3>Grafovi</h3>
+            <p>Vizualizacija rasta i mjerenja.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal: Nova biljka -->
+  <div id="modal-plant" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-plant-title">Nova biljka</h2>
+        <button type="button" class="modal-close" aria-label="Zatvori">&times;</button>
+      </div>
+      <form id="form-plant">
+        <input type="hidden" id="plant-id" />
+        <label>
+          Ime biljke *
+          <input type="text" id="plant-name" required placeholder="npr. CBD Auto #1" />
+        </label>
+        <label>
+          Sorta
+          <input type="text" id="plant-strain" placeholder="npr. CBD Auto" />
+        </label>
+        <label>
+          Faza
+          <select id="plant-stage">
+            <option value="klijanje">Klijanje</option>
+            <option value="sadnica">Sadnica</option>
+            <option value="vegetativna">Vegetativna</option>
+            <option value="cvjetanje">Cvjetanje</option>
+            <option value="susenje">Sušenje</option>
+          </select>
+        </label>
+        <label>
+          Datum početka
+          <input type="date" id="plant-start-date" />
+        </label>
+        <label>
+          Bilješke
+          <textarea id="plant-notes" rows="3" placeholder="Opcionalne bilješke..."></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-cancel">Odustani</button>
+          <button type="submit" class="btn btn-primary">Spremi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Nova bilješka -->
+  <div id="modal-entry" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nova bilješka</h2>
+        <button type="button" class="modal-close" aria-label="Zatvori">&times;</button>
+      </div>
+      <form id="form-entry">
+        <label>
+          Biljka
+          <select id="entry-plant"></select>
+        </label>
+        <label>
+          Datum *
+          <input type="date" id="entry-date" required />
+        </label>
+        <label>
+          Vrsta
+          <select id="entry-type">
+            <option value="opcenito">Općenito</option>
+            <option value="zalijevanje">Zalijevanje</option>
+            <option value="gnojidba">Gnojidba</option>
+            <option value="okolis">Okoliš</option>
+            <option value="ostalo">Ostalo</option>
+          </select>
+        </label>
+        <label>
+          Bilješka *
+          <textarea id="entry-note" rows="4" required placeholder="Što ste danas napravili?"></textarea>
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost modal-cancel">Odustani</button>
+          <button type="submit" class="btn btn-primary">Spremi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
