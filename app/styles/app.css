@@ -642,6 +642,10 @@ body {
   margin-left: 0.5rem;
 }
 
+.toolbox-bar-item-ph .toolbox-bar-fill-ph {
+  background: linear-gradient(90deg, var(--accent) 0%, #5dd9c8 100%);
+}
+
 .toolbox-timeline-list {
   display: flex;
   flex-direction: column;

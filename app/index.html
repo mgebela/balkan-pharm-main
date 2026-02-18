@@ -179,16 +179,17 @@
               <label>Datum <input type="date" id="tool-environment-date" required /></label>
               <label>Temperatura (°C) <input type="number" id="tool-environment-value1" step="0.1" placeholder="npr. 24" required /></label>
               <label>Vlažnost (%) <input type="number" id="tool-environment-value2" min="0" max="100" placeholder="npr. 60" /></label>
+              <label>pH (voda/tlo) <input type="number" id="tool-environment-value3" step="0.1" min="0" max="14" placeholder="npr. 6.2" /></label>
               <button type="submit" class="btn btn-primary">Dodaj</button>
             </form>
             <div class="toolbox-list" id="toolbox-list-environment"></div>
-            <div class="toolbox-chart-wrap"><h4>Graf: Temperatura i vlažnost</h4><div class="toolbox-chart" id="toolbox-chart-environment"></div></div>
+            <div class="toolbox-chart-wrap"><h4>Graf: Temperatura, vlažnost i pH</h4><div class="toolbox-chart" id="toolbox-chart-environment"></div></div>
           </div>
           <div id="toolbox-panel-graphs" class="toolbox-panel toolbox-panel-graphs" data-tool="graphs" aria-hidden="true">
             <h3 class="toolbox-panel-title">Pregled svih grafova</h3>
             <div class="toolbox-overview-charts">
               <div class="toolbox-overview-block"><h4>Zalijevanje</h4><div class="toolbox-chart" id="overview-chart-watering"></div></div>
-              <div class="toolbox-overview-block"><h4>Okoliš (temperatura)</h4><div class="toolbox-chart" id="overview-chart-environment"></div></div>
+              <div class="toolbox-overview-block"><h4>Okoliš (temperatura, vlažnost, pH)</h4><div class="toolbox-chart" id="overview-chart-environment"></div></div>
             </div>
           </div>
         </div>

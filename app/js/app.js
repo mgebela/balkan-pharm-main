@@ -277,7 +277,7 @@
         chartsSection.style.display = 'block';
         chartsContainer.innerHTML = '';
         if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Zalijevanje</h4><div id="dashboard-chart-watering"></div></div>';
-        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Okoliš (temperatura)</h4><div id="dashboard-chart-environment"></div></div>';
+        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Okoliš (temperatura, vlažnost, pH)</h4><div id="dashboard-chart-environment"></div></div>';
         if (hasWatering && typeof renderToolboxChart === 'function') renderToolboxChart('watering', document.getElementById('dashboard-chart-watering'));
         if (hasEnv && typeof renderToolboxChart === 'function') renderToolboxChart('environment', document.getElementById('dashboard-chart-environment'));
       }
@@ -698,17 +698,24 @@
       return;
     }
     listEl.innerHTML = data
-      .map(
-        (item) =>
+      .map((item) => {
+        const valuesStr =
+          tool === 'environment'
+            ? escapeHtml(String(item.value1 || '')) +
+              ' °C' +
+              (item.value2 ? ' · ' + escapeHtml(String(item.value2)) + ' %' : '') +
+              (item.value3 ? ' · pH ' + escapeHtml(String(item.value3)) : '')
+            : escapeHtml(String(item.value1 || '')) + (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '');
+        return (
           '<div class="toolbox-list-item" data-id="' +
           item.id +
           '"><span class="toolbox-list-date">' +
           (item.date ? new Date(item.date).toLocaleDateString('hr-HR') : '') +
           '</span><span class="toolbox-list-values">' +
-          escapeHtml(String(item.value1 || '')) +
-          (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '') +
+          valuesStr +
           '</span><button type="button" class="toolbox-list-delete" aria-label="Obriši">×</button></div>'
-      )
+        );
+      })
       .join('');
     listEl.querySelectorAll('.toolbox-list-delete').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -748,18 +755,45 @@
     } else if (tool === 'environment') {
       const temps = sorted.map((x) => numVal(x.value1));
       const hums = sorted.map((x) => numVal(x.value2));
+      const phs = sorted.map((x) => numVal(x.value3));
       const maxT = Math.max(1, ...temps);
       const maxH = Math.max(1, ...hums);
+      const maxPh = Math.max(1, ...phs.filter((p) => p > 0));
+      const hasPh = phs.some((p) => p > 0);
       container.innerHTML =
         '<div class="toolbox-bars">' +
         sorted
-          .map((x, i) => {
+          .map((x) => {
             const t = numVal(x.value1);
             const h = numVal(x.value2);
+            const ph = numVal(x.value3);
             const pctT = Math.round((t / maxT) * 100);
-            const pctH = maxH ? Math.round((h / maxH) * 100) : 0;
             const label = x.date ? new Date(x.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
-            return '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' + label + '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' + pctT + '%" title="' + t + ' °C"></div></div><span class="toolbox-bar-value">' + t + ' °C</span>' + (h ? ' <span class="toolbox-bar-value toolbox-bar-value-alt">' + h + ' %</span>' : '') + '</div>';
+            let row =
+              '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' +
+              label +
+              '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' +
+              pctT +
+              '%" title="' +
+              t +
+              ' °C"></div></div><span class="toolbox-bar-value">' +
+              t +
+              ' °C</span>' +
+              (h ? ' <span class="toolbox-bar-value toolbox-bar-value-alt">' + h + ' %</span>' : '') +
+              (ph ? ' <span class="toolbox-bar-value toolbox-bar-value-alt">' + ph + ' pH</span>' : '') +
+              '</div>';
+            if (hasPh && ph > 0 && maxPh >= 1) {
+              const pctPh = Math.round((ph / 14) * 100);
+              row +=
+                '<div class="toolbox-bar-item toolbox-bar-item-ph"><span class="toolbox-bar-label">pH</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill toolbox-bar-fill-ph" style="width:' +
+                pctPh +
+                '%" title="' +
+                ph +
+                ' pH"></div></div><span class="toolbox-bar-value">' +
+                ph +
+                ' pH</span></div>';
+            }
+            return row;
           })
           .join('') +
         '</div>';
@@ -815,6 +849,7 @@
       date: document.getElementById('tool-environment-date').value,
       value1: document.getElementById('tool-environment-value1').value.trim(),
       value2: document.getElementById('tool-environment-value2').value.trim() || null,
+      value3: document.getElementById('tool-environment-value3').value.trim() || null,
     });
     setToolboxData(data);
     document.getElementById('toolbox-form-environment').reset();
