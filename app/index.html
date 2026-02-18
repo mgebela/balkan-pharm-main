@@ -129,21 +129,63 @@
 
       <div id="view-toolbox" class="view">
         <div class="toolbox-grid">
-          <div class="toolbox-card">
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="watering">
             <h3>Zalijevanje</h3>
             <p>Zabilježite kada ste zalijevali biljku.</p>
-          </div>
-          <div class="toolbox-card">
+          </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="feeding">
             <h3>Gnojidba</h3>
             <p>Pratite hraniva i doze.</p>
-          </div>
-          <div class="toolbox-card">
+          </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="environment">
             <h3>Okoliš</h3>
             <p>Temperature, vlažnost, pH.</p>
-          </div>
-          <div class="toolbox-card">
+          </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="graphs">
             <h3>Grafovi</h3>
             <p>Vizualizacija rasta i mjerenja.</p>
+          </button>
+        </div>
+        <div class="toolbox-panels">
+          <div id="toolbox-panel-watering" class="toolbox-panel" data-tool="watering" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Zalijevanje</h3>
+            <form class="toolbox-form" id="toolbox-form-watering">
+              <label>Datum <input type="date" id="tool-watering-date" required /></label>
+              <label>Količina (mL) <input type="number" id="tool-watering-value1" min="0" placeholder="npr. 500" required /></label>
+              <label>Biljka <select id="tool-watering-value2"><option value="">— Sve —</option></select></label>
+              <button type="submit" class="btn btn-primary">Dodaj</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-watering"></div>
+            <div class="toolbox-chart-wrap"><h4>Graf: Količina po datumu</h4><div class="toolbox-chart" id="toolbox-chart-watering"></div></div>
+          </div>
+          <div id="toolbox-panel-feeding" class="toolbox-panel" data-tool="feeding" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Gnojidba</h3>
+            <form class="toolbox-form" id="toolbox-form-feeding">
+              <label>Datum <input type="date" id="tool-feeding-date" required /></label>
+              <label>Proizvod / doza <input type="text" id="tool-feeding-value1" placeholder="npr. NPK 1 mL/L" required /></label>
+              <label>Napomena <input type="text" id="tool-feeding-value2" placeholder="Opcionalno" /></label>
+              <button type="submit" class="btn btn-primary">Dodaj</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-feeding"></div>
+            <div class="toolbox-chart-wrap"><h4>Povijest gnojidbe</h4><div class="toolbox-chart toolbox-chart-bars" id="toolbox-chart-feeding"></div></div>
+          </div>
+          <div id="toolbox-panel-environment" class="toolbox-panel" data-tool="environment" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Okoliš</h3>
+            <form class="toolbox-form" id="toolbox-form-environment">
+              <label>Datum <input type="date" id="tool-environment-date" required /></label>
+              <label>Temperatura (°C) <input type="number" id="tool-environment-value1" step="0.1" placeholder="npr. 24" required /></label>
+              <label>Vlažnost (%) <input type="number" id="tool-environment-value2" min="0" max="100" placeholder="npr. 60" /></label>
+              <button type="submit" class="btn btn-primary">Dodaj</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-environment"></div>
+            <div class="toolbox-chart-wrap"><h4>Graf: Temperatura i vlažnost</h4><div class="toolbox-chart" id="toolbox-chart-environment"></div></div>
+          </div>
+          <div id="toolbox-panel-graphs" class="toolbox-panel toolbox-panel-graphs" data-tool="graphs" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Pregled svih grafova</h3>
+            <div class="toolbox-overview-charts">
+              <div class="toolbox-overview-block"><h4>Zalijevanje</h4><div class="toolbox-chart" id="overview-chart-watering"></div></div>
+              <div class="toolbox-overview-block"><h4>Okoliš (temperatura)</h4><div class="toolbox-chart" id="overview-chart-environment"></div></div>
+            </div>
           </div>
         </div>
       </div>

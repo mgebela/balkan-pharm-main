@@ -427,10 +427,209 @@ body {
 .toolbox-card h3 {
   font-size: 1.05rem;
   margin-bottom: 0.5rem;
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .toolbox-card p {
   font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.toolbox-card-btn {
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.toolbox-card-btn:hover {
+  border-color: rgba(45, 212, 191, 0.5);
+  transform: translateY(-2px);
+}
+
+.toolbox-panels {
+  margin-top: 1.5rem;
+}
+
+.toolbox-panel {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.toolbox-panel.open {
+  display: block;
+}
+
+.toolbox-panel-title {
+  font-size: 1.2rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.toolbox-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.toolbox-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.toolbox-form input,
+.toolbox-form select {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  min-width: 120px;
+}
+
+.toolbox-form input:focus,
+.toolbox-form select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.toolbox-list {
+  margin-bottom: 1.5rem;
+}
+
+.toolbox-empty,
+.toolbox-chart-empty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.toolbox-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.toolbox-list-date {
+  min-width: 5rem;
+  color: var(--text-muted);
+}
+
+.toolbox-list-values {
+  flex: 1;
+}
+
+.toolbox-list-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 0.25rem;
+  line-height: 1;
+}
+
+.toolbox-list-delete:hover {
+  color: var(--accent-bright);
+}
+
+.toolbox-chart-wrap {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.toolbox-chart-wrap h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+}
+
+.toolbox-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toolbox-bar-item {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.toolbox-bar-label {
+  color: var(--text-muted);
+}
+
+.toolbox-bar-track {
+  height: 20px;
+  background: var(--bg-alt);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.toolbox-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  border-radius: 6px;
+  transition: width 0.3s;
+}
+
+.toolbox-bar-value {
+  color: var(--accent-bright);
+  font-weight: 600;
+  min-width: 4rem;
+}
+
+.toolbox-bar-value-alt {
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 0.5rem;
+}
+
+.toolbox-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.toolbox-timeline-item {
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toolbox-overview-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.toolbox-overview-block h4 {
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
   color: var(--text-muted);
 }
 

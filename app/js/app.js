@@ -74,6 +74,7 @@
     if (id === 'dashboard') renderDashboard();
     if (id === 'plants') renderPlants();
     if (id === 'journal') renderJournal();
+    if (id === 'toolbox') renderToolbox();
   }
 
   navItems.forEach((item) => {
@@ -606,6 +607,199 @@
 
   modalEntry.querySelector('.modal-close').addEventListener('click', () => modalEntry.classList.remove('open'));
   modalEntry.querySelector('.modal-cancel').addEventListener('click', () => modalEntry.classList.remove('open'));
+
+  // --- Toolbox (Alati) ---
+  const STORAGE_TOOLBOX = 'balkan-pharm-toolbox';
+
+  function getToolboxData() {
+    try {
+      const data = localStorage.getItem(STORAGE_TOOLBOX);
+      const parsed = data ? JSON.parse(data) : {};
+      return {
+        watering: parsed.watering || [],
+        feeding: parsed.feeding || [],
+        environment: parsed.environment || [],
+      };
+    } catch {
+      return { watering: [], feeding: [], environment: [] };
+    }
+  }
+
+  function setToolboxData(data) {
+    localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data));
+  }
+
+  function openToolboxPanel(tool) {
+    document.querySelectorAll('.toolbox-panel').forEach((p) => {
+      const open = p.dataset.tool === tool;
+      p.classList.toggle('open', open);
+      p.setAttribute('aria-hidden', !open);
+    });
+    const today = new Date().toISOString().slice(0, 10);
+    ['tool-watering-date', 'tool-feeding-date', 'tool-environment-date'].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = today;
+    });
+    if (tool === 'watering') fillToolboxPlantSelect();
+    if (tool === 'graphs') {
+      renderToolboxChart('watering', document.getElementById('overview-chart-watering'));
+      renderToolboxChart('environment', document.getElementById('overview-chart-environment'));
+    } else {
+      renderToolboxList(tool);
+      const chartEl = document.getElementById('toolbox-chart-' + tool);
+      if (chartEl) renderToolboxChart(tool, chartEl);
+    }
+  }
+
+  function fillToolboxPlantSelect() {
+    const sel = document.getElementById('tool-watering-value2');
+    if (!sel) return;
+    const plants = getPlants();
+    const first = sel.options[0] ? sel.options[0].outerHTML : '<option value="">— Sve —</option>';
+    sel.innerHTML = first + plants.map((p) => '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>').join('');
+  }
+
+  function renderToolbox() {
+    document.querySelectorAll('.toolbox-panel').forEach((p) => {
+      p.classList.remove('open');
+      p.setAttribute('aria-hidden', 'true');
+    });
+    fillToolboxPlantSelect();
+  }
+
+  function renderToolboxList(tool) {
+    const listEl = document.getElementById('toolbox-list-' + tool);
+    if (!listEl) return;
+    const data = getToolboxData()[tool] || [];
+    data.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    if (data.length === 0) {
+      listEl.innerHTML = '<p class="toolbox-empty">Nema unosa. Dodajte prvi.</p>';
+      return;
+    }
+    listEl.innerHTML = data
+      .map(
+        (item) =>
+          '<div class="toolbox-list-item" data-id="' +
+          item.id +
+          '"><span class="toolbox-list-date">' +
+          (item.date ? new Date(item.date).toLocaleDateString('hr-HR') : '') +
+          '</span><span class="toolbox-list-values">' +
+          escapeHtml(String(item.value1 || '')) +
+          (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '') +
+          '</span><button type="button" class="toolbox-list-delete" aria-label="Obriši">×</button></div>'
+      )
+      .join('');
+    listEl.querySelectorAll('.toolbox-list-delete').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.closest('.toolbox-list-item').dataset.id;
+        const data = getToolboxData();
+        data[tool] = data[tool].filter((x) => x.id !== id);
+        setToolboxData(data);
+        renderToolboxList(tool);
+        const chartEl = document.getElementById('toolbox-chart-' + tool);
+        if (chartEl) renderToolboxChart(tool, chartEl);
+      });
+    });
+  }
+
+  function renderToolboxChart(tool, container) {
+    if (!container) return;
+    const data = getToolboxData()[tool] || [];
+    const sorted = [...data].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+    if (sorted.length === 0) {
+      container.innerHTML = '<p class="toolbox-chart-empty">Nema podataka za graf.</p>';
+      return;
+    }
+    const numVal = (v) => (v === '' || v === null || v === undefined ? 0 : Number(v));
+    if (tool === 'watering') {
+      const max = Math.max(1, ...sorted.map((x) => numVal(x.value1)));
+      container.innerHTML =
+        '<div class="toolbox-bars">' +
+        sorted
+          .map((x) => {
+            const val = numVal(x.value1);
+            const pct = Math.round((val / max) * 100);
+            const label = x.date ? new Date(x.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
+            return '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' + label + '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' + pct + '%"></div></div><span class="toolbox-bar-value">' + val + ' mL</span></div>';
+          })
+          .join('') +
+        '</div>';
+    } else if (tool === 'environment') {
+      const temps = sorted.map((x) => numVal(x.value1));
+      const hums = sorted.map((x) => numVal(x.value2));
+      const maxT = Math.max(1, ...temps);
+      const maxH = Math.max(1, ...hums);
+      container.innerHTML =
+        '<div class="toolbox-bars">' +
+        sorted
+          .map((x, i) => {
+            const t = numVal(x.value1);
+            const h = numVal(x.value2);
+            const pctT = Math.round((t / maxT) * 100);
+            const pctH = maxH ? Math.round((h / maxH) * 100) : 0;
+            const label = x.date ? new Date(x.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
+            return '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' + label + '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' + pctT + '%" title="' + t + ' °C"></div></div><span class="toolbox-bar-value">' + t + ' °C</span>' + (h ? ' <span class="toolbox-bar-value toolbox-bar-value-alt">' + h + ' %</span>' : '') + '</div>';
+          })
+          .join('') +
+        '</div>';
+    } else if (tool === 'feeding') {
+      container.innerHTML =
+        '<div class="toolbox-timeline-list">' +
+        sorted
+          .map((x) => '<div class="toolbox-timeline-item"><span class="toolbox-list-date">' + (x.date ? new Date(x.date).toLocaleDateString('hr-HR') : '') + '</span> ' + escapeHtml(String(x.value1 || '')) + (x.value2 ? ' – ' + escapeHtml(String(x.value2)) : '') + '</div>')
+          .join('') +
+        '</div>';
+    }
+  }
+
+  document.querySelectorAll('.toolbox-card-btn').forEach((btn) => {
+    btn.addEventListener('click', () => openToolboxPanel(btn.dataset.tool));
+  });
+
+  document.getElementById('toolbox-form-watering').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = getToolboxData();
+    data.watering.push({
+      id: uuid(),
+      date: document.getElementById('tool-watering-date').value,
+      value1: document.getElementById('tool-watering-value1').value.trim(),
+      value2: document.getElementById('tool-watering-value2').value.trim() || null,
+    });
+    setToolboxData(data);
+    document.getElementById('toolbox-form-watering').reset();
+    renderToolboxList('watering');
+    renderToolboxChart('watering', document.getElementById('toolbox-chart-watering'));
+  });
+
+  document.getElementById('toolbox-form-feeding').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = getToolboxData();
+    data.feeding.push({
+      id: uuid(),
+      date: document.getElementById('tool-feeding-date').value,
+      value1: document.getElementById('tool-feeding-value1').value.trim(),
+      value2: document.getElementById('tool-feeding-value2').value.trim() || null,
+    });
+    setToolboxData(data);
+    document.getElementById('toolbox-form-feeding').reset();
+    renderToolboxList('feeding');
+    renderToolboxChart('feeding', document.getElementById('toolbox-chart-feeding'));
+  });
+
+  document.getElementById('toolbox-form-environment').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = getToolboxData();
+    data.environment.push({
+      id: uuid(),
+      date: document.getElementById('tool-environment-date').value,
+      value1: document.getElementById('tool-environment-value1').value.trim(),
+      value2: document.getElementById('tool-environment-value2').value.trim() || null,
+    });
+    setToolboxData(data);
+    document.getElementById('toolbox-form-environment').reset();
+    renderToolboxList('environment');
+    renderToolboxChart('environment', document.getElementById('toolbox-chart-environment'));
+  });
 
   // Init
   fillEntryPlantSelect();
