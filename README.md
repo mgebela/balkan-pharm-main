@@ -29,8 +29,18 @@ npx serve .
 
 Zatim otvori: http://localhost:8000
 
+## Deploy na GitHub Pages
+
+Aplikacija se može objaviti besplatno na GitHub Pages.
+
+1. U repozitoriju [mgebela/balkan-pharm-main](https://github.com/mgebela/balkan-pharm-main) otvori **Settings** → **Pages**.
+2. Kod **Build and deployment** odaberi **Source**: **GitHub Actions**.
+3. Nakon pusha na granicu `main`, workflow automatski deploya stranicu.
+
+**Live URL** (nakon prvog deploya):  
+**https://mgebela.github.io/balkan-pharm-main/**
+
 ## Tehnologije
 
 - HTML5, CSS3, JavaScript (vanilla)
 - Bez backenda – sve radi u pregledniku
-# balkan-pharm-main
