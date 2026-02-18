@@ -33,3 +33,4 @@ Zatim otvori: http://localhost:8000
 
 - HTML5, CSS3, JavaScript (vanilla)
 - Bez backenda – sve radi u pregledniku
+# balkan-pharm-main
