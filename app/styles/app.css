@@ -416,6 +416,61 @@ body {
   font-size: 0.95rem;
 }
 
+.journal-entry .entry-meta-blocks {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.journal-entry .entry-meta-block {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.journal-entry .entry-meta-block strong {
+  color: var(--text);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.journal-entry .entry-meta-block ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.entry-extra {
+  margin-bottom: 1rem;
+}
+
+.entry-extra-section {
+  display: none;
+  padding: 1rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+}
+
+.entry-extra-section.open {
+  display: block;
+}
+
+.entry-extra-title {
+  font-size: 0.95rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text);
+}
+
+.entry-extra-section label {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.entry-extra-section label:last-of-type {
+  margin-bottom: 0;
+}
+
 .entry-media-wrap {
   margin-top: 0.75rem;
   display: flex;

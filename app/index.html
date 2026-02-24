@@ -145,6 +145,14 @@
             <h3>Okoliš</h3>
             <p>Temperature, vlažnost, pH.</p>
           </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="transplant">
+            <h3>Presađivanje</h3>
+            <p>Bilježite detalje presađivanja.</p>
+          </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="stressors">
+            <h3>Stresori</h3>
+            <p>Evidentirajte stresne uvjete i nametnike.</p>
+          </button>
           <button type="button" class="toolbox-card toolbox-card-btn" data-tool="graphs">
             <h3>Grafovi</h3>
             <p>Vizualizacija rasta i mjerenja.</p>
@@ -184,6 +192,29 @@
             </form>
             <div class="toolbox-list" id="toolbox-list-environment"></div>
             <div class="toolbox-chart-wrap"><h4>Graf: Temperatura, vlažnost i pH</h4><div class="toolbox-chart" id="toolbox-chart-environment"></div></div>
+          </div>
+          <div id="toolbox-panel-transplant" class="toolbox-panel" data-tool="transplant" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Presađivanje</h3>
+            <form class="toolbox-form" id="toolbox-form-transplant">
+              <label>Datum <input type="date" id="tool-transplant-date" required /></label>
+              <label>Kvaliteta zemlje <input type="text" id="tool-transplant-soil" placeholder="npr. kvalitetna, organska" /></label>
+              <label>Starost biljke u presađivanju <input type="text" id="tool-transplant-age" placeholder="npr. 3 tjedna" /></label>
+              <label>Stanje biljke <input type="text" id="tool-transplant-condition" placeholder="npr. zdrava, dobro ukorijenjena" /></label>
+              <button type="submit" class="btn btn-primary">Dodaj</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-transplant"></div>
+          </div>
+          <div id="toolbox-panel-stressors" class="toolbox-panel" data-tool="stressors" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Stresori</h3>
+            <form class="toolbox-form" id="toolbox-form-stressors">
+              <label>Datum <input type="date" id="tool-stressors-date" required /></label>
+              <label>Temperatura <input type="text" id="tool-stressors-temp" placeholder="npr. visoka, niska" /></label>
+              <label>Vlaga <input type="text" id="tool-stressors-humidity" placeholder="npr. suho, vlažno" /></label>
+              <label>VPD (ukupnost svjetlosnih čestica u toku dana) <input type="text" id="tool-stressors-vpd" placeholder="npr. vrijednost ili opis" /></label>
+              <label>Nametnici <input type="text" id="tool-stressors-pests" placeholder="npr. grinje, uši" /></label>
+              <button type="submit" class="btn btn-primary">Dodaj</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-stressors"></div>
           </div>
           <div id="toolbox-panel-graphs" class="toolbox-panel toolbox-panel-graphs" data-tool="graphs" aria-hidden="true">
             <h3 class="toolbox-panel-title">Pregled svih grafova</h3>
@@ -284,9 +315,26 @@
             <option value="zalijevanje">Zalijevanje</option>
             <option value="gnojidba">Gnojidba</option>
             <option value="okolis">Okoliš</option>
+            <option value="presadjivanje">Presađivanje</option>
+            <option value="stresori">Stresori</option>
             <option value="ostalo">Ostalo</option>
           </select>
         </label>
+        <div id="entry-extra" class="entry-extra">
+          <div id="entry-extra-presadjivanje" class="entry-extra-section" aria-hidden="true">
+            <h4 class="entry-extra-title">Presađivanje</h4>
+            <label>Kvaliteta zemlje <input type="text" id="entry-transplant-soil" placeholder="npr. kvalitetna, organska" /></label>
+            <label>Starost biljke u presađivanju <input type="text" id="entry-transplant-age" placeholder="npr. 3 tjedna" /></label>
+            <label>Stanje biljke <input type="text" id="entry-transplant-condition" placeholder="npr. zdrava, dobro ukorijenjena" /></label>
+          </div>
+          <div id="entry-extra-stresori" class="entry-extra-section" aria-hidden="true">
+            <h4 class="entry-extra-title">Stresori</h4>
+            <label>Temperatura <input type="text" id="entry-stressor-temp" placeholder="npr. visoka, niska" /></label>
+            <label>Vlaga <input type="text" id="entry-stressor-humidity" placeholder="npr. suho, vlažno" /></label>
+            <label>VPD (ukupnost svjetlosnih čestica u toku dana) <input type="text" id="entry-stressor-vpd" placeholder="npr. vrijednost ili opis" /></label>
+            <label>Nametnici <input type="text" id="entry-stressor-pests" placeholder="npr. grinje, uši" /></label>
+          </div>
+        </div>
         <label>
           Bilješka *
           <textarea id="entry-note" rows="4" required placeholder="Što ste danas napravili?"></textarea>

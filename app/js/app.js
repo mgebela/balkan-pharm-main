@@ -253,7 +253,7 @@
           const thumb = e.photo ? '<img src="' + e.photo + '" alt="" class="recent-note-thumb" />' : '';
           return `
             <div class="recent-note">
-              <div class="meta">${plantName} · ${date} · ${e.type || 'Općenito'}</div>
+              <div class="meta">${plantName} · ${date} · ${ENTRY_TYPE_LABELS[e.type] || e.type || 'Općenito'}</div>
               ${thumb}
               <div class="text">${escapeHtml(e.note || '').slice(0, 120)}${(e.note || '').length > 120 ? '…' : ''}</div>
             </div>
@@ -505,6 +505,32 @@
     sel.innerHTML = first + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
+  const ENTRY_TYPE_LABELS = {
+    opcenito: 'Općenito',
+    zalijevanje: 'Zalijevanje',
+    gnojidba: 'Gnojidba',
+    okolis: 'Okoliš',
+    presadjivanje: 'Presađivanje',
+    stresori: 'Stresori',
+    ostalo: 'Ostalo',
+  };
+
+  function updateEntryExtraVisibility() {
+    const type = document.getElementById('entry-type').value;
+    const pres = document.getElementById('entry-extra-presadjivanje');
+    const stres = document.getElementById('entry-extra-stresori');
+    if (pres) {
+      const open = type === 'presadjivanje';
+      pres.classList.toggle('open', open);
+      pres.setAttribute('aria-hidden', !open);
+    }
+    if (stres) {
+      const open = type === 'stresori';
+      stres.classList.toggle('open', open);
+      stres.setAttribute('aria-hidden', !open);
+    }
+  }
+
   function renderJournal() {
     fillJournalPlantFilter();
     const filter = document.getElementById('journal-plant-filter').value;
@@ -523,16 +549,38 @@
         const plant = plants.find((p) => p.id === e.plantId);
         const plantName = plant ? plant.name : 'Biljka';
         const date = e.date ? new Date(e.date).toLocaleDateString('hr-HR') : '';
+        const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'Općenito';
         const media = [];
         if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + e.photo + '" alt="Fotografija" /></div>');
         if (e.video) media.push('<div class="entry-media entry-video"><video src="' + e.video + '" controls></video></div>');
+        let metaHtml = '';
+        if (e.meta) {
+          if (e.meta.presadjivanje) {
+            const m = e.meta.presadjivanje;
+            const parts = [];
+            if (m.soilQuality) parts.push('Kvaliteta zemlje: ' + escapeHtml(m.soilQuality));
+            if (m.plantAge) parts.push('Starost biljke: ' + escapeHtml(m.plantAge));
+            if (m.plantCondition) parts.push('Stanje biljke: ' + escapeHtml(m.plantCondition));
+            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Presađivanje</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+          }
+          if (e.meta.stresori) {
+            const m = e.meta.stresori;
+            const parts = [];
+            if (m.temperature) parts.push('Temperatura: ' + escapeHtml(m.temperature));
+            if (m.humidity) parts.push('Vlaga: ' + escapeHtml(m.humidity));
+            if (m.vpd) parts.push('VPD: ' + escapeHtml(m.vpd));
+            if (m.pests) parts.push('Nametnici: ' + escapeHtml(m.pests));
+            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stresori</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+          }
+        }
         return `
           <div class="journal-entry">
             <div class="entry-meta">
-              <span class="entry-type">${e.type || 'Općenito'}</span>
+              <span class="entry-type">${typeLabel}</span>
               ${plantName} · ${date}
             </div>
             <div class="entry-note">${escapeHtml(e.note || '')}</div>
+            ${metaHtml ? '<div class="entry-meta-blocks">' + metaHtml + '</div>' : ''}
             ${media.length ? '<div class="entry-media-wrap">' + media.join('') + '</div>' : ''}
           </div>
         `;
@@ -543,6 +591,8 @@
   document.getElementById('journal-plant-filter').addEventListener('change', renderJournal);
 
   const modalEntry = document.getElementById('modal-entry');
+  document.getElementById('entry-type').addEventListener('change', updateEntryExtraVisibility);
+
   document.getElementById('btn-add-entry').addEventListener('click', () => {
     fillEntryPlantSelect();
     document.getElementById('form-entry').reset();
@@ -551,6 +601,7 @@
     document.getElementById('entry-video-data').value = '';
     document.getElementById('entry-photo-preview').innerHTML = '';
     document.getElementById('entry-video-preview').innerHTML = '';
+    updateEntryExtraVisibility();
     modalEntry.classList.add('open');
   });
 
@@ -610,15 +661,30 @@
 
   document.getElementById('form-entry').addEventListener('submit', (e) => {
     e.preventDefault();
+    const type = document.getElementById('entry-type').value;
+    let meta = null;
+    if (type === 'presadjivanje') {
+      const soil = document.getElementById('entry-transplant-soil').value.trim();
+      const age = document.getElementById('entry-transplant-age').value.trim();
+      const condition = document.getElementById('entry-transplant-condition').value.trim();
+      if (soil || age || condition) meta = { presadjivanje: { soilQuality: soil || null, plantAge: age || null, plantCondition: condition || null } };
+    } else if (type === 'stresori') {
+      const temp = document.getElementById('entry-stressor-temp').value.trim();
+      const humidity = document.getElementById('entry-stressor-humidity').value.trim();
+      const vpd = document.getElementById('entry-stressor-vpd').value.trim();
+      const pests = document.getElementById('entry-stressor-pests').value.trim();
+      if (temp || humidity || vpd || pests) meta = { stresori: { temperature: temp || null, humidity: humidity || null, vpd: vpd || null, pests: pests || null } };
+    }
     const entries = getEntries();
     entries.push({
       id: uuid(),
       plantId: document.getElementById('entry-plant').value || null,
       date: document.getElementById('entry-date').value,
-      type: document.getElementById('entry-type').value,
+      type: type,
       note: document.getElementById('entry-note').value.trim(),
       photo: document.getElementById('entry-photo-data').value.trim() || null,
       video: document.getElementById('entry-video-data').value.trim() || null,
+      meta: meta || undefined,
     });
     setEntries(entries);
     modalEntry.classList.remove('open');
@@ -640,9 +706,11 @@
         watering: parsed.watering || [],
         feeding: parsed.feeding || [],
         environment: parsed.environment || [],
+        transplant: parsed.transplant || [],
+        stressors: parsed.stressors || [],
       };
     } catch {
-      return { watering: [], feeding: [], environment: [] };
+      return { watering: [], feeding: [], environment: [], transplant: [], stressors: [] };
     }
   }
 
@@ -657,7 +725,7 @@
       p.setAttribute('aria-hidden', !open);
     });
     const today = new Date().toISOString().slice(0, 10);
-    ['tool-watering-date', 'tool-feeding-date', 'tool-environment-date'].forEach((id) => {
+    ['tool-watering-date', 'tool-feeding-date', 'tool-environment-date', 'tool-transplant-date', 'tool-stressors-date'].forEach((id) => {
       const el = document.getElementById(id);
       if (el && !el.value) el.value = today;
     });
@@ -699,13 +767,29 @@
     }
     listEl.innerHTML = data
       .map((item) => {
-        const valuesStr =
-          tool === 'environment'
-            ? escapeHtml(String(item.value1 || '')) +
-              ' °C' +
-              (item.value2 ? ' · ' + escapeHtml(String(item.value2)) + ' %' : '') +
-              (item.value3 ? ' · pH ' + escapeHtml(String(item.value3)) : '')
-            : escapeHtml(String(item.value1 || '')) + (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '');
+        let valuesStr;
+        if (tool === 'environment') {
+          valuesStr =
+            escapeHtml(String(item.value1 || '')) +
+            ' °C' +
+            (item.value2 ? ' · ' + escapeHtml(String(item.value2)) + ' %' : '') +
+            (item.value3 ? ' · pH ' + escapeHtml(String(item.value3)) : '');
+        } else if (tool === 'transplant') {
+          const parts = [];
+          if (item.soilQuality) parts.push('Kvaliteta zemlje: ' + escapeHtml(String(item.soilQuality)));
+          if (item.plantAge) parts.push('Starost: ' + escapeHtml(String(item.plantAge)));
+          if (item.plantCondition) parts.push('Stanje: ' + escapeHtml(String(item.plantCondition)));
+          valuesStr = parts.join(' · ') || '-';
+        } else if (tool === 'stressors') {
+          const parts = [];
+          if (item.temperature) parts.push('Temperatura: ' + escapeHtml(String(item.temperature)));
+          if (item.humidity) parts.push('Vlaga: ' + escapeHtml(String(item.humidity)));
+          if (item.vpd) parts.push('VPD: ' + escapeHtml(String(item.vpd)));
+          if (item.pests) parts.push('Nametnici: ' + escapeHtml(String(item.pests)));
+          valuesStr = parts.join(' · ') || '-';
+        } else {
+          valuesStr = escapeHtml(String(item.value1 || '')) + (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '');
+        }
         return (
           '<div class="toolbox-list-item" data-id="' +
           item.id +
@@ -856,6 +940,43 @@
     renderToolboxList('environment');
     renderToolboxChart('environment', document.getElementById('toolbox-chart-environment'));
   });
+
+  const transplantForm = document.getElementById('toolbox-form-transplant');
+  if (transplantForm) {
+    transplantForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = getToolboxData();
+      data.transplant.push({
+        id: uuid(),
+        date: document.getElementById('tool-transplant-date').value,
+        soilQuality: document.getElementById('tool-transplant-soil').value.trim() || null,
+        plantAge: document.getElementById('tool-transplant-age').value.trim() || null,
+        plantCondition: document.getElementById('tool-transplant-condition').value.trim() || null,
+      });
+      setToolboxData(data);
+      document.getElementById('toolbox-form-transplant').reset();
+      renderToolboxList('transplant');
+    });
+  }
+
+  const stressorsForm = document.getElementById('toolbox-form-stressors');
+  if (stressorsForm) {
+    stressorsForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = getToolboxData();
+      data.stressors.push({
+        id: uuid(),
+        date: document.getElementById('tool-stressors-date').value,
+        temperature: document.getElementById('tool-stressors-temp').value.trim() || null,
+        humidity: document.getElementById('tool-stressors-humidity').value.trim() || null,
+        vpd: document.getElementById('tool-stressors-vpd').value.trim() || null,
+        pests: document.getElementById('tool-stressors-pests').value.trim() || null,
+      });
+      setToolboxData(data);
+      document.getElementById('toolbox-form-stressors').reset();
+      renderToolboxList('stressors');
+    });
+  }
 
   // Init
   fillEntryPlantSelect();
