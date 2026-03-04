@@ -46,9 +46,8 @@
   const viewTitle = document.querySelector('.view-title');
   const titles = {
     dashboard: 'Nadzorna ploča',
-    plants: 'Moje biljke',
+    plants: 'Biljke i dnevnik',
     growlog: 'Growlog',
-    journal: 'Dnevnik',
     toolbox: 'Alati',
   };
 
@@ -72,8 +71,10 @@
     if (view) view.classList.add('active');
     if (viewTitle && titles[id]) viewTitle.textContent = titles[id];
     if (id === 'dashboard') renderDashboard();
-    if (id === 'plants') renderPlants();
-    if (id === 'journal') renderJournal();
+    if (id === 'plants') {
+      renderPlants();
+      renderJournal();
+    }
     if (id === 'toolbox') renderToolbox();
   }
 
@@ -494,15 +495,16 @@
   // --- Journal ---
   function fillEntryPlantSelect() {
     const sel = document.getElementById('entry-plant');
+    if (!sel) return;
     const plants = getPlants();
     sel.innerHTML = '<option value="">-- Odaberi biljku --</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
   function fillJournalPlantFilter() {
     const sel = document.getElementById('journal-plant-filter');
+    if (!sel) return;
     const plants = getPlants();
-    const first = sel.innerHTML.split('</option>')[0] + '</option>';
-    sel.innerHTML = first + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">Sve biljke</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
   const ENTRY_TYPE_LABELS = {
@@ -588,10 +590,12 @@
       .join('');
   }
 
-  document.getElementById('journal-plant-filter').addEventListener('change', renderJournal);
+  const journalPlantFilterEl = document.getElementById('journal-plant-filter');
+  if (journalPlantFilterEl) journalPlantFilterEl.addEventListener('change', renderJournal);
 
   const modalEntry = document.getElementById('modal-entry');
-  document.getElementById('entry-type').addEventListener('change', updateEntryExtraVisibility);
+  const entryTypeEl = document.getElementById('entry-type');
+  if (entryTypeEl) entryTypeEl.addEventListener('change', updateEntryExtraVisibility);
 
   document.getElementById('btn-add-entry').addEventListener('click', () => {
     fillEntryPlantSelect();
