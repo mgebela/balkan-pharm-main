@@ -44,3 +44,19 @@ Aplikacija se može objaviti besplatno na GitHub Pages.
 
 - HTML5, CSS3, JavaScript (vanilla)
 - Bez backenda – sve radi u pregledniku
+
+## Netlify Identity email obavijesti
+
+Za automatsko slanje emaila nakon registracije novog korisnika dodana je Netlify Identity event funkcija:
+
+- `netlify/functions/identity-signup.js`
+
+Funkcija šalje:
+
+- potvrdu registracije korisniku
+- obavijest administratoru na `admin@dnevnik.live`
+
+Potrebne varijable okruženja:
+
+- `RESEND_API_KEY` – API ključ za Resend
+- `SIGNUP_EMAIL_FROM` (opcionalno) – adresa pošiljatelja; ako nije postavljena koristi se `EMAIL_FROM` ili `no-reply@dnevnik.live`
