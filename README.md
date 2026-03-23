@@ -13,7 +13,7 @@ Web stranica i aplikacija za vođenje dnevnika uzgoja CBD biljaka, na hrvatskom 
 
 Faze biljke: Klijanje → Sadnica → Vegetativna → Cvjetanje → Sušenje.
 
-Podaci se spremaju lokalno u pregledniku (localStorage); nema potrebe za registracijom.
+Podaci se spremaju lokalno u pregledniku (localStorage); korisnici se mogu registrirati i prijaviti unutar aplikacije.
 
 ## Pokretanje
 

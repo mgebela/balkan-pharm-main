@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prijava – Balkan-pharm dnevnik</title>
+  <title>Prijava i registracija – Balkan-pharm dnevnik</title>
   <link rel="icon" type="image/png" href="../images/bp.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -55,6 +55,26 @@
       text-align: center;
       font-size: 0.92rem;
     }
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin: 0.9rem 0 1rem;
+    }
+    .tab-btn {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.75rem;
+      color: var(--text-muted);
+      background: transparent;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: #06201a;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      border-color: transparent;
+    }
     label {
       display: block;
       font-size: 0.9rem;
@@ -74,6 +94,9 @@
       outline: none;
       border-color: var(--accent);
     }
+    .hidden {
+      display: none;
+    }
     button {
       width: 100%;
       border: 0;
@@ -90,34 +113,162 @@
       font-size: 0.9rem;
     }
     .back-link a { color: var(--accent-bright); text-decoration: none; }
+    .auth-feedback {
+      min-height: 1.1rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.85rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+    .auth-feedback.error {
+      color: #fda4af;
+    }
+    .auth-feedback.success {
+      color: #86efac;
+    }
   </style>
 </head>
 <body>
   <form class="login-card" id="login-form">
     <img class="logo" src="../images/bp.png" alt="Balkan-pharm" />
-    <h1>Prijava u dnevnik</h1>
-    <p>Prijavite se da otvorite aplikaciju dnevnika uzgoja.</p>
+    <h1 id="form-title">Prijava u dnevnik</h1>
+    <p id="form-subtitle">Prijavite se da otvorite aplikaciju dnevnika uzgoja.</p>
+    <div class="auth-tabs">
+      <button type="button" class="tab-btn active" id="tab-login">Prijava</button>
+      <button type="button" class="tab-btn" id="tab-signup">Registracija</button>
+    </div>
+    <label for="name" id="name-label" class="hidden">Ime</label>
+    <input id="name" class="hidden" type="text" placeholder="Vaše ime" />
     <label for="email">E-mail</label>
     <input id="email" type="email" required placeholder="vas@email.com" />
     <label for="password">Lozinka</label>
     <input id="password" type="password" required placeholder="••••••••" />
-    <button type="submit">Prijavi se</button>
+    <label for="confirm-password" id="confirm-label" class="hidden">Potvrda lozinke</label>
+    <input id="confirm-password" class="hidden" type="password" placeholder="Ponovite lozinku" />
+    <p id="auth-feedback" class="auth-feedback" aria-live="polite"></p>
+    <button type="submit" id="submit-btn">Prijavi se</button>
     <div class="back-link"><a href="../index.html">← Povratak na početnu</a></div>
   </form>
   <script>
     (function () {
       var form = document.getElementById('login-form');
       var STORAGE_AUTH = 'balkan-pharm-auth';
+      var STORAGE_USERS = 'balkan-pharm-users';
+      var tabLogin = document.getElementById('tab-login');
+      var tabSignup = document.getElementById('tab-signup');
+      var formTitle = document.getElementById('form-title');
+      var formSubtitle = document.getElementById('form-subtitle');
+      var submitBtn = document.getElementById('submit-btn');
+      var nameLabel = document.getElementById('name-label');
+      var nameInput = document.getElementById('name');
+      var confirmLabel = document.getElementById('confirm-label');
+      var confirmInput = document.getElementById('confirm-password');
+      var feedback = document.getElementById('auth-feedback');
+      var isSignupMode = false;
+
+      function getUsers() {
+        try {
+          var data = localStorage.getItem(STORAGE_USERS);
+          return data ? JSON.parse(data) : [];
+        } catch (_err) {
+          return [];
+        }
+      }
+
+      function setUsers(users) {
+        localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+      }
+
+      function normalizeEmail(email) {
+        return email.trim().toLowerCase();
+      }
+
+      function setFeedback(message, type) {
+        feedback.textContent = message || '';
+        feedback.classList.remove('error', 'success');
+        if (type) feedback.classList.add(type);
+      }
+
+      function setMode(signup) {
+        isSignupMode = signup;
+        tabLogin.classList.toggle('active', !signup);
+        tabSignup.classList.toggle('active', signup);
+        nameLabel.classList.toggle('hidden', !signup);
+        nameInput.classList.toggle('hidden', !signup);
+        confirmLabel.classList.toggle('hidden', !signup);
+        confirmInput.classList.toggle('hidden', !signup);
+        nameInput.required = signup;
+        confirmInput.required = signup;
+        formTitle.textContent = signup ? 'Kreiranje računa' : 'Prijava u dnevnik';
+        formSubtitle.textContent = signup
+          ? 'Otvorite novi račun i nastavite u aplikaciju dnevnika.'
+          : 'Prijavite se da otvorite aplikaciju dnevnika uzgoja.';
+        submitBtn.textContent = signup ? 'Kreiraj račun' : 'Prijavi se';
+        setFeedback('');
+      }
+
       if (localStorage.getItem(STORAGE_AUTH)) {
         window.location.href = '../app/dnevnik/';
         return;
       }
+
+      tabLogin.addEventListener('click', function () { setMode(false); });
+      tabSignup.addEventListener('click', function () { setMode(true); });
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var email = document.getElementById('email').value.trim();
+        var email = normalizeEmail(document.getElementById('email').value);
         var password = document.getElementById('password').value;
-        if (!email || !password) return;
-        localStorage.setItem(STORAGE_AUTH, JSON.stringify({ email: email, loggedAt: Date.now() }));
+        var users = getUsers();
+        if (!email || !password) {
+          setFeedback('Unesite e-mail i lozinku.', 'error');
+          return;
+        }
+
+        if (isSignupMode) {
+          var name = nameInput.value.trim();
+          var confirmPassword = confirmInput.value;
+          if (!name) {
+            setFeedback('Unesite ime za registraciju.', 'error');
+            return;
+          }
+          if (password.length < 6) {
+            setFeedback('Lozinka mora imati najmanje 6 znakova.', 'error');
+            return;
+          }
+          if (password !== confirmPassword) {
+            setFeedback('Lozinke se ne podudaraju.', 'error');
+            return;
+          }
+          if (users.some(function (u) { return u.email === email; })) {
+            setFeedback('Račun s tim e-mailom već postoji.', 'error');
+            return;
+          }
+          users.push({
+            id: 'user-' + Date.now(),
+            name: name,
+            email: email,
+            password: password,
+            createdAt: Date.now()
+          });
+          setUsers(users);
+          localStorage.setItem(STORAGE_AUTH, JSON.stringify({ email: email, name: name, loggedAt: Date.now() }));
+          setFeedback('Registracija uspješna. Preusmjeravanje...', 'success');
+          window.location.href = '../app/dnevnik/';
+          return;
+        }
+
+        var existingUser = users.find(function (u) { return u.email === email; });
+        if (users.length && (!existingUser || existingUser.password !== password)) {
+          setFeedback('Neispravan e-mail ili lozinka.', 'error');
+          return;
+        }
+
+        localStorage.setItem(STORAGE_AUTH, JSON.stringify({
+          email: email,
+          name: existingUser ? existingUser.name : '',
+          loggedAt: Date.now()
+        }));
         window.location.href = '../app/dnevnik/';
       });
     })();
