@@ -36,6 +36,87 @@ body {
   min-height: 100vh;
 }
 
+[hidden] {
+  display: none !important;
+}
+
+.auth-gate {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(1200px 500px at 20% -20%, rgba(45, 212, 191, 0.2), transparent 60%),
+    radial-gradient(900px 460px at 100% 120%, rgba(13, 148, 136, 0.22), transparent 60%),
+    var(--bg);
+}
+
+.auth-card {
+  width: min(440px, 100%);
+  background: rgba(11, 31, 25, 0.9);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+}
+
+.auth-brand h1 {
+  font-size: 1.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.auth-brand p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.auth-logo {
+  width: 54px;
+  height: auto;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.auth-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.auth-mode-btn {
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.auth-mode-btn.active {
+  border-color: rgba(45, 212, 191, 0.5);
+  color: var(--accent-bright);
+  background: rgba(45, 212, 191, 0.1);
+}
+
+.auth-feedback {
+  min-height: 1.2rem;
+  margin-top: 0.9rem;
+  color: var(--accent-bright);
+}
+
+.auth-submit {
+  width: 100%;
+}
+
 .app {
   display: flex;
   min-height: 100vh;
@@ -115,12 +196,39 @@ body {
 
 .main-header {
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .view-title {
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.02em;
+}
+
+.session-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.session-user {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.role-pill {
+  border: 1px solid rgba(45, 212, 191, 0.45);
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--accent-bright);
 }
 
 .view {

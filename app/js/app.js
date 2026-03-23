@@ -1,6 +1,42 @@
+import { AuthError, MissingIdentityError, getUser, handleAuthCallback, login, logout, onAuthChange, signup } from 'https://esm.sh/@netlify/identity';
+
 (function () {
   const STORAGE_PLANTS = 'balkan-pharm-plants';
   const STORAGE_ENTRIES = 'balkan-pharm-entries';
+  const STORAGE_TOOLBOX = 'balkan-pharm-toolbox';
+  const STORAGE_PROFILE_CACHE = 'balkan-pharm-profile-cache';
+  const PROFILE_API_PATH = '/.netlify/functions/profile-data';
+  const ROLE_SUPERADMIN = 'superadmin';
+  const ROLE_ADMIN_USER = 'admin_user';
+  const DEFAULT_TOOLBOX = {
+    watering: [],
+    feeding: [],
+    environment: [],
+    transplant: [],
+    stressors: [],
+  };
+  const EMPTY_PROFILE = {
+    plants: [],
+    entries: [],
+    toolbox: { ...DEFAULT_TOOLBOX },
+    progress: null,
+  };
+
+  const authGate = document.getElementById('auth-gate');
+  const appShell = document.getElementById('app-shell');
+  const authFeedback = document.getElementById('auth-feedback');
+  const sessionUserEl = document.getElementById('session-user');
+  const sessionRoleEl = document.getElementById('session-role');
+  const authModeButtons = document.querySelectorAll('.auth-mode-btn');
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const logoutButton = document.getElementById('btn-logout');
+
+  let currentUser = null;
+  let currentAccessToken = null;
+  let profileState = { ...EMPTY_PROFILE };
+  let loadedProfileUserId = null;
+  let saveTimer = null;
 
   const STAGES = {
     klijanje: 'Klijanje',
@@ -10,34 +46,358 @@
     susenje: 'Sušenje',
   };
 
-  function getPlants() {
+  function normalizeToolbox(toolbox) {
+    const next = toolbox && typeof toolbox === 'object' ? toolbox : {};
+    return {
+      watering: Array.isArray(next.watering) ? next.watering : [],
+      feeding: Array.isArray(next.feeding) ? next.feeding : [],
+      environment: Array.isArray(next.environment) ? next.environment : [],
+      transplant: Array.isArray(next.transplant) ? next.transplant : [],
+      stressors: Array.isArray(next.stressors) ? next.stressors : [],
+    };
+  }
+
+  function normalizeProfile(profile) {
+    const next = profile && typeof profile === 'object' ? profile : {};
+    return {
+      plants: Array.isArray(next.plants) ? next.plants : [],
+      entries: Array.isArray(next.entries) ? next.entries : [],
+      toolbox: normalizeToolbox(next.toolbox),
+      progress: next.progress && typeof next.progress === 'object' ? next.progress : null,
+    };
+  }
+
+  function getProfileCache() {
+    try {
+      const data = localStorage.getItem(STORAGE_PROFILE_CACHE);
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  function setProfileCache(cache) {
+    localStorage.setItem(STORAGE_PROFILE_CACHE, JSON.stringify(cache));
+  }
+
+  function getUserProfileKey(user) {
+    if (!user) return '';
+    return String(user?.id || user?.sub || user?.email || '');
+  }
+
+  function setProfileState(profile) {
+    profileState = normalizeProfile(profile);
+    localStorage.setItem(STORAGE_PLANTS, JSON.stringify(profileState.plants));
+    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(profileState.entries));
+    localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(profileState.toolbox));
+  }
+
+  function resetProfileState() {
+    setProfileState(EMPTY_PROFILE);
+  }
+
+  function getAccessToken(user) {
+    if (!user) return null;
+    if (user.token && typeof user.token.access_token === 'string' && user.token.access_token) return user.token.access_token;
+    return null;
+  }
+
+  function readLegacyLocalData() {
+    let plants = [];
+    let entries = [];
+    let toolbox = { ...DEFAULT_TOOLBOX };
     try {
       const data = localStorage.getItem(STORAGE_PLANTS);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
+      plants = data ? JSON.parse(data) : [];
+    } catch {}
+    try {
+      const data = localStorage.getItem(STORAGE_ENTRIES);
+      entries = data ? JSON.parse(data) : [];
+    } catch {}
+    try {
+      const data = localStorage.getItem(STORAGE_TOOLBOX);
+      const parsed = data ? JSON.parse(data) : {};
+      toolbox = normalizeToolbox(parsed);
+    } catch {}
+    return normalizeProfile({ plants, entries, toolbox });
+  }
+
+  function queueProfileSave() {
+    if (!currentUser) return;
+    if (saveTimer) window.clearTimeout(saveTimer);
+    saveTimer = window.setTimeout(() => {
+      persistProfileToServer().catch(() => {});
+    }, 350);
+  }
+
+  async function persistProfileToServer() {
+    const token = currentAccessToken;
+    if (!token) return;
+    const payload = {
+      plants: profileState.plants,
+      entries: profileState.entries,
+      toolbox: profileState.toolbox,
+      progress: {
+        plantsCount: profileState.plants.length,
+        entriesCount: profileState.entries.length,
+        updatedAt: new Date().toISOString(),
+      },
+    };
+    await fetch(PROFILE_API_PATH, {
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json',
+        authorization: 'Bearer ' + token,
+      },
+      body: JSON.stringify(payload),
+    });
+    const key = getUserProfileKey(currentUser);
+    if (!key) return;
+    const cache = getProfileCache();
+    cache[key] = payload;
+    setProfileCache(cache);
+  }
+
+  async function loadProfileForCurrentUser() {
+    const userKey = getUserProfileKey(currentUser);
+    if (!userKey) {
+      resetProfileState();
+      return;
     }
+    if (loadedProfileUserId === userKey) return;
+
+    const token = currentAccessToken || getAccessToken(currentUser);
+    currentAccessToken = token;
+    if (!token) {
+      setProfileState(readLegacyLocalData());
+      loadedProfileUserId = userKey;
+      return;
+    }
+
+    try {
+      const response = await fetch(PROFILE_API_PATH, {
+        method: 'GET',
+        headers: {
+          authorization: 'Bearer ' + token,
+        },
+      });
+      if (!response.ok) throw new Error('load-failed');
+      const data = await response.json();
+      setProfileState(normalizeProfile(data.profile));
+      const cache = getProfileCache();
+      cache[userKey] = normalizeProfile(data.profile);
+      setProfileCache(cache);
+    } catch {
+      const cache = getProfileCache();
+      if (cache[userKey]) setProfileState(normalizeProfile(cache[userKey]));
+      else setProfileState(readLegacyLocalData());
+    }
+    loadedProfileUserId = userKey;
+  }
+
+  function getPlants() {
+    return Array.isArray(profileState.plants) ? profileState.plants : [];
   }
 
   function setPlants(plants) {
-    localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
+    profileState.plants = Array.isArray(plants) ? plants : [];
+    queueProfileSave();
   }
 
   function getEntries() {
-    try {
-      const data = localStorage.getItem(STORAGE_ENTRIES);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
+    return Array.isArray(profileState.entries) ? profileState.entries : [];
   }
 
   function setEntries(entries) {
-    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
+    profileState.entries = Array.isArray(entries) ? entries : [];
+    queueProfileSave();
+  }
+
+  function getToolboxData() {
+    return normalizeToolbox(profileState.toolbox);
+  }
+
+  function setToolboxData(data) {
+    profileState.toolbox = normalizeToolbox(data);
+    queueProfileSave();
   }
 
   function uuid() {
     return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9);
+  }
+
+  function getCurrentRoles(user) {
+    if (!user || !user.app_metadata || !Array.isArray(user.app_metadata.roles)) return [];
+    return user.app_metadata.roles.map((role) => String(role).toLowerCase());
+  }
+
+  function getCurrentRoleLabel(user) {
+    const roles = getCurrentRoles(user);
+    if (roles.includes(ROLE_SUPERADMIN)) return ROLE_SUPERADMIN;
+    if (roles.includes(ROLE_ADMIN_USER)) return ROLE_ADMIN_USER;
+    return user ? 'user' : 'guest';
+  }
+
+  function isSuperadmin() {
+    return Boolean(currentUser);
+  }
+
+  function isAuthorizedRole(user) {
+    return Boolean(user);
+  }
+
+  function setAuthFeedback(message, isError) {
+    if (!authFeedback) return;
+    authFeedback.textContent = message || '';
+    authFeedback.style.color = isError ? '#fda4af' : 'var(--accent-bright)';
+  }
+
+  function setAppVisibility(isAuthed) {
+    if (authGate) authGate.hidden = isAuthed;
+    if (appShell) appShell.hidden = !isAuthed;
+  }
+
+  function renderSessionMeta() {
+    const role = getCurrentRoleLabel(currentUser);
+    if (sessionUserEl) sessionUserEl.textContent = currentUser?.email || 'Nije prijavljeno';
+    if (sessionRoleEl) sessionRoleEl.textContent = role;
+  }
+
+  function applyRoleAccess() {
+    const addPlantButton = document.getElementById('btn-add-plant');
+    if (addPlantButton) addPlantButton.hidden = false;
+  }
+
+  function requireSuperadmin(_actionName) {
+    return true;
+  }
+
+  function setAuthMode(mode) {
+    const isSignup = mode === 'signup';
+    if (loginForm) loginForm.hidden = isSignup;
+    if (signupForm) signupForm.hidden = !isSignup;
+    authModeButtons.forEach((button) => {
+      const active = button.dataset.authMode === mode;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  }
+
+  async function refreshSession(options = {}) {
+    const openDiary = Boolean(options.openDiary);
+    const user = await getUser();
+    if (!user || !isAuthorizedRole(user)) {
+      currentUser = null;
+      currentAccessToken = null;
+      loadedProfileUserId = null;
+      if (saveTimer) {
+        window.clearTimeout(saveTimer);
+        saveTimer = null;
+      }
+      resetProfileState();
+      setAppVisibility(false);
+      applyRoleAccess();
+      renderSessionMeta();
+      return;
+    }
+    currentUser = user;
+    currentAccessToken = getAccessToken(user);
+    if (!currentAccessToken && typeof user.jwt === 'function') {
+      try {
+        currentAccessToken = await user.jwt();
+      } catch {
+        currentAccessToken = null;
+      }
+    }
+    await loadProfileForCurrentUser();
+    setAppVisibility(true);
+    renderSessionMeta();
+    applyRoleAccess();
+    setAuthFeedback('');
+    renderPlants();
+    renderJournal();
+    renderDashboard();
+    if (openDiary) showView('plants');
+  }
+
+  async function handleLoginSubmit(event) {
+    event.preventDefault();
+    const email = document.getElementById('login-email')?.value?.trim() || '';
+    const password = document.getElementById('login-password')?.value || '';
+    if (!email || !password) {
+      setAuthFeedback('Unesite email i lozinku.', true);
+      return;
+    }
+    try {
+      setAuthFeedback('Prijava u tijeku...', false);
+      await login(email, password);
+      await refreshSession({ openDiary: true });
+      if (loginForm) loginForm.reset();
+    } catch (error) {
+      if (error instanceof MissingIdentityError) {
+        setAuthFeedback('Netlify Identity nije aktivan za ovaj projekt.', true);
+        return;
+      }
+      if (error instanceof AuthError) {
+        setAuthFeedback(error.status === 401 ? 'Neispravni podaci za prijavu.' : error.message, true);
+        return;
+      }
+      setAuthFeedback('Neuspjela prijava. Pokušajte ponovno.', true);
+    }
+  }
+
+  async function handleLogoutClick() {
+    await logout();
+    currentUser = null;
+    currentAccessToken = null;
+    loadedProfileUserId = null;
+    if (saveTimer) {
+      window.clearTimeout(saveTimer);
+      saveTimer = null;
+    }
+    resetProfileState();
+    renderSessionMeta();
+    setAppVisibility(false);
+    setAuthFeedback('Odjava uspješna.', false);
+  }
+
+  async function handleSignupSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById('signup-name')?.value?.trim() || '';
+    const email = document.getElementById('signup-email')?.value?.trim() || '';
+    const password = document.getElementById('signup-password')?.value || '';
+    const confirmPassword = document.getElementById('signup-password-confirm')?.value || '';
+    if (!email || !password || !confirmPassword) {
+      setAuthFeedback('Unesite sve obavezne podatke za registraciju.', true);
+      return;
+    }
+    if (password !== confirmPassword) {
+      setAuthFeedback('Lozinke se ne podudaraju.', true);
+      return;
+    }
+    try {
+      setAuthFeedback('Registracija u tijeku...', false);
+      const user = await signup(email, password, { full_name: name || undefined });
+      if (user && (user.emailVerified || getAccessToken(user))) {
+        await refreshSession({ openDiary: true });
+        if (signupForm) signupForm.reset();
+        setAuthMode('signin');
+        return;
+      }
+      setAuthFeedback('Profil je kreiran. Potvrdite email, zatim se prijavite i otvorit će se dnevnik.', false);
+      if (signupForm) signupForm.reset();
+      setAuthMode('signin');
+    } catch (error) {
+      if (error instanceof MissingIdentityError) {
+        setAuthFeedback('Netlify Identity nije aktivan za ovaj projekt.', true);
+        return;
+      }
+      if (error instanceof AuthError) {
+        setAuthFeedback(error.status === 422 ? 'Lozinka mora imati najmanje 6 znakova.' : error.message, true);
+        return;
+      }
+      setAuthFeedback('Neuspjela registracija. Pokušajte ponovno.', true);
+    }
   }
 
   // --- Navigation ---
@@ -336,6 +696,7 @@
   function renderPlants() {
     const list = document.getElementById('plants-list');
     const plants = getPlants();
+    const canManagePlants = isSuperadmin();
     if (plants.length === 0) {
       list.innerHTML = '<div class="empty-state">Nemate biljaka. Kliknite "Nova biljka" da dodate prvu.</div>';
       return;
@@ -353,8 +714,8 @@
         ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Od ${new Date(p.startDate).toLocaleDateString('hr-HR')}</div>` : ''}
         <div class="plant-card-actions">
           <button type="button" class="btn btn-primary btn-growlog">Growlog</button>
-          <button type="button" class="btn btn-ghost btn-edit-plant">Uredi</button>
-          <button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>
+          ${canManagePlants ? '<button type="button" class="btn btn-ghost btn-edit-plant">Uredi</button>' : ''}
+          ${canManagePlants ? '<button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>' : ''}
         </div>
       </div>
     `
@@ -373,6 +734,7 @@
   }
 
   function deletePlant(id) {
+    if (!requireSuperadmin('brisanje biljke')) return;
     if (!confirm('Obrisati ovu biljku?')) return;
     const plants = getPlants().filter((p) => p.id !== id);
     setPlants(plants);
@@ -385,6 +747,7 @@
   }
 
   function openPlantModal(editId) {
+    if (!requireSuperadmin('upravljanje biljkama')) return;
     const modal = document.getElementById('modal-plant');
     const form = document.getElementById('form-plant');
     const titleEl = document.getElementById('modal-plant-title');
@@ -430,7 +793,10 @@
     document.getElementById('modal-plant').classList.remove('open');
   }
 
-  document.getElementById('btn-add-plant').addEventListener('click', () => openPlantModal());
+  document.getElementById('btn-add-plant').addEventListener('click', () => {
+    if (!requireSuperadmin('dodavanje biljke')) return;
+    openPlantModal();
+  });
 
   document.getElementById('plant-photo').addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -458,6 +824,7 @@
 
   document.getElementById('form-plant').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (!requireSuperadmin('spremanje biljke')) return;
     const id = document.getElementById('plant-id').value;
     const plants = getPlants();
     const photoData = document.getElementById('plant-photo-data').value.trim();
@@ -735,27 +1102,6 @@
   });
 
   // --- Toolbox (Alati) ---
-  const STORAGE_TOOLBOX = 'balkan-pharm-toolbox';
-
-  function getToolboxData() {
-    try {
-      const data = localStorage.getItem(STORAGE_TOOLBOX);
-      const parsed = data ? JSON.parse(data) : {};
-      return {
-        watering: parsed.watering || [],
-        feeding: parsed.feeding || [],
-        environment: parsed.environment || [],
-        transplant: parsed.transplant || [],
-        stressors: parsed.stressors || [],
-      };
-    } catch {
-      return { watering: [], feeding: [], environment: [], transplant: [], stressors: [] };
-    }
-  }
-
-  function setToolboxData(data) {
-    localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data));
-  }
 
   function openToolboxPanel(tool) {
     document.querySelectorAll('.toolbox-panel').forEach((p) => {
@@ -1017,8 +1363,54 @@
     });
   }
 
+  authModeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      setAuthMode(button.dataset.authMode === 'signup' ? 'signup' : 'signin');
+      setAuthFeedback('', false);
+    });
+  });
+
+  if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+  if (signupForm) signupForm.addEventListener('submit', handleSignupSubmit);
+  if (logoutButton) logoutButton.addEventListener('click', handleLogoutClick);
+
+  onAuthChange(async (_event, user) => {
+    if (!user) {
+      currentUser = null;
+      currentAccessToken = null;
+      loadedProfileUserId = null;
+      if (saveTimer) {
+        window.clearTimeout(saveTimer);
+        saveTimer = null;
+      }
+      resetProfileState();
+      renderSessionMeta();
+      setAppVisibility(false);
+      applyRoleAccess();
+      return;
+    }
+    await refreshSession();
+  });
+
+  async function bootstrapAuth() {
+    try {
+      await handleAuthCallback();
+    } catch (error) {
+      if (error instanceof AuthError) {
+        setAuthFeedback(error.message, true);
+      } else {
+        setAuthFeedback('Greška pri obradi autentikacije.', true);
+      }
+    }
+    await refreshSession();
+  }
+
   // Init
   fillEntryPlantSelect();
   fillJournalPlantFilter();
-  renderDashboard();
+  applyRoleAccess();
+  renderSessionMeta();
+  setAuthMode('signin');
+  setAppVisibility(false);
+  bootstrapAuth();
 })();

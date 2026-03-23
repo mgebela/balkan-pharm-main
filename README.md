@@ -13,7 +13,25 @@ Web stranica i aplikacija za vođenje dnevnika uzgoja CBD biljaka, na hrvatskom 
 
 Faze biljke: Klijanje → Sadnica → Vegetativna → Cvjetanje → Sušenje.
 
-Podaci se spremaju lokalno u pregledniku (localStorage); nema potrebe za registracijom.
+Pristup aplikaciji na `/app` je zaštićen kroz Netlify Identity s prijavom i registracijom. Nakon uspješne prijave/registracije aplikacija automatski otvara sekciju **Biljke i dnevnik**.
+
+## Prijava i uloge
+
+Aplikacija koristi profile korisnika kroz Netlify Identity:
+
+- `registracija` – korisnik kreira profil (email + lozinka)
+- `prijava` – korisnik ulazi u svoj profil i vidi vlastite zapise
+
+## Spremanje dnevnika i napretka (server-side)
+
+Podaci o biljkama, dnevniku, alatima i napretku više nisu samo lokalni:
+
+- `netlify/functions/profile-data.js` služi kao API za čitanje/pisanje profila
+- svaki prijavljeni korisnik ima zaseban profil (ključan po Identity korisniku)
+- podaci se trajno spremaju u **Netlify Blobs** store `diary-profiles`
+- klijent i dalje drži lokalni cache kao fallback kada API nije dostupan
+
+Datoteka `netlify/functions/identity-signup.js` i dalje automatski dodaje ulogu `admin_user` novim korisnicima pri registraciji.
 
 ## Pokretanje
 
@@ -43,4 +61,5 @@ Aplikacija se može objaviti besplatno na GitHub Pages.
 ## Tehnologije
 
 - HTML5, CSS3, JavaScript (vanilla)
-- Bez backenda – sve radi u pregledniku
+- Netlify Identity (`@netlify/identity`)
+- Netlify Functions + Netlify Blobs (`@netlify/blobs`)

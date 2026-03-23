@@ -11,7 +11,52 @@
   <link rel="stylesheet" href="styles/app.css" />
 </head>
 <body>
-  <div class="app">
+  <section id="auth-gate" class="auth-gate">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <img src="../images/bp.png" alt="Balkan-pharm" class="auth-logo" />
+        <h1>Prijava i registracija</h1>
+        <p>Kreirajte profil ili se prijavite da biste otvorili svoj dnevnik i napredak.</p>
+      </div>
+      <div class="auth-mode-switch" role="tablist" aria-label="Odabir načina autentikacije">
+        <button type="button" class="auth-mode-btn active" data-auth-mode="signin" role="tab" aria-selected="true">Prijava</button>
+        <button type="button" class="auth-mode-btn" data-auth-mode="signup" role="tab" aria-selected="false">Registracija</button>
+      </div>
+      <form id="login-form" class="auth-form">
+        <label>
+          Email
+          <input type="email" id="login-email" required autocomplete="email" />
+        </label>
+        <label>
+          Lozinka
+          <input type="password" id="login-password" required autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn btn-primary auth-submit">Prijava</button>
+      </form>
+      <form id="signup-form" class="auth-form" hidden>
+        <label>
+          Ime
+          <input type="text" id="signup-name" autocomplete="name" />
+        </label>
+        <label>
+          Email
+          <input type="email" id="signup-email" required autocomplete="email" />
+        </label>
+        <label>
+          Lozinka
+          <input type="password" id="signup-password" required autocomplete="new-password" minlength="6" />
+        </label>
+        <label>
+          Potvrda lozinke
+          <input type="password" id="signup-password-confirm" required autocomplete="new-password" minlength="6" />
+        </label>
+        <button type="submit" class="btn btn-primary auth-submit">Kreiraj profil</button>
+      </form>
+      <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <div class="app app-shell" id="app-shell" hidden>
     <aside class="sidebar">
       <a href="../index.html" class="sidebar-logo"><img src="../images/bp.png" alt="Balkan-pharm" class="sidebar-logo-img" /></a>
       <nav class="sidebar-nav">
@@ -56,6 +101,11 @@
     <main class="main">
       <header class="main-header">
         <h1 class="view-title">Nadzorna ploča</h1>
+        <div class="session-meta">
+          <span id="session-user" class="session-user">Nije prijavljeno</span>
+          <span id="session-role" class="role-pill">guest</span>
+          <button type="button" id="btn-logout" class="btn btn-ghost">Odjava</button>
+        </div>
       </header>
 
       <div id="view-dashboard" class="view active">
@@ -389,6 +439,6 @@
     </div>
   </div>
 
-  <script src="js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>
