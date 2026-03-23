@@ -9,6 +9,30 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/app.css" />
+  <style>
+    html:not(.auth-ready) body {
+      visibility: hidden;
+    }
+  </style>
+  <script type="module">
+    import { getUser, handleAuthCallback } from 'https://cdn.jsdelivr.net/npm/@netlify/identity/+esm';
+
+    async function ensureAuthenticated() {
+      try {
+        const callback = await handleAuthCallback();
+        const user = (callback && callback.user) || (await getUser());
+        if (!user) {
+          window.location.replace('/login/?next=' + encodeURIComponent('/app/'));
+          return;
+        }
+        document.documentElement.classList.add('auth-ready');
+      } catch {
+        window.location.replace('/login/?next=' + encodeURIComponent('/app/'));
+      }
+    }
+
+    ensureAuthenticated();
+  </script>
 </head>
 <body>
   <div class="app">
