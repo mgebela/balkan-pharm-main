@@ -84,6 +84,36 @@
       background: linear-gradient(90deg, var(--accent), var(--accent-bright));
       cursor: pointer;
     }
+    .auth-mode {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+    .mode-btn {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.55rem 0.6rem;
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      border-color: transparent;
+      color: #06201a;
+      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    }
+    .auth-helper {
+      margin-top: 0.65rem;
+      font-size: 0.86rem;
+      text-align: center;
+      color: var(--text-muted);
+      min-height: 1.2rem;
+    }
+    .auth-helper.error {
+      color: #fca5a5;
+    }
     .back-link {
       margin-top: 0.85rem;
       text-align: center;
@@ -96,27 +126,98 @@
   <form class="login-card" id="login-form">
     <img class="logo" src="../images/bp.png" alt="Balkan-pharm" />
     <h1>Prijava u dnevnik</h1>
-    <p>Prijavite se da otvorite aplikaciju dnevnika uzgoja.</p>
+    <p id="auth-subtitle">Prijavite se da otvorite aplikaciju dnevnika uzgoja.</p>
+    <div class="auth-mode" role="tablist" aria-label="Način prijave">
+      <button type="button" class="mode-btn active" id="mode-signin" aria-selected="true">Prijava</button>
+      <button type="button" class="mode-btn" id="mode-signup" aria-selected="false">Kreiraj račun</button>
+    </div>
     <label for="email">E-mail</label>
     <input id="email" type="email" required placeholder="vas@email.com" />
     <label for="password">Lozinka</label>
     <input id="password" type="password" required placeholder="••••••••" />
-    <button type="submit">Prijavi se</button>
+    <button type="submit" id="auth-submit">Prijavi se</button>
+    <div class="auth-helper" id="auth-helper"></div>
     <div class="back-link"><a href="../index.html">← Povratak na početnu</a></div>
   </form>
   <script>
     (function () {
       var form = document.getElementById('login-form');
+      var subtitle = document.getElementById('auth-subtitle');
+      var helper = document.getElementById('auth-helper');
+      var submit = document.getElementById('auth-submit');
+      var modeSignin = document.getElementById('mode-signin');
+      var modeSignup = document.getElementById('mode-signup');
       var STORAGE_AUTH = 'balkan-pharm-auth';
+      var STORAGE_USERS = 'balkan-pharm-users';
+      var authMode = 'signin';
+
+      function getUsers() {
+        try {
+          var data = localStorage.getItem(STORAGE_USERS);
+          return data ? JSON.parse(data) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+
+      function setUsers(users) {
+        localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+      }
+
+      function setMessage(message, isError) {
+        helper.textContent = message || '';
+        helper.classList.toggle('error', Boolean(isError));
+      }
+
+      function setMode(mode) {
+        authMode = mode;
+        var signinMode = mode === 'signin';
+        modeSignin.classList.toggle('active', signinMode);
+        modeSignin.setAttribute('aria-selected', signinMode ? 'true' : 'false');
+        modeSignup.classList.toggle('active', !signinMode);
+        modeSignup.setAttribute('aria-selected', signinMode ? 'false' : 'true');
+        submit.textContent = signinMode ? 'Prijavi se' : 'Kreiraj račun';
+        subtitle.textContent = signinMode
+          ? 'Prijavite se da otvorite aplikaciju dnevnika uzgoja.'
+          : 'Kreirajte račun pa se odmah prijavite.';
+        setMessage('');
+      }
+
       if (localStorage.getItem(STORAGE_AUTH)) {
         window.location.href = '../app/dnevnik/';
         return;
       }
+
+      modeSignin.addEventListener('click', function () {
+        setMode('signin');
+      });
+
+      modeSignup.addEventListener('click', function () {
+        setMode('signup');
+      });
+
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var email = document.getElementById('email').value.trim();
         var password = document.getElementById('password').value;
         if (!email || !password) return;
+        var users = getUsers();
+        var user = users.find(function (u) { return u.email === email; });
+
+        if (authMode === 'signup') {
+          if (user) {
+            setMessage('Račun s tim e-mailom već postoji. Koristite Prijavu.', true);
+            return;
+          }
+          users.push({ email: email, password: password, createdAt: Date.now() });
+          setUsers(users);
+        } else {
+          if (!user || user.password !== password) {
+            setMessage('Neispravan e-mail ili lozinka.', true);
+            return;
+          }
+        }
+
         localStorage.setItem(STORAGE_AUTH, JSON.stringify({ email: email, loggedAt: Date.now() }));
         window.location.href = '../app/dnevnik/';
       });
