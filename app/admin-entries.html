@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin – Entries</title>
+  <link rel="stylesheet" href="styles/app.css" />
+  <style>
+    body {
+      font-family: Arial;
+      background: var(--bg);
+      color: #e5e7eb;
+      padding: 20px;
+    }
+
+    h1 { margin-bottom: 20px; }
+
+    .toolbar { margin-bottom: 20px; }
+
+    button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .add-btn { background: #22c55e; }
+    .edit-btn { background: #3b82f6; }
+    .delete-btn { background: #ef4444; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e293b;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #334155;
+      text-align: left;
+    }
+
+    th { background: #0f172a; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-content {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+    }
+  </style>
+</head>
+
+<body data-page="entries">
+
+<div id="loading-screen" class="loading-screen">
+<div class="loader"></div>
+  <p>Učitavanje entries-a...</p>
+</div>
+<button onclick="history.back()" style="margin-bottom:15px;">
+  ⬅ Back
+</button>
+<h1>Admin – Entries</h1>
+
+<div class="toolbar">
+  <button class="add-btn" id="addUserBtn">➕ Add Entry</button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Data</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="usersTable"></tbody>
+</table>
+
+<div class="modal" id="userModal">
+  <div class="modal-content">
+    <h3>Add / Edit Entry</h3>
+    <button id="saveUser">Save</button>
+  </div>
+</div>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

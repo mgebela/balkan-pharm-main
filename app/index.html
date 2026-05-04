@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/app.css" />
 </head>
-<body>
+<body class="app-loading">
   <div class="app">
     <aside class="sidebar">
       <a href="../index.html" class="sidebar-logo"><img src="../images/bp.png" alt="dnevnik.live" class="sidebar-logo-img" /></a>
@@ -31,7 +31,15 @@
           <span class="nav-icon">🧰</span>
           <span>Alati</span>
         </a>
-      </nav>
+         <a href="#" class="nav-item" data-view="danas">
+          <span class="nav-icon">☀</span>
+          <span>Danas</span>
+        </a>
+          <a href="#" class="nav-item admin-only" data-view="admin">
+          <span class="nav-icon">🛠️</span>
+          <span>Admin</span>
+          </a>
+       </nav>
     </aside>
 
     <nav class="bottom-nav" aria-label="Glavna navigacija">
@@ -50,6 +58,14 @@
       <a href="#" class="nav-item" data-view="toolbox">
         <span class="nav-icon">🧰</span>
         <span class="bottom-nav-label">Alati</span>
+      </a>
+      <a href="#" class="nav-item" data-view="danas">
+        <span class="nav-icon">☀</span>
+        <span class="bottom-nav-label">Danas</span>
+      </a>
+      <a href="#" class="nav-item admin-only" data-view="admin">
+        <span class="nav-icon">🛠️</span>
+        <span>Admin</span>
       </a>
     </nav>
 
@@ -187,8 +203,19 @@
             <h3>Grafovi</h3>
             <p>Vizualizacija rasta i mjerenja.</p>
           </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="vrijeme">
+            <h3>Vrijeme</h3>
+            <p>Procjena vremena za danas i idućih par dana</p>
+          </button>
         </div>
-        <div class="toolbox-panels">
+          <div class="toolbox-panels">
+          <div id="toolbox-panel-vrijeme" class="toolbox-panel" data-tool="vrijeme" aria-hidden="true">
+            <h3 class="toolbox-panel-title">Vrijeme</h3>
+                <section class="section cta-section">
+                <h1>Prognoza Vremena</h1>
+                <div id="weather">Loading...</div>
+          </section>
+          </div>
           <div id="toolbox-panel-watering" class="toolbox-panel" data-tool="watering" aria-hidden="true">
             <h3 class="toolbox-panel-title">Zalijevanje</h3>
             <form class="toolbox-form" id="toolbox-form-watering">
@@ -264,6 +291,69 @@
           </div>
         </div>
       </div>
+
+    <div id="view-danas" class="view">
+      <div class="danas-list">
+
+        <label class="danas-item">
+          <input type="checkbox">
+          <div class="danas-content">
+            <span class="danas-title">Zaliti biljke</span>
+            <span class="danas-desc">3 biljke trebaju zalijevanje</span>
+          </div>
+        </label>
+
+        <label class="danas-item">
+          <input type="checkbox">
+            <div class="danas-content">
+              <span class="danas-title">Provjeriti vlagu</span>
+              <span class="danas-desc">Provjera tla u posudama</span>
+            </div>
+        </label>
+
+        <label class="danas-item">
+            <input type="checkbox">
+            <div class="danas-content">
+              <span class="danas-title">Dodati bilješku</span>
+              <span class="danas-desc">Zapiši promjene</span>
+          </div>
+        </label>
+        </div>
+      </div>
+
+      <div id="view-admin" class="view">
+  <h2 class="section-heading">Admin Panel</h2>
+
+  <div class="toolbox-grid">
+    <button class="toolbox-card toolbox-card-btn" id="admin-users">
+      <h3>Korisnici</h3>
+      <p>Upravljanje korisnicima</p>
+    </button>
+
+    <button class="toolbox-card toolbox-card-btn" id="admin-plants">
+      <h3>Biljke</h3>
+      <p>Pregled i uređivanje biljaka</p>
+    </button>
+
+    <button class="toolbox-card toolbox-card-btn" id="admin-entries">
+      <h3>Dnevnik</h3>
+      <p>Upravljanje zapisima</p>
+    </button>
+
+    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-tenant">
+      <h3>Tenants</h3>
+      <p>Pregled Tenanta</p>
+    </button>
+
+    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-system">
+      <h3>Postavke</h3>
+      <p>Sistemske postavke</p>
+    </button>
+    
+      </div>
+    </div>
+      
+
     </main>
   </div>
 
@@ -436,12 +526,11 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
   <script>
     (function () {
-      var firebaseProjectId = "ba" + "lpha-9dab9";
       var firebaseConfig = {
         apiKey: "AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg",
-        authDomain: firebaseProjectId + ".firebaseapp.com",
-        projectId: firebaseProjectId,
-        storageBucket: firebaseProjectId + ".firebasestorage.app",
+        authDomain: "balpha-9dab9.firebaseapp.com",
+        projectId: "balpha-9dab9",
+        storageBucket: "balpha-9dab9.firebasestorage.app",
         messagingSenderId: "398537397385",
         appId: "1:398537397385:web:9bd3aec82f44ddec20e258",
         measurementId: "G-HLXHTQP41H"

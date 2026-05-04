@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<script>
+
+
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const db = firebase.firestore();
+  const userRef = db.collection("users").doc(user.uid);
+  const snap = await userRef.get();
+
+  if (!snap.exists) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const role = snap.data().role;
+
+  if (role !== "superadmin") {
+    window.location.href = "index.html";
+    return;
+  }
+});
+
+
+</script>
+<link rel="stylesheet" href="styles/app.css" />
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: var(--bg);
+      color: #e5e7eb;
+      padding: 20px;
+    }
+
+
+h1 { margin-bottom: 20px; }
+
+.section {
+  margin-bottom: 40px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+}
+
+button {
+  margin-right: 5px;
+  padding: 6px 10px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+}
+
+.add-btn { background: #22c55e; }
+.edit-btn { background: #3b82f6; }
+.delete-btn { background: #ef4444; }
+
+
+  </style>
+</head>
+<body>
+<div id="loading-screen" class="loading-screen">
+<div class="loader"></div>
+  <p>Učitavanje Postavka...</p>
+</div>
+<button onclick="history.back()" style="margin-bottom:15px;">
+  ⬅ Back
+</button>
+<h1>Admin Dashboard</h1>
+
+<div id="app"></div>
+
+<script type="module" src="js/admin.js"></script>
+
+</body>
+</html>

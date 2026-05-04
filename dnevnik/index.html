@@ -109,12 +109,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
-    const firebaseProjectId = "ba" + "lpha-9dab9";
     const firebaseConfig = {
       apiKey: "AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg",
-      authDomain: firebaseProjectId + ".firebaseapp.com",
-      projectId: firebaseProjectId,
-      storageBucket: firebaseProjectId + ".firebasestorage.app",
+      authDomain: "balpha-9dab9.firebaseapp.com",
+      projectId: "balpha-9dab9",
+      storageBucket: "balpha-9dab9.firebasestorage.app",
       messagingSenderId: "398537397385",
       appId: "1:398537397385:web:9bd3aec82f44ddec20e258",
       measurementId: "G-HLXHTQP41H"
@@ -157,16 +156,10 @@
           } catch (createErr) {
             setStatus('Neuspjela registracija. Provjerite lozinku (min 6 znakova).', true);
           }
-        } else if (err && err.code === 'auth/user-disabled') {
-          setStatus('Račun je onemogućen. Kontaktirajte administratora ili uključite korisnika u Firebase Auth.', true);
         } else if (err && err.code === 'auth/wrong-password') {
           setStatus('Pogrešna lozinka. Pokušajte ponovno.', true);
         } else if (err && err.code === 'auth/invalid-email') {
           setStatus('E-mail nije ispravan.', true);
-        } else if (err && err.code === 'auth/too-many-requests') {
-          setStatus('Privremeno previše pokušaja prijave. Pokušajte kasnije ili resetirajte lozinku.', true);
-        } else if (err && err.code === 'auth/network-request-failed') {
-          setStatus('Mrežna greška pri prijavi. Provjerite internet vezu i pokušajte ponovno.', true);
         } else {
           setStatus('Prijava nije uspjela. Pokušajte ponovno.', true);
         }

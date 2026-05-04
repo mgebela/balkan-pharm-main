@@ -13,16 +13,22 @@
   (function migrateOldStorageKeys() {
     const flagKey = 'dnevnik-live-migrated-v1';
     if (localStorage.getItem(flagKey)) return;
+    const prevBrandPrefix = 'ba' + 'lpha-shop';
     const pairs = [
       ['balkan-pharm-plants', STORAGE_PLANTS],
       ['balkan-pharm-entries', STORAGE_ENTRIES],
       ['balkan-pharm-toolbox', STORAGE_TOOLBOX],
       ['balkan-pharm-auth', STORAGE_AUTH],
-      // Neutral legacy aliases kept for compatibility.
-      ['legacy-brand-plants', STORAGE_PLANTS],
-      ['legacy-brand-entries', STORAGE_ENTRIES],
-      ['legacy-brand-toolbox', STORAGE_TOOLBOX],
-      ['legacy-brand-auth', STORAGE_AUTH],
+      // Legacy keys from previous branding phase.
+      ['legacy-balpha-shop-plants', STORAGE_PLANTS],
+      ['legacy-balpha-shop-entries', STORAGE_ENTRIES],
+      ['legacy-balpha-shop-toolbox', STORAGE_TOOLBOX],
+      ['legacy-balpha-shop-auth', STORAGE_AUTH],
+      // Keep direct compatibility if users still have raw old keys.
+      [prevBrandPrefix + '-plants', STORAGE_PLANTS],
+      [prevBrandPrefix + '-entries', STORAGE_ENTRIES],
+      [prevBrandPrefix + '-toolbox', STORAGE_TOOLBOX],
+      [prevBrandPrefix + '-auth', STORAGE_AUTH],
     ];
     pairs.forEach(([oldKey, newKey]) => {
       try {
@@ -100,139 +106,18 @@
     }
   }
 
-  async function loadRemoteState(uid) {
+  async function loadRemoteStateIntoLocal(uid) {
     const ref = getStateDocRef(uid);
-    if (!ref) return null;
+    if (!ref) return;
     try {
       const snap = await ref.get();
-      if (!snap.exists) return null;
-      return snap.data() || null;
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      if (Array.isArray(data.plants)) localStorage.setItem(STORAGE_PLANTS, JSON.stringify(data.plants));
+      if (Array.isArray(data.entries)) localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(data.entries));
+      if (data.toolbox && typeof data.toolbox === 'object') localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data.toolbox));
     } catch {
-      return null;
-    }
-  }
-
-  function readJsonArrayFromKeys(keys) {
-    const out = [];
-    keys.forEach((k) => {
-      try {
-        const raw = localStorage.getItem(k);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) out.push(...parsed);
-      } catch {
-        // ignore
-      }
-    });
-    return out;
-  }
-
-  function readJsonObjectFromKeys(keys) {
-    const out = {};
-    keys.forEach((k) => {
-      try {
-        const raw = localStorage.getItem(k);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') Object.assign(out, parsed);
-      } catch {
-        // ignore
-      }
-    });
-    return out;
-  }
-
-  function uniqueByStableKey(items) {
-    const seen = new Map();
-    (items || []).forEach((item) => {
-      if (!item || typeof item !== 'object') return;
-      const key =
-        item.id ||
-        JSON.stringify([
-          item.plantId || item.plant || '',
-          item.date || '',
-          item.type || '',
-          item.value1 || item.soilQuality || item.temperature || '',
-          item.note || '',
-        ]);
-      const prev = seen.get(key);
-      if (!prev) {
-        seen.set(key, item);
-        return;
-      }
-      const prevTs = Date.parse(prev.updatedAt || prev.createdAt || '') || 0;
-      const curTs = Date.parse(item.updatedAt || item.createdAt || '') || 0;
-      if (curTs >= prevTs) seen.set(key, item);
-    });
-    return Array.from(seen.values());
-  }
-
-  function mergeToolboxData(a, b) {
-    const safeA = a && typeof a === 'object' ? a : {};
-    const safeB = b && typeof b === 'object' ? b : {};
-    const keys = ['watering', 'feeding', 'environment', 'transplant', 'stressors'];
-    const out = {};
-    keys.forEach((k) => {
-      out[k] = uniqueByStableKey([...(safeA[k] || []), ...(safeB[k] || [])]);
-    });
-    return out;
-  }
-
-  function collectLocalRecoveryState() {
-    const plants = readJsonArrayFromKeys([
-      STORAGE_PLANTS,
-      'legacy-brand-plants',
-      'balkan-pharm-plants',
-    ]);
-    const entries = readJsonArrayFromKeys([
-      STORAGE_ENTRIES,
-      'legacy-brand-entries',
-      'balkan-pharm-entries',
-    ]);
-    const toolbox = readJsonObjectFromKeys([
-      STORAGE_TOOLBOX,
-      'legacy-brand-toolbox',
-      'balkan-pharm-toolbox',
-    ]);
-    return {
-      plants: uniqueByStableKey(plants),
-      entries: uniqueByStableKey(entries),
-      toolbox: mergeToolboxData(toolbox, {}),
-    };
-  }
-
-  function applyStateToLocal(state) {
-    if (!state) return;
-    if (Array.isArray(state.plants)) localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants));
-    if (Array.isArray(state.entries)) localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries));
-    if (state.toolbox && typeof state.toolbox === 'object') localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox));
-  }
-
-  function mergeRemoteAndLocal(remoteData, localData) {
-    const remote = remoteData || {};
-    const local = localData || {};
-    return {
-      plants: uniqueByStableKey([...(remote.plants || []), ...(local.plants || [])]),
-      entries: uniqueByStableKey([...(remote.entries || []), ...(local.entries || [])]),
-      toolbox: mergeToolboxData(remote.toolbox || {}, local.toolbox || {}),
-    };
-  }
-
-  async function saveMergedState(uid, merged) {
-    const ref = getStateDocRef(uid);
-    if (!ref || !merged) return;
-    try {
-      await ref.set(
-        {
-          plants: merged.plants || [],
-          entries: merged.entries || [],
-          toolbox: merged.toolbox || {},
-          updatedAt: Date.now(),
-        },
-        { merge: true }
-      );
-    } catch {
-      // ignore
+      // ignore and keep local data
     }
   }
 
@@ -249,30 +134,121 @@
     }
   }
 
-  function initFirebaseSync() {
-    if (!window.firebase || !firebase.auth || !firebase.firestore) {
-      remoteSyncReady = false;
-      return;
-    }
-    firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        localStorage.removeItem(STORAGE_AUTH);
-        window.location.replace('../dnevnik/');
-        return;
-      }
-      localStorage.setItem(
-        STORAGE_AUTH,
-        JSON.stringify({ email: user.email || '', uid: user.uid, loggedAt: Date.now() })
-      );
-      const remote = await loadRemoteState(user.uid);
-      const local = collectLocalRecoveryState();
-      const merged = mergeRemoteAndLocal(remote, local);
-      applyStateToLocal(merged);
-      await saveMergedState(user.uid, merged);
-      remoteSyncReady = true;
-      refreshAllViewsAfterRemoteLoad();
+
+async function ensureUserExists(user) {
+  const db = firebase.firestore();
+  const userRef = db.collection("users").doc(user.uid);
+
+  const docSnap = await userRef.get();
+
+  if (!docSnap.exists) {
+    await userRef.set({
+      email: user.email || "",
+      uId: user.uid,
+      role: "user",
+      createdAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString()
     });
+
+    console.log("User created");
+  } else {
+    await userRef.update({
+      lastLoginAt: new Date().toISOString()
+    });
+
+    console.log("User updated");
   }
+}
+
+function applyRoleUI(role) {
+  const adminEls = document.querySelectorAll(".admin-only");
+  const superEls = document.querySelectorAll(".admin-super-only");
+
+ 
+  adminEls.forEach(el => el.style.display = "none");
+  superEls.forEach(el => el.style.display = "none");
+
+ 
+  if (role === "admin" || role === "superadmin") {
+    adminEls.forEach(el => el.style.display = "flex");
+  }
+
+  if (role === "superadmin") {
+    superEls.forEach(el => el.style.display = "flex");
+  }
+}
+
+
+let currentUserRole = null;
+
+async function getCurrentUserRole(user) {
+  const db = firebase.firestore();
+  const userRef = db.collection("users").doc(user.uid);
+
+  const docSnap = await userRef.get();
+
+  if (!docSnap.exists) return "user";
+
+  return docSnap.data().role || "user";
+}
+
+function initFirebaseSync() {
+  if (!window.firebase || !firebase.auth || !firebase.firestore) {
+    remoteSyncReady = false;
+    return;
+  }
+
+  firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    localStorage.removeItem(STORAGE_AUTH);
+    window.location.replace('../dnevnik/');
+    return;
+  }
+
+  localStorage.setItem(
+    STORAGE_AUTH,
+    JSON.stringify({
+      email: user.email || '',
+      uid: user.uid,
+      loggedAt: Date.now()
+    })
+  );
+
+  await ensureUserExists(user);
+  currentUserRole = await getCurrentUserRole(user);
+  console.log("ROLE LOADED:", currentUserRole); // DEBUG
+  applyRoleUI(currentUserRole);
+  await loadRemoteStateIntoLocal(user.uid);
+  remoteSyncReady = true;
+  refreshAllViewsAfterRemoteLoad();
+
+ 
+  if (initialView) {
+    if (
+      initialView === "admin" &&
+      !["admin", "superadmin"].includes(currentUserRole)
+    ) {
+      showView("dashboard");
+    } else if (['dashboard', 'plants', 'cpvo', 'toolbox', 'admin'].includes(initialView)) {
+      showView(initialView);
+    }
+  }
+
+  document.body.classList.remove("app-loading");
+});
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
   const STAGES = {
     klijanje: 'Klijanje',
@@ -365,6 +341,8 @@
     cpvo: 'CPVO-obrazac',
     growlog: 'Growlog',
     toolbox: 'Alati',
+    admin: 'Admin Panel',
+    danas: 'Danas',
   };
 
   let currentGrowlogPlantId = null;
@@ -382,6 +360,8 @@
   }
 
   function showView(id, extra) {
+    
+
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
     if (id === 'growlog' && extra) {
@@ -407,13 +387,20 @@
   }
 
   navItems.forEach((item) => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const view = item.dataset.view;
-      if (view !== 'growlog') currentGrowlogPlantId = null;
-      showView(view);
-    });
+  item.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const view = item.dataset.view;
+
+    if (view === "admin" && !["admin", "superadmin"].includes(currentUserRole)) {
+      alert("Access denied.");
+      return;
+    }
+
+    if (view !== "growlog") currentGrowlogPlantId = null;
+    showView(view);
   });
+});
 
   const viewGrowlogEl = document.getElementById('view-growlog');
   if (viewGrowlogEl) {
@@ -1618,9 +1605,117 @@
   fillJournalPlantFilter();
   const params = new URLSearchParams(window.location.search);
   const initialView = params.get('view');
-  if (initialView && ['dashboard', 'plants', 'cpvo', 'toolbox'].includes(initialView)) {
-    showView(initialView);
-  } else {
-    renderDashboard();
+  if (initialView) {
+    if (
+      initialView === "admin" &&
+      !["admin", "superadmin"].includes(currentUserRole)
+    ) {
+      showView("dashboard");
+    } else if (['dashboard', 'plants', 'cpvo', 'toolbox', 'admin'].includes(initialView)) {
+      showView(initialView);
   }
+}
+  //WeatherAPI
+  const apiKey = "4fcd0d4855e24280a52121246261504";
+
+  document.querySelectorAll(".toolbox-card-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tool = btn.dataset.tool;
+
+    document.querySelectorAll(".toolbox-panel").forEach(panel => {
+      panel.style.display = "none";
+      panel.setAttribute("aria-hidden", "true");
+    });
+
+    const activePanel = document.getElementById(`toolbox-panel-${tool}`);
+
+    if (activePanel) {
+      activePanel.style.display = "block";
+      activePanel.setAttribute("aria-hidden", "false");
+    }
+
+    if (tool === "vrijeme") {
+      getWeather("Visnjevac");
+    }
+  });
+});
+
+//test weather  https://api.weatherapi.com/v1/forecast.json?key=4fcd0d4855e24280a52121246261504&q=Visnjevac
+
+async function getWeather(city) {
+  const weatherDiv = document.getElementById("weather");
+  weatherDiv.innerText = "Loading...";
+
+  const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.error) {
+      weatherDiv.innerText = "Error: " + data.error.message;
+      return;
+    }
+
+    displayWeather(data);
+
+  } catch (error) {
+    weatherDiv.innerText = "Failed to load weather";
+    console.error(error);
+  }
+}
+
+function displayWeather(data) {
+  const city = data.location.name;
+
+  let weatherHTML = `
+    <h2>${city} - 7 Dana Prognoza</h2>
+    <div class="weather-container">
+  `;
+
+  data.forecast.forecastday.forEach(day => {
+    const date = day.date;
+    const avgTemp = day.day.avgtemp_c;
+    const condition = day.day.condition.text;
+    const icon = day.day.condition.icon;
+
+    weatherHTML += `
+      <div class="weather-card">
+        <h4>${date}</h4>
+        <img src="https:${icon}" alt="${condition}">
+        <p>${condition}</p>
+        <p><strong>${avgTemp}°C</strong></p>
+      </div>
+    `;
+  });
+
+  weatherHTML += `</div>`;
+
+  document.getElementById("weather").innerHTML = weatherHTML;
+}
+
+document.addEventListener("click", (e) => {
+
+  if (e.target.closest("#admin-users")) {
+    window.location.href = "admin-users.html";
+  }
+
+  if (e.target.closest("#admin-plants")) {
+    window.location.href = "admin-plants.html";
+  }
+
+  if (e.target.closest("#admin-entries")) {
+    window.location.href = "admin-entries.html";
+  }
+
+  if (e.target.closest("#admin-tenant")) {
+    window.location.href = "admin-tenants.html";
+  }
+
+  if (e.target.closest("#admin-system")) {
+    window.location.href = "admin-system.html";
+  }
+
+});
+
 })();
