@@ -229,7 +229,7 @@ function initFirebaseSync() {
       !["admin", "superadmin"].includes(currentUserRole)
     ) {
       showView("dashboard");
-    } else if (['dashboard', 'plants', 'cpvo', 'toolbox', 'admin'].includes(initialView)) {
+    } else if (['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)) {
       showView(initialView);
     }
   }
@@ -339,6 +339,7 @@ function initFirebaseSync() {
     dashboard: 'Nadzorna ploča',
     plants: 'Biljke i dnevnik',
     cpvo: 'CPVO-obrazac',
+    pitchdeck: 'Pitch deck',
     growlog: 'Growlog',
     toolbox: 'Alati',
     admin: 'Admin Panel',
@@ -1611,10 +1612,10 @@ function initFirebaseSync() {
       !["admin", "superadmin"].includes(currentUserRole)
     ) {
       showView("dashboard");
-    } else if (['dashboard', 'plants', 'cpvo', 'toolbox', 'admin'].includes(initialView)) {
+    } else if (['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)) {
       showView(initialView);
+    }
   }
-}
   //WeatherAPI
   const apiKey = "4fcd0d4855e24280a52121246261504";
 
