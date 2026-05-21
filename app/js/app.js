@@ -264,12 +264,15 @@ function initFirebaseSync() {
     return 'klijanje';
   }
 
+  const SUBPHASE_FIELD = 'na_polju';
+
   const SUBPHASE_POTS = {
     pot_1_5dcl: '1,5 dcl',
     pot_5l: '5 L',
     pot_30l: '30 L',
     pot_10dcl: '10 dcl',
     pot_1_5l: '1,5 L',
+    [SUBPHASE_FIELD]: 'Na polju',
   };
 
   const SUBPHASE_ORDER = ['pot_1_5dcl', 'pot_5l', 'pot_30l'];
@@ -277,6 +280,26 @@ function initFirebaseSync() {
   function subphaseLabel(key) {
     if (!key) return '';
     return SUBPHASE_POTS[key] || key;
+  }
+
+  function normalizeSubphase(value) {
+    const v = String(value == null ? '' : value).trim();
+    if (!v) return null;
+    if (v === SUBPHASE_FIELD || SUBPHASE_POTS[v]) return v;
+    return null;
+  }
+
+  function nextPotSubphase(current) {
+    const cur = normalizeSubphase(current);
+    if (!cur || cur === SUBPHASE_FIELD) return SUBPHASE_ORDER[0];
+    const idx = SUBPHASE_ORDER.indexOf(cur);
+    if (idx < 0) return SUBPHASE_ORDER[0];
+    if (idx >= SUBPHASE_ORDER.length - 1) return null;
+    return SUBPHASE_ORDER[idx + 1];
+  }
+
+  function isOutdoorPlantContext(envType, subphase) {
+    return envType === 'outdoor' || subphase === SUBPHASE_FIELD;
   }
 
   const ENTRY_TYPE_LABELS = {
@@ -288,6 +311,7 @@ function initFirebaseSync() {
     stresori: 'Stresori',
     ostalo: 'Ostalo',
     faza: 'Faza (prijelaz)',
+    podfaza: 'Podfaza (lonac / polje)',
   };
 
   function getPlants() {
@@ -510,17 +534,27 @@ function initFirebaseSync() {
       })
       .join('');
 
-    const subRows = SUBPHASE_ORDER.map((k) => {
-      const isCurrent = plant.subphase === k;
-      const label = SUBPHASE_POTS[k];
-      return (
-        '<div class="tree-stage-item tree-subphase-item' +
-        (isCurrent ? ' current' : '') +
-        '"><span class="tree-stage-icon">🫙</span><span class="tree-stage-label">' +
-        escapeHtml(label) +
-        '</span></div>'
-      );
-    }).join('');
+    const subphaseDisplayOrder = SUBPHASE_ORDER.concat(
+      plant.subphase === SUBPHASE_FIELD || plant.environmentType === 'outdoor' ? [SUBPHASE_FIELD] : []
+    );
+    const subRows = subphaseDisplayOrder
+      .filter((k, i, arr) => arr.indexOf(k) === i)
+      .map((k) => {
+        const isCurrent =
+          plant.subphase === k || (k === SUBPHASE_FIELD && !plant.subphase && plant.environmentType === 'outdoor');
+        const label = SUBPHASE_POTS[k];
+        const icon = k === SUBPHASE_FIELD ? '🌾' : '🫙';
+        return (
+          '<div class="tree-stage-item tree-subphase-item' +
+          (isCurrent ? ' current' : '') +
+          '"><span class="tree-stage-icon">' +
+          icon +
+          '</span><span class="tree-stage-label">' +
+          escapeHtml(label) +
+          '</span></div>'
+        );
+      })
+      .join('');
 
     const hist = plant.stageHistory || [];
     let histHtml;
@@ -551,15 +585,55 @@ function initFirebaseSync() {
         '<div class="tree-stages tree-subphases">' +
         subRows +
         '</div>' +
-        '<h4 class="growlog-subsection-title">Povijest prijelaza</h4>' +
+        '<h4 class="growlog-subsection-title">Povijest prijelaza faza</h4>' +
         '<div class="stage-history-list">' +
         histHtml +
-        '</div>';
+        '</div>' +
+        (function () {
+          const sh = plant.subphaseHistory || [];
+          if (!sh.length) return '';
+          const rows = sh
+            .slice()
+            .reverse()
+            .map((h) => {
+              const d = h.date
+                ? new Date(h.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short', year: 'numeric' })
+                : '—';
+              const fromLab = h.from ? subphaseLabel(h.from) : '—';
+              const toLab = subphaseLabel(h.to) || h.to || '—';
+              return (
+                '<div class="stage-history-item"><span class="stage-history-date">' +
+                d +
+                '</span><span class="stage-history-label">' +
+                escapeHtml(fromLab) +
+                ' → ' +
+                escapeHtml(toLab) +
+                '</span></div>'
+              );
+            })
+            .join('');
+          return (
+            '<h4 class="growlog-subsection-title">Povijest podfaza (lonci / polje)</h4>' +
+            '<div class="stage-history-list">' +
+            rows +
+            '</div>'
+          );
+        })();
     }
 
     document.getElementById('growlog-environment').innerHTML = `
       <div class="env-row"><span class="env-icon">⛺</span> ${escapeHtml(plant.environmentName || '—')}</div>
       <div class="env-row"><span class="env-icon">💡</span> ${envType}</div>
+      ${
+        plant.fieldLocation
+          ? '<div class="env-row"><span class="env-icon">📍</span> Polje: ' + escapeHtml(plant.fieldLocation) + '</div>'
+          : ''
+      }
+      ${
+        plant.plantingLocation
+          ? '<div class="env-row"><span class="env-icon">🌱</span> Sađenje: ' + escapeHtml(plant.plantingLocation) + '</div>'
+          : ''
+      }
       <div class="env-row"><span class="env-icon">🕐</span> ${exposure} osvjetljenja</div>
     `;
 
@@ -754,6 +828,16 @@ function initFirebaseSync() {
             : ''
         }
         ${p.strain ? `<div class="strain">${escapeHtml(p.strain)}</div>` : ''}
+        ${
+          p.fieldLocation
+            ? `<div class="text-muted" style="font-size:0.85rem">📍 ${escapeHtml(p.fieldLocation)}</div>`
+            : ''
+        }
+        ${
+          p.plantingLocation
+            ? `<div class="text-muted" style="font-size:0.85rem">🌱 ${escapeHtml(p.plantingLocation)}</div>`
+            : ''
+        }
         <div class="text-muted" style="font-size:0.85rem">Nasad: <strong style="color:var(--text)">${Math.max(1, Number(p.count || 1))}</strong> bilj.</div>
         ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Od ${new Date(p.startDate).toLocaleDateString('hr-HR')}</div>` : ''}
         <div class="plant-card-actions">
@@ -775,6 +859,65 @@ function initFirebaseSync() {
     list.querySelectorAll('.btn-delete-plant').forEach((btn) => {
       btn.addEventListener('click', () => deletePlant(btn.closest('.plant-card').dataset.id));
     });
+  }
+
+  function updatePlantOutdoorFieldsVisibility() {
+    const outdoorBlock = document.getElementById('plant-outdoor-fields');
+    const typeEl = document.getElementById('plant-environment-type');
+    const subSel = document.getElementById('plant-subphase');
+    const fieldInput = document.getElementById('plant-field-location');
+    const plantingWrap = document.getElementById('plant-planting-location-wrap');
+    if (!outdoorBlock || !typeEl) return;
+    const subVal = subSel ? normalizeSubphase(subSel.value) : null;
+    const showOutdoor = isOutdoorPlantContext(typeEl.value, subVal);
+    outdoorBlock.hidden = !showOutdoor;
+    outdoorBlock.style.display = showOutdoor ? '' : 'none';
+    if (plantingWrap && fieldInput) {
+      const plantingInput = document.getElementById('plant-planting-location');
+      const showPlanting =
+        showOutdoor &&
+        (fieldInput.value.trim().length > 0 || (plantingInput && plantingInput.value.trim().length > 0));
+      plantingWrap.hidden = !showPlanting;
+      plantingWrap.style.display = showPlanting ? '' : 'none';
+    }
+    if (subVal === SUBPHASE_FIELD && typeEl.value !== 'outdoor') typeEl.value = 'outdoor';
+    updatePlantSubphaseActions();
+  }
+
+  function updatePlantSubphaseActions() {
+    const subSel = document.getElementById('plant-subphase');
+    const btnNext = document.getElementById('plant-btn-next-pot');
+    const btnField = document.getElementById('plant-btn-to-field');
+    const typeEl = document.getElementById('plant-environment-type');
+    if (!subSel || !btnNext || !btnField) return;
+    const cur = normalizeSubphase(subSel.value);
+    const onField = cur === SUBPHASE_FIELD;
+    const nextPot = nextPotSubphase(cur);
+    btnNext.disabled = onField || !nextPot;
+    btnField.disabled = onField;
+    if (onField && typeEl && typeEl.value !== 'outdoor') typeEl.value = 'outdoor';
+  }
+
+  function applyPlantNextPot() {
+    const subSel = document.getElementById('plant-subphase');
+    const typeEl = document.getElementById('plant-environment-type');
+    if (!subSel) return;
+    const cur = normalizeSubphase(subSel.value);
+    const next = nextPotSubphase(cur);
+    if (!next) return;
+    subSel.value = next;
+    if (typeEl && typeEl.value === 'outdoor') typeEl.value = 'indoor';
+    updatePlantOutdoorFieldsVisibility();
+  }
+
+  function applyPlantToField() {
+    const subSel = document.getElementById('plant-subphase');
+    const typeEl = document.getElementById('plant-environment-type');
+    if (subSel) subSel.value = SUBPHASE_FIELD;
+    if (typeEl) typeEl.value = 'outdoor';
+    updatePlantOutdoorFieldsVisibility();
+    const fieldInput = document.getElementById('plant-field-location');
+    if (fieldInput) fieldInput.focus();
   }
 
   function deletePlant(id) {
@@ -826,11 +969,18 @@ function initFirebaseSync() {
         document.getElementById('plant-strain').value = p.strain || '';
         document.getElementById('plant-count').value = p.count ?? 1;
         document.getElementById('plant-stage').value = stageCanonical;
+        const subCanonical = normalizeSubphase(p.subphase);
         const subSel = document.getElementById('plant-subphase');
-        if (subSel) subSel.value = p.subphase && SUBPHASE_POTS[p.subphase] ? p.subphase : '';
+        if (subSel) subSel.value = subCanonical || '';
+        const subAtOpenEl = document.getElementById('plant-subphase-at-open');
+        if (subAtOpenEl) subAtOpenEl.value = subCanonical || '';
         document.getElementById('plant-start-date').value = p.startDate || '';
         document.getElementById('plant-environment-name').value = p.environmentName || '';
         document.getElementById('plant-environment-type').value = p.environmentType || 'indoor';
+        const fieldLocEl = document.getElementById('plant-field-location');
+        if (fieldLocEl) fieldLocEl.value = p.fieldLocation || '';
+        const plantingEl = document.getElementById('plant-planting-location');
+        if (plantingEl) plantingEl.value = p.plantingLocation || '';
         document.getElementById('plant-exposure-hours').value = p.exposureHours ?? '';
         document.getElementById('plant-notes').value = p.notes || '';
         if (p.photo) {
@@ -851,13 +1001,20 @@ function initFirebaseSync() {
       form.reset();
       document.getElementById('plant-id').value = '';
       if (stageAtOpenEl) stageAtOpenEl.value = '';
+      const subAtOpenElNew = document.getElementById('plant-subphase-at-open');
+      if (subAtOpenElNew) subAtOpenElNew.value = '';
       document.getElementById('plant-count').value = 1;
       document.getElementById('plant-stage').value = 'klijanje';
       const subSelNew = document.getElementById('plant-subphase');
       if (subSelNew) subSelNew.value = '';
+      const fieldLocNew = document.getElementById('plant-field-location');
+      if (fieldLocNew) fieldLocNew.value = '';
+      const plantingNew = document.getElementById('plant-planting-location');
+      if (plantingNew) plantingNew.value = '';
       photoData.value = '';
       photoPreview.innerHTML = '';
     }
+    updatePlantOutdoorFieldsVisibility();
     modal.classList.add('open');
   }
 
@@ -866,6 +1023,17 @@ function initFirebaseSync() {
   }
 
   document.getElementById('btn-add-plant').addEventListener('click', () => openPlantModal());
+
+  const plantEnvTypeEl = document.getElementById('plant-environment-type');
+  if (plantEnvTypeEl) plantEnvTypeEl.addEventListener('change', updatePlantOutdoorFieldsVisibility);
+  const plantSubphaseEl = document.getElementById('plant-subphase');
+  if (plantSubphaseEl) plantSubphaseEl.addEventListener('change', updatePlantOutdoorFieldsVisibility);
+  const plantFieldLocInput = document.getElementById('plant-field-location');
+  if (plantFieldLocInput) plantFieldLocInput.addEventListener('input', updatePlantOutdoorFieldsVisibility);
+  const btnNextPot = document.getElementById('plant-btn-next-pot');
+  if (btnNextPot) btnNextPot.addEventListener('click', applyPlantNextPot);
+  const btnToField = document.getElementById('plant-btn-to-field');
+  if (btnToField) btnToField.addEventListener('click', applyPlantToField);
 
   document.getElementById('plant-photo').addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -906,12 +1074,31 @@ function initFirebaseSync() {
     const transDateEl = document.getElementById('plant-stage-transition-date');
     const transNoteEl = document.getElementById('plant-stage-transition-note');
     const transitionNote = transNoteEl ? transNoteEl.value.trim() : '';
+    let envTypeVal = document.getElementById('plant-environment-type').value || 'indoor';
+    const newSubphase = normalizeSubphase(
+      (() => {
+        const v = document.getElementById('plant-subphase');
+        return v && v.value ? v.value.trim() : '';
+      })()
+    );
+    if (newSubphase === SUBPHASE_FIELD) envTypeVal = 'outdoor';
+    const outdoorCtx = isOutdoorPlantContext(envTypeVal, newSubphase);
+    const fieldLocEl = document.getElementById('plant-field-location');
+    const plantingEl = document.getElementById('plant-planting-location');
+    const fieldLocationVal = outdoorCtx && fieldLocEl ? fieldLocEl.value.trim() || null : null;
+    const plantingLocationVal =
+      outdoorCtx && fieldLocationVal && plantingEl ? plantingEl.value.trim() || null : null;
+    let locNoteSuffix = '';
+    if (fieldLocationVal) locNoteSuffix += ' Lokacija polja: ' + fieldLocationVal + '.';
+    if (plantingLocationVal) locNoteSuffix += ' Lokacija sađenja: ' + plantingLocationVal + '.';
 
     let stageHistory = [];
     let stageDates = {};
+    let subphaseHistory = [];
     if (prev) {
       stageHistory = Array.isArray(prev.stageHistory) ? prev.stageHistory.slice() : [];
       stageDates = prev.stageDates && typeof prev.stageDates === 'object' ? { ...prev.stageDates } : {};
+      subphaseHistory = Array.isArray(prev.subphaseHistory) ? prev.subphaseHistory.slice() : [];
     }
 
     const journalAdds = [];
@@ -921,6 +1108,7 @@ function initFirebaseSync() {
       stageHistory.push({ from: null, to: newStage, date: day0 });
       stageDates[newStage] = day0;
       let note0 = 'Započet uzgoj — faza: ' + (STAGES[newStage] || newStage);
+      if (locNoteSuffix) note0 += locNoteSuffix;
       if (transitionNote) note0 += '. ' + transitionNote;
       journalAdds.push({
         id: uuid(),
@@ -929,8 +1117,30 @@ function initFirebaseSync() {
         type: 'faza',
         note: note0,
         photo: photoData || null,
-        meta: { faza: { from: null, to: newStage } },
+        meta: {
+          faza: { from: null, to: newStage },
+          ...(fieldLocationVal ? { fieldLocation: fieldLocationVal } : {}),
+          ...(plantingLocationVal ? { plantingLocation: plantingLocationVal } : {}),
+        },
       });
+      if (newSubphase) {
+        subphaseHistory.push({ from: null, to: newSubphase, date: day0 });
+        let subNote = 'Podfaza: ' + subphaseLabel(newSubphase);
+        if (locNoteSuffix) subNote += locNoteSuffix;
+        journalAdds.push({
+          id: uuid(),
+          plantId: newId,
+          date: day0,
+          type: 'podfaza',
+          note: subNote,
+          photo: null,
+          meta: {
+            podfaza: { from: null, to: newSubphase },
+            ...(fieldLocationVal ? { fieldLocation: fieldLocationVal } : {}),
+            ...(plantingLocationVal ? { plantingLocation: plantingLocationVal } : {}),
+          },
+        });
+      }
     } else if (id) {
       const atOpenEl = document.getElementById('plant-stage-at-open');
       const stageAtOpen = canonicalPlantStage(
@@ -942,7 +1152,7 @@ function initFirebaseSync() {
         stageDates[newStage] = td;
         const base =
           'Prijelaz faze: ' + (STAGES[stageAtOpen] || stageAtOpen) + ' → ' + (STAGES[newStage] || newStage);
-        const note1 = transitionNote ? base + '. ' + transitionNote : base;
+        const note1 = (transitionNote ? base + '. ' + transitionNote : base) + locNoteSuffix;
         journalAdds.push({
           id: uuid(),
           plantId: newId,
@@ -950,7 +1160,39 @@ function initFirebaseSync() {
           type: 'faza',
           note: note1,
           photo: photoData || null,
-          meta: { faza: { from: stageAtOpen, to: newStage } },
+          meta: {
+            faza: { from: stageAtOpen, to: newStage },
+            ...(fieldLocationVal ? { fieldLocation: fieldLocationVal } : {}),
+            ...(plantingLocationVal ? { plantingLocation: plantingLocationVal } : {}),
+          },
+        });
+      }
+
+      const subAtOpenEl = document.getElementById('plant-subphase-at-open');
+      const subAtOpen = normalizeSubphase(
+        subAtOpenEl && String(subAtOpenEl.value).trim() !== ''
+          ? subAtOpenEl.value
+          : prev && prev.subphase
+      );
+      if (subAtOpen !== newSubphase) {
+        const tdSub = (transDateEl && transDateEl.value) || localDateYYYYMMDD();
+        subphaseHistory.push({ from: subAtOpen, to: newSubphase, date: tdSub });
+        const fromLab = subAtOpen ? subphaseLabel(subAtOpen) : '—';
+        const toLab = newSubphase ? subphaseLabel(newSubphase) : '—';
+        let subNote =
+          'Prijelaz podfaze: ' + fromLab + ' → ' + toLab + (transitionNote ? '. ' + transitionNote : '') + locNoteSuffix;
+        journalAdds.push({
+          id: uuid(),
+          plantId: newId,
+          date: tdSub,
+          type: 'podfaza',
+          note: subNote,
+          photo: photoData || null,
+          meta: {
+            podfaza: { from: subAtOpen, to: newSubphase },
+            ...(fieldLocationVal ? { fieldLocation: fieldLocationVal } : {}),
+            ...(plantingLocationVal ? { plantingLocation: plantingLocationVal } : {}),
+          },
         });
       }
     }
@@ -961,15 +1203,12 @@ function initFirebaseSync() {
       strain: document.getElementById('plant-strain').value.trim(),
       count: countNum,
       stage: newStage,
-      subphase:
-        (() => {
-          const v = document.getElementById('plant-subphase');
-          const raw = v && v.value ? v.value.trim() : '';
-          return raw && SUBPHASE_POTS[raw] ? raw : null;
-        })(),
+      subphase: newSubphase,
       startDate: startDateVal,
       environmentName: document.getElementById('plant-environment-name').value.trim() || null,
-      environmentType: document.getElementById('plant-environment-type').value || 'indoor',
+      environmentType: envTypeVal,
+      fieldLocation: fieldLocationVal,
+      plantingLocation: plantingLocationVal,
       exposureHours: exposureVal ? parseInt(exposureVal, 10) : null,
       notes: document.getElementById('plant-notes').value.trim(),
       photo: photoData || null,
@@ -977,6 +1216,7 @@ function initFirebaseSync() {
       views: (prev || {}).views ?? 0,
       stageHistory,
       stageDates,
+      subphaseHistory,
     };
     let next;
     if (id) {
@@ -1016,10 +1256,33 @@ function initFirebaseSync() {
     sel.innerHTML = '<option value="">Sve biljke</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
+  function syncEntryFazaLocationsFromPlant() {
+    const plantId = document.getElementById('entry-plant') && document.getElementById('entry-plant').value;
+    const fieldInput = document.getElementById('entry-faza-field-location');
+    const plantingInput = document.getElementById('entry-faza-planting-location');
+    const plantingWrap = document.getElementById('entry-faza-planting-wrap');
+    if (!fieldInput) return;
+    if (!plantId) {
+      fieldInput.value = '';
+      if (plantingInput) plantingInput.value = '';
+      if (plantingWrap) plantingWrap.hidden = true;
+      return;
+    }
+    const plant = getPlants().find((p) => p.id === plantId);
+    fieldInput.value = (plant && plant.fieldLocation) || '';
+    if (plantingInput) plantingInput.value = (plant && plant.plantingLocation) || '';
+    if (plantingWrap) {
+      const show = !!(plant && plant.fieldLocation);
+      plantingWrap.hidden = !show;
+      plantingWrap.style.display = show ? '' : 'none';
+    }
+  }
+
   function updateEntryExtraVisibility() {
     const type = document.getElementById('entry-type').value;
     const pres = document.getElementById('entry-extra-presadjivanje');
     const stres = document.getElementById('entry-extra-stresori');
+    const faza = document.getElementById('entry-extra-faza');
     if (pres) {
       const open = type === 'presadjivanje';
       pres.classList.toggle('open', open);
@@ -1029,6 +1292,12 @@ function initFirebaseSync() {
       const open = type === 'stresori';
       stres.classList.toggle('open', open);
       stres.setAttribute('aria-hidden', !open);
+    }
+    if (faza) {
+      const open = type === 'faza';
+      faza.classList.toggle('open', open);
+      faza.setAttribute('aria-hidden', !open);
+      if (open) syncEntryFazaLocationsFromPlant();
     }
   }
 
@@ -1062,6 +1331,39 @@ function initFirebaseSync() {
             if (m.from) parts.push('Od: ' + escapeHtml(STAGES[m.from] || m.from));
             parts.push('U: ' + escapeHtml(STAGES[m.to] || m.to));
             if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Prijelaz faze</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+            if (e.meta.fieldLocation) {
+              metaHtml +=
+                '<div class="entry-meta-block"><strong>Lokacija polja</strong><p>' +
+                escapeHtml(e.meta.fieldLocation) +
+                '</p></div>';
+            }
+            if (e.meta.plantingLocation) {
+              metaHtml +=
+                '<div class="entry-meta-block"><strong>Lokacija sađenja</strong><p>' +
+                escapeHtml(e.meta.plantingLocation) +
+                '</p></div>';
+            }
+          }
+          if (e.meta.podfaza) {
+            const m = e.meta.podfaza;
+            const parts = [];
+            if (m.from) parts.push('Od: ' + escapeHtml(subphaseLabel(m.from)));
+            parts.push('U: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
+            if (parts.length) {
+              metaHtml += '<div class="entry-meta-block"><strong>Prijelaz podfaze</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+            }
+            if (e.meta.fieldLocation) {
+              metaHtml +=
+                '<div class="entry-meta-block"><strong>Lokacija polja</strong><p>' +
+                escapeHtml(e.meta.fieldLocation) +
+                '</p></div>';
+            }
+            if (e.meta.plantingLocation) {
+              metaHtml +=
+                '<div class="entry-meta-block"><strong>Lokacija sađenja</strong><p>' +
+                escapeHtml(e.meta.plantingLocation) +
+                '</p></div>';
+            }
           }
           if (e.meta.presadjivanje) {
             const m = e.meta.presadjivanje;
@@ -1102,6 +1404,22 @@ function initFirebaseSync() {
   const modalEntry = document.getElementById('modal-entry');
   const entryTypeEl = document.getElementById('entry-type');
   if (entryTypeEl) entryTypeEl.addEventListener('change', updateEntryExtraVisibility);
+  const entryPlantEl = document.getElementById('entry-plant');
+  if (entryPlantEl) {
+    entryPlantEl.addEventListener('change', () => {
+      if (document.getElementById('entry-type').value === 'faza') syncEntryFazaLocationsFromPlant();
+    });
+  }
+  const entryFazaFieldInput = document.getElementById('entry-faza-field-location');
+  if (entryFazaFieldInput) {
+    entryFazaFieldInput.addEventListener('input', () => {
+      const wrap = document.getElementById('entry-faza-planting-wrap');
+      if (!wrap) return;
+      const show = entryFazaFieldInput.value.trim().length > 0;
+      wrap.hidden = !show;
+      wrap.style.display = show ? '' : 'none';
+    });
+  }
 
   function openEntryModal(plantId) {
     if (!modalEntry) return;
@@ -1208,7 +1526,18 @@ function initFirebaseSync() {
       const vpd = document.getElementById('entry-stressor-vpd').value.trim();
       const pests = document.getElementById('entry-stressor-pests').value.trim();
       if (temp || humidity || vpd || pests) meta = { stresori: { temperature: temp || null, humidity: humidity || null, vpd: vpd || null, pests: pests || null } };
+    } else if (type === 'faza') {
+      const fieldLocInput = document.getElementById('entry-faza-field-location');
+      const plantingInput = document.getElementById('entry-faza-planting-location');
+      const fieldLoc = fieldLocInput ? fieldLocInput.value.trim() : '';
+      const plantingLoc = plantingInput ? plantingInput.value.trim() : '';
+      if (fieldLoc || plantingLoc) {
+        meta = { faza: {} };
+        if (fieldLoc) meta.fieldLocation = fieldLoc;
+        if (plantingLoc) meta.plantingLocation = plantingLoc;
+      }
     }
+    const plantIdForEntry = document.getElementById('entry-plant').value || null;
     const entries = getEntries();
     entries.push({
       id: uuid(),
@@ -1221,6 +1550,22 @@ function initFirebaseSync() {
       meta: meta || undefined,
     });
     setEntries(entries);
+    if (type === 'faza' && plantIdForEntry && meta && (meta.fieldLocation || meta.plantingLocation)) {
+      const plants = getPlants();
+      const idx = plants.findIndex((p) => p.id === plantIdForEntry);
+      if (idx >= 0) {
+        const patch = { ...plants[idx], updatedAt: new Date().toISOString() };
+        if (meta.fieldLocation) {
+          patch.fieldLocation = meta.fieldLocation;
+          patch.environmentType = 'outdoor';
+        }
+        if (meta.plantingLocation) patch.plantingLocation = meta.plantingLocation;
+        plants[idx] = patch;
+        setPlants(plants);
+        renderPlants();
+        if (currentGrowlogPlantId === plantIdForEntry) renderGrowlog(plantIdForEntry);
+      }
+    }
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');

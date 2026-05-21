@@ -1386,6 +1386,30 @@ body {
   line-height: 1.35;
 }
 
+.plant-subphase-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.plant-subphase-actions-hint {
+  flex: 1 1 100%;
+  margin: 0.15rem 0 0;
+}
+
+.plant-subphase-actions .btn-sm {
+  font-size: 0.82rem;
+  padding: 0.35rem 0.65rem;
+}
+
+.plant-outdoor-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
 .plant-stage-transition-block {
   margin: 0.25rem 0 0.5rem;
   padding: 0.75rem 0;

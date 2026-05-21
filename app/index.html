@@ -404,6 +404,7 @@
       <form id="form-plant">
         <input type="hidden" id="plant-id" />
         <input type="hidden" id="plant-stage-at-open" value="" />
+        <input type="hidden" id="plant-subphase-at-open" value="" />
         <label>
           Ime biljke *
           <input type="text" id="plant-name" required placeholder="npr. CBD Auto #1" />
@@ -433,8 +434,20 @@
             <option value="pot_1_5dcl">1,5 dcl</option>
             <option value="pot_5l">5 L</option>
             <option value="pot_30l">30 L</option>
+            <option value="na_polju">Na polju</option>
           </select>
         </label>
+        <div class="plant-subphase-actions" id="plant-subphase-actions">
+          <button type="button" class="btn btn-ghost btn-sm" id="plant-btn-next-pot">
+            → Sljedeći lonac
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="plant-btn-to-field">
+            → Na polje
+          </button>
+          <p class="field-hint plant-subphase-actions-hint">
+            Iz lonca možete prijeći u veći lonac ili na otvoreno polje; zatim unesite lokaciju polja i sađenja.
+          </p>
+        </div>
         <div class="plant-stage-transition-block">
           <p class="field-hint">
             Kod <strong>nove biljke</strong> nastaje prva bilješka u dnevniku. Kad <strong>mijenjaš fazu</strong> i spremiš,
@@ -468,6 +481,24 @@
             <option value="outdoor">Na otvorenom</option>
           </select>
         </label>
+        <div id="plant-outdoor-fields" class="plant-outdoor-fields" hidden>
+          <label id="plant-field-location-wrap" class="plant-field-location-wrap">
+            Lokacija polja
+            <input
+              type="text"
+              id="plant-field-location"
+              placeholder="npr. Polje A, parcela 3, GPS koordinate…"
+            />
+          </label>
+          <label id="plant-planting-location-wrap" class="plant-planting-location-wrap" hidden>
+            Lokacija sađenja
+            <input
+              type="text"
+              id="plant-planting-location"
+              placeholder="npr. red 2, mjesto 15, uz rub parcele…"
+            />
+          </label>
+        </div>
         <label>
           Sati osvjetljenja (dnevno)
           <input type="number" id="plant-exposure-hours" min="0" max="24" placeholder="npr. 18" />
@@ -532,6 +563,18 @@
             <label>Vlaga <input type="text" id="entry-stressor-humidity" placeholder="npr. suho, vlažno" /></label>
             <label>VPD (ukupnost svjetlosnih čestica u toku dana) <input type="text" id="entry-stressor-vpd" placeholder="npr. vrijednost ili opis" /></label>
             <label>Nametnici <input type="text" id="entry-stressor-pests" placeholder="npr. grinje, uši" /></label>
+          </div>
+          <div id="entry-extra-faza" class="entry-extra-section" aria-hidden="true">
+            <h4 class="entry-extra-title">Faza / milestone</h4>
+            <label>
+              Lokacija polja
+              <input type="text" id="entry-faza-field-location" placeholder="npr. Polje A, parcela 3…" />
+            </label>
+            <label id="entry-faza-planting-wrap">
+              Lokacija sađenja
+              <input type="text" id="entry-faza-planting-location" placeholder="npr. red 2, mjesto 15…" />
+            </label>
+            <p class="field-hint">Ažurira lokacije na profilu odabrane biljke (uzgoj na otvorenom).</p>
           </div>
         </div>
         <label>
