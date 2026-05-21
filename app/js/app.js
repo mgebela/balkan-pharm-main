@@ -822,6 +822,8 @@ function initFirebaseSync() {
       if (initialView) {
         if (initialView === 'admin' && !['admin', 'superadmin'].includes(currentUserRole)) {
           showView('dashboard');
+        } else if (initialView === 'pitchdeck' && currentUserRole !== 'superadmin') {
+          showView('dashboard');
         } else if (
           ['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
         ) {
@@ -985,7 +987,9 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
-    
+    if (id === 'pitchdeck' && currentUserRole !== 'superadmin') {
+      id = 'dashboard';
+    }
 
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
@@ -1021,6 +1025,10 @@ function initFirebaseSync() {
 
     if (view === "admin" && !["admin", "superadmin"].includes(currentUserRole)) {
       alert("Access denied.");
+      return;
+    }
+
+    if (view === "pitchdeck" && currentUserRole !== "superadmin") {
       return;
     }
 
