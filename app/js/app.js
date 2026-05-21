@@ -607,72 +607,87 @@ async function getCurrentUserRole(user) {
   return docSnap.data().role || "user";
 }
 
+function getInitialViewFromUrl() {
+  try {
+    return new URLSearchParams(window.location.search).get('view');
+  } catch {
+    return null;
+  }
+}
+
+function finishAppLoading() {
+  document.body.classList.remove('app-loading');
+}
+
 function initFirebaseSync() {
   if (!window.firebase || !firebase.auth || !firebase.firestore) {
     remoteSyncReady = false;
+    finishAppLoading();
     return;
   }
 
   firebase.auth().onAuthStateChanged(async (user) => {
-  if (!user) {
-    localStorage.removeItem(STORAGE_AUTH);
-    window.location.replace('../dnevnik/');
-    return;
-  }
-
-  localStorage.setItem(
-    STORAGE_AUTH,
-    JSON.stringify({
-      email: user.email || '',
-      uid: user.uid,
-      loggedAt: Date.now()
-    })
-  );
-
-  await ensureUserExists(user);
-  currentUserRole = await getCurrentUserRole(user);
-  console.log("ROLE LOADED:", currentUserRole); // DEBUG
-  applyRoleUI(currentUserRole);
-
-  if (currentUserRole === 'admin') {
-    isAdminReadOnly = true;
-    remoteSyncReady = false;
-    await loadSuperadminDatabaseForAdmin();
-    applyAdminReadOnlyUI(
-      'Pregled cijele baze superadmina (samo čitanje) — bez mogućnosti uređivanja biljaka.'
-    );
-  } else if (currentUserRole === 'viewer') {
-    isAdminReadOnly = true;
-    remoteSyncReady = false;
-    await ensureViewerBootstrapGrant(user.uid, user.email || '');
-    await loadSharedDatabaseForViewer(user.uid, user.email || '');
-    applyAdminReadOnlyUI(
-      'Pregled dijeljenih biljaka (samo čitanje) — uređivanje nije dopušteno.'
-    );
-  } else {
-    isAdminReadOnly = false;
-    document.body.classList.remove('admin-readonly');
-    const state = await loadRemoteStateIntoLocal(user.uid);
-    applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
-    remoteSyncReady = true;
-  }
-
-  refreshAllViewsAfterRemoteLoad();
-
- 
-  if (initialView) {
-    if (
-      initialView === "admin" &&
-      !["admin", "superadmin"].includes(currentUserRole)
-    ) {
-      showView("dashboard");
-    } else if (['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)) {
-      showView(initialView);
+    if (!user) {
+      localStorage.removeItem(STORAGE_AUTH);
+      window.location.replace('../dnevnik/');
+      return;
     }
-  }
 
-  document.body.classList.remove("app-loading");
-});
+    try {
+      localStorage.setItem(
+        STORAGE_AUTH,
+        JSON.stringify({
+          email: user.email || '',
+          uid: user.uid,
+          loggedAt: Date.now()
+        })
+      );
+
+      await ensureUserExists(user);
+      currentUserRole = await getCurrentUserRole(user);
+      applyRoleUI(currentUserRole);
+
+      if (currentUserRole === 'admin') {
+        isAdminReadOnly = true;
+        remoteSyncReady = false;
+        await loadSuperadminDatabaseForAdmin();
+        applyAdminReadOnlyUI(
+          'Pregled cijele baze superadmina (samo čitanje) — bez mogućnosti uređivanja biljaka.'
+        );
+      } else if (currentUserRole === 'viewer') {
+        isAdminReadOnly = true;
+        remoteSyncReady = false;
+        await ensureViewerBootstrapGrant(user.uid, user.email || '');
+        await loadSharedDatabaseForViewer(user.uid, user.email || '');
+        applyAdminReadOnlyUI(
+          'Pregled dijeljenih biljaka (samo čitanje) — uređivanje nije dopušteno.'
+        );
+      } else {
+        isAdminReadOnly = false;
+        document.body.classList.remove('admin-readonly');
+        const state = await loadRemoteStateIntoLocal(user.uid);
+        applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
+        remoteSyncReady = true;
+      }
+
+      refreshAllViewsAfterRemoteLoad();
+
+      const initialView = getInitialViewFromUrl();
+      if (initialView) {
+        if (initialView === 'admin' && !['admin', 'superadmin'].includes(currentUserRole)) {
+          showView('dashboard');
+        } else if (
+          ['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
+        ) {
+          showView(initialView);
+        }
+      }
+    } catch (err) {
+      console.error('App init failed', err);
+    } finally {
+      finishAppLoading();
+    }
+  });
 }
 
 
