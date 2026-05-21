@@ -650,6 +650,7 @@ function initFirebaseSync() {
       heroEl.innerHTML =
         '<div class="growlog-hero-glow" aria-hidden="true"></div>' +
         '<div class="growlog-hero-inner">' +
+        '<div class="growlog-hero-head">' +
         '<div class="growlog-hero-badges">' +
         '<span class="growlog-hero-chip growlog-hero-chip--accent">' +
         escapeHtml(stageLabel) +
@@ -664,12 +665,18 @@ function initFirebaseSync() {
         escapeHtml(envType) +
         '</span>' +
         '</div>' +
+        '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Uredi biljku</button>' +
+        '</div>' +
         '<h2 class="growlog-hero-title">' +
         escapeHtml(plant.name) +
         '</h2>' +
         strainHtml +
         '<p class="growlog-hero-hint">Fotografije su u bočnoj traci i u nedavnim slikama ispod.</p>' +
         '</div>';
+      const heroEditBtn = document.getElementById('growlog-hero-edit');
+      if (heroEditBtn) {
+        heroEditBtn.addEventListener('click', () => openPlantModal(plantId));
+      }
     }
 
     const timelineItems = [];
@@ -842,7 +849,7 @@ function initFirebaseSync() {
         ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Od ${new Date(p.startDate).toLocaleDateString('hr-HR')}</div>` : ''}
         <div class="plant-card-actions">
           <button type="button" class="btn btn-primary btn-growlog">Growlog</button>
-          <button type="button" class="btn btn-ghost btn-edit-plant">Uredi</button>
+          <button type="button" class="btn btn-ghost btn-edit-plant">✎ Uredi biljku</button>
           <button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>
         </div>
       </div>
@@ -1235,7 +1242,11 @@ function initFirebaseSync() {
     fillEntryPlantSelect();
     fillJournalPlantFilter();
     if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
-    if (currentGrowlogPlantId === newId) renderGrowlog(newId);
+    if (currentGrowlogPlantId === newId) {
+      renderGrowlog(newId);
+      const headerTitle = document.querySelector('.view-title');
+      if (headerTitle) headerTitle.textContent = payload.name;
+    }
   });
 
   document.querySelector('#modal-plant .modal-close').addEventListener('click', closePlantModal);
@@ -1454,6 +1465,14 @@ function initFirebaseSync() {
     btnAddEntryGrowlog.addEventListener('click', () => {
       if (!currentGrowlogPlantId) return;
       openEntryModal(currentGrowlogPlantId);
+    });
+  }
+
+  const btnEditPlantGrowlog = document.getElementById('btn-edit-plant-growlog');
+  if (btnEditPlantGrowlog) {
+    btnEditPlantGrowlog.addEventListener('click', () => {
+      if (!currentGrowlogPlantId) return;
+      openPlantModal(currentGrowlogPlantId);
     });
   }
 
