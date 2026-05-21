@@ -50,6 +50,7 @@
   let remoteSyncTimer = null;
   let remoteSyncPending = {};
   let remoteSyncInFlight = false;
+  let isAdminReadOnly = false;
 
   function getStoredAuth() {
     try {
@@ -78,7 +79,7 @@
   }
 
   function scheduleRemoteSync(patch) {
-    if (!remoteSyncReady) return;
+    if (isAdminReadOnly || !remoteSyncReady) return;
     remoteSyncPending = Object.assign(remoteSyncPending, patch || {});
     if (remoteSyncTimer) clearTimeout(remoteSyncTimer);
     remoteSyncTimer = setTimeout(() => {
@@ -108,16 +109,160 @@
 
   async function loadRemoteStateIntoLocal(uid) {
     const ref = getStateDocRef(uid);
-    if (!ref) return;
+    if (!ref) return null;
     try {
       const snap = await ref.get();
-      if (!snap.exists) return;
+      if (!snap.exists) return null;
       const data = snap.data() || {};
-      if (Array.isArray(data.plants)) localStorage.setItem(STORAGE_PLANTS, JSON.stringify(data.plants));
-      if (Array.isArray(data.entries)) localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(data.entries));
-      if (data.toolbox && typeof data.toolbox === 'object') localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data.toolbox));
+      return {
+        plants: Array.isArray(data.plants) ? data.plants : [],
+        entries: Array.isArray(data.entries) ? data.entries : [],
+        toolbox: data.toolbox && typeof data.toolbox === 'object' ? data.toolbox : {},
+      };
     } catch {
-      // ignore and keep local data
+      return null;
+    }
+  }
+
+  function applyRemoteStateToLocal(state) {
+    if (!state) return;
+    localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants || []));
+    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries || []));
+    localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox || {}));
+  }
+
+  function mergeRecordsById(existing, incoming) {
+    const map = new Map();
+    (existing || []).forEach((item) => {
+      if (item && item.id) map.set(item.id, item);
+    });
+    (incoming || []).forEach((item) => {
+      if (item && item.id) map.set(item.id, item);
+    });
+    return Array.from(map.values());
+  }
+
+  function convertFirestorePlantDoc(docId, data) {
+    if (!data || typeof data !== 'object') return null;
+    const m = data.metadata && typeof data.metadata === 'object' ? data.metadata : {};
+    const name = (m.naziv || data.name || data.naziv || '').trim();
+    if (!name) return null;
+    return {
+      id: m.plantId || data.plantId || docId,
+      name,
+      strain: m.sorta || data.strain || '',
+      count: Math.max(1, Number(data.count ?? m.count ?? 1) || 1),
+      stage: m.stage || data.stage || 'klijanje',
+      subphase: data.subphase || m.subphase || null,
+      startDate: data.startDate || m.startDate || null,
+      environmentName: data.environmentName || m.environmentName || null,
+      environmentType: data.environmentType || m.environmentType || 'indoor',
+      fieldLocation: data.fieldLocation || m.fieldLocation || null,
+      plantingLocation: data.plantingLocation || m.plantingLocation || null,
+      exposureHours: data.exposureHours ?? m.exposureHours ?? null,
+      notes: data.notes || m.notes || '',
+      photo: data.photo || m.photo || null,
+      updatedAt: data.updatedAt || new Date().toISOString(),
+      views: data.views ?? 0,
+      stageHistory: data.stageHistory || [],
+      stageDates: data.stageDates || {},
+      subphaseHistory: data.subphaseHistory || [],
+    };
+  }
+
+  function convertFirestoreEntryDoc(docId, data) {
+    if (!data || typeof data !== 'object') return null;
+    const m = data.metadata && typeof data.metadata === 'object' ? data.metadata : {};
+    const plantId = data.plantId || m.plantId || null;
+    return {
+      id: data.entryId || docId,
+      plantId,
+      date: data.date || data.createdAt || null,
+      type: data.type || 'opcenito',
+      note: data.note || data.text || '',
+      photo: data.photo || null,
+      video: data.video || null,
+      meta: data.meta || undefined,
+    };
+  }
+
+  async function findSuperadminUserIds() {
+    if (!window.firebase || !firebase.firestore) return [];
+    try {
+      const snap = await firebase.firestore().collection('users').where('role', '==', 'superadmin').get();
+      return snap.docs.map((d) => d.id);
+    } catch (err) {
+      console.warn('Superadmin lookup failed', err);
+      return [];
+    }
+  }
+
+  async function loadFirestorePlantsAndEntries() {
+    if (!window.firebase || !firebase.firestore) return { plants: [], entries: [] };
+    const plants = [];
+    const entries = [];
+    try {
+      const plantsSnap = await firebase.firestore().collection('plants').get();
+      plantsSnap.forEach((docSnap) => {
+        const p = convertFirestorePlantDoc(docSnap.id, docSnap.data());
+        if (p) plants.push(p);
+      });
+    } catch (err) {
+      console.warn('Firestore plants load failed', err);
+    }
+    try {
+      const entriesSnap = await firebase.firestore().collection('entries').get();
+      entriesSnap.forEach((docSnap) => {
+        const e = convertFirestoreEntryDoc(docSnap.id, docSnap.data());
+        if (e) entries.push(e);
+      });
+    } catch (err) {
+      console.warn('Firestore entries load failed', err);
+    }
+    return { plants, entries };
+  }
+
+  async function loadSuperadminDatabaseForAdmin() {
+    const superIds = await findSuperadminUserIds();
+    let plants = [];
+    let entries = [];
+    let toolbox = {};
+
+    for (const uid of superIds) {
+      const state = await loadRemoteStateIntoLocal(uid);
+      if (!state) continue;
+      plants = mergeRecordsById(plants, state.plants);
+      entries = mergeRecordsById(entries, state.entries);
+      toolbox = Object.assign({}, toolbox, state.toolbox || {});
+    }
+
+    const firestoreData = await loadFirestorePlantsAndEntries();
+    plants = mergeRecordsById(plants, firestoreData.plants);
+    entries = mergeRecordsById(entries, firestoreData.entries);
+
+    applyRemoteStateToLocal({ plants, entries, toolbox });
+    console.log('Admin loaded superadmin DB:', plants.length, 'plants,', entries.length, 'entries');
+  }
+
+  function blockAdminWrite() {
+    if (!isAdminReadOnly) return false;
+    alert('Admin ima samo pregled baze superadmina — uređivanje nije dopušteno.');
+    return true;
+  }
+
+  function applyAdminReadOnlyUI() {
+    if (!isAdminReadOnly) return;
+    document.body.classList.add('admin-readonly');
+    let banner = document.getElementById('admin-readonly-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'admin-readonly-banner';
+      banner.className = 'admin-readonly-banner';
+      banner.setAttribute('role', 'status');
+      banner.textContent =
+        'Pregled baze superadmina (samo čitanje) — biljke, dnevnik i alati bez mogućnosti uređivanja.';
+      const main = document.querySelector('.main');
+      if (main) main.insertBefore(banner, main.firstChild);
     }
   }
 
@@ -218,8 +363,20 @@ function initFirebaseSync() {
   currentUserRole = await getCurrentUserRole(user);
   console.log("ROLE LOADED:", currentUserRole); // DEBUG
   applyRoleUI(currentUserRole);
-  await loadRemoteStateIntoLocal(user.uid);
-  remoteSyncReady = true;
+
+  if (currentUserRole === 'admin') {
+    isAdminReadOnly = true;
+    remoteSyncReady = false;
+    await loadSuperadminDatabaseForAdmin();
+    applyAdminReadOnlyUI();
+  } else {
+    isAdminReadOnly = false;
+    document.body.classList.remove('admin-readonly');
+    const state = await loadRemoteStateIntoLocal(user.uid);
+    applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
+    remoteSyncReady = true;
+  }
+
   refreshAllViewsAfterRemoteLoad();
 
  
@@ -324,6 +481,7 @@ function initFirebaseSync() {
   }
 
   function setPlants(plants) {
+    if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
     scheduleRemoteSync({ plants: plants || [] });
   }
@@ -338,6 +496,7 @@ function initFirebaseSync() {
   }
 
   function setEntries(entries) {
+    if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
     scheduleRemoteSync({ entries: entries || [] });
   }
@@ -928,6 +1087,7 @@ function initFirebaseSync() {
   }
 
   function deletePlant(id) {
+    if (blockAdminWrite()) return;
     if (!confirm('Obrisati ovu biljku?')) return;
     const plants = getPlants().filter((p) => p.id !== id);
     setPlants(plants);
@@ -941,6 +1101,7 @@ function initFirebaseSync() {
   }
 
   function openPlantModal(editId) {
+    if (blockAdminWrite()) return;
     const modal = document.getElementById('modal-plant');
     const form = document.getElementById('form-plant');
     const titleEl = document.getElementById('modal-plant-title');
@@ -1029,7 +1190,10 @@ function initFirebaseSync() {
     document.getElementById('modal-plant').classList.remove('open');
   }
 
-  document.getElementById('btn-add-plant').addEventListener('click', () => openPlantModal());
+  document.getElementById('btn-add-plant').addEventListener('click', () => {
+    if (blockAdminWrite()) return;
+    openPlantModal();
+  });
 
   const plantEnvTypeEl = document.getElementById('plant-environment-type');
   if (plantEnvTypeEl) plantEnvTypeEl.addEventListener('change', updatePlantOutdoorFieldsVisibility);
@@ -1068,6 +1232,7 @@ function initFirebaseSync() {
 
   document.getElementById('form-plant').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (blockAdminWrite()) return;
     const id = document.getElementById('plant-id').value;
     const plants = getPlants();
     const prev = id ? plants.find((p) => p.id === id) : null;
@@ -1433,6 +1598,7 @@ function initFirebaseSync() {
   }
 
   function openEntryModal(plantId) {
+    if (blockAdminWrite()) return;
     if (!modalEntry) return;
     fillEntryPlantSelect();
     const form = document.getElementById('form-entry');
@@ -1457,12 +1623,16 @@ function initFirebaseSync() {
 
   const btnAddEntry = document.getElementById('btn-add-entry');
   if (btnAddEntry) {
-    btnAddEntry.addEventListener('click', () => openEntryModal(null));
+    btnAddEntry.addEventListener('click', () => {
+      if (blockAdminWrite()) return;
+      openEntryModal(null);
+    });
   }
 
   const btnAddEntryGrowlog = document.getElementById('btn-add-entry-growlog');
   if (btnAddEntryGrowlog) {
     btnAddEntryGrowlog.addEventListener('click', () => {
+      if (blockAdminWrite()) return;
       if (!currentGrowlogPlantId) return;
       openEntryModal(currentGrowlogPlantId);
     });
@@ -1471,6 +1641,7 @@ function initFirebaseSync() {
   const btnEditPlantGrowlog = document.getElementById('btn-edit-plant-growlog');
   if (btnEditPlantGrowlog) {
     btnEditPlantGrowlog.addEventListener('click', () => {
+      if (blockAdminWrite()) return;
       if (!currentGrowlogPlantId) return;
       openPlantModal(currentGrowlogPlantId);
     });
@@ -1532,6 +1703,7 @@ function initFirebaseSync() {
 
   document.getElementById('form-entry').addEventListener('submit', (e) => {
     e.preventDefault();
+    if (blockAdminWrite()) return;
     const type = document.getElementById('entry-type').value;
     let meta = null;
     if (type === 'presadjivanje') {
@@ -1621,6 +1793,7 @@ function initFirebaseSync() {
   }
 
   function setToolboxData(data) {
+    if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data));
     scheduleRemoteSync({ toolbox: data || {} });
   }
@@ -1743,6 +1916,7 @@ function initFirebaseSync() {
       .join('');
     listEl.querySelectorAll('.toolbox-list-delete').forEach((btn) => {
       btn.addEventListener('click', () => {
+        if (blockAdminWrite()) return;
         const id = btn.closest('.toolbox-list-item').dataset.id;
         const data = getToolboxData();
         data[tool] = data[tool].filter((x) => x.id !== id);

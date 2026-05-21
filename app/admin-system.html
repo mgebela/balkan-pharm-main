@@ -20,7 +20,7 @@ firebase.auth().onAuthStateChanged(async (user) => {
 
   const role = snap.data().role;
 
-  if (role !== "superadmin") {
+  if (!["admin", "superadmin"].includes(role)) {
     window.location.href = "index.html";
     return;
   }

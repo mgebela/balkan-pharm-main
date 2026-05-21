@@ -49,6 +49,9 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  window.__adminPanelRole = role;
+  window.__adminReadOnly = role === "admin";
+
   init();
 });
 
@@ -109,9 +112,14 @@ const schemas = {
 };
 
 
+function canAdminPanelEdit() {
+  return window.__adminPanelRole === "superadmin";
+}
+
 function init() {
 console.log("INIT RUNNING");
 const page = document.body.dataset.page;
+const readOnly = !!window.__adminReadOnly;
 
 const table = document.getElementById("usersTable");
 const modal = document.getElementById("userModal");
@@ -119,6 +127,15 @@ const saveBtn = document.getElementById("saveUser");
 const addBtn = document.getElementById("addUserBtn");
 
 let editId = null;
+
+if (readOnly) {
+  document.body.classList.add("admin-readonly");
+  const banner = document.createElement("div");
+  banner.className = "admin-readonly-banner";
+  banner.textContent = "Pregled baze superadmina (samo čitanje) — uređivanje nije dopušteno.";
+  document.body.insertBefore(banner, document.body.firstChild);
+  if (addBtn) addBtn.style.display = "none";
+}
 
 function deepMerge(target, source) {
   for (const key in source) {
@@ -163,27 +180,37 @@ async function loadData() {
 
       const row = document.createElement("tr");
 
+      const actionsCell = readOnly
+        ? `<button type="button" class="view-btn">Pregled</button>`
+        : `<button class="edit-btn">Edit</button>
+          <button class="delete-btn">Delete</button>`;
+
       row.innerHTML = `
         <td>${renderRow(data)}</td>
-        <td>
-          <button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>
-        </td>
+        <td>${actionsCell}</td>
       `;
 
-      row.querySelector(".edit-btn").onclick = () => {
-        editId = docSnap.id;
-        const page = document.body.dataset.page;
-        const merged = deepMerge(structuredClone(schemas[page]), data);
-        openModal(merged);
-      };
+      if (readOnly) {
+        row.querySelector(".view-btn").onclick = () => {
+          const page = document.body.dataset.page;
+          const merged = deepMerge(structuredClone(schemas[page]), data);
+          openModal(merged, true);
+        };
+      } else {
+        row.querySelector(".edit-btn").onclick = () => {
+          editId = docSnap.id;
+          const page = document.body.dataset.page;
+          const merged = deepMerge(structuredClone(schemas[page]), data);
+          openModal(merged, false);
+        };
 
-      row.querySelector(".delete-btn").onclick = async () => {
-        if (!confirm("Delete?")) return;
+        row.querySelector(".delete-btn").onclick = async () => {
+          if (!confirm("Delete?")) return;
 
-        await deleteDoc(doc(db, page, docSnap.id));
-        loadData();
-      };
+          await deleteDoc(doc(db, page, docSnap.id));
+          loadData();
+        };
+      }
 
       table.appendChild(row);
     });
@@ -220,26 +247,33 @@ function renderRow(data) {
 
 // ADD
 // =======================
-addBtn.onclick = () => {
-  editId = null;
-  openModal({});
-};
+if (addBtn && canAdminPanelEdit()) {
+  addBtn.onclick = () => {
+    editId = null;
+    openModal({}, false);
+  };
+}
 
 
 // MODAL FORM
 // =======================
-function openModal(data) {
+function openModal(data, readOnly = false) {
   modal.classList.add("open");
 
   modal.innerHTML = `
     <div class="modal-content">
-      <h3>${editId ? "Edit" : "Add"} ${page}</h3>
+      <h3>${readOnly ? "Pregled" : editId ? "Edit" : "Add"} ${page}</h3>
 
-      ${generateForm(data)}
+      ${generateForm(data, "", readOnly)}
 
-      <button id="saveDynamic">Save</button>
+      ${readOnly ? `<button type="button" id="closeView">Zatvori</button>` : `<button type="button" id="saveDynamic">Save</button>`}
     </div>
   `;
+
+  if (readOnly) {
+    document.getElementById("closeView").onclick = () => modal.classList.remove("open");
+    return;
+  }
 
   document.getElementById("saveDynamic").onclick = async () => {
     const formData = getFormDataDynamic();
@@ -255,7 +289,7 @@ function openModal(data) {
   };
 }
 
-function generateForm(data, parentKey = "") {
+function generateForm(data, parentKey = "", readOnly = false) {
   let html = "";
 
   for (const key in data) {
@@ -264,14 +298,16 @@ function generateForm(data, parentKey = "") {
 
     if (typeof value === "object" && value !== null) {
       html += `<div style="margin-top:10px;"><strong>${key}</strong></div>`;
-      html += generateForm(value, fullKey);
+      html += generateForm(value, fullKey, readOnly);
     } else {
+      const safeVal = String(value ?? "").replace(/"/g, "&quot;");
       html += `
         <input 
           data-key="${fullKey}" 
-          value="${value ?? ""}" 
+          value="${safeVal}" 
           placeholder="${fullKey}"
           style="margin-bottom:6px; width:100%;"
+          ${readOnly ? "readonly disabled" : ""}
         />
       `;
     }

@@ -1386,6 +1386,39 @@ body {
   line-height: 1.35;
 }
 
+.admin-readonly-banner {
+  margin: 0 0 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--accent-bright, #2dd4bf);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+body.admin-readonly #btn-add-plant,
+body.admin-readonly #btn-add-entry,
+body.admin-readonly #btn-add-entry-growlog,
+body.admin-readonly #btn-edit-plant-growlog,
+body.admin-readonly #growlog-hero-edit,
+body.admin-readonly .btn-edit-plant,
+body.admin-readonly .btn-delete-plant {
+  display: none !important;
+}
+
+body.admin-readonly .toolbox-form button[type="submit"],
+body.admin-readonly .toolbox-list-delete {
+  display: none !important;
+}
+
+body.admin-readonly .toolbox-form input,
+body.admin-readonly .toolbox-form select,
+body.admin-readonly .toolbox-form textarea {
+  pointer-events: none;
+  opacity: 0.72;
+}
+
 .plant-subphase-actions {
   display: flex;
   flex-wrap: wrap;
