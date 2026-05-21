@@ -52,8 +52,65 @@
   let remoteSyncInFlight = false;
   let isAdminReadOnly = false;
   let readOnlyBannerMessage = '';
+  let sharedReadOnlyPlantIds = new Set();
+  let sharedReadOnlyEntryIds = new Set();
 
-  const FULL_READ_ONLY_EMAILS = ['filip.balkanpharm@gmail.com'];
+  const SHARED_HYBRID_ACCESS_EMAILS = ['filip.balkanpharm@gmail.com'];
+
+  function isSharedHybridUser(email) {
+    return SHARED_HYBRID_ACCESS_EMAILS.includes((email || '').toLowerCase());
+  }
+
+  function isSharedPlantId(plantId) {
+    return !!(plantId && sharedReadOnlyPlantIds.has(plantId));
+  }
+
+  function isSharedEntryId(entryId) {
+    return !!(entryId && sharedReadOnlyEntryIds.has(entryId));
+  }
+
+  function stripSharedMeta(record) {
+    if (!record || typeof record !== 'object') return record;
+    const copy = Object.assign({}, record);
+    delete copy._sharedReadOnly;
+    delete copy._sharedOwnerUid;
+    return copy;
+  }
+
+  function plantsForRemoteSync(plants) {
+    return (plants || [])
+      .filter((p) => p && p.id && !isSharedPlantId(p.id))
+      .map(stripSharedMeta);
+  }
+
+  function entriesForRemoteSync(entries) {
+    return (entries || [])
+      .filter((e) => e && e.id && !isSharedEntryId(e.id))
+      .map(stripSharedMeta);
+  }
+
+  function tagSharedRecords(plants, entries, ownerUid) {
+    const owner = ownerUid || null;
+    return {
+      plants: (plants || []).map((p) =>
+        Object.assign({}, p, { _sharedReadOnly: true, _sharedOwnerUid: owner })
+      ),
+      entries: (entries || []).map((e) =>
+        Object.assign({}, e, { _sharedReadOnly: true, _sharedOwnerUid: owner })
+      ),
+    };
+  }
+
+  function registerSharedReadOnlyIds(plants, entries) {
+    sharedReadOnlyPlantIds = new Set();
+    sharedReadOnlyEntryIds = new Set();
+    (plants || []).forEach((p) => {
+      if (p && p.id) sharedReadOnlyPlantIds.add(p.id);
+    });
+    (entries || []).forEach((e) => {
+      if (e && e.id) sharedReadOnlyEntryIds.add(e.id);
+    });
+  }
 
   function getStoredAuth() {
     try {
@@ -290,7 +347,7 @@
 
   async function ensureViewerBootstrapGrant(viewerUid, email) {
     const normalized = (email || '').toLowerCase();
-    if (!FULL_READ_ONLY_EMAILS.includes(normalized)) return;
+    if (!SHARED_HYBRID_ACCESS_EMAILS.includes(normalized)) return;
     const superIds = await findSuperadminUserIds();
     if (!superIds.length) return;
     const ownerUid = superIds[0];
@@ -335,7 +392,7 @@
     console.log('Admin loaded superadmin DB:', result.plants.length, 'plants,', result.entries.length, 'entries');
   }
 
-  async function loadSharedDatabaseForViewer(viewerUid, email) {
+  async function fetchSharedRecordsForViewer(viewerUid, email) {
     const superIds = await findSuperadminUserIds();
     let plants = [];
     let entries = [];
@@ -370,24 +427,104 @@
         e = e.filter((en) => en && (!en.plantId || idSet.has(en.plantId)));
       }
 
-      plants = mergeRecordsById(plants, p);
-      if (grant.shareEntries !== false) entries = mergeRecordsById(entries, e);
+      const tagged = tagSharedRecords(p, grant.shareEntries !== false ? e : [], ownerUid);
+      plants = mergeRecordsById(plants, tagged.plants);
+      if (grant.shareEntries !== false) entries = mergeRecordsById(entries, tagged.entries);
       if (grant.shareToolbox) toolbox = Object.assign({}, toolbox, state.toolbox || {});
     }
 
-    if (!matchedGrant && FULL_READ_ONLY_EMAILS.includes((email || '').toLowerCase())) {
+    return { plants, entries, toolbox, matchedGrant };
+  }
+
+  async function loadSharedDatabaseForViewer(viewerUid, email) {
+    let { plants, entries, toolbox, matchedGrant } = await fetchSharedRecordsForViewer(viewerUid, email);
+
+    if (!matchedGrant && isSharedHybridUser(email)) {
       await ensureViewerBootstrapGrant(viewerUid, email);
-      return loadSharedDatabaseForViewer(viewerUid, email);
+      ({ plants, entries, toolbox } = await fetchSharedRecordsForViewer(viewerUid, email));
     }
 
+    registerSharedReadOnlyIds(plants, entries);
     applyRemoteStateToLocal({ plants, entries, toolbox });
     console.log('Viewer loaded shared DB:', plants.length, 'plants,', entries.length, 'entries');
   }
 
+  async function loadHybridUserWithSharedReadOnly(viewerUid, email) {
+    await ensureViewerBootstrapGrant(viewerUid, email);
+    const ownState = (await loadRemoteStateIntoLocal(viewerUid)) || {
+      plants: [],
+      entries: [],
+      toolbox: {},
+    };
+    let { plants: sharedPlants, entries: sharedEntries } = await fetchSharedRecordsForViewer(
+      viewerUid,
+      email
+    );
+    if (!sharedPlants.length && isSharedHybridUser(email)) {
+      await ensureViewerBootstrapGrant(viewerUid, email);
+      ({ plants: sharedPlants, entries: sharedEntries } = await fetchSharedRecordsForViewer(
+        viewerUid,
+        email
+      ));
+    }
+
+    registerSharedReadOnlyIds(sharedPlants, sharedEntries);
+    const plants = mergeRecordsById(sharedPlants, ownState.plants || []);
+    const entries = mergeRecordsById(sharedEntries, ownState.entries || []);
+    applyRemoteStateToLocal({
+      plants,
+      entries,
+      toolbox: ownState.toolbox || {},
+    });
+    console.log(
+      'Hybrid user loaded:',
+      ownState.plants.length,
+      'own +',
+      sharedPlants.length,
+      'shared plants'
+    );
+  }
+
+  function blockWrite(opts) {
+    const plantId = opts && opts.plantId;
+    const entryId = opts && opts.entryId;
+    if (isAdminReadOnly) {
+      alert(readOnlyBannerMessage || 'Pregled je samo za čitanje — uređivanje nije dopušteno.');
+      return true;
+    }
+    if (plantId && isSharedPlantId(plantId)) {
+      alert(
+        'Ova biljka dolazi iz dijeljene baze superadmina — možete je pregledavati, ali ne uređivati.'
+      );
+      return true;
+    }
+    if (entryId && isSharedEntryId(entryId)) {
+      alert('Ova bilješka dolazi iz dijeljene baze — nije je moguće uređivati.');
+      return true;
+    }
+    return false;
+  }
+
   function blockAdminWrite() {
-    if (!isAdminReadOnly) return false;
-    alert(readOnlyBannerMessage || 'Pregled je samo za čitanje — uređivanje nije dopušteno.');
-    return true;
+    return blockWrite({});
+  }
+
+  function applySharedLibraryBanner(message) {
+    readOnlyBannerMessage =
+      message ||
+      'Vlastite biljke i bilješke možete uređivati. Biljke iz dijeljene baze superadmina su samo za pregled.';
+    document.body.classList.remove('admin-readonly');
+    document.body.classList.add('shared-library-mode');
+    let banner = document.getElementById('shared-library-banner');
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'shared-library-banner';
+      banner.className = 'admin-readonly-banner shared-library-banner';
+      banner.setAttribute('role', 'status');
+      const main = document.querySelector('.main');
+      if (main) main.insertBefore(banner, main.firstChild);
+    }
+    banner.textContent = readOnlyBannerMessage;
   }
 
   function applyAdminReadOnlyUI(message) {
@@ -545,13 +682,13 @@ async function ensureUserExists(user) {
   const docSnap = await userRef.get();
 
   const email = (user.email || '').toLowerCase();
-  const promoteViewer = FULL_READ_ONLY_EMAILS.includes(email);
+  const hybridUser = isSharedHybridUser(email);
 
   if (!docSnap.exists) {
     await userRef.set({
       email: user.email || "",
       uId: user.uid,
-      role: promoteViewer ? 'viewer' : 'user',
+      role: 'user',
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString()
     });
@@ -560,8 +697,8 @@ async function ensureUserExists(user) {
   } else {
     const data = docSnap.data() || {};
     const patch = { lastLoginAt: new Date().toISOString() };
-    if (promoteViewer && (!data.role || data.role === 'user')) {
-      patch.role = 'viewer';
+    if (hybridUser && data.role === 'viewer') {
+      patch.role = 'user';
     }
     await userRef.update(patch);
 
@@ -665,8 +802,17 @@ function initFirebaseSync() {
       } else {
         isAdminReadOnly = false;
         document.body.classList.remove('admin-readonly');
-        const state = await loadRemoteStateIntoLocal(user.uid);
-        applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
+        const userEmail = user.email || '';
+        if (isSharedHybridUser(userEmail)) {
+          await loadHybridUserWithSharedReadOnly(user.uid, userEmail);
+          applySharedLibraryBanner(
+            'Vlastite biljke i bilješke možete dodavati i uređivati. Biljke iz dijeljene baze superadmina su samo za pregled.'
+          );
+        } else {
+          document.body.classList.remove('shared-library-mode');
+          const state = await loadRemoteStateIntoLocal(user.uid);
+          applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
+        }
         remoteSyncReady = true;
       }
 
@@ -778,7 +924,7 @@ function initFirebaseSync() {
   function setPlants(plants) {
     if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
-    scheduleRemoteSync({ plants: plants || [] });
+    scheduleRemoteSync({ plants: plantsForRemoteSync(plants) });
   }
 
   function getEntries() {
@@ -793,7 +939,7 @@ function initFirebaseSync() {
   function setEntries(entries) {
     if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
-    scheduleRemoteSync({ entries: entries || [] });
+    scheduleRemoteSync({ entries: entriesForRemoteSync(entries) });
   }
 
   function uuid() {
@@ -947,6 +1093,11 @@ function initFirebaseSync() {
   function renderGrowlog(plantId) {
     const plant = getPlants().find((p) => p.id === plantId);
     const entries = getPlantEntries(plantId);
+    const sharedPlant = isSharedPlantId(plantId);
+    const addEntryGrowlog = document.getElementById('btn-add-entry-growlog');
+    const editPlantGrowlog = document.getElementById('btn-edit-plant-growlog');
+    if (addEntryGrowlog) addEntryGrowlog.hidden = sharedPlant;
+    if (editPlantGrowlog) editPlantGrowlog.hidden = sharedPlant;
     if (!plant) return;
 
     const startDate = plant.startDate || new Date().toISOString().slice(0, 10);
@@ -1121,7 +1272,9 @@ function initFirebaseSync() {
         escapeHtml(envType) +
         '</span>' +
         '</div>' +
-        '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Uredi biljku</button>' +
+        (sharedPlant
+          ? ''
+          : '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Uredi biljku</button>') +
         '</div>' +
         '<h2 class="growlog-hero-title">' +
         escapeHtml(plant.name) +
@@ -1451,13 +1604,15 @@ function initFirebaseSync() {
       return;
     }
     list.innerHTML = plants
-      .map(
-        (p) => `
-      <div class="plant-card" data-id="${p.id}">
+      .map((p) => {
+        const shared = isSharedPlantId(p.id);
+        return `
+      <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}">
         ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" /></div>` : ''}
         <div class="plant-card-header">
           <h3>${escapeHtml(p.name)}</h3>
           <span class="stage-badge">${STAGES[p.stage] || p.stage}</span>
+          ${shared ? '<span class="stage-badge plant-shared-badge" title="Dijeljena baza">Dijeljeno</span>' : ''}
         </div>
         ${
           p.subphase
@@ -1479,12 +1634,16 @@ function initFirebaseSync() {
         ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Od ${new Date(p.startDate).toLocaleDateString('hr-HR')}</div>` : ''}
         <div class="plant-card-actions">
           <button type="button" class="btn btn-primary btn-growlog">Growlog</button>
-          <button type="button" class="btn btn-ghost btn-edit-plant">✎ Uredi biljku</button>
-          <button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>
+          ${
+            shared
+              ? ''
+              : `<button type="button" class="btn btn-ghost btn-edit-plant">✎ Uredi biljku</button>
+          <button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>`
+          }
         </div>
       </div>
-    `
-      )
+    `;
+      })
       .join('');
 
     list.querySelectorAll('.btn-growlog').forEach((btn) => {
@@ -1558,7 +1717,7 @@ function initFirebaseSync() {
   }
 
   function deletePlant(id) {
-    if (blockAdminWrite()) return;
+    if (blockWrite({ plantId: id })) return;
     if (!confirm('Obrisati ovu biljku?')) return;
     const plants = getPlants().filter((p) => p.id !== id);
     setPlants(plants);
@@ -1572,7 +1731,7 @@ function initFirebaseSync() {
   }
 
   function openPlantModal(editId) {
-    if (blockAdminWrite()) return;
+    if (editId && blockWrite({ plantId: editId })) return;
     const modal = document.getElementById('modal-plant');
     const form = document.getElementById('form-plant');
     const titleEl = document.getElementById('modal-plant-title');
@@ -1703,8 +1862,8 @@ function initFirebaseSync() {
 
   document.getElementById('form-plant').addEventListener('submit', (e) => {
     e.preventDefault();
-    if (blockAdminWrite()) return;
     const id = document.getElementById('plant-id').value;
+    if (blockWrite({ plantId: id || null })) return;
     const plants = getPlants();
     const prev = id ? plants.find((p) => p.id === id) : null;
     const photoData = document.getElementById('plant-photo-data').value.trim();
@@ -2069,7 +2228,7 @@ function initFirebaseSync() {
   }
 
   function openEntryModal(plantId) {
-    if (blockAdminWrite()) return;
+    if (plantId && blockWrite({ plantId })) return;
     if (!modalEntry) return;
     fillEntryPlantSelect();
     const form = document.getElementById('form-entry');
@@ -2103,7 +2262,6 @@ function initFirebaseSync() {
   const btnAddEntryGrowlog = document.getElementById('btn-add-entry-growlog');
   if (btnAddEntryGrowlog) {
     btnAddEntryGrowlog.addEventListener('click', () => {
-      if (blockAdminWrite()) return;
       if (!currentGrowlogPlantId) return;
       openEntryModal(currentGrowlogPlantId);
     });
@@ -2112,7 +2270,6 @@ function initFirebaseSync() {
   const btnEditPlantGrowlog = document.getElementById('btn-edit-plant-growlog');
   if (btnEditPlantGrowlog) {
     btnEditPlantGrowlog.addEventListener('click', () => {
-      if (blockAdminWrite()) return;
       if (!currentGrowlogPlantId) return;
       openPlantModal(currentGrowlogPlantId);
     });
@@ -2174,7 +2331,8 @@ function initFirebaseSync() {
 
   document.getElementById('form-entry').addEventListener('submit', (e) => {
     e.preventDefault();
-    if (blockAdminWrite()) return;
+    const plantIdForEntry = document.getElementById('entry-plant').value || null;
+    if (blockWrite({ plantId: plantIdForEntry })) return;
     const type = document.getElementById('entry-type').value;
     let meta = null;
     if (type === 'presadjivanje') {
@@ -2199,7 +2357,6 @@ function initFirebaseSync() {
         if (plantingLoc) meta.plantingLocation = plantingLoc;
       }
     }
-    const plantIdForEntry = document.getElementById('entry-plant').value || null;
     const entries = getEntries();
     entries.push({
       id: uuid(),

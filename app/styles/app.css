@@ -1709,6 +1709,22 @@ body.admin-readonly .toolbox-form textarea {
   opacity: 0.72;
 }
 
+.plant-shared-badge {
+  margin-left: 0.35rem;
+  background: rgba(45, 212, 191, 0.15);
+  color: var(--accent-bright, #2dd4bf);
+  font-size: 0.72rem;
+}
+
+.plant-card--shared {
+  border-color: rgba(45, 212, 191, 0.28);
+}
+
+.plant-card--shared .btn-edit-plant,
+.plant-card--shared .btn-delete-plant {
+  display: none !important;
+}
+
 .plant-subphase-actions {
   display: flex;
   flex-wrap: wrap;
