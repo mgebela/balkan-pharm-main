@@ -17,7 +17,7 @@
     <div class="bg-gradient" aria-hidden="true"></div>
     <div class="bg-grid" aria-hidden="true"></div>
 
-    <main id="deck" class="deck">
+    <main id="deck" class="deck deck--dense">
       <!-- 1. COVER -->
       <section class="slide slide--cover" data-title="Cover">
         <div class="cover">
@@ -34,9 +34,10 @@
           <h1 class="cover-headline">
             The operating system for <span class="grad">modern CBD cultivation.</span>
           </h1>
-          <p class="cover-sub">
-            An AI-powered grow journal that turns daily inputs into predictive insights —
-            from seed to harvest, for hobbyists and commercial operations alike.
+          <p class="cover-sub">Journal · AI · sensors · plant passport — one cultivation OS.</p>
+          <p class="slide-remark">
+            A technical stack for logging grows, predicting stress, and optionally tying each plant to a
+            <strong>dynamic passport</strong> — from hobby tents to licensed CBD operations.
           </p>
 
           <div class="cover-meta">
@@ -67,777 +68,446 @@
         </div>
       </section>
 
-      <!-- 2. PROBLEM -->
-      <section class="slide" data-title="Problem">
+
+      <!-- 2. WHY -->
+      <section class="slide slide--dense" data-title="Why">
         <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">01 · The Problem</span>
-            <h2>Cultivation runs on guesswork, paper, and fragmented tools.</h2>
-            <p class="lede">
-              CBD growers — from passionate hobbyists to multi-site producers — still rely on
-              memory, scattered notes, and generic forum advice to make decisions that directly
-              impact yield, quality, and compliance.
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">02 · Why</span>
+            <h2>Guesswork. Paper. <span class="grad">Too late.</span></h2>
+            <p class="slide-remark">
+              Most growers still decide on memory and forums — losing yield, quality, and repeatability every cycle.
             </p>
           </header>
-
-          <div class="grid grid-3">
-            <article class="card">
+          <div class="grid grid-3 why-cards">
+            <article class="card card--dense">
               <div class="card-icon" aria-hidden="true">
-                <svg class="deck-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8 3.5h11A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 3.5h3A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5h-1A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M9.5 9h7M9.5 12.5h7M9.5 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M8 3.5h11A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 3.5h3A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5h-1A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9h7M9.5 12.5h7M9.5 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
-              <h3>Manual &amp; inconsistent logging</h3>
-              <p>
-                Notebooks, spreadsheets and phone photos scattered across cycles. No structure,
-                no continuity, no learning between grows.
-              </p>
+              <h3>Scattered logs</h3>
+              <p class="card-tagline">No structure between cycles</p>
             </article>
-            <article class="card">
+            <article class="card card--dense">
               <div class="card-icon" aria-hidden="true">
-                <svg class="deck-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="6" cy="8" r="2.25" stroke="currentColor" stroke-width="1.5"/>
-                  <circle cx="18" cy="6" r="2.25" stroke="currentColor" stroke-width="1.5"/>
-                  <circle cx="15" cy="18" r="2.25" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M7.7 9.4l4.6 6.2M7.7 9.4l9.6-2.6M12.3 15.6l3.2 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                  <path d="M4 20.5h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 3"/>
-                </svg>
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="8" r="2.25" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="6" r="2.25" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="18" r="2.25" stroke="currentColor" stroke-width="1.5"/><path d="M7.7 9.4l4.6 6.2M7.7 9.4l9.6-2.6M12.3 15.6l3.2 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
-              <h3>No insight, only data</h3>
-              <p>
-                Even when growers record everything, they can&rsquo;t connect cause and effect.
-                Patterns hide in plain sight; mistakes repeat each cycle.
-              </p>
+              <h3>Data, no insight</h3>
+              <p class="card-tagline">Cause &amp; effect stays hidden</p>
             </article>
-            <article class="card">
+            <article class="card card--dense">
               <div class="card-icon" aria-hidden="true">
-                <svg class="deck-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 3.5 21.5 20H2.5L12 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                  <path d="M12 9v5M12 17h.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
-                </svg>
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3.5 21.5 20H2.5L12 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9v5M12 17h.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
               </div>
-              <h3>Costly, late interventions</h3>
-              <p>
-                Stress, deficiencies, and environmental drift are spotted only when visible
-                damage appears — often days too late to fully recover.
-              </p>
+              <h3>Late fixes</h3>
+              <p class="card-tagline">Stress seen after damage</p>
             </article>
           </div>
-
-          <div class="quote">
-            <p>
-              &ldquo;A bad cycle costs weeks of work and thousands of euros. Most of that loss
-              is preventable — if someone or something had warned you in time.&rdquo;
-            </p>
+          <div class="why-arrow" aria-hidden="true">
+            <span>→</span>
+            <span class="why-arrow-label">Dnevnik.live</span>
+          </div>
+          <div class="chip-row chip-row--center">
+            <span class="chip">Journal</span>
+            <span class="chip">AI Coach</span>
+            <span class="chip">Sensors</span>
+            <span class="chip">Plant Passport</span>
           </div>
         </div>
       </section>
 
-      <!-- 3. SOLUTION -->
-      <section class="slide" data-title="Solution">
+      <!-- 3. PLATFORM -->
+      <section class="slide slide--dense" data-title="Platform">
         <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">02 · The Solution</span>
-            <h2>A digital grow journal that <span class="grad">thinks with you.</span></h2>
-            <p class="lede">
-              Dnevnik.live is more than logging. Every entry feeds an AI engine that learns
-              your strains, your setup, and your habits — then proactively guides decisions
-              from germination to harvest.
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">03 · Platform</span>
+            <h2>One OS. <span class="grad">Seed → harvest.</span></h2>
+            <p class="slide-remark">
+              Structured journaling, AI coaching, and sensor timelines in a single app — built for CBD from day one.
             </p>
           </header>
-
-          <div class="grid grid-2">
-            <div class="feature">
-              <div class="feature-num">01</div>
-              <h3>Capture everything, effortlessly</h3>
-              <p>
-                Watering, feeding, pruning, environment, photos, observations — structured
-                automatically into plants, environments and cycles.
-              </p>
-            </div>
-            <div class="feature">
-              <div class="feature-num">02</div>
-              <h3>AI that learns your grow</h3>
-              <p>
-                Models correlate actions and outcomes across cycles, surfacing what works
-                for <em>your</em> strain, room, and method — not generic advice.
-              </p>
-            </div>
-            <div class="feature">
-              <div class="feature-num">03</div>
-              <h3>Predictive, contextual alerts</h3>
-              <p>
-                Smart notifications fire <em>before</em> stress is visible — feeding drift,
-                VPD anomalies, growth-stage interventions, all in one inbox.
-              </p>
-            </div>
-            <div class="feature">
-              <div class="feature-num">04</div>
-              <h3>Knowledge that compounds</h3>
-              <p>
-                A hybrid of structured agronomic protocols and adaptive learning — the
-                system gets smarter every cycle, for every user.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. PRODUCT TOUR -->
-      <section class="slide" data-title="Product">
-        <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">03 · Product</span>
-            <h2>One platform. From seed to harvest to insight.</h2>
-          </header>
-
-          <div class="product">
-            <div class="product-mock">
+          <div class="platform-dense">
+            <div class="product-mock product-mock--hero">
               <div class="mock-window">
-                <div class="mock-bar">
-                  <span></span><span></span><span></span>
-                  <span class="mock-url">dnevnik.live / grow / strain-01</span>
-                </div>
+                <div class="mock-bar"><span></span><span></span><span></span><span class="mock-url">dnevnik.live</span></div>
                 <div class="mock-body">
                   <div class="mock-side">
                     <div class="mock-logo">Dnevnik<span>.live</span></div>
-                    <ul>
-                      <li class="active">Plants</li>
-                      <li>Environments</li>
-                      <li>Schedule</li>
-                      <li>AI Coach</li>
-                      <li>Insights</li>
-                      <li>Community</li>
-                    </ul>
+                    <ul><li class="active">Plants</li><li>Environments</li><li>AI Coach</li><li>Insights</li></ul>
                   </div>
                   <div class="mock-main">
                     <div class="mock-row">
-                      <div class="mock-stat">
-                        <span class="stat-label">Day</span>
-                        <span class="stat-value">42</span>
-                        <span class="stat-foot">Veg → Flower</span>
-                      </div>
-                      <div class="mock-stat">
-                        <span class="stat-label">Health</span>
-                        <span class="stat-value good">92<i>%</i></span>
-                        <span class="stat-foot">+3 vs last cycle</span>
-                      </div>
-                      <div class="mock-stat">
-                        <span class="stat-label">VPD</span>
-                        <span class="stat-value">1.21<i>kPa</i></span>
-                        <span class="stat-foot">in optimal band</span>
-                      </div>
+                      <div class="mock-stat"><span class="stat-label">Day</span><span class="stat-value">42</span></div>
+                      <div class="mock-stat"><span class="stat-label">Health</span><span class="stat-value good">92<i>%</i></span></div>
+                      <div class="mock-stat"><span class="stat-label">VPD</span><span class="stat-value">1.21<i>kPa</i></span></div>
                     </div>
                     <div class="mock-chart">
                       <svg viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
-                        <defs>
-                          <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stop-color="rgba(120,224,143,0.55)"/>
-                            <stop offset="100%" stop-color="rgba(120,224,143,0)"/>
-                          </linearGradient>
-                        </defs>
+                        <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="rgba(120,224,143,0.55)"/><stop offset="100%" stop-color="rgba(120,224,143,0)"/></linearGradient></defs>
                         <path d="M0,120 C60,110 90,80 140,75 C200,68 230,95 280,85 C340,72 370,40 430,38 C490,36 520,55 600,30 L600,160 L0,160 Z" fill="url(#g1)"/>
                         <path d="M0,120 C60,110 90,80 140,75 C200,68 230,95 280,85 C340,72 370,40 430,38 C490,36 520,55 600,30" fill="none" stroke="#78e08f" stroke-width="2"/>
                       </svg>
                     </div>
-                    <div class="mock-alert">
-                      <span class="dot"></span>
-                      <div>
-                        <strong>AI Coach</strong>
-                        <p>EC trending high vs. your last 3 cycles at this stage. Consider a 15% dilution at next feed.</p>
-                      </div>
-                    </div>
+                    <div class="mock-alert"><span class="dot"></span><div><strong>AI Coach</strong><p>VPD optimal · EC watch at next feed</p></div></div>
                   </div>
                 </div>
               </div>
             </div>
-
-            <ul class="product-list">
-              <li><strong>Plants &amp; Environments</strong> — unlimited, indoor or outdoor.</li>
-              <li><strong>Smart Schedule</strong> — AI-tuned reminders for water, feed, defoliation.</li>
-              <li><strong>AI Coach</strong> — predictive insights, anomaly detection, stage guidance.</li>
-              <li><strong>Measurements</strong> — pH, EC, VPD, temp, humidity, growth metrics.</li>
-              <li><strong>Privacy by default</strong> — local-first storage, full user control.</li>
-              <li><strong>Community &amp; Guides</strong> — curated knowledge, beginner to pro.</li>
-            </ul>
+            <div class="chip-grid chip-grid--6">
+              <span class="chip chip--lg"><strong>Log</strong> plants · cycles</span>
+              <span class="chip chip--lg"><strong>Coach</strong> predict · alert</span>
+              <span class="chip chip--lg"><strong>Sense</strong> meteo · stress</span>
+              <span class="chip chip--lg"><strong>Schedule</strong> smart reminders</span>
+              <span class="chip chip--lg"><strong>Passport</strong> dNFT · RWA</span>
+              <span class="chip chip--lg"><strong>Local</strong> privacy-first</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- 5. AI ENGINE -->
-      <section class="slide" data-title="AI">
-        <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">04 · AI Engine</span>
-            <h2>Not a chatbot. A cultivation co-pilot.</h2>
-            <p class="lede">
-              The AI layer fuses each grower&rsquo;s historical data with structured agronomic
-              knowledge to produce decisions, not summaries.
+      <!-- 4. MONITORING -->
+      <section class="slide slide--dense slide--monitor" data-title="Monitoring">
+        <div class="monitor-deco" aria-hidden="true"><div class="monitor-orb monitor-orb--1"></div><div class="monitor-orb monitor-orb--2"></div></div>
+        <div class="slide-inner slide-inner--monitor">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">04 · Monitoring</span>
+            <h2>Meteo + <span class="grad">plant stress</span> → early warnings.</h2>
+            <p class="slide-remark">
+              Room-level meteo feeds the app timeline today; an on-plant stress device in development closes the loop
+              with alerts <strong>before</strong> damage is visible.
             </p>
           </header>
-
-          <div class="pipeline">
-            <div class="pipe-step">
-              <div class="pipe-num">1</div>
-              <h3>Ingest</h3>
-              <p>Daily logs, sensor inputs, photos, environment, strain genetics.</p>
+          <div class="monitor-layout monitor-layout--dense">
+            <div class="monitor-scene monitor-scene--hero">
+              <svg class="monitor-svg" viewBox="0 0 520 320" fill="none" aria-hidden="true">
+                <defs><linearGradient id="monG" x1="0" y1="320" x2="520" y2="0"><stop stop-color="#78e08f" stop-opacity="0.35"/><stop offset="1" stop-color="#5fb6ff" stop-opacity="0.2"/></linearGradient><linearGradient id="monWarn" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb86b"/><stop offset="1" stop-color="#ff8a5c"/></linearGradient></defs>
+                <ellipse cx="260" cy="278" rx="200" ry="28" fill="url(#monG)" opacity="0.5"/>
+                <g><rect x="48" y="118" width="72" height="148" rx="10" stroke="rgba(95,182,255,0.55)" stroke-width="1.5" fill="rgba(95,182,255,0.06)"/><path d="M84 118V72" stroke="#5fb6ff" stroke-width="2"/><circle cx="84" cy="58" r="14" stroke="#5fb6ff" stroke-width="1.5" fill="rgba(95,182,255,0.12)"/></g>
+                <g><circle cx="300" cy="200" r="78" stroke="rgba(120,224,143,0.25)" stroke-width="1.5" stroke-dasharray="6 5"/><circle cx="300" cy="200" r="58" stroke="rgba(255,184,107,0.45)" stroke-width="1.5"/><path d="M300 248V168" stroke="rgba(120,224,143,0.5)" stroke-width="2.5"/><path d="M300 200c-32-20-58-10-72 24 28-10 52-6 72-12" stroke="#78e08f" stroke-width="2" fill="none"/><circle cx="300" cy="188" r="10" fill="rgba(255,184,107,0.2)" stroke="url(#monWarn)" stroke-width="1.75"/><circle cx="300" cy="188" r="4" fill="#ffb86b"/></g>
+                <path d="M132 160 C180 140 220 130 360 118" stroke="rgba(95,182,255,0.4)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <path d="M358 188 C400 170 430 150 448 128" stroke="rgba(255,184,107,0.45)" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <g><rect x="400" y="36" width="108" height="132" rx="14" stroke="rgba(120,224,143,0.4)" stroke-width="1.5" fill="rgba(7,20,16,0.85)"/><polyline points="412,108 428,92 444,98 460,72 476,78 492,58" fill="none" stroke="#78e08f" stroke-width="1.75"/><rect x="412" y="118" width="84" height="36" rx="8" fill="rgba(255,184,107,0.12)" stroke="rgba(255,184,107,0.35)"/><text x="454" y="156" text-anchor="middle" fill="#78e08f" font-size="8" font-weight="600">ALERT</text></g>
+              </svg>
             </div>
-            <div class="pipe-arrow" aria-hidden="true">→</div>
-            <div class="pipe-step">
-              <div class="pipe-num">2</div>
-              <h3>Correlate</h3>
-              <p>Match inputs to outcomes across cycles, strains, and setups.</p>
-            </div>
-            <div class="pipe-arrow" aria-hidden="true">→</div>
-            <div class="pipe-step">
-              <div class="pipe-num">3</div>
-              <h3>Predict</h3>
-              <p>Detect stress, drift, and deficiencies before they&rsquo;re visible.</p>
-            </div>
-            <div class="pipe-arrow" aria-hidden="true">→</div>
-            <div class="pipe-step">
-              <div class="pipe-num">4</div>
-              <h3>Guide</h3>
-              <p>Context-aware reminders &amp; recommendations tuned to <em>your</em> grow.</p>
+            <div class="monitor-cards monitor-cards--row">
+              <article class="monitor-card monitor-card--meteo monitor-card--compact">
+                <span class="monitor-card-tag monitor-card-tag--live">Live</span>
+                <h3>Meteo station</h3>
+                <ul class="monitor-metrics"><li>Temp · RH · VPD</li><li>Timeline in app</li></ul>
+              </article>
+              <article class="monitor-card monitor-card--stress monitor-card--compact">
+                <span class="monitor-card-tag monitor-card-tag--dev">In dev</span>
+                <h3>Stress sensor</h3>
+                <ul class="monitor-metrics"><li>On plant / perimeter</li><li>Push warnings</li></ul>
+              </article>
             </div>
           </div>
-
-          <div class="ai-grid">
-            <div class="ai-card">
-              <h4>Personalization that compounds</h4>
-              <p>Every cycle sharpens recommendations for your strains, room, and goals.</p>
-            </div>
-            <div class="ai-card">
-              <h4>Hybrid knowledge layer</h4>
-              <p>Curated agronomic protocols + adaptive learning from anonymized cohort data.</p>
-            </div>
-            <div class="ai-card">
-              <h4>Privacy-first by design</h4>
-              <p>Local data ownership; opt-in cohort intelligence with full user control.</p>
-            </div>
+          <div class="monitor-pipeline monitor-pipeline--inline">
+            <span class="mp-label">Sense</span><span class="mp-arrow">→</span><span class="mp-label">Sync</span><span class="mp-arrow">→</span><span class="mp-label">Warn</span><span class="mp-arrow">→</span><span class="mp-label mp-label--final">Optimize</span>
           </div>
         </div>
       </section>
 
-      <!-- 5b–5c. PLANT PASSPORT (2 slides) -->
-      <section class="slide slide--passport slide--passport-a" data-title="Plant Passport">
-        <div class="passport-deco" aria-hidden="true">
-          <div class="passport-orb passport-orb--1"></div>
-          <div class="passport-orb passport-orb--2"></div>
+      <!-- 5. AI -->
+      <section class="slide slide--dense" data-title="AI">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">05 · AI Engine</span>
+            <h2>Cultivation <span class="grad">co-pilot.</span></h2>
+            <p class="slide-remark">
+              Fuses your logs and sensor streams with agronomic rules — recommendations tuned to <em>your</em> strain and room, not generic blogs.
+            </p>
+          </header>
+          <div class="pipeline pipeline--dense">
+            <div class="pipe-step"><div class="pipe-num">1</div><h3>Ingest</h3><p>Logs · sensors · genetics</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">2</div><h3>Correlate</h3><p>Strain · room · cycle</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3>Predict</h3><p>Stress before visible</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">4</div><h3>Guide</h3><p>Your grow, not generic</p></div>
+          </div>
+          <div class="chip-grid chip-grid--3">
+            <span class="chip chip--lg chip--g">Personalized per cycle</span>
+            <span class="chip chip--lg chip--b">Hybrid agronomic + ML</span>
+            <span class="chip chip--lg">Privacy-first · local data</span>
+          </div>
         </div>
-        <div class="slide-inner slide-inner--passport">
-          <div class="passport-hero-grid">
-            <header class="slide-head slide-head--passport">
-              <span class="kicker">05 · Plant Passport</span>
-              <h2 class="passport-h1">
-                A <span class="grad">living passport</span><br />
-                for every plant.
-              </h2>
-              <p class="lede passport-lede">
-                <strong>Dynamic NFTs</strong> as verifiable cultivation identity — genetics, traceability,
-                and brand story first. Utility is product-led; we are not leading with a tradable memecoin.
-              </p>
-              <ul class="passport-pills" aria-label="Design principles">
-                <li class="pp-pill pp-pill--g">Proof of grow</li>
-                <li class="pp-pill pp-pill--b">Lab &amp; partner attestations</li>
-                <li class="pp-pill pp-pill--p">Evolving artwork</li>
-              </ul>
-            </header>
+      </section>
 
-            <aside class="passport-showcase" aria-label="Passport preview">
-              <div class="passport-card-wrap">
-                <div class="passport-card-ring" aria-hidden="true"></div>
-                <div class="passport-card">
-                  <header class="passport-card-top">
-                    <span class="passport-card-label">dNFT · plant passport</span>
-                    <span class="passport-card-id">#DNV · 042</span>
-                  </header>
-                  <div class="passport-card-art" aria-hidden="true">
-                    <svg class="passport-card-svg" viewBox="0 0 240 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <defs>
-                        <linearGradient id="pvG" x1="0" y1="200" x2="240" y2="0" gradientUnits="userSpaceOnUse">
-                          <stop stop-color="#78e08f" stop-opacity="0.5"/>
-                          <stop offset="1" stop-color="#5fb6ff" stop-opacity="0.25"/>
-                        </linearGradient>
-                      </defs>
-                      <ellipse cx="120" cy="168" rx="72" ry="14" fill="url(#pvG)" opacity="0.6"/>
-                      <path d="M120 168V92" stroke="rgba(120,224,143,0.45)" stroke-width="3" stroke-linecap="round"/>
-                      <path d="M120 120c-28-18-52-8-68 22 24-8 48-4 68-10" stroke="#78e08f" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
-                      <path d="M120 100c32-22 58-12 74 18-26-10-50-8-74-4" stroke="#5fb6ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
-                      <circle cx="120" cy="72" r="22" stroke="rgba(199,155,255,0.7)" stroke-width="2" fill="rgba(199,155,255,0.08)"/>
-                      <circle cx="120" cy="72" r="8" fill="#c79bff" fill-opacity="0.5"/>
-                    </svg>
-                  </div>
-                  <footer class="passport-card-foot">
-                    <span class="passport-card-stage">Vegetative</span>
-                    <span class="passport-card-score">AI health · 92</span>
-                  </footer>
+      <!-- 6. PASSPORT -->
+      <section class="slide slide--dense slide--passport" data-title="Plant Passport">
+        <div class="passport-deco" aria-hidden="true"><div class="passport-orb passport-orb--1"></div></div>
+        <div class="slide-inner slide-inner--passport">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">06 · Plant Passport</span>
+            <h2>Living dNFT · <span class="grad">RWA rails.</span></h2>
+            <p class="slide-remark">
+              Each plant can become a verifiable passport that evolves with real grow data — composable with
+              <strong>RWA</strong> tokenize · issue · settle · trade flows where regulation allows.
+            </p>
+          </header>
+          <div class="passport-dense">
+            <div class="passport-card-wrap passport-card-wrap--sm">
+              <div class="passport-card-ring" aria-hidden="true"></div>
+              <div class="passport-card">
+                <header class="passport-card-top"><span class="passport-card-label">dNFT</span><span class="passport-card-id">#042</span></header>
+                <div class="passport-card-art" aria-hidden="true">
+                  <svg class="passport-card-svg" viewBox="0 0 240 200" fill="none">
+                    <ellipse cx="120" cy="168" rx="72" ry="14" fill="rgba(120,224,143,0.2)"/>
+                    <path d="M120 168V92" stroke="rgba(120,224,143,0.45)" stroke-width="3"/><path d="M120 120c-28-18-52-8-68 22 24-8 48-4 68-10" stroke="#78e08f" stroke-width="2" fill="none"/><circle cx="120" cy="72" r="18" stroke="#c79bff" stroke-width="2" fill="rgba(199,155,255,0.08)"/>
+                  </svg>
+                </div>
+                <footer class="passport-card-foot"><span class="passport-card-stage">Veg</span><span class="passport-card-score">AI 92</span></footer>
+              </div>
+            </div>
+            <div class="passport-dense-mid">
+              <div class="passport-journey passport-journey--compact">
+                <ol class="pj-steps">
+                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Seed</span></li>
+                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Sprout</span></li>
+                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Veg</span></li>
+                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Flower</span></li>
+                  <li class="pj-step pj-step--final"><span class="pj-dot pj-dot--final"></span><span class="pj-name">Harvest</span></li>
+                </ol>
+              </div>
+              <div class="passport-rwa passport-rwa--compact">
+                <span class="passport-rwa-tag">RWA</span>
+                <div class="passport-rwa-flow">
+                  <span class="rwa-step">Tokenize</span><span class="rwa-arrow">→</span><span class="rwa-step">Issue</span><span class="rwa-arrow">→</span><span class="rwa-step">Settle</span><span class="rwa-arrow">→</span><span class="rwa-step rwa-step--final">Trade</span>
                 </div>
               </div>
-            </aside>
-          </div>
-
-          <div class="passport-strip">
-            <span class="passport-strip-icon" aria-hidden="true">✦</span>
-            <p>
-              The <strong>seed → flower</strong> arc is already legible in open-source NFT collections and Web3
-              farming games. We route that same mechanic through <em>real</em> grow logs, sensors, labs, and AI —
-              so the asset matures with the crop.
-            </p>
-          </div>
-
-          <div class="passport-mint">
-            <div class="passport-mint-icon" aria-hidden="true">◇</div>
-            <div class="passport-mint-body">
-              <h3 class="passport-mint-title">Mint as a Seed. Grow on-chain.</h3>
-              <p>
-                Metadata updates on a cadence, when you hit verified journal milestones, or when partners
-                attest lab data — artwork and traits evolve in lockstep with the plant.
-              </p>
+              <div class="chip-grid chip-grid--4">
+                <span class="chip">Genetics</span><span class="chip">COA · terpenes</span><span class="chip">Grow score</span><span class="chip">Evolving art</span>
+              </div>
             </div>
           </div>
-
-          <div class="passport-journey" aria-label="Passport lifecycle stages">
-            <span class="pj-label">Lifecycle</span>
-            <div class="pj-rail" aria-hidden="true">
-              <span class="pj-rail-fill"></span>
-            </div>
-            <ol class="pj-steps">
-              <li class="pj-step">
-                <span class="pj-dot"></span>
-                <span class="pj-name">Seed</span>
-                <span class="pj-desc">Genesis traits &amp; strain</span>
-              </li>
-              <li class="pj-step">
-                <span class="pj-dot"></span>
-                <span class="pj-name">Sprout</span>
-                <span class="pj-desc">Early env &amp; feed signals</span>
-              </li>
-              <li class="pj-step">
-                <span class="pj-dot"></span>
-                <span class="pj-name">Vegetative</span>
-                <span class="pj-desc">Logs + AI health score</span>
-              </li>
-              <li class="pj-step">
-                <span class="pj-dot"></span>
-                <span class="pj-name">Flowering</span>
-                <span class="pj-desc">Protocols &amp; alerts</span>
-              </li>
-              <li class="pj-step pj-step--final">
-                <span class="pj-dot pj-dot--final"></span>
-                <span class="pj-name">CBD flower</span>
-                <span class="pj-desc">COA-linked chemistry + final art</span>
-              </li>
-            </ol>
+          <div class="icon-row icon-row--4">
+            <div class="icon-tile"><span class="icon-tile-glyph" aria-hidden="true">J</span><span>Journal</span></div>
+            <div class="icon-tile icon-tile--b"><span class="icon-tile-glyph" aria-hidden="true">AI</span><span>Coach</span></div>
+            <div class="icon-tile icon-tile--o"><span class="icon-tile-glyph" aria-hidden="true">⬢</span><span>Compliance</span></div>
+            <div class="icon-tile icon-tile--p"><span class="icon-tile-glyph" aria-hidden="true">✦</span><span>Partners</span></div>
           </div>
         </div>
       </section>
 
-      <section class="slide slide--passport slide--passport-b" data-title="Passport + platform">
-        <div class="passport-deco passport-deco--subtle" aria-hidden="true">
-          <div class="passport-orb passport-orb--3"></div>
-        </div>
-        <div class="slide-inner slide-inner--passport">
-          <header class="slide-head slide-head--passport-b">
-            <span class="kicker">06 · Passport + platform</span>
-            <h2>What the chain holds — and how it <span class="grad">powers the OS.</span></h2>
-            <p class="lede">
-              The passport is a curated, attestable surface on top of the same plants, cycles, and AI signals
-              you already trust in Dnevnik — not a second database.
+      <!-- 7. ADOPT A PLANT -->
+      <section class="slide slide--dense slide--adopt" data-title="Adopt a plant">
+        <div class="adopt-deco" aria-hidden="true"><div class="adopt-orb"></div></div>
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">07 · Adopt a plant</span>
+            <h2>Sponsor a plant. <span class="grad">Share the harvest.</span></h2>
+            <p class="slide-remark">
+              <strong>Adopt</strong> a plant in the platform, follow its full cycle with live monitoring and passport
+              updates, then redeem <strong>CBD flower</strong> from that grow — or <strong>trade</strong> your stake for
+              partner products like oil, tea, and other CBD goods.
             </p>
           </header>
 
-          <div class="grid grid-2 passport-dual">
-            <div class="passport-panel passport-panel--encode">
-              <div class="passport-panel-head">
-                <span class="passport-panel-icon" aria-hidden="true">⬢</span>
-                <h3>On the passport</h3>
-              </div>
-              <ul class="passport-list passport-list--dense">
-                <li>Genetics &amp; lineage</li>
-                <li>Strain / cultivar identity</li>
-                <li>Terpene profile <span class="passport-muted">(lab-backed)</span></li>
-                <li>Growth stage &amp; timeline</li>
-                <li>Cultivation milestones from the journal</li>
-                <li>AI grow score &amp; risk flags</li>
-                <li>Lab results &amp; co-signers</li>
-                <li>Art layer that evolves with outcomes</li>
-              </ul>
+          <div class="adopt-layout">
+            <div class="adopt-viz" aria-label="Adopt to redeem flow">
+              <svg class="adopt-svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="adG" x1="0" y1="240" x2="720" y2="0">
+                    <stop stop-color="#78e08f" stop-opacity="0.4"/>
+                    <stop offset="1" stop-color="#5fb6ff" stop-opacity="0.25"/>
+                  </linearGradient>
+                </defs>
+                <path d="M60 200 H660" stroke="rgba(120,224,143,0.25)" stroke-width="2" stroke-dasharray="5 5"/>
+                <!-- step 1 adopt -->
+                <g transform="translate(24,48)">
+                  <rect width="120" height="140" rx="14" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/>
+                  <circle cx="60" cy="52" r="22" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.12)"/>
+                  <path d="M60 38c0-8 6-14 14-14" stroke="#78e08f" stroke-width="1.5" stroke-linecap="round"/>
+                  <text x="60" y="95" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="700" font-family="system-ui">Adopt</text>
+                  <text x="60" y="115" text-anchor="middle" fill="#6f8a7e" font-size="9">Claim · sponsor</text>
+                  <path d="M48 130h24v28h-24z" stroke="#78e08f" stroke-width="1.25" fill="none" opacity="0.6"/>
+                </g>
+                <path d="M156 118 H184" stroke="#78e08f" stroke-width="2" marker-end="url(#none)"/>
+                <!-- step 2 monitor -->
+                <g transform="translate(188,48)">
+                  <rect width="120" height="140" rx="14" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/>
+                  <rect x="24" y="28" width="72" height="48" rx="8" stroke="#5fb6ff" stroke-width="1.25" fill="rgba(7,20,16,0.6)"/>
+                  <polyline points="30,62 42,50 54,56 66,40 78,46 90,34" fill="none" stroke="#78e08f" stroke-width="1.5"/>
+                  <circle cx="60" cy="92" r="14" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.1)"/>
+                  <path d="M60 106v20" stroke="#78e08f" stroke-width="1.5"/>
+                  <text x="60" y="95" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="700" font-family="system-ui">Monitor</text>
+                  <text x="60" y="148" text-anchor="middle" fill="#6f8a7e" font-size="9">App · sensors · alerts</text>
+                </g>
+                <path d="M320 118 H348" stroke="#78e08f" stroke-width="2"/>
+                <!-- step 3 fork -->
+                <g transform="translate(352,32)">
+                  <circle cx="60" cy="88" r="56" fill="url(#adG)" opacity="0.35"/>
+                  <circle cx="60" cy="88" r="28" stroke="#c79bff" stroke-width="1.5" fill="rgba(199,155,255,0.1)"/>
+                  <path d="M60 116v24" stroke="#78e08f" stroke-width="2"/>
+                  <path d="M60 88c-20-14-36-8-44 16" stroke="#78e08f" stroke-width="1.75" fill="none"/>
+                  <text x="60" y="92" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Harvest</text>
+                </g>
+                <path d="M472 88 C520 60 560 48 600 48" stroke="#78e08f" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <path d="M472 118 C520 146 560 158 600 158" stroke="#ffb86b" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <!-- flower -->
+                <g transform="translate(604,24)">
+                  <rect width="96" height="72" rx="12" fill="rgba(120,224,143,0.1)" stroke="#78e08f" stroke-width="1.5"/>
+                  <circle cx="48" cy="36" r="14" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.15)"/>
+                  <path d="M48 50v8M48 28c-6 0-10 4-10 8" stroke="#78e08f" stroke-width="1.25"/>
+                  <text x="48" y="62" text-anchor="middle" fill="#b6f4c4" font-size="9" font-weight="600">CBD flower</text>
+                </g>
+                <!-- trade products -->
+                <g transform="translate(604,108)">
+                  <rect width="96" height="72" rx="12" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/>
+                  <rect x="20" y="22" width="18" height="28" rx="4" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
+                  <ellipse cx="58" cy="38" rx="10" ry="14" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
+                  <path d="M72 30 Q78 38 72 46" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
+                  <text x="48" y="62" text-anchor="middle" fill="#ffd9a8" font-size="9" font-weight="600">Oil · tea · more</text>
+                </g>
+              </svg>
             </div>
-            <div class="passport-panel passport-panel--unlock">
-              <div class="passport-panel-head">
-                <span class="passport-panel-icon passport-panel-icon--unlock" aria-hidden="true">✦</span>
-                <h3>Maturity can unlock</h3>
+
+            <div class="adopt-steps">
+              <div class="adopt-step">
+                <span class="adopt-step-num">1</span>
+                <h3>Adopt</h3>
+                <p>Pick a plant or batch — tied to your passport.</p>
               </div>
-              <p class="passport-panel-sub">Optional, gated, regulation-aware.</p>
-              <ul class="passport-list passport-list--dense">
-                <li>In-app rewards &amp; achievements</li>
-                <li>Staking / loyalty <span class="passport-muted">(if legal &amp; UX fit)</span></li>
-                <li>Physical product &amp; merch redemption</li>
-                <li>Access tiers — Pro drops, partner rooms</li>
-                <li>Traits &amp; on-chain grow reputation</li>
-                <li>B2B-ready proof for buyers &amp; brands</li>
-              </ul>
+              <div class="adopt-step">
+                <span class="adopt-step-num">2</span>
+                <h3>Monitor</h3>
+                <p>Watch growth, alerts, and stage updates in-app.</p>
+              </div>
+              <div class="adopt-step adopt-step--split">
+                <span class="adopt-step-num">3</span>
+                <h3>Redeem or trade</h3>
+                <p>Flower from your plant, or swap for oil, tea &amp; partner SKUs.</p>
+              </div>
             </div>
           </div>
 
-          <h3 class="passport-fit-title">Ripples through the product</h3>
-          <div class="passport-fit passport-fit--styled">
-            <article class="fit-card fit-card--j">
-              <span class="fit-card-icon" aria-hidden="true">
-                <svg class="deck-icon deck-icon--fit" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 3.5h12A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M5 3.5h2A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5H4A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M10 9h8M10 12.5h8M10 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+          <div class="adopt-products">
+            <article class="adopt-product adopt-product--flower">
+              <span class="adopt-product-icon" aria-hidden="true">
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c2.5 5.5 7 8 13 8-1 7.5-6 13-13 18-7-5-12-10.5-13-18 6 0 10.5-2.5 13-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 11v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>Journal &amp; data model</h4>
-              <p>One graph: plants, environments, cycles. The NFT is a signed view — no duplicate silo.</p>
+              <h4>CBD flower</h4>
+              <p>Physical harvest linked to your adopted plant &amp; COA.</p>
             </article>
-            <article class="fit-card fit-card--a">
-              <span class="fit-card-icon" aria-hidden="true">
-                <svg class="deck-icon deck-icon--fit" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.5"/>
-                  <circle cx="12" cy="12" r="2.25" fill="currentColor" fill-opacity="0.35" stroke="currentColor" stroke-width="1.25"/>
-                  <path d="M12 4.5v3M12 16.5v3M4.5 12h3M16.5 12h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+            <article class="adopt-product">
+              <span class="adopt-product-icon" aria-hidden="true">
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M8 4h8l2 4v12a2 2 0 01-2 2H8a2 2 0 01-2-2V8l2-4z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>AI engine</h4>
-              <p>Coach outputs feed scores and stage transitions; the passport makes them portable.</p>
+              <h4>CBD oil</h4>
+              <p>Trade grow credits or passport maturity for oil.</p>
             </article>
-            <article class="fit-card fit-card--c">
-              <span class="fit-card-icon" aria-hidden="true">
-                <svg class="deck-icon deck-icon--fit" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M4.5 20.5V9.5L12 5l7.5 4.5v11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M9.5 20.5v-6h5v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <path d="M4.5 20.5h15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
+            <article class="adopt-product">
+              <span class="adopt-product-icon" aria-hidden="true">
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M6 10c0-4 3-7 6-7s6 3 6 7v8H6V10z" stroke="currentColor" stroke-width="1.5"/><path d="M8 18h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>Business tier</h4>
-              <p>Audit trails, batch IDs, COAs surfaced as metadata for buyers and regulators.</p>
+              <h4>CBD tea &amp; more</h4>
+              <p>Exchange for tea, topicals, or partner catalog items.</p>
             </article>
-            <article class="fit-card fit-card--p">
-              <span class="fit-card-icon" aria-hidden="true">
-                <svg class="deck-icon deck-icon--fit" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.5 11a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M15.5 18a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" stroke="currentColor" stroke-width="1.5"/>
-                  <path d="M5 20.5c.5-3 3-5 6.5-5.2M19 3.5c-.5 3-3 5-6.5 5.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-              </span>
-              <h4>Partners &amp; GTM</h4>
-              <p>Labs and brands co-sign updates, sponsor mints — Web3 as partnership rails.</p>
-            </article>
-          </div>
-
-          <div class="passport-foot">
-            <p>
-              Built on dynamic NFT patterns (mutable metadata / on-chain state). Chain, legal framing, and any
-              liquidity mechanics are scoped with counsel <em>before</em> a public mint.
-            </p>
           </div>
         </div>
       </section>
 
-      <!-- 7. MARKET -->
-      <section class="slide" data-title="Market">
+      <!-- 8. STACK -->
+      <section class="slide slide--dense" data-title="Stack">
         <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">07 · Market</span>
-            <h2>A category exploding into legitimacy.</h2>
-            <p class="lede">
-              CBD and legal cannabis are among the fastest-growing consumer categories in the
-              world — and the cultivators powering them lack modern software.
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">08 · Full stack</span>
+            <h2>How it <span class="grad">connects.</span></h2>
+            <p class="slide-remark">
+              Journal, AI, sensors, and passport layers share one data graph — hobbyists to commercial operators on the same OS.
             </p>
           </header>
-
-          <div class="market">
-            <div class="tam">
-              <div class="tam-row tam-tam">
-                <span class="tam-label">TAM</span>
-                <span class="tam-value">$50B+</span>
-                <span class="tam-desc">Global legal cannabis &amp; CBD market by 2030</span>
-              </div>
-              <div class="tam-row tam-sam">
-                <span class="tam-label">SAM</span>
-                <span class="tam-value">$3.5B</span>
-                <span class="tam-desc">Cultivation software, sensors &amp; SaaS for licensed and home growers</span>
-              </div>
-              <div class="tam-row tam-som">
-                <span class="tam-label">SOM</span>
-                <span class="tam-value">$120M</span>
-                <span class="tam-desc">EU CBD &amp; hemp growers + prosumer segment, 5-yr capture target</span>
-              </div>
-            </div>
-
-            <div class="market-side">
-              <div class="stat-block">
-                <span class="big">~16%</span>
-                <span class="small">CAGR of global legal cannabis market</span>
-              </div>
-              <div class="stat-block">
-                <span class="big">2M+</span>
-                <span class="small">Estimated CBD/hemp home &amp; small-scale growers in EU</span>
-              </div>
-              <div class="stat-block">
-                <span class="big">8 of 10</span>
-                <span class="small">Growers still rely on paper or notes apps</span>
-              </div>
-            </div>
+          <div class="stack-viz" aria-hidden="true">
+            <svg class="stack-svg" viewBox="0 0 900 280" fill="none">
+              <defs><linearGradient id="stkG" x1="0" y1="0" x2="900" y2="0"><stop stop-color="#78e08f"/><stop offset="0.5" stop-color="#5fb6ff"/><stop offset="1" stop-color="#c79bff"/></linearGradient></defs>
+              <path d="M80 140 H820" stroke="url(#stkG)" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
+              <g transform="translate(40,90)"><rect width="140" height="100" rx="16" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600" font-family="system-ui">Journal</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Plants · cycles</text></g>
+              <g transform="translate(200,90)"><rect width="140" height="100" rx="16" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">AI Coach</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Predict · guide</text></g>
+              <g transform="translate(360,90)"><rect width="140" height="100" rx="16" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">Sensors</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Meteo · stress</text></g>
+              <g transform="translate(520,90)"><rect width="140" height="100" rx="16" fill="rgba(199,155,255,0.08)" stroke="#c79bff" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">dNFT</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Plant passport</text></g>
+              <g transform="translate(680,90)"><rect width="140" height="100" rx="16" fill="rgba(255,184,107,0.06)" stroke="#ffb86b" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" fill="#ffd9a8" font-size="12" font-weight="600">RWA</text><text x="70" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Tokenize · trade</text></g>
+              <path d="M180 140 L200 140 M340 140 L360 140 M500 140 L520 140 M660 140 L680 140" stroke="#78e08f" stroke-width="2" marker-end="url(#none)"/>
+            </svg>
           </div>
-
-          <p class="footnote">
-            Sources: Grand View Research, Prohibition Partners EU CBD Report, MJBizDaily, internal estimates.
-            Figures are directional; full sourcing in the appendix.
-          </p>
-        </div>
-      </section>
-
-      <!-- 8. CUSTOMERS -->
-      <section class="slide" data-title="Customers">
-        <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">08 · Who We Serve</span>
-            <h2>Three growers. One platform.</h2>
-          </header>
-
-          <div class="grid grid-3 personas">
-            <article class="persona">
-              <div class="persona-tag">Hobbyist</div>
-              <h3>The first-time grower</h3>
-              <p>Wants guidance, structure, and confidence. Replaces YouTube guesswork with a guided journal.</p>
-              <ul>
-                <li>Full journaling core without forced signup</li>
-                <li>Beginner guides &amp; checklists</li>
-                <li>Privacy-first by default</li>
-              </ul>
-            </article>
-            <article class="persona persona--mid">
-              <div class="persona-tag">Prosumer</div>
-              <h3>The serious enthusiast</h3>
-              <p>Runs multiple strains and rooms. Wants AI insights, comparisons, and community benchmarks.</p>
-              <ul>
-                <li>AI Coach + multi-grow analytics</li>
-                <li>Deep sensor &amp; calculator integrations</li>
-                <li>Benchmarking &amp; cohort-safe insights</li>
-              </ul>
-            </article>
-            <article class="persona">
-              <div class="persona-tag">Commercial</div>
-              <h3>Licensed CBD operators</h3>
-              <p>Multi-room, multi-cycle production. Needs SOPs, team workflows, and compliance-ready logs.</p>
-              <ul>
-                <li>Team seats &amp; roles</li>
-                <li>SOP templates &amp; audit trail</li>
-                <li>API + sensor ingestion</li>
-              </ul>
-            </article>
+          <div class="grid grid-3 personas personas--dense">
+            <article class="persona"><div class="persona-tag">Hobbyist</div><h3>Guided grows</h3></article>
+            <article class="persona persona--mid"><div class="persona-tag">Prosumer</div><h3>AI + sensors</h3></article>
+            <article class="persona"><div class="persona-tag">Commercial</div><h3>Audit · multi-site</h3></article>
           </div>
         </div>
       </section>
 
-      <!-- 9. TRACTION -->
-      <section class="slide" data-title="Traction">
+      <!-- 8. MOMENTUM -->
+      <section class="slide slide--dense" data-title="Momentum">
         <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">09 · Traction</span>
-            <h2>Live product, organic growth, real signal.</h2>
-            <p class="lede">
-              Dnevnik.live ships today as a no-registration, client-side-first app — building
-              real-world usage patterns and a data foundation for the AI engine.
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">09 · Momentum</span>
+            <h2>Live today. <span class="grad">Building next.</span></h2>
+            <p class="slide-remark">
+              <a href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a> ships today; roadmap adds mobile, deeper sensors, commercial tooling, and passport pilots.
             </p>
           </header>
-
-          <div class="grid grid-3 traction">
-            <div class="t-card">
-              <span class="t-num">v1.0</span>
-              <span class="t-label">Live MVP</span>
-              <p>Journal, environments, reminders, calculators &amp; guides shipped at <a href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a>.</p>
-            </div>
-            <div class="t-card">
-              <span class="t-num">EU</span>
-              <span class="t-label">Initial market</span>
-              <p>Croatian launch as a beachhead; positioned for EU &amp; DACH expansion.</p>
-            </div>
-            <div class="t-card">
-              <span class="t-num">100%</span>
-              <span class="t-label">Organic users</span>
-              <p>Organic acquisition only — no paid performance marketing to date. SEO &amp; community-driven growth foundation.</p>
-            </div>
+          <div class="grid grid-3 traction traction--dense">
+            <div class="t-card"><span class="t-num">v1</span><span class="t-label">dnevnik.live</span></div>
+            <div class="t-card"><span class="t-num">EU</span><span class="t-label">Beachhead</span></div>
+            <div class="t-card"><span class="t-num">∞</span><span class="t-label">Organic growth</span></div>
           </div>
-
-          <div class="milestones">
-            <h3>What we&rsquo;ve already built</h3>
-            <ul>
-              <li>Plant &amp; environment data model with cycle continuity</li>
-              <li>Reminder engine and grower-friendly calendar</li>
-              <li>Beginner-to-advanced guide library (germination, nutrients, pests)</li>
-              <li>Privacy-first architecture with local-device storage</li>
-              <li>Foundations for the AI Coach &amp; analytics layer</li>
-            </ul>
+          <div class="timeline-viz" aria-label="Roadmap">
+            <div class="tl-node"><span class="tl-q">Q1–2</span><span class="tl-title">AI Coach</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node"><span class="tl-q">Q2–3</span><span class="tl-title">Mobile · sensors</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node"><span class="tl-q">Q3–4</span><span class="tl-title">Commercial</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">API · Passport</span></div>
           </div>
         </div>
       </section>
 
-      <!-- 10. COMPETITION -->
-      <section class="slide" data-title="Competition">
+      <!-- 9. TEAM -->
+      <section class="slide slide--dense" data-title="Team">
         <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">10 · Competition</span>
-            <h2>The category exists. The intelligence layer doesn&rsquo;t.</h2>
-          </header>
-
-          <div class="comp-table" role="table" aria-label="Competitive comparison">
-            <div class="comp-row comp-head" role="row">
-              <span role="columnheader">Capability</span>
-              <span role="columnheader">Paper / Notes</span>
-              <span role="columnheader">Generic grow apps</span>
-              <span role="columnheader">Commercial seed-to-sale</span>
-              <span role="columnheader" class="us">Dnevnik.live</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>Structured journaling</span><span>—</span><span>•</span><span>•</span><span class="us">●</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>Smart reminders</span><span>—</span><span>•</span><span>•</span><span class="us">●</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>AI predictions &amp; coach</span><span>—</span><span>—</span><span>—</span><span class="us">●</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>Personalized over time</span><span>—</span><span>—</span><span>—</span><span class="us">●</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>Hobbyist → Commercial</span><span>—</span><span>•</span><span>—</span><span class="us">●</span>
-            </div>
-            <div class="comp-row" role="row">
-              <span>Privacy-first / local data</span><span>•</span><span>—</span><span>—</span><span class="us">●</span>
-            </div>
-          </div>
-
-          <p class="legend">● Strong &nbsp;·&nbsp; • Partial &nbsp;·&nbsp; — Missing</p>
-        </div>
-      </section>
-
-      <!-- 11. ROADMAP -->
-      <section class="slide" data-title="Roadmap">
-        <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">11 · Roadmap</span>
-            <h2>From journal → cultivation OS in 18 months.</h2>
-          </header>
-
-          <ol class="roadmap">
-            <li>
-              <span class="rm-tag">Q1–Q2</span>
-              <h3>AI Coach v1</h3>
-              <p>Predictive alerts, anomaly detection, personalized recommendations.</p>
-            </li>
-            <li>
-              <span class="rm-tag">Q2–Q3</span>
-              <h3>Mobile apps &amp; sensor depth</h3>
-              <p>Native iOS &amp; Android clients, deeper sensor integrations (pH/EC/VPD), offline-first sync.</p>
-            </li>
-            <li>
-              <span class="rm-tag">Q3–Q4</span>
-              <h3>Commercial &amp; multi-site</h3>
-              <p>Team seats, SOPs, multi-site dashboards, audit-ready logs.</p>
-            </li>
-            <li>
-              <span class="rm-tag">Year 2</span>
-              <h3>EU expansion &amp; API platform</h3>
-              <p>
-                Localization, partnerships with seed/fertilizer brands, public API — plus optional
-                Plant Passport (dynamic NFT) pilots tied to verified grow &amp; lab data.
-              </p>
-            </li>
-          </ol>
-        </div>
-      </section>
-
-      <!-- 12. TEAM -->
-      <section class="slide" data-title="Team">
-        <div class="slide-inner">
-          <header class="slide-head">
-            <span class="kicker">12 · Team</span>
-            <h2>Operators who grow what they build.</h2>
-            <p class="lede">
-              A small, technical team with deep roots in cultivation, software, and product
-              design — shipping a live product end-to-end.
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">10 · Team</span>
+            <h2>Builders who <span class="grad">grow.</span></h2>
+            <p class="slide-remark">
+              Cultivation science and product engineering in one team — from EU hemp genetics to the platform you see in this deck.
             </p>
           </header>
-
-          <div class="grid grid-2 team team--founders">
+          <div class="grid grid-2 team team--founders team--dense">
             <div class="member">
-              <div class="avatar" aria-hidden="true">GB</div>
+              <div class="avatar">GB</div>
               <h3>Goran Brnić</h3>
-              <p class="role">Co-founder · Cultivation · <a href="https://financije.hr/balkan-pharma-d-o-o-pet-godina-predanog-rada-njihova-sorta-konoplje-sada-je-na-listi-eu/" target="_blank" rel="noreferrer">Balkan Pharma</a></p>
-              <p>
-                Founder of <strong>Balkan Pharma</strong> (Višnjevac, Croatia), focused on medicinal hemp R&amp;D and
-                compliant preparations. Phytotherapist with long-standing work on <em>Cannabis sativa L.</em>;
-                developed HACCP-aligned extraction and maceration workflows and breeding lines — including genetics
-                later registered on the EU common catalogue (e.g. the Freja Brnić NB1 variety reported in trade press).
-              </p>
+              <p class="role">Cultivation · <a href="https://financije.hr/balkan-pharma-d-o-o-pet-godina-predanog-rada-njihova-sorta-konoplje-sada-je-na-listi-eu/" target="_blank" rel="noreferrer">Balkan Pharma</a></p>
+              <p class="member-short">Hemp R&amp;D · EU genetics · HACCP extraction protocols.</p>
             </div>
             <div class="member">
-              <div class="avatar" aria-hidden="true">BI</div>
+              <div class="avatar">BI</div>
               <h3>Bela Ikotić</h3>
-              <p class="role">Co-founder · Product &amp; engineering · <a href="https://softwarecity.hr/clan/bela-ikotic/profil/" target="_blank" rel="noreferrer">Osijek Software City</a></p>
-              <p>
-                Osijek-based builder at the intersection of product, community, and deep tech: <strong>CEO, Void Main Studio</strong>
-                (games), with a public track record across <strong>BIOS</strong> / Microsoft Innovation Center–style programmes,
-                EU and education projects, and regional events (e.g. <a href="https://leapsummit.com/speaker/bela-ikotic/" target="_blank" rel="noreferrer">LEAP Summit</a>).
-                Leads Dnevnik.live architecture, AI roadmap, and shipping cadence.
-              </p>
+              <p class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
+              <p class="member-short">Dnevnik architecture &amp; AI roadmap.</p>
             </div>
           </div>
-
-          <p class="footnote">Agronomy &amp; compliance advisors support protocol design on a project basis.</p>
         </div>
       </section>
 
-      <!-- 13. VISION -->
-      <section class="slide" data-title="Vision">
-        <div class="slide-inner vision">
-          <header class="slide-head">
-            <span class="kicker">13 · Vision</span>
-            <h2>
-              From a logbook for one grower<br/>
-              to the <span class="grad">operating system</span> for an industry.
-            </h2>
-            <p class="lede big">
-              Every cycle generates data. Every grower learns. Dnevnik.live makes that
-              learning compound — across plants, across people, across cultures of cultivation.
-            </p>
-          </header>
-
-          <div class="vision-points">
-            <div><strong>Year 1</strong> — The most loved CBD grow journal in Europe.</div>
-            <div><strong>Year 3</strong> — The default AI co-pilot for prosumer &amp; commercial growers.</div>
-            <div><strong>Year 5</strong> — A category-defining cultivation OS &amp; data platform.</div>
+      <!-- 10. CLOSE -->
+      <section class="slide slide--dense slide--contact" data-title="Close">
+        <div class="slide-inner contact contact--dense">
+          <span class="kicker">11 · Close</span>
+          <h2>The <span class="grad">operating system</span> for cultivation.</h2>
+          <p class="slide-remark">
+            From daily journaling to adopted plants and redeemable CBD — one stack for growers, partners, and institutional RWA rails.
+          </p>
+          <div class="vision-points vision-points--dense">
+            <div><strong>Y1</strong> EU grow journal</div>
+            <div><strong>Y3</strong> AI co-pilot default</div>
+            <div><strong>Y5</strong> Cultivation OS + data platform</div>
           </div>
-        </div>
-      </section>
-
-      <!-- 14. CONTACT -->
-      <section class="slide slide--contact" data-title="Contact">
-        <div class="slide-inner contact">
-          <span class="kicker">Let&rsquo;s grow together.</span>
-          <h2>Join us in building the operating system for modern cultivation.</h2>
           <div class="contact-grid">
-            <div>
-              <span class="meta-label">Product</span>
-              <span class="meta-value">Journal · AI · Plant Passport</span>
-            </div>
-            <div>
-              <span class="meta-label">Live</span>
-              <a class="meta-value" href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a>
-            </div>
-            <div>
-              <span class="meta-label">Contact</span>
-              <span class="meta-value">admin@dnevnik.live</span>
-            </div>
+            <div><span class="meta-label">Live</span><a class="meta-value" href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a></div>
+            <div><span class="meta-label">Contact</span><span class="meta-value">admin@dnevnik.live</span></div>
           </div>
           <p class="thanks">Thank you.</p>
         </div>
@@ -847,7 +517,7 @@
     <!-- HUD -->
     <div class="hud" aria-hidden="true">
       <button class="hud-btn" id="prevBtn" aria-label="Previous slide">←</button>
-      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">15</span></span>
+      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">11</span></span>
       <button class="hud-btn" id="nextBtn" aria-label="Next slide">→</button>
     </div>
 
