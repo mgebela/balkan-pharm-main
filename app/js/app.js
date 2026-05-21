@@ -1213,6 +1213,180 @@ function initFirebaseSync() {
     return div.innerHTML;
   }
 
+  const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
+  const WEATHER_CITY_KEY = 'dnevnik-live-weather-city';
+  const DEFAULT_WEATHER_CITY = 'Visnjevac';
+  const PLANTS_WEATHER_EL = 'plants-weather';
+  let plantsWeatherFormBound = false;
+
+  function getWeatherCity() {
+    try {
+      const saved = localStorage.getItem(WEATHER_CITY_KEY);
+      return (saved && saved.trim()) || DEFAULT_WEATHER_CITY;
+    } catch {
+      return DEFAULT_WEATHER_CITY;
+    }
+  }
+
+  function formatWeatherDayLabel(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T12:00:00');
+    const today = new Date();
+    const isToday =
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear();
+    if (isToday) return 'Danas';
+    return d.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  async function getWeather(city, containerId) {
+    const elId = containerId || PLANTS_WEATHER_EL;
+    const weatherDiv = document.getElementById(elId);
+    if (!weatherDiv) return;
+
+    const cityName = (city || DEFAULT_WEATHER_CITY).trim() || DEFAULT_WEATHER_CITY;
+    weatherDiv.innerHTML = '<p class="plants-weather-loading">Učitavanje prognoze…</p>';
+
+    const url =
+      'https://api.weatherapi.com/v1/forecast.json?key=' +
+      encodeURIComponent(WEATHER_API_KEY) +
+      '&q=' +
+      encodeURIComponent(cityName) +
+      '&days=7';
+
+    try {
+      const response = await fetch(url);
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
+      }
+
+      if (!response.ok) {
+        const msg = (data && data.error && data.error.message) || 'HTTP ' + response.status;
+        weatherDiv.innerHTML =
+          '<p class="plants-weather-error">Prognoza nije dostupna: ' + escapeHtml(msg) + '</p>';
+        return;
+      }
+
+      if (!data || data.error) {
+        weatherDiv.innerHTML =
+          '<p class="plants-weather-error">Prognoza nije dostupna: ' +
+          escapeHtml((data && data.error && data.error.message) || 'Nepoznat grad') +
+          '</p>';
+        return;
+      }
+
+      if (!data.forecast || !Array.isArray(data.forecast.forecastday) || !data.forecast.forecastday.length) {
+        weatherDiv.innerHTML = '<p class="plants-weather-error">Nema podataka za prognozu.</p>';
+        return;
+      }
+
+      displayWeather(data, elId);
+    } catch (error) {
+      console.error('Weather fetch failed', error);
+      weatherDiv.innerHTML =
+        '<p class="plants-weather-error">Nije moguće učitati prognozu. Provjerite mrežu i naziv grada.</p>';
+    }
+  }
+
+  function displayWeather(data, containerId) {
+    const elId = containerId || PLANTS_WEATHER_EL;
+    const weatherDiv = document.getElementById(elId);
+    if (!weatherDiv || !data.forecast || !data.forecast.forecastday) return;
+
+    const city = data.location.name;
+    const region = data.location.region ? ', ' + data.location.region : '';
+    const days = data.forecast.forecastday;
+
+    let html =
+      '<p class="plants-weather-location">' +
+      escapeHtml(city + region) +
+      ' · sljedećih 7 dana</p><div class="weather-container plants-weather-days">';
+
+    days.forEach((day, i) => {
+      const label = formatWeatherDayLabel(day.date);
+      const avgTemp = day.day.avgtemp_c;
+      const minT = day.day.mintemp_c;
+      const maxT = day.day.maxtemp_c;
+      const condition = day.day.condition.text;
+      const icon = day.day.condition.icon;
+      const rain = day.day.daily_chance_of_rain;
+
+      html +=
+        '<div class="weather-card plants-weather-day' +
+        (i === 0 ? ' plants-weather-day--today' : '') +
+        '">' +
+        '<span class="plants-weather-day-label">' +
+        escapeHtml(label) +
+        '</span>' +
+        '<img src="https:' +
+        icon +
+        '" alt="" width="44" height="44" loading="lazy" />' +
+        '<span class="plants-weather-temp">' +
+        Math.round(avgTemp) +
+        '°</span>' +
+        '<span class="plants-weather-range">' +
+        Math.round(minT) +
+        '° / ' +
+        Math.round(maxT) +
+        '°</span>' +
+        '<span class="plants-weather-condition">' +
+        escapeHtml(condition) +
+        '</span>' +
+        (rain != null ? '<span class="plants-weather-rain">☔ ' + rain + '%</span>' : '') +
+        '</div>';
+    });
+
+    html += '</div>';
+    weatherDiv.innerHTML = html;
+  }
+
+  function loadPlantsWeatherFromInput() {
+    const input = document.getElementById('plants-weather-city');
+    const city = (input && input.value.trim()) || getWeatherCity();
+    if (input && !input.value.trim()) input.value = city;
+    try {
+      localStorage.setItem(WEATHER_CITY_KEY, city);
+    } catch {
+      // ignore
+    }
+    return getWeather(city);
+  }
+
+  function initPlantsWeatherWidget() {
+    const form = document.getElementById('plants-weather-city-form');
+    const input = document.getElementById('plants-weather-city');
+    const refreshBtn = document.getElementById('plants-weather-refresh');
+    if (!form || !input) return;
+
+    if (!input.value.trim()) input.value = getWeatherCity();
+
+    if (!plantsWeatherFormBound) {
+      plantsWeatherFormBound = true;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        loadPlantsWeatherFromInput();
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          loadPlantsWeatherFromInput();
+        }
+      });
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          loadPlantsWeatherFromInput();
+        });
+      }
+    }
+
+    loadPlantsWeatherFromInput();
+  }
+
   const MAX_IMAGE_SIZE = 800;
   const MAX_VIDEO_SIZE_MB = 2;
 
@@ -2424,147 +2598,6 @@ function initFirebaseSync() {
   initFirebaseSync();
   fillEntryPlantSelect();
   fillJournalPlantFilter();
-  const params = new URLSearchParams(window.location.search);
-  const initialView = params.get('view');
-  if (initialView) {
-    if (
-      initialView === "admin" &&
-      !["admin", "superadmin"].includes(currentUserRole)
-    ) {
-      showView("dashboard");
-    } else if (['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)) {
-      showView(initialView);
-    }
-  }
-  const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
-  const WEATHER_CITY_KEY = 'dnevnik-live-weather-city';
-  const DEFAULT_WEATHER_CITY = 'Visnjevac';
-  const PLANTS_WEATHER_EL = 'plants-weather';
-
-  function getWeatherCity() {
-    try {
-      const saved = localStorage.getItem(WEATHER_CITY_KEY);
-      return (saved && saved.trim()) || DEFAULT_WEATHER_CITY;
-    } catch {
-      return DEFAULT_WEATHER_CITY;
-    }
-  }
-
-  function formatWeatherDayLabel(dateStr) {
-    if (!dateStr) return '—';
-    const d = new Date(dateStr + 'T12:00:00');
-    const today = new Date();
-    const isToday =
-      d.getDate() === today.getDate() &&
-      d.getMonth() === today.getMonth() &&
-      d.getFullYear() === today.getFullYear();
-    if (isToday) return 'Danas';
-    return d.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
-  }
-
-  async function getWeather(city, containerId) {
-    const elId = containerId || PLANTS_WEATHER_EL;
-    const weatherDiv = document.getElementById(elId);
-    if (!weatherDiv) return;
-    weatherDiv.innerHTML = '<p class="plants-weather-loading">Učitavanje prognoze…</p>';
-
-    const q = encodeURIComponent((city || DEFAULT_WEATHER_CITY).trim());
-    const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${q}&days=7&lang=hr`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.error) {
-        weatherDiv.innerHTML =
-          '<p class="plants-weather-error">Prognoza nije dostupna: ' + escapeHtml(data.error.message) + '</p>';
-        return;
-      }
-
-      displayWeather(data, elId);
-    } catch (error) {
-      weatherDiv.innerHTML = '<p class="plants-weather-error">Nije moguće učitati prognozu.</p>';
-      console.error(error);
-    }
-  }
-
-  function displayWeather(data, containerId) {
-    const elId = containerId || PLANTS_WEATHER_EL;
-    const weatherDiv = document.getElementById(elId);
-    if (!weatherDiv || !data.forecast || !data.forecast.forecastday) return;
-
-    const city = data.location.name;
-    const region = data.location.region ? ', ' + data.location.region : '';
-    const days = data.forecast.forecastday;
-
-    let html =
-      '<p class="plants-weather-location">' +
-      escapeHtml(city + region) +
-      ' · 7 dana</p><div class="weather-container plants-weather-days">';
-
-    days.forEach((day, i) => {
-      const label = formatWeatherDayLabel(day.date);
-      const avgTemp = day.day.avgtemp_c;
-      const minT = day.day.mintemp_c;
-      const maxT = day.day.maxtemp_c;
-      const condition = day.day.condition.text;
-      const icon = day.day.condition.icon;
-      const rain = day.day.daily_chance_of_rain;
-
-      html +=
-        '<div class="weather-card plants-weather-day' +
-        (i === 0 ? ' plants-weather-day--today' : '') +
-        '">' +
-        '<span class="plants-weather-day-label">' +
-        escapeHtml(label) +
-        '</span>' +
-        '<img src="https:' +
-        icon +
-        '" alt="" width="44" height="44" loading="lazy" />' +
-        '<span class="plants-weather-temp">' +
-        Math.round(avgTemp) +
-        '°</span>' +
-        '<span class="plants-weather-range">' +
-        Math.round(minT) +
-        '° / ' +
-        Math.round(maxT) +
-        '°</span>' +
-        '<span class="plants-weather-condition">' +
-        escapeHtml(condition) +
-        '</span>' +
-        (rain != null ? '<span class="plants-weather-rain">☔ ' + rain + '%</span>' : '') +
-        '</div>';
-    });
-
-    html += '</div>';
-    weatherDiv.innerHTML = html;
-  }
-
-  let plantsWeatherFormBound = false;
-
-  function initPlantsWeatherWidget() {
-    const form = document.getElementById('plants-weather-city-form');
-    const input = document.getElementById('plants-weather-city');
-    if (!form || !input) return;
-
-    if (!input.value.trim()) input.value = getWeatherCity();
-
-    if (!plantsWeatherFormBound) {
-      plantsWeatherFormBound = true;
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const city = input.value.trim() || DEFAULT_WEATHER_CITY;
-        try {
-          localStorage.setItem(WEATHER_CITY_KEY, city);
-        } catch {
-          // ignore
-        }
-        getWeather(city);
-      });
-    }
-
-    getWeather(getWeatherCity());
-  }
 
   document.querySelectorAll('.toolbox-card-btn').forEach((btn) => {
     btn.addEventListener('click', () => {

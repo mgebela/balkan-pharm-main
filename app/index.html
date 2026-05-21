@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css" />
+  <link rel="stylesheet" href="styles/app.css?v=20260521" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -99,22 +99,25 @@
         <section class="plants-weather-widget" id="plants-weather-widget" aria-label="Prognoza vremena">
           <div class="plants-weather-widget-inner">
             <div class="plants-weather-widget-head">
-              <span class="plants-weather-widget-icon" aria-hidden="true">☀</span>
-              <div class="plants-weather-widget-meta">
-                <h3 class="plants-weather-widget-title">Prognoza vremena</h3>
-                <form class="plants-weather-city-form" id="plants-weather-city-form">
-                  <label class="sr-only" for="plants-weather-city">Grad</label>
-                  <input
-                    type="text"
-                    id="plants-weather-city"
-                    placeholder="npr. Visnjevac, Zagreb…"
-                    autocomplete="off"
-                  />
-                  <button type="submit" class="btn btn-ghost btn-sm">Osvježi</button>
-                </form>
+              <div class="plants-weather-widget-brand">
+                <span class="plants-weather-widget-icon" aria-hidden="true">☀</span>
+                <div>
+                  <h3 class="plants-weather-widget-title">Prognoza vremena</h3>
+                  <p class="plants-weather-widget-sub">7 dana · za planiranje uzgoja</p>
+                </div>
               </div>
+              <form class="plants-weather-city-form" id="plants-weather-city-form">
+                <input
+                  type="search"
+                  id="plants-weather-city"
+                  placeholder="Grad (npr. Visnjevac)"
+                  autocomplete="off"
+                  aria-label="Grad za prognozu"
+                />
+                <button type="submit" class="plants-weather-refresh-btn" id="plants-weather-refresh">Osvježi</button>
+              </form>
             </div>
-            <div id="plants-weather" class="plants-weather-body">Učitavanje prognoze…</div>
+            <div id="plants-weather" class="plants-weather-body" role="status">Učitavanje prognoze…</div>
           </div>
         </section>
         <section class="plants-journal-section">
@@ -638,6 +641,6 @@
       }
     })();
   </script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=20260521"></script>
 </body>
 </html>
