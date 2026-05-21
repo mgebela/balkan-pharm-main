@@ -44,8 +44,13 @@ onAuthStateChanged(auth, async (user) => {
 
   const role = userSnap.data().role;
 
-  if (!["admin", "superadmin"].includes(role)) {
+  if (!["admin", "superadmin", "viewer"].includes(role)) {
     window.location.href = "../index.html";
+    return;
+  }
+
+  if (role === "viewer") {
+    window.location.href = "../index.html?view=plants";
     return;
   }
 

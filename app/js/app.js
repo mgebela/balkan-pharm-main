@@ -51,6 +51,9 @@
   let remoteSyncPending = {};
   let remoteSyncInFlight = false;
   let isAdminReadOnly = false;
+  let readOnlyBannerMessage = '';
+
+  const FULL_READ_ONLY_EMAILS = ['filip.balkanpharm@gmail.com'];
 
   function getStoredAuth() {
     try {
@@ -222,7 +225,90 @@
     return { plants, entries };
   }
 
-  async function loadSuperadminDatabaseForAdmin() {
+  function getSharedGrantsRef(ownerUid, viewerUid) {
+    if (!ownerUid || !viewerUid || !window.firebase || !firebase.firestore) return null;
+    return firebase
+      .firestore()
+      .collection('users')
+      .doc(ownerUid)
+      .collection('sharedGrants')
+      .doc(viewerUid);
+  }
+
+  async function listFirestoreUsers() {
+    if (!window.firebase || !firebase.firestore) return [];
+    try {
+      const snap = await firebase.firestore().collection('users').get();
+      return snap.docs.map((d) => {
+        const data = d.data() || {};
+        return {
+          uid: d.id,
+          email: data.email || '',
+          role: data.role || 'user',
+        };
+      });
+    } catch (err) {
+      console.warn('Users list failed', err);
+      return [];
+    }
+  }
+
+  async function listSharedGrantsForOwner(ownerUid) {
+    if (!ownerUid || !window.firebase || !firebase.firestore) return [];
+    try {
+      const snap = await firebase
+        .firestore()
+        .collection('users')
+        .doc(ownerUid)
+        .collection('sharedGrants')
+        .get();
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (err) {
+      console.warn('Shared grants list failed', err);
+      return [];
+    }
+  }
+
+  async function saveSharedGrant(ownerUid, viewerUid, grant) {
+    const ref = getSharedGrantsRef(ownerUid, viewerUid);
+    if (!ref) return;
+    await ref.set(
+      Object.assign({}, grant, {
+        viewerUid,
+        updatedAt: new Date().toISOString(),
+        enabled: grant.enabled !== false,
+      }),
+      { merge: true }
+    );
+  }
+
+  async function deleteSharedGrant(ownerUid, viewerUid) {
+    const ref = getSharedGrantsRef(ownerUid, viewerUid);
+    if (!ref) return;
+    await ref.delete();
+  }
+
+  async function ensureViewerBootstrapGrant(viewerUid, email) {
+    const normalized = (email || '').toLowerCase();
+    if (!FULL_READ_ONLY_EMAILS.includes(normalized)) return;
+    const superIds = await findSuperadminUserIds();
+    if (!superIds.length) return;
+    const ownerUid = superIds[0];
+    const ref = getSharedGrantsRef(ownerUid, viewerUid);
+    if (!ref) return;
+    const snap = await ref.get();
+    if (snap.exists) return;
+    await saveSharedGrant(ownerUid, viewerUid, {
+      viewerEmail: email,
+      plantIds: [],
+      shareEntries: true,
+      shareToolbox: true,
+      enabled: true,
+      fullAccess: true,
+    });
+  }
+
+  async function loadSuperadminDatabaseFull() {
     const superIds = await findSuperadminUserIds();
     let plants = [];
     let entries = [];
@@ -241,17 +327,74 @@
     entries = mergeRecordsById(entries, firestoreData.entries);
 
     applyRemoteStateToLocal({ plants, entries, toolbox });
-    console.log('Admin loaded superadmin DB:', plants.length, 'plants,', entries.length, 'entries');
+    return { plants, entries, toolbox };
+  }
+
+  async function loadSuperadminDatabaseForAdmin() {
+    const result = await loadSuperadminDatabaseFull();
+    console.log('Admin loaded superadmin DB:', result.plants.length, 'plants,', result.entries.length, 'entries');
+  }
+
+  async function loadSharedDatabaseForViewer(viewerUid, email) {
+    const superIds = await findSuperadminUserIds();
+    let plants = [];
+    let entries = [];
+    let toolbox = {};
+    let matchedGrant = false;
+
+    for (const ownerUid of superIds) {
+      const ref = getSharedGrantsRef(ownerUid, viewerUid);
+      if (!ref) continue;
+      let grantSnap;
+      try {
+        grantSnap = await ref.get();
+      } catch {
+        continue;
+      }
+      if (!grantSnap.exists || grantSnap.data().enabled === false) continue;
+      const grant = grantSnap.data();
+      const grantEmail = (grant.viewerEmail || '').toLowerCase();
+      const userEmail = (email || '').toLowerCase();
+      if (grantEmail && userEmail && grantEmail !== userEmail) continue;
+
+      matchedGrant = true;
+      const state = await loadRemoteStateIntoLocal(ownerUid);
+      if (!state) continue;
+
+      let p = state.plants || [];
+      let e = state.entries || [];
+      const ids = Array.isArray(grant.plantIds) ? grant.plantIds : [];
+      if (ids.length > 0) {
+        const idSet = new Set(ids);
+        p = p.filter((pl) => pl && idSet.has(pl.id));
+        e = e.filter((en) => en && (!en.plantId || idSet.has(en.plantId)));
+      }
+
+      plants = mergeRecordsById(plants, p);
+      if (grant.shareEntries !== false) entries = mergeRecordsById(entries, e);
+      if (grant.shareToolbox) toolbox = Object.assign({}, toolbox, state.toolbox || {});
+    }
+
+    if (!matchedGrant && FULL_READ_ONLY_EMAILS.includes((email || '').toLowerCase())) {
+      await ensureViewerBootstrapGrant(viewerUid, email);
+      return loadSharedDatabaseForViewer(viewerUid, email);
+    }
+
+    applyRemoteStateToLocal({ plants, entries, toolbox });
+    console.log('Viewer loaded shared DB:', plants.length, 'plants,', entries.length, 'entries');
   }
 
   function blockAdminWrite() {
     if (!isAdminReadOnly) return false;
-    alert('Admin ima samo pregled baze superadmina — uređivanje nije dopušteno.');
+    alert(readOnlyBannerMessage || 'Pregled je samo za čitanje — uređivanje nije dopušteno.');
     return true;
   }
 
-  function applyAdminReadOnlyUI() {
+  function applyAdminReadOnlyUI(message) {
     if (!isAdminReadOnly) return;
+    readOnlyBannerMessage =
+      message ||
+      'Pregled baze (samo čitanje) — biljke, dnevnik i alati bez mogućnosti uređivanja.';
     document.body.classList.add('admin-readonly');
     let banner = document.getElementById('admin-readonly-banner');
     if (!banner) {
@@ -259,11 +402,126 @@
       banner.id = 'admin-readonly-banner';
       banner.className = 'admin-readonly-banner';
       banner.setAttribute('role', 'status');
-      banner.textContent =
-        'Pregled baze superadmina (samo čitanje) — biljke, dnevnik i alati bez mogućnosti uređivanja.';
       const main = document.querySelector('.main');
       if (main) main.insertBefore(banner, main.firstChild);
     }
+    banner.textContent = readOnlyBannerMessage;
+  }
+
+  async function renderSuperadminSharingPanel() {
+    const section = document.getElementById('admin-sharing-section');
+    const panel = document.getElementById('admin-sharing-panel');
+    const ownerUid = getFirebaseUserId();
+    if (!section || !panel || !ownerUid || currentUserRole !== 'superadmin') return;
+
+    section.setAttribute('aria-hidden', 'false');
+    panel.innerHTML = '<p class="growlog-empty">Učitavanje korisnika i biljaka…</p>';
+
+    const users = (await listFirestoreUsers()).filter((u) => u.uid !== ownerUid);
+    const plants = getPlants();
+    const grants = await listSharedGrantsForOwner(ownerUid);
+
+    const userOptions = users
+      .map(
+        (u) =>
+          `<option value="${escapeHtml(u.uid)}" data-email="${escapeHtml(u.email)}">${escapeHtml(u.email || u.uid)} (${escapeHtml(u.role)})</option>`
+      )
+      .join('');
+
+    const plantChecks = plants.length
+      ? plants
+          .map(
+            (p) =>
+              `<label class="admin-sharing-plant-item"><input type="checkbox" class="share-plant-cb" value="${escapeHtml(p.id)}" /> ${escapeHtml(p.name)}${p.strain ? ' · ' + escapeHtml(p.strain) : ''}</label>`
+          )
+          .join('')
+      : '<p class="growlog-empty">Nemate biljaka u svojoj bazi — dodajte ih u Biljke i dnevnik.</p>';
+
+    const grantsHtml = grants.length
+      ? grants
+          .map((g) => {
+            const plantCount =
+              Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' bilj.' : 'sve biljke';
+            return (
+              `<div class="admin-sharing-grant-row" data-viewer="${escapeHtml(g.viewerUid || g.id)}">` +
+              `<span><strong>${escapeHtml(g.viewerEmail || g.viewerUid || g.id)}</strong> — ${escapeHtml(plantCount)}` +
+              `${g.shareEntries === false ? '' : ', dnevnik'}` +
+              `${g.shareToolbox ? ', alati' : ''}</span>` +
+              `<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Ukloni</button></div>`
+            );
+          })
+          .join('')
+      : '<p class="growlog-empty">Još nema dodijeljenih pristupa.</p>';
+
+    panel.innerHTML =
+      '<form id="form-sharing-grant" class="admin-sharing-form">' +
+      '<label>Korisnik <select id="share-viewer-user" required><option value="">— odaberi —</option>' +
+      userOptions +
+      '</select></label>' +
+      '<fieldset class="admin-sharing-plants-fieldset"><legend>Biljke za dijeljenje</legend>' +
+      '<label class="admin-sharing-all"><input type="checkbox" id="share-all-plants" checked /> Sve biljke</label>' +
+      '<div id="share-plants-list" class="admin-sharing-plants-list" hidden>' +
+      plantChecks +
+      '</div></fieldset>' +
+      '<label><input type="checkbox" id="share-entries" checked /> Dijeli i bilješke dnevnika</label>' +
+      '<label><input type="checkbox" id="share-toolbox" /> Dijeli podatke iz Alata</label>' +
+      '<button type="submit" class="btn btn-primary">Spremi pristup</button>' +
+      '</form>' +
+      '<div class="admin-sharing-grants"><h4>Aktivni pristupi</h4>' +
+      grantsHtml +
+      '</div>';
+
+    const allPlantsCb = document.getElementById('share-all-plants');
+    const plantsList = document.getElementById('share-plants-list');
+    if (allPlantsCb && plantsList) {
+      allPlantsCb.addEventListener('change', () => {
+        plantsList.hidden = allPlantsCb.checked;
+      });
+    }
+
+    document.getElementById('form-sharing-grant').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const sel = document.getElementById('share-viewer-user');
+      const viewerUid = sel.value;
+      if (!viewerUid) return;
+      const viewerEmail = sel.selectedOptions[0]?.dataset?.email || '';
+      const allPlants = document.getElementById('share-all-plants').checked;
+      const plantIds = allPlants
+        ? []
+        : Array.from(document.querySelectorAll('.share-plant-cb:checked')).map((cb) => cb.value);
+      if (!allPlants && plantIds.length === 0) {
+        alert('Odaberite barem jednu biljku ili uključite „Sve biljke”.');
+        return;
+      }
+      try {
+        await saveSharedGrant(ownerUid, viewerUid, {
+          viewerEmail,
+          plantIds,
+          shareEntries: document.getElementById('share-entries').checked,
+          shareToolbox: document.getElementById('share-toolbox').checked,
+          enabled: true,
+        });
+        await renderSuperadminSharingPanel();
+        alert('Pristup je spremljen.');
+      } catch (err) {
+        console.error(err);
+        alert('Spremanje nije uspjelo. Provjerite Firestore pravila.');
+      }
+    });
+
+    panel.querySelectorAll('.btn-revoke-grant').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const row = btn.closest('.admin-sharing-grant-row');
+        const viewerUid = row && row.dataset.viewer;
+        if (!viewerUid || !confirm('Ukloniti pristup za ovog korisnika?')) return;
+        try {
+          await deleteSharedGrant(ownerUid, viewerUid);
+          await renderSuperadminSharingPanel();
+        } catch (err) {
+          alert('Uklanjanje nije uspjelo.');
+        }
+      });
+    });
   }
 
   function refreshAllViewsAfterRemoteLoad() {
@@ -286,20 +544,26 @@ async function ensureUserExists(user) {
 
   const docSnap = await userRef.get();
 
+  const email = (user.email || '').toLowerCase();
+  const promoteViewer = FULL_READ_ONLY_EMAILS.includes(email);
+
   if (!docSnap.exists) {
     await userRef.set({
       email: user.email || "",
       uId: user.uid,
-      role: "user",
+      role: promoteViewer ? 'viewer' : 'user',
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString()
     });
 
     console.log("User created");
   } else {
-    await userRef.update({
-      lastLoginAt: new Date().toISOString()
-    });
+    const data = docSnap.data() || {};
+    const patch = { lastLoginAt: new Date().toISOString() };
+    if (promoteViewer && (!data.role || data.role === 'user')) {
+      patch.role = 'viewer';
+    }
+    await userRef.update(patch);
 
     console.log("User updated");
   }
@@ -315,11 +579,17 @@ function applyRoleUI(role) {
 
  
   if (role === "admin" || role === "superadmin") {
-    adminEls.forEach(el => el.style.display = "flex");
+    adminEls.forEach((el) => (el.style.display = "flex"));
   }
 
   if (role === "superadmin") {
-    superEls.forEach(el => el.style.display = "flex");
+    superEls.forEach((el) => (el.style.display = "flex"));
+  }
+
+  const sharingSection = document.getElementById('admin-sharing-section');
+  if (sharingSection) {
+    sharingSection.style.display = role === 'superadmin' ? 'block' : 'none';
+    sharingSection.setAttribute('aria-hidden', role !== 'superadmin');
   }
 }
 
@@ -368,7 +638,17 @@ function initFirebaseSync() {
     isAdminReadOnly = true;
     remoteSyncReady = false;
     await loadSuperadminDatabaseForAdmin();
-    applyAdminReadOnlyUI();
+    applyAdminReadOnlyUI(
+      'Pregled cijele baze superadmina (samo čitanje) — bez mogućnosti uređivanja biljaka.'
+    );
+  } else if (currentUserRole === 'viewer') {
+    isAdminReadOnly = true;
+    remoteSyncReady = false;
+    await ensureViewerBootstrapGrant(user.uid, user.email || '');
+    await loadSharedDatabaseForViewer(user.uid, user.email || '');
+    applyAdminReadOnlyUI(
+      'Pregled dijeljenih biljaka (samo čitanje) — uređivanje nije dopušteno.'
+    );
   } else {
     isAdminReadOnly = false;
     document.body.classList.remove('admin-readonly');
@@ -568,6 +848,7 @@ function initFirebaseSync() {
       renderJournal();
     }
     if (id === 'toolbox') renderToolbox();
+    if (id === 'admin' && currentUserRole === 'superadmin') renderSuperadminSharingPanel();
   }
 
   navItems.forEach((item) => {
