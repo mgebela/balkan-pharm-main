@@ -96,6 +96,27 @@
       </div>
 
       <div id="view-plants" class="view">
+        <section class="plants-weather-widget" id="plants-weather-widget" aria-label="Prognoza vremena">
+          <div class="plants-weather-widget-inner">
+            <div class="plants-weather-widget-head">
+              <span class="plants-weather-widget-icon" aria-hidden="true">☀</span>
+              <div class="plants-weather-widget-meta">
+                <h3 class="plants-weather-widget-title">Prognoza vremena</h3>
+                <form class="plants-weather-city-form" id="plants-weather-city-form">
+                  <label class="sr-only" for="plants-weather-city">Grad</label>
+                  <input
+                    type="text"
+                    id="plants-weather-city"
+                    placeholder="npr. Visnjevac, Zagreb…"
+                    autocomplete="off"
+                  />
+                  <button type="submit" class="btn btn-ghost btn-sm">Osvježi</button>
+                </form>
+              </div>
+            </div>
+            <div id="plants-weather" class="plants-weather-body">Učitavanje prognoze…</div>
+          </div>
+        </section>
         <section class="plants-journal-section">
           <h2 class="section-heading">Moje biljke</h2>
           <div class="toolbar">
@@ -241,19 +262,8 @@
             <h3>Grafovi</h3>
             <p>Vizualizacija rasta i mjerenja.</p>
           </button>
-          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="vrijeme">
-            <h3>Vrijeme</h3>
-            <p>Procjena vremena za danas i idućih par dana</p>
-          </button>
         </div>
           <div class="toolbox-panels">
-          <div id="toolbox-panel-vrijeme" class="toolbox-panel" data-tool="vrijeme" aria-hidden="true">
-            <h3 class="toolbox-panel-title">Vrijeme</h3>
-                <section class="section cta-section">
-                <h1>Prognoza Vremena</h1>
-                <div id="weather">Loading...</div>
-          </section>
-          </div>
           <div id="toolbox-panel-watering" class="toolbox-panel" data-tool="watering" aria-hidden="true">
             <h3 class="toolbox-panel-title">Zalijevanje</h3>
             <form class="toolbox-form" id="toolbox-form-watering">

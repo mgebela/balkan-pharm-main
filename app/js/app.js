@@ -844,6 +844,7 @@ function initFirebaseSync() {
     if (viewTitle && titles[id]) viewTitle.textContent = titles[id];
     if (id === 'dashboard') renderDashboard();
     if (id === 'plants') {
+      initPlantsWeatherWidget();
       renderPlants();
       renderJournal();
     }
@@ -2435,84 +2436,153 @@ function initFirebaseSync() {
       showView(initialView);
     }
   }
-  //WeatherAPI
-  const apiKey = "4fcd0d4855e24280a52121246261504";
+  const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
+  const WEATHER_CITY_KEY = 'dnevnik-live-weather-city';
+  const DEFAULT_WEATHER_CITY = 'Visnjevac';
+  const PLANTS_WEATHER_EL = 'plants-weather';
 
-  document.querySelectorAll(".toolbox-card-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const tool = btn.dataset.tool;
+  function getWeatherCity() {
+    try {
+      const saved = localStorage.getItem(WEATHER_CITY_KEY);
+      return (saved && saved.trim()) || DEFAULT_WEATHER_CITY;
+    } catch {
+      return DEFAULT_WEATHER_CITY;
+    }
+  }
 
-    document.querySelectorAll(".toolbox-panel").forEach(panel => {
-      panel.style.display = "none";
-      panel.setAttribute("aria-hidden", "true");
+  function formatWeatherDayLabel(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T12:00:00');
+    const today = new Date();
+    const isToday =
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear();
+    if (isToday) return 'Danas';
+    return d.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  async function getWeather(city, containerId) {
+    const elId = containerId || PLANTS_WEATHER_EL;
+    const weatherDiv = document.getElementById(elId);
+    if (!weatherDiv) return;
+    weatherDiv.innerHTML = '<p class="plants-weather-loading">Učitavanje prognoze…</p>';
+
+    const q = encodeURIComponent((city || DEFAULT_WEATHER_CITY).trim());
+    const url = `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${q}&days=7&lang=hr`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.error) {
+        weatherDiv.innerHTML =
+          '<p class="plants-weather-error">Prognoza nije dostupna: ' + escapeHtml(data.error.message) + '</p>';
+        return;
+      }
+
+      displayWeather(data, elId);
+    } catch (error) {
+      weatherDiv.innerHTML = '<p class="plants-weather-error">Nije moguće učitati prognozu.</p>';
+      console.error(error);
+    }
+  }
+
+  function displayWeather(data, containerId) {
+    const elId = containerId || PLANTS_WEATHER_EL;
+    const weatherDiv = document.getElementById(elId);
+    if (!weatherDiv || !data.forecast || !data.forecast.forecastday) return;
+
+    const city = data.location.name;
+    const region = data.location.region ? ', ' + data.location.region : '';
+    const days = data.forecast.forecastday;
+
+    let html =
+      '<p class="plants-weather-location">' +
+      escapeHtml(city + region) +
+      ' · 7 dana</p><div class="weather-container plants-weather-days">';
+
+    days.forEach((day, i) => {
+      const label = formatWeatherDayLabel(day.date);
+      const avgTemp = day.day.avgtemp_c;
+      const minT = day.day.mintemp_c;
+      const maxT = day.day.maxtemp_c;
+      const condition = day.day.condition.text;
+      const icon = day.day.condition.icon;
+      const rain = day.day.daily_chance_of_rain;
+
+      html +=
+        '<div class="weather-card plants-weather-day' +
+        (i === 0 ? ' plants-weather-day--today' : '') +
+        '">' +
+        '<span class="plants-weather-day-label">' +
+        escapeHtml(label) +
+        '</span>' +
+        '<img src="https:' +
+        icon +
+        '" alt="" width="44" height="44" loading="lazy" />' +
+        '<span class="plants-weather-temp">' +
+        Math.round(avgTemp) +
+        '°</span>' +
+        '<span class="plants-weather-range">' +
+        Math.round(minT) +
+        '° / ' +
+        Math.round(maxT) +
+        '°</span>' +
+        '<span class="plants-weather-condition">' +
+        escapeHtml(condition) +
+        '</span>' +
+        (rain != null ? '<span class="plants-weather-rain">☔ ' + rain + '%</span>' : '') +
+        '</div>';
     });
 
-    const activePanel = document.getElementById(`toolbox-panel-${tool}`);
-
-    if (activePanel) {
-      activePanel.style.display = "block";
-      activePanel.setAttribute("aria-hidden", "false");
-    }
-
-    if (tool === "vrijeme") {
-      getWeather("Visnjevac");
-    }
-  });
-});
-
-//test weather  https://api.weatherapi.com/v1/forecast.json?key=4fcd0d4855e24280a52121246261504&q=Visnjevac
-
-async function getWeather(city) {
-  const weatherDiv = document.getElementById("weather");
-  weatherDiv.innerText = "Loading...";
-
-  const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=7`;
-
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (data.error) {
-      weatherDiv.innerText = "Error: " + data.error.message;
-      return;
-    }
-
-    displayWeather(data);
-
-  } catch (error) {
-    weatherDiv.innerText = "Failed to load weather";
-    console.error(error);
+    html += '</div>';
+    weatherDiv.innerHTML = html;
   }
-}
 
-function displayWeather(data) {
-  const city = data.location.name;
+  let plantsWeatherFormBound = false;
 
-  let weatherHTML = `
-    <h2>${city} - 7 Dana Prognoza</h2>
-    <div class="weather-container">
-  `;
+  function initPlantsWeatherWidget() {
+    const form = document.getElementById('plants-weather-city-form');
+    const input = document.getElementById('plants-weather-city');
+    if (!form || !input) return;
 
-  data.forecast.forecastday.forEach(day => {
-    const date = day.date;
-    const avgTemp = day.day.avgtemp_c;
-    const condition = day.day.condition.text;
-    const icon = day.day.condition.icon;
+    if (!input.value.trim()) input.value = getWeatherCity();
 
-    weatherHTML += `
-      <div class="weather-card">
-        <h4>${date}</h4>
-        <img src="https:${icon}" alt="${condition}">
-        <p>${condition}</p>
-        <p><strong>${avgTemp}°C</strong></p>
-      </div>
-    `;
+    if (!plantsWeatherFormBound) {
+      plantsWeatherFormBound = true;
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const city = input.value.trim() || DEFAULT_WEATHER_CITY;
+        try {
+          localStorage.setItem(WEATHER_CITY_KEY, city);
+        } catch {
+          // ignore
+        }
+        getWeather(city);
+      });
+    }
+
+    getWeather(getWeatherCity());
+  }
+
+  document.querySelectorAll('.toolbox-card-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tool = btn.dataset.tool;
+
+      document.querySelectorAll('.toolbox-panel').forEach((panel) => {
+        panel.style.display = 'none';
+        panel.setAttribute('aria-hidden', 'true');
+      });
+
+      const activePanel = document.getElementById(`toolbox-panel-${tool}`);
+
+      if (activePanel) {
+        activePanel.style.display = 'block';
+        activePanel.setAttribute('aria-hidden', 'false');
+      }
+    });
   });
-
-  weatherHTML += `</div>`;
-
-  document.getElementById("weather").innerHTML = weatherHTML;
-}
 
 document.addEventListener("click", (e) => {
 
