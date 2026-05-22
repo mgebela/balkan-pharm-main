@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260521c" />
+  <link rel="stylesheet" href="styles/app.css?v=20260522b" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -402,28 +402,40 @@
     </button>
   </div>
 
-  <section id="admin-user-report-section" class="admin-user-report-section admin-super-only" aria-hidden="true">
-    <h3 class="admin-sharing-title">Izvještaj prijava korisnika</h3>
-    <p class="field-hint admin-sharing-lede">
-      Pregled tko se i kada prijavio u aplikaciju. Dnevni prikaz za danas, tjedni za zadnjih 7 dana.
-    </p>
-    <div class="admin-report-toolbar">
-      <button type="button" class="btn btn-ghost btn-sm admin-report-period is-active" data-period="daily">Danas</button>
-      <button type="button" class="btn btn-ghost btn-sm admin-report-period" data-period="weekly">Zadnjih 7 dana</button>
-      <button type="button" class="btn btn-ghost btn-sm" id="admin-report-refresh">Osvježi</button>
-    </div>
-    <div id="admin-user-report-panel" class="admin-user-report-panel">
-      <p class="growlog-empty">Otvorite Admin panel za učitavanje izvještaja.</p>
-    </div>
-  </section>
+  <div id="admin-super-hub" class="admin-super-hub admin-super-only" aria-hidden="true">
+    <section id="admin-user-report-section" class="admin-hub-card admin-user-report-section">
+      <header class="admin-hub-card-head">
+        <span class="admin-hub-icon" aria-hidden="true">📊</span>
+        <div class="admin-hub-card-titles">
+          <h3 class="admin-hub-title">Praćenje prijava</h3>
+          <p class="admin-hub-lede">Tko se i kada prijavio u aplikaciju — dnevno ili tjedno.</p>
+        </div>
+      </header>
+      <div class="admin-hub-card-body">
+        <div class="admin-report-toolbar admin-segmented" role="tablist" aria-label="Razdoblje izvještaja">
+          <button type="button" class="admin-segment admin-report-period is-active" data-period="daily" role="tab">Danas</button>
+          <button type="button" class="admin-segment admin-report-period" data-period="weekly" role="tab">7 dana</button>
+          <button type="button" class="admin-segment admin-segment--ghost" id="admin-report-refresh" title="Osvježi podatke">↻ Osvježi</button>
+        </div>
+        <div id="admin-user-report-panel" class="admin-user-report-panel">
+          <p class="admin-empty-state">Otvorite Admin panel za učitavanje izvještaja.</p>
+        </div>
+      </div>
+    </section>
 
-  <section id="admin-sharing-section" class="admin-sharing-section admin-super-only" aria-hidden="true">
-    <h3 class="admin-sharing-title">Dijeljenje baze biljaka s korisnicima</h3>
-    <p class="field-hint admin-sharing-lede">
-      Odaberite korisnika i biljke koje želite podijeliti. Korisnik vidi samo odabrano (samo čitanje, bez uređivanja).
-    </p>
-    <div id="admin-sharing-panel" class="admin-sharing-panel"></div>
-  </section>
+    <section id="admin-sharing-section" class="admin-hub-card admin-sharing-section">
+      <header class="admin-hub-card-head">
+        <span class="admin-hub-icon" aria-hidden="true">🌱</span>
+        <div class="admin-hub-card-titles">
+          <h3 class="admin-hub-title">Dijeljenje biljaka i alata</h3>
+          <p class="admin-hub-lede">Odaberite korisnika i što dijelite — pregled je samo za čitanje.</p>
+        </div>
+      </header>
+      <div class="admin-hub-card-body">
+        <div id="admin-sharing-panel" class="admin-sharing-panel"></div>
+      </div>
+    </section>
+  </div>
 
       </div>
 
@@ -656,6 +668,6 @@
       }
     })();
   </script>
-  <script src="js/app.js?v=20260522a"></script>
+  <script src="js/app.js?v=20260522b"></script>
 </body>
 </html>

@@ -447,6 +447,21 @@
     );
   }
 
+  function adminRoleBadge(role) {
+    const r = (role || 'user').toLowerCase();
+    const safe = escapeHtml(r);
+    return `<span class="admin-role-badge admin-role-badge--${safe}">${safe}</span>`;
+  }
+
+  function adminGrantBadgesHtml(g) {
+    const plantCount =
+      Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' biljaka' : 'Sve biljke';
+    const parts = [`<span class="admin-grant-badge admin-grant-badge--plants">🌱 ${escapeHtml(plantCount)}</span>`];
+    if (g.shareEntries !== false) parts.push('<span class="admin-grant-badge admin-grant-badge--journal">📓 Dnevnik</span>');
+    if (g.shareToolbox) parts.push('<span class="admin-grant-badge admin-grant-badge--toolbox">🧰 Alati</span>');
+    return parts.join('');
+  }
+
   function groupLoginEventsByDay(events) {
     const map = new Map();
     (events || []).forEach((e) => {
@@ -464,7 +479,7 @@
 
     adminReportPeriod = period || adminReportPeriod || 'daily';
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="growlog-empty">Učitavanje izvještaja prijava…</p>';
+    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Učitavanje izvještaja…</p>';
 
     section.querySelectorAll('.admin-report-period').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.period === adminReportPeriod);
@@ -489,9 +504,9 @@
 
     const summaryHtml =
       '<div class="admin-report-summary">' +
-      `<div class="admin-report-stat"><strong>${filteredEvents.length}</strong><span>Prijave ${periodLabel}</span></div>` +
-      `<div class="admin-report-stat"><strong>${uniqueUsers.size}</strong><span>Jedinstveni korisnici</span></div>` +
-      `<div class="admin-report-stat"><strong>${summary.length}</strong><span>Korisnika u sažetku</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--logins"><strong>${filteredEvents.length}</strong><span>Prijave ${periodLabel}</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--users"><strong>${uniqueUsers.size}</strong><span>Jedinstveni korisnici</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--total"><strong>${summary.length}</strong><span>U sažetku</span></div>` +
       '</div>';
 
     const usersTableRows = summary.length
@@ -499,54 +514,58 @@
           .map(
             (u) =>
               '<tr>' +
-              `<td>${escapeHtml(u.email)}</td>` +
-              `<td>${escapeHtml(u.role || 'user')}</td>` +
-              `<td>${u.count > 0 ? u.count : '—'}</td>` +
-              `<td>${escapeHtml(formatReportDateTime(u.lastLoginAt))}</td>` +
+              `<td class="admin-td-email">${escapeHtml(u.email)}</td>` +
+              `<td>${adminRoleBadge(u.role)}</td>` +
+              `<td class="admin-td-num">${u.count > 0 ? u.count : '—'}</td>` +
+              `<td class="admin-td-time">${escapeHtml(formatReportDateTime(u.lastLoginAt))}</td>` +
               '</tr>'
           )
           .join('')
-      : '<tr><td colspan="4" class="growlog-empty">Nema prijava u odabranom razdoblju.</td></tr>';
+      : '<tr><td colspan="4" class="admin-empty-state">Nema prijava u odabranom razdoblju.</td></tr>';
 
     const usersTableHtml =
-      '<h4>Sažetak po korisniku</h4>' +
+      '<div class="admin-report-block">' +
+      '<h4 class="admin-subheading">Sažetak po korisniku</h4>' +
       '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
       '<thead><tr><th>E-mail</th><th>Uloga</th><th>Prijave</th><th>Zadnja prijava</th></tr></thead>' +
-      `<tbody>${usersTableRows}</tbody></table></div>`;
+      `<tbody>${usersTableRows}</tbody></table></div></div>`;
 
-    let detailHtml = '<h4>Pojedinačne prijave</h4>';
+    let detailHtml = '<div class="admin-report-block admin-report-block--detail">';
+    detailHtml += '<h4 class="admin-subheading">Pojedinačne prijave</h4>';
     if (!filteredEvents.length) {
-      detailHtml += '<p class="growlog-empty">Nema zabilježenih prijava za ovo razdoblje. Prijave se bilježe od sljedeće prijave korisnika.</p>';
+      detailHtml +=
+        '<p class="admin-empty-state">Nema zabilježenih prijava za ovo razdoblje. Prijave se bilježe od sljedeće prijave korisnika.</p>';
     } else if (adminReportPeriod === 'weekly') {
       const groups = groupLoginEventsByDay(filteredEvents);
-      detailHtml += groups
+      detailHtml += '<div class="admin-report-day-groups">' + groups
         .map(([day, dayEvents]) => {
           const rows = dayEvents
             .map(
               (e) =>
                 '<tr>' +
-                `<td>${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
-                `<td>${escapeHtml(e.email || '—')}</td>` +
-                `<td>${escapeHtml(e.role || 'user')}</td>` +
+                `<td class="admin-td-time">${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
+                `<td class="admin-td-email">${escapeHtml(e.email || '—')}</td>` +
+                `<td>${adminRoleBadge(e.role)}</td>` +
                 '</tr>'
             )
             .join('');
           return (
+            '<div class="admin-report-day-group">' +
             `<h5 class="admin-report-day">${escapeHtml(formatReportDayLabel(day))}</h5>` +
             '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
             '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
-            `<tbody>${rows}</tbody></table></div>`
+            `<tbody>${rows}</tbody></table></div></div>`
           );
         })
-        .join('');
+        .join('') + '</div>';
     } else {
       const rows = filteredEvents
         .map(
           (e) =>
             '<tr>' +
-            `<td>${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
-            `<td>${escapeHtml(e.email || '—')}</td>` +
-            `<td>${escapeHtml(e.role || 'user')}</td>` +
+            `<td class="admin-td-time">${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
+            `<td class="admin-td-email">${escapeHtml(e.email || '—')}</td>` +
+            `<td>${adminRoleBadge(e.role)}</td>` +
             '</tr>'
         )
         .join('');
@@ -555,6 +574,7 @@
         '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
         `<tbody>${rows}</tbody></table></div>`;
     }
+    detailHtml += '</div>';
 
     panel.innerHTML = summaryHtml + usersTableHtml + detailHtml;
 
@@ -836,7 +856,7 @@
     if (!section || !panel || !ownerUid || currentUserRole !== 'superadmin') return;
 
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="growlog-empty">Učitavanje korisnika i biljaka…</p>';
+    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Učitavanje…</p>';
 
     const users = (await listFirestoreUsers()).filter((u) => u.uid !== ownerUid);
     const plants = getPlants();
@@ -853,44 +873,60 @@
       ? plants
           .map(
             (p) =>
-              `<label class="admin-sharing-plant-item"><input type="checkbox" class="share-plant-cb" value="${escapeHtml(p.id)}" /> ${escapeHtml(p.name)}${p.strain ? ' · ' + escapeHtml(p.strain) : ''}</label>`
+              `<label class="admin-plant-pick"><input type="checkbox" class="share-plant-cb" value="${escapeHtml(p.id)}" />` +
+              `<span class="admin-plant-pick-name">${escapeHtml(p.name)}</span>` +
+              (p.strain ? `<span class="admin-plant-pick-meta">${escapeHtml(p.strain)}</span>` : '') +
+              '</label>'
           )
           .join('')
-      : '<p class="growlog-empty">Nemate biljaka u svojoj bazi — dodajte ih u Biljke i dnevnik.</p>';
+      : '<p class="admin-empty-state">Nemate biljaka u bazi — dodajte ih u Biljke i dnevnik.</p>';
 
     const grantsHtml = grants.length
       ? grants
           .map((g) => {
-            const plantCount =
-              Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' bilj.' : 'sve biljke';
+            const email = g.viewerEmail || g.viewerUid || g.id;
             return (
-              `<div class="admin-sharing-grant-row" data-viewer="${escapeHtml(g.viewerUid || g.id)}">` +
-              `<span><strong>${escapeHtml(g.viewerEmail || g.viewerUid || g.id)}</strong> — ${escapeHtml(plantCount)}` +
-              `${g.shareEntries === false ? '' : ', dnevnik'}` +
-              `${g.shareToolbox ? ', alati' : ''}</span>` +
-              `<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Ukloni</button></div>`
+              `<article class="admin-grant-card" data-viewer="${escapeHtml(g.viewerUid || g.id)}">` +
+              '<div class="admin-grant-card-head">' +
+              `<div class="admin-grant-user"><span class="admin-grant-avatar" aria-hidden="true">${escapeHtml((email[0] || '?').toUpperCase())}</span>` +
+              `<strong class="admin-grant-email">${escapeHtml(email)}</strong></div>` +
+              '<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Ukloni</button></div>' +
+              `<div class="admin-grant-badges">${adminGrantBadgesHtml(g)}</div></article>`
             );
           })
           .join('')
-      : '<p class="growlog-empty">Još nema dodijeljenih pristupa.</p>';
+      : '<p class="admin-empty-state">Još nema dodijeljenih pristupa.</p>';
 
     panel.innerHTML =
+      '<div class="admin-sharing-layout">' +
+      '<div class="admin-sharing-form-card">' +
+      '<h4 class="admin-subheading">Novi pristup</h4>' +
       '<form id="form-sharing-grant" class="admin-sharing-form">' +
-      '<label>Korisnik <select id="share-viewer-user" required><option value="">— odaberi —</option>' +
+      '<label class="admin-field"><span class="admin-field-label">Korisnik</span>' +
+      '<select id="share-viewer-user" class="admin-field-input" required><option value="">— odaberi korisnika —</option>' +
       userOptions +
       '</select></label>' +
-      '<fieldset class="admin-sharing-plants-fieldset"><legend>Biljke za dijeljenje</legend>' +
-      '<label class="admin-sharing-all"><input type="checkbox" id="share-all-plants" checked /> Sve biljke</label>' +
-      '<div id="share-plants-list" class="admin-sharing-plants-list" hidden>' +
+      '<fieldset class="admin-sharing-plants-fieldset">' +
+      '<legend class="admin-field-label">Biljke</legend>' +
+      '<label class="admin-toggle-tile admin-toggle-tile--wide">' +
+      '<input type="checkbox" id="share-all-plants" checked />' +
+      '<span><strong>Sve biljke</strong><small>Pregled cijele baze biljaka</small></span></label>' +
+      '<div id="share-plants-list" class="admin-plants-pick-list" hidden>' +
       plantChecks +
       '</div></fieldset>' +
-      '<label><input type="checkbox" id="share-entries" checked /> Dijeli i bilješke dnevnika</label>' +
-      '<label><input type="checkbox" id="share-toolbox" /> Dijeli podatke iz Alata</label>' +
-      '<button type="submit" class="btn btn-primary">Spremi pristup</button>' +
-      '</form>' +
-      '<div class="admin-sharing-grants"><h4>Aktivni pristupi</h4>' +
-      grantsHtml +
-      '</div>';
+      '<div class="admin-toggle-row">' +
+      '<label class="admin-toggle-tile">' +
+      '<input type="checkbox" id="share-entries" checked />' +
+      '<span><strong>Dnevnik</strong><small>Bilješke i unosi</small></span></label>' +
+      '<label class="admin-toggle-tile">' +
+      '<input type="checkbox" id="share-toolbox" />' +
+      '<span><strong>Alati</strong><small>Podaci iz Alata</small></span></label>' +
+      '</div>' +
+      '<button type="submit" class="btn btn-primary admin-sharing-submit">Spremi pristup</button>' +
+      '</form></div>' +
+      '<div class="admin-sharing-grants-card">' +
+      '<h4 class="admin-subheading">Aktivni pristupi <span class="admin-count-badge">' + grants.length + '</span></h4>' +
+      '<div class="admin-grant-list">' + grantsHtml + '</div></div></div>';
 
     const allPlantsCb = document.getElementById('share-all-plants');
     const plantsList = document.getElementById('share-plants-list');
@@ -932,7 +968,7 @@
 
     panel.querySelectorAll('.btn-revoke-grant').forEach((btn) => {
       btn.addEventListener('click', async () => {
-        const row = btn.closest('.admin-sharing-grant-row');
+        const row = btn.closest('.admin-grant-card');
         const viewerUid = row && row.dataset.viewer;
         if (!viewerUid || !confirm('Ukloniti pristup za ovog korisnika?')) return;
         try {
@@ -1007,16 +1043,10 @@ function applyRoleUI(role) {
     superEls.forEach((el) => (el.style.display = "flex"));
   }
 
-  const sharingSection = document.getElementById('admin-sharing-section');
-  if (sharingSection) {
-    sharingSection.style.display = role === 'superadmin' ? 'block' : 'none';
-    sharingSection.setAttribute('aria-hidden', role !== 'superadmin');
-  }
-
-  const reportSection = document.getElementById('admin-user-report-section');
-  if (reportSection) {
-    reportSection.style.display = role === 'superadmin' ? 'block' : 'none';
-    reportSection.setAttribute('aria-hidden', role !== 'superadmin');
+  const superHub = document.getElementById('admin-super-hub');
+  if (superHub) {
+    superHub.style.display = role === 'superadmin' ? 'flex' : 'none';
+    superHub.setAttribute('aria-hidden', role !== 'superadmin');
   }
 }
 
