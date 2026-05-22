@@ -402,6 +402,21 @@
     </button>
   </div>
 
+  <section id="admin-user-report-section" class="admin-user-report-section admin-super-only" aria-hidden="true">
+    <h3 class="admin-sharing-title">Izvještaj prijava korisnika</h3>
+    <p class="field-hint admin-sharing-lede">
+      Pregled tko se i kada prijavio u aplikaciju. Dnevni prikaz za danas, tjedni za zadnjih 7 dana.
+    </p>
+    <div class="admin-report-toolbar">
+      <button type="button" class="btn btn-ghost btn-sm admin-report-period is-active" data-period="daily">Danas</button>
+      <button type="button" class="btn btn-ghost btn-sm admin-report-period" data-period="weekly">Zadnjih 7 dana</button>
+      <button type="button" class="btn btn-ghost btn-sm" id="admin-report-refresh">Osvježi</button>
+    </div>
+    <div id="admin-user-report-panel" class="admin-user-report-panel">
+      <p class="growlog-empty">Otvorite Admin panel za učitavanje izvještaja.</p>
+    </div>
+  </section>
+
   <section id="admin-sharing-section" class="admin-sharing-section admin-super-only" aria-hidden="true">
     <h3 class="admin-sharing-title">Dijeljenje baze biljaka s korisnicima</h3>
     <p class="field-hint admin-sharing-lede">
@@ -641,6 +656,6 @@
       }
     })();
   </script>
-  <script src="js/app.js?v=20260521d"></script>
+  <script src="js/app.js?v=20260522a"></script>
 </body>
 </html>

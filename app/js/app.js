@@ -56,6 +56,8 @@
   let sharedReadOnlyEntryIds = new Set();
 
   const SHARED_HYBRID_ACCESS_EMAILS = ['filip.balkanpharm@gmail.com'];
+  const LOGIN_EVENT_SESSION_KEY = 'dnevnik-login-event-recorded';
+  let adminReportPeriod = 'daily';
 
   function isSharedHybridUser(email) {
     return SHARED_HYBRID_ACCESS_EMAILS.includes((email || '').toLowerCase());
@@ -292,6 +294,286 @@
       .doc(viewerUid);
   }
 
+  function getLocalDayKey(date) {
+    const d = date || new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatReportDateTime(iso) {
+    if (!iso) return '—';
+    try {
+      return new Date(iso).toLocaleString('hr-HR', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch {
+      return iso;
+    }
+  }
+
+  function formatReportDayLabel(dayKey) {
+    if (!dayKey) return '—';
+    try {
+      const [y, m, d] = dayKey.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      const today = getLocalDayKey();
+      const label = dt.toLocaleDateString('hr-HR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+      if (dayKey === today) return `Danas · ${label}`;
+      return label;
+    } catch {
+      return dayKey;
+    }
+  }
+
+  function startOfPeriodMs(period) {
+    const now = new Date();
+    if (period === 'daily') {
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    }
+    const week = new Date(now);
+    week.setDate(week.getDate() - 6);
+    week.setHours(0, 0, 0, 0);
+    return week.getTime();
+  }
+
+  async function recordUserLogin(user, role) {
+    if (!user || !window.firebase || !firebase.firestore) return;
+    const sessionKey = `${LOGIN_EVENT_SESSION_KEY}:${user.uid}`;
+    try {
+      if (sessionStorage.getItem(sessionKey)) return;
+      sessionStorage.setItem(sessionKey, String(Date.now()));
+    } catch {
+      // ignore
+    }
+
+    const loggedAt = new Date().toISOString();
+    try {
+      await firebase.firestore().collection('loginEvents').add({
+        uid: user.uid,
+        email: (user.email || '').toLowerCase(),
+        role: role || 'user',
+        loggedAt,
+        dayKey: getLocalDayKey(),
+      });
+    } catch (err) {
+      console.warn('Login event record failed', err);
+    }
+  }
+
+  async function fetchLoginEventsSince(period) {
+    if (!window.firebase || !firebase.firestore) return [];
+    const sinceIso = new Date(startOfPeriodMs(period)).toISOString();
+    try {
+      const snap = await firebase
+        .firestore()
+        .collection('loginEvents')
+        .where('loggedAt', '>=', sinceIso)
+        .orderBy('loggedAt', 'desc')
+        .limit(400)
+        .get();
+      return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    } catch (err) {
+      console.warn('Login events query failed, using fallback', err);
+      try {
+        const snap = await firebase
+          .firestore()
+          .collection('loginEvents')
+          .orderBy('loggedAt', 'desc')
+          .limit(400)
+          .get();
+        return snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .filter((e) => e.loggedAt && e.loggedAt >= sinceIso);
+      } catch {
+        return [];
+      }
+    }
+  }
+
+  function buildLoginUserSummary(events, users) {
+    const byUid = new Map();
+    (events || []).forEach((e) => {
+      const key = e.uid || e.email || e.id;
+      if (!key) return;
+      const prev = byUid.get(key) || {
+        uid: e.uid,
+        email: e.email || '—',
+        role: e.role || 'user',
+        count: 0,
+        lastLoginAt: null,
+      };
+      prev.count += 1;
+      if (!prev.lastLoginAt || (e.loggedAt && e.loggedAt > prev.lastLoginAt)) {
+        prev.lastLoginAt = e.loggedAt;
+        prev.role = e.role || prev.role;
+        prev.email = e.email || prev.email;
+      }
+      byUid.set(key, prev);
+    });
+
+    (users || []).forEach((u) => {
+      if (!u.lastLoginAt) return;
+      const key = u.uid;
+      const existing = byUid.get(key);
+      if (existing) {
+        if (u.lastLoginAt > (existing.lastLoginAt || '')) existing.lastLoginAt = u.lastLoginAt;
+        if (u.email) existing.email = u.email;
+        if (u.role) existing.role = u.role;
+        return;
+      }
+      byUid.set(key, {
+        uid: u.uid,
+        email: u.email || '—',
+        role: u.role || 'user',
+        count: 0,
+        lastLoginAt: u.lastLoginAt,
+        fromProfileOnly: true,
+      });
+    });
+
+    return Array.from(byUid.values()).sort((a, b) =>
+      (b.lastLoginAt || '').localeCompare(a.lastLoginAt || '')
+    );
+  }
+
+  function groupLoginEventsByDay(events) {
+    const map = new Map();
+    (events || []).forEach((e) => {
+      const day = e.dayKey || (e.loggedAt || '').slice(0, 10);
+      if (!map.has(day)) map.set(day, []);
+      map.get(day).push(e);
+    });
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }
+
+  async function renderSuperadminUserReport(period) {
+    const section = document.getElementById('admin-user-report-section');
+    const panel = document.getElementById('admin-user-report-panel');
+    if (!section || !panel || currentUserRole !== 'superadmin') return;
+
+    adminReportPeriod = period || adminReportPeriod || 'daily';
+    section.setAttribute('aria-hidden', 'false');
+    panel.innerHTML = '<p class="growlog-empty">Učitavanje izvještaja prijava…</p>';
+
+    section.querySelectorAll('.admin-report-period').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.period === adminReportPeriod);
+    });
+
+    const sinceIso = new Date(startOfPeriodMs(adminReportPeriod)).toISOString();
+    const [events, usersRaw] = await Promise.all([
+      fetchLoginEventsSince(adminReportPeriod),
+      listFirestoreUsers(),
+    ]);
+
+    const todayKey = getLocalDayKey();
+    const filteredEvents =
+      adminReportPeriod === 'daily'
+        ? events.filter((e) => (e.dayKey || (e.loggedAt || '').slice(0, 10)) === todayKey)
+        : events;
+
+    const usersInPeriod = usersRaw.filter((u) => u.lastLoginAt && u.lastLoginAt >= sinceIso);
+    const uniqueUsers = new Set(filteredEvents.map((e) => e.uid || e.email).filter(Boolean));
+    const summary = buildLoginUserSummary(filteredEvents, usersInPeriod);
+    const periodLabel = adminReportPeriod === 'daily' ? 'danas' : 'u zadnjih 7 dana';
+
+    const summaryHtml =
+      '<div class="admin-report-summary">' +
+      `<div class="admin-report-stat"><strong>${filteredEvents.length}</strong><span>Prijave ${periodLabel}</span></div>` +
+      `<div class="admin-report-stat"><strong>${uniqueUsers.size}</strong><span>Jedinstveni korisnici</span></div>` +
+      `<div class="admin-report-stat"><strong>${summary.length}</strong><span>Korisnika u sažetku</span></div>` +
+      '</div>';
+
+    const usersTableRows = summary.length
+      ? summary
+          .map(
+            (u) =>
+              '<tr>' +
+              `<td>${escapeHtml(u.email)}</td>` +
+              `<td>${escapeHtml(u.role || 'user')}</td>` +
+              `<td>${u.count > 0 ? u.count : '—'}</td>` +
+              `<td>${escapeHtml(formatReportDateTime(u.lastLoginAt))}</td>` +
+              '</tr>'
+          )
+          .join('')
+      : '<tr><td colspan="4" class="growlog-empty">Nema prijava u odabranom razdoblju.</td></tr>';
+
+    const usersTableHtml =
+      '<h4>Sažetak po korisniku</h4>' +
+      '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
+      '<thead><tr><th>E-mail</th><th>Uloga</th><th>Prijave</th><th>Zadnja prijava</th></tr></thead>' +
+      `<tbody>${usersTableRows}</tbody></table></div>`;
+
+    let detailHtml = '<h4>Pojedinačne prijave</h4>';
+    if (!filteredEvents.length) {
+      detailHtml += '<p class="growlog-empty">Nema zabilježenih prijava za ovo razdoblje. Prijave se bilježe od sljedeće prijave korisnika.</p>';
+    } else if (adminReportPeriod === 'weekly') {
+      const groups = groupLoginEventsByDay(filteredEvents);
+      detailHtml += groups
+        .map(([day, dayEvents]) => {
+          const rows = dayEvents
+            .map(
+              (e) =>
+                '<tr>' +
+                `<td>${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
+                `<td>${escapeHtml(e.email || '—')}</td>` +
+                `<td>${escapeHtml(e.role || 'user')}</td>` +
+                '</tr>'
+            )
+            .join('');
+          return (
+            `<h5 class="admin-report-day">${escapeHtml(formatReportDayLabel(day))}</h5>` +
+            '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
+            '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
+            `<tbody>${rows}</tbody></table></div>`
+          );
+        })
+        .join('');
+    } else {
+      const rows = filteredEvents
+        .map(
+          (e) =>
+            '<tr>' +
+            `<td>${escapeHtml(formatReportDateTime(e.loggedAt))}</td>` +
+            `<td>${escapeHtml(e.email || '—')}</td>` +
+            `<td>${escapeHtml(e.role || 'user')}</td>` +
+            '</tr>'
+        )
+        .join('');
+      detailHtml +=
+        '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
+        '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
+        `<tbody>${rows}</tbody></table></div>`;
+    }
+
+    panel.innerHTML = summaryHtml + usersTableHtml + detailHtml;
+
+    const refreshBtn = document.getElementById('admin-report-refresh');
+    if (refreshBtn && !refreshBtn.dataset.bound) {
+      refreshBtn.dataset.bound = '1';
+      refreshBtn.addEventListener('click', () => renderSuperadminUserReport(adminReportPeriod));
+    }
+
+    section.querySelectorAll('.admin-report-period').forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', () => {
+        const p = btn.dataset.period;
+        if (p) renderSuperadminUserReport(p);
+      });
+    });
+  }
+
   async function listFirestoreUsers() {
     if (!window.firebase || !firebase.firestore) return [];
     try {
@@ -302,6 +584,8 @@
           uid: d.id,
           email: data.email || '',
           role: data.role || 'user',
+          lastLoginAt: data.lastLoginAt || null,
+          createdAt: data.createdAt || null,
         };
       });
     } catch (err) {
@@ -728,6 +1012,12 @@ function applyRoleUI(role) {
     sharingSection.style.display = role === 'superadmin' ? 'block' : 'none';
     sharingSection.setAttribute('aria-hidden', role !== 'superadmin');
   }
+
+  const reportSection = document.getElementById('admin-user-report-section');
+  if (reportSection) {
+    reportSection.style.display = role === 'superadmin' ? 'block' : 'none';
+    reportSection.setAttribute('aria-hidden', role !== 'superadmin');
+  }
 }
 
 
@@ -782,6 +1072,7 @@ function initFirebaseSync() {
 
       await ensureUserExists(user);
       currentUserRole = await getCurrentUserRole(user);
+      await recordUserLogin(user, currentUserRole);
       applyRoleUI(currentUserRole);
 
       if (currentUserRole === 'admin') {
@@ -1014,7 +1305,10 @@ function initFirebaseSync() {
       renderJournal();
     }
     if (id === 'toolbox') renderToolbox();
-    if (id === 'admin' && currentUserRole === 'superadmin') renderSuperadminSharingPanel();
+    if (id === 'admin' && currentUserRole === 'superadmin') {
+      renderSuperadminUserReport(adminReportPeriod);
+      renderSuperadminSharingPanel();
+    }
   }
 
   navItems.forEach((item) => {

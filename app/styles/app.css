@@ -1610,10 +1610,93 @@ body {
   line-height: 1.35;
 }
 
+.admin-user-report-section,
 .admin-sharing-section {
   margin-top: 1.5rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--border);
+}
+
+.admin-report-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.admin-report-period.is-active {
+  border-color: var(--accent, #0d9488);
+  color: var(--accent-bright, #2dd4bf);
+  background: rgba(13, 148, 136, 0.12);
+}
+
+.admin-report-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.admin-report-stat {
+  flex: 1 1 140px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface, rgba(255, 255, 255, 0.03));
+}
+
+.admin-report-stat strong {
+  display: block;
+  font-size: 1.35rem;
+  color: var(--text);
+  margin-bottom: 0.15rem;
+}
+
+.admin-report-stat span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.admin-report-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.admin-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.admin-report-table th,
+.admin-report-table td {
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-report-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.admin-report-day {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-bright, #2dd4bf);
+}
+
+.admin-report-day:first-child {
+  margin-top: 0;
+}
+
+.admin-user-report-panel .growlog-empty {
+  margin: 0.5rem 0;
 }
 
 .admin-sharing-title {
