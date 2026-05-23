@@ -55,7 +55,10 @@
   let sharedReadOnlyPlantIds = new Set();
   let sharedReadOnlyEntryIds = new Set();
 
-  const SHARED_HYBRID_ACCESS_EMAILS = ['filip.balkanpharm@gmail.com'];
+  const SHARED_HYBRID_ACCESS_EMAILS = [
+    'filip.balkanpharm@gmail.com',
+    'marko.matosevic2005@gmail.com',
+  ];
   const LOGIN_EVENT_SESSION_KEY = 'dnevnik-login-event-recorded';
   let adminReportPeriod = 'daily';
 
