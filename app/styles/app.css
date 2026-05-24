@@ -2147,6 +2147,29 @@ body {
   color: #ffd9a8;
 }
 
+/* Soil moisture tool (Marko) */
+.tool-soil-moisture-only {
+  display: none !important;
+}
+
+body.soil-moisture-tool-visible .toolbox-card.tool-soil-moisture-only {
+  display: flex !important;
+}
+
+body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-only.open,
+body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-only[style*="block"] {
+  display: block !important;
+}
+
+.soil-moisture-iframe {
+  width: 100%;
+  min-height: 420px;
+  height: 52vh;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
 .admin-readonly-banner {
   margin: 0 0 1rem;
   padding: 0.65rem 0.85rem;

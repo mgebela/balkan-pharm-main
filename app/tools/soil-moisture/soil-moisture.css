@@ -1,0 +1,132 @@
+.soil-moisture-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  padding: 1rem;
+}
+
+.soil-moisture-page-head {
+  max-width: 960px;
+  margin: 0 auto 1rem;
+}
+
+.soil-moisture-page-head h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.35rem;
+}
+
+.soil-moisture-source {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.soil-moisture-source a {
+  color: var(--accent-bright);
+}
+
+.soil-moisture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.soil-moisture-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  box-shadow: var(--shadow);
+}
+
+.soil-moisture-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.soil-moisture-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-bright);
+}
+
+.soil-moisture-status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.soil-moisture-status--online {
+  color: #b6f4c4;
+  background: rgba(120, 224, 143, 0.15);
+  border: 1px solid rgba(120, 224, 143, 0.35);
+}
+
+.soil-moisture-status--offline {
+  color: #ffb4b4;
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.28);
+}
+
+.soil-moisture-metric {
+  margin: 0.35rem 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.soil-moisture-metric strong {
+  color: var(--text);
+}
+
+.soil-moisture-bar {
+  height: 8px;
+  margin-top: 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.soil-moisture-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  transition: width 0.45s ease;
+}
+
+.soil-moisture-meta {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.soil-moisture-panel-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.soil-moisture-live-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.soil-moisture-live-note a {
+  color: var(--accent-bright);
+}

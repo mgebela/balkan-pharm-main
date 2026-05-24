@@ -1,0 +1,30 @@
+name: Sync soil moisture JSON
+
+on:
+  schedule:
+    - cron: '*/3 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch sensor JSON
+        run: |
+          mkdir -p app/tools/soil-moisture
+          curl -sf "http://164.92.208.95/latest.json" -o app/tools/soil-moisture/latest.json
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/tools/soil-moisture/latest.json
+          git diff --staged --quiet && echo "No changes" && exit 0
+          git commit -m "Sync soil moisture sensor data from 164.92.208.95"
+          git push

@@ -59,8 +59,49 @@
     'filip.balkanpharm@gmail.com',
     'marko.matosevic2005@gmail.com',
   ];
+  const SOIL_MOISTURE_TOOL_EMAILS = ['marko.matosevic2005@gmail.com'];
   const LOGIN_EVENT_SESSION_KEY = 'dnevnik-login-event-recorded';
   let adminReportPeriod = 'daily';
+
+  function getCurrentUserEmail() {
+    try {
+      if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        return firebase.auth().currentUser.email || '';
+      }
+    } catch {
+      // ignore
+    }
+    const auth = getStoredAuth();
+    return (auth && auth.email) || '';
+  }
+
+  function canUseSoilMoistureTool(email, role) {
+    if (role === 'superadmin') return true;
+    return SOIL_MOISTURE_TOOL_EMAILS.includes((email || '').toLowerCase());
+  }
+
+  function reloadSoilMoistureIframe(selector) {
+    const iframe = document.querySelector(selector);
+    if (!iframe) return;
+    try {
+      if (iframe.contentWindow) iframe.contentWindow.location.reload();
+    } catch {
+      iframe.src = iframe.src.split('?')[0] + '?v=' + Date.now();
+    }
+  }
+
+  function scrollToAdminSoilMoisture() {
+    const section = document.getElementById('admin-soil-moisture-section');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      reloadSoilMoistureIframe('#admin-soil-moisture-section .soil-moisture-iframe');
+    }
+  }
+
+  function applySoilMoistureToolUI(role) {
+    const show = canUseSoilMoistureTool(getCurrentUserEmail(), role);
+    document.body.classList.toggle('soil-moisture-tool-visible', show);
+  }
 
   function isSharedHybridUser(email) {
     return SHARED_HYBRID_ACCESS_EMAILS.includes((email || '').toLowerCase());
@@ -1046,6 +1087,8 @@ function applyRoleUI(role) {
     superEls.forEach((el) => (el.style.display = "flex"));
   }
 
+  applySoilMoistureToolUI(role);
+
   const superHub = document.getElementById('admin-super-hub');
   if (superHub) {
     superHub.style.display = role === 'superadmin' ? 'flex' : 'none';
@@ -1341,6 +1384,7 @@ function initFirebaseSync() {
     if (id === 'admin' && currentUserRole === 'superadmin') {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
+      reloadSoilMoistureIframe('#admin-soil-moisture-section .soil-moisture-iframe');
     }
   }
 
@@ -2776,6 +2820,8 @@ function initFirebaseSync() {
     if (tool === 'graphs') {
       renderToolboxChart('watering', document.getElementById('overview-chart-watering'));
       renderToolboxChart('environment', document.getElementById('overview-chart-environment'));
+    } else if (tool === 'soil-moisture') {
+      reloadSoilMoistureIframe('#toolbox-panel-soil-moisture .soil-moisture-iframe');
     } else {
       renderToolboxList(tool);
       const chartEl = document.getElementById('toolbox-chart-' + tool);
@@ -3144,6 +3190,12 @@ document.addEventListener("click", (e) => {
 
   if (e.target.closest("#admin-system")) {
     window.location.href = "admin-system.html";
+  }
+
+  if (e.target.closest("#admin-soil-moisture")) {
+    e.preventDefault();
+    showView("admin");
+    scrollToAdminSoilMoisture();
   }
 
 });

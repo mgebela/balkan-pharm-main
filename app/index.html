@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260522b" />
+  <link rel="stylesheet" href="styles/app.css?v=20260524" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -261,6 +261,10 @@
             <h3>Stresori</h3>
             <p>Evidentirajte stresne uvjete i nametnike.</p>
           </button>
+          <button type="button" class="toolbox-card toolbox-card-btn tool-soil-moisture-only admin-super-only" data-tool="soil-moisture">
+            <h3>Vlažnost zemlje</h3>
+            <p>Live senzor vlažnosti tla (Plastenik).</p>
+          </button>
           <button type="button" class="toolbox-card toolbox-card-btn" data-tool="graphs">
             <h3>Grafovi</h3>
             <p>Vizualizacija rasta i mjerenja.</p>
@@ -327,6 +331,14 @@
               <button type="submit" class="btn btn-primary">Dodaj</button>
             </form>
             <div class="toolbox-list" id="toolbox-list-stressors"></div>
+          </div>
+          <div id="toolbox-panel-soil-moisture" class="toolbox-panel tool-soil-moisture-only" data-tool="soil-moisture" aria-hidden="true">
+            <div class="soil-moisture-panel-toolbar">
+              <h3 class="toolbox-panel-title">Vlažnost zemlje</h3>
+              <a class="btn btn-ghost btn-sm" href="tools/soil-moisture/index.html" target="_blank" rel="noreferrer">↗ Puni prozor</a>
+            </div>
+            <p class="soil-moisture-live-note">Podaci sa senzora · izvor <a href="http://164.92.208.95/latest.json" target="_blank" rel="noreferrer">164.92.208.95</a> · osvježavanje svake 2 s</p>
+            <iframe class="soil-moisture-iframe" title="Vlažnost zemlje" src="tools/soil-moisture/index.html?v=20260524"></iframe>
           </div>
           <div id="toolbox-panel-graphs" class="toolbox-panel toolbox-panel-graphs" data-tool="graphs" aria-hidden="true">
             <h3 class="toolbox-panel-title">Pregled svih grafova</h3>
@@ -396,6 +408,11 @@
       <p>Pregled Tenanta</p>
     </button>
 
+    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-soil-moisture">
+      <h3>Vlažnost zemlje</h3>
+      <p>Live senzor vlažnosti tla</p>
+    </button>
+
     <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-system">
       <h3>Postavke</h3>
       <p>Sistemske postavke</p>
@@ -433,6 +450,23 @@
       </header>
       <div class="admin-hub-card-body">
         <div id="admin-sharing-panel" class="admin-sharing-panel"></div>
+      </div>
+    </section>
+
+    <section id="admin-soil-moisture-section" class="admin-hub-card admin-soil-moisture-section admin-super-only">
+      <header class="admin-hub-card-head">
+        <span class="admin-hub-icon" aria-hidden="true">💧</span>
+        <div class="admin-hub-card-titles">
+          <h3 class="admin-hub-title">Vlažnost zemlje</h3>
+          <p class="admin-hub-lede">Live očitanje senzora — ista nadzorna ploča kao u Alatima za Marka.</p>
+        </div>
+      </header>
+      <div class="admin-hub-card-body">
+        <div class="soil-moisture-panel-toolbar">
+          <p class="soil-moisture-live-note">Izvor: <a href="http://164.92.208.95/latest.json" target="_blank" rel="noreferrer">164.92.208.95/latest.json</a> · osvježavanje svake 2 s</p>
+          <a class="btn btn-ghost btn-sm" href="tools/soil-moisture/index.html" target="_blank" rel="noreferrer">↗ Puni prozor</a>
+        </div>
+        <iframe class="soil-moisture-iframe" title="Vlažnost zemlje — admin" src="tools/soil-moisture/index.html?v=20260524"></iframe>
       </div>
     </section>
   </div>
@@ -668,6 +702,6 @@
       }
     })();
   </script>
-  <script src="js/app.js?v=20260522c"></script>
+  <script src="js/app.js?v=20260524b"></script>
 </body>
 </html>
