@@ -90,14 +90,6 @@
     }
   }
 
-  function scrollToAdminSoilMoisture() {
-    const section = document.getElementById('admin-soil-moisture-section');
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      reloadSoilMoistureIframe('#admin-soil-moisture-section .soil-moisture-iframe');
-    }
-  }
-
   function applySoilMoistureToolUI(role) {
     const show = canUseSoilMoistureTool(getCurrentUserEmail(), role);
     document.body.classList.toggle('soil-moisture-tool-visible', show);
@@ -1417,7 +1409,6 @@ function initFirebaseSync() {
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
-      reloadSoilMoistureIframe('#admin-soil-moisture-section .soil-moisture-iframe');
     }
   }
 
@@ -3227,18 +3218,6 @@ document.addEventListener("click", (e) => {
 
   if (e.target.closest("#admin-system")) {
     window.location.href = "admin-system.html";
-  }
-
-  if (e.target.closest("#admin-soil-moisture")) {
-    e.preventDefault();
-    resolveCurrentUserRole().then((role) => {
-      if (!isAdminPanelRole(role)) {
-        alert('Pristup odbijen — nemate admin ovlasti.');
-        return;
-      }
-      showView("admin");
-      scrollToAdminSoilMoisture();
-    });
   }
 
 });
