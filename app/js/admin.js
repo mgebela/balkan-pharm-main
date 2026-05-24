@@ -27,6 +27,18 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+function normalizeUserRole(role) {
+  const r = String(role == null ? '' : role).trim().toLowerCase();
+  if (!r) return 'user';
+  if (r === 'supadmin' || r === 'super-admin' || r === 'super_admin') return 'superadmin';
+  return r;
+}
+
+function isAdminPanelRole(role) {
+  const r = normalizeUserRole(role);
+  return r === 'admin' || r === 'superadmin';
+}
+
 onAuthStateChanged(auth, async (user) => {
   console.log("AUTH:", user);
 
@@ -42,9 +54,9 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  const role = userSnap.data().role;
+  const role = normalizeUserRole(userSnap.data().role);
 
-  if (!["admin", "superadmin", "viewer"].includes(role)) {
+  if (!isAdminPanelRole(role) && role !== 'viewer') {
     window.location.href = "../index.html";
     return;
   }
@@ -118,7 +130,7 @@ const schemas = {
 
 
 function canAdminPanelEdit() {
-  return window.__adminPanelRole === "superadmin";
+  return normalizeUserRole(window.__adminPanelRole) === "superadmin";
 }
 
 function init() {

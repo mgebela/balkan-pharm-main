@@ -18,9 +18,14 @@ firebase.auth().onAuthStateChanged(async (user) => {
     return;
   }
 
-  const role = snap.data().role;
+  const role = (function normalizeUserRole(r) {
+    const v = String(r == null ? '' : r).trim().toLowerCase();
+    if (!v) return 'user';
+    if (v === 'supadmin' || v === 'super-admin' || v === 'super_admin') return 'superadmin';
+    return v;
+  })(snap.data().role);
 
-  if (!["admin", "superadmin"].includes(role)) {
+  if (role !== 'admin' && role !== 'superadmin') {
     window.location.href = "index.html";
     return;
   }

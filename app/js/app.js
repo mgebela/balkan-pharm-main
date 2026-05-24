@@ -76,7 +76,7 @@
   }
 
   function canUseSoilMoistureTool(email, role) {
-    if (role === 'superadmin') return true;
+    if (isSuperadminRole(role)) return true;
     return SOIL_MOISTURE_TOOL_EMAILS.includes((email || '').toLowerCase());
   }
 
@@ -294,9 +294,13 @@
 
   async function findSuperadminUserIds() {
     if (!window.firebase || !firebase.firestore) return [];
+  const ids = new Set();
     try {
-      const snap = await firebase.firestore().collection('users').where('role', '==', 'superadmin').get();
-      return snap.docs.map((d) => d.id);
+      for (const roleName of ['superadmin', 'supadmin']) {
+        const snap = await firebase.firestore().collection('users').where('role', '==', roleName).get();
+        snap.docs.forEach((d) => ids.add(d.id));
+      }
+      return Array.from(ids);
     } catch (err) {
       console.warn('Superadmin lookup failed', err);
       return [];
@@ -1079,11 +1083,11 @@ function applyRoleUI(role) {
   superEls.forEach(el => el.style.display = "none");
 
  
-  if (role === "admin" || role === "superadmin") {
+  if (isAdminPanelRole(role)) {
     adminEls.forEach((el) => (el.style.display = "flex"));
   }
 
-  if (role === "superadmin") {
+  if (isSuperadminRole(role)) {
     superEls.forEach((el) => (el.style.display = "flex"));
   }
 
@@ -1091,13 +1095,42 @@ function applyRoleUI(role) {
 
   const superHub = document.getElementById('admin-super-hub');
   if (superHub) {
-    superHub.style.display = role === 'superadmin' ? 'flex' : 'none';
-    superHub.setAttribute('aria-hidden', role !== 'superadmin');
+    superHub.style.display = isSuperadminRole(role) ? 'flex' : 'none';
+    superHub.setAttribute('aria-hidden', !isSuperadminRole(role));
   }
 }
 
 
 let currentUserRole = null;
+
+function normalizeUserRole(role) {
+  const r = String(role == null ? '' : role).trim().toLowerCase();
+  if (!r) return 'user';
+  if (r === 'supadmin' || r === 'super-admin' || r === 'super_admin') return 'superadmin';
+  return r;
+}
+
+function isAdminPanelRole(role) {
+  const r = normalizeUserRole(role);
+  return r === 'admin' || r === 'superadmin';
+}
+
+function isSuperadminRole(role) {
+  return normalizeUserRole(role) === 'superadmin';
+}
+
+async function resolveCurrentUserRole() {
+  if (currentUserRole && isAdminPanelRole(currentUserRole)) return currentUserRole;
+  try {
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+      currentUserRole = await getCurrentUserRole(firebase.auth().currentUser);
+      applyRoleUI(currentUserRole);
+    }
+  } catch (err) {
+    console.warn('Role resolve failed', err);
+  }
+  return currentUserRole;
+}
 
 async function getCurrentUserRole(user) {
   const db = firebase.firestore();
@@ -1107,7 +1140,7 @@ async function getCurrentUserRole(user) {
 
   if (!docSnap.exists) return "user";
 
-  return docSnap.data().role || "user";
+  return normalizeUserRole(docSnap.data().role || "user");
 }
 
 function getInitialViewFromUrl() {
@@ -1187,9 +1220,9 @@ function initFirebaseSync() {
 
       const initialView = getInitialViewFromUrl();
       if (initialView) {
-        if (initialView === 'admin' && !['admin', 'superadmin'].includes(currentUserRole)) {
+        if (initialView === 'admin' && !isAdminPanelRole(currentUserRole)) {
           showView('dashboard');
-        } else if (initialView === 'pitchdeck' && currentUserRole !== 'superadmin') {
+        } else if (initialView === 'pitchdeck' && !isSuperadminRole(currentUserRole)) {
           showView('dashboard');
         } else if (
           ['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
@@ -1354,7 +1387,7 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
-    if (id === 'pitchdeck' && currentUserRole !== 'superadmin') {
+    if (id === 'pitchdeck' && !isSuperadminRole(currentUserRole)) {
       id = 'dashboard';
     }
 
@@ -1381,7 +1414,7 @@ function initFirebaseSync() {
       renderJournal();
     }
     if (id === 'toolbox') renderToolbox();
-    if (id === 'admin' && currentUserRole === 'superadmin') {
+    if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
       reloadSoilMoistureIframe('#admin-soil-moisture-section .soil-moisture-iframe');
@@ -1389,18 +1422,22 @@ function initFirebaseSync() {
   }
 
   navItems.forEach((item) => {
-  item.addEventListener("click", (e) => {
+  item.addEventListener("click", async (e) => {
     e.preventDefault();
 
     const view = item.dataset.view;
 
-    if (view === "admin" && !["admin", "superadmin"].includes(currentUserRole)) {
-      alert("Access denied.");
-      return;
+    if (view === "admin") {
+      await resolveCurrentUserRole();
+      if (!isAdminPanelRole(currentUserRole)) {
+        alert('Pristup odbijen — nemate admin ovlasti.');
+        return;
+      }
     }
 
-    if (view === "pitchdeck" && currentUserRole !== "superadmin") {
-      return;
+    if (view === "pitchdeck") {
+      await resolveCurrentUserRole();
+      if (!isSuperadminRole(currentUserRole)) return;
     }
 
     if (view !== "growlog") currentGrowlogPlantId = null;
@@ -3194,8 +3231,14 @@ document.addEventListener("click", (e) => {
 
   if (e.target.closest("#admin-soil-moisture")) {
     e.preventDefault();
-    showView("admin");
-    scrollToAdminSoilMoisture();
+    resolveCurrentUserRole().then((role) => {
+      if (!isAdminPanelRole(role)) {
+        alert('Pristup odbijen — nemate admin ovlasti.');
+        return;
+      }
+      showView("admin");
+      scrollToAdminSoilMoisture();
+    });
   }
 
 });
