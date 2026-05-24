@@ -1,0 +1,151 @@
+rules_version = '2';
+
+// Dnevnik.live — Firestore security rules
+// Deploy: Firebase Console → Firestore → Rules → paste & Publish
+//   or: firebase deploy --only firestore:rules (requires Firebase CLI)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────────
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userPath(uid) {
+      return /databases/$(database)/documents/users/$(uid);
+    }
+
+    function userDoc(uid) {
+      return get(userPath(uid)).data;
+    }
+
+    function callerDoc() {
+      return userDoc(request.auth.uid);
+    }
+
+    function normalizedRole(role) {
+      return role in ['superadmin', 'supadmin']
+        ? 'superadmin'
+        : role;
+    }
+
+    function callerRole() {
+      return signedIn() && exists(userPath(request.auth.uid))
+        ? normalizedRole(callerDoc().role)
+        : 'none';
+    }
+
+    function isSuperadmin() {
+      return callerRole() == 'superadmin';
+    }
+
+    function isAdminOrSuper() {
+      return callerRole() in ['admin', 'superadmin'];
+    }
+
+    function isPrivilegedRole(role) {
+      return normalizedRole(role) in ['admin', 'superadmin'];
+    }
+
+    function hasSharedGrant(ownerUid) {
+      return exists(/databases/$(database)/documents/users/$(ownerUid)/sharedGrants/$(request.auth.uid));
+    }
+
+    function selfRoleUpdateAllowed() {
+      // Users may not promote themselves; allow viewer → user (hybrid bootstrap).
+      return request.resource.data.role == resource.data.role
+        || (resource.data.role == 'viewer' && request.resource.data.role == 'user');
+    }
+
+  // ── users ────────────────────────────────────────────────
+
+  match /users/{userId} {
+    // Own profile, admin/superadmin, or discover superadmin owner docs (shared library).
+    allow read: if signedIn() && (
+      request.auth.uid == userId
+      || isAdminOrSuper()
+      || isPrivilegedRole(resource.data.role)
+    );
+
+    allow create: if signedIn()
+      && request.auth.uid == userId
+      && request.resource.data.role == 'user';
+
+    allow update: if signedIn() && (
+      (request.auth.uid == userId && selfRoleUpdateAllowed())
+      || isSuperadmin()
+    );
+
+    allow delete: if isSuperadmin();
+
+    // App state: plants, entries, toolbox (local-first sync)
+    match /app/{docId} {
+      allow read: if signedIn() && (
+        request.auth.uid == userId
+        || isAdminOrSuper()
+        || hasSharedGrant(userId)
+      );
+
+      allow write: if signedIn() && request.auth.uid == userId;
+    }
+
+    // Superadmin shares plants/journal/tools with viewers / hybrid users
+    match /sharedGrants/{viewerUid} {
+      allow read: if signedIn() && (
+        request.auth.uid == userId
+        || request.auth.uid == viewerUid
+        || isSuperadmin()
+      );
+
+      allow create: if signedIn() && (
+        request.auth.uid == userId
+        || isSuperadmin()
+        // Hybrid bootstrap: viewer may request own grant from a superadmin owner
+        || (
+          request.auth.uid == viewerUid
+          && isPrivilegedRole(userDoc(userId).role)
+          && request.resource.data.viewerUid == viewerUid
+        )
+      );
+
+      allow update, delete: if signedIn() && (
+        request.auth.uid == userId
+        || isSuperadmin()
+      );
+    }
+  }
+
+  // ── Login analytics (superadmin report) ──────────────────
+
+  match /loginEvents/{eventId} {
+    allow create: if signedIn()
+      && request.resource.data.uid == request.auth.uid
+      && request.resource.data.keys().hasAll(['uid', 'loggedAt']);
+
+    allow read: if isSuperadmin();
+
+    allow update, delete: if false;
+  }
+
+  // ── Admin panel collections ──────────────────────────────
+
+  match /plants/{docId} {
+    allow read, write: if isAdminOrSuper();
+  }
+
+  match /entries/{docId} {
+    allow read, write: if isAdminOrSuper();
+  }
+
+  match /tenants/{docId} {
+    allow read, write: if isSuperadmin();
+  }
+
+  // Deny everything else by default
+  match /{document=**} {
+    allow read, write: if false;
+  }
+  }
+}

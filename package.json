@@ -1,0 +1,11 @@
+{
+  "name": "dnevnik-live",
+  "private": true,
+  "scripts": {
+    "firebase:login": "firebase login",
+    "deploy:firestore-rules": "firebase deploy --only firestore:rules --project balpha-9dab9"
+  },
+  "devDependencies": {
+    "firebase-tools": "^14.0.0"
+  }
+}
