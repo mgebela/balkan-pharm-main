@@ -54,19 +54,19 @@
     const diff = d.server_time ? now - d.server_time : Infinity;
     const online = diff < ONLINE_SEC;
     const pct = Math.max(0, Math.min(100, d.moisture));
-    const updated = d.server_time ? new Date(d.server_time * 1000).toLocaleString('hr-HR') : '—';
+    const updated = d.server_time ? new Date(d.server_time * 1000).toLocaleString('en-GB') : '—';
 
     return (
       '<article class="soil-moisture-card">' +
       '<div class="soil-moisture-card-head">' +
-      `<h3 class="soil-moisture-card-title">🌿 Uređaj ${escapeHtml(d.id)}</h3>` +
+      `<h3 class="soil-moisture-card-title">🌿 Device ${escapeHtml(d.id)}</h3>` +
       `<span class="soil-moisture-status soil-moisture-status--${online ? 'online' : 'offline'}">${online ? 'Online' : 'Offline'}</span>` +
       '</div>' +
-      `<p class="soil-moisture-metric">💧 Vlažnost: <strong>${pct}%</strong></p>` +
+      `<p class="soil-moisture-metric">💧 Moisture: <strong>${pct}%</strong></p>` +
       `<div class="soil-moisture-bar"><div class="soil-moisture-bar-fill" style="width:${pct}%"></div></div>` +
       `<p class="soil-moisture-metric">📟 Raw: <strong>${escapeHtml(String(d.raw != null ? d.raw : '—'))}</strong></p>` +
-      `<p class="soil-moisture-metric">📍 Lokacija: <strong>${escapeHtml(d.location)}</strong></p>` +
-      `<div class="soil-moisture-meta">⏱ Zadnji signal: ${escapeHtml(updated)}` +
+      `<p class="soil-moisture-metric">📍 Location: <strong>${escapeHtml(d.location)}</strong></p>` +
+      `<div class="soil-moisture-meta">⏱ Last signal: ${escapeHtml(updated)}` +
       (source === 'cache' ? ' · sync cache' : ' · live') +
       '</div></article>'
     );
@@ -79,13 +79,13 @@
       const { data, source } = await fetchSoilMoistureData();
       const devices = normalizeDevices(data);
       if (!devices.length) {
-        grid.innerHTML = '<p class="admin-empty-state">Nema podataka sa senzora.</p>';
+        grid.innerHTML = '<p class="admin-empty-state">No sensor data available.</p>';
         return;
       }
       grid.innerHTML = devices.map((d) => renderDeviceCard(d, source)).join('');
     } catch {
       grid.innerHTML =
-        '<p class="admin-empty-state">Učitavanje nije uspjelo. <a href="http://164.92.208.95/" target="_blank" rel="noreferrer">Otvori nadzornu ploču senzora</a>.</p>';
+        '<p class="admin-empty-state">Loading failed. <a href="http://164.92.208.95/" target="_blank" rel="noreferrer">Open the sensor dashboard</a>.</p>';
     }
   }
 

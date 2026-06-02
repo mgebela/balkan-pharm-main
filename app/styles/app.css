@@ -2599,3 +2599,210 @@ body.admin-readonly .toolbox-form textarea {
     width: 100%;
   }
 }
+
+/* ===========================================================
+   Design refresh — align app with landing page & pitch deck
+   =========================================================== */
+
+/* Subtle background depth (deck-style radial glow) */
+body:not(.app-loading) {
+  background:
+    radial-gradient(900px 500px at 12% -8%, rgba(45, 212, 191, 0.10), transparent 60%),
+    radial-gradient(800px 520px at 100% 0%, rgba(95, 182, 255, 0.07), transparent 55%),
+    var(--bg);
+  background-attachment: fixed;
+}
+
+/* Nav icons → SVG */
+.nav-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-svg {
+  width: 21px;
+  height: 21px;
+}
+
+.bottom-nav .nav-svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Sidebar: brand divider + polished active state */
+.sidebar-nav {
+  padding: 0 0.6rem;
+  gap: 0.15rem;
+}
+
+.nav-item {
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active {
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.04));
+  color: var(--accent-bright);
+  border-left: none;
+  padding-left: 0.75rem;
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.3);
+}
+
+.nav-item.active .nav-icon {
+  color: var(--accent-bright);
+}
+
+/* Main header: structure + accent on the view title */
+.main-header {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.view-title {
+  position: relative;
+  padding-left: 0.85rem;
+  font-weight: 700;
+}
+
+.view-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.12em;
+  bottom: 0.12em;
+  width: 4px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+}
+
+/* Section headings: accent bar like landing */
+.section-heading,
+.plants-journal-section .section-heading,
+.recent-section h2,
+.dashboard-charts-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.section-heading::before,
+.plants-journal-section .section-heading::before,
+.recent-section h2::before,
+.dashboard-charts-section h2::before {
+  content: '';
+  width: 4px;
+  height: 1.05em;
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+}
+
+/* Cards: top accent bar on hover + lift (dashboard, toolbox, charts) */
+.dashboard-card,
+.toolbox-card,
+.dashboard-chart-block {
+  position: relative;
+  transition: border-color 0.2s, box-shadow 0.25s, transform 0.2s;
+}
+
+.dashboard-card::before,
+.toolbox-card::before,
+.dashboard-chart-block::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--card-accent, var(--accent)), var(--card-accent-2, var(--accent-bright)));
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.dashboard-card:hover,
+.dashboard-chart-block:hover {
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent-bright)) 55%, transparent);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.dashboard-card:hover::before,
+.toolbox-card-btn:hover::before,
+.dashboard-chart-block:hover::before {
+  opacity: 1;
+}
+
+/* Colorful dashboard cards (cycle deck palette) */
+.dashboard-card:nth-child(4n + 1) { --card-accent: #0d9488; --card-accent-2: #2dd4bf; }
+.dashboard-card:nth-child(4n + 2) { --card-accent: #3b82f6; --card-accent-2: #5fb6ff; }
+.dashboard-card:nth-child(4n + 3) { --card-accent: #8b5cf6; --card-accent-2: #c79bff; }
+.dashboard-card:nth-child(4n + 4) { --card-accent: #d97706; --card-accent-2: #f59e0b; }
+
+.dashboard-card .value {
+  color: var(--card-accent-2, var(--accent-bright));
+}
+
+.dashboard-card::before {
+  opacity: 0.5;
+}
+
+/* Toolbox cards: always-on faint accent + colorful cycle */
+.toolbox-card-btn::before {
+  opacity: 0.45;
+}
+
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 1) { --card-accent: #0d9488; --card-accent-2: #2dd4bf; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 2) { --card-accent: #3b82f6; --card-accent-2: #5fb6ff; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 3) { --card-accent: #8b5cf6; --card-accent-2: #c79bff; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 4) { --card-accent: #d97706; --card-accent-2: #f59e0b; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 5) { --card-accent: #db2777; --card-accent-2: #f472b6; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 6) { --card-accent: #059669; --card-accent-2: #34d399; }
+
+.toolbox-card-btn:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Primary button: brighter gradient + lift consistent with landing */
+.btn-primary {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Recent notes: left accent strip */
+.recent-note {
+  overflow: hidden;
+}
+
+.recent-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  opacity: 0.6;
+}
+
+.recent-note {
+  padding-left: 1.15rem;
+}
+
+/* Plant cards: stronger hover accent */
+.plant-card {
+  transition: border-color 0.2s, box-shadow 0.25s, transform 0.2s;
+}
+
+.plant-card:hover {
+  border-color: rgba(45, 212, 191, 0.5);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}

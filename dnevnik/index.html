@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="hr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Prijava – dnevnik.live dnevnik</title>
+  <title>Sign in – dnevnik.live</title>
   <link rel="icon" type="image/png" href="../images/bp.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -95,15 +95,15 @@
 <body>
   <form class="login-card" id="login-form">
     <img class="logo" src="../images/bp.png" alt="dnevnik.live" />
-    <h1>Prijava u dnevnik</h1>
-    <p>Prijavite se da otvorite aplikaciju dnevnika uzgoja.</p>
-    <label for="email">E-mail</label>
-    <input id="email" type="email" required placeholder="vas@email.com" />
-    <label for="password">Lozinka</label>
+    <h1>Sign in to the journal</h1>
+    <p>Sign in to open the grow journal app.</p>
+    <label for="email">Email</label>
+    <input id="email" type="email" required placeholder="you@email.com" />
+    <label for="password">Password</label>
     <input id="password" type="password" required placeholder="••••••••" />
-    <button type="submit">Prijavi se</button>
+    <button type="submit">Sign in</button>
     <p id="login-status" style="margin-top:0.75rem;font-size:0.85rem;" aria-live="polite"></p>
-    <div class="back-link"><a href="../index.html">← Povratak na početnu</a></div>
+    <div class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
@@ -144,24 +144,24 @@
       const password = document.getElementById('password').value;
       if (!email || !password) return;
       submitBtn.disabled = true;
-      setStatus('Prijava u tijeku…');
+      setStatus('Signing in…');
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
         if (err && err.code === 'auth/user-not-found') {
           try {
-            setStatus('Kreiranje novog računa…');
+            setStatus('Creating a new account…');
             await createUserWithEmailAndPassword(auth, email, password);
             return;
           } catch (createErr) {
-            setStatus('Neuspjela registracija. Provjerite lozinku (min 6 znakova).', true);
+            setStatus('Registration failed. Check your password (min. 6 characters).', true);
           }
         } else if (err && err.code === 'auth/wrong-password') {
-          setStatus('Pogrešna lozinka. Pokušajte ponovno.', true);
+          setStatus('Wrong password. Please try again.', true);
         } else if (err && err.code === 'auth/invalid-email') {
-          setStatus('E-mail nije ispravan.', true);
+          setStatus('Invalid email address.', true);
         } else {
-          setStatus('Prijava nije uspjela. Pokušajte ponovno.', true);
+          setStatus('Sign-in failed. Please try again.', true);
         }
       } finally {
         submitBtn.disabled = false;

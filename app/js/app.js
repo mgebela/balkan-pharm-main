@@ -345,7 +345,7 @@
   function formatReportDateTime(iso) {
     if (!iso) return '—';
     try {
-      return new Date(iso).toLocaleString('hr-HR', {
+      return new Date(iso).toLocaleString('en-GB', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -363,7 +363,7 @@
       const [y, m, d] = dayKey.split('-').map(Number);
       const dt = new Date(y, m - 1, d);
       const today = getLocalDayKey();
-      const label = dt.toLocaleDateString('hr-HR', {
+      const label = dt.toLocaleDateString('en-GB', {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -495,10 +495,10 @@
 
   function adminGrantBadgesHtml(g) {
     const plantCount =
-      Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' biljaka' : 'Sve biljke';
+      Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' plants' : 'All plants';
     const parts = [`<span class="admin-grant-badge admin-grant-badge--plants">🌱 ${escapeHtml(plantCount)}</span>`];
-    if (g.shareEntries !== false) parts.push('<span class="admin-grant-badge admin-grant-badge--journal">📓 Dnevnik</span>');
-    if (g.shareToolbox) parts.push('<span class="admin-grant-badge admin-grant-badge--toolbox">🧰 Alati</span>');
+    if (g.shareEntries !== false) parts.push('<span class="admin-grant-badge admin-grant-badge--journal">📓 Journal</span>');
+    if (g.shareToolbox) parts.push('<span class="admin-grant-badge admin-grant-badge--toolbox">🧰 Tools</span>');
     return parts.join('');
   }
 
@@ -519,7 +519,7 @@
 
     adminReportPeriod = period || adminReportPeriod || 'daily';
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Učitavanje izvještaja…</p>';
+    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Loading report…</p>';
 
     section.querySelectorAll('.admin-report-period').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.period === adminReportPeriod);
@@ -540,13 +540,13 @@
     const usersInPeriod = usersRaw.filter((u) => u.lastLoginAt && u.lastLoginAt >= sinceIso);
     const uniqueUsers = new Set(filteredEvents.map((e) => e.uid || e.email).filter(Boolean));
     const summary = buildLoginUserSummary(filteredEvents, usersInPeriod);
-    const periodLabel = adminReportPeriod === 'daily' ? 'danas' : 'u zadnjih 7 dana';
+    const periodLabel = adminReportPeriod === 'daily' ? 'today' : 'in the last 7 days';
 
     const summaryHtml =
       '<div class="admin-report-summary">' +
-      `<div class="admin-report-stat admin-report-stat--logins"><strong>${filteredEvents.length}</strong><span>Prijave ${periodLabel}</span></div>` +
-      `<div class="admin-report-stat admin-report-stat--users"><strong>${uniqueUsers.size}</strong><span>Jedinstveni korisnici</span></div>` +
-      `<div class="admin-report-stat admin-report-stat--total"><strong>${summary.length}</strong><span>U sažetku</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--logins"><strong>${filteredEvents.length}</strong><span>Logins ${periodLabel}</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--users"><strong>${uniqueUsers.size}</strong><span>Unique users</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--total"><strong>${summary.length}</strong><span>In summary</span></div>` +
       '</div>';
 
     const usersTableRows = summary.length
@@ -561,20 +561,20 @@
               '</tr>'
           )
           .join('')
-      : '<tr><td colspan="4" class="admin-empty-state">Nema prijava u odabranom razdoblju.</td></tr>';
+      : '<tr><td colspan="4" class="admin-empty-state">No logins in the selected period.</td></tr>';
 
     const usersTableHtml =
       '<div class="admin-report-block">' +
-      '<h4 class="admin-subheading">Sažetak po korisniku</h4>' +
+      '<h4 class="admin-subheading">Summary by user</h4>' +
       '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
-      '<thead><tr><th>E-mail</th><th>Uloga</th><th>Prijave</th><th>Zadnja prijava</th></tr></thead>' +
+      '<thead><tr><th>Email</th><th>Role</th><th>Logins</th><th>Last login</th></tr></thead>' +
       `<tbody>${usersTableRows}</tbody></table></div></div>`;
 
     let detailHtml = '<div class="admin-report-block admin-report-block--detail">';
-    detailHtml += '<h4 class="admin-subheading">Pojedinačne prijave</h4>';
+    detailHtml += '<h4 class="admin-subheading">Individual logins</h4>';
     if (!filteredEvents.length) {
       detailHtml +=
-        '<p class="admin-empty-state">Nema zabilježenih prijava za ovo razdoblje. Prijave se bilježe od sljedeće prijave korisnika.</p>';
+        '<p class="admin-empty-state">No recorded logins for this period. Logins are tracked from the next user sign-in.</p>';
     } else if (adminReportPeriod === 'weekly') {
       const groups = groupLoginEventsByDay(filteredEvents);
       detailHtml += '<div class="admin-report-day-groups">' + groups
@@ -593,7 +593,7 @@
             '<div class="admin-report-day-group">' +
             `<h5 class="admin-report-day">${escapeHtml(formatReportDayLabel(day))}</h5>` +
             '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
-            '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
+            '<thead><tr><th>Time</th><th>Email</th><th>Role</th></tr></thead>' +
             `<tbody>${rows}</tbody></table></div></div>`
           );
         })
@@ -611,7 +611,7 @@
         .join('');
       detailHtml +=
         '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
-        '<thead><tr><th>Vrijeme</th><th>E-mail</th><th>Uloga</th></tr></thead>' +
+        '<thead><tr><th>Time</th><th>Email</th><th>Role</th></tr></thead>' +
         `<tbody>${rows}</tbody></table></div>`;
     }
     detailHtml += '</div>';
@@ -833,17 +833,17 @@
     const plantId = opts && opts.plantId;
     const entryId = opts && opts.entryId;
     if (isAdminReadOnly) {
-      alert(readOnlyBannerMessage || 'Pregled je samo za čitanje — uređivanje nije dopušteno.');
+      alert(readOnlyBannerMessage || 'View is read-only — editing is not allowed.');
       return true;
     }
     if (plantId && isSharedPlantId(plantId)) {
       alert(
-        'Ova biljka dolazi iz dijeljene baze superadmina — možete je pregledavati, ali ne uređivati.'
+        'This plant comes from the superadmin shared library — you can view it, but not edit it.'
       );
       return true;
     }
     if (entryId && isSharedEntryId(entryId)) {
-      alert('Ova bilješka dolazi iz dijeljene baze — nije je moguće uređivati.');
+      alert('This entry comes from a shared library — it cannot be edited.');
       return true;
     }
     return false;
@@ -856,7 +856,7 @@
   function applySharedLibraryBanner(message) {
     readOnlyBannerMessage =
       message ||
-      'Vlastite biljke i bilješke možete uređivati. Biljke iz dijeljene baze superadmina su samo za pregled.';
+      'You can edit your own plants and entries. Plants from the superadmin shared library are view-only.';
     document.body.classList.remove('admin-readonly');
     document.body.classList.add('shared-library-mode');
     let banner = document.getElementById('shared-library-banner');
@@ -875,7 +875,7 @@
     if (!isAdminReadOnly) return;
     readOnlyBannerMessage =
       message ||
-      'Pregled baze (samo čitanje) — biljke, dnevnik i alati bez mogućnosti uređivanja.';
+      'Read-only database view — plants, journal and tools without editing.';
     document.body.classList.add('admin-readonly');
     let banner = document.getElementById('admin-readonly-banner');
     if (!banner) {
@@ -896,7 +896,7 @@
     if (!section || !panel || !ownerUid || currentUserRole !== 'superadmin') return;
 
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Učitavanje…</p>';
+    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Loading…</p>';
 
     const users = (await listFirestoreUsers()).filter((u) => u.uid !== ownerUid);
     const plants = getPlants();
@@ -919,7 +919,7 @@
               '</label>'
           )
           .join('')
-      : '<p class="admin-empty-state">Nemate biljaka u bazi — dodajte ih u Biljke i dnevnik.</p>';
+      : '<p class="admin-empty-state">You have no plants in the database — add them in Plants & journal.</p>';
 
     const grantsHtml = grants.length
       ? grants
@@ -930,42 +930,42 @@
               '<div class="admin-grant-card-head">' +
               `<div class="admin-grant-user"><span class="admin-grant-avatar" aria-hidden="true">${escapeHtml((email[0] || '?').toUpperCase())}</span>` +
               `<strong class="admin-grant-email">${escapeHtml(email)}</strong></div>` +
-              '<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Ukloni</button></div>' +
+              '<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Remove</button></div>' +
               `<div class="admin-grant-badges">${adminGrantBadgesHtml(g)}</div></article>`
             );
           })
           .join('')
-      : '<p class="admin-empty-state">Još nema dodijeljenih pristupa.</p>';
+      : '<p class="admin-empty-state">No access granted yet.</p>';
 
     panel.innerHTML =
       '<div class="admin-sharing-layout">' +
       '<div class="admin-sharing-form-card">' +
-      '<h4 class="admin-subheading">Novi pristup</h4>' +
+      '<h4 class="admin-subheading">New access</h4>' +
       '<form id="form-sharing-grant" class="admin-sharing-form">' +
-      '<label class="admin-field"><span class="admin-field-label">Korisnik</span>' +
-      '<select id="share-viewer-user" class="admin-field-input" required><option value="">— odaberi korisnika —</option>' +
+      '<label class="admin-field"><span class="admin-field-label">User</span>' +
+      '<select id="share-viewer-user" class="admin-field-input" required><option value="">— select a user —</option>' +
       userOptions +
       '</select></label>' +
       '<fieldset class="admin-sharing-plants-fieldset">' +
-      '<legend class="admin-field-label">Biljke</legend>' +
+      '<legend class="admin-field-label">Plants</legend>' +
       '<label class="admin-toggle-tile admin-toggle-tile--wide">' +
       '<input type="checkbox" id="share-all-plants" checked />' +
-      '<span><strong>Sve biljke</strong><small>Pregled cijele baze biljaka</small></span></label>' +
+      '<span><strong>All plants</strong><small>View the entire plant database</small></span></label>' +
       '<div id="share-plants-list" class="admin-plants-pick-list" hidden>' +
       plantChecks +
       '</div></fieldset>' +
       '<div class="admin-toggle-row">' +
       '<label class="admin-toggle-tile">' +
       '<input type="checkbox" id="share-entries" checked />' +
-      '<span><strong>Dnevnik</strong><small>Bilješke i unosi</small></span></label>' +
+      '<span><strong>Journal</strong><small>Notes and entries</small></span></label>' +
       '<label class="admin-toggle-tile">' +
       '<input type="checkbox" id="share-toolbox" />' +
-      '<span><strong>Alati</strong><small>Podaci iz Alata</small></span></label>' +
+      '<span><strong>Tools</strong><small>Data from Tools</small></span></label>' +
       '</div>' +
-      '<button type="submit" class="btn btn-primary admin-sharing-submit">Spremi pristup</button>' +
+      '<button type="submit" class="btn btn-primary admin-sharing-submit">Save access</button>' +
       '</form></div>' +
       '<div class="admin-sharing-grants-card">' +
-      '<h4 class="admin-subheading">Aktivni pristupi <span class="admin-count-badge">' + grants.length + '</span></h4>' +
+      '<h4 class="admin-subheading">Active access <span class="admin-count-badge">' + grants.length + '</span></h4>' +
       '<div class="admin-grant-list">' + grantsHtml + '</div></div></div>';
 
     const allPlantsCb = document.getElementById('share-all-plants');
@@ -987,7 +987,7 @@
         ? []
         : Array.from(document.querySelectorAll('.share-plant-cb:checked')).map((cb) => cb.value);
       if (!allPlants && plantIds.length === 0) {
-        alert('Odaberite barem jednu biljku ili uključite „Sve biljke”.');
+        alert('Select at least one plant or enable "All plants".');
         return;
       }
       try {
@@ -999,10 +999,10 @@
           enabled: true,
         });
         await renderSuperadminSharingPanel();
-        alert('Pristup je spremljen.');
+        alert('Access saved.');
       } catch (err) {
         console.error(err);
-        alert('Spremanje nije uspjelo. Provjerite Firestore pravila.');
+        alert('Saving failed. Check your Firestore rules.');
       }
     });
 
@@ -1010,12 +1010,12 @@
       btn.addEventListener('click', async () => {
         const row = btn.closest('.admin-grant-card');
         const viewerUid = row && row.dataset.viewer;
-        if (!viewerUid || !confirm('Ukloniti pristup za ovog korisnika?')) return;
+        if (!viewerUid || !confirm('Remove access for this user?')) return;
         try {
           await deleteSharedGrant(ownerUid, viewerUid);
           await renderSuperadminSharingPanel();
         } catch (err) {
-          alert('Uklanjanje nije uspjelo.');
+          alert('Removal failed.');
         }
       });
     });
@@ -1181,7 +1181,7 @@ function initFirebaseSync() {
         remoteSyncReady = false;
         await loadSuperadminDatabaseForAdmin();
         applyAdminReadOnlyUI(
-          'Pregled cijele baze superadmina (samo čitanje) — bez mogućnosti uređivanja biljaka.'
+          'Read-only view of the entire superadmin database — plants cannot be edited.'
         );
       } else if (currentUserRole === 'viewer') {
         isAdminReadOnly = true;
@@ -1189,7 +1189,7 @@ function initFirebaseSync() {
         await ensureViewerBootstrapGrant(user.uid, user.email || '');
         await loadSharedDatabaseForViewer(user.uid, user.email || '');
         applyAdminReadOnlyUI(
-          'Pregled dijeljenih biljaka (samo čitanje) — uređivanje nije dopušteno.'
+          'Read-only view of shared plants — editing is not allowed.'
         );
       } else {
         isAdminReadOnly = false;
@@ -1198,7 +1198,7 @@ function initFirebaseSync() {
         if (isSharedHybridUser(userEmail)) {
           await loadHybridUserWithSharedReadOnly(user.uid, userEmail);
           applySharedLibraryBanner(
-            'Vlastite biljke i bilješke možete dodavati i uređivati. Biljke iz dijeljene baze superadmina su samo za pregled.'
+            'You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.'
           );
         } else {
           document.body.classList.remove('shared-library-mode');
@@ -1243,11 +1243,11 @@ function initFirebaseSync() {
 
 
   const STAGES = {
-    klijanje: 'Klijanje',
-    sadnica: 'Sadnica',
-    vegetativna: 'Vegetativna',
-    cvjetanje: 'Cvjetanje',
-    susenje: 'Sušenje',
+    klijanje: 'Germination',
+    sadnica: 'Seedling',
+    vegetativna: 'Vegetative',
+    cvjetanje: 'Flowering',
+    susenje: 'Drying',
   };
 
   function canonicalPlantStage(value) {
@@ -1259,12 +1259,12 @@ function initFirebaseSync() {
   const SUBPHASE_FIELD = 'na_polju';
 
   const SUBPHASE_POTS = {
-    pot_1_5dcl: '1,5 dcl',
+    pot_1_5dcl: '1.5 dcl',
     pot_5l: '5 L',
     pot_30l: '30 L',
     pot_10dcl: '10 dcl',
-    pot_1_5l: '1,5 L',
-    [SUBPHASE_FIELD]: 'Na polju',
+    pot_1_5l: '1.5 L',
+    [SUBPHASE_FIELD]: 'In the field',
   };
 
   const SUBPHASE_ORDER = ['pot_1_5dcl', 'pot_5l', 'pot_30l'];
@@ -1295,15 +1295,15 @@ function initFirebaseSync() {
   }
 
   const ENTRY_TYPE_LABELS = {
-    opcenito: 'Općenito',
-    zalijevanje: 'Zalijevanje',
-    gnojidba: 'Gnojidba',
-    okolis: 'Okoliš',
-    presadjivanje: 'Presađivanje',
-    stresori: 'Stresori',
-    ostalo: 'Ostalo',
-    faza: 'Faza (prijelaz)',
-    podfaza: 'Podfaza (lonac / polje)',
+    opcenito: 'General',
+    zalijevanje: 'Watering',
+    gnojidba: 'Feeding',
+    okolis: 'Environment',
+    presadjivanje: 'Transplanting',
+    stresori: 'Stressors',
+    ostalo: 'Other',
+    faza: 'Stage (transition)',
+    podfaza: 'Sub-phase (pot / field)',
   };
 
   function getPlants() {
@@ -1354,14 +1354,14 @@ function initFirebaseSync() {
   const viewTitle = document.querySelector('.view-title');
   const logoutBtn = document.getElementById('btn-logout');
   const titles = {
-    dashboard: 'Nadzorna ploča',
-    plants: 'Biljke i dnevnik',
-    cpvo: 'CPVO-obrazac',
+    dashboard: 'Dashboard',
+    plants: 'Plants & journal',
+    cpvo: 'CPVO form',
     pitchdeck: 'Pitch deck',
-    growlog: 'Growlog',
-    toolbox: 'Alati',
+    growlog: 'Grow log',
+    toolbox: 'Tools',
     admin: 'Admin Panel',
-    danas: 'Danas',
+    danas: 'Today',
   };
 
   let currentGrowlogPlantId = null;
@@ -1421,7 +1421,7 @@ function initFirebaseSync() {
     if (view === "admin") {
       await resolveCurrentUserRole();
       if (!isAdminPanelRole(currentUserRole)) {
-        alert('Pristup odbijen — nemate admin ovlasti.');
+        alert('Access denied — you do not have admin privileges.');
         return;
       }
     }
@@ -1471,13 +1471,13 @@ function initFirebaseSync() {
     const d = new Date(iso);
     const n = new Date();
     const sec = Math.floor((n - d) / 1000);
-    if (sec < 60) return 'upravo';
-    if (sec < 3600) return 'prije ' + Math.floor(sec / 60) + ' min';
-    if (sec < 86400) return 'prije ' + Math.floor(sec / 3600) + ' h';
-    if (sec < 604800) return 'prije ' + Math.floor(sec / 86400) + ' d';
-    if (sec < 2592000) return 'prije ' + Math.floor(sec / 604800) + ' tjedana';
-    if (sec < 31536000) return 'prije ' + Math.floor(sec / 2592000) + ' mj.';
-    return 'prije ' + Math.floor(sec / 31536000) + ' god.';
+    if (sec < 60) return 'just now';
+    if (sec < 3600) return Math.floor(sec / 60) + ' min ago';
+    if (sec < 86400) return Math.floor(sec / 3600) + ' h ago';
+    if (sec < 604800) return Math.floor(sec / 86400) + ' d ago';
+    if (sec < 2592000) return Math.floor(sec / 604800) + ' weeks ago';
+    if (sec < 31536000) return Math.floor(sec / 2592000) + ' mo. ago';
+    return Math.floor(sec / 31536000) + ' yr. ago';
   }
 
   function formatDayWeek(dateStr, startDateStr) {
@@ -1486,7 +1486,7 @@ function initFirebaseSync() {
     const start = new Date(startDateStr);
     const day = daysBetween(startDateStr, dateStr);
     const week = Math.floor(day / 7);
-    return 'Dan ' + day + ' (' + week + '. tjedan)';
+    return 'Day ' + day + ' (week ' + week + ')';
   }
 
   const STAGE_ICONS = {
@@ -1511,14 +1511,14 @@ function initFirebaseSync() {
     const updatedAt = plant.updatedAt || (plant.startDate ? plant.startDate + 'T12:00:00.000Z' : new Date().toISOString());
     const views = plant.views != null ? plant.views : 0;
     const durationWeeks = weeksBetween(startDate, updatedAt.slice(0, 10));
-    const envType = plant.environmentType === 'outdoor' ? 'Na otvorenom' : 'U zatvorenom';
+    const envType = plant.environmentType === 'outdoor' ? 'Outdoor' : 'Indoor';
     const exposure = plant.exposureHours ? plant.exposureHours + ' h' : '—';
 
-    document.getElementById('growlog-updated').textContent = 'Ažurirano ' + timeAgo(updatedAt);
-    document.getElementById('growlog-views').textContent = views + ' pregleda';
+    document.getElementById('growlog-updated').textContent = 'Updated ' + timeAgo(updatedAt);
+    document.getElementById('growlog-views').textContent = views + ' views';
 
     document.getElementById('growlog-metrics').innerHTML = `
-      <div class="growlog-metric"><span class="growlog-metric-icon">📅</span> ${durationWeeks} tjedana</div>
+      <div class="growlog-metric"><span class="growlog-metric-icon">📅</span> ${durationWeeks} weeks</div>
       <div class="growlog-metric"><span class="growlog-metric-icon">💧</span> ${STAGES[plant.stage] || plant.stage}</div>
       <div class="growlog-metric"><span class="growlog-metric-icon">💡</span> ${envType}</div>
     `;
@@ -1529,7 +1529,7 @@ function initFirebaseSync() {
       if (e.photo) allPhotos.push(e.photo);
     });
     const photoGrid = document.getElementById('growlog-photo-grid');
-    photoGrid.innerHTML = allPhotos.slice(0, 3).map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">Nema fotografija</p>';
+    photoGrid.innerHTML = allPhotos.slice(0, 3).map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">No photos</p>';
     document.getElementById('growlog-view-all-photos').style.display = allPhotos.length > 3 ? 'inline-block' : 'none';
 
     document.getElementById('growlog-strain').innerHTML = plant.strain
@@ -1543,7 +1543,7 @@ function initFirebaseSync() {
         const date = stageDates[s] || (s === 'klijanje' ? startDate : null);
         const isCurrent = canonicalPlantStage(plant.stage) === s;
         const label = STAGES[s] || s;
-        const dateStr = date ? new Date(date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
+        const dateStr = date ? new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
         return '<div class="tree-stage-item' + (isCurrent ? ' current' : '') + '"><span class="tree-stage-icon">' + (STAGE_ICONS[s] || '•') + '</span><span class="tree-stage-label">' + label + '</span><span class="tree-stage-date">' + dateStr + '</span></div>';
       })
       .join('');
@@ -1574,16 +1574,16 @@ function initFirebaseSync() {
     let histHtml;
     if (hist.length === 0) {
       histHtml =
-        '<p class="growlog-empty">Još nema zapisanih prijelaza. Mijenjaj fazu u &quot;Uredi biljku&quot; — nastaje bilješka u dnevniku.</p>';
+        '<p class="growlog-empty">No transitions recorded yet. Change the stage in &quot;Edit plant&quot; — a journal entry will be created.</p>';
     } else {
       histHtml = hist
         .slice()
         .reverse()
         .map((h) => {
-          const d = h.date ? new Date(h.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+          const d = h.date ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
           const line = h.from
             ? escapeHtml(STAGES[h.from] || h.from) + ' → ' + escapeHtml(STAGES[h.to] || h.to)
-            : 'Započetak: ' + escapeHtml(STAGES[h.to] || h.to);
+            : 'Start: ' + escapeHtml(STAGES[h.to] || h.to);
           return '<div class="stage-history-item"><span class="stage-history-date">' + d + '</span><span class="stage-history-label">' + line + '</span></div>';
         })
         .join('');
@@ -1595,11 +1595,11 @@ function initFirebaseSync() {
         '<div class="tree-stages growlog-tree-stages">' +
         stageRows +
         '</div>' +
-        '<h4 class="growlog-subsection-title">Podfaze (lonci)</h4>' +
+        '<h4 class="growlog-subsection-title">Sub-phases (pots)</h4>' +
         '<div class="tree-stages tree-subphases">' +
         subRows +
         '</div>' +
-        '<h4 class="growlog-subsection-title">Povijest prijelaza faza</h4>' +
+        '<h4 class="growlog-subsection-title">Stage transition history</h4>' +
         '<div class="stage-history-list">' +
         histHtml +
         '</div>' +
@@ -1611,7 +1611,7 @@ function initFirebaseSync() {
             .reverse()
             .map((h) => {
               const d = h.date
-                ? new Date(h.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short', year: 'numeric' })
+                ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                 : '—';
               const fromLab = h.from ? subphaseLabel(h.from) : '—';
               const toLab = subphaseLabel(h.to) || h.to || '—';
@@ -1627,7 +1627,7 @@ function initFirebaseSync() {
             })
             .join('');
           return (
-            '<h4 class="growlog-subsection-title">Povijest podfaza (lonci / polje)</h4>' +
+            '<h4 class="growlog-subsection-title">Sub-phase history (pots / field)</h4>' +
             '<div class="stage-history-list">' +
             rows +
             '</div>'
@@ -1640,15 +1640,15 @@ function initFirebaseSync() {
       <div class="env-row"><span class="env-icon">💡</span> ${envType}</div>
       ${
         plant.fieldLocation
-          ? '<div class="env-row"><span class="env-icon">📍</span> Polje: ' + escapeHtml(plant.fieldLocation) + '</div>'
+          ? '<div class="env-row"><span class="env-icon">📍</span> Field: ' + escapeHtml(plant.fieldLocation) + '</div>'
           : ''
       }
       ${
         plant.plantingLocation
-          ? '<div class="env-row"><span class="env-icon">🌱</span> Sađenje: ' + escapeHtml(plant.plantingLocation) + '</div>'
+          ? '<div class="env-row"><span class="env-icon">🌱</span> Planting: ' + escapeHtml(plant.plantingLocation) + '</div>'
           : ''
       }
-      <div class="env-row"><span class="env-icon">🕐</span> ${exposure} osvjetljenja</div>
+      <div class="env-row"><span class="env-icon">🕐</span> ${exposure} of light</div>
     `;
 
     const heroEl = document.getElementById('growlog-hero');
@@ -1674,20 +1674,20 @@ function initFirebaseSync() {
           : '') +
         '<span class="growlog-hero-chip">' +
         durationWeeks +
-        ' tj. uzgoja</span>' +
+        ' wk grow</span>' +
         '<span class="growlog-hero-chip growlog-hero-chip--muted">' +
         escapeHtml(envType) +
         '</span>' +
         '</div>' +
         (sharedPlant
           ? ''
-          : '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Uredi biljku</button>') +
+          : '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Edit plant</button>') +
         '</div>' +
         '<h2 class="growlog-hero-title">' +
         escapeHtml(plant.name) +
         '</h2>' +
         strainHtml +
-        '<p class="growlog-hero-hint">Fotografije su u bočnoj traci i u nedavnim slikama ispod.</p>' +
+        '<p class="growlog-hero-hint">Photos are in the sidebar and in the recent photos below.</p>' +
         '</div>';
       const heroEditBtn = document.getElementById('growlog-hero-edit');
       if (heroEditBtn) {
@@ -1698,18 +1698,18 @@ function initFirebaseSync() {
     const timelineItems = [];
     entries.slice(0, 20).forEach((e) => {
       const dayWeek = formatDayWeek(e.date, startDate);
-      const dateStr = e.date ? new Date(e.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
-      const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'Općenito';
+      const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
+      const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
       const note = (e.note || '').slice(0, 80) + ((e.note || '').length > 80 ? '…' : '');
       const media = e.photo ? '<img src="' + e.photo + '" alt="" class="timeline-thumb" />' : '';
       timelineItems.push(
         '<div class="timeline-entry"><div class="timeline-entry-header"><span class="timeline-date">📅 ' + dateStr + '</span><span class="timeline-day">' + dayWeek + '</span></div><div class="timeline-entry-body">' + typeLabel + ': ' + escapeHtml(note) + '</div>' + (media ? '<div class="timeline-entry-media">' + media + '</div>' : '') + '</div>'
       );
     });
-    document.getElementById('growlog-timeline').innerHTML = timelineItems.length ? timelineItems.join('') : '<p class="growlog-empty">Nema unosa u vremenskoj crti. Dodajte bilješke u Dnevnik.</p>';
+    document.getElementById('growlog-timeline').innerHTML = timelineItems.length ? timelineItems.join('') : '<p class="growlog-empty">No entries in the timeline. Add notes in the Journal.</p>';
 
     const stripPhotos = allPhotos.slice(0, 8);
-    document.getElementById('growlog-photo-strip').innerHTML = stripPhotos.map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">Nema fotografija</p>';
+    document.getElementById('growlog-photo-strip').innerHTML = stripPhotos.map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">No photos</p>';
 
     document.getElementById('growlog-view-all-photos').onclick = () => {
       document.getElementById('growlog-photo-strip').scrollIntoView({ behavior: 'smooth' });
@@ -1726,32 +1726,32 @@ function initFirebaseSync() {
 
     cardsEl.innerHTML = `
       <div class="dashboard-card">
-        <h3>Broj biljaka</h3>
+        <h3>Number of plants</h3>
         <div class="value">${totalPlantCount}</div>
       </div>
       <div class="dashboard-card">
-        <h3>Bilješke u dnevniku</h3>
+        <h3>Journal entries</h3>
         <div class="value">${entries.length}</div>
       </div>
       <div class="dashboard-card">
-        <h3>Aktivne faze</h3>
+        <h3>Active stages</h3>
         <div class="value">${new Set(plants.map((p) => p.stage)).size}</div>
       </div>
     `;
 
     const recent = entries.slice(-5).reverse();
     if (recent.length === 0) {
-      recentEl.innerHTML = '<div class="empty-state">Nema bilješki. Dodajte biljku i započnite dnevnik.</div>';
+      recentEl.innerHTML = '<div class="empty-state">No entries yet. Add a plant and start your journal.</div>';
     } else {
       recentEl.innerHTML = recent
         .map((e) => {
           const plant = plants.find((p) => p.id === e.plantId);
-          const plantName = plant ? plant.name : 'Biljka';
-          const date = e.date ? new Date(e.date).toLocaleDateString('hr-HR') : '';
+          const plantName = plant ? plant.name : 'Plant';
+          const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
           const thumb = e.photo ? '<img src="' + e.photo + '" alt="" class="recent-note-thumb" />' : '';
           return `
             <div class="recent-note">
-              <div class="meta">${plantName} · ${date} · ${ENTRY_TYPE_LABELS[e.type] || e.type || 'Općenito'}</div>
+              <div class="meta">${plantName} · ${date} · ${ENTRY_TYPE_LABELS[e.type] || e.type || 'General'}</div>
               ${thumb}
               <div class="text">${escapeHtml(e.note || '').slice(0, 120)}${(e.note || '').length > 120 ? '…' : ''}</div>
             </div>
@@ -1774,8 +1774,8 @@ function initFirebaseSync() {
       } else {
         chartsSection.style.display = 'block';
         chartsContainer.innerHTML = '';
-        if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Zalijevanje</h4><div id="dashboard-chart-watering"></div></div>';
-        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Okoliš (temperatura, vlažnost, pH)</h4><div id="dashboard-chart-environment"></div></div>';
+        if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Watering</h4><div id="dashboard-chart-watering"></div></div>';
+        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Environment (temperature, humidity, pH)</h4><div id="dashboard-chart-environment"></div></div>';
         if (hasWatering && typeof renderToolboxChart === 'function') renderToolboxChart('watering', document.getElementById('dashboard-chart-watering'));
         if (hasEnv && typeof renderToolboxChart === 'function') renderToolboxChart('environment', document.getElementById('dashboard-chart-environment'));
       }
@@ -1811,8 +1811,8 @@ function initFirebaseSync() {
       d.getDate() === today.getDate() &&
       d.getMonth() === today.getMonth() &&
       d.getFullYear() === today.getFullYear();
-    if (isToday) return 'Danas';
-    return d.toLocaleDateString('hr-HR', { weekday: 'short', day: 'numeric', month: 'short' });
+    if (isToday) return 'Today';
+    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   async function getWeather(city, containerId) {
@@ -1821,7 +1821,7 @@ function initFirebaseSync() {
     if (!weatherDiv) return;
 
     const cityName = (city || DEFAULT_WEATHER_CITY).trim() || DEFAULT_WEATHER_CITY;
-    weatherDiv.innerHTML = '<p class="plants-weather-loading">Učitavanje prognoze…</p>';
+    weatherDiv.innerHTML = '<p class="plants-weather-loading">Loading forecast…</p>';
 
     const url =
       'https://api.weatherapi.com/v1/forecast.json?key=' +
@@ -1842,20 +1842,20 @@ function initFirebaseSync() {
       if (!response.ok) {
         const msg = (data && data.error && data.error.message) || 'HTTP ' + response.status;
         weatherDiv.innerHTML =
-          '<p class="plants-weather-error">Prognoza nije dostupna: ' + escapeHtml(msg) + '</p>';
+          '<p class="plants-weather-error">Forecast unavailable: ' + escapeHtml(msg) + '</p>';
         return;
       }
 
       if (!data || data.error) {
         weatherDiv.innerHTML =
-          '<p class="plants-weather-error">Prognoza nije dostupna: ' +
-          escapeHtml((data && data.error && data.error.message) || 'Nepoznat grad') +
+          '<p class="plants-weather-error">Forecast unavailable: ' +
+          escapeHtml((data && data.error && data.error.message) || 'Unknown city') +
           '</p>';
         return;
       }
 
       if (!data.forecast || !Array.isArray(data.forecast.forecastday) || !data.forecast.forecastday.length) {
-        weatherDiv.innerHTML = '<p class="plants-weather-error">Nema podataka za prognozu.</p>';
+        weatherDiv.innerHTML = '<p class="plants-weather-error">No forecast data available.</p>';
         return;
       }
 
@@ -1863,7 +1863,7 @@ function initFirebaseSync() {
     } catch (error) {
       console.error('Weather fetch failed', error);
       weatherDiv.innerHTML =
-        '<p class="plants-weather-error">Nije moguće učitati prognozu. Provjerite mrežu i naziv grada.</p>';
+        '<p class="plants-weather-error">Could not load the forecast. Check your connection and the city name.</p>';
     }
   }
 
@@ -1879,7 +1879,7 @@ function initFirebaseSync() {
     let html =
       '<p class="plants-weather-location">' +
       escapeHtml(city + region) +
-      ' · sljedećih 7 dana</p><div class="weather-container plants-weather-days">';
+      ' · next 7 days</p><div class="weather-container plants-weather-days">';
 
     days.forEach((day, i) => {
       const label = formatWeatherDayLabel(day.date);
@@ -2007,7 +2007,7 @@ function initFirebaseSync() {
     const list = document.getElementById('plants-list');
     const plants = getPlants();
     if (plants.length === 0) {
-      list.innerHTML = '<div class="empty-state">Nemate biljaka. Kliknite "Nova biljka" da dodate prvu.</div>';
+      list.innerHTML = '<div class="empty-state">You have no plants. Click "New plant" to add your first one.</div>';
       return;
     }
     list.innerHTML = plants
@@ -2019,11 +2019,11 @@ function initFirebaseSync() {
         <div class="plant-card-header">
           <h3>${escapeHtml(p.name)}</h3>
           <span class="stage-badge">${STAGES[p.stage] || p.stage}</span>
-          ${shared ? '<span class="stage-badge plant-shared-badge" title="Dijeljena baza">Dijeljeno</span>' : ''}
+          ${shared ? '<span class="stage-badge plant-shared-badge" title="Shared library">Shared</span>' : ''}
         </div>
         ${
           p.subphase
-            ? `<div class="plant-card-subphases"><span class="subphase-badge" title="Volumen lonca">${escapeHtml(subphaseLabel(p.subphase))}</span></div>`
+            ? `<div class="plant-card-subphases"><span class="subphase-badge" title="Pot volume">${escapeHtml(subphaseLabel(p.subphase))}</span></div>`
             : ''
         }
         ${p.strain ? `<div class="strain">${escapeHtml(p.strain)}</div>` : ''}
@@ -2037,15 +2037,15 @@ function initFirebaseSync() {
             ? `<div class="text-muted" style="font-size:0.85rem">🌱 ${escapeHtml(p.plantingLocation)}</div>`
             : ''
         }
-        <div class="text-muted" style="font-size:0.85rem">Nasad: <strong style="color:var(--text)">${Math.max(1, Number(p.count || 1))}</strong> bilj.</div>
-        ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Od ${new Date(p.startDate).toLocaleDateString('hr-HR')}</div>` : ''}
+        <div class="text-muted" style="font-size:0.85rem">Batch: <strong style="color:var(--text)">${Math.max(1, Number(p.count || 1))}</strong> plants</div>
+        ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Since ${new Date(p.startDate).toLocaleDateString('en-GB')}</div>` : ''}
         <div class="plant-card-actions">
-          <button type="button" class="btn btn-primary btn-growlog">Growlog</button>
+          <button type="button" class="btn btn-primary btn-growlog">Grow log</button>
           ${
             shared
               ? ''
-              : `<button type="button" class="btn btn-ghost btn-edit-plant">✎ Uredi biljku</button>
-          <button type="button" class="btn btn-ghost btn-delete-plant">Obriši</button>`
+              : `<button type="button" class="btn btn-ghost btn-edit-plant">✎ Edit plant</button>
+          <button type="button" class="btn btn-ghost btn-delete-plant">Delete</button>`
           }
         </div>
       </div>
@@ -2125,7 +2125,7 @@ function initFirebaseSync() {
 
   function deletePlant(id) {
     if (blockWrite({ plantId: id })) return;
-    if (!confirm('Obrisati ovu biljku?')) return;
+    if (!confirm('Delete this plant?')) return;
     const plants = getPlants().filter((p) => p.id !== id);
     setPlants(plants);
     const entries = getEntries().filter((e) => e.plantId !== id);
@@ -2163,7 +2163,7 @@ function initFirebaseSync() {
     if (transNote) transNote.value = '';
     const stageAtOpenEl = document.getElementById('plant-stage-at-open');
     document.getElementById('plant-id').value = editId || '';
-    titleEl.textContent = editId ? 'Uredi biljku' : 'Nova biljka';
+    titleEl.textContent = editId ? 'Edit plant' : 'New plant';
     document.getElementById('plant-photo').value = '';
     if (editId) {
       const p = getPlants().find((x) => x.id === editId);
@@ -2190,7 +2190,7 @@ function initFirebaseSync() {
         document.getElementById('plant-notes').value = p.notes || '';
         if (p.photo) {
           photoData.value = p.photo;
-          photoPreview.innerHTML = '<img src="' + p.photo + '" alt="Fotografija" class="media-thumb" /> <button type="button" class="btn-remove-media">Ukloni</button>';
+          photoPreview.innerHTML = '<img src="' + p.photo + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
           photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
             photoData.value = '';
             photoPreview.innerHTML = '';
@@ -2256,14 +2256,14 @@ function initFirebaseSync() {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
       photoData.value = dataUrl;
-      photoPreview.innerHTML = '<img src="' + dataUrl + '" alt="Fotografija" class="media-thumb" /> <button type="button" class="btn-remove-media">Ukloni</button>';
+      photoPreview.innerHTML = '<img src="' + dataUrl + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
       photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
         photoData.value = '';
         photoPreview.innerHTML = '';
         document.getElementById('plant-photo').value = '';
       });
     } catch (err) {
-      photoPreview.innerHTML = '<span class="media-error">Greška pri učitavanju.</span>';
+      photoPreview.innerHTML = '<span class="media-error">Error while loading.</span>';
     }
   });
 
@@ -2298,8 +2298,8 @@ function initFirebaseSync() {
     const plantingLocationVal =
       outdoorCtx && fieldLocationVal && plantingEl ? plantingEl.value.trim() || null : null;
     let locNoteSuffix = '';
-    if (fieldLocationVal) locNoteSuffix += ' Lokacija polja: ' + fieldLocationVal + '.';
-    if (plantingLocationVal) locNoteSuffix += ' Lokacija sađenja: ' + plantingLocationVal + '.';
+    if (fieldLocationVal) locNoteSuffix += ' Field location: ' + fieldLocationVal + '.';
+    if (plantingLocationVal) locNoteSuffix += ' Planting location: ' + plantingLocationVal + '.';
 
     let stageHistory = [];
     let stageDates = {};
@@ -2316,7 +2316,7 @@ function initFirebaseSync() {
       const day0 = startDateVal || localDateYYYYMMDD();
       stageHistory.push({ from: null, to: newStage, date: day0 });
       stageDates[newStage] = day0;
-      let note0 = 'Započet uzgoj — faza: ' + (STAGES[newStage] || newStage);
+      let note0 = 'Grow started — stage: ' + (STAGES[newStage] || newStage);
       if (locNoteSuffix) note0 += locNoteSuffix;
       if (transitionNote) note0 += '. ' + transitionNote;
       journalAdds.push({
@@ -2334,7 +2334,7 @@ function initFirebaseSync() {
       });
       if (newSubphase) {
         subphaseHistory.push({ from: null, to: newSubphase, date: day0 });
-        let subNote = 'Podfaza: ' + subphaseLabel(newSubphase);
+        let subNote = 'Sub-phase: ' + subphaseLabel(newSubphase);
         if (locNoteSuffix) subNote += locNoteSuffix;
         journalAdds.push({
           id: uuid(),
@@ -2360,7 +2360,7 @@ function initFirebaseSync() {
         stageHistory.push({ from: stageAtOpen, to: newStage, date: td });
         stageDates[newStage] = td;
         const base =
-          'Prijelaz faze: ' + (STAGES[stageAtOpen] || stageAtOpen) + ' → ' + (STAGES[newStage] || newStage);
+          'Stage transition: ' + (STAGES[stageAtOpen] || stageAtOpen) + ' → ' + (STAGES[newStage] || newStage);
         const note1 = (transitionNote ? base + '. ' + transitionNote : base) + locNoteSuffix;
         journalAdds.push({
           id: uuid(),
@@ -2389,7 +2389,7 @@ function initFirebaseSync() {
         const fromLab = subAtOpen ? subphaseLabel(subAtOpen) : '—';
         const toLab = newSubphase ? subphaseLabel(newSubphase) : '—';
         let subNote =
-          'Prijelaz podfaze: ' + fromLab + ' → ' + toLab + (transitionNote ? '. ' + transitionNote : '') + locNoteSuffix;
+          'Sub-phase transition: ' + fromLab + ' → ' + toLab + (transitionNote ? '. ' + transitionNote : '') + locNoteSuffix;
         journalAdds.push({
           id: uuid(),
           plantId: newId,
@@ -2459,14 +2459,14 @@ function initFirebaseSync() {
     const sel = document.getElementById('entry-plant');
     if (!sel) return;
     const plants = getPlants();
-    sel.innerHTML = '<option value="">-- Odaberi biljku --</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">-- Select a plant --</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
   function fillJournalPlantFilter() {
     const sel = document.getElementById('journal-plant-filter');
     if (!sel) return;
     const plants = getPlants();
-    sel.innerHTML = '<option value="">Sve biljke</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    sel.innerHTML = '<option value="">All plants</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
   }
 
   function syncEntryFazaLocationsFromPlant() {
@@ -2524,35 +2524,35 @@ function initFirebaseSync() {
     const container = document.getElementById('journal-entries');
     const plants = getPlants();
     if (entries.length === 0) {
-      container.innerHTML = '<div class="empty-state">Nema bilješki. Kliknite "Nova bilješka".</div>';
+      container.innerHTML = '<div class="empty-state">No entries yet. Click "New entry".</div>';
       return;
     }
     container.innerHTML = entries
       .map((e) => {
         const plant = plants.find((p) => p.id === e.plantId);
-        const plantName = plant ? plant.name : 'Biljka';
-        const date = e.date ? new Date(e.date).toLocaleDateString('hr-HR') : '';
-        const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'Općenito';
+        const plantName = plant ? plant.name : 'Plant';
+        const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+        const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
         const media = [];
-        if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + e.photo + '" alt="Fotografija" /></div>');
+        if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + e.photo + '" alt="Photo" /></div>');
         if (e.video) media.push('<div class="entry-media entry-video"><video src="' + e.video + '" controls></video></div>');
         let metaHtml = '';
         if (e.meta) {
           if (e.meta.faza) {
             const m = e.meta.faza;
             const parts = [];
-            if (m.from) parts.push('Od: ' + escapeHtml(STAGES[m.from] || m.from));
-            parts.push('U: ' + escapeHtml(STAGES[m.to] || m.to));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Prijelaz faze</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+            if (m.from) parts.push('From: ' + escapeHtml(STAGES[m.from] || m.from));
+            parts.push('To: ' + escapeHtml(STAGES[m.to] || m.to));
+            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stage transition</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
             if (e.meta.fieldLocation) {
               metaHtml +=
-                '<div class="entry-meta-block"><strong>Lokacija polja</strong><p>' +
+                '<div class="entry-meta-block"><strong>Field location</strong><p>' +
                 escapeHtml(e.meta.fieldLocation) +
                 '</p></div>';
             }
             if (e.meta.plantingLocation) {
               metaHtml +=
-                '<div class="entry-meta-block"><strong>Lokacija sađenja</strong><p>' +
+                '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
                 escapeHtml(e.meta.plantingLocation) +
                 '</p></div>';
             }
@@ -2560,20 +2560,20 @@ function initFirebaseSync() {
           if (e.meta.podfaza) {
             const m = e.meta.podfaza;
             const parts = [];
-            if (m.from) parts.push('Od: ' + escapeHtml(subphaseLabel(m.from)));
-            parts.push('U: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
+            if (m.from) parts.push('From: ' + escapeHtml(subphaseLabel(m.from)));
+            parts.push('To: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
             if (parts.length) {
-              metaHtml += '<div class="entry-meta-block"><strong>Prijelaz podfaze</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+              metaHtml += '<div class="entry-meta-block"><strong>Sub-phase transition</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
             }
             if (e.meta.fieldLocation) {
               metaHtml +=
-                '<div class="entry-meta-block"><strong>Lokacija polja</strong><p>' +
+                '<div class="entry-meta-block"><strong>Field location</strong><p>' +
                 escapeHtml(e.meta.fieldLocation) +
                 '</p></div>';
             }
             if (e.meta.plantingLocation) {
               metaHtml +=
-                '<div class="entry-meta-block"><strong>Lokacija sađenja</strong><p>' +
+                '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
                 escapeHtml(e.meta.plantingLocation) +
                 '</p></div>';
             }
@@ -2581,19 +2581,19 @@ function initFirebaseSync() {
           if (e.meta.presadjivanje) {
             const m = e.meta.presadjivanje;
             const parts = [];
-            if (m.soilQuality) parts.push('Kvaliteta zemlje: ' + escapeHtml(m.soilQuality));
-            if (m.plantAge) parts.push('Starost biljke: ' + escapeHtml(m.plantAge));
-            if (m.plantCondition) parts.push('Stanje biljke: ' + escapeHtml(m.plantCondition));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Presađivanje</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+            if (m.soilQuality) parts.push('Soil quality: ' + escapeHtml(m.soilQuality));
+            if (m.plantAge) parts.push('Plant age: ' + escapeHtml(m.plantAge));
+            if (m.plantCondition) parts.push('Plant condition: ' + escapeHtml(m.plantCondition));
+            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Transplanting</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
           }
           if (e.meta.stresori) {
             const m = e.meta.stresori;
             const parts = [];
-            if (m.temperature) parts.push('Temperatura: ' + escapeHtml(m.temperature));
-            if (m.humidity) parts.push('Vlaga: ' + escapeHtml(m.humidity));
+            if (m.temperature) parts.push('Temperature: ' + escapeHtml(m.temperature));
+            if (m.humidity) parts.push('Humidity: ' + escapeHtml(m.humidity));
             if (m.vpd) parts.push('VPD: ' + escapeHtml(m.vpd));
-            if (m.pests) parts.push('Nametnici: ' + escapeHtml(m.pests));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stresori</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+            if (m.pests) parts.push('Pests: ' + escapeHtml(m.pests));
+            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stressors</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
           }
         }
         return `
@@ -2695,14 +2695,14 @@ function initFirebaseSync() {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
       dataEl.value = dataUrl;
-      previewEl.innerHTML = '<img src="' + dataUrl + '" alt="Fotografija" class="media-thumb" /> <button type="button" class="btn-remove-media">Ukloni</button>';
+      previewEl.innerHTML = '<img src="' + dataUrl + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
         previewEl.innerHTML = '';
         document.getElementById('entry-photo').value = '';
       });
     } catch (err) {
-      previewEl.innerHTML = '<span class="media-error">Greška pri učitavanju.</span>';
+      previewEl.innerHTML = '<span class="media-error">Error while loading.</span>';
     }
   });
 
@@ -2717,7 +2717,7 @@ function initFirebaseSync() {
     }
     const maxBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024;
     if (file.size > maxBytes) {
-      previewEl.innerHTML = '<span class="media-error">Video prevelik (max ' + MAX_VIDEO_SIZE_MB + ' MB za lokalno spremanje).</span>';
+      previewEl.innerHTML = '<span class="media-error">Video too large (max ' + MAX_VIDEO_SIZE_MB + ' MB for local storage).</span>';
       dataEl.value = '';
       document.getElementById('entry-video').value = '';
       return;
@@ -2725,14 +2725,14 @@ function initFirebaseSync() {
     try {
       const dataUrl = await readFileAsDataUrl(file);
       dataEl.value = dataUrl;
-      previewEl.innerHTML = '<video src="' + dataUrl + '" controls class="media-thumb-video"></video> <button type="button" class="btn-remove-media">Ukloni</button>';
+      previewEl.innerHTML = '<video src="' + dataUrl + '" controls class="media-thumb-video"></video> <button type="button" class="btn-remove-media">Remove</button>';
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
         previewEl.innerHTML = '';
         document.getElementById('entry-video').value = '';
       });
     } catch (err) {
-      previewEl.innerHTML = '<span class="media-error">Greška pri učitavanju.</span>';
+      previewEl.innerHTML = '<span class="media-error">Error while loading.</span>';
     }
   });
 
@@ -2868,13 +2868,13 @@ function initFirebaseSync() {
     ['tool-watering-value2', 'tool-feeding-plant', 'tool-environment-plant', 'tool-transplant-plant', 'tool-stressors-plant'].forEach((id) => {
       const sel = document.getElementById(id);
       if (!sel) return;
-      const first = sel.options[0] ? sel.options[0].outerHTML : '<option value="">-- Odaberi biljku --</option>';
+      const first = sel.options[0] ? sel.options[0].outerHTML : '<option value="">-- Select a plant --</option>';
       sel.innerHTML = first + options;
     });
 
     const graphsSel = document.getElementById('tool-graphs-plant');
     if (graphsSel) {
-      const first = graphsSel.options[0] ? graphsSel.options[0].outerHTML : '<option value="">Sve biljke</option>';
+      const first = graphsSel.options[0] ? graphsSel.options[0].outerHTML : '<option value="">All plants</option>';
       graphsSel.innerHTML = first + options;
     }
   }
@@ -2893,14 +2893,14 @@ function initFirebaseSync() {
     const data = getToolboxData()[tool] || [];
     data.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (data.length === 0) {
-      listEl.innerHTML = '<p class="toolbox-empty">Nema unosa. Dodajte prvi.</p>';
+      listEl.innerHTML = '<p class="toolbox-empty">No entries yet. Add the first one.</p>';
       return;
     }
     const plants = getPlants();
     const plantById = new Map(plants.map((p) => [p.id, p.name]));
     const plantLabel = (plantId) => {
       if (!plantId) return '—';
-      return plantById.get(plantId) || 'Biljka';
+      return plantById.get(plantId) || 'Plant';
     };
     listEl.innerHTML = data
       .map((item) => {
@@ -2924,18 +2924,18 @@ function initFirebaseSync() {
             escapeHtml(plantLabel(item.plantId));
         } else if (tool === 'transplant') {
           const parts = [];
-          if (item.soilQuality) parts.push('Kvaliteta zemlje: ' + escapeHtml(String(item.soilQuality)));
-          if (item.plantAge) parts.push('Starost: ' + escapeHtml(String(item.plantAge)));
-          if (item.plantCondition) parts.push('Stanje: ' + escapeHtml(String(item.plantCondition)));
-          parts.push('Biljka: ' + escapeHtml(plantLabel(item.plantId)));
+          if (item.soilQuality) parts.push('Soil quality: ' + escapeHtml(String(item.soilQuality)));
+          if (item.plantAge) parts.push('Age: ' + escapeHtml(String(item.plantAge)));
+          if (item.plantCondition) parts.push('Condition: ' + escapeHtml(String(item.plantCondition)));
+          parts.push('Plant: ' + escapeHtml(plantLabel(item.plantId)));
           valuesStr = parts.join(' · ') || '-';
         } else if (tool === 'stressors') {
           const parts = [];
-          if (item.temperature) parts.push('Temperatura: ' + escapeHtml(String(item.temperature)));
-          if (item.humidity) parts.push('Vlaga: ' + escapeHtml(String(item.humidity)));
+          if (item.temperature) parts.push('Temperature: ' + escapeHtml(String(item.temperature)));
+          if (item.humidity) parts.push('Humidity: ' + escapeHtml(String(item.humidity)));
           if (item.vpd) parts.push('VPD: ' + escapeHtml(String(item.vpd)));
-          if (item.pests) parts.push('Nametnici: ' + escapeHtml(String(item.pests)));
-          parts.push('Biljka: ' + escapeHtml(plantLabel(item.plantId)));
+          if (item.pests) parts.push('Pests: ' + escapeHtml(String(item.pests)));
+          parts.push('Plant: ' + escapeHtml(plantLabel(item.plantId)));
           valuesStr = parts.join(' · ') || '-';
         } else {
           valuesStr = escapeHtml(String(item.value1 || '')) + (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '');
@@ -2944,10 +2944,10 @@ function initFirebaseSync() {
           '<div class="toolbox-list-item" data-id="' +
           item.id +
           '"><span class="toolbox-list-date">' +
-          (item.date ? new Date(item.date).toLocaleDateString('hr-HR') : '') +
+          (item.date ? new Date(item.date).toLocaleDateString('en-GB') : '') +
           '</span><span class="toolbox-list-values">' +
           valuesStr +
-          '</span><button type="button" class="toolbox-list-delete" aria-label="Obriši">×</button></div>'
+          '</span><button type="button" class="toolbox-list-delete" aria-label="Delete">×</button></div>'
         );
       })
       .join('');
@@ -2988,7 +2988,7 @@ function initFirebaseSync() {
       : sortedAll;
 
     if (sorted.length === 0) {
-      container.innerHTML = '<p class="toolbox-chart-empty">Nema podataka za graf.</p>';
+      container.innerHTML = '<p class="toolbox-chart-empty">No data for the chart.</p>';
       return;
     }
     const numVal = (v) => (v === '' || v === null || v === undefined ? 0 : Number(v));
@@ -3000,7 +3000,7 @@ function initFirebaseSync() {
           .map((x) => {
             const val = numVal(x.value1);
             const pct = Math.round((val / max) * 100);
-            const label = x.date ? new Date(x.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
+            const label = x.date ? new Date(x.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
             return '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' + label + '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' + pct + '%"></div></div><span class="toolbox-bar-value">' + val + ' mL</span></div>';
           })
           .join('') +
@@ -3021,7 +3021,7 @@ function initFirebaseSync() {
             const h = numVal(x.value2);
             const ph = numVal(x.value3);
             const pctT = Math.round((t / maxT) * 100);
-            const label = x.date ? new Date(x.date).toLocaleDateString('hr-HR', { day: 'numeric', month: 'short' }) : '';
+            const label = x.date ? new Date(x.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
             let row =
               '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' +
               label +
@@ -3054,7 +3054,7 @@ function initFirebaseSync() {
       container.innerHTML =
         '<div class="toolbox-timeline-list">' +
         sorted
-          .map((x) => '<div class="toolbox-timeline-item"><span class="toolbox-list-date">' + (x.date ? new Date(x.date).toLocaleDateString('hr-HR') : '') + '</span> ' + escapeHtml(String(x.value1 || '')) + (x.value2 ? ' – ' + escapeHtml(String(x.value2)) : '') + '</div>')
+          .map((x) => '<div class="toolbox-timeline-item"><span class="toolbox-list-date">' + (x.date ? new Date(x.date).toLocaleDateString('en-GB') : '') + '</span> ' + escapeHtml(String(x.value1 || '')) + (x.value2 ? ' – ' + escapeHtml(String(x.value2)) : '') + '</div>')
           .join('') +
         '</div>';
     }

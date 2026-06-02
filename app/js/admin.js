@@ -149,7 +149,7 @@ if (readOnly) {
   document.body.classList.add("admin-readonly");
   const banner = document.createElement("div");
   banner.className = "admin-readonly-banner";
-  banner.textContent = "Pregled baze superadmina (samo čitanje) — uređivanje nije dopušteno.";
+  banner.textContent = "Read-only view of the superadmin database — editing is not allowed.";
   document.body.insertBefore(banner, document.body.firstChild);
   if (addBtn) addBtn.style.display = "none";
 }
@@ -198,7 +198,7 @@ async function loadData() {
       const row = document.createElement("tr");
 
       const actionsCell = readOnly
-        ? `<button type="button" class="view-btn">Pregled</button>`
+        ? `<button type="button" class="view-btn">View</button>`
         : `<button class="edit-btn">Edit</button>
           <button class="delete-btn">Delete</button>`;
 
@@ -279,11 +279,11 @@ function openModal(data, readOnly = false) {
 
   modal.innerHTML = `
     <div class="modal-content">
-      <h3>${readOnly ? "Pregled" : editId ? "Edit" : "Add"} ${page}</h3>
+      <h3>${readOnly ? "View" : editId ? "Edit" : "Add"} ${page}</h3>
 
       ${generateForm(data, "", readOnly)}
 
-      ${readOnly ? `<button type="button" id="closeView">Zatvori</button>` : `<button type="button" id="saveDynamic">Save</button>`}
+      ${readOnly ? `<button type="button" id="closeView">Close</button>` : `<button type="button" id="saveDynamic">Save</button>`}
     </div>
   `;
 
