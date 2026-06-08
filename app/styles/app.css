@@ -581,6 +581,87 @@ body {
   color: var(--accent-bright);
 }
 
+.dashboard-adopt-section {
+  margin-bottom: 2rem;
+}
+
+.dashboard-adopt-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.dashboard-adopt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), var(--surface));
+}
+
+.dashboard-adopt-empty p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  max-width: 52ch;
+}
+
+.dashboard-adopt-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.dashboard-adopt-token {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.dashboard-adopt-token-emoji {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.dashboard-adopt-token-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-adopt-token-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.dashboard-adopt-token-head strong {
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-adopt-more {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.dashboard-card--token .value {
+  font-family: var(--font-mono);
+}
+
 .recent-section h2 {
   font-size: 1.1rem;
   font-weight: 600;
@@ -2686,6 +2767,7 @@ body:not(.app-loading) {
 .section-heading,
 .plants-journal-section .section-heading,
 .recent-section h2,
+.dashboard-adopt-section h2,
 .dashboard-charts-section h2 {
   display: flex;
   align-items: center;
@@ -2697,6 +2779,7 @@ body:not(.app-loading) {
 .section-heading::before,
 .plants-journal-section .section-heading::before,
 .recent-section h2::before,
+.dashboard-adopt-section h2::before,
 .dashboard-charts-section h2::before {
   content: '';
   width: 4px;

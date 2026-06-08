@@ -527,5 +527,52 @@
       bindEvents();
       render();
     },
+
+    renderDashboard(container, onOpen) {
+      if (!container) return;
+      const wallet = readWallet();
+      const maxStage = GROWTH_STAGES.length - 1;
+
+      if (!wallet.connected) {
+        container.innerHTML =
+          '<div class="dashboard-adopt-empty">' +
+          '<p>Connect a wallet to mint seeds and track plant growth as tokens.</p>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
+          '</div>';
+      } else if (!wallet.tokens.length) {
+        container.innerHTML =
+          '<div class="dashboard-adopt-empty">' +
+          '<p>Wallet connected · no plant tokens yet. Mint your first seed to start earning <strong>$GROW</strong>.</p>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Mint a seed</button>' +
+          '</div>';
+      } else {
+        const preview = wallet.tokens.slice(0, 3).map((token) => {
+          const stage = GROWTH_STAGES[token.stageIndex] || GROWTH_STAGES[0];
+          const pct = Math.round((token.stageIndex / maxStage) * 100);
+          return (
+            '<div class="dashboard-adopt-token">' +
+            '<span class="dashboard-adopt-token-emoji" aria-hidden="true">' + stage.emoji + '</span>' +
+            '<div class="dashboard-adopt-token-body">' +
+            '<div class="dashboard-adopt-token-head">' +
+            '<strong>' + esc(token.name) + '</strong>' +
+            '<span class="adopt-stage-badge">' + esc(stage.label) + '</span>' +
+            '</div>' +
+            '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
+            '</div>' +
+            '</div>'
+          );
+        }).join('');
+
+        const more = wallet.tokens.length > 3 ? '<p class="dashboard-adopt-more">+' + (wallet.tokens.length - 3) + ' more in your garden</p>' : '';
+
+        container.innerHTML =
+          '<div class="dashboard-adopt-preview">' + preview + '</div>' +
+          more +
+          '<button type="button" class="btn btn-ghost" id="dashboard-adopt-open">Open token garden →</button>';
+      }
+
+      const openBtn = document.getElementById('dashboard-adopt-open');
+      if (openBtn && typeof onOpen === 'function') openBtn.addEventListener('click', onOpen);
+    },
   };
 })();
