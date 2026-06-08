@@ -1356,6 +1356,7 @@ function initFirebaseSync() {
   const titles = {
     dashboard: 'Dashboard',
     plants: 'Plants & journal',
+    adopt: 'Adopt a plant',
     cpvo: 'CPVO form',
     pitchdeck: 'Pitch deck',
     growlog: 'Grow log',
@@ -1405,6 +1406,7 @@ function initFirebaseSync() {
       renderPlants();
       renderJournal();
     }
+    if (id === 'adopt' && window.AdoptPlant) window.AdoptPlant.render();
     if (id === 'toolbox') renderToolbox();
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
