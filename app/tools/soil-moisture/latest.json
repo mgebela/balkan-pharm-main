@@ -1,1 +1,9 @@
-[{"device_id":"0","moisture":4,"raw":3237,"location":"Marko","device_time":1779810412,"server_time":1779810412,"last_seen":1779810412},{"device_id":"1","moisture":0,"raw":3335,"location":"BalkanPharm","device_time":1780563456,"server_time":1780563456,"last_seen":1780563456}]
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://balkanpharm.infolatest.json">here</a>.</p>
+<hr>
+<address>Apache/2.4.58 (Ubuntu) Server at 164.92.208.95 Port 80</address>
+</body></html>
