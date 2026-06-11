@@ -1722,24 +1722,83 @@ function initFirebaseSync() {
   function renderDashboard() {
     const plants = getPlants();
     const entries = getEntries();
-    const cardsEl = document.getElementById('dashboard-cards');
+    const metricsEl = document.getElementById('dashboard-metrics');
     const recentEl = document.getElementById('recent-notes');
     const totalPlantCount = plants.reduce((sum, p) => sum + Math.max(1, Number(p.count || 1)), 0);
+    const indoorCount = plants.filter((p) => p.environmentType === 'indoor' || (!p.environmentType && !p.fieldLocation)).length;
+    const outdoorCount = plants.length - indoorCount;
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const entriesWeek = entries.filter((e) => {
+      if (!e.date) return false;
+      return new Date(e.date + 'T12:00:00').getTime() >= weekAgo;
+    }).length;
+    const stageSet = new Set(plants.map((p) => p.stage).filter(Boolean));
+    const stageCounts = {};
+    plants.forEach((p) => {
+      const s = p.stage || 'unknown';
+      stageCounts[s] = (stageCounts[s] || 0) + 1;
+    });
+    const topStage = Object.keys(stageCounts).sort((a, b) => stageCounts[b] - stageCounts[a])[0];
+    const topStagePct = plants.length && topStage ? Math.round((stageCounts[topStage] / plants.length) * 100) : 0;
 
-    cardsEl.innerHTML = `
-      <div class="dashboard-card">
-        <h3>Number of plants</h3>
-        <div class="value">${totalPlantCount}</div>
-      </div>
-      <div class="dashboard-card">
-        <h3>Journal entries</h3>
-        <div class="value">${entries.length}</div>
-      </div>
-      <div class="dashboard-card">
-        <h3>Active stages</h3>
-        <div class="value">${new Set(plants.map((p) => p.stage)).size}</div>
-      </div>
-    `;
+    let growBalance = '—';
+    let tokenCount = 0;
+    let growingCount = 0;
+    let growPct = 0;
+    if (window.PlantToken) {
+      const wallet = PlantToken.getWallet();
+      if (wallet.connected) {
+        growBalance = Number(wallet.growthBalance || 0).toLocaleString('en-US');
+        tokenCount = wallet.tokens.length;
+        const maxStage = PlantToken.maxStageIndex();
+        growingCount = wallet.tokens.filter((t) => t.stageIndex < maxStage).length;
+        const grown = tokenCount - growingCount;
+        growPct = tokenCount ? Math.round((grown / tokenCount) * 100) : 0;
+      }
+    }
+
+    if (metricsEl && window.MetricUI) {
+      const M = MetricUI;
+      metricsEl.innerHTML = M.panel(
+        '',
+        M.card({
+          label: 'Grow overview',
+          value: totalPlantCount.toLocaleString('en-US'),
+          meta:
+            M.row('Individual plants', plants.length, 'metric-dot--teal') +
+            M.row('Plants in batch', totalPlantCount, 'metric-dot--blue'),
+          donut: { pct: plants.length ? Math.round((indoorCount / plants.length) * 100) : 0, color: '#2dd4bf' },
+          modifier: 'teal',
+        }) +
+          M.card({
+            label: 'Journal activity',
+            value: entries.length.toLocaleString('en-US'),
+            meta:
+              M.row('Last 7 days', entriesWeek, 'metric-dot--blue') +
+              M.row('Plant profiles', plants.length, 'metric-dot--muted'),
+            donut: { pct: entries.length ? Math.min(100, Math.round((entriesWeek / entries.length) * 100)) : 0, color: '#5fb6ff' },
+            modifier: 'blue',
+          }) +
+          M.card({
+            label: 'Active stages',
+            value: stageSet.size.toLocaleString('en-US'),
+            meta:
+              M.row(topStage ? STAGES[topStage] || topStage : 'No plants', topStagePct + '%', 'metric-dot--violet') +
+              M.row('Outdoor', outdoorCount, 'metric-dot--amber'),
+            donut: { pct: topStagePct, color: '#c79bff' },
+            modifier: 'violet',
+          }) +
+          M.card({
+            label: 'Token portfolio',
+            value: growBalance,
+            meta:
+              M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
+              M.row('Still growing', growingCount, 'metric-dot--teal'),
+            donut: { pct: growPct, color: '#f59e0b' },
+            modifier: 'amber',
+          })
+      );
+    }
 
     if (window.AdoptPlant && typeof window.AdoptPlant.renderDashboard === 'function') {
       window.AdoptPlant.renderDashboard(document.getElementById('dashboard-adopt-panel'), () => showView('adopt'));

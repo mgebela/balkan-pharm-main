@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260611" />
+  <link rel="stylesheet" href="styles/app.css?v=20260612" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -92,9 +92,8 @@
       </header>
 
       <div id="view-dashboard" class="view active">
-        <div class="dashboard-cards" id="dashboard-cards"></div>
+        <div id="dashboard-metrics" class="dashboard-metrics"></div>
         <section class="dashboard-adopt-section" id="dashboard-adopt-section">
-          <h2>Adopt a plant</h2>
           <div id="dashboard-adopt-panel"></div>
         </section>
         <section class="dashboard-charts-section" id="dashboard-charts-section">
@@ -731,7 +730,8 @@
       }
     })();
   </script>
-  <script src="js/plant-token.js?v=20260611b"></script>
-  <script src="js/app.js?v=20260611"></script>
+  <script src="js/metric-ui.js?v=20260612"></script>
+  <script src="js/plant-token.js?v=20260612"></script>
+  <script src="js/app.js?v=20260612"></script>
 </body>
 </html>

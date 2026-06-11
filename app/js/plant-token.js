@@ -457,6 +457,8 @@
     }).join('');
 
     el.innerHTML =
+      '<div class="metric-panel metric-panel--adopt">' +
+      '<header class="metric-panel-head"><h2 class="metric-panel-title">Growth lifecycle</h2></header>' +
       '<div class="adopt-growth-guide-inner">' +
       '<div class="adopt-growth-guide-head">' +
       '<h3 class="adopt-growth-guide-title">How your token grows</h3>' +
@@ -478,7 +480,7 @@
       stepperHtml +
       '</div>' +
       '</div>' +
-      '</div>';
+      '</div></div>';
   }
 
   let busy = false;
@@ -488,18 +490,60 @@
     if (!el) return;
     if (!wallet.connected) {
       el.innerHTML =
-        '<div class="adopt-wallet-card adopt-wallet-card--disconnected">' +
-        '<div class="adopt-wallet-icon" aria-hidden="true">👛</div>' +
+        '<div class="metric-panel metric-panel--inline">' +
+        '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
         '<h3>Connect your wallet</h3>' +
-        '<p>Connect a (demo) wallet to import seeds and mint growth.</p>' +
+        '<p>Connect a (demo) wallet to import seeds and mint growth tokens on each stage.</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
-        '</div>';
+        '</div></div>';
       return;
     }
     const seeds = wallet.tokens.length;
     const grown = wallet.tokens.filter((t) => t.stageIndex >= GROWTH_STAGES.length - 1).length;
+    const growing = seeds - grown;
+    const growPct = seeds ? Math.round((grown / seeds) * 100) : 0;
+    const M = window.MetricUI;
+
+    if (M) {
+      el.innerHTML =
+        '<div class="metric-panel metric-panel--inline">' +
+        '<div class="metric-cards metric-cards--wallet">' +
+        M.card({
+          label: 'Wallet address',
+          value: esc(shortAddr(wallet.address)),
+          meta: M.row('Network', 'Demo · testnet', 'metric-dot--teal'),
+          modifier: 'teal',
+        }) +
+        M.card({
+          label: '$GROW balance',
+          value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
+          meta: M.row('Rewards', 'Simulated', 'metric-dot--amber'),
+          donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
+          modifier: 'amber',
+        }) +
+        M.card({
+          label: 'Plant tokens',
+          value: String(seeds),
+          meta: M.row('Growing', growing, 'metric-dot--teal') + M.row('Harvested', grown, 'metric-dot--blue'),
+          donut: { pct: growPct, color: '#2dd4bf' },
+          modifier: 'blue',
+        }) +
+        M.card({
+          label: 'Growth progress',
+          value: grown + ' / ' + seeds,
+          meta: M.row('Complete', growPct + '%', 'metric-dot--violet'),
+          donut: { pct: growPct, color: '#c79bff' },
+          modifier: 'violet',
+        }) +
+        '</div>' +
+        '<div class="adopt-wallet-actions">' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
+        '</div></div>';
+      return;
+    }
+
     el.innerHTML =
       '<div class="adopt-wallet-card">' +
       '<div class="adopt-wallet-row">' +
@@ -775,9 +819,12 @@
       if (!container) return;
       const wallet = readWallet();
       const maxStage = GROWTH_STAGES.length - 1;
+      const M = window.MetricUI;
 
       if (!wallet.connected) {
         container.innerHTML =
+          '<div class="metric-panel metric-panel--adopt">' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant</h2></header>' +
           '<div class="dashboard-adopt-panel">' +
           '<div class="dashboard-adopt-visual">' +
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
@@ -785,17 +832,36 @@
           '<div class="dashboard-adopt-copy">' +
           '<p>Connect a wallet to mint a seed token and grow it from soil to flower — each stage mints <strong>$GROW</strong>.</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
-          '</div></div>';
+          '</div></div></div>';
       } else if (!wallet.tokens.length) {
         container.innerHTML =
+          '<div class="metric-panel metric-panel--adopt">' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant</h2></header>' +
+          (M
+            ? '<div class="metric-cards metric-cards--compact">' +
+              M.card({
+                label: '$GROW balance',
+                value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
+                meta: M.row('Status', 'Wallet connected', 'metric-dot--teal'),
+                donut: { pct: 0, color: '#f59e0b' },
+                modifier: 'amber',
+              }) +
+              M.card({
+                label: 'Plant tokens',
+                value: '0',
+                meta: M.row('Next step', 'Mint a seed', 'metric-dot--blue'),
+                modifier: 'blue',
+              }) +
+              '</div>'
+            : '') +
           '<div class="dashboard-adopt-panel">' +
           '<div class="dashboard-adopt-visual">' +
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
-          '<p>Wallet connected · <strong>' + Number(wallet.growthBalance || 0) + ' $GROW</strong>. Mint your first seed to start the growth cycle.</p>' +
+          '<p>Mint your first seed to start the growth cycle and earn rewards at each stage.</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Mint a seed</button>' +
-          '</div></div>';
+          '</div></div></div>';
       } else {
         const top = wallet.tokens.reduce((best, t) => (t.stageIndex > best.stageIndex ? t : best), wallet.tokens[0]);
         const stage = GROWTH_STAGES[top.stageIndex] || GROWTH_STAGES[0];
@@ -826,6 +892,33 @@
             : '';
 
         container.innerHTML =
+          '<div class="metric-panel metric-panel--adopt">' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant · Token garden</h2></header>' +
+          (M
+            ? '<div class="metric-cards metric-cards--compact">' +
+              M.card({
+                label: '$GROW balance',
+                value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
+                meta: M.row('Top plant', esc(top.name), 'metric-dot--amber'),
+                donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
+                modifier: 'amber',
+              }) +
+              M.card({
+                label: 'Plant tokens',
+                value: String(wallet.tokens.length),
+                meta: M.row('Growing', growing, 'metric-dot--teal'),
+                donut: { pct: Math.round((growing / wallet.tokens.length) * 100), color: '#2dd4bf' },
+                modifier: 'teal',
+              }) +
+              M.card({
+                label: 'Lead grow',
+                value: pct + '%',
+                meta: M.row(esc(stage.label), esc(top.strain || '—'), 'metric-dot--violet'),
+                donut: { pct: pct, color: '#c79bff' },
+                modifier: 'violet',
+              }) +
+              '</div>'
+            : '') +
           '<div class="dashboard-adopt-panel dashboard-adopt-panel--active">' +
           '<div class="dashboard-adopt-visual">' +
           buildPlantGrowSvg(top.stageIndex, { hero: true, noBg: true }) +
@@ -833,15 +926,10 @@
           '<strong>' + esc(top.name) + '</strong>' +
           '<span>' + esc(stage.label) + ' · ' + pct + '% grown</span>' +
           '</div></div>' +
-          '<div class="dashboard-adopt-stats">' +
-          '<div class="dashboard-adopt-stat"><span class="dashboard-adopt-stat-val">' + Number(wallet.growthBalance || 0) + '</span><span>$GROW</span></div>' +
-          '<div class="dashboard-adopt-stat"><span class="dashboard-adopt-stat-val">' + wallet.tokens.length + '</span><span>Tokens</span></div>' +
-          '<div class="dashboard-adopt-stat"><span class="dashboard-adopt-stat-val">' + growing + '</span><span>Growing</span></div>' +
-          '</div>' +
           '<div class="dashboard-adopt-preview">' + preview + '</div>' +
           more +
           '<button type="button" class="btn btn-ghost" id="dashboard-adopt-open">Open token garden →</button>' +
-          '</div>';
+          '</div></div>';
       }
 
       const openBtn = document.getElementById('dashboard-adopt-open');
