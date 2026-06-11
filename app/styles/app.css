@@ -3189,8 +3189,243 @@ body:not(.app-loading) {
   pointer-events: none;
 }
 
+/* Growth lifecycle guide + plant SVG */
+.adopt-growth-guide {
+  margin-bottom: 1.5rem;
+}
+
+.adopt-growth-guide-inner {
+  padding: 1.25rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.adopt-growth-guide-head {
+  margin-bottom: 1rem;
+}
+
+.adopt-growth-guide-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.adopt-growth-guide-lede {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 58ch;
+}
+
+.adopt-growth-stages {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.adopt-growth-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.35rem 0.65rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.03);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.adopt-growth-stage--done {
+  border-color: rgba(45, 212, 191, 0.25);
+}
+
+.adopt-growth-stage--active {
+  border-color: rgba(45, 212, 191, 0.55);
+  background: rgba(13, 148, 136, 0.12);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.15);
+}
+
+.adopt-growth-stage-name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--text);
+}
+
+.adopt-growth-stage-reward {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--accent-bright);
+  text-align: center;
+}
+
+.plant-grow-svg {
+  display: block;
+  width: 100%;
+  max-width: 88px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.plant-grow-svg--compact {
+  max-width: 72px;
+}
+
+.plant-grow-svg .grow-bg {
+  fill: rgba(7, 20, 16, 0.45);
+}
+
+.plant-grow-svg .grow-pot {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 0.75;
+}
+
+.plant-grow-svg .grow-pot-rim {
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.plant-grow-svg .grow-soil {
+  stroke: rgba(92, 64, 51, 0.6);
+  stroke-width: 0.5;
+}
+
+.plant-grow-svg .grow-seed {
+  fill: #f59e0b;
+  stroke: #fcd34d;
+  stroke-width: 0.75;
+}
+
+.plant-grow-svg .grow-stem {
+  stroke: #2dd4bf;
+  stroke-linecap: round;
+  transition: y2 0.55s ease;
+}
+
+.plant-grow-svg .grow-cotyledon {
+  fill: #1a5f4a;
+  stroke: #2dd4bf;
+  stroke-width: 0.6;
+}
+
+.plant-grow-svg .grow-leaf {
+  fill: #1a5f4a;
+  stroke: #2dd4bf;
+  stroke-width: 0.55;
+  stroke-linejoin: round;
+}
+
+.plant-grow-svg .grow-bud ellipse {
+  fill: #1a5f4a;
+  stroke: #2dd4bf;
+  stroke-width: 0.75;
+}
+
+.plant-grow-svg .grow-bud path {
+  fill: none;
+  stroke: #2dd4bf;
+  stroke-width: 0.75;
+}
+
+.plant-grow-svg .grow-petal {
+  fill: rgba(45, 212, 191, 0.55);
+  stroke: #2dd4bf;
+  stroke-width: 0.5;
+}
+
+.plant-grow-svg .grow-flower-center {
+  fill: #f59e0b;
+  stroke: #fcd34d;
+  stroke-width: 0.5;
+}
+
+.plant-grow-svg .grow-label {
+  fill: rgba(255, 255, 255, 0.35);
+  font-size: 5px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.plant-grow-svg--animate .grow-stem,
+.plant-grow-svg--animate .grow-leaf-pair,
+.plant-grow-svg--animate .grow-flower,
+.plant-grow-svg--animate .grow-bud,
+.plant-grow-svg--animate .grow-seed {
+  animation: growReveal 0.65s ease both;
+}
+
+@keyframes growReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.adopt-token-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.adopt-token-visual {
+  flex-shrink: 0;
+  width: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem;
+  border-radius: 12px;
+  background: rgba(7, 20, 16, 0.55);
+  border: 1px solid var(--border);
+}
+
+.adopt-token-visual .plant-grow-svg {
+  max-width: 80px;
+}
+
+.adopt-token-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard-adopt-token-visual {
+  flex-shrink: 0;
+  width: 56px;
+}
+
+.dashboard-adopt-token-visual .plant-grow-svg {
+  max-width: 56px;
+}
+
 @media (max-width: 720px) {
   .adopt-seed-form {
     grid-template-columns: 1fr;
+  }
+
+  .adopt-growth-stages {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .adopt-token-layout {
+    flex-direction: column;
+  }
+
+  .adopt-token-visual {
+    width: 100%;
+    max-width: 120px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .adopt-growth-stages {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

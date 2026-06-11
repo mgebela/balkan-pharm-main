@@ -262,6 +262,182 @@
     return tx.slice(0, 10) + '…';
   }
 
+  // --- Plant growth SVG (seed → harvest) ----------------------------------
+  // Hand-drawn pot / soil / stem / leaves / flower — one graphic per stage.
+
+  function buildPlantGrowSvg(stageIndex, options) {
+    const opts = options || {};
+    const stage = Math.max(0, Math.min(GROWTH_STAGES.length - 1, Number(stageIndex) || 0));
+    const compact = !!opts.compact;
+    const animate = !!opts.animate;
+    const uid = 'pg' + Math.random().toString(36).slice(2, 8);
+
+    const stemTop = [118, 106, 86, 58, 34, 22][stage];
+    const stemW = stage === 0 ? 0 : Math.max(1.5, 2.8 - stage * 0.15);
+    const leafLevels = [
+      [],
+      [],
+      [{ y: 98, s: 0.72 }],
+      [
+        { y: 100, s: 0.78 },
+        { y: 82, s: 0.92 },
+      ],
+      [
+        { y: 102, s: 0.72 },
+        { y: 86, s: 0.88 },
+        { y: 68, s: 1 },
+      ],
+      [
+        { y: 102, s: 0.72 },
+        { y: 86, s: 0.88 },
+        { y: 68, s: 1 },
+      ],
+    ][stage];
+
+    const showSeed = stage === 0;
+    const showSprout = stage === 1;
+    const showBud = stage === 4;
+    const showFlower = stage >= 5;
+
+    function leafPair(y, scale) {
+      const s = scale || 1;
+      const d = 'M0 0 L-1.5 -3 L-3.5 -1.5 L-5 -5.5 L-7 -2 L-9 -6.5 L-7.5 0 Z';
+      return (
+        '<g class="grow-leaf-pair" transform="translate(50,' + y + ') scale(' + s + ')">' +
+        '<path class="grow-leaf grow-leaf--l" d="' + d + '" transform="scale(-1,1)"/>' +
+        '<path class="grow-leaf grow-leaf--r" d="' + d + '"/>' +
+        '</g>'
+      );
+    }
+
+    function sproutLeaves() {
+      return (
+        '<g class="grow-sprout-leaves" transform="translate(50,106)">' +
+        '<ellipse class="grow-cotyledon" cx="-4" cy="-2" rx="3.5" ry="6" transform="rotate(-28 -4 -2)"/>' +
+        '<ellipse class="grow-cotyledon" cx="4" cy="-2" rx="3.5" ry="6" transform="rotate(28 4 -2)"/>' +
+        '</g>'
+      );
+    }
+
+    function flowerSvg(y) {
+      let petals = '';
+      for (let i = 0; i < 5; i += 1) {
+        petals +=
+          '<ellipse class="grow-petal" cx="0" cy="-6.5" rx="2.6" ry="5.2" transform="rotate(' + i * 72 + ')"/>';
+      }
+      return (
+        '<g class="grow-flower" transform="translate(50,' + y + ')">' +
+        petals +
+        '<circle class="grow-flower-center" cx="0" cy="0" r="3"/>' +
+        '</g>'
+      );
+    }
+
+    const leavesHtml = leafLevels.map((lv) => leafPair(lv.y, lv.s)).join('');
+    const stemHtml =
+      stage > 0
+        ? '<line class="grow-stem" x1="50" y1="118" x2="50" y2="' + stemTop + '" stroke-width="' + stemW + '"/>'
+        : '';
+    const sproutHtml = showSprout ? sproutLeaves() : '';
+    const budHtml = showBud
+      ? '<g class="grow-bud" transform="translate(50,' + stemTop + ')"><ellipse cx="0" cy="-4" rx="4" ry="6"/><path d="M0 -10 Q4 -6 0 -2 Q-4 -6 0 -10" /></g>'
+      : '';
+    const flowerHtml = showFlower ? flowerSvg(stemTop) : '';
+    const seedHtml = showSeed
+      ? '<circle class="grow-seed" cx="50" cy="128" r="4"/><text class="grow-label grow-label--seed" x="50" y="142" text-anchor="middle">seed</text>'
+      : '';
+
+    const cls =
+      'plant-grow-svg plant-grow-svg--s' +
+      stage +
+      (compact ? ' plant-grow-svg--compact' : '') +
+      (animate ? ' plant-grow-svg--animate' : '');
+
+    const aria = GROWTH_STAGES[stage].label + ' stage';
+
+    return (
+      '<svg class="' +
+      cls +
+      '" viewBox="0 0 100 170" role="img" aria-label="' +
+      esc(aria) +
+      '" xmlns="http://www.w3.org/2000/svg">' +
+      '<defs>' +
+      '<linearGradient id="' +
+      uid +
+      '-pot" x1="50" y1="118" x2="50" y2="162" gradientUnits="userSpaceOnUse">' +
+      '<stop stop-color="#1a5f4a"/><stop offset="1" stop-color="#0b1f19"/>' +
+      '</linearGradient>' +
+      '<linearGradient id="' +
+      uid +
+      '-soil" x1="50" y1="118" x2="50" y2="148" gradientUnits="userSpaceOnUse">' +
+      '<stop stop-color="#5c4033"/><stop offset="1" stop-color="#3d2914"/>' +
+      '</linearGradient>' +
+      '</defs>' +
+      '<rect class="grow-bg" x="0" y="0" width="100" height="170" rx="12"/>' +
+      '<path class="grow-pot" d="M20 118 L24 160 L76 160 L80 118 Z" fill="url(#' +
+      uid +
+      '-pot)"/>' +
+      '<path class="grow-pot-rim" d="M16 118 H84"/>' +
+      '<path class="grow-soil" d="M22 118 L26 148 L74 148 L78 118 Z" fill="url(#' +
+      uid +
+      '-soil)"/>' +
+      (opts.showSoilLabel ? '<text class="grow-label grow-label--soil" x="50" y="140" text-anchor="middle">soil</text>' : '') +
+      seedHtml +
+      stemHtml +
+      sproutHtml +
+      leavesHtml +
+      budHtml +
+      flowerHtml +
+      '</svg>'
+    );
+  }
+
+  PlantToken.renderPlantSvg = buildPlantGrowSvg;
+
+  function renderGrowthGuide(activeStageIndex) {
+    const el = document.getElementById('adopt-growth-guide');
+    if (!el) return;
+    const active = activeStageIndex == null ? -1 : activeStageIndex;
+    const stagesHtml = GROWTH_STAGES.map((s, i) => {
+      const isActive = i === active;
+      const isPast = active >= 0 && i < active;
+      const cls =
+        'adopt-growth-stage' +
+        (isActive ? ' adopt-growth-stage--active' : '') +
+        (isPast ? ' adopt-growth-stage--done' : '');
+      const reward =
+        i === 0
+          ? 'Mint seed'
+          : '+' + s.reward + ' $GROW';
+      return (
+        '<div class="' +
+        cls +
+        '" data-stage="' +
+        i +
+        '">' +
+        buildPlantGrowSvg(i, { compact: true, showSoilLabel: i === 0 }) +
+        '<span class="adopt-growth-stage-name">' +
+        esc(s.label) +
+        '</span>' +
+        '<span class="adopt-growth-stage-reward">' +
+        esc(reward) +
+        '</span>' +
+        '</div>'
+      );
+    }).join('');
+
+    el.innerHTML =
+      '<div class="adopt-growth-guide-inner">' +
+      '<div class="adopt-growth-guide-head">' +
+      '<h3 class="adopt-growth-guide-title">How your token grows</h3>' +
+      '<p class="adopt-growth-guide-lede">Each mint advances the plant from seed in soil to a full flower — matching on-chain growth rewards.</p>' +
+      '</div>' +
+      '<div class="adopt-growth-stages">' +
+      stagesHtml +
+      '</div>' +
+      '</div>';
+  }
+
   let busy = false;
 
   function renderWalletPanel(wallet) {
@@ -331,9 +507,13 @@
       .join('');
 
     return (
-      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '">' +
+      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + token.stageIndex + '">' +
+      '<div class="adopt-token-layout">' +
+      '<div class="adopt-token-visual">' +
+      buildPlantGrowSvg(token.stageIndex, { compact: true, animate: true }) +
+      '</div>' +
+      '<div class="adopt-token-main">' +
       '<div class="adopt-token-head">' +
-      '<span class="adopt-token-emoji" aria-hidden="true">' + stage.emoji + '</span>' +
       '<div class="adopt-token-titles">' +
       '<h4>' + esc(token.name) + '</h4>' +
       (token.strain ? '<p class="adopt-token-strain">' + esc(token.strain) + '</p>' : '') +
@@ -353,6 +533,8 @@
         : '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn" data-id="' + esc(token.id) + '">⛏ Mint growth → ' + esc(next.label) + ' (+' + next.reward + ')</button>') +
       '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' + esc(token.id) + '">Burn</button>' +
+      '</div>' +
+      '</div>' +
       '</div>' +
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
@@ -392,6 +574,11 @@
     const wallet = readWallet();
     const seedSection = document.getElementById('adopt-seed-section');
     const gardenSection = document.getElementById('adopt-garden-section');
+    const highlightStage =
+      wallet.tokens.length > 0
+        ? Math.max.apply(null, wallet.tokens.map((t) => t.stageIndex))
+        : -1;
+    renderGrowthGuide(highlightStage);
     renderWalletPanel(wallet);
     if (seedSection) seedSection.hidden = !wallet.connected;
     if (gardenSection) gardenSection.hidden = !wallet.connected;
@@ -551,7 +738,9 @@
           const pct = Math.round((token.stageIndex / maxStage) * 100);
           return (
             '<div class="dashboard-adopt-token">' +
-            '<span class="dashboard-adopt-token-emoji" aria-hidden="true">' + stage.emoji + '</span>' +
+            '<div class="dashboard-adopt-token-visual">' +
+            buildPlantGrowSvg(token.stageIndex, { compact: true }) +
+            '</div>' +
             '<div class="dashboard-adopt-token-body">' +
             '<div class="dashboard-adopt-token-head">' +
             '<strong>' + esc(token.name) + '</strong>' +
