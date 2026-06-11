@@ -1217,7 +1217,7 @@ function initFirebaseSync() {
         } else if (initialView === 'pitchdeck' && !isSuperadminRole(currentUserRole)) {
           showView('dashboard');
         } else if (
-          ['dashboard', 'plants', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
+          ['dashboard', 'plants', 'adopt', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
         ) {
           showView(initialView);
         }
@@ -1719,41 +1719,6 @@ function initFirebaseSync() {
   }
 
   // --- Dashboard ---
-  function renderDashboardTokenCards() {
-    if (!window.PlantToken) return '';
-    const wallet = PlantToken.getWallet();
-    if (!wallet.connected) {
-      return `
-      <div class="dashboard-card dashboard-card--token">
-        <h3>$GROW balance</h3>
-        <div class="value">—</div>
-      </div>
-      <div class="dashboard-card dashboard-card--token">
-        <h3>Plant tokens</h3>
-        <div class="value">—</div>
-      </div>
-      <div class="dashboard-card dashboard-card--token">
-        <h3>Growing</h3>
-        <div class="value">—</div>
-      </div>`;
-    }
-    const maxStage = PlantToken.maxStageIndex();
-    const growing = wallet.tokens.filter((t) => t.stageIndex < maxStage).length;
-    return `
-      <div class="dashboard-card dashboard-card--token">
-        <h3>$GROW balance</h3>
-        <div class="value">${Number(wallet.growthBalance || 0)}</div>
-      </div>
-      <div class="dashboard-card dashboard-card--token">
-        <h3>Plant tokens</h3>
-        <div class="value">${wallet.tokens.length}</div>
-      </div>
-      <div class="dashboard-card dashboard-card--token">
-        <h3>Growing</h3>
-        <div class="value">${growing}</div>
-      </div>`;
-  }
-
   function renderDashboard() {
     const plants = getPlants();
     const entries = getEntries();
@@ -1774,7 +1739,6 @@ function initFirebaseSync() {
         <h3>Active stages</h3>
         <div class="value">${new Set(plants.map((p) => p.stage)).size}</div>
       </div>
-      ${renderDashboardTokenCards()}
     `;
 
     if (window.AdoptPlant && typeof window.AdoptPlant.renderDashboard === 'function') {
