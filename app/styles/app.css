@@ -3521,9 +3521,9 @@ body:not(.app-loading) {
 }
 
 .adopt-growth-feature .plant-grow-svg--hero {
-  max-width: 260px;
-  width: min(72vw, 260px);
-  filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.55));
+  max-width: 320px;
+  width: min(78vw, 320px);
+  filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.6));
 }
 
 .adopt-growth-feature-meta {
@@ -3664,11 +3664,11 @@ body:not(.app-loading) {
 }
 
 .plant-grow-svg--compact {
-  max-width: 88px;
+  max-width: 104px;
 }
 
 .plant-grow-svg--hero {
-  max-width: 280px;
+  max-width: 340px;
 }
 
 .plant-grow-svg .grow-nft-bg {
