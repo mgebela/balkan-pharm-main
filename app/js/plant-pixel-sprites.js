@@ -109,24 +109,28 @@
 
   const COTYLEDON = ['.lLgLl.', 'lLgGgLl', '.lLgLl.'];
 
+  /** Pad a sprite row to full canvas width, centered horizontally. */
+  function padCenter(row) {
+    if (row.length >= SIZE) return row.slice(0, SIZE);
+    const left = Math.floor((SIZE - row.length) / 2);
+    return '.'.repeat(left) + row + '.'.repeat(SIZE - row.length - left);
+  }
+
+  const POT_LINES = [
+    'SSSSSSSSSSSSSSSSSS',
+    'PPPPPPPPPPPPPPPPPPPP',
+    'pppppppppppppppppppp',
+    'pPPPPPPPPPPPPPPPPPPp',
+    'pPP..............PPp',
+    'pPP..............PPp',
+    'pPP..............PPp',
+    'pqqqqqqqqqqqqqqqqqqp',
+    'qqqqqqqqqqqqqqqqqqqq',
+    'qqqqqqqqqqqqqqqqqqq',
+  ].map(padCenter);
+
   function drawPot(grid) {
-    stampTemplate(
-      grid,
-      [
-        '..............SSSSSSSSSSSSSSSS..............',
-        '.............PPPPPPPPPPPPPPPPP.............',
-        '............pppppppppppppppppp............',
-        '............pPPPPPPPPPPPPPPPPp............',
-        '............pPP.............PPp............',
-        '............pPP.............PPp............',
-        '............pPP.............PPp............',
-        '............pqqqqqqqqqqqqqqqqp............',
-        '.............qqqqqqqqqqqqqqq.............',
-        '..............qqqqqqqqqqqqq..............',
-      ],
-      0,
-      POT_TOP
-    );
+    stampTemplate(grid, POT_LINES, 0, POT_TOP);
   }
 
   function drawStem(grid, y0, y1) {
@@ -141,17 +145,19 @@
 
   function leafLeft(grid, attachY, size) {
     const t = size === 'lg' ? LEAF_LG : size === 'md' ? LEAF_MD : LEAF_SM;
-    stampTemplate(grid, t, CX - t[0].length + 1, attachY - t.length + 1);
+    // Attach leaf base to left side of stem (stem center CX).
+    stampTemplate(grid, t, CX - t[0].length, attachY - t.length + 1);
   }
 
   function leafRight(grid, attachY, size) {
     const t = size === 'lg' ? LEAF_LG : size === 'md' ? LEAF_MD : LEAF_SM;
-    stampTemplate(grid, mirrorTemplate(t), CX, attachY - t.length + 1);
+    // Attach leaf base to right side of stem (stem center CX).
+    stampTemplate(grid, mirrorTemplate(t), CX + 1, attachY - t.length + 1);
   }
 
   function drawCola(grid, topY, harvest) {
     const t = harvest ? COLA_HARVEST : COLA_GREEN;
-    stampTemplate(grid, t, CX - Math.floor(t[0].length / 2), topY);
+    stampTemplate(grid, t, CX - Math.floor((t[0].length - 1) / 2), topY);
   }
 
   function drawSeed(grid) {
