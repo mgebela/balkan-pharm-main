@@ -1,0 +1,24 @@
+{
+  "name": "dnevnik-live-functions",
+  "description": "Cloud Functions for dnevnik.live (Gemini grow reports, etc.)",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions --project balpha-9dab9"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.4.0"
+  }
+}

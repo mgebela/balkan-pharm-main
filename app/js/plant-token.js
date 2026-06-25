@@ -263,7 +263,7 @@
   }
 
   // --- Plant growth SVG (seed → harvest) ----------------------------------
-  // Single pot / soil / seed / stem / jagged leaves / flower — scales by stage.
+  // Pixel-art hemp plant in a terracotta pot — one illustration per stage.
 
   let growthPreviewStage = null;
 
@@ -276,81 +276,123 @@
     const noBg = !!opts.noBg;
     const uid = 'pg' + Math.random().toString(36).slice(2, 8);
 
-    const soilY = 128;
-    const stemTop = [128, 114, 94, 68, 42, 28][stage];
-    const stemW = stage === 0 ? 0 : Math.max(2, 3.2 - stage * 0.2);
+    function px(x, y, w, h, fill, stroke) {
+      const s = stroke ? ' stroke="' + stroke + '" stroke-width="1"' : '';
+      return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" fill="' + fill + '"' + s + '/>';
+    }
 
-    const leafLevels = [
-      [],
-      [],
-      [{ y: 104, s: 0.85 }],
-      [
-        { y: 106, s: 0.88 },
-        { y: 86, s: 1 },
-      ],
-      [
-        { y: 108, s: 0.82 },
-        { y: 92, s: 0.95 },
-        { y: 72, s: 1.05 },
-      ],
-      [
-        { y: 108, s: 0.82 },
-        { y: 92, s: 0.95 },
-        { y: 72, s: 1.05 },
-      ],
-    ][stage];
-
-    function leafPair(y, scale) {
-      const s = scale || 1;
-      const d = 'M0 0 L2 -5 L3.5 -2 L5.5 -9 L7.5 -3 L9.5 -8 L8 0 Z';
+    function fanLeaf(cx, cy, scale, rot, tone) {
+      const s = scale;
+      const fill = tone === 'light' ? '#8fd46a' : tone === 'mid' ? '#5cb848' : '#2f7a3a';
+      const stroke = '#1a3d24';
+      const d =
+        'M' + cx + ' ' + cy +
+        ' L' + (cx - 9 * s) + ' ' + (cy - 3 * s) +
+        ' L' + (cx - 11 * s) + ' ' + (cy - 11 * s) +
+        ' L' + (cx - 5 * s) + ' ' + (cy - 16 * s) +
+        ' L' + cx + ' ' + (cy - 24 * s) +
+        ' L' + (cx + 5 * s) + ' ' + (cy - 16 * s) +
+        ' L' + (cx + 11 * s) + ' ' + (cy - 11 * s) +
+        ' L' + (cx + 9 * s) + ' ' + (cy - 3 * s) + ' Z';
       return (
-        '<g class="grow-leaf-pair" transform="translate(50,' + y + ') scale(' + s + ')">' +
-        '<path class="grow-leaf" d="' + d + '" transform="scale(-1,1)"/>' +
-        '<path class="grow-leaf" d="' + d + '"/>' +
+        '<path class="grow-leaf" d="' + d + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="0.9" stroke-linejoin="round"' +
+        (rot ? ' transform="rotate(' + rot + ' ' + cx + ' ' + cy + ')"' : '') +
+        '/>'
+      );
+    }
+
+    function leafPair(y, scale, spread) {
+      const sp = spread || 0;
+      return fanLeaf(60 - sp, y, scale, -18, 'dark') + fanLeaf(60 + sp, y, scale, 18, 'dark');
+    }
+
+    function potAndSoil() {
+      return (
+        '<g class="grow-pot-group">' +
+        px(34, 142, 52, 6, '#a85a2a') +
+        px(30, 148, 60, 22, '#c46a32', '#8b4513') +
+        px(34, 148, 8, 22, '#e08848') +
+        px(78, 148, 8, 22, '#7a3e1c') +
+        px(28, 140, 64, 6, '#d4844a', '#8b4513') +
+        px(32, 134, 56, 8, '#3d2914') +
+        px(34, 136, 52, 4, '#5c3d28') +
         '</g>'
       );
     }
 
-    function sproutLeaves() {
+    function seedBody() {
       return (
-        '<g class="grow-sprout-leaves" transform="translate(50,112)">' +
-        '<path class="grow-leaf" d="M0 0 L1.5 -5 L3 -2 L4.5 -7 L3 0 Z" transform="scale(-1,1)"/>' +
-        '<path class="grow-leaf" d="M0 0 L1.5 -5 L3 -2 L4.5 -7 L3 0 Z"/>' +
+        '<g class="grow-seed-group">' +
+        '<ellipse class="grow-seed" cx="60" cy="138" rx="5" ry="3.2" fill="#8b5a2b" stroke="#c49a6c" stroke-width="0.8"/>' +
+        px(57, 136, 4, 2, '#d4a574') +
         '</g>'
       );
     }
 
-    function flowerSvg(y) {
-      let petals = '';
-      for (let i = 0; i < 6; i += 1) {
-        petals +=
-          '<ellipse class="grow-petal" cx="0" cy="-7" rx="2.8" ry="5.5" transform="rotate(' + i * 60 + ')"/>';
+    function stagePlant() {
+      switch (stage) {
+        case 0:
+          return seedBody();
+        case 1:
+          return (
+            seedBody() +
+            '<path class="grow-sprout" d="M60 136 Q58 128 62 122 Q64 118 60 114" fill="none" stroke="#6ecf4a" stroke-width="2.5" stroke-linecap="round"/>' +
+            fanLeaf(60, 114, 0.42, 0, 'light')
+          );
+        case 2:
+          return (
+            '<line class="grow-stem" x1="60" y1="134" x2="60" y2="108" stroke="#3d8f45" stroke-width="2.5" stroke-linecap="round"/>' +
+            '<ellipse class="grow-cotyledon" cx="54" cy="110" rx="5" ry="3" fill="#6ecf4a" stroke="#2f7a3a" stroke-width="0.7" transform="rotate(-25 54 110)"/>' +
+            '<ellipse class="grow-cotyledon" cx="66" cy="110" rx="5" ry="3" fill="#6ecf4a" stroke="#2f7a3a" stroke-width="0.7" transform="rotate(25 66 110)"/>' +
+            fanLeaf(60, 104, 0.55, 0, 'mid')
+          );
+        case 3:
+          return (
+            '<line class="grow-stem" x1="60" y1="134" x2="60" y2="72" stroke="#3d8f45" stroke-width="3" stroke-linecap="round"/>' +
+            leafPair(118, 0.72, 2) +
+            leafPair(100, 0.82, 1) +
+            leafPair(84, 0.9, 0) +
+            fanLeaf(60, 74, 0.65, 0, 'mid')
+          );
+        case 4:
+          return (
+            '<line class="grow-stem" x1="60" y1="134" x2="60" y2="58" stroke="#3d8f45" stroke-width="3" stroke-linecap="round"/>' +
+            leafPair(118, 0.78, 3) +
+            leafPair(102, 0.88, 2) +
+            leafPair(86, 0.95, 1) +
+            '<g class="grow-bud">' +
+            fanLeaf(60, 68, 0.7, 0, 'mid') +
+            fanLeaf(52, 58, 0.55, -12, 'light') +
+            fanLeaf(68, 58, 0.55, 12, 'light') +
+            fanLeaf(60, 48, 0.62, 0, 'light') +
+            px(54, 42, 12, 10, '#b8e86a', '#6ba83a') +
+            px(56, 38, 8, 6, '#d4f080') +
+            '</g>'
+          );
+        case 5:
+        default:
+          return (
+            '<line class="grow-stem" x1="60" y1="134" x2="60" y2="52" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round"/>' +
+            leafPair(118, 0.8, 3) +
+            leafPair(100, 0.9, 2) +
+            leafPair(82, 0.98, 1) +
+            '<g class="grow-harvest-cola">' +
+            fanLeaf(48, 62, 0.6, -14, 'mid') +
+            fanLeaf(72, 62, 0.6, 14, 'mid') +
+            fanLeaf(60, 54, 0.72, 0, 'light') +
+            '</g>' +
+            '<g class="grow-flower" transform="translate(60,42)">' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(0)"/>' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(60)"/>' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(120)"/>' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(180)"/>' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(240)"/>' +
+            '<ellipse class="grow-petal" cx="0" cy="-8" rx="3.2" ry="6" fill="rgba(45,212,191,0.65)" stroke="#2dd4bf" stroke-width="0.6" transform="rotate(300)"/>' +
+            '<circle class="grow-flower-center" cx="0" cy="0" r="4" fill="#f59e0b" stroke="#fcd34d" stroke-width="0.6"/>' +
+            '</g>'
+          );
       }
-      return (
-        '<g class="grow-flower" transform="translate(50,' + y + ')">' +
-        petals +
-        '<circle class="grow-flower-center" cx="0" cy="0" r="3.5"/>' +
-        '</g>'
-      );
     }
-
-    const leavesHtml = leafLevels.map((lv) => leafPair(lv.y, lv.s)).join('');
-    const stemHtml =
-      stage > 0
-        ? '<line class="grow-stem" x1="50" y1="' + soilY + '" x2="50" y2="' + stemTop + '" stroke-width="' + stemW + '"/>'
-        : '';
-    const sproutHtml = stage === 1 ? sproutLeaves() : '';
-    const budHtml =
-      stage === 4
-        ? '<g class="grow-bud" transform="translate(50,' + stemTop + ')"><ellipse cx="0" cy="-5" rx="4.5" ry="7"/><path d="M0 -12 Q5 -7 0 -3 Q-5 -7 0 -12"/></g>'
-        : '';
-    const flowerHtml = stage >= 5 ? flowerSvg(stemTop) : '';
-    const seedHtml =
-      stage === 0
-        ? '<circle class="grow-seed" cx="50" cy="136" r="4.5"/>'
-        : stage === 1
-          ? '<circle class="grow-seed grow-seed--buried" cx="50" cy="132" r="3" opacity="0.55"/>'
-          : '';
 
     const cls =
       'plant-grow-svg plant-grow-svg--s' +
@@ -361,48 +403,23 @@
 
     const bgHtml = noBg
       ? ''
-      : '<rect class="grow-bg" x="0" y="0" width="100" height="176" rx="14"/>';
+      : '<rect class="grow-bg" x="0" y="0" width="120" height="180" rx="14"/>';
 
     return (
       '<svg class="' +
       cls +
-      '" viewBox="0 0 100 176" role="img" aria-label="' +
+      '" viewBox="0 0 120 180" role="img" aria-label="' +
       esc(GROWTH_STAGES[stage].label + ' stage') +
       '" xmlns="http://www.w3.org/2000/svg">' +
       '<defs>' +
-      '<linearGradient id="' +
-      uid +
-      '-pot" x1="50" y1="128" x2="50" y2="168" gradientUnits="userSpaceOnUse">' +
-      '<stop stop-color="#245a47"/><stop offset="1" stop-color="#0b1f19"/>' +
+      '<linearGradient id="' + uid + '-bg" x1="60" y1="0" x2="60" y2="180" gradientUnits="userSpaceOnUse">' +
+      '<stop stop-color="rgba(12,28,24,0.35)"/><stop offset="1" stop-color="rgba(7,16,14,0.15)"/>' +
       '</linearGradient>' +
-      '<linearGradient id="' +
-      uid +
-      '-soil" x1="50" y1="128" x2="50" y2="152" gradientUnits="userSpaceOnUse">' +
-      '<stop stop-color="#6b4a32"/><stop offset="1" stop-color="#3d2914"/>' +
-      '</linearGradient>' +
-      '<pattern id="' +
-      uid +
-      '-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">' +
-      '<line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>' +
-      '</pattern>' +
       '</defs>' +
       bgHtml +
-      '<path class="grow-pot" d="M16 128 L20 168 L80 168 L84 128 Z" fill="url(#' +
-      uid +
-      '-pot)"/>' +
-      '<path class="grow-pot-rim" d="M12 128 H88"/>' +
-      '<path class="grow-soil" d="M20 128 L24 154 L76 154 L80 128 Z" fill="url(#' +
-      uid +
-      '-soil)"/>' +
-      '<path class="grow-soil-hatch" d="M20 128 L24 154 L76 154 L80 128 Z" fill="url(#' +
-      uid +
-      '-hatch)" opacity="0.55"/>' +
-      seedHtml +
-      stemHtml +
-      sproutHtml +
-      leavesHtml +
-      budHtml +
-      flowerHtml +
+      (!noBg ? '<rect class="grow-scene" x="0" y="0" width="120" height="180" fill="url(#' + uid + '-bg)"/>' : '') +
+      potAndSoil() +
+      stagePlant() +
       '</svg>'
     );
   }
@@ -460,10 +477,6 @@
       '<div class="metric-panel metric-panel--adopt">' +
       '<header class="metric-panel-head"><h2 class="metric-panel-title">Growth lifecycle</h2></header>' +
       '<div class="adopt-growth-guide-inner">' +
-      '<div class="adopt-growth-guide-head">' +
-      '<h3 class="adopt-growth-guide-title">How your token grows</h3>' +
-      '<p class="adopt-growth-guide-lede">Seed in soil → stem and leaves → flower. Each stage is one mint on the demo chain.</p>' +
-      '</div>' +
       '<div class="adopt-growth-showcase">' +
       '<div class="adopt-growth-feature">' +
       buildPlantGrowSvg(preview, { hero: true, animate: true }) +

@@ -3499,31 +3499,10 @@ body:not(.app-loading) {
   border-radius: 0;
 }
 
-.adopt-growth-guide-head {
-  margin-bottom: 1rem;
-}
-
-.adopt-growth-guide-title {
-  margin: 0 0 0.35rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.adopt-growth-guide-lede {
-  margin: 0;
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  max-width: 58ch;
-}
-
-.adopt-growth-stages {
-  display: none;
-}
-
 .adopt-growth-showcase {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) 1fr;
-  gap: 1.25rem;
+  grid-template-columns: minmax(200px, 260px) 1fr;
+  gap: 1rem;
   align-items: stretch;
 }
 
@@ -3532,14 +3511,15 @@ body:not(.app-loading) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1rem 0.75rem;
+  padding: 1.35rem 1rem 1.5rem;
   border-radius: 14px;
   background: rgba(7, 20, 16, 0.55);
   border: 1px solid var(--border);
+  min-height: 100%;
 }
 
 .adopt-growth-feature .plant-grow-svg--hero {
-  max-width: 180px;
+  max-width: 200px;
   width: 100%;
 }
 
@@ -3547,73 +3527,82 @@ body:not(.app-loading) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  margin-top: 0.65rem;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
   text-align: center;
 }
 
 .adopt-growth-feature-stage {
-  font-size: 0.95rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--accent-bright);
+  letter-spacing: -0.01em;
 }
 
 .adopt-growth-feature-hint {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
-  max-width: 18ch;
+  max-width: 22ch;
+  line-height: 1.35;
 }
 
 .adopt-growth-stepper {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.15rem;
 }
 
 .adopt-growth-step {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.15rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 10px;
-  border: 1px solid var(--border);
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 4.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(45, 212, 191, 0.18);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text);
   font-family: var(--font);
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .adopt-growth-step:hover {
-  border-color: rgba(45, 212, 191, 0.35);
+  border-color: rgba(45, 212, 191, 0.38);
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .adopt-growth-step--done {
-  border-color: rgba(45, 212, 191, 0.22);
+  border-color: rgba(45, 212, 191, 0.28);
 }
 
 .adopt-growth-step--active {
-  border-color: rgba(45, 212, 191, 0.55);
-  background: rgba(13, 148, 136, 0.14);
-  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.62);
+  background: rgba(13, 148, 136, 0.12);
+  box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.14);
 }
 
 .adopt-growth-step-num {
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-family: var(--font-mono);
+  font-weight: 600;
   color: var(--accent-bright);
 }
 
 .adopt-growth-step-name {
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .adopt-growth-step-reward {
-  font-size: 0.68rem;
+  font-size: 0.78rem;
   font-family: var(--font-mono);
   color: var(--text-muted);
 }
@@ -3657,86 +3646,57 @@ body:not(.app-loading) {
 .plant-grow-svg {
   display: block;
   width: 100%;
-  max-width: 96px;
+  max-width: 110px;
   height: auto;
   margin: 0 auto;
 }
 
 .plant-grow-svg--compact {
-  max-width: 72px;
+  max-width: 80px;
 }
 
 .plant-grow-svg--hero {
-  max-width: 200px;
+  max-width: 220px;
 }
 
 .plant-grow-svg .grow-bg {
   fill: rgba(7, 20, 16, 0.45);
 }
 
-.plant-grow-svg .grow-pot {
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 0.75;
+.plant-grow-svg .grow-scene {
+  pointer-events: none;
 }
 
-.plant-grow-svg .grow-pot-rim {
-  stroke: rgba(255, 255, 255, 0.22);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-}
-
-.plant-grow-svg .grow-soil {
-  stroke: rgba(92, 64, 51, 0.6);
-  stroke-width: 0.5;
+.plant-grow-svg .grow-pot-group rect {
+  shape-rendering: crispEdges;
 }
 
 .plant-grow-svg .grow-seed {
-  fill: #f59e0b;
-  stroke: #fcd34d;
-  stroke-width: 0.75;
+  fill: #8b5a2b;
+  stroke: #c49a6c;
 }
 
 .plant-grow-svg .grow-stem {
-  stroke: #2dd4bf;
   stroke-linecap: round;
-  transition: y2 0.55s ease;
-}
-
-.plant-grow-svg .grow-cotyledon {
-  fill: #1a5f4a;
-  stroke: #2dd4bf;
-  stroke-width: 0.6;
 }
 
 .plant-grow-svg .grow-leaf {
-  fill: #1a5f4a;
-  stroke: #2dd4bf;
-  stroke-width: 0.55;
   stroke-linejoin: round;
 }
 
-.plant-grow-svg .grow-bud ellipse {
-  fill: #1a5f4a;
-  stroke: #2dd4bf;
-  stroke-width: 0.75;
-}
-
-.plant-grow-svg .grow-bud path {
-  fill: none;
-  stroke: #2dd4bf;
-  stroke-width: 0.75;
+.plant-grow-svg .grow-cotyledon {
+  fill: #6ecf4a;
+  stroke: #2f7a3a;
 }
 
 .plant-grow-svg .grow-petal {
-  fill: rgba(45, 212, 191, 0.55);
+  fill: rgba(45, 212, 191, 0.65);
   stroke: #2dd4bf;
-  stroke-width: 0.5;
 }
 
 .plant-grow-svg .grow-flower-center {
   fill: #f59e0b;
   stroke: #fcd34d;
-  stroke-width: 0.5;
 }
 
 .plant-grow-svg .grow-label {
@@ -3837,16 +3797,10 @@ body:not(.app-loading) {
   }
 
   .adopt-growth-stepper {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-height: none;
   }
 
   .dashboard-adopt-panel {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .adopt-growth-stepper {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

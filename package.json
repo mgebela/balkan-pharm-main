@@ -4,6 +4,8 @@
   "scripts": {
     "firebase:login": "firebase login",
     "deploy:firestore-rules": "firebase deploy --only firestore:rules --project balpha-9dab9",
+    "deploy:functions": "firebase deploy --only functions --project balpha-9dab9",
+    "functions:install": "npm install --prefix functions",
     "pdf:investor": "python3 docs/generate_investor_pdf.py"
   },
   "devDependencies": {
