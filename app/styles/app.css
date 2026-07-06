@@ -722,8 +722,20 @@ body {
 
 .adopt-wallet-actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 0.75rem;
   margin-top: 0.65rem;
+}
+
+.adopt-wallet-explorer {
+  font-size: 0.78rem;
+  color: var(--accent-bright);
+  text-decoration: none;
+}
+
+.adopt-wallet-explorer:hover {
+  text-decoration: underline;
 }
 
 .dashboard-adopt-section {

@@ -147,24 +147,31 @@
     },
 
     connect() {
-      return chainCall(() => {
+      return (async function () {
+        const SW = window.SolanaWallet;
+        if (!SW) throw new Error('Solana wallet module failed to load. Refresh the page and try again.');
+        const address = await SW.connect();
         const wallet = readWallet();
-        if (!wallet.connected) {
-          wallet.connected = true;
-          wallet.address = wallet.address || mockAddress();
-          writeWallet(wallet);
-        }
+        wallet.connected = true;
+        wallet.address = address;
+        wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
+        wallet.provider = 'solflare';
+        writeWallet(wallet);
         return wallet;
-      }, 600);
+      })();
     },
 
     disconnect() {
-      return chainCall(() => {
+      return (async function () {
+        const SW = window.SolanaWallet;
+        if (SW) await SW.disconnect();
         const wallet = readWallet();
         wallet.connected = false;
+        wallet.address = '';
+        wallet.provider = '';
         writeWallet(wallet);
         return wallet;
-      }, 200);
+      })();
     },
 
     // Mint a new seed token into the wallet.
@@ -346,6 +353,31 @@
       '</div></div>';
   }
 
+  function networkLabel() {
+    return (window.ChainConfig && window.ChainConfig.networkLabel) || 'Solana · devnet';
+  }
+
+  function explorerAddressUrl(address) {
+    if (window.ChainConfig && typeof window.ChainConfig.explorerAddress === 'function') {
+      return window.ChainConfig.explorerAddress(address);
+    }
+    return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
+  }
+
+  function syncWalletFromSolana() {
+    const SW = window.SolanaWallet;
+    if (!SW || !SW.isConnected()) return readWallet();
+    const wallet = readWallet();
+    const address = SW.getPublicKey();
+    if (!address) return wallet;
+    wallet.connected = true;
+    wallet.address = address;
+    wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
+    wallet.provider = SW.getProviderName() || 'solflare';
+    writeWallet(wallet);
+    return wallet;
+  }
+
   let busy = false;
 
   function renderWalletPanel(wallet) {
@@ -356,10 +388,10 @@
         '<div class="metric-panel metric-panel--inline">' +
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
-        '<h3>Connect your wallet</h3>' +
-        '<p>Connect a (demo) wallet to import seeds and mint growth tokens on each stage.</p>' +
+        '<h3>Connect Solflare</h3>' +
+        '<p>Connect your Solflare wallet on Solana devnet. Seed minting and $GROW rewards are still simulated until on-chain deploy (M2).</p>' +
         '</div>' +
-        '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
+        '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect Solflare</button>' +
         '</div></div>';
       return;
     }
@@ -369,6 +401,13 @@
     const growPct = seeds ? Math.round((grown / seeds) * 100) : 0;
     const M = window.MetricUI;
 
+    const addrLink =
+      wallet.address
+        ? '<a class="adopt-wallet-explorer" href="' +
+          esc(explorerAddressUrl(wallet.address)) +
+          '" target="_blank" rel="noopener noreferrer" title="View on Solscan">Solscan ↗</a>'
+        : '';
+
     if (M) {
       el.innerHTML =
         '<div class="metric-panel metric-panel--inline">' +
@@ -376,7 +415,7 @@
         M.card({
           label: 'Wallet address',
           value: esc(shortAddr(wallet.address)),
-          meta: M.row('Network', 'Demo · testnet', 'metric-dot--teal'),
+          meta: M.row('Network', esc(networkLabel()), 'metric-dot--teal'),
           modifier: 'teal',
         }) +
         M.card({
@@ -402,6 +441,7 @@
         }) +
         '</div>' +
         '<div class="adopt-wallet-actions">' +
+        addrLink +
         '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
         '</div></div>';
       return;
@@ -519,6 +559,7 @@
   }
 
   function render() {
+    syncWalletFromSolana();
     const wallet = readWallet();
     const seedSection = document.getElementById('adopt-seed-section');
     const gardenSection = document.getElementById('adopt-garden-section');
@@ -541,6 +582,12 @@
 
   function flashError(err) {
     const msg = (err && err.message) || 'Something went wrong.';
+    if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
+      if (confirm(msg + '\n\nOpen Solflare download page?')) {
+        window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
+      }
+      return;
+    }
     alert(msg);
   }
 
@@ -675,11 +722,24 @@
   window.AdoptPlant = {
     render() {
       bindEvents();
+      const SW = window.SolanaWallet;
+      if (SW && typeof SW.tryRestore === 'function') {
+        SW.tryRestore()
+          .then(function () {
+            syncWalletFromSolana();
+            render();
+          })
+          .catch(function () {
+            render();
+          });
+        return;
+      }
       render();
     },
 
     renderDashboard(container, onOpen) {
       if (!container) return;
+      syncWalletFromSolana();
       const wallet = readWallet();
       const maxStage = GROWTH_STAGES.length - 1;
       const M = window.MetricUI;
@@ -693,7 +753,7 @@
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
-          '<p>Connect a wallet to mint a seed token and grow it from soil to flower — each stage mints <strong>$GROW</strong>.</p>' +
+          '<p>Connect Solflare on Solana devnet to adopt a seed and grow it through each stage — minting <strong>$GROW</strong> rewards (simulated until M2).</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
@@ -705,7 +765,7 @@
               M.card({
                 label: '$GROW balance',
                 value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
-                meta: M.row('Status', 'Wallet connected', 'metric-dot--teal'),
+                meta: M.row('Wallet', esc(shortAddr(wallet.address)), 'metric-dot--teal'),
                 donut: { pct: 0, color: '#f59e0b' },
                 modifier: 'amber',
               }) +

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260625e" />
+  <link rel="stylesheet" href="styles/app.css?v=20260706" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -182,12 +182,12 @@
             <h2>Adopt a plant</h2>
             <p>Bring a seed into your wallet as a token and watch it grow. Every growth stage you reach mints new <strong>$GROW</strong> tokens.</p>
           </div>
-          <span class="adopt-chain-badge">⛓ Demo chain · testnet</span>
+          <span class="adopt-chain-badge">◎ Solana · devnet · Solflare</span>
         </section>
 
         <div class="adopt-notice" id="adopt-notice">
           <span class="adopt-notice-icon" aria-hidden="true">🛈</span>
-          <p><strong>Simulation:</strong> the crypto layer is a local mock (wallet, seeds and minting are stored on this device). On-chain infrastructure will be connected later — the interface is already built for it.</p>
+          <p><strong>Devnet:</strong> Solflare connects to Solana devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.</p>
         </div>
 
         <section class="adopt-growth-guide" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
@@ -730,9 +730,11 @@
       }
     })();
   </script>
-  <script src="js/metric-ui.js?v=20260625e"></script>
-  <script src="js/plant-pixel-sprites.js?v=20260625e"></script>
-  <script src="js/plant-token.js?v=20260625e"></script>
-  <script src="js/app.js?v=20260625e"></script>
+  <script src="js/chain-config.js?v=20260706"></script>
+  <script src="js/solana-wallet.js?v=20260706"></script>
+  <script src="js/metric-ui.js?v=20260706"></script>
+  <script src="js/plant-pixel-sprites.js?v=20260706"></script>
+  <script src="js/plant-token.js?v=20260706"></script>
+  <script src="js/app.js?v=20260706"></script>
 </body>
 </html>
