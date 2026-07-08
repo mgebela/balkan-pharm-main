@@ -1182,6 +1182,15 @@ function initFirebaseSync() {
           }
         });
       }
+      if (window.PlantToken && typeof PlantToken.onChange === 'function') {
+        PlantToken.onChange(function () {
+          try {
+            renderDashboard();
+          } catch {
+            // ignore
+          }
+        });
+      }
       currentUserRole = await getCurrentUserRole(user);
       await recordUserLogin(user, currentUserRole);
       applyRoleUI(currentUserRole);
@@ -1421,6 +1430,9 @@ function initFirebaseSync() {
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
+    }
+    if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+      window.AdoptPlant.renderGlobalWalletUI();
     }
   }
 

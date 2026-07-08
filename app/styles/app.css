@@ -494,6 +494,101 @@ body {
   margin-bottom: 1.5rem;
 }
 
+.main-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.app-wallet-bar {
+  display: flex;
+  align-items: center;
+}
+
+.wallet-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.wallet-controls--compact {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wallet-controls--panel {
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 1.25rem;
+}
+
+.wallet-controls-copy h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.wallet-controls-copy p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wallet-controls-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wallet-controls-addr {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.82rem;
+}
+
+.wallet-controls-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.wallet-controls-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.wallet-link-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.wallet-link-badge--ok {
+  color: #2dd4bf;
+  background: rgba(45, 212, 191, 0.12);
+}
+
+.wallet-link-badge--muted {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-wallet-section {
+  margin-bottom: 1.25rem;
+}
+
 .view-title {
   font-size: 1.5rem;
   font-weight: 600;

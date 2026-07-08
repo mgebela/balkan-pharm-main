@@ -612,12 +612,148 @@
   function flashError(err) {
     const msg = (err && err.message) || 'Something went wrong.';
     if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
-      if (confirm(msg + '\n\nOpen Solflare download page?')) {
+      const hint =
+        msg +
+        '\n\nIf Solflare is installed, open the extension, unlock it, allow dnevnik.live, then refresh this page.';
+      if (confirm(hint + '\n\nOpen Solflare download page?')) {
         window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
       }
       return;
     }
     alert(msg);
+  }
+
+  async function handleWalletConnect(btn) {
+    if (busy) return;
+    setBusy(true);
+    const original = btn ? btn.textContent : '';
+    if (btn) btn.textContent = 'Connecting…';
+    try {
+      await PlantToken.connect();
+      render();
+      renderGlobalWalletUI();
+    } catch (err) {
+      flashError(err);
+    } finally {
+      if (btn) btn.textContent = original || 'Connect Solflare';
+      setBusy(false);
+    }
+  }
+
+  async function handleWalletDisconnect(btn) {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await PlantToken.disconnect();
+      render();
+      renderGlobalWalletUI();
+    } catch (err) {
+      flashError(err);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function walletLinkBadgeHtml() {
+    const WL = window.WalletLink;
+    if (!WL) return '';
+    const profile = WL.getProfile();
+    if (!profile.solanaPubkey) return '<span class="wallet-link-badge wallet-link-badge--muted">Not linked</span>';
+    const wallet = readWallet();
+    if (wallet.connected && wallet.address === profile.solanaPubkey) {
+      return '<span class="wallet-link-badge wallet-link-badge--ok">Account linked</span>';
+    }
+    return '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' + esc(shortAddr(profile.solanaPubkey)) + '</span>';
+  }
+
+  function walletControlsHtml(variant) {
+    syncWalletFromSolana();
+    const wallet = readWallet();
+    const compact = variant === 'compact';
+
+    if (!wallet.connected) {
+      if (compact) {
+        return (
+          '<div class="wallet-controls wallet-controls--compact">' +
+          '<span class="wallet-controls-label">Solana</span>' +
+          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect Solflare</button>' +
+          '</div>'
+        );
+      }
+      return (
+        '<div class="wallet-controls wallet-controls--panel">' +
+        '<div class="wallet-controls-copy">' +
+        '<h3>Connect Solflare</h3>' +
+        '<p>' + esc(devnetNotice()) + '</p>' +
+        walletLinkBadgeHtml() +
+        '</div>' +
+        '<button type="button" class="btn btn-primary wallet-connect-btn">Connect Solflare</button>' +
+        '</div>'
+      );
+    }
+
+    const explorer =
+      wallet.address
+        ? '<a class="adopt-wallet-explorer wallet-explorer-link" href="' +
+          esc(explorerAddressUrl(wallet.address)) +
+          '" target="_blank" rel="noopener noreferrer" title="View on Solscan">Solscan ↗</a>'
+        : '';
+
+    if (compact) {
+      return (
+        '<div class="wallet-controls wallet-controls--compact wallet-controls--connected">' +
+        '<span class="wallet-controls-addr" title="' + esc(wallet.address) + '">' + esc(shortAddr(wallet.address)) + '</span>' +
+        walletLinkBadgeHtml() +
+        explorer +
+        '<button type="button" class="btn btn-ghost btn-sm wallet-disconnect-btn">Disconnect</button>' +
+        '</div>'
+      );
+    }
+
+    return (
+      '<div class="wallet-controls wallet-controls--panel wallet-controls--connected">' +
+      '<div class="wallet-controls-copy">' +
+      '<h3>Solana wallet</h3>' +
+      '<p class="wallet-controls-addr" title="' + esc(wallet.address) + '">' + esc(wallet.address) + '</p>' +
+      '<p class="wallet-controls-meta">Network: ' + esc(networkLabel()) + '</p>' +
+      walletLinkBadgeHtml() +
+      linkStatusHtml(wallet) +
+      '</div>' +
+      '<div class="wallet-controls-actions">' +
+      explorer +
+      '<button type="button" class="btn btn-ghost wallet-disconnect-btn">Disconnect wallet</button>' +
+      '</div></div>'
+    );
+  }
+
+  function renderGlobalWalletUI() {
+    const headerBar = document.getElementById('app-wallet-bar');
+    if (headerBar) headerBar.innerHTML = walletControlsHtml('compact');
+
+    const adminPanel = document.getElementById('admin-wallet-panel');
+    if (adminPanel) adminPanel.innerHTML = walletControlsHtml('panel');
+  }
+
+  function bindGlobalWalletControls() {
+    if (document.body.dataset.walletBound === '1') return;
+    document.body.dataset.walletBound = '1';
+
+    document.addEventListener('click', async function (e) {
+      const connectBtn = e.target.closest('.wallet-connect-btn');
+      const disconnectBtn = e.target.closest('.wallet-disconnect-btn');
+      if (!connectBtn && !disconnectBtn) return;
+      if (connectBtn && connectBtn.id === 'adopt-connect-btn') return;
+      if (disconnectBtn && disconnectBtn.id === 'adopt-disconnect-btn') return;
+
+      e.preventDefault();
+      if (connectBtn) {
+        await handleWalletConnect(connectBtn);
+        return;
+      }
+      if (disconnectBtn) {
+        await handleWalletDisconnect(disconnectBtn);
+      }
+    });
   }
 
   function bindEvents() {
@@ -646,31 +782,12 @@
       }
 
       if (connectBtn) {
-        if (busy) return;
-        setBusy(true);
-        connectBtn.textContent = 'Connecting…';
-        try {
-          await PlantToken.connect();
-          render();
-        } catch (err) {
-          flashError(err);
-        } finally {
-          setBusy(false);
-        }
+        await handleWalletConnect(connectBtn);
         return;
       }
 
       if (disconnectBtn) {
-        if (busy) return;
-        setBusy(true);
-        try {
-          await PlantToken.disconnect();
-          render();
-        } catch (err) {
-          flashError(err);
-        } finally {
-          setBusy(false);
-        }
+        await handleWalletDisconnect(disconnectBtn);
         return;
       }
 
@@ -750,6 +867,7 @@
 
   window.AdoptPlant = {
     render() {
+      bindGlobalWalletControls();
       bindEvents();
       const SW = window.SolanaWallet;
       if (SW && typeof SW.tryRestore === 'function') {
@@ -769,14 +887,19 @@
               }
             }
             render();
+            renderGlobalWalletUI();
           })
           .catch(function () {
             render();
+            renderGlobalWalletUI();
           });
         return;
       }
       render();
+      renderGlobalWalletUI();
     },
+
+    renderGlobalWalletUI: renderGlobalWalletUI,
 
     renderDashboard(container, onOpen) {
       if (!container) return;
@@ -796,6 +919,7 @@
           '<div class="dashboard-adopt-copy">' +
           '<p>' + esc(devnetNotice()) + '</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
+          '<button type="button" class="btn btn-ghost wallet-connect-btn">Connect Solflare</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
         container.innerHTML =
@@ -898,6 +1022,18 @@
 
       const openBtn = document.getElementById('dashboard-adopt-open');
       if (openBtn && typeof onOpen === 'function') openBtn.addEventListener('click', onOpen);
+      renderGlobalWalletUI();
     },
   };
+
+  bindGlobalWalletControls();
+  PlantToken.onChange(renderGlobalWalletUI);
+  if (window.WalletLink && typeof window.WalletLink.onChange === 'function') {
+    window.WalletLink.onChange(renderGlobalWalletUI);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderGlobalWalletUI);
+  } else {
+    renderGlobalWalletUI();
+  }
 })();

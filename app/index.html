@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260708" />
+  <link rel="stylesheet" href="styles/app.css?v=20260708c" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -88,7 +88,10 @@
     <main class="main">
       <header class="main-header">
         <h1 class="view-title">Dashboard</h1>
-        <button type="button" class="btn btn-ghost" id="btn-logout">Log out</button>
+        <div class="main-header-actions">
+          <div id="app-wallet-bar" class="app-wallet-bar" aria-live="polite"></div>
+          <button type="button" class="btn btn-ghost" id="btn-logout">Log out</button>
+        </div>
       </header>
 
       <div id="view-dashboard" class="view active">
@@ -437,6 +440,10 @@
       <div id="view-admin" class="view">
   <h2 class="section-heading">Admin Panel</h2>
 
+  <section class="admin-wallet-section" id="admin-wallet-section" aria-label="Solana wallet">
+    <div id="admin-wallet-panel"></div>
+  </section>
+
   <div class="toolbox-grid">
     <button class="toolbox-card toolbox-card-btn" id="admin-users">
       <h3>Users</h3>
@@ -730,12 +737,12 @@
       }
     })();
   </script>
-  <script src="js/chain-config.js?v=20260708b"></script>
-  <script src="js/solana-wallet.js?v=20260708b"></script>
-  <script src="js/wallet-link.js?v=20260708b"></script>
-  <script src="js/metric-ui.js?v=20260708b"></script>
-  <script src="js/plant-pixel-sprites.js?v=20260708b"></script>
-  <script src="js/plant-token.js?v=20260708b"></script>
-  <script src="js/app.js?v=20260708b"></script>
+  <script src="js/chain-config.js?v=20260708c"></script>
+  <script src="js/solana-wallet.js?v=20260708d"></script>
+  <script src="js/wallet-link.js?v=20260708c"></script>
+  <script src="js/metric-ui.js?v=20260708c"></script>
+  <script src="js/plant-pixel-sprites.js?v=20260708c"></script>
+  <script src="js/plant-token.js?v=20260708d"></script>
+  <script src="js/app.js?v=20260708c"></script>
 </body>
 </html>
