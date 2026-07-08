@@ -1172,6 +1172,16 @@ function initFirebaseSync() {
       );
 
       await ensureUserExists(user);
+      if (window.WalletLink) {
+        await WalletLink.loadProfile();
+        WalletLink.onChange(function () {
+          try {
+            renderDashboard();
+          } catch {
+            // ignore
+          }
+        });
+      }
       currentUserRole = await getCurrentUserRole(user);
       await recordUserLogin(user, currentUserRole);
       applyRoleUI(currentUserRole);
@@ -1719,6 +1729,11 @@ function initFirebaseSync() {
   }
 
   // --- Dashboard ---
+  function shortSolanaAddr(addr) {
+    if (!addr || addr.length < 12) return addr || '—';
+    return addr.slice(0, 4) + '…' + addr.slice(-4);
+  }
+
   function renderDashboard() {
     const plants = getPlants();
     const entries = getEntries();
@@ -1745,8 +1760,20 @@ function initFirebaseSync() {
     let tokenCount = 0;
     let growingCount = 0;
     let growPct = 0;
+    let walletDisplay = '—';
+    let walletLinked = false;
+    if (window.WalletLink) {
+      const profile = WalletLink.getProfile();
+      if (profile.solanaPubkey) {
+        walletDisplay = shortSolanaAddr(profile.solanaPubkey);
+        walletLinked = true;
+      }
+    }
     if (window.PlantToken) {
       const wallet = PlantToken.getWallet();
+      if (!walletLinked && wallet.connected && wallet.address) {
+        walletDisplay = shortSolanaAddr(wallet.address);
+      }
       if (wallet.connected) {
         growBalance = Number(wallet.growthBalance || 0).toLocaleString('en-US');
         tokenCount = wallet.tokens.length;
@@ -1796,6 +1823,15 @@ function initFirebaseSync() {
               M.row('Still growing', growingCount, 'metric-dot--teal'),
             donut: { pct: growPct, color: '#f59e0b' },
             modifier: 'amber',
+          }) +
+          M.card({
+            label: 'Solana wallet',
+            value: walletDisplay,
+            meta:
+              M.row('Network', 'devnet', 'metric-dot--teal') +
+              M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
+            donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
+            modifier: 'teal',
           })
       );
     }

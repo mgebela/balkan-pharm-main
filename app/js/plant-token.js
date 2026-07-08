@@ -157,6 +157,9 @@
         wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
         wallet.provider = 'solflare';
         writeWallet(wallet);
+        if (window.WalletLink) {
+          await WalletLink.linkWallet(address);
+        }
         return wallet;
       })();
     },
@@ -380,6 +383,24 @@
 
   let busy = false;
 
+  function linkStatusHtml(wallet) {
+    const WL = window.WalletLink;
+    if (!WL) return '';
+    const profile = WL.getProfile();
+    const linked = profile.solanaPubkey === wallet.address;
+    if (linked) {
+      return '<p class="adopt-wallet-link-status adopt-wallet-link-status--ok">Account linked to this wallet</p>';
+    }
+    if (profile.solanaPubkey && profile.solanaPubkey !== wallet.address) {
+      return (
+        '<p class="adopt-wallet-link-status adopt-wallet-link-status--warn">Account linked to a different wallet (' +
+        esc(shortAddr(profile.solanaPubkey)) +
+        ')</p>'
+      );
+    }
+    return '<p class="adopt-wallet-link-status">Wallet connected — link your account on next connect</p>';
+  }
+
   function renderWalletPanel(wallet) {
     const el = document.getElementById('adopt-wallet');
     if (!el) return;
@@ -441,6 +462,7 @@
         }) +
         '</div>' +
         '<div class="adopt-wallet-actions">' +
+        linkStatusHtml(wallet) +
         addrLink +
         '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
         '</div></div>';
@@ -725,8 +747,20 @@
       const SW = window.SolanaWallet;
       if (SW && typeof SW.tryRestore === 'function') {
         SW.tryRestore()
-          .then(function () {
+          .then(async function () {
             syncWalletFromSolana();
+            const w = readWallet();
+            if (w.connected && window.WalletLink) {
+              try {
+                await WalletLink.loadProfile();
+                const profile = WalletLink.getProfile();
+                if (!profile.solanaPubkey || profile.solanaPubkey !== w.address) {
+                  await WalletLink.linkWallet(w.address);
+                }
+              } catch (err) {
+                console.warn('Wallet link restore', err);
+              }
+            }
             render();
           })
           .catch(function () {

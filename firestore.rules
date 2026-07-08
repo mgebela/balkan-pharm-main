@@ -59,6 +59,20 @@ service cloud.firestore {
         || (resource.data.role == 'viewer' && request.resource.data.role == 'user');
     }
 
+    function isValidSolanaPubkey(pk) {
+      return pk is string && pk.size() >= 32 && pk.size() <= 44;
+    }
+
+    function walletLinkPatchAllowed() {
+      return request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
+        && isValidSolanaPubkey(request.resource.data.solanaPubkey)
+        && request.resource.data.walletProvider is string
+        && request.resource.data.walletLinkedAt is string;
+    }
+
   // ── users ────────────────────────────────────────────────
 
   match /users/{userId} {
@@ -75,6 +89,7 @@ service cloud.firestore {
 
     allow update: if signedIn() && (
       (request.auth.uid == userId && selfRoleUpdateAllowed())
+      || (request.auth.uid == userId && walletLinkPatchAllowed())
       || isSuperadmin()
     );
 
