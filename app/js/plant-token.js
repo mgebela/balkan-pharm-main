@@ -360,6 +360,13 @@
     return (window.ChainConfig && window.ChainConfig.networkLabel) || 'Solana · devnet';
   }
 
+  function devnetNotice() {
+    return (
+      (window.ChainConfig && window.ChainConfig.devnetNotice) ||
+      'Solflare connects to Solana devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.'
+    );
+  }
+
   function explorerAddressUrl(address) {
     if (window.ChainConfig && typeof window.ChainConfig.explorerAddress === 'function') {
       return window.ChainConfig.explorerAddress(address);
@@ -410,7 +417,7 @@
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
         '<h3>Connect Solflare</h3>' +
-        '<p>Connect your Solflare wallet on Solana devnet. Seed minting and $GROW rewards are still simulated until on-chain deploy (M2).</p>' +
+        '<p>' + esc(devnetNotice()) + '</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect Solflare</button>' +
         '</div></div>';
@@ -787,7 +794,7 @@
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
-          '<p>Connect Solflare on Solana devnet to adopt a seed and grow it through each stage — minting <strong>$GROW</strong> rewards (simulated until M2).</p>' +
+          '<p>' + esc(devnetNotice()) + '</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {

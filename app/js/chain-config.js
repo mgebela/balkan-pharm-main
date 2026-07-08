@@ -11,6 +11,8 @@
     networkLabel: 'Solana · devnet',
     walletName: 'Solflare',
     walletDownloadUrl: 'https://solflare.com/download',
+    devnetNotice:
+      'Solflare connects to Solana devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.',
     explorerAddress: function (address) {
       return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
     },
