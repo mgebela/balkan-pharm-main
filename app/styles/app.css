@@ -683,6 +683,72 @@ body {
   font-size: 0.95rem;
 }
 
+.wallet-picker-empty {
+  margin: 0;
+  padding: 0.75rem 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wallet-picker-manual-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.wallet-picker-manual-toggle:hover {
+  color: var(--accent-bright);
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.wallet-picker-manual {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wallet-picker-manual-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.wallet-picker-manual-input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  color: inherit;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.82rem;
+}
+
+.wallet-picker-manual-input--error {
+  border-color: #f87171;
+}
+
+.wallet-picker-manual-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .wallet-picker-foot {
   margin: 0.85rem 0 0;
   font-size: 0.78rem;

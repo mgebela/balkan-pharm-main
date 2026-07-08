@@ -161,8 +161,10 @@
       const SW = window.SolanaWallet;
       const provider = SW && SW.getProviderName ? SW.getProviderName() : 'solana';
       const message = buildLinkMessage(user.uid, pubkey);
+      // Watch-only addresses cannot sign; store the link as unverified.
+      const isWatchOnly = provider === 'watch-only' || provider === 'manual';
 
-      if (!opts.skipSign) {
+      if (!opts.skipSign && !isWatchOnly) {
         try {
           await signLinkMessage(message);
         } catch (err) {

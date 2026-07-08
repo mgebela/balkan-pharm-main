@@ -253,26 +253,71 @@
   async function discoverWalletAdapters() {
     const found = new Map();
 
-    function add(adapter) {
-      if (!adapter || found.has(adapter.id)) return;
-      found.set(adapter.id, adapter);
+    function adapterRank(adapter) {
+      let rank = 0;
+      if (adapter.kind === 'standard') rank += 20;
+      if (adapter.icon) rank += 10;
+      return rank;
     }
 
-    add(legacyAdapter('phantom', 'Phantom', getLegacyPhantom(), ''));
-    add(legacyAdapter('solflare', 'Solflare', getLegacySolflare(), ''));
-    add(legacyAdapter('backpack', 'Backpack', getLegacyBackpack(), ''));
+    function upsert(adapter) {
+      if (!adapter) return;
+      const key = slugify(adapter.name);
+      const existing = found.get(key);
+      if (!existing || adapterRank(adapter) > adapterRank(existing)) {
+        found.set(key, adapter);
+      }
+    }
 
     try {
       const api = await loadWalletStandard();
       const wallets = api.get();
       wallets.filter(isSolanaStandardWallet).forEach(function (wallet) {
-        add(standardAdapter(wallet));
+        upsert(standardAdapter(wallet));
       });
     } catch (err) {
       console.warn('Wallet Standard discovery failed', err);
     }
 
-    return Array.from(found.values());
+    upsert(legacyAdapter('phantom', 'Phantom', getLegacyPhantom(), ''));
+    upsert(legacyAdapter('solflare', 'Solflare', getLegacySolflare(), ''));
+    upsert(legacyAdapter('backpack', 'Backpack', getLegacyBackpack(), ''));
+
+    return Array.from(found.values()).sort(function (a, b) {
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  function isValidBase58Address(value) {
+    return typeof value === 'string' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value);
+  }
+
+  function manualAdapter(address) {
+    function watchOnlyError() {
+      return new Error(
+        'Watch-only address cannot sign. Connect a wallet extension to verify ownership or make transactions.'
+      );
+    }
+    return {
+      id: 'manual',
+      name: 'Watch-only',
+      icon: '',
+      kind: 'manual',
+      connect: async function () {
+        const web3 = await loadWeb3();
+        return new web3.PublicKey(address);
+      },
+      disconnect: async function () {},
+      signMessage: async function () {
+        throw watchOnlyError();
+      },
+      signTransaction: async function () {
+        throw watchOnlyError();
+      },
+      signAllTransactions: async function () {
+        throw watchOnlyError();
+      },
+    };
   }
 
   function wrapConnectError(err, walletName) {
@@ -304,24 +349,33 @@
         '</header>' +
         '<p class="wallet-picker-lede">Choose a Solana wallet installed in your browser.</p>' +
         '<div class="wallet-picker-list">' +
-        adapters
-          .map(function (adapter) {
-            const icon = adapter.icon
-              ? '<img src="' + adapter.icon + '" alt="" class="wallet-picker-icon" />'
-              : '<span class="wallet-picker-icon wallet-picker-icon--fallback" aria-hidden="true">◎</span>';
-            return (
-              '<button type="button" class="wallet-picker-item" data-wallet-id="' +
-              adapter.id +
-              '">' +
-              icon +
-              '<span class="wallet-picker-name">' +
-              adapter.name +
-              '</span>' +
-              '</button>'
-            );
-          })
-          .join('') +
+        (adapters.length
+          ? adapters
+              .map(function (adapter) {
+                const icon = adapter.icon
+                  ? '<img src="' + adapter.icon + '" alt="" class="wallet-picker-icon" />'
+                  : '<span class="wallet-picker-icon wallet-picker-icon--fallback" aria-hidden="true">◎</span>';
+                return (
+                  '<button type="button" class="wallet-picker-item" data-wallet-id="' +
+                  adapter.id +
+                  '">' +
+                  icon +
+                  '<span class="wallet-picker-name">' +
+                  adapter.name +
+                  '</span>' +
+                  '</button>'
+                );
+              })
+              .join('')
+          : '<p class="wallet-picker-empty">No wallet extension detected in this browser.</p>') +
         '</div>' +
+        '<button type="button" class="wallet-picker-manual-toggle">Enter address manually (watch-only)</button>' +
+        '<form class="wallet-picker-manual" hidden>' +
+        '<label class="wallet-picker-manual-label" for="wallet-picker-manual-input">Solana address</label>' +
+        '<input type="text" id="wallet-picker-manual-input" class="wallet-picker-manual-input" placeholder="e.g. 7fUAJd…Stgnd" autocomplete="off" spellcheck="false" />' +
+        '<p class="wallet-picker-manual-note">Watch-only: your address is shown in the app, but ownership is not verified and signing is unavailable.</p>' +
+        '<button type="submit" class="btn btn-primary wallet-picker-manual-submit">Use this address</button>' +
+        '</form>' +
         '<p class="wallet-picker-foot">Need a wallet? <a href="https://solana.com/solutions/wallets" target="_blank" rel="noopener noreferrer">Browse Solana wallets</a></p>' +
         '</div>';
 
@@ -354,10 +408,38 @@
           else reject(new Error('Wallet not found.'));
           return;
         }
+        if (e.target.closest('.wallet-picker-manual-toggle')) {
+          const form = overlay.querySelector('.wallet-picker-manual');
+          if (form) {
+            form.hidden = !form.hidden;
+            if (!form.hidden) {
+              const input = form.querySelector('.wallet-picker-manual-input');
+              if (input) input.focus();
+            }
+          }
+          return;
+        }
         if (e.target.closest('.wallet-picker-close')) {
           close();
           reject(new Error('Wallet selection cancelled.'));
         }
+      });
+
+      overlay.addEventListener('submit', function (e) {
+        const form = e.target.closest('.wallet-picker-manual');
+        if (!form) return;
+        e.preventDefault();
+        const input = form.querySelector('.wallet-picker-manual-input');
+        const address = input ? input.value.trim() : '';
+        if (!isValidBase58Address(address)) {
+          if (input) {
+            input.classList.add('wallet-picker-manual-input--error');
+            input.focus();
+          }
+          return;
+        }
+        close();
+        resolve(manualAdapter(address));
       });
 
       document.addEventListener('keydown', onKey);
@@ -367,20 +449,13 @@
 
   async function pickAdapter(preferredId) {
     const adapters = await discoverWalletAdapters();
-    if (!adapters.length) {
-      const err = new Error(
-        'No Solana wallet found. Install Phantom, Solflare, or another Solana wallet, then refresh this page.'
-      );
-      err.code = 'WALLET_NOT_FOUND';
-      throw err;
-    }
     if (preferredId) {
       const chosen = adapters.find(function (a) {
         return a.id === preferredId;
       });
       if (chosen) return chosen;
     }
-    if (adapters.length === 1) return adapters[0];
+    // Always show the picker so the manual watch-only option is available.
     return showWalletPicker(adapters);
   }
 

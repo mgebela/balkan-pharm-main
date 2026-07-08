@@ -713,21 +713,32 @@
     }
   }
 
+  function isWatchOnlyProvider(provider) {
+    return provider === 'watch-only' || provider === 'manual';
+  }
+
   function walletLinkBadgeHtml() {
     const WL = window.WalletLink;
     if (!WL) return '';
     const profile = WL.getProfile();
+    const wallet = readWallet();
+    const watchBadge =
+      wallet.connected && isWatchOnlyProvider(wallet.provider)
+        ? '<span class="wallet-link-badge wallet-link-badge--muted">Watch-only</span>'
+        : '';
     if (!profile.solanaPubkey) {
       return (
+        watchBadge +
         '<span class="wallet-link-badge wallet-link-badge--muted">Not linked</span>' +
         '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button>'
       );
     }
-    const wallet = readWallet();
+    const linkedUnverified = isWatchOnlyProvider(profile.walletProvider);
+    const linkedLabel = linkedUnverified ? 'Linked · unverified' : 'Account linked';
     if (wallet.connected && wallet.address === profile.solanaPubkey) {
-      return '<span class="wallet-link-badge wallet-link-badge--ok">Account linked</span>';
+      return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">' + linkedLabel + '</span>';
     }
-    return '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' + esc(shortAddr(profile.solanaPubkey)) + '</span>';
+    return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' + esc(shortAddr(profile.solanaPubkey)) + '</span>';
   }
 
   function walletControlsHtml(variant) {
