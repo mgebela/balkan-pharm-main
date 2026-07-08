@@ -589,6 +589,110 @@ body {
   margin-bottom: 1.25rem;
 }
 
+.wallet-picker-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.wallet-picker-card {
+  width: min(100%, 420px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface, #111);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  padding: 1.1rem;
+}
+
+.wallet-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.wallet-picker-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.wallet-picker-close {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wallet-picker-lede {
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wallet-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wallet-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.wallet-picker-item:hover {
+  border-color: rgba(45, 212, 191, 0.35);
+  background: rgba(45, 212, 191, 0.06);
+}
+
+.wallet-picker-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex: 0 0 28px;
+}
+
+.wallet-picker-icon--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+}
+
+.wallet-picker-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.wallet-picker-foot {
+  margin: 0.85rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.wallet-picker-foot a {
+  color: var(--accent-bright);
+}
+
 .view-title {
   font-size: 1.5rem;
   font-weight: 600;

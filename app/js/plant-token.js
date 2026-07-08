@@ -155,10 +155,20 @@
         wallet.connected = true;
         wallet.address = address;
         wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
-        wallet.provider = 'solflare';
+        wallet.provider = SW.getProviderName() || 'solana';
+        wallet.linkError = '';
         writeWallet(wallet);
         if (window.WalletLink) {
-          await WalletLink.linkWallet(address);
+          try {
+            await WalletLink.linkWallet(address);
+            wallet.linkError = '';
+            writeWallet(wallet);
+          } catch (linkErr) {
+            console.warn('Wallet account link failed', linkErr);
+            wallet.linkError =
+              window.WalletLink.formatError ? WalletLink.formatError(linkErr) : linkErr.message || 'Account link failed.';
+            writeWallet(wallet);
+          }
         }
         return wallet;
       })();
@@ -363,7 +373,7 @@
   function devnetNotice() {
     return (
       (window.ChainConfig && window.ChainConfig.devnetNotice) ||
-      'Solflare connects to Solana devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.'
+      'Connect a Solana wallet on devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.'
     );
   }
 
@@ -383,7 +393,7 @@
     wallet.connected = true;
     wallet.address = address;
     wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
-    wallet.provider = SW.getProviderName() || 'solflare';
+        wallet.provider = SW.getProviderName() || 'solana';
     writeWallet(wallet);
     return wallet;
   }
@@ -405,7 +415,17 @@
         ')</p>'
       );
     }
-    return '<p class="adopt-wallet-link-status">Wallet connected — link your account on next connect</p>';
+    if (wallet.linkError) {
+      return (
+        '<p class="adopt-wallet-link-status adopt-wallet-link-status--warn">' +
+        esc(wallet.linkError) +
+        ' <button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button></p>'
+      );
+    }
+    return (
+      '<p class="adopt-wallet-link-status">Wallet connected. ' +
+      '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button></p>'
+    );
   }
 
   function renderWalletPanel(wallet) {
@@ -416,10 +436,10 @@
         '<div class="metric-panel metric-panel--inline">' +
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
-        '<h3>Connect Solflare</h3>' +
+        '<h3>Connect wallet</h3>' +
         '<p>' + esc(devnetNotice()) + '</p>' +
         '</div>' +
-        '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect Solflare</button>' +
+        '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
         '</div></div>';
       return;
     }
@@ -609,18 +629,54 @@
     }
   }
 
+  function formatWalletError(err) {
+    if (window.WalletLink && typeof window.WalletLink.formatError === 'function') {
+      return WalletLink.formatError(err);
+    }
+    if (!err) return 'Something went wrong.';
+    if (typeof err === 'string') return err;
+    return err.message || 'Something went wrong.';
+  }
+
   function flashError(err) {
-    const msg = (err && err.message) || 'Something went wrong.';
+    const msg = formatWalletError(err);
+    console.error('Wallet UI error', err);
     if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
       const hint =
         msg +
-        '\n\nIf Solflare is installed, open the extension, unlock it, allow dnevnik.live, then refresh this page.';
-      if (confirm(hint + '\n\nOpen Solflare download page?')) {
+        '\n\nIf a wallet is installed, unlock it, allow dnevnik.live, then refresh this page.';
+      if (confirm(hint + '\n\nBrowse Solana wallets?')) {
         window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
       }
       return;
     }
     alert(msg);
+  }
+
+  async function handleWalletLink(btn) {
+    if (busy) return;
+    const wallet = readWallet();
+    if (!wallet.connected || !wallet.address) {
+      flashError(new Error('Connect a wallet before linking your account.'));
+      return;
+    }
+    setBusy(true);
+    const original = btn ? btn.textContent : '';
+    if (btn) btn.textContent = 'Linking…';
+    try {
+      if (window.WalletLink) {
+        await WalletLink.linkWallet(wallet.address, { force: false });
+        wallet.linkError = '';
+        writeWallet(wallet);
+      }
+      render();
+      renderGlobalWalletUI();
+    } catch (err) {
+      flashError(err);
+    } finally {
+      if (btn) btn.textContent = original || 'Link account';
+      setBusy(false);
+    }
   }
 
   async function handleWalletConnect(btn) {
@@ -629,13 +685,16 @@
     const original = btn ? btn.textContent : '';
     if (btn) btn.textContent = 'Connecting…';
     try {
-      await PlantToken.connect();
+      const wallet = await PlantToken.connect();
       render();
       renderGlobalWalletUI();
+      if (wallet && wallet.linkError) {
+        alert('Wallet connected, but account link failed:\n\n' + wallet.linkError + '\n\nUse "Link account" to try again.');
+      }
     } catch (err) {
       flashError(err);
     } finally {
-      if (btn) btn.textContent = original || 'Connect Solflare';
+      if (btn) btn.textContent = original || 'Connect wallet';
       setBusy(false);
     }
   }
@@ -658,7 +717,12 @@
     const WL = window.WalletLink;
     if (!WL) return '';
     const profile = WL.getProfile();
-    if (!profile.solanaPubkey) return '<span class="wallet-link-badge wallet-link-badge--muted">Not linked</span>';
+    if (!profile.solanaPubkey) {
+      return (
+        '<span class="wallet-link-badge wallet-link-badge--muted">Not linked</span>' +
+        '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button>'
+      );
+    }
     const wallet = readWallet();
     if (wallet.connected && wallet.address === profile.solanaPubkey) {
       return '<span class="wallet-link-badge wallet-link-badge--ok">Account linked</span>';
@@ -676,18 +740,18 @@
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
           '<span class="wallet-controls-label">Solana</span>' +
-          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect Solflare</button>' +
+          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect wallet</button>' +
           '</div>'
         );
       }
       return (
         '<div class="wallet-controls wallet-controls--panel">' +
         '<div class="wallet-controls-copy">' +
-        '<h3>Connect Solflare</h3>' +
+        '<h3>Connect wallet</h3>' +
         '<p>' + esc(devnetNotice()) + '</p>' +
         walletLinkBadgeHtml() +
         '</div>' +
-        '<button type="button" class="btn btn-primary wallet-connect-btn">Connect Solflare</button>' +
+        '<button type="button" class="btn btn-primary wallet-connect-btn">Connect wallet</button>' +
         '</div>'
       );
     }
@@ -741,7 +805,8 @@
     document.addEventListener('click', async function (e) {
       const connectBtn = e.target.closest('.wallet-connect-btn');
       const disconnectBtn = e.target.closest('.wallet-disconnect-btn');
-      if (!connectBtn && !disconnectBtn) return;
+      const linkBtn = e.target.closest('.wallet-link-btn');
+      if (!connectBtn && !disconnectBtn && !linkBtn) return;
       if (connectBtn && connectBtn.id === 'adopt-connect-btn') return;
       if (disconnectBtn && disconnectBtn.id === 'adopt-disconnect-btn') return;
 
@@ -752,6 +817,10 @@
       }
       if (disconnectBtn) {
         await handleWalletDisconnect(disconnectBtn);
+        return;
+      }
+      if (linkBtn) {
+        await handleWalletLink(linkBtn);
       }
     });
   }
@@ -919,7 +988,7 @@
           '<div class="dashboard-adopt-copy">' +
           '<p>' + esc(devnetNotice()) + '</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
-          '<button type="button" class="btn btn-ghost wallet-connect-btn">Connect Solflare</button>' +
+          '<button type="button" class="btn btn-ghost wallet-connect-btn">Connect wallet</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
         container.innerHTML =

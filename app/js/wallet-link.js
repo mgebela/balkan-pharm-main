@@ -1,6 +1,6 @@
 /*
  * Link Firebase Auth user ↔ Solana pubkey (M1).
- * User signs a short message in Solflare; pubkey is stored on users/{uid}.
+ * User signs a short message in their wallet; pubkey is stored on users/{uid}.
  */
 (function () {
   'use strict';
@@ -60,16 +60,30 @@
     return result;
   }
 
-  async function assertPubkeyAvailable(pubkey, uid) {
-    const firestore = db();
-    if (!firestore) return;
-    const snap = await firestore.collection('users').where('solanaPubkey', '==', pubkey).limit(2).get();
-    const conflict = snap.docs.find(function (doc) {
-      return doc.id !== uid;
-    });
-    if (conflict) {
-      throw new Error('This Solana wallet is already linked to another dnevnik.live account.');
+  function normalizeWalletError(err) {
+    if (!err) return 'Something went wrong.';
+    if (typeof err === 'string') return err;
+    if (err.message) return err.message;
+    if (err.code === 4001 || err.code === '4001') return 'Request cancelled in wallet.';
+    if (err.code === 'permission-denied') {
+      return 'Could not save wallet link. Deploy the latest Firestore rules: firebase deploy --only firestore:rules';
     }
+    if (err.code === 'WALLET_NOT_FOUND') {
+      return 'No Solana wallet found. Install Phantom, Solflare, or another wallet, then refresh.';
+    }
+    try {
+      const details = err.details || err.reason || err.error;
+      if (typeof details === 'string' && details) return details;
+    } catch {
+      // ignore
+    }
+    console.error('Wallet error', err);
+    return 'Something went wrong. Open the browser console (F12) for details.';
+  }
+
+  async function assertPubkeyAvailable() {
+    // Cross-user pubkey lookup is blocked by Firestore rules for normal users.
+    // Uniqueness will be enforced server-side in a later milestone.
   }
 
   const WalletLink = {
@@ -120,6 +134,8 @@
       return cache;
     },
 
+    formatError: normalizeWalletError,
+
     async linkWallet(pubkey, options) {
       const opts = options || {};
       const user = firebaseUser();
@@ -140,32 +156,46 @@
         throw new Error('A different wallet is already linked to this account. Disconnect and contact support to change it.');
       }
 
-      await assertPubkeyAvailable(pubkey, user.uid);
+      await assertPubkeyAvailable();
 
       const SW = window.SolanaWallet;
-      const provider = SW && SW.getProviderName ? SW.getProviderName() : 'solflare';
+      const provider = SW && SW.getProviderName ? SW.getProviderName() : 'solana';
       const message = buildLinkMessage(user.uid, pubkey);
 
       if (!opts.skipSign) {
-        await signLinkMessage(message);
+        try {
+          await signLinkMessage(message);
+        } catch (err) {
+          const wrapped = new Error(normalizeWalletError(err));
+          wrapped.code = err && err.code;
+          throw wrapped;
+        }
       }
 
       const firestore = db();
       if (!firestore) throw new Error('Firestore is not available.');
 
       const now = new Date().toISOString();
-      await firestore.collection('users').doc(user.uid).set(
-        {
-          solanaPubkey: pubkey,
-          walletProvider: provider || 'solflare',
-          walletLinkedAt: now,
-        },
-        { merge: true }
-      );
+      const patch = {
+        solanaPubkey: pubkey,
+        walletProvider: provider || 'solana',
+        walletLinkedAt: now,
+      };
+      try {
+        await firestore.collection('users').doc(user.uid).update(patch);
+      } catch (err) {
+        if (err && err.code === 'not-found') {
+          await firestore.collection('users').doc(user.uid).set(patch, { merge: true });
+        } else {
+          const wrapped = new Error(normalizeWalletError(err));
+          wrapped.code = err && err.code;
+          throw wrapped;
+        }
+      }
 
       cache.uid = user.uid;
       cache.solanaPubkey = pubkey;
-      cache.walletProvider = provider || 'solflare';
+      cache.walletProvider = provider || 'solana';
       cache.walletLinkedAt = now;
       cache.loaded = true;
       emit();

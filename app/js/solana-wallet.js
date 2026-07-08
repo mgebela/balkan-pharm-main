@@ -1,25 +1,25 @@
 /*
- * Solflare-first Solana wallet layer for dnevnik.live (devnet).
- * Uses @solflare-wallet/sdk (extension + web wallet) with window.solflare fallback.
+ * Multi-wallet Solana layer for dnevnik.live (devnet).
+ * Wallet Standard + legacy extension adapters (Phantom, Solflare, Backpack, …).
  */
 (function () {
   'use strict';
 
   const WEB3_CDN = 'https://esm.sh/@solana/web3.js@1.98.4';
-  const SOLFLARE_SDK_CDN = 'https://esm.sh/@solflare-wallet/sdk@1.4.2';
-  const PROVIDER_WAIT_MS = 2500;
+  const WALLET_STANDARD_CDN = 'https://esm.sh/@wallet-standard/app@1.1.0';
+  const SOLANA_CHAINS = ['solana:devnet', 'solana:mainnet', 'solana:testnet', 'solana:localnet'];
+
   const cfg = function () {
     return window.ChainConfig || { rpcUrl: 'https://api.devnet.solana.com', cluster: 'devnet' };
   };
 
   let web3Module = null;
-  let solflareSdk = null;
-  let solflareSdkLoading = null;
   let connection = null;
   let publicKey = null;
   let providerName = '';
-  let activeProvider = null;
-
+  let activeAdapter = null;
+  let standardApi = null;
+  let standardApiLoading = null;
   const listeners = new Set();
 
   function emit() {
@@ -49,7 +49,51 @@
     return web3Module;
   }
 
-  function getLegacySolflareProvider() {
+  async function loadWalletStandard() {
+    if (standardApi) return standardApi;
+    if (standardApiLoading) return standardApiLoading;
+    standardApiLoading = import(WALLET_STANDARD_CDN)
+      .then(function (mod) {
+        const getWallets = mod.getWallets || (mod.default && mod.default.getWallets);
+        if (typeof getWallets !== 'function') {
+          throw new Error('Wallet Standard failed to load.');
+        }
+        standardApi = getWallets();
+        return standardApi;
+      })
+      .finally(function () {
+        standardApiLoading = null;
+      });
+    return standardApiLoading;
+  }
+
+  function isSolanaChain(chain) {
+    return typeof chain === 'string' && chain.indexOf('solana:') === 0;
+  }
+
+  function isSolanaStandardWallet(wallet) {
+    return wallet && wallet.chains && wallet.chains.some(isSolanaChain);
+  }
+
+  function walletIcon(wallet) {
+    if (wallet && wallet.icon) return wallet.icon;
+    return '';
+  }
+
+  function slugify(name) {
+    return String(name || 'wallet')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  function getLegacyPhantom() {
+    const p = window.phantom && window.phantom.solana;
+    if (p && p.isPhantom) return p;
+    return null;
+  }
+
+  function getLegacySolflare() {
     const candidates = [window.solflare];
     if (window.solflare && window.solflare.solflare) candidates.push(window.solflare.solflare);
     for (let i = 0; i < candidates.length; i += 1) {
@@ -59,131 +103,285 @@
     return null;
   }
 
-  async function waitForLegacyProvider(timeoutMs) {
-    const deadline = Date.now() + (timeoutMs || PROVIDER_WAIT_MS);
-    while (Date.now() < deadline) {
-      const provider = getLegacySolflareProvider();
-      if (provider) return provider;
-      await sleep(120);
-    }
-    return getLegacySolflareProvider();
-  }
-
-  function bindLegacyProviderEvents(provider) {
-    if (!provider || provider.__dnevnikBound) return;
-    provider.__dnevnikBound = true;
-    if (typeof provider.on !== 'function') return;
-    provider.on('connect', function () {
-      const pk = readPublicKey(provider);
-      if (pk) {
-        publicKey = pk;
-        providerName = 'solflare';
-        activeProvider = provider;
-        emit();
-      }
-    });
-    provider.on('disconnect', function () {
-      publicKey = null;
-      providerName = '';
-      activeProvider = null;
-      emit();
-    });
-    provider.on('accountChanged', function () {
-      const pk = readPublicKey(provider);
-      publicKey = pk;
-      if (!pk) {
-        providerName = '';
-        activeProvider = null;
-      }
-      emit();
-    });
-  }
-
-  function bindSdkEvents(wallet) {
-    if (!wallet || wallet.__dnevnikBound) return;
-    wallet.__dnevnikBound = true;
-    if (typeof wallet.on !== 'function') return;
-    wallet.on('connect', function () {
-      const pk = readPublicKey(wallet);
-      if (pk) {
-        publicKey = pk;
-        providerName = 'solflare';
-        activeProvider = wallet;
-        emit();
-      }
-    });
-    wallet.on('disconnect', function () {
-      publicKey = null;
-      providerName = '';
-      activeProvider = null;
-      emit();
-    });
-  }
-
-  async function loadSolflareSdk() {
-    if (solflareSdk) return solflareSdk;
-    if (solflareSdkLoading) return solflareSdkLoading;
-    solflareSdkLoading = import(SOLFLARE_SDK_CDN)
-      .then(function (mod) {
-        const Solflare = mod.default || mod.Solflare || mod;
-        if (typeof Solflare !== 'function') {
-          throw new Error('Solflare SDK failed to load.');
-        }
-        const cluster = cfg().cluster || 'devnet';
-        solflareSdk = new Solflare({ network: cluster });
-        bindSdkEvents(solflareSdk);
-        return solflareSdk;
-      })
-      .finally(function () {
-        solflareSdkLoading = null;
-      });
-    return solflareSdkLoading;
-  }
-
-  async function getConnectableProvider() {
-    try {
-      const sdk = await loadSolflareSdk();
-      if (sdk) return sdk;
-    } catch (err) {
-      console.warn('Solflare SDK unavailable, falling back to extension', err);
-    }
-    const legacy = await waitForLegacyProvider(PROVIDER_WAIT_MS);
-    if (legacy) {
-      bindLegacyProviderEvents(legacy);
-      return legacy;
-    }
-    const err = new Error(
-      'Solflare wallet not found. Install the Solflare browser extension, allow it on this site, then refresh and try again.'
-    );
-    err.code = 'WALLET_NOT_FOUND';
-    throw err;
-  }
-
-  async function getActiveProvider() {
-    if (activeProvider) return activeProvider;
-    if (solflareSdk && (solflareSdk.isConnected || solflareSdk.publicKey)) return solflareSdk;
-    const legacy = getLegacySolflareProvider();
-    if (legacy) return legacy;
-    return getConnectableProvider();
-  }
-
-  async function getConnection() {
-    const web3 = await loadWeb3();
-    const c = cfg();
-    if (!connection) {
-      connection = new web3.Connection(c.rpcUrl, 'confirmed');
-    }
-    return connection;
-  }
-
-  function readPublicKey(provider) {
-    if (!provider || !provider.publicKey) return null;
-    if (typeof provider.publicKey.toBase58 === 'function') return provider.publicKey;
-    const web3 = web3Module;
-    if (web3 && web3.PublicKey) {
-      return new web3.PublicKey(String(provider.publicKey));
-    }
+  function getLegacyBackpack() {
+    const w = window.backpack;
+    if (w && (w.isBackpack || typeof w.connect === 'function')) return w;
     return null;
+  }
+
+  function legacyAdapter(id, name, provider, icon) {
+    if (!provider) return null;
+    return {
+      id: id,
+      name: name,
+      icon: icon || '',
+      kind: 'legacy',
+      provider: provider,
+      connect: async function () {
+        if (!provider.publicKey) await provider.connect();
+        const pk = await readLegacyPublicKey(provider);
+        if (!pk) throw new Error(name + ' connected but no public key was returned.');
+        return pk;
+      },
+      disconnect: async function () {
+        if (typeof provider.disconnect === 'function') {
+          try {
+            await provider.disconnect();
+          } catch {
+            // ignore
+          }
+        }
+      },
+      signMessage: async function (bytes) {
+        if (typeof provider.signMessage !== 'function') {
+          throw new Error(name + ' does not support signMessage.');
+        }
+        const result = await provider.signMessage(bytes, 'utf8');
+        if (result && result.signature) return result;
+        return result;
+      },
+      signTransaction: async function (transaction) {
+        if (typeof provider.signTransaction !== 'function') {
+          throw new Error(name + ' does not support signTransaction.');
+        }
+        return provider.signTransaction(transaction);
+      },
+      signAllTransactions: async function (transactions) {
+        if (typeof provider.signAllTransactions === 'function') {
+          return provider.signAllTransactions(transactions);
+        }
+        const out = [];
+        for (let i = 0; i < transactions.length; i += 1) {
+          out.push(await provider.signTransaction(transactions[i]));
+        }
+        return out;
+      },
+    };
+  }
+
+  function standardAdapter(wallet) {
+    const id = 'standard:' + slugify(wallet.name);
+    let account = null;
+
+    function pickAccount() {
+      if (account) return account;
+      const accounts = wallet.accounts || [];
+      account = accounts.find(function (a) {
+        return a.chains && a.chains.some(isSolanaChain);
+      });
+      return account || accounts[0] || null;
+    }
+
+    return {
+      id: id,
+      name: wallet.name || 'Wallet',
+      icon: walletIcon(wallet),
+      kind: 'standard',
+      wallet: wallet,
+      connect: async function () {
+        const connect = wallet.features && wallet.features['standard:connect'];
+        if (!connect || typeof connect.connect !== 'function') {
+          throw new Error((wallet.name || 'Wallet') + ' does not support connect.');
+        }
+        await connect.connect();
+        account = pickAccount();
+        if (!account || !account.address) {
+          throw new Error((wallet.name || 'Wallet') + ' connected but no account was returned.');
+        }
+        const web3 = await loadWeb3();
+        return new web3.PublicKey(account.address);
+      },
+      disconnect: async function () {
+        const disconnect = wallet.features && wallet.features['standard:disconnect'];
+        account = null;
+        if (disconnect && typeof disconnect.disconnect === 'function') {
+          try {
+            await disconnect.disconnect();
+          } catch {
+            // ignore
+          }
+        }
+      },
+      signMessage: async function (bytes) {
+        const current = pickAccount();
+        const signMessage = wallet.features && wallet.features['solana:signMessage'];
+        if (!signMessage || typeof signMessage.signMessage !== 'function') {
+          throw new Error((wallet.name || 'Wallet') + ' does not support signMessage.');
+        }
+        if (!current) throw new Error('Wallet account not available.');
+        return signMessage.signMessage({ account: current, message: bytes });
+      },
+      signTransaction: async function (transaction) {
+        const current = pickAccount();
+        const signTx = wallet.features && wallet.features['solana:signTransaction'];
+        if (!signTx || typeof signTx.signTransaction !== 'function') {
+          throw new Error((wallet.name || 'Wallet') + ' does not support signTransaction.');
+        }
+        if (!current) throw new Error('Wallet account not available.');
+        const out = await signTx.signTransaction({ account: current, transaction: transaction });
+        return out && out.signedTransaction ? out.signedTransaction : out;
+      },
+      signAllTransactions: async function (transactions) {
+        const current = pickAccount();
+        const signTx = wallet.features && wallet.features['solana:signAndSendTransaction'];
+        const signMany = wallet.features && wallet.features['solana:signTransaction'];
+        if (signMany && typeof signMany.signTransaction === 'function') {
+          const out = [];
+          for (let i = 0; i < transactions.length; i += 1) {
+            const signed = await signMany.signTransaction({
+              account: current,
+              transaction: transactions[i],
+            });
+            out.push(signed && signed.signedTransaction ? signed.signedTransaction : signed);
+          }
+          return out;
+        }
+        throw new Error((wallet.name || 'Wallet') + ' does not support signAllTransactions.');
+      },
+    };
+  }
+
+  async function readLegacyPublicKey(provider) {
+    if (!provider || !provider.publicKey) return null;
+    const raw = provider.publicKey;
+    if (typeof raw.toBase58 === 'function') return raw;
+    const web3 = await loadWeb3();
+    const asString = typeof raw.toString === 'function' ? raw.toString() : String(raw);
+    return new web3.PublicKey(asString);
+  }
+
+  async function discoverWalletAdapters() {
+    const found = new Map();
+
+    function add(adapter) {
+      if (!adapter || found.has(adapter.id)) return;
+      found.set(adapter.id, adapter);
+    }
+
+    add(legacyAdapter('phantom', 'Phantom', getLegacyPhantom(), ''));
+    add(legacyAdapter('solflare', 'Solflare', getLegacySolflare(), ''));
+    add(legacyAdapter('backpack', 'Backpack', getLegacyBackpack(), ''));
+
+    try {
+      const api = await loadWalletStandard();
+      const wallets = api.get();
+      wallets.filter(isSolanaStandardWallet).forEach(function (wallet) {
+        add(standardAdapter(wallet));
+      });
+    } catch (err) {
+      console.warn('Wallet Standard discovery failed', err);
+    }
+
+    return Array.from(found.values());
+  }
+
+  function wrapConnectError(err, walletName) {
+    if (!err) return new Error('Wallet connection failed.');
+    if (err.message) return err;
+    if (err.code === 4001 || err.code === '4001') {
+      return new Error('Connection cancelled in ' + (walletName || 'wallet') + '.');
+    }
+    return new Error('Wallet connection failed. Unlock your wallet extension and try again.');
+  }
+
+  function removeWalletPicker() {
+    const el = document.getElementById('wallet-picker-modal');
+    if (el) el.remove();
+  }
+
+  function showWalletPicker(adapters) {
+    return new Promise(function (resolve, reject) {
+      removeWalletPicker();
+
+      const overlay = document.createElement('div');
+      overlay.id = 'wallet-picker-modal';
+      overlay.className = 'wallet-picker-modal';
+      overlay.innerHTML =
+        '<div class="wallet-picker-card" role="dialog" aria-modal="true" aria-labelledby="wallet-picker-title">' +
+        '<header class="wallet-picker-head">' +
+        '<h2 id="wallet-picker-title">Connect wallet</h2>' +
+        '<button type="button" class="wallet-picker-close" aria-label="Close">×</button>' +
+        '</header>' +
+        '<p class="wallet-picker-lede">Choose a Solana wallet installed in your browser.</p>' +
+        '<div class="wallet-picker-list">' +
+        adapters
+          .map(function (adapter) {
+            const icon = adapter.icon
+              ? '<img src="' + adapter.icon + '" alt="" class="wallet-picker-icon" />'
+              : '<span class="wallet-picker-icon wallet-picker-icon--fallback" aria-hidden="true">◎</span>';
+            return (
+              '<button type="button" class="wallet-picker-item" data-wallet-id="' +
+              adapter.id +
+              '">' +
+              icon +
+              '<span class="wallet-picker-name">' +
+              adapter.name +
+              '</span>' +
+              '</button>'
+            );
+          })
+          .join('') +
+        '</div>' +
+        '<p class="wallet-picker-foot">Need a wallet? <a href="https://solana.com/solutions/wallets" target="_blank" rel="noopener noreferrer">Browse Solana wallets</a></p>' +
+        '</div>';
+
+      function close() {
+        removeWalletPicker();
+        document.removeEventListener('keydown', onKey);
+      }
+
+      function onKey(e) {
+        if (e.key === 'Escape') {
+          close();
+          reject(new Error('Wallet selection cancelled.'));
+        }
+      }
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          close();
+          reject(new Error('Wallet selection cancelled.'));
+          return;
+        }
+        const btn = e.target.closest('.wallet-picker-item');
+        if (btn) {
+          const id = btn.getAttribute('data-wallet-id');
+          const adapter = adapters.find(function (a) {
+            return a.id === id;
+          });
+          close();
+          if (adapter) resolve(adapter);
+          else reject(new Error('Wallet not found.'));
+          return;
+        }
+        if (e.target.closest('.wallet-picker-close')) {
+          close();
+          reject(new Error('Wallet selection cancelled.'));
+        }
+      });
+
+      document.addEventListener('keydown', onKey);
+      document.body.appendChild(overlay);
+    });
+  }
+
+  async function pickAdapter(preferredId) {
+    const adapters = await discoverWalletAdapters();
+    if (!adapters.length) {
+      const err = new Error(
+        'No Solana wallet found. Install Phantom, Solflare, or another Solana wallet, then refresh this page.'
+      );
+      err.code = 'WALLET_NOT_FOUND';
+      throw err;
+    }
+    if (preferredId) {
+      const chosen = adapters.find(function (a) {
+        return a.id === preferredId;
+      });
+      if (chosen) return chosen;
+    }
+    if (adapters.length === 1) return adapters[0];
+    return showWalletPicker(adapters);
   }
 
   const SolanaWallet = {
@@ -207,8 +405,17 @@
       return providerName;
     },
 
+    async listWallets() {
+      return discoverWalletAdapters();
+    },
+
+    isWalletAvailable: function () {
+      return typeof window !== 'undefined';
+    },
+
+    // Back-compat alias
     isSolflareAvailable: function () {
-      return !!getLegacySolflareProvider() || typeof window !== 'undefined';
+      return SolanaWallet.isWalletAvailable();
     },
 
     onChange: function (fn) {
@@ -218,105 +425,80 @@
       };
     },
 
-    getConnection: getConnection,
-
-    async connect() {
-      const provider = await getConnectableProvider();
-      activeProvider = provider;
-      if (!readPublicKey(provider)) {
-        await provider.connect();
+    getConnection: async function () {
+      const web3 = await loadWeb3();
+      const c = cfg();
+      if (!connection) {
+        connection = new web3.Connection(c.rpcUrl, 'confirmed');
       }
-      const pk = readPublicKey(provider);
-      if (!pk) throw new Error('Solflare connected but no public key was returned.');
-      publicKey = pk;
-      providerName = 'solflare';
-      emit();
-      return publicKey.toBase58();
+      return connection;
+    },
+
+    async connect(preferredId) {
+      const adapter = await pickAdapter(preferredId);
+      activeAdapter = adapter;
+      try {
+        const pk = await adapter.connect();
+        publicKey = pk;
+        providerName = slugify(adapter.name);
+        emit();
+        return publicKey.toBase58();
+      } catch (err) {
+        throw wrapConnectError(err, adapter.name);
+      }
     },
 
     async disconnect() {
-      const provider = activeProvider || solflareSdk || getLegacySolflareProvider();
-      if (provider && typeof provider.disconnect === 'function') {
+      if (activeAdapter && typeof activeAdapter.disconnect === 'function') {
         try {
-          await provider.disconnect();
+          await activeAdapter.disconnect();
         } catch {
-          // wallet may already be disconnected
+          // ignore
         }
       }
       publicKey = null;
       providerName = '';
-      activeProvider = null;
+      activeAdapter = null;
       emit();
     },
 
     async tryRestore() {
-      try {
-        const sdk = await loadSolflareSdk();
-        if (sdk && sdk.isConnected && sdk.publicKey) {
-          const pk = readPublicKey(sdk);
-          if (pk) {
-            publicKey = pk;
-            providerName = 'solflare';
-            activeProvider = sdk;
-            emit();
-            return true;
+      const adapters = await discoverWalletAdapters();
+      for (let i = 0; i < adapters.length; i += 1) {
+        const adapter = adapters[i];
+        if (adapter.kind !== 'legacy' || !adapter.provider) continue;
+        const provider = adapter.provider;
+        try {
+          if (provider.isConnected && provider.publicKey) {
+            const pk = await readLegacyPublicKey(provider);
+            if (pk) {
+              activeAdapter = adapter;
+              publicKey = pk;
+              providerName = slugify(adapter.name);
+              emit();
+              return true;
+            }
           }
+        } catch {
+          // try next wallet
         }
-      } catch {
-        // fall through to legacy restore
-      }
-
-      const legacy = getLegacySolflareProvider();
-      if (!legacy) return false;
-      bindLegacyProviderEvents(legacy);
-      try {
-        if (legacy.isConnected && legacy.publicKey) {
-          const pk = readPublicKey(legacy);
-          if (pk) {
-            publicKey = pk;
-            providerName = 'solflare';
-            activeProvider = legacy;
-            emit();
-            return true;
-          }
-        }
-      } catch {
-        return false;
       }
       return false;
     },
 
     async signTransaction(transaction) {
-      const provider = await getActiveProvider();
-      if (!publicKey) throw new Error('Wallet not connected.');
-      if (typeof provider.signTransaction !== 'function') {
-        throw new Error('Solflare does not support signTransaction.');
-      }
-      return provider.signTransaction(transaction);
+      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      return activeAdapter.signTransaction(transaction);
     },
 
     async signAllTransactions(transactions) {
-      const provider = await getActiveProvider();
-      if (!publicKey) throw new Error('Wallet not connected.');
-      if (typeof provider.signAllTransactions === 'function') {
-        return provider.signAllTransactions(transactions);
-      }
-      const out = [];
-      for (let i = 0; i < transactions.length; i += 1) {
-        out.push(await provider.signTransaction(transactions[i]));
-      }
-      return out;
+      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      return activeAdapter.signAllTransactions(transactions);
     },
 
     async signMessage(messageBytes) {
-      const provider = await getActiveProvider();
-      if (!publicKey) throw new Error('Wallet not connected.');
-      if (typeof provider.signMessage === 'function') {
-        const result = await provider.signMessage(messageBytes, 'utf8');
-        if (result && result.signature) return result;
-        return result;
-      }
-      throw new Error('Solflare does not support signMessage.');
+      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      return activeAdapter.signMessage(messageBytes);
     },
   };
 
