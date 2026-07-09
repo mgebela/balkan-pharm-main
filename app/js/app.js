@@ -1233,10 +1233,8 @@ function initFirebaseSync() {
       if (initialView) {
         if (initialView === 'admin' && !isAdminPanelRole(currentUserRole)) {
           showView('dashboard');
-        } else if (initialView === 'pitchdeck' && !isSuperadminRole(currentUserRole)) {
-          showView('dashboard');
         } else if (
-          ['dashboard', 'plants', 'adopt', 'cpvo', 'pitchdeck', 'toolbox', 'admin', 'danas'].includes(initialView)
+          ['dashboard', 'plants', 'adopt', 'toolbox', 'admin', 'danas'].includes(initialView)
         ) {
           showView(initialView);
         }
@@ -1376,8 +1374,6 @@ function initFirebaseSync() {
     dashboard: 'Dashboard',
     plants: 'Plants & journal',
     adopt: 'Adopt a plant',
-    cpvo: 'CPVO form',
-    pitchdeck: 'Pitch deck',
     growlog: 'Grow log',
     toolbox: 'Tools',
     admin: 'Admin Panel',
@@ -1399,10 +1395,6 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
-    if (id === 'pitchdeck' && !isSuperadminRole(currentUserRole)) {
-      id = 'dashboard';
-    }
-
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
     if (id === 'growlog' && extra) {
@@ -1448,11 +1440,6 @@ function initFirebaseSync() {
         alert('Access denied — you do not have admin privileges.');
         return;
       }
-    }
-
-    if (view === "pitchdeck") {
-      await resolveCurrentUserRole();
-      if (!isSuperadminRole(currentUserRole)) return;
     }
 
     if (view !== "growlog") currentGrowlogPlantId = null;
