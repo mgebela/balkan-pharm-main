@@ -1,0 +1,23 @@
+{
+  "name": "dnevnik-chain",
+  "private": true,
+  "type": "module",
+  "description": "Solana devnet deploy scripts for dnevnik.live ($GROW SPL token + seed NFT collection)",
+  "scripts": {
+    "create-keypair": "node create-keypair.js",
+    "airdrop": "node airdrop.js",
+    "deploy:grow": "node deploy-grow-token.js",
+    "deploy:collection": "node deploy-seed-collection.js"
+  },
+  "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
+    "@metaplex-foundation/umi": "^0.9.2",
+    "@metaplex-foundation/umi-bundle-defaults": "^0.9.2",
+    "@solana/web3.js": "^1.98.4"
+  },
+  "overrides": {
+    "rpc-websockets": {
+      "uuid": "^8.3.2"
+    }
+  }
+}
