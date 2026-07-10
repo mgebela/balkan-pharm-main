@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260708h" />
+  <link rel="stylesheet" href="styles/app.css?v=20260710" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -162,7 +162,11 @@
           <form class="adopt-seed-form" id="adopt-seed-form">
             <label>
               Strain / name *
-              <input type="text" id="adopt-seed-name" placeholder="e.g. CBD Auto" autocomplete="off" required />
+              <input type="text" id="adopt-seed-name" placeholder="e.g. CBD Auto" autocomplete="off" required maxlength="32" />
+            </label>
+            <label>
+              Batch (optional)
+              <input type="text" id="adopt-seed-batch" placeholder="e.g. B-2026-07" autocomplete="off" maxlength="32" />
             </label>
             <label>
               Link to a journal plant (optional)
@@ -668,12 +672,13 @@
       }
     })();
   </script>
-  <script src="js/chain-config.js?v=20260708f"></script>
+  <script src="js/chain-config.js?v=20260710"></script>
   <script src="js/solana-wallet.js?v=20260708h"></script>
   <script src="js/wallet-link.js?v=20260708h"></script>
+  <script src="js/seed-chain.js?v=20260710"></script>
   <script src="js/metric-ui.js?v=20260708f"></script>
   <script src="js/plant-pixel-sprites.js?v=20260708f"></script>
-  <script src="js/plant-token.js?v=20260708h"></script>
+  <script src="js/plant-token.js?v=20260710"></script>
   <script src="js/app.js?v=20260709"></script>
 </body>
 </html>

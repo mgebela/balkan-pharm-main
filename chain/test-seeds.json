@@ -1,0 +1,14 @@
+[
+  { "name": "CBD Auto #1", "strain": "CBD Auto", "batch": "B-2026-07-A", "plantId": null },
+  { "name": "CBD Auto #2", "strain": "CBD Auto", "batch": "B-2026-07-A", "plantId": null },
+  { "name": "CBD Auto #3", "strain": "CBD Auto", "batch": "B-2026-07-A", "plantId": null },
+  { "name": "Charlotte's Web #1", "strain": "Charlotte's Web", "batch": "B-2026-07-B", "plantId": null },
+  { "name": "Charlotte's Web #2", "strain": "Charlotte's Web", "batch": "B-2026-07-B", "plantId": null },
+  { "name": "Harlequin #1", "strain": "Harlequin", "batch": "B-2026-07-B", "plantId": null },
+  { "name": "Harlequin #2", "strain": "Harlequin", "batch": "B-2026-07-B", "plantId": null },
+  { "name": "ACDC #1", "strain": "ACDC", "batch": "B-2026-07-C", "plantId": null },
+  { "name": "ACDC #2", "strain": "ACDC", "batch": "B-2026-07-C", "plantId": null },
+  { "name": "Ringo's Gift #1", "strain": "Ringo's Gift", "batch": "B-2026-07-C", "plantId": null },
+  { "name": "Ringo's Gift #2", "strain": "Ringo's Gift", "batch": "B-2026-07-C", "plantId": null },
+  { "name": "Sour Tsunami #1", "strain": "Sour Tsunami", "batch": "B-2026-07-D", "plantId": null }
+]

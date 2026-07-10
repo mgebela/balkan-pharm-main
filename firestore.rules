@@ -132,6 +132,31 @@ service cloud.firestore {
     }
   }
 
+  // ── Seed NFT mint requests (M2) ──────────────────────────
+  // Users file a mint request; the devnet minter (Admin SDK, bypasses
+  // rules) mints the NFT and writes back mintAddress / metadataUri.
+
+  match /seedMints/{requestId} {
+    allow create: if signedIn()
+      && request.resource.data.uid == request.auth.uid
+      && request.resource.data.status == 'pending'
+      && request.resource.data.name is string
+      && request.resource.data.name.size() > 0
+      && request.resource.data.name.size() <= 32
+      && request.resource.data.strain is string
+      && request.resource.data.strain.size() > 0
+      && request.resource.data.batch is string
+      && request.resource.data.batch.size() > 0
+      && (!('recipient' in request.resource.data)
+        || isValidSolanaPubkey(request.resource.data.recipient));
+
+    allow read: if signedIn()
+      && (resource.data.uid == request.auth.uid || isAdminOrSuper());
+
+    // Only the backend minter (Admin SDK) may change status / results.
+    allow update, delete: if false;
+  }
+
   // ── Login analytics (superadmin report) ──────────────────
 
   match /loginEvents/{eventId} {

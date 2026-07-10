@@ -3691,6 +3691,24 @@ body:not(.app-loading) {
   font-size: 0.78rem;
   color: var(--text-muted);
 }
+.adopt-token-chain {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.adopt-token-chain a {
+  color: inherit;
+  text-decoration: underline;
+}
+.adopt-token-chain--minted {
+  color: #34d399;
+}
+.adopt-token-chain--minted a {
+  color: #34d399;
+}
+.adopt-token-chain--failed {
+  color: #f87171;
+}
 .adopt-progress {
   height: 8px;
   border-radius: 999px;

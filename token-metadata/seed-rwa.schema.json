@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://dnevnik.live/token-metadata/seed-rwa.schema.json",
+  "title": "dnevnik.live Seed RWA metadata (v1.0.0)",
+  "description": "Metadata schema for dnevnik.live seed NFTs (M2). Extends the Metaplex non-fungible token standard with a structured `rwa` block describing the physical seed. Metadata JSON is uploaded to Arweave (via Irys) and referenced by the on-chain token metadata URI.",
+  "type": "object",
+  "required": ["name", "symbol", "description", "image", "attributes", "rwa"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "maxLength": 32,
+      "description": "Display name of the seed NFT (Metaplex on-chain limit: 32 chars)."
+    },
+    "symbol": { "type": "string", "const": "SEED" },
+    "description": { "type": "string" },
+    "image": { "type": "string", "format": "uri" },
+    "external_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the dnevnik.live grow journal, with ?plant=<plantId> when linked."
+    },
+    "attributes": {
+      "type": "array",
+      "description": "Wallet-visible traits. Always includes Strain, Batch, Stage, Network, Imported; Plant ID when linked.",
+      "items": {
+        "type": "object",
+        "required": ["trait_type", "value"],
+        "properties": {
+          "trait_type": { "type": "string" },
+          "value": { "type": ["string", "number"] }
+        }
+      }
+    },
+    "properties": {
+      "type": "object",
+      "properties": {
+        "category": { "type": "string" },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["uri", "type"],
+            "properties": {
+              "uri": { "type": "string", "format": "uri" },
+              "type": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "rwa": {
+      "type": "object",
+      "description": "Machine-readable real-world-asset record for the physical seed.",
+      "required": ["standard", "version", "assetType", "strain", "batch", "cluster", "importedAt"],
+      "properties": {
+        "standard": { "type": "string", "const": "dnevnik.live/seed-rwa" },
+        "version": { "type": "string", "const": "1.0.0" },
+        "assetType": { "type": "string", "const": "seed" },
+        "strain": { "type": "string", "description": "Cultivar / strain name of the seed." },
+        "batch": { "type": "string", "description": "Physical batch code the seed belongs to." },
+        "plantId": {
+          "type": ["string", "null"],
+          "description": "dnevnik.live plant ID this seed is linked to in the grow journal (null until planted)."
+        },
+        "journalUrl": { "type": "string", "format": "uri" },
+        "cluster": { "type": "string", "enum": ["devnet", "mainnet-beta"] },
+        "importedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

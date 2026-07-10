@@ -12,7 +12,7 @@
     walletName: 'Solana wallet',
     walletDownloadUrl: 'https://solana.com/solutions/wallets',
     devnetNotice:
-      'Connect a Solana wallet on devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.',
+      'Connect a Solana wallet on devnet. Seed NFTs are minted for real on devnet via the mint queue; $GROW SPL rewards are still simulated locally.',
     explorerAddress: function (address) {
       return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
     },

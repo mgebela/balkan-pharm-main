@@ -187,7 +187,8 @@
       })();
     },
 
-    // Mint a new seed token into the wallet.
+    // Mint a new seed token into the wallet. When signed in, also files a
+    // real devnet mint request (seedMints queue) — see seed-chain.js.
     importSeed(opts) {
       const o = opts || {};
       return chainCall(() => {
@@ -202,6 +203,7 @@
           id: tokenId(),
           name,
           strain: String(o.strain || '').trim(),
+          batch: String(o.batch || '').trim(),
           plantId: o.plantId || null,
           stageIndex: 0,
           createdAt: now,
@@ -218,7 +220,32 @@
         wallet.tokens.unshift(token);
         writeWallet(wallet);
         return { token, tx };
-      }, 700);
+      }, 700).then(async (result) => {
+        const SC = window.SeedChain;
+        if (SC && SC.isEnabled()) {
+          try {
+            const requestId = await SC.requestSeedMint({
+              name: result.token.name,
+              strain: result.token.strain || result.token.name,
+              batch: result.token.batch,
+              plantId: result.token.plantId,
+            });
+            if (requestId) {
+              const wallet = readWallet();
+              const stored = wallet.tokens.find((t) => t.id === result.token.id);
+              if (stored) {
+                stored.mintRequestId = requestId;
+                writeWallet(wallet);
+              }
+              result.mintRequestId = requestId;
+            }
+          } catch (err) {
+            // The local token still exists; on-chain mint can be retried later.
+            console.warn('Devnet seed mint request failed', err);
+          }
+        }
+        return result;
+      });
     },
 
     // Advance a token to the next growth stage and mint the GROW reward.
@@ -559,6 +586,7 @@
       '</div>' +
       '</div>' +
       (token.plantId ? '<p class="adopt-token-link">🔗 linked to a journal plant</p>' : '') +
+      chainMintHtml(token) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
@@ -576,6 +604,35 @@
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
     );
+  }
+
+  // On-chain (devnet) mint status for a token, from the seedMints queue.
+  function chainMintHtml(token) {
+    const SC = window.SeedChain;
+    if (!SC || !token.mintRequestId) return '';
+    const mint = SC.getMint(token.mintRequestId);
+    if (!mint) {
+      return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint requested…</p>';
+    }
+    if (mint.status === 'minted' && mint.mintAddress) {
+      const explorer =
+        window.ChainConfig && window.ChainConfig.explorerAddress
+          ? ChainConfig.explorerAddress(mint.mintAddress)
+          : 'https://solscan.io/account/' + encodeURIComponent(mint.mintAddress) + '?cluster=devnet';
+      return (
+        '<p class="adopt-token-chain adopt-token-chain--minted">⛓ Minted on devnet: ' +
+        '<a href="' + esc(explorer) + '" target="_blank" rel="noopener noreferrer"><code>' +
+        esc(shortAddr(mint.mintAddress)) + '</code></a>' +
+        (mint.metadataUri
+          ? ' · <a href="' + esc(mint.metadataUri) + '" target="_blank" rel="noopener noreferrer">metadata</a>'
+          : '') +
+        '</p>'
+      );
+    }
+    if (mint.status === 'failed') {
+      return '<p class="adopt-token-chain adopt-token-chain--failed">⛓ Devnet mint failed — it will be retried.</p>';
+    }
+    return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint pending…</p>';
   }
 
   function renderGarden(wallet) {
@@ -919,9 +976,11 @@
         e.preventDefault();
         if (busy) return;
         const nameEl = document.getElementById('adopt-seed-name');
+        const batchEl = document.getElementById('adopt-seed-batch');
         const plantSel = document.getElementById('adopt-seed-plant');
         const name = nameEl ? nameEl.value.trim() : '';
         if (!name) return;
+        const batch = batchEl ? batchEl.value.trim() : '';
         let plantId = plantSel ? plantSel.value : '';
         let strain = '';
         if (plantId) {
@@ -932,7 +991,7 @@
         setBusy(true);
         if (submitBtn) submitBtn.textContent = 'Minting…';
         try {
-          await PlantToken.importSeed({ name, strain, plantId: plantId || null });
+          await PlantToken.importSeed({ name, strain, batch, plantId: plantId || null });
           seedForm.reset();
           render();
         } catch (err) {
@@ -1110,6 +1169,12 @@
   PlantToken.onChange(renderGlobalWalletUI);
   if (window.WalletLink && typeof window.WalletLink.onChange === 'function') {
     window.WalletLink.onChange(renderGlobalWalletUI);
+  }
+  if (window.SeedChain && typeof window.SeedChain.onChange === 'function') {
+    // Re-render token cards when devnet mint results land in Firestore.
+    window.SeedChain.onChange(function () {
+      render();
+    });
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', renderGlobalWalletUI);
