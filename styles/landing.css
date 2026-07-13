@@ -96,15 +96,9 @@ body {
   align-items: center;
   font-weight: 700;
   font-size: 1.35rem;
-  color: var(--accent);
+  color: var(--accent-bright);
   text-decoration: none;
   letter-spacing: -0.02em;
-}
-
-.logo-img {
-  height: 56px;
-  width: auto;
-  display: block;
 }
 
 .nav {
@@ -779,10 +773,6 @@ body {
 @media (max-width: 640px) {
   .header-inner {
     padding: 0.75rem 0;
-  }
-
-  .logo-img {
-    height: 44px;
   }
 
   .hero-inner {
