@@ -6,37 +6,13 @@
  * writes the mint address + metadata URI back to the request document, where
  * the app picks it up live.
  *
- * Auth: needs a Firebase service account key at
- *   chain/keys/firebase-service-account.json
- * (Firebase Console → Project settings → Service accounts → Generate new
- *  private key. The keys/ folder is gitignored.)
- *
  * Usage: node process-seed-mints.js [--watch]
  *   --watch  keep running and process new requests as they arrive
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import admin from 'firebase-admin';
-import { KEYS_DIR } from './common.js';
+import { initFirestore, admin } from './firebase.js';
 import { createMintClient, mintSeedNft } from './mint-seed-lib.js';
 
-const SERVICE_ACCOUNT_PATH = path.join(KEYS_DIR, 'firebase-service-account.json');
-
-if (!fs.existsSync(SERVICE_ACCOUNT_PATH)) {
-  console.error(
-    'Missing Firebase service account key.\n' +
-      'Download it from Firebase Console → Project settings → Service accounts\n' +
-      '→ "Generate new private key" and save it as:\n  ' +
-      SERVICE_ACCOUNT_PATH
-  );
-  process.exit(1);
-}
-
-admin.initializeApp({
-  credential: admin.credential.cert(JSON.parse(fs.readFileSync(SERVICE_ACCOUNT_PATH, 'utf8'))),
-});
-
-const db = admin.firestore();
+const db = initFirestore();
 const umi = createMintClient();
 const watch = process.argv.includes('--watch');
 

@@ -1234,7 +1234,7 @@ function initFirebaseSync() {
         if (initialView === 'admin' && !isAdminPanelRole(currentUserRole)) {
           showView('dashboard');
         } else if (
-          ['dashboard', 'plants', 'adopt', 'toolbox', 'admin', 'danas'].includes(initialView)
+          ['dashboard', 'plants', 'adopt', 'market', 'toolbox', 'admin', 'danas'].includes(initialView)
         ) {
           showView(initialView);
         }
@@ -1374,6 +1374,7 @@ function initFirebaseSync() {
     dashboard: 'Dashboard',
     plants: 'Plants & journal',
     adopt: 'Adopt a plant',
+    market: 'Market',
     growlog: 'Grow log',
     toolbox: 'Tools',
     admin: 'Admin Panel',
@@ -1418,6 +1419,7 @@ function initFirebaseSync() {
       renderJournal();
     }
     if (id === 'adopt' && window.AdoptPlant) window.AdoptPlant.render();
+    if (id === 'market' && window.Market) window.Market.render();
     if (id === 'toolbox') renderToolbox();
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);

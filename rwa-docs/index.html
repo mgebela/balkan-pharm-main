@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dnevnik.live — RWA documentation</title>
+  <meta name="description" content="Public documentation for the dnevnik.live real-world-asset (RWA) architecture: token standards, growth minting and redemption flow on Solana." />
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #2d333b;
+      --text: #e6edf3;
+      --muted: #9aa4b2;
+      --accent: #2dd4bf;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; padding: 3rem 1.4rem 5rem; }
+    header.site { margin-bottom: 3rem; }
+    header.site .kicker { color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.78rem; }
+    h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; }
+    .sub { color: var(--muted); font-size: 1.02rem; max-width: 640px; }
+    h2 { font-size: 1.4rem; margin: 3rem 0 0.8rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; }
+    p, li { color: var(--text); font-size: 0.95rem; }
+    li { margin-bottom: 0.35rem; }
+    code {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.85em;
+    }
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    pre code { background: none; border: none; padding: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
+    th { background: var(--panel); }
+    a { color: var(--accent); }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      margin-left: 0.6rem;
+      vertical-align: middle;
+    }
+    .flow { counter-reset: step; list-style: none; padding-left: 0; }
+    .flow li { position: relative; padding-left: 2.4rem; margin-bottom: 0.8rem; }
+    .flow li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute; left: 0; top: 0.1rem;
+      width: 1.6rem; height: 1.6rem;
+      border-radius: 50%;
+      background: var(--panel);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 0.8rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.82rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="site">
+      <span class="kicker">dnevnik.live · public docs</span>
+      <h1>Seed RWA architecture <span class="badge">Solana devnet</span></h1>
+      <p class="sub">
+        How dnevnik.live tokenizes physical CBD plants as real-world assets (RWAs)
+        on Solana: token standards, growth minting, marketplace and redemption flow.
+      </p>
+    </header>
+
+    <h2 id="architecture">1. RWA architecture</h2>
+    <p>
+      Each physical seed adopted on <a href="https://dnevnik.live">dnevnik.live</a> is represented
+      by a <strong>Seed NFT</strong> — a Metaplex NFT in the verified
+      <em>dnevnik.live Seeds</em> collection. The NFT is the on-chain record of the asset;
+      the public grow journal is the off-chain evidence trail. The two are linked in both
+      directions: the NFT metadata references the journal plant ID, and the app shows the
+      on-chain mint address, transactions and metadata for each token.
+    </p>
+    <h3>Components</h3>
+    <ul>
+      <li><strong>App (dnevnik.live/app)</strong> — Firebase-authenticated grow journal. Users connect a Solana wallet (multi-wallet or watch-only) and link it to their account by signing a message.</li>
+      <li><strong>Seed NFTs</strong> — one per physical seed; strain, batch and linked plant ID live in the metadata (Arweave, uploaded via Irys).</li>
+      <li><strong>$GROW SPL token</strong> — fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
+      <li><strong>Mint queue</strong> — mint and settlement requests are filed in Firestore; an authority-operated worker executes them on devnet and writes back transaction signatures. This queue is the devnet stand-in for backend services / on-chain programs planned for mainnet.</li>
+    </ul>
+    <h3>Trust model (devnet MVP)</h3>
+    <p>
+      On devnet, the collection authority also acts as metadata update authority, $GROW mint
+      authority and marketplace escrow. Growth-stage updates are only executed by the authority
+      after the corresponding journal progress exists, and rewards are computed server-side.
+      The mainnet path replaces the queue with an on-chain escrow program and oracle-verified
+      growth attestations.
+    </p>
+
+    <h2 id="standards">2. Token standards</h2>
+    <h3>Seed NFT (non-fungible)</h3>
+    <p>
+      Metaplex Token Metadata standard, extended with a machine-readable
+      <code>rwa</code> block. Full JSON Schema:
+      <a href="https://dnevnik.live/token-metadata/seed-rwa.schema.json"><code>seed-rwa.schema.json</code></a>.
+    </p>
+<pre><code>{
+  "name": "CBD Auto #1",
+  "symbol": "SEED",
+  "image": "…",
+  "attributes": [
+    { "trait_type": "Strain",  "value": "CBD Auto" },
+    { "trait_type": "Batch",   "value": "B-2026-07-A" },
+    { "trait_type": "Stage",   "value": "Flowering" },
+    { "trait_type": "Plant ID","value": "plant-abc" }
+  ],
+  "rwa": {
+    "standard": "dnevnik.live/seed-rwa",
+    "version": "1.0.0",
+    "assetType": "flower",
+    "strain": "CBD Auto",
+    "batch": "B-2026-07-A",
+    "plantId": "plant-abc",
+    "cluster": "devnet",
+    "importedAt": "2026-07-10T00:00:00Z",
+    "growthHistory": [
+      { "stage": "germination", "reward": 10, "ts": "…", "signature": "…" }
+    ]
+  }
+}</code></pre>
+    <p>
+      The metadata URI is updated at every growth stage; <code>rwa.assetType</code> flips from
+      <code>seed</code> to <code>flower</code> at the flowering stage, which is what makes
+      seed RWAs and flower-stage tokens two distinct tradeable asset types on the marketplace.
+    </p>
+    <h3>$GROW (fungible, SPL)</h3>
+    <table>
+      <tr><th>Property</th><th>Value</th></tr>
+      <tr><td>Standard</td><td>SPL token + Metaplex fungible metadata</td></tr>
+      <tr><td>Symbol / decimals</td><td>GROW / 9</td></tr>
+      <tr><td>Issuance</td><td>Minted per growth stage: Germination 10, Seedling 20, Vegetative 35, Flowering 60, Harvest 100</td></tr>
+      <tr><td>Utility</td><td>Marketplace currency; future redemption &amp; governance</td></tr>
+    </table>
+
+    <h2 id="growth">3. Growth minting flow</h2>
+    <ol class="flow">
+      <li>User documents growth in the journal and advances the plant token a stage in the app.</li>
+      <li>The app files a <code>growthMints</code> request referencing the Seed NFT mint address.</li>
+      <li>The worker uploads new stage metadata to Arweave (Stage trait + <code>growthHistory</code>) and updates the NFT metadata URI on-chain.</li>
+      <li>The worker mints the stage's $GROW reward to the holder's wallet.</li>
+      <li>The app displays the real transaction signatures (Solscan links) in the token's history.</li>
+    </ol>
+
+    <h2 id="marketplace">4. Marketplace (devnet MVP)</h2>
+    <ol class="flow">
+      <li><strong>List:</strong> the seller signs a transfer of the NFT to the marketplace escrow wallet and the listing goes live with a $GROW price.</li>
+      <li><strong>Buy:</strong> the buyer signs a $GROW payment directly to the seller.</li>
+      <li><strong>Settle:</strong> the worker verifies the payment on-chain and releases the NFT from escrow to the buyer. Sellers can cancel live listings; the NFT is returned.</li>
+    </ol>
+    <p>
+      The swap is escrow-mediated rather than atomic — an accepted trade-off for the devnet MVP.
+      Mainnet uses an on-chain escrow program so neither leg depends on the operator.
+    </p>
+
+    <h2 id="redemption">5. Redemption flow</h2>
+    <p>
+      Redemption converts the on-chain asset back into its real-world counterpart
+      (harvest share of the plant, subject to applicable regulation).
+    </p>
+    <ol class="flow">
+      <li>A harvest-stage NFT holder requests redemption in the app (planned M5; devnet mock until then).</li>
+      <li>The redemption burns the NFT (or marks it redeemed via a frozen redemption trait), permanently retiring the claim.</li>
+      <li>The operator fulfils the physical delivery / payout recorded against the batch code, and publishes the fulfilment reference in the journal.</li>
+      <li>$GROW earned by the plant remains with the holder — only the asset NFT is retired.</li>
+    </ol>
+
+    <h2 id="addresses">6. Deployed addresses (devnet)</h2>
+    <p>
+      Published after the M1 devnet deploy in
+      <a href="https://github.com/mgebela/balkan-pharm-main">the repository</a>
+      (<code>chain/deployed.devnet.json</code>) and in the app's chain config.
+      All assets are on <strong>devnet</strong> — they carry no monetary value.
+    </p>
+
+    <footer>
+      dnevnik.live · Seed RWA docs · schema version 1.0.0 ·
+      <a href="https://dnevnik.live">dnevnik.live</a> ·
+      <a href="https://dnevnik.live/token-metadata/seed-rwa.schema.json">seed-rwa.schema.json</a>
+    </footer>
+  </div>
+</body>
+</html>

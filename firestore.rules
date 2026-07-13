@@ -157,6 +157,74 @@ service cloud.firestore {
     allow update, delete: if false;
   }
 
+  // ── Growth mint requests (M3) ────────────────────────────
+  // Filed when a plant token with a real Seed NFT advances a stage.
+  // The backend minter updates the NFT metadata and mints the $GROW
+  // reward; rewards are computed server-side.
+
+  match /growthMints/{requestId} {
+    allow create: if signedIn()
+      && request.resource.data.uid == request.auth.uid
+      && request.resource.data.status == 'pending'
+      && request.resource.data.mintAddress is string
+      && request.resource.data.mintAddress.size() > 0
+      && request.resource.data.stage in
+        ['germination', 'seedling', 'vegetative', 'flowering', 'harvest']
+      && (!('recipient' in request.resource.data)
+        || isValidSolanaPubkey(request.resource.data.recipient));
+
+    allow read: if signedIn()
+      && (resource.data.uid == request.auth.uid || isAdminOrSuper());
+
+    allow update, delete: if false;
+  }
+
+  // ── Marketplace listings (M4, devnet MVP) ────────────────
+  // Seller escrows the NFT to the authority wallet, buyer pays $GROW to
+  // the seller; the settlement script verifies both on-chain and moves
+  // the listing through escrow_pending → active → sale_pending → sold.
+
+  match /marketListings/{listingId} {
+    // Anyone signed in can browse the market.
+    allow read: if signedIn();
+
+    allow create: if signedIn()
+      && request.resource.data.uid == request.auth.uid
+      && request.resource.data.status == 'escrow_pending'
+      && request.resource.data.mintAddress is string
+      && request.resource.data.mintAddress.size() > 0
+      && isValidSolanaPubkey(request.resource.data.sellerPubkey)
+      && request.resource.data.priceGrow is int
+      && request.resource.data.priceGrow > 0
+      && request.resource.data.name is string
+      && request.resource.data.name.size() > 0
+      && request.resource.data.escrowSignature is string
+      && request.resource.data.escrowSignature.size() > 0;
+
+    // Buyer claims an active listing with their payment signature…
+    allow update: if signedIn() && (
+      (
+        resource.data.status == 'active'
+        && request.resource.data.status == 'sale_pending'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'buyerUid', 'buyerPubkey', 'paymentSignature'])
+        && request.resource.data.buyerUid == request.auth.uid
+        && isValidSolanaPubkey(request.resource.data.buyerPubkey)
+        && request.resource.data.paymentSignature is string
+        && request.resource.data.paymentSignature.size() > 0
+      )
+      // …or the seller requests a cancel while the listing is live.
+      || (
+        resource.data.uid == request.auth.uid
+        && resource.data.status == 'active'
+        && request.resource.data.status == 'cancel_requested'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+      )
+    );
+
+    allow delete: if false;
+  }
+
   // ── Login analytics (superadmin report) ──────────────────
 
   match /loginEvents/{eventId} {

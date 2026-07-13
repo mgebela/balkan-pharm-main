@@ -78,3 +78,35 @@ export function buildSeedMetadata(seed) {
     },
   };
 }
+
+/**
+ * Metadata for an already-minted seed NFT that advanced to a new growth
+ * stage (M3). Same schema as the seed metadata, with the Stage trait
+ * updated and a growthHistory log in the `rwa` block.
+ *
+ * @param {object} seed    { name, strain, batch, plantId?, importedAt? }
+ * @param {object} stage   { key, label, reward }
+ * @param {Array}  history [{ stage, reward, ts, signature? }, …] oldest first
+ */
+export function buildStageMetadata(seed, stage, history) {
+  const metadata = buildSeedMetadata(seed);
+  const assetType = stage.key === 'flowering' || stage.key === 'harvest' ? 'flower' : 'seed';
+
+  metadata.description =
+    `dnevnik.live plant RWA — strain "${metadata.rwa.strain}", batch ${metadata.rwa.batch}, ` +
+    `stage: ${stage.label}. Growth from seed to harvest is documented in the public grow journal.`;
+
+  const stageAttr = metadata.attributes.find((a) => a.trait_type === 'Stage');
+  if (stageAttr) stageAttr.value = stage.label;
+
+  metadata.rwa.assetType = assetType;
+  metadata.rwa.stage = stage.key;
+  metadata.rwa.growthHistory = (history || []).map((h) => ({
+    stage: h.stage,
+    reward: Number(h.reward || 0),
+    ts: h.ts || null,
+    signature: h.signature || null,
+  }));
+
+  return metadata;
+}

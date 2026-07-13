@@ -12,10 +12,12 @@
   const cache = {
     uid: '',
     mints: {}, // requestId -> seedMints doc data
+    growth: {}, // requestId -> growthMints doc data
   };
 
   const listeners = new Set();
   let unsubscribeSnapshot = null;
+  let unsubscribeGrowth = null;
 
   function emit() {
     listeners.forEach(function (fn) {
@@ -46,8 +48,13 @@
       unsubscribeSnapshot();
       unsubscribeSnapshot = null;
     }
+    if (unsubscribeGrowth) {
+      unsubscribeGrowth();
+      unsubscribeGrowth = null;
+    }
     cache.uid = uid || '';
     cache.mints = {};
+    cache.growth = {};
     if (!uid) {
       emit();
       return;
@@ -67,6 +74,23 @@
         },
         function (err) {
           console.warn('seedMints watch failed', err);
+        }
+      );
+    unsubscribeGrowth = firebase
+      .firestore()
+      .collection('growthMints')
+      .where('uid', '==', uid)
+      .onSnapshot(
+        function (snap) {
+          const next = {};
+          snap.forEach(function (doc) {
+            next[doc.id] = Object.assign({ id: doc.id }, doc.data());
+          });
+          cache.growth = next;
+          emit();
+        },
+        function (err) {
+          console.warn('growthMints watch failed', err);
         }
       );
   }
@@ -118,6 +142,74 @@
 
       const ref = await firebase.firestore().collection('seedMints').add(request);
       return ref.id;
+    },
+
+    getGrowth(requestId) {
+      return requestId ? cache.growth[requestId] || null : null;
+    },
+
+    /*
+     * File an on-chain growth request (M3): the minter updates the seed
+     * NFT's stage metadata and mints the $GROW reward to the holder.
+     * Returns the request id, or null when not signed in.
+     */
+    async requestGrowthMint(params) {
+      const user = currentUser();
+      if (!user) return null;
+      if (!params || !params.mintAddress) {
+        throw new Error('Seed NFT is not minted on devnet yet.');
+      }
+
+      const linked = window.WalletLink ? WalletLink.getProfile() : {};
+      const request = {
+        uid: user.uid,
+        mintAddress: String(params.mintAddress),
+        seedMintRequestId: params.seedMintRequestId || null,
+        stage: String(params.stage),
+        name: String(params.name || '').trim().slice(0, 32),
+        strain: String(params.strain || params.name || '').trim(),
+        batch: String(params.batch || '').trim() || defaultBatch(),
+        plantId: params.plantId || null,
+        status: 'pending',
+        cluster: 'devnet',
+        requestedAt: new Date().toISOString(),
+      };
+      if (linked.solanaPubkey) {
+        request.recipient = linked.solanaPubkey;
+      }
+
+      const ref = await firebase.firestore().collection('growthMints').add(request);
+      return ref.id;
+    },
+
+    /*
+     * On-chain $GROW balance (whole tokens) for a wallet address.
+     * Returns null when the $GROW mint is not deployed/configured yet.
+     */
+    async fetchGrowBalance(ownerAddress) {
+      const cfg = window.ChainConfig || {};
+      if (!cfg.growMint || !ownerAddress) return null;
+      const res = await fetch(cfg.rpcUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTokenAccountsByOwner',
+          params: [ownerAddress, { mint: cfg.growMint }, { encoding: 'jsonParsed' }],
+        }),
+      });
+      const json = await res.json();
+      const accounts = (json.result && json.result.value) || [];
+      let total = 0;
+      accounts.forEach(function (a) {
+        try {
+          total += Number(a.account.data.parsed.info.tokenAmount.uiAmount || 0);
+        } catch {
+          // ignore malformed accounts
+        }
+      });
+      return total;
     },
   };
 

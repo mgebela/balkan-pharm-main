@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260710" />
+  <link rel="stylesheet" href="styles/app.css?v=20260713" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -26,6 +26,10 @@
         <a href="#" class="nav-item" data-view="adopt">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
           <span>Adopt a plant</span>
+        </a>
+        <a href="#" class="nav-item" data-view="market">
+          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
+          <span>Market</span>
         </a>
         <a href="#" class="nav-item" data-view="toolbox">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
@@ -54,6 +58,10 @@
       <a href="#" class="nav-item" data-view="adopt">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
         <span class="bottom-nav-label">Adopt</span>
+      </a>
+      <a href="#" class="nav-item" data-view="market">
+        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
+        <span class="bottom-nav-label">Market</span>
       </a>
       <a href="#" class="nav-item" data-view="toolbox">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
@@ -179,6 +187,39 @@
         <section class="adopt-section plants-journal-section" id="adopt-garden-section" hidden>
           <h2 class="section-heading">My token garden</h2>
           <div class="adopt-token-grid" id="adopt-token-grid"></div>
+        </section>
+      </div>
+
+      <div id="view-market" class="view">
+        <p class="market-notice" id="market-notice" hidden></p>
+
+        <section class="plants-journal-section" id="market-list-section" hidden>
+          <h2 class="section-heading">List an asset</h2>
+          <p class="market-hint">
+            Sell your devnet-minted seed RWAs and flower-stage tokens for $GROW.
+            Listing escrows the NFT to the marketplace wallet; you can cancel while it is live.
+          </p>
+          <form class="adopt-seed-form" id="market-list-form">
+            <label>
+              Asset *
+              <select id="market-asset-select"><option value="">— choose a minted asset —</option></select>
+            </label>
+            <label>
+              Price ($GROW) *
+              <input type="number" id="market-price-input" min="1" step="1" placeholder="e.g. 50" required />
+            </label>
+            <button type="submit" class="btn btn-primary">List for sale</button>
+          </form>
+        </section>
+
+        <section class="plants-journal-section">
+          <h2 class="section-heading">My listings</h2>
+          <div class="market-grid" id="market-mine-grid"></div>
+        </section>
+
+        <section class="plants-journal-section">
+          <h2 class="section-heading">Browse market</h2>
+          <div class="market-grid" id="market-grid"></div>
         </section>
       </div>
 
@@ -672,13 +713,15 @@
       }
     })();
   </script>
-  <script src="js/chain-config.js?v=20260710"></script>
+  <script src="js/chain-config.js?v=20260713"></script>
   <script src="js/solana-wallet.js?v=20260708h"></script>
   <script src="js/wallet-link.js?v=20260708h"></script>
-  <script src="js/seed-chain.js?v=20260710"></script>
+  <script src="js/seed-chain.js?v=20260713"></script>
+  <script src="js/spl-transfer.js?v=20260713"></script>
+  <script src="js/market.js?v=20260713"></script>
   <script src="js/metric-ui.js?v=20260708f"></script>
   <script src="js/plant-pixel-sprites.js?v=20260708f"></script>
-  <script src="js/plant-token.js?v=20260710"></script>
-  <script src="js/app.js?v=20260709"></script>
+  <script src="js/plant-token.js?v=20260713"></script>
+  <script src="js/app.js?v=20260713"></script>
 </body>
 </html>

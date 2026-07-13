@@ -3709,6 +3709,105 @@ body:not(.app-loading) {
 .adopt-token-chain--failed {
   color: #f87171;
 }
+
+/* ── Marketplace (M4) ─────────────────────────────────────── */
+
+.market-notice {
+  margin: 0 0 1.2rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+.market-hint {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.market-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.market-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+.market-card-name {
+  margin: 0;
+  font-size: 1.02rem;
+}
+.market-card-meta {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  word-break: break-word;
+}
+.market-card-meta a {
+  color: inherit;
+  text-decoration: underline;
+}
+.market-card-foot {
+  margin-top: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+.market-price {
+  font-weight: 700;
+  color: #f59e0b;
+}
+.market-asset-badge {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  color: #2dd4bf;
+}
+.market-asset-badge--flower {
+  background: rgba(199, 155, 255, 0.12);
+  border-color: rgba(199, 155, 255, 0.35);
+  color: #c79bff;
+}
+.market-status {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+.market-status--active {
+  background: rgba(52, 211, 153, 0.12);
+  color: #34d399;
+}
+.market-status--sold {
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+}
+.market-status--failed {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+.market-card-error {
+  margin: 0.3rem 0 0;
+  font-size: 0.75rem;
+  color: #f87171;
+}
 .adopt-progress {
   height: 8px;
   border-radius: 999px;

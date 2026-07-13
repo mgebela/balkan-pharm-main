@@ -249,6 +249,8 @@
     },
 
     // Advance a token to the next growth stage and mint the GROW reward.
+    // When the token has a real devnet Seed NFT, also files an on-chain
+    // growth request (metadata update + $GROW SPL reward) — see seed-chain.js.
     mintGrowth(id) {
       return chainCall(() => {
         const wallet = readWallet();
@@ -271,7 +273,37 @@
         });
         writeWallet(wallet);
         return { token, reward: stage.reward, tx };
-      }, 800);
+      }, 800).then(async (result) => {
+        const SC = window.SeedChain;
+        const token = result.token;
+        const seedMint = SC && token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
+        if (SC && SC.isEnabled() && seedMint && seedMint.mintAddress) {
+          try {
+            const stage = GROWTH_STAGES[token.stageIndex];
+            const requestId = await SC.requestGrowthMint({
+              mintAddress: seedMint.mintAddress,
+              seedMintRequestId: token.mintRequestId,
+              stage: stage.key,
+              name: token.name,
+              strain: token.strain || token.name,
+              batch: token.batch,
+              plantId: token.plantId,
+            });
+            if (requestId) {
+              const wallet = readWallet();
+              const stored = wallet.tokens.find((t) => t.id === token.id);
+              if (stored) {
+                if (!stored.growthRequests) stored.growthRequests = {};
+                stored.growthRequests[stage.key] = requestId;
+                writeWallet(wallet);
+              }
+            }
+          } catch (err) {
+            console.warn('Devnet growth mint request failed', err);
+          }
+        }
+        return result;
+      });
     },
 
     // Burn (remove) a token from the wallet.
@@ -496,7 +528,10 @@
         M.card({
           label: '$GROW balance',
           value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
-          meta: M.row('Rewards', 'Simulated', 'metric-dot--amber'),
+          meta:
+            onchainGrowBalance != null
+              ? M.row('On-chain', onchainGrowBalance.toLocaleString('en-US') + ' $GROW', 'metric-dot--amber')
+              : M.row('Rewards', 'Simulated', 'metric-dot--amber'),
           donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
           modifier: 'amber',
         }) +
@@ -538,6 +573,43 @@
       '</div>';
   }
 
+  // --- On-chain $GROW balance (M3) -----------------------------------------
+  // Once the $GROW mint is deployed and configured in chain-config.js, the
+  // wallet's real devnet balance is shown next to the simulated one.
+
+  let onchainGrowBalance = null;
+  let onchainGrowFetchedFor = '';
+
+  function refreshOnchainGrowBalance() {
+    const SC = window.SeedChain;
+    const cfg = window.ChainConfig || {};
+    const wallet = readWallet();
+    if (!SC || !cfg.growMint || !wallet.connected || !wallet.address) return;
+    if (onchainGrowFetchedFor === wallet.address) return;
+    onchainGrowFetchedFor = wallet.address;
+    SC.fetchGrowBalance(wallet.address)
+      .then(function (balance) {
+        if (balance != null && balance !== onchainGrowBalance) {
+          onchainGrowBalance = balance;
+          render();
+          renderGlobalWalletUI();
+        }
+      })
+      .catch(function (err) {
+        onchainGrowFetchedFor = '';
+        console.warn('On-chain $GROW balance fetch failed', err);
+      });
+  }
+
+  PlantToken.getOnchainGrowBalance = function () {
+    return onchainGrowBalance;
+  };
+
+  PlantToken.refreshOnchainGrowBalance = function () {
+    onchainGrowFetchedFor = '';
+    refreshOnchainGrowBalance();
+  };
+
   function progressPercent(stageIndex) {
     return Math.round((stageIndex / (GROWTH_STAGES.length - 1)) * 100);
   }
@@ -563,10 +635,14 @@
         const date = new Date(h.ts).toLocaleString('en-GB');
         const label = h.type === 'mint' ? 'Seed minted' : 'Grew to ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
         const amt = h.amount ? ' · +' + h.amount + ' $GROW' : '';
+        const real = realTxForHistoryEntry(token, h);
+        const txHtml = real
+          ? '<a href="' + esc(real.url) + '" target="_blank" rel="noopener noreferrer"><code title="' + esc(real.sig) + '">' + esc(shortTx(real.sig)) + '</code></a> · devnet'
+          : '<code title="' + esc(h.tx) + '">' + esc(shortTx(h.tx)) + '</code>';
         return (
           '<li class="adopt-hist-item">' +
           '<span class="adopt-hist-label">' + esc(label) + esc(amt) + '</span>' +
-          '<span class="adopt-hist-meta"><time>' + esc(date) + '</time> · <code title="' + esc(h.tx) + '">' + esc(shortTx(h.tx)) + '</code></span>' +
+          '<span class="adopt-hist-meta"><time>' + esc(date) + '</time> · ' + txHtml + '</span>' +
           '</li>'
         );
       })
@@ -604,6 +680,27 @@
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
     );
+  }
+
+  // Real devnet signature for a history entry, when the on-chain queue
+  // (seedMints / growthMints) has processed it.
+  function realTxForHistoryEntry(token, h) {
+    const SC = window.SeedChain;
+    if (!SC) return null;
+    let sig = '';
+    if (h.type === 'mint' && token.mintRequestId) {
+      const mint = SC.getMint(token.mintRequestId);
+      sig = mint && mint.signature ? mint.signature : '';
+    } else if (h.type === 'growth' && token.growthRequests && token.growthRequests[h.stage]) {
+      const growth = SC.getGrowth(token.growthRequests[h.stage]);
+      sig = growth && growth.signature ? growth.signature : '';
+    }
+    if (!sig) return null;
+    const url =
+      window.ChainConfig && window.ChainConfig.explorerTx
+        ? ChainConfig.explorerTx(sig)
+        : 'https://solscan.io/tx/' + encodeURIComponent(sig) + '?cluster=devnet';
+    return { sig, url };
   }
 
   // On-chain (devnet) mint status for a token, from the seedMints queue.
@@ -666,6 +763,7 @@
 
   function render() {
     syncWalletFromSolana();
+    refreshOnchainGrowBalance();
     const wallet = readWallet();
     const seedSection = document.getElementById('adopt-seed-section');
     const gardenSection = document.getElementById('adopt-garden-section');
