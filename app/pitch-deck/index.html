@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dnevnik.live — Technical overview</title>
-    <meta name="description" content="The operating system for modern CBD cultivation — grow journal, AI co-pilot, and optional plant passport layer." />
+    <meta name="description" content="dnevnik.live — CBD grow journal, AI co-pilot, and harvest-share RWA investing on Solana." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,24 +34,24 @@
           <h1 class="cover-headline">
             The operating system for <span class="grad">modern CBD cultivation.</span>
           </h1>
-          <p class="cover-sub">Journal · AI · sensors · plant passport — one cultivation OS.</p>
+          <p class="cover-sub">Journal · AI · Seed RWA · harvest-share investing — one cultivation OS.</p>
           <p class="slide-remark">
-            A technical stack for logging grows, predicting stress, and optionally tying each plant to a
-            <strong>dynamic passport</strong> — from hobby tents to licensed CBD operations.
+            A technical stack for logging grows, predicting stress, and funding batches through
+            <strong>harvest-share RWAs on Solana</strong> — from hobby tents to licensed CBD operations.
           </p>
 
           <div class="cover-meta">
             <div class="cover-meta-row">
               <span class="meta-label">Stack</span>
-              <span class="meta-value">Local-first PWA · hybrid AI</span>
+              <span class="meta-value">PWA · Firebase · Solana devnet</span>
             </div>
             <div class="cover-meta-row">
               <span class="meta-label">Scope</span>
-              <span class="meta-value">Journal · AI Coach · Plant Passport</span>
+              <span class="meta-value">Journal · Adopt · Harvest-share RWA</span>
             </div>
             <div class="cover-meta-row">
-              <span class="meta-label">Data model</span>
-              <span class="meta-value">Plants · environments · cycles</span>
+              <span class="meta-label">Economics</span>
+              <span class="meta-value">Early mint → bigger harvest stake</span>
             </div>
             <div class="cover-meta-row">
               <span class="meta-label">Live</span>
@@ -109,8 +109,8 @@
           <div class="chip-row chip-row--center">
             <span class="chip">Journal</span>
             <span class="chip">AI Coach</span>
-            <span class="chip">Sensors</span>
-            <span class="chip">Plant Passport</span>
+            <span class="chip">Seed RWA</span>
+            <span class="chip">$GROW</span>
           </div>
         </div>
       </section>
@@ -155,10 +155,10 @@
             <div class="chip-grid chip-grid--6">
               <span class="chip chip--lg"><strong>Log</strong> plants · cycles</span>
               <span class="chip chip--lg"><strong>Coach</strong> predict · alert</span>
-              <span class="chip chip--lg"><strong>Sense</strong> meteo · stress</span>
-              <span class="chip chip--lg"><strong>Schedule</strong> smart reminders</span>
-              <span class="chip chip--lg"><strong>Passport</strong> dNFT · RWA</span>
-              <span class="chip chip--lg"><strong>Local</strong> privacy-first</span>
+              <span class="chip chip--lg"><strong>Mint</strong> Seed NFT · batch</span>
+              <span class="chip chip--lg"><strong>Earn</strong> $GROW per stage</span>
+              <span class="chip chip--lg"><strong>Invest</strong> harvest-share</span>
+              <span class="chip chip--lg"><strong>Trade</strong> market · redeem</span>
             </div>
           </div>
         </div>
@@ -234,151 +234,135 @@
         </div>
       </section>
 
-      <!-- 6. PASSPORT -->
-      <section class="slide slide--dense slide--passport" data-title="Plant Passport">
+      <!-- 6. SEED RWA -->
+      <section class="slide slide--dense slide--passport" data-title="Seed RWA">
         <div class="passport-deco" aria-hidden="true"><div class="passport-orb passport-orb--1"></div></div>
         <div class="slide-inner slide-inner--passport">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">06 · Plant Passport</span>
-            <h2>Living dNFT · <span class="grad">RWA rails.</span></h2>
+            <span class="kicker">06 · Seed RWA</span>
+            <h2>Journal proof. <span class="grad">On-chain stake.</span></h2>
             <p class="slide-remark">
-              Each plant can become a verifiable passport that evolves with real grow data — composable with
-              <strong>RWA</strong> tokenize · issue · settle · trade flows where regulation allows.
+              Each grow batch becomes a <strong>Batch NFT</strong> on Solana. Investors mint <strong>Stake NFTs</strong>
+              with harvest-share weight; metadata lives on Arweave and evolves with every documented growth stage.
+              <strong>Early mint = bigger stake.</strong>
             </p>
           </header>
           <div class="passport-dense">
             <div class="passport-card-wrap passport-card-wrap--sm">
               <div class="passport-card-ring" aria-hidden="true"></div>
               <div class="passport-card">
-                <header class="passport-card-top"><span class="passport-card-label">dNFT</span><span class="passport-card-id">#042</span></header>
+                <header class="passport-card-top"><span class="passport-card-label">SEED</span><span class="passport-card-id">B-2026-07</span></header>
                 <div class="passport-card-art" aria-hidden="true">
                   <svg class="passport-card-svg" viewBox="0 0 240 200" fill="none">
                     <ellipse cx="120" cy="168" rx="72" ry="14" fill="rgba(120,224,143,0.2)"/>
                     <path d="M120 168V92" stroke="rgba(120,224,143,0.45)" stroke-width="3"/><path d="M120 120c-28-18-52-8-68 22 24-8 48-4 68-10" stroke="#78e08f" stroke-width="2" fill="none"/><circle cx="120" cy="72" r="18" stroke="#c79bff" stroke-width="2" fill="rgba(199,155,255,0.08)"/>
                   </svg>
                 </div>
-                <footer class="passport-card-foot"><span class="passport-card-stage">Veg</span><span class="passport-card-score">AI 92</span></footer>
+                <footer class="passport-card-foot"><span class="passport-card-stage">Flowering</span><span class="passport-card-score">3× weight</span></footer>
               </div>
             </div>
             <div class="passport-dense-mid">
               <div class="passport-journey passport-journey--compact">
                 <ol class="pj-steps">
                   <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Seed</span></li>
-                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Sprout</span></li>
+                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Germ</span></li>
                   <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Veg</span></li>
                   <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Flower</span></li>
                   <li class="pj-step pj-step--final"><span class="pj-dot pj-dot--final"></span><span class="pj-name">Harvest</span></li>
                 </ol>
               </div>
               <div class="passport-rwa passport-rwa--compact">
-                <span class="passport-rwa-tag">RWA</span>
+                <span class="passport-rwa-tag">Option A</span>
                 <div class="passport-rwa-flow">
-                  <span class="rwa-step">Tokenize</span><span class="rwa-arrow">→</span><span class="rwa-step">Issue</span><span class="rwa-arrow">→</span><span class="rwa-step">Settle</span><span class="rwa-arrow">→</span><span class="rwa-step rwa-step--final">Trade</span>
+                  <span class="rwa-step">Open batch</span><span class="rwa-arrow">→</span><span class="rwa-step">Mint stake</span><span class="rwa-arrow">→</span><span class="rwa-step">Grow</span><span class="rwa-arrow">→</span><span class="rwa-step rwa-step--final">Split harvest</span>
                 </div>
               </div>
               <div class="chip-grid chip-grid--4">
-                <span class="chip">Genetics</span><span class="chip">COA · terpenes</span><span class="chip">Grow score</span><span class="chip">Evolving art</span>
+                <span class="chip">Strain · batch</span><span class="chip">Plant ID link</span><span class="chip">COA · journal</span><span class="chip">Solscan txs</span>
               </div>
             </div>
           </div>
           <div class="icon-row icon-row--4">
-            <div class="icon-tile"><span class="icon-tile-glyph" aria-hidden="true">J</span><span>Journal</span></div>
-            <div class="icon-tile icon-tile--b"><span class="icon-tile-glyph" aria-hidden="true">AI</span><span>Coach</span></div>
-            <div class="icon-tile icon-tile--o"><span class="icon-tile-glyph" aria-hidden="true">⬢</span><span>Compliance</span></div>
-            <div class="icon-tile icon-tile--p"><span class="icon-tile-glyph" aria-hidden="true">✦</span><span>Partners</span></div>
+            <div class="icon-tile"><span class="icon-tile-glyph" aria-hidden="true">G</span><span>Grower</span></div>
+            <div class="icon-tile icon-tile--b"><span class="icon-tile-glyph" aria-hidden="true">I</span><span>Investor</span></div>
+            <div class="icon-tile icon-tile--o"><span class="icon-tile-glyph" aria-hidden="true">P</span><span>Platform</span></div>
+            <div class="icon-tile icon-tile--p"><span class="icon-tile-glyph" aria-hidden="true">M</span><span>Market</span></div>
           </div>
         </div>
       </section>
 
-      <!-- 7. ADOPT A PLANT -->
-      <section class="slide slide--dense slide--adopt" data-title="Adopt a plant">
+      <!-- 7. HARVEST-SHARE ECONOMICS -->
+      <section class="slide slide--dense slide--adopt" data-title="Harvest-share">
         <div class="adopt-deco" aria-hidden="true"><div class="adopt-orb"></div></div>
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">07 · Adopt a plant</span>
-            <h2>Sponsor a plant. <span class="grad">Share the harvest.</span></h2>
+            <span class="kicker">07 · Harvest-share economics</span>
+            <h2>Fund early. <span class="grad">Own more of the harvest.</span></h2>
             <p class="slide-remark">
-              <strong>Adopt</strong> a plant in the platform, follow its full cycle with live monitoring and passport
-              updates, then redeem <strong>CBD flower</strong> from that grow — or <strong>trade</strong> your stake for
-              partner products like oil, tea, and other CBD goods.
+              <strong>Option A — harvest-share RWA.</strong> A grower opens a batch and documents the cycle in the journal.
+              Investors mint <strong>Stake NFTs</strong> on Solana; share weight depends on <em>when</em> they enter.
+              At harvest, sale proceeds from the marketplace split pro-rata — grower, investors, platform.
             </p>
           </header>
 
-          <div class="adopt-layout">
-            <div class="adopt-viz" aria-label="Adopt to redeem flow">
-              <svg class="adopt-svg" viewBox="0 0 720 240" fill="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="adG" x1="0" y1="240" x2="720" y2="0">
-                    <stop stop-color="#78e08f" stop-opacity="0.4"/>
-                    <stop offset="1" stop-color="#5fb6ff" stop-opacity="0.25"/>
-                  </linearGradient>
-                </defs>
-                <path d="M60 200 H660" stroke="rgba(120,224,143,0.25)" stroke-width="2" stroke-dasharray="5 5"/>
-                <!-- step 1 adopt -->
-                <g transform="translate(24,48)">
-                  <rect width="120" height="140" rx="14" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/>
-                  <circle cx="60" cy="52" r="22" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.12)"/>
-                  <path d="M60 38c0-8 6-14 14-14" stroke="#78e08f" stroke-width="1.5" stroke-linecap="round"/>
-                  <text x="60" y="95" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="700" font-family="system-ui">Adopt</text>
-                  <text x="60" y="115" text-anchor="middle" fill="#6f8a7e" font-size="9">Claim · sponsor</text>
-                  <path d="M48 130h24v28h-24z" stroke="#78e08f" stroke-width="1.25" fill="none" opacity="0.6"/>
-                </g>
-                <path d="M156 118 H184" stroke="#78e08f" stroke-width="2" marker-end="url(#none)"/>
-                <!-- step 2 monitor -->
-                <g transform="translate(188,48)">
-                  <rect width="120" height="140" rx="14" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/>
-                  <rect x="24" y="28" width="72" height="48" rx="8" stroke="#5fb6ff" stroke-width="1.25" fill="rgba(7,20,16,0.6)"/>
-                  <polyline points="30,62 42,50 54,56 66,40 78,46 90,34" fill="none" stroke="#78e08f" stroke-width="1.5"/>
-                  <circle cx="60" cy="92" r="14" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.1)"/>
-                  <path d="M60 106v20" stroke="#78e08f" stroke-width="1.5"/>
-                  <text x="60" y="95" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="700" font-family="system-ui">Monitor</text>
-                  <text x="60" y="148" text-anchor="middle" fill="#6f8a7e" font-size="9">App · sensors · alerts</text>
-                </g>
-                <path d="M320 118 H348" stroke="#78e08f" stroke-width="2"/>
-                <!-- step 3 fork -->
-                <g transform="translate(352,32)">
-                  <circle cx="60" cy="88" r="56" fill="url(#adG)" opacity="0.35"/>
-                  <circle cx="60" cy="88" r="28" stroke="#c79bff" stroke-width="1.5" fill="rgba(199,155,255,0.1)"/>
-                  <path d="M60 116v24" stroke="#78e08f" stroke-width="2"/>
-                  <path d="M60 88c-20-14-36-8-44 16" stroke="#78e08f" stroke-width="1.75" fill="none"/>
-                  <text x="60" y="92" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Harvest</text>
-                </g>
-                <path d="M472 88 C520 60 560 48 600 48" stroke="#78e08f" stroke-width="1.5" stroke-dasharray="4 4"/>
-                <path d="M472 118 C520 146 560 158 600 158" stroke="#ffb86b" stroke-width="1.5" stroke-dasharray="4 4"/>
-                <!-- flower -->
-                <g transform="translate(604,24)">
-                  <rect width="96" height="72" rx="12" fill="rgba(120,224,143,0.1)" stroke="#78e08f" stroke-width="1.5"/>
-                  <circle cx="48" cy="36" r="14" stroke="#78e08f" stroke-width="1.5" fill="rgba(120,224,143,0.15)"/>
-                  <path d="M48 50v8M48 28c-6 0-10 4-10 8" stroke="#78e08f" stroke-width="1.25"/>
-                  <text x="48" y="62" text-anchor="middle" fill="#b6f4c4" font-size="9" font-weight="600">CBD flower</text>
-                </g>
-                <!-- trade products -->
-                <g transform="translate(604,108)">
-                  <rect width="96" height="72" rx="12" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/>
-                  <rect x="20" y="22" width="18" height="28" rx="4" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
-                  <ellipse cx="58" cy="38" rx="10" ry="14" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
-                  <path d="M72 30 Q78 38 72 46" stroke="#ffb86b" stroke-width="1.25" fill="none"/>
-                  <text x="48" y="62" text-anchor="middle" fill="#ffd9a8" font-size="9" font-weight="600">Oil · tea · more</text>
-                </g>
-              </svg>
-            </div>
+          <div class="grid grid-3 economics-roles">
+            <article class="card card--dense">
+              <h3>Grower</h3>
+              <p class="card-tagline">Runs the batch · logs proof</p>
+              <p>Opens a capped batch, links journal plants, advances stages, earns a fixed grower share (e.g. 40–50%) plus $GROW emissions for documented milestones.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Investor</h3>
+              <p class="card-tagline">Mints early · bigger stake</p>
+              <p>Buys Stake NFTs in mint rounds tied to growth stage. Seed-round weight is highest; late entry costs more per share point. Trade stakes on the secondary market before harvest.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Platform</h3>
+              <p class="card-tagline">Rules · escrow · market</p>
+              <p>Batch issuance, vault escrow, marketplace settlement, and public RWA docs. Revenue from mint fees, marketplace take, and grower tooling subscriptions.</p>
+            </article>
+          </div>
 
-            <div class="adopt-steps">
-              <div class="adopt-step">
-                <span class="adopt-step-num">1</span>
-                <h3>Adopt</h3>
-                <p>Pick a plant or batch — tied to your passport.</p>
-              </div>
-              <div class="adopt-step">
-                <span class="adopt-step-num">2</span>
-                <h3>Monitor</h3>
-                <p>Watch growth, alerts, and stage updates in-app.</p>
-              </div>
-              <div class="adopt-step adopt-step--split">
-                <span class="adopt-step-num">3</span>
-                <h3>Redeem or trade</h3>
-                <p>Flower from your plant, or swap for oil, tea &amp; partner SKUs.</p>
-              </div>
+          <div class="economics-rounds">
+            <h3 class="economics-rounds-title">Mint rounds — early advantage</h3>
+            <table class="economics-table">
+              <thead>
+                <tr><th>Round</th><th>Growth stage</th><th>Share weight</th><th>What investors get</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Seed round</td><td>Seed · Germination</td><td><strong>3×</strong></td><td>Lowest entry · max harvest %</td></tr>
+                <tr><td>Growth round</td><td>Seedling · Vegetative</td><td><strong>2×</strong></td><td>Mid-cycle exposure</td></tr>
+                <tr><td>Flower round</td><td>Flowering</td><td><strong>1.5×</strong></td><td>Flower-stage token · higher certainty</td></tr>
+                <tr><td>Late round</td><td>Pre-harvest</td><td><strong>1×</strong></td><td>Last chance before payout</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="adopt-steps adopt-steps--5">
+            <div class="adopt-step">
+              <span class="adopt-step-num">1</span>
+              <h3>Open batch</h3>
+              <p>Grower creates Batch NFT · sets cap · links journal.</p>
+            </div>
+            <div class="adopt-step">
+              <span class="adopt-step-num">2</span>
+              <h3>Invest</h3>
+              <p>Investors mint Stake NFTs · pay into batch vault.</p>
+            </div>
+            <div class="adopt-step">
+              <span class="adopt-step-num">3</span>
+              <h3>Grow</h3>
+              <p>Stages update on-chain · $GROW rewards · journal proof.</p>
+            </div>
+            <div class="adopt-step">
+              <span class="adopt-step-num">4</span>
+              <h3>Sell</h3>
+              <p>Harvest listed on marketplace · COA · batch traceability.</p>
+            </div>
+            <div class="adopt-step adopt-step--split">
+              <span class="adopt-step-num">5</span>
+              <h3>Split</h3>
+              <p>Vault pays investors by weight · grower cut · platform fee.</p>
             </div>
           </div>
 
@@ -387,22 +371,22 @@
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c2.5 5.5 7 8 13 8-1 7.5-6 13-13 18-7-5-12-10.5-13-18 6 0 10.5-2.5 13-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 11v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>CBD flower</h4>
-              <p>Physical harvest linked to your adopted plant &amp; COA.</p>
+              <h4>CBD flower lots</h4>
+              <p>Physical harvest sold on marketplace — proceeds flow to batch vault.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
-                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M8 4h8l2 4v12a2 2 0 01-2 2H8a2 2 0 01-2-2V8l2-4z" stroke="currentColor" stroke-width="1.5"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>CBD oil</h4>
-              <p>Trade grow credits or passport maturity for oil.</p>
+              <h4>Stake NFTs</h4>
+              <p>Trade harvest-share positions before payout — seed vs flower asset types.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
-                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M6 10c0-4 3-7 6-7s6 3 6 7v8H6V10z" stroke="currentColor" stroke-width="1.5"/><path d="M8 18h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>CBD tea &amp; more</h4>
-              <p>Exchange for tea, topicals, or partner catalog items.</p>
+              <h4>$GROW utility</h4>
+              <p>Stage rewards for growers · marketplace currency · future governance.</p>
             </article>
           </div>
         </div>
@@ -415,25 +399,25 @@
             <span class="kicker">08 · Full stack</span>
             <h2>How it <span class="grad">connects.</span></h2>
             <p class="slide-remark">
-              Journal, AI, sensors, and passport layers share one data graph — hobbyists to commercial operators on the same OS.
+              Journal, AI, Solana RWAs, and marketplace share one data graph — growers document proof, investors hold stakes, goods trade on the same platform.
             </p>
           </header>
           <div class="stack-viz" aria-hidden="true">
             <svg class="stack-svg" viewBox="0 0 900 280" fill="none">
               <defs><linearGradient id="stkG" x1="0" y1="0" x2="900" y2="0"><stop stop-color="#78e08f"/><stop offset="0.5" stop-color="#5fb6ff"/><stop offset="1" stop-color="#c79bff"/></linearGradient></defs>
               <path d="M80 140 H820" stroke="url(#stkG)" stroke-width="2" stroke-dasharray="6 6" opacity="0.5"/>
-              <g transform="translate(40,90)"><rect width="140" height="100" rx="16" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600" font-family="system-ui">Journal</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Plants · cycles</text></g>
-              <g transform="translate(200,90)"><rect width="140" height="100" rx="16" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">AI Coach</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Predict · guide</text></g>
-              <g transform="translate(360,90)"><rect width="140" height="100" rx="16" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">Sensors</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Meteo · stress</text></g>
-              <g transform="translate(520,90)"><rect width="140" height="100" rx="16" fill="rgba(199,155,255,0.08)" stroke="#c79bff" stroke-width="1.5"/><text x="70" y="45" text-anchor="middle" fill="#e7f5ee" font-size="13" font-weight="600">dNFT</text><text x="70" y="68" text-anchor="middle" fill="#6f8a7e" font-size="10">Plant passport</text></g>
-              <g transform="translate(680,90)"><rect width="140" height="100" rx="16" fill="rgba(255,184,107,0.06)" stroke="#ffb86b" stroke-width="1.5"/><text x="70" y="42" text-anchor="middle" fill="#ffd9a8" font-size="12" font-weight="600">RWA</text><text x="70" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Tokenize · trade</text></g>
-              <path d="M180 140 L200 140 M340 140 L360 140 M500 140 L520 140 M660 140 L680 140" stroke="#78e08f" stroke-width="2" marker-end="url(#none)"/>
+              <g transform="translate(20,90)"><rect width="120" height="100" rx="16" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/><text x="60" y="45" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600" font-family="system-ui">Journal</text><text x="60" y="68" text-anchor="middle" fill="#6f8a7e" font-size="9">Plants · proof</text></g>
+              <g transform="translate(155,90)"><rect width="120" height="100" rx="16" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/><text x="60" y="45" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600">Wallet</text><text x="60" y="68" text-anchor="middle" fill="#6f8a7e" font-size="9">Link · sign</text></g>
+              <g transform="translate(290,90)"><rect width="120" height="100" rx="16" fill="rgba(199,155,255,0.08)" stroke="#c79bff" stroke-width="1.5"/><text x="60" y="45" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600">Seed NFT</text><text x="60" y="68" text-anchor="middle" fill="#6f8a7e" font-size="9">Mint · metadata</text></g>
+              <g transform="translate(425,90)"><rect width="120" height="100" rx="16" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600">$GROW</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Stage rewards</text></g>
+              <g transform="translate(560,90)"><rect width="120" height="100" rx="16" fill="rgba(120,224,143,0.06)" stroke="#78e08f" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#b6f4c4" font-size="11" font-weight="600">Batch vault</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Investor stakes</text></g>
+              <g transform="translate(695,90)"><rect width="120" height="100" rx="16" fill="rgba(95,182,255,0.06)" stroke="#5fb6ff" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="600">Market</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Trade · settle</text></g>
             </svg>
           </div>
           <div class="grid grid-3 personas personas--dense">
-            <article class="persona"><div class="persona-tag">Hobbyist</div><h3>Guided grows</h3></article>
-            <article class="persona persona--mid"><div class="persona-tag">Prosumer</div><h3>AI + sensors</h3></article>
-            <article class="persona"><div class="persona-tag">Commercial</div><h3>Audit · multi-site</h3></article>
+            <article class="persona"><div class="persona-tag">Grower</div><h3>Batch + journal</h3></article>
+            <article class="persona persona--mid"><div class="persona-tag">Investor</div><h3>Early stake · trade</h3></article>
+            <article class="persona"><div class="persona-tag">Buyer</div><h3>Flower · COA lots</h3></article>
           </div>
         </div>
       </section>
@@ -445,22 +429,29 @@
             <span class="kicker">09 · Momentum</span>
             <h2>Live today. <span class="grad">Building next.</span></h2>
             <p class="slide-remark">
-              <a href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a> ships today; roadmap adds mobile, deeper sensors, commercial tooling, and passport pilots.
+              <a href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a> ships the journal, wallet, Seed NFT minting, growth stages, $GROW rewards, and devnet marketplace.
+              Next: batch vault, investor mint rounds, mainnet, and redemption ops.
             </p>
           </header>
           <div class="grid grid-3 traction traction--dense">
-            <div class="t-card"><span class="t-num">v1</span><span class="t-label">dnevnik.live</span></div>
-            <div class="t-card"><span class="t-num">EU</span><span class="t-label">Beachhead</span></div>
-            <div class="t-card"><span class="t-num">∞</span><span class="t-label">Organic growth</span></div>
+            <div class="t-card"><span class="t-num">M1–M4</span><span class="t-label">Wallet · NFT · market</span></div>
+            <div class="t-card"><span class="t-num">Devnet</span><span class="t-label">Solana · Metaplex</span></div>
+            <div class="t-card"><span class="t-num">RWA</span><span class="t-label">Public docs live</span></div>
           </div>
           <div class="timeline-viz" aria-label="Roadmap">
-            <div class="tl-node"><span class="tl-q">Q1–2</span><span class="tl-title">AI Coach</span></div>
+            <div class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · adopt · market UI</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node"><span class="tl-q">Q2–3</span><span class="tl-title">Mobile · sensors</span></div>
+            <div class="tl-node"><span class="tl-q">Q3</span><span class="tl-title">Batch vault · stake rounds</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node"><span class="tl-q">Q3–4</span><span class="tl-title">Commercial</span></div>
+            <div class="tl-node"><span class="tl-q">Q4</span><span class="tl-title">Mainnet pilot · redemption</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">API · Passport</span></div>
+            <div class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">EU batches · API</span></div>
+          </div>
+          <div class="chip-row chip-row--center">
+            <span class="chip chip--green">Seed NFT minting</span>
+            <span class="chip chip--blue">Growth + $GROW on-chain</span>
+            <span class="chip">Marketplace MVP</span>
+            <span class="chip">dnevnik.live/rwa-docs</span>
           </div>
         </div>
       </section>
@@ -492,15 +483,16 @@
           <span class="kicker">11 · Close</span>
           <h2>The <span class="grad">operating system</span> for cultivation.</h2>
           <p class="slide-remark">
-            From daily journaling to adopted plants and redeemable CBD — one stack for growers, partners, and institutional RWA rails.
+            From daily journaling to harvest-share investing and tradeable CBD lots — one OS for growers, investors, and the marketplace.
           </p>
           <div class="vision-points vision-points--dense">
-            <div><strong>Y1</strong> EU grow journal</div>
-            <div><strong>Y3</strong> AI co-pilot default</div>
-            <div><strong>Y5</strong> Cultivation OS + data platform</div>
+            <div><strong>Y1</strong> Devnet RWA + EU journal</div>
+            <div><strong>Y2</strong> Batch funding · mainnet pilot</div>
+            <div><strong>Y3</strong> Cultivation OS + harvest market</div>
           </div>
           <div class="contact-grid">
             <div><span class="meta-label">Live</span><a class="meta-value" href="https://dnevnik.live" target="_blank" rel="noreferrer">dnevnik.live</a></div>
+            <div><span class="meta-label">Docs</span><a class="meta-value" href="https://dnevnik.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
             <div><span class="meta-label">Contact</span><span class="meta-value">admin@dnevnik.live</span></div>
           </div>
           <p class="thanks">Thank you.</p>
