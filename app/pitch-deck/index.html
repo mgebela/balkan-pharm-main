@@ -299,70 +299,92 @@
             <span class="kicker">07 · Harvest-share economics</span>
             <h2>Fund early. <span class="grad">Own more of the harvest.</span></h2>
             <p class="slide-remark">
-              <strong>Option A — harvest-share RWA.</strong> A grower opens a batch and documents the cycle in the journal.
-              Investors mint <strong>Stake NFTs</strong> on Solana; share weight depends on <em>when</em> they enter.
-              At harvest, sale proceeds from the marketplace split pro-rata — grower, investors, platform.
+              Grower opens a batch · investors mint <strong>Stake NFTs</strong> on Solana · early entry = higher share weight · harvest sales split pro-rata.
             </p>
           </header>
 
           <div class="grid grid-3 economics-roles">
             <article class="card card--dense">
               <h3>Grower</h3>
-              <p class="card-tagline">Runs the batch · logs proof</p>
-              <p>Opens a capped batch, links journal plants, advances stages, earns a fixed grower share (e.g. 40–50%) plus $GROW emissions for documented milestones.</p>
+              <p class="card-tagline">Batch · journal · 40–50% share</p>
             </article>
             <article class="card card--dense">
               <h3>Investor</h3>
-              <p class="card-tagline">Mints early · bigger stake</p>
-              <p>Buys Stake NFTs in mint rounds tied to growth stage. Seed-round weight is highest; late entry costs more per share point. Trade stakes on the secondary market before harvest.</p>
+              <p class="card-tagline">Mint early · trade stake NFTs</p>
             </article>
             <article class="card card--dense">
               <h3>Platform</h3>
-              <p class="card-tagline">Rules · escrow · market</p>
-              <p>Batch issuance, vault escrow, marketplace settlement, and public RWA docs. Revenue from mint fees, marketplace take, and grower tooling subscriptions.</p>
+              <p class="card-tagline">Vault · market · RWA docs</p>
             </article>
           </div>
 
-          <div class="economics-rounds">
-            <h3 class="economics-rounds-title">Mint rounds — early advantage</h3>
-            <table class="economics-table">
-              <thead>
-                <tr><th>Round</th><th>Growth stage</th><th>Share weight</th><th>What investors get</th></tr>
-              </thead>
-              <tbody>
-                <tr><td>Seed round</td><td>Seed · Germination</td><td><strong>3×</strong></td><td>Lowest entry · max harvest %</td></tr>
-                <tr><td>Growth round</td><td>Seedling · Vegetative</td><td><strong>2×</strong></td><td>Mid-cycle exposure</td></tr>
-                <tr><td>Flower round</td><td>Flowering</td><td><strong>1.5×</strong></td><td>Flower-stage token · higher certainty</td></tr>
-                <tr><td>Late round</td><td>Pre-harvest</td><td><strong>1×</strong></td><td>Last chance before payout</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <div class="adopt-layout">
+            <div class="adopt-viz" aria-label="Harvest-share flow">
+              <svg class="adopt-svg economics-svg" viewBox="0 0 720 220" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ecoG" x1="0" y1="220" x2="720" y2="0">
+                    <stop stop-color="#78e08f" stop-opacity="0.35"/>
+                    <stop offset="1" stop-color="#5fb6ff" stop-opacity="0.2"/>
+                  </linearGradient>
+                </defs>
+                <path d="M40 180 H680" stroke="rgba(120,224,143,0.2)" stroke-width="2" stroke-dasharray="5 5"/>
+                <g transform="translate(24,36)">
+                  <rect width="100" height="120" rx="12" fill="rgba(120,224,143,0.08)" stroke="#78e08f" stroke-width="1.5"/>
+                  <text x="50" y="58" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Batch</text>
+                  <text x="50" y="76" text-anchor="middle" fill="#6f8a7e" font-size="9">NFT · cap</text>
+                </g>
+                <path d="M128 96 H156" stroke="#78e08f" stroke-width="2"/>
+                <g transform="translate(160,36)">
+                  <rect width="100" height="120" rx="12" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/>
+                  <text x="50" y="52" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Vault</text>
+                  <text x="50" y="70" text-anchor="middle" fill="#6f8a7e" font-size="9">Stake NFTs</text>
+                  <text x="50" y="88" text-anchor="middle" fill="#78e08f" font-size="9" font-weight="600">3× → 1×</text>
+                </g>
+                <path d="M264 96 H292" stroke="#78e08f" stroke-width="2"/>
+                <g transform="translate(296,24)">
+                  <circle cx="50" cy="72" r="48" fill="url(#ecoG)" opacity="0.4"/>
+                  <path d="M50 120v-36" stroke="#78e08f" stroke-width="2"/>
+                  <path d="M50 96c-18-12-32-6-40 14" stroke="#78e08f" stroke-width="1.75" fill="none"/>
+                  <text x="50" y="68" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Grow</text>
+                </g>
+                <path d="M400 96 H428" stroke="#78e08f" stroke-width="2"/>
+                <g transform="translate(432,36)">
+                  <rect width="100" height="120" rx="12" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/>
+                  <text x="50" y="58" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Market</text>
+                  <text x="50" y="76" text-anchor="middle" fill="#6f8a7e" font-size="9">Flower · COA</text>
+                </g>
+                <path d="M536 96 H564" stroke="#78e08f" stroke-width="2"/>
+                <g transform="translate(568,36)">
+                  <rect width="100" height="120" rx="12" fill="rgba(199,155,255,0.08)" stroke="#c79bff" stroke-width="1.5"/>
+                  <text x="50" y="52" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Split</text>
+                  <text x="50" y="70" text-anchor="middle" fill="#6f8a7e" font-size="9">By weight</text>
+                  <text x="50" y="88" text-anchor="middle" fill="#c79bff" font-size="8">Grower · investor · fee</text>
+                </g>
+              </svg>
+              <div class="economics-weights">
+                <span class="economics-weight economics-weight--seed"><strong>Seed</strong> 3×</span>
+                <span class="economics-weight economics-weight--growth"><strong>Growth</strong> 2×</span>
+                <span class="economics-weight economics-weight--flower"><strong>Flower</strong> 1.5×</span>
+                <span class="economics-weight economics-weight--late"><strong>Late</strong> 1×</span>
+              </div>
+            </div>
 
-          <div class="adopt-steps adopt-steps--5">
-            <div class="adopt-step">
-              <span class="adopt-step-num">1</span>
-              <h3>Open batch</h3>
-              <p>Grower creates Batch NFT · sets cap · links journal.</p>
-            </div>
-            <div class="adopt-step">
-              <span class="adopt-step-num">2</span>
-              <h3>Invest</h3>
-              <p>Investors mint Stake NFTs · pay into batch vault.</p>
-            </div>
-            <div class="adopt-step">
-              <span class="adopt-step-num">3</span>
-              <h3>Grow</h3>
-              <p>Stages update on-chain · $GROW rewards · journal proof.</p>
-            </div>
-            <div class="adopt-step">
-              <span class="adopt-step-num">4</span>
-              <h3>Sell</h3>
-              <p>Harvest listed on marketplace · COA · batch traceability.</p>
-            </div>
-            <div class="adopt-step adopt-step--split">
-              <span class="adopt-step-num">5</span>
-              <h3>Split</h3>
-              <p>Vault pays investors by weight · grower cut · platform fee.</p>
+            <div class="adopt-steps">
+              <div class="adopt-step">
+                <span class="adopt-step-num">1</span>
+                <h3>Fund early</h3>
+                <p>Grower opens batch · investors mint Stake NFTs into vault · weight highest at seed round.</p>
+              </div>
+              <div class="adopt-step">
+                <span class="adopt-step-num">2</span>
+                <h3>Grow &amp; prove</h3>
+                <p>Journal logs each stage · NFT metadata updates · $GROW rewards mint to holder.</p>
+              </div>
+              <div class="adopt-step adopt-step--split">
+                <span class="adopt-step-num">3</span>
+                <h3>Harvest &amp; split</h3>
+                <p>Flower listed on market · vault pays investors by weight · grower cut · platform fee.</p>
+              </div>
             </div>
           </div>
 
@@ -372,21 +394,21 @@
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c2.5 5.5 7 8 13 8-1 7.5-6 13-13 18-7-5-12-10.5-13-18 6 0 10.5-2.5 13-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 11v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
               <h4>CBD flower lots</h4>
-              <p>Physical harvest sold on marketplace — proceeds flow to batch vault.</p>
+              <p>Physical harvest on marketplace — proceeds to batch vault.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
               <h4>Stake NFTs</h4>
-              <p>Trade harvest-share positions before payout — seed vs flower asset types.</p>
+              <p>Trade harvest-share before payout · seed vs flower types.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
               <h4>$GROW utility</h4>
-              <p>Stage rewards for growers · marketplace currency · future governance.</p>
+              <p>Stage rewards · marketplace currency · governance.</p>
             </article>
           </div>
         </div>

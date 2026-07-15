@@ -2267,61 +2267,43 @@ em { font-style: italic; color: var(--ink); }
 
 /* Harvest-share economics (slide 7) */
 .economics-roles {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
-.economics-roles .card p:last-child {
-  margin: 0.5rem 0 0;
-  font-size: 13px;
-  color: var(--ink-dim);
-  line-height: 1.5;
+.economics-svg {
+  margin-bottom: 12px;
 }
-.economics-rounds {
-  margin: 20px 0;
-}
-.economics-rounds-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 15px;
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 10px;
-  color: var(--ink);
-}
-.economics-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  overflow: hidden;
-}
-.economics-table th,
-.economics-table td {
-  padding: 10px 12px;
-  text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.economics-table th {
-  font-weight: 600;
-  color: var(--ink-dim);
-  background: rgba(255, 255, 255, 0.03);
-}
-.economics-table tbody tr:last-child td {
-  border-bottom: none;
-}
-.economics-table td:nth-child(3) {
-  color: var(--green);
-  font-weight: 600;
-}
-.adopt-steps--5 {
+.economics-weights {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin: 20px 0;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
 }
-@media (max-width: 900px) {
-  .adopt-steps--5 {
-    grid-template-columns: 1fr;
+.economics-weight {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding: 8px 6px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+.economics-weight strong {
+  display: block;
+  font-size: 12px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.economics-weight--seed { border-color: rgba(120, 224, 143, 0.35); color: var(--green); }
+.economics-weight--seed strong { color: var(--green); }
+.economics-weight--growth { border-color: rgba(95, 182, 255, 0.35); color: #93c5fd; }
+.economics-weight--growth strong { color: #93c5fd; }
+.economics-weight--flower { border-color: rgba(199, 155, 255, 0.35); color: #c79bff; }
+.economics-weight--flower strong { color: #c79bff; }
+.economics-weight--late { border-color: rgba(255, 184, 107, 0.35); color: #ffd9a8; }
+.economics-weight--late strong { color: #ffd9a8; }
+
+@media (max-width: 720px) {
+  .economics-weights {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
