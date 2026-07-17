@@ -6,8 +6,10 @@
   "scripts": {
     "create-keypair": "node create-keypair.js",
     "airdrop": "node airdrop.js",
+    "firebase:setup": "node firebase-setup.js",
     "deploy:grow": "node deploy-grow-token.js",
     "deploy:collection": "node deploy-seed-collection.js",
+    "deploy:all": "node deploy-all.js && node sync-chain-config.js",
     "mint:seed": "node mint-seed.js",
     "mint:test-seeds": "node mint-test-seeds.js",
     "mint:queue": "node process-seed-mints.js",
@@ -25,7 +27,7 @@
     "@metaplex-foundation/umi-bundle-defaults": "^0.9.2",
     "@metaplex-foundation/umi-uploader-irys": "^0.9.2",
     "@solana/web3.js": "^1.98.4",
-    "firebase-admin": "^13.10.0"
+    "firebase-admin": "^14.1.0"
   },
   "overrides": {
     "rpc-websockets": {
