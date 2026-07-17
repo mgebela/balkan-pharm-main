@@ -12,6 +12,6 @@
     "@solana/web3.js": "^1.98.4"
   },
   "devDependencies": {
-    "firebase-tools": "^14.0.0"
+    "firebase-tools": "^15.24.0"
   }
 }

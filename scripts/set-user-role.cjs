@@ -1,10 +1,10 @@
 // Postavi (ili samo pregledaj) Firestore ulogu korisnika preko prijavljenog Firebase CLI-a.
 //
 // Pregled (ne mijenja ništa):
-//   node scripts/set-user-role.cjs dominik.krizic@gmail.com
+//   node scripts/set-user-role.cjs user@example.com
 //
 // Primjena nove uloge:
-//   node scripts/set-user-role.cjs dominik.krizic@gmail.com --apply admin
+//   node scripts/set-user-role.cjs user@example.com --apply admin
 //
 // Napomena: zahtijeva prijavljen Firebase CLI (firebase login) s računom koji
 // ima IAM ovlasti (Owner/Editor/datastore.user) nad projektom.
