@@ -1,9 +1,10 @@
 const {onRequest} = require('firebase-functions/v2/https');
 const {defineSecret} = require('firebase-functions/params');
-const admin = require('firebase-admin');
-const {GoogleGenerativeAI} = require('@google/generative-ai');
+const {initializeApp} = require('firebase-admin/app');
+const {getAuth} = require('firebase-admin/auth');
+const {GoogleGenAI} = require('@google/genai');
 
-admin.initializeApp();
+initializeApp();
 
 // Set after: firebase functions:secrets:set GEMINI_API_KEY
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
@@ -53,7 +54,7 @@ exports.analyzeGrowFrames = onRequest(
           res.status(401).json({error: 'Missing Authorization Bearer token'});
           return;
         }
-        await admin.auth().verifyIdToken(match[1]);
+        await getAuth().verifyIdToken(match[1]);
 
         const {frames, plantName, stage, locale} = req.body || {};
         if (!Array.isArray(frames) || frames.length === 0 || frames.length > 2) {
@@ -67,8 +68,7 @@ exports.analyzeGrowFrames = onRequest(
           return;
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({model: 'gemini-2.0-flash'});
+        const genAI = new GoogleGenAI({apiKey});
 
         const lang = locale === 'en' ? 'English' : 'Croatian';
         const context = [
@@ -99,8 +99,11 @@ Do not invent details not visible in the images.`;
           parts.push({inlineData: {mimeType: m[1], data: m[2]}});
         }
 
-        const result = await model.generateContent(parts);
-        const text = result.response.text();
+        const result = await genAI.models.generateContent({
+          model: 'gemini-2.0-flash',
+          contents: parts,
+        });
+        const text = result.text;
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
           res.status(502).json({error: 'Model did not return JSON', raw: text.slice(0, 500)});

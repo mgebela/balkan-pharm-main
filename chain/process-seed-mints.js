@@ -9,7 +9,8 @@
  * Usage: node process-seed-mints.js [--watch]
  *   --watch  keep running and process new requests as they arrive
  */
-import { initFirestore, admin } from './firebase.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import { initFirestore } from './firebase.js';
 import { createMintClient, mintSeedNft } from './mint-seed-lib.js';
 
 const db = initFirestore();
@@ -41,7 +42,7 @@ async function processDoc(doc) {
       signature: result.signature,
       owner: result.owner,
       mintedAt: new Date().toISOString(),
-      error: admin.firestore.FieldValue.delete(),
+      error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: ${result.mint}`);
   } catch (err) {

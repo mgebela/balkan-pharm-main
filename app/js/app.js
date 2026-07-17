@@ -1714,7 +1714,7 @@ function initFirebaseSync() {
       const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
       const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
       const note = (e.note || '').slice(0, 80) + ((e.note || '').length > 80 ? '…' : '');
-      const media = e.photo ? '<img src="' + e.photo + '" alt="" class="timeline-thumb" />' : '';
+      const media = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="timeline-thumb" />' : '';
       timelineItems.push(
         '<div class="timeline-entry"><div class="timeline-entry-header"><span class="timeline-date">📅 ' + dateStr + '</span><span class="timeline-day">' + dayWeek + '</span></div><div class="timeline-entry-body">' + typeLabel + ': ' + escapeHtml(note) + '</div>' + (media ? '<div class="timeline-entry-media">' + media + '</div>' : '') + '</div>'
       );
@@ -1848,12 +1848,12 @@ function initFirebaseSync() {
       recentEl.innerHTML = recent
         .map((e) => {
           const plant = plants.find((p) => p.id === e.plantId);
-          const plantName = plant ? plant.name : 'Plant';
+          const plantName = escapeHtml(plant ? plant.name : 'Plant');
           const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-          const thumb = e.photo ? '<img src="' + e.photo + '" alt="" class="recent-note-thumb" />' : '';
+          const thumb = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="recent-note-thumb" />' : '';
           return `
             <div class="recent-note">
-              <div class="meta">${plantName} · ${date} · ${ENTRY_TYPE_LABELS[e.type] || e.type || 'General'}</div>
+              <div class="meta">${plantName} · ${date} · ${escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General')}</div>
               ${thumb}
               <div class="text">${escapeHtml(e.note || '').slice(0, 120)}${(e.note || '').length > 120 ? '…' : ''}</div>
             </div>
@@ -2632,12 +2632,12 @@ function initFirebaseSync() {
     container.innerHTML = entries
       .map((e) => {
         const plant = plants.find((p) => p.id === e.plantId);
-        const plantName = plant ? plant.name : 'Plant';
+        const plantName = escapeHtml(plant ? plant.name : 'Plant');
         const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-        const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
+        const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
         const media = [];
-        if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + e.photo + '" alt="Photo" /></div>');
-        if (e.video) media.push('<div class="entry-media entry-video"><video src="' + e.video + '" controls></video></div>');
+        if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + escapeHtml(e.photo) + '" alt="Photo" /></div>');
+        if (e.video) media.push('<div class="entry-media entry-video"><video src="' + escapeHtml(e.video) + '" controls></video></div>');
         let metaHtml = '';
         if (e.meta) {
           if (e.meta.faza) {

@@ -26,7 +26,8 @@ import {
   findAssociatedTokenPda,
 } from '@metaplex-foundation/mpl-toolbox';
 import { base58 } from '@metaplex-foundation/umi/serializers';
-import { initFirestore, admin } from './firebase.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
 import { RPC_URL, readDeployed } from './common.js';
 
@@ -122,7 +123,7 @@ async function processEscrowPending(doc) {
     await doc.ref.update({
       status: 'active',
       activatedAt: new Date().toISOString(),
-      error: admin.firestore.FieldValue.delete(),
+      error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: NFT in escrow, listing is live`);
   } catch (err) {
@@ -143,7 +144,7 @@ async function processSalePending(doc) {
       status: 'sold',
       transferSignature,
       soldAt: new Date().toISOString(),
-      error: admin.firestore.FieldValue.delete(),
+      error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: payment verified, NFT released (${transferSignature})`);
   } catch (err) {
@@ -160,7 +161,7 @@ async function processCancelRequested(doc) {
       status: 'cancelled',
       transferSignature,
       cancelledAt: new Date().toISOString(),
-      error: admin.firestore.FieldValue.delete(),
+      error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: NFT returned to seller (${transferSignature})`);
   } catch (err) {

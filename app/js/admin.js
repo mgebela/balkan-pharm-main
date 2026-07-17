@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 
 import {
   getFirestore,
@@ -9,12 +9,12 @@ import {
   updateDoc,
   doc,
   getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
 import {
   getAuth,
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
 
 const firebaseConfig = {
@@ -37,6 +37,15 @@ function normalizeUserRole(role) {
 function isAdminPanelRole(role) {
   const r = normalizeUserRole(role);
   return r === 'admin' || r === 'superadmin';
+}
+
+// HTML-escape any value before interpolating it into innerHTML. Firestore
+// documents in `plants`/`entries`/`users` can contain user-supplied strings
+// (plant names, journal notes, emails, etc.) — never trust them as markup.
+function esc(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, (c) => {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
 }
 
 onAuthStateChanged(auth, async (user) => {
@@ -243,22 +252,22 @@ async function loadData() {
 // =======================
 function renderRow(data) {
   if (page === "users") {
-    return `${data.email} (${data.role})`;
+    return `${esc(data.email)} (${esc(data.role)})`;
   }
 
   if (page === "plants") {
-    return `${data.metadata?.naziv || "-"} (${data.metadata?.sorta || "-"})`;
+    return `${esc(data.metadata?.naziv || "-")} (${esc(data.metadata?.sorta || "-")})`;
   }
 
   if (page === "entries") {
-    return `${data.type || "-"} - ${data.note || "-"}`;
+    return `${esc(data.type || "-")} - ${esc(data.note || "-")}`;
   }
 
   if (page === "tenants") {
-    return `${data.naziv || "-"} (${data.status || "-"})`;
+    return `${esc(data.naziv || "-")} (${esc(data.status || "-")})`;
   }
 
-  return JSON.stringify(data);
+  return esc(JSON.stringify(data));
 }
 
 
@@ -314,15 +323,15 @@ function generateForm(data, parentKey = "", readOnly = false) {
     const fullKey = parentKey ? `${parentKey}.${key}` : key;
 
     if (typeof value === "object" && value !== null) {
-      html += `<div style="margin-top:10px;"><strong>${key}</strong></div>`;
+      html += `<div style="margin-top:10px;"><strong>${esc(key)}</strong></div>`;
       html += generateForm(value, fullKey, readOnly);
     } else {
-      const safeVal = String(value ?? "").replace(/"/g, "&quot;");
+      const safeVal = esc(value ?? "");
       html += `
-        <input 
-          data-key="${fullKey}" 
-          value="${safeVal}" 
-          placeholder="${fullKey}"
+        <input
+          data-key="${esc(fullKey)}"
+          value="${safeVal}"
+          placeholder="${esc(fullKey)}"
           style="margin-bottom:6px; width:100%;"
           ${readOnly ? "readonly disabled" : ""}
         />
@@ -357,7 +366,14 @@ function getFormDataDynamic() {
 function parseValue(val) {
   if (val === "") return "";
 
-  if (!isNaN(val)) return Number(val);
+  const trimmed = val.trim();
+  // Numeric-looking strings only — and don't coerce things like "0791234567"
+  // (phone numbers, batch codes) that have a meaningful leading zero.
+  const looksNumeric =
+    trimmed !== "" &&
+    /^-?\d+(\.\d+)?$/.test(trimmed) &&
+    !(trimmed.length > 1 && trimmed[0] === "0" && trimmed[1] !== ".");
+  if (looksNumeric) return Number(trimmed);
 
   if (val === "true") return true;
   if (val === "false") return false;

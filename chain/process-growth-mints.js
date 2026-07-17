@@ -25,7 +25,8 @@ import {
   findAssociatedTokenPda,
 } from '@metaplex-foundation/mpl-toolbox';
 import { base58 } from '@metaplex-foundation/umi/serializers';
-import { initFirestore, admin } from './firebase.js';
+import { FieldValue } from 'firebase-admin/firestore';
+import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
 import { buildStageMetadata } from './seed-metadata.js';
 import { stageByKey, stageIndexByKey } from './stages.js';
@@ -142,7 +143,7 @@ async function processDoc(doc) {
       rewardSignature,
       recipient: String(recipient),
       mintedAt: new Date().toISOString(),
-      error: admin.firestore.FieldValue.delete(),
+      error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: metadata ${metadataUri}`);
     console.log(`  update tx: ${updateSignature}${rewardSignature ? ` · reward tx: ${rewardSignature}` : ''}`);
