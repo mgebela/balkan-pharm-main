@@ -663,10 +663,17 @@ body {
 }
 
 .wallet-picker-card {
+  /* Opaque dark "ink plate" card over the modal scrim, regardless of page
+     theme — text tokens are re-scoped so every nested label reads
+     light-on-dark instead of inheriting the light page's dark ink. */
+  --text: rgba(247, 238, 225, 0.94);
+  --text-muted: rgba(247, 238, 225, 0.68);
+  --border: rgba(255, 255, 255, 0.14);
+  color: var(--text);
   width: min(100%, 420px);
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: var(--surface, #111);
+  background: rgba(23, 16, 8, 0.97);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
   padding: 1.1rem;
 }
@@ -713,7 +720,7 @@ body {
   padding: 0.75rem 0.85rem;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(31, 46, 34, 0.02);
+  background: rgba(255, 255, 255, 0.03);
   color: inherit;
   cursor: pointer;
   text-align: left;
@@ -735,7 +742,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(31, 46, 34, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   font-size: 0.9rem;
 }
 
@@ -778,7 +785,7 @@ body {
   padding: 0.85rem;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(31, 46, 34, 0.02);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .wallet-picker-manual-label {
