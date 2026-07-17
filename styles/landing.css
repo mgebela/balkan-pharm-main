@@ -748,6 +748,10 @@ body {
   }
 
   .nav .nav-link {
+    /* .nav becomes an opaque light slide-out panel at this width, unlike its
+       desktop position inside the dark .header — so the link color needs to
+       flip from the header's white to the panel's ink, not inherit it. */
+    color: var(--text);
     display: block;
     padding: 0.85rem 0;
     font-size: 1.05rem;
