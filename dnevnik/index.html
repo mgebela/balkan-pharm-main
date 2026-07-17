@@ -6,17 +6,17 @@
   <title>Sign in – dnevnik.live</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #071411;
-      --bg-alt: #0b1f19;
-      --surface: rgba(255, 255, 255, 0.06);
-      --text: rgba(255, 255, 255, 0.94);
-      --text-muted: rgba(255, 255, 255, 0.72);
-      --accent: #0d9488;
-      --accent-bright: #2dd4bf;
-      --border: rgba(255, 255, 255, 0.14);
+      --bg: #e4d9c2;
+      --bg-alt: #dccfaf;
+      --surface: rgba(31, 26, 15, 0.05);
+      --text: rgba(31, 46, 34, 0.92);
+      --text-muted: rgba(31, 46, 34, 0.62);
+      --accent: #8e3520;
+      --accent-bright: #b4472b;
+      --border: rgba(31, 46, 34, 0.18);
     }
     * { box-sizing: border-box; }
     body {
@@ -25,18 +25,18 @@
       display: grid;
       place-items: center;
       padding: 1rem;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background: radial-gradient(900px 500px at 50% -10%, rgba(45,212,191,0.18), transparent), var(--bg);
+      font-family: 'Archivo', sans-serif;
+      background: radial-gradient(900px 500px at 50% -10%, rgba(180,71,43,0.1), transparent), var(--bg);
       color: var(--text);
     }
     .login-card {
       width: 100%;
       max-width: 420px;
-      background: var(--surface);
+      background: var(--bg-alt);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 6px;
       padding: 1.25rem;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 8px 24px rgba(31, 20, 10, 0.12);
     }
     h1 {
       margin: 0 0 0.5rem;
@@ -58,9 +58,9 @@
       width: 100%;
       margin-bottom: 0.85rem;
       padding: 0.65rem 0.75rem;
-      border-radius: 10px;
+      border-radius: 4px;
       border: 1px solid var(--border);
-      background: var(--bg-alt);
+      background: var(--bg);
       color: var(--text);
       font-family: inherit;
     }
@@ -71,10 +71,10 @@
     button {
       width: 100%;
       border: 0;
-      border-radius: 10px;
+      border-radius: 4px;
       padding: 0.7rem 0.9rem;
       font-weight: 700;
-      color: #06201a;
+      color: #f7eee1;
       background: linear-gradient(90deg, var(--accent), var(--accent-bright));
       cursor: pointer;
     }
