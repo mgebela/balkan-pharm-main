@@ -51,11 +51,29 @@
     ].join('\n');
   }
 
+  function withTimeout(promise, ms, message) {
+    let timer;
+    const timeout = new Promise(function (_, reject) {
+      timer = setTimeout(function () {
+        reject(new Error(message || 'Request timed out.'));
+      }, ms);
+    });
+    return Promise.race([promise, timeout]).finally(function () {
+      clearTimeout(timer);
+    });
+  }
+
+  const FIRESTORE_TIMEOUT_MS = 12000;
+
   async function signLinkMessage(message) {
     const SW = window.SolanaWallet;
     if (!SW) throw new Error('Solana wallet module not loaded.');
     const bytes = new TextEncoder().encode(message);
-    const result = await SW.signMessage(bytes);
+    const result = await withTimeout(
+      SW.signMessage(bytes),
+      45000,
+      'Wallet did not respond to the sign request. Unlock the extension and try again.'
+    );
     if (result && result.signature) return result.signature;
     return result;
   }
@@ -123,7 +141,11 @@
         return cache;
       }
 
-      const snap = await firestore.collection('users').doc(user.uid).get();
+      const snap = await withTimeout(
+        firestore.collection('users').doc(user.uid).get(),
+        FIRESTORE_TIMEOUT_MS,
+        'Firestore timed out loading your profile. Check your connection and try again.'
+      );
       const data = snap.exists ? snap.data() || {} : {};
       cache.uid = user.uid;
       cache.solanaPubkey = String(data.solanaPubkey || '');
@@ -153,24 +175,42 @@
       }
 
       if (cache.solanaPubkey && cache.solanaPubkey !== pubkey && !opts.force) {
-        throw new Error('A different wallet is already linked to this account. Disconnect and contact support to change it.');
+        throw new Error(
+          'A different wallet is already linked to this account. Disconnect and contact support to change it.'
+        );
       }
 
       await assertPubkeyAvailable();
 
       const SW = window.SolanaWallet;
-      const provider = SW && SW.getProviderName ? SW.getProviderName() : 'solana';
+      let provider = SW && SW.getProviderName ? SW.getProviderName() : 'solana';
+      const adapterKind = SW && typeof SW.getAdapterKind === 'function' ? SW.getAdapterKind() : '';
+      const isWatchOnly =
+        opts.skipSign ||
+        adapterKind === 'manual' ||
+        provider === 'watch-only' ||
+        provider === 'manual' ||
+        (SW && typeof SW.isWatchOnly === 'function' && SW.isWatchOnly());
+
+      if (isWatchOnly && (!provider || provider === 'solana')) {
+        provider = 'watch-only';
+      }
+
       const message = buildLinkMessage(user.uid, pubkey);
-      // Watch-only addresses cannot sign; store the link as unverified.
-      const isWatchOnly = provider === 'watch-only' || provider === 'manual';
 
       if (!opts.skipSign && !isWatchOnly) {
         try {
           await signLinkMessage(message);
         } catch (err) {
-          const wrapped = new Error(normalizeWalletError(err));
-          wrapped.code = err && err.code;
-          throw wrapped;
+          const msg = normalizeWalletError(err);
+          // If the session is watch-only / cannot sign, fall back to unverified link.
+          if (/watch-only|cannot sign|does not support signMessage/i.test(msg)) {
+            provider = 'watch-only';
+          } else {
+            const wrapped = new Error(msg);
+            wrapped.code = err && err.code;
+            throw wrapped;
+          }
         }
       }
 
@@ -180,25 +220,40 @@
       const now = new Date().toISOString();
       const patch = {
         solanaPubkey: pubkey,
-        walletProvider: provider || 'solana',
+        walletProvider: provider || (isWatchOnly ? 'watch-only' : 'solana'),
         walletLinkedAt: now,
       };
+
+      const userRef = firestore.collection('users').doc(user.uid);
       try {
-        await firestore.collection('users').doc(user.uid).update(patch);
+        await withTimeout(
+          userRef.set(patch, { merge: true }),
+          FIRESTORE_TIMEOUT_MS,
+          'Firestore timed out saving the wallet link. Check your connection and try again.'
+        );
       } catch (err) {
-        if (err && err.code === 'not-found') {
-          await firestore.collection('users').doc(user.uid).set(patch, { merge: true });
-        } else {
-          const wrapped = new Error(normalizeWalletError(err));
-          wrapped.code = err && err.code;
-          throw wrapped;
-        }
+        const wrapped = new Error(normalizeWalletError(err));
+        wrapped.code = err && err.code;
+        throw wrapped;
+      }
+
+      // Re-read to confirm the write landed (rules / offline can look successful otherwise).
+      const confirm = await withTimeout(
+        userRef.get(),
+        FIRESTORE_TIMEOUT_MS,
+        'Firestore timed out confirming the wallet link.'
+      );
+      const saved = confirm.exists ? confirm.data() || {} : {};
+      if (String(saved.solanaPubkey || '') !== pubkey) {
+        throw new Error(
+          'Wallet link did not save. Check Firestore rules for users/{uid} wallet fields, then try again.'
+        );
       }
 
       cache.uid = user.uid;
       cache.solanaPubkey = pubkey;
-      cache.walletProvider = provider || 'solana';
-      cache.walletLinkedAt = now;
+      cache.walletProvider = String(saved.walletProvider || patch.walletProvider);
+      cache.walletLinkedAt = String(saved.walletLinkedAt || now);
       cache.loaded = true;
       emit();
       return cache;

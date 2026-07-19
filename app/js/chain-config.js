@@ -13,9 +13,9 @@
     walletDownloadUrl: 'https://solana.com/solutions/wallets',
 
     // Deployed addresses (devnet) — filled in after chain/deploy scripts run.
-    growMint: '',
+    growMint: '3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp',
     growDecimals: 9,
-    seedCollection: '',
+    seedCollection: '79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa',
     // Authority wallet; also acts as the marketplace escrow on devnet.
     escrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
     devnetNotice:

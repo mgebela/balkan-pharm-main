@@ -12,6 +12,7 @@
     "deploy:all": "node deploy-all.js && node sync-chain-config.js",
     "mint:seed": "node mint-seed.js",
     "mint:test-seeds": "node mint-test-seeds.js",
+    "update:seed-art": "node update-seed-art.js",
     "mint:queue": "node process-seed-mints.js",
     "mint:queue:watch": "node process-seed-mints.js --watch",
     "grow:queue": "node process-growth-mints.js",

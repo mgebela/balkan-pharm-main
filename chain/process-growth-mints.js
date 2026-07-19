@@ -28,7 +28,7 @@ import { base58 } from '@metaplex-foundation/umi/serializers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
-import { buildStageMetadata } from './seed-metadata.js';
+import { buildStageMetadata, toPublicMetadataUri } from './seed-metadata.js';
 import { stageByKey, stageIndexByKey } from './stages.js';
 import { readDeployed } from './common.js';
 
@@ -107,7 +107,7 @@ async function processDoc(doc) {
     const history = await loadGrowthHistory(data.mintAddress);
     history.push({ stage: stage.key, reward, ts: new Date().toISOString(), signature: null });
     const metadata = buildStageMetadata(seed, stage, history);
-    const metadataUri = await umi.uploader.uploadJson(metadata);
+    const metadataUri = toPublicMetadataUri(await umi.uploader.uploadJson(metadata));
 
     // 2. Point the NFT at the new metadata.
     const current = await fetchMetadataFromSeeds(umi, { mint });

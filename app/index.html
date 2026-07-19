@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260717f" />
+  <link rel="stylesheet" href="styles/app.css?v=20260717i" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -72,7 +72,7 @@
       </a>
       <a href="#" class="nav-item admin-only" data-view="admin">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
-        <span>Admin</span>
+        <span class="bottom-nav-label">Admin</span>
       </a>
     </nav>
 
@@ -149,20 +149,20 @@
       <div id="view-adopt" class="view">
         <section class="adopt-hero">
           <div class="adopt-hero-text">
-            <h2>Adopt a plant</h2>
-            <p>Bring a seed into your wallet as a token and watch it grow. Every growth stage you reach mints new <strong>$GROW</strong> tokens.</p>
+            <div class="adopt-hero-top">
+              <h2>Adopt a plant</h2>
+              <span class="adopt-chain-badge">◎ Devnet</span>
+            </div>
+            <p>Mint a seed NFT, grow it through stages, and earn <strong>$GROW</strong>.</p>
           </div>
-          <span class="adopt-chain-badge">◎ Solana · devnet</span>
         </section>
 
-        <div class="adopt-notice" id="adopt-notice">
-          <span class="adopt-notice-icon" aria-hidden="true">🛈</span>
-          <p><strong>Devnet:</strong> Connect a Solana wallet on devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.</p>
-        </div>
-
-        <section class="adopt-growth-guide" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
-
         <section class="adopt-wallet" id="adopt-wallet"></section>
+
+        <div class="adopt-notice" id="adopt-notice">
+          <span class="adopt-notice-icon" aria-hidden="true">◎</span>
+          <p>Use Phantom or Solflare on <strong>Devnet</strong>. Seed NFTs mint on-chain; keep a little SOL for fees.</p>
+        </div>
 
         <section class="adopt-section plants-journal-section" id="adopt-seed-section" hidden>
           <h2 class="section-heading">Plant a seed</h2>
@@ -175,11 +175,11 @@
               Batch (optional)
               <input type="text" id="adopt-seed-batch" placeholder="e.g. B-2026-07" autocomplete="off" maxlength="32" />
             </label>
-            <label>
+            <label class="adopt-seed-form-span">
               Link to a journal plant (optional)
               <select id="adopt-seed-plant"><option value="">— none —</option></select>
             </label>
-            <button type="submit" class="btn btn-primary">🌰 Mint seed token</button>
+            <button type="submit" class="btn btn-primary adopt-seed-submit">Mint seed token</button>
           </form>
         </section>
 
@@ -187,6 +187,8 @@
           <h2 class="section-heading">My token garden</h2>
           <div class="adopt-token-grid" id="adopt-token-grid"></div>
         </section>
+
+        <section class="adopt-growth-guide" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
       </div>
 
       <div id="view-market" class="view">
@@ -693,9 +695,9 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
   <script>
     (function () {
       var firebaseConfig = {
@@ -713,14 +715,14 @@
     })();
   </script>
   <script src="js/chain-config.js?v=20260713"></script>
-  <script src="js/solana-wallet.js?v=20260708h"></script>
-  <script src="js/wallet-link.js?v=20260708h"></script>
+  <script src="js/solana-wallet.js?v=20260717i"></script>
+  <script src="js/wallet-link.js?v=20260717h"></script>
   <script src="js/seed-chain.js?v=20260713"></script>
   <script src="js/spl-transfer.js?v=20260713"></script>
   <script src="js/market.js?v=20260713"></script>
   <script src="js/metric-ui.js?v=20260708f"></script>
   <script src="js/plant-pixel-sprites.js?v=20260708f"></script>
-  <script src="js/plant-token.js?v=20260713"></script>
+  <script src="js/plant-token.js?v=20260717i"></script>
   <script src="js/app.js?v=20260713"></script>
 </body>
 </html>

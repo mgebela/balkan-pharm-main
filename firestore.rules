@@ -60,17 +60,23 @@ service cloud.firestore {
     }
 
     function isValidSolanaPubkey(pk) {
-      return pk is string && pk.size() >= 32 && pk.size() <= 44;
+      return pk is string
+        && pk.size() >= 32
+        && pk.size() <= 44;
     }
 
     function walletLinkPatchAllowed() {
-      return request.resource.data.role == resource.data.role
-        && request.resource.data.email == resource.data.email
-        && request.resource.data.diff(resource.data).affectedKeys()
+      return request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
         && isValidSolanaPubkey(request.resource.data.solanaPubkey)
         && request.resource.data.walletProvider is string
-        && request.resource.data.walletLinkedAt is string;
+        && request.resource.data.walletProvider.size() > 0
+        && request.resource.data.walletProvider.size() <= 64
+        && request.resource.data.walletLinkedAt is string
+        && request.resource.data.walletLinkedAt.size() > 0
+        // Keep identity fields stable when present
+        && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
+        && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email);
     }
 
   // ── users ────────────────────────────────────────────────

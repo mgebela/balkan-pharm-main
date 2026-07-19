@@ -1,0 +1,10 @@
+{
+  "cluster": "devnet",
+  "authority": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
+  "growMint": "3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp",
+  "growDecimals": 9,
+  "growMetadataUri": "https://dnevnik.live/token-metadata/grow.json",
+  "updatedAt": "2026-07-15T16:19:29.938Z",
+  "seedCollection": "79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa",
+  "seedCollectionMetadataUri": "https://dnevnik.live/token-metadata/seed-collection.json"
+}

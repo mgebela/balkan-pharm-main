@@ -21,7 +21,7 @@ import {
 import { base58 } from '@metaplex-foundation/umi/serializers';
 import { irysUploader } from '@metaplex-foundation/umi-uploader-irys';
 import { RPC_URL, loadAuthoritySecret, readDeployed } from './common.js';
-import { buildSeedMetadata, SEED_SYMBOL } from './seed-metadata.js';
+import { buildSeedMetadata, SEED_SYMBOL, toPublicMetadataUri } from './seed-metadata.js';
 
 const IRYS_DEVNET = 'https://devnet.irys.xyz';
 
@@ -32,6 +32,11 @@ export function createMintClient() {
   const authority = umi.eddsa.createKeypairFromSecretKey(loadAuthoritySecret());
   umi.use(keypairIdentity(authority));
   return umi;
+}
+
+export async function uploadSeedMetadata(umi, metadata) {
+  const rawUri = await umi.uploader.uploadJson(metadata);
+  return toPublicMetadataUri(rawUri);
 }
 
 export function requireSeedCollection() {
@@ -56,7 +61,7 @@ export async function mintSeedNft(umi, seed, options) {
   const collection = opts.collection || requireSeedCollection();
   const metadata = buildSeedMetadata(seed);
 
-  const metadataUri = await umi.uploader.uploadJson(metadata);
+  const metadataUri = await uploadSeedMetadata(umi, metadata);
 
   const mint = generateSigner(umi);
   const owner = opts.recipient ? publicKey(opts.recipient) : umi.identity.publicKey;

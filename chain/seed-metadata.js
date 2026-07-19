@@ -13,8 +13,17 @@
 export const SEED_RWA_STANDARD = 'dnevnik.live/seed-rwa';
 export const SEED_RWA_VERSION = '1.0.0';
 export const SEED_SYMBOL = 'SEED';
-export const SEED_IMAGE_URL = 'https://dnevnik.live/images/bp.png';
+/** Default seed NFT artwork (hosted on dnevnik.live for wallet reliability). */
+export const SEED_IMAGE_URL = 'https://dnevnik.live/token-metadata/images/seed-rwa.png';
 export const EXTERNAL_URL = 'https://dnevnik.live';
+
+/** Irys-devnet uploads are NOT on arweave.net — rewrite so wallets can fetch JSON/images. */
+export function toPublicMetadataUri(uri) {
+  if (!uri || typeof uri !== 'string') return uri;
+  return uri
+    .replace('https://arweave.net/', 'https://gateway.irys.xyz/')
+    .replace('https://arweave.dev/', 'https://gateway.irys.xyz/');
+}
 
 export function validateSeedInput(seed) {
   const errors = [];

@@ -404,7 +404,10 @@
 
     el.innerHTML =
       '<div class="metric-panel metric-panel--adopt">' +
-      '<header class="metric-panel-head"><h2 class="metric-panel-title">Growth lifecycle</h2></header>' +
+      '<header class="metric-panel-head">' +
+      '<h2 class="metric-panel-title">How growth works</h2>' +
+      '<p class="metric-panel-sub">Tap a stage to preview rewards</p>' +
+      '</header>' +
       '<div class="adopt-growth-guide-inner">' +
       '<div class="adopt-growth-showcase">' +
       '<div class="adopt-growth-feature">' +
@@ -492,11 +495,11 @@
     if (!el) return;
     if (!wallet.connected) {
       el.innerHTML =
-        '<div class="metric-panel metric-panel--inline">' +
+        '<div class="metric-panel metric-panel--inline adopt-wallet-panel">' +
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
-        '<h3>Connect wallet</h3>' +
-        '<p>' + esc(devnetNotice()) + '</p>' +
+        '<h3>Connect to start</h3>' +
+        '<p>Link a Solana wallet on Devnet to mint seed NFTs and earn $GROW.</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
         '</div></div>';
@@ -671,10 +674,18 @@
       '</div>' +
       '<div class="adopt-token-actions">' +
       (isMax
-        ? '<button type="button" class="btn btn-ghost btn-sm" disabled>🌼 Fully grown</button>'
-        : '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn" data-id="' + esc(token.id) + '">⛏ Mint growth → ' + esc(next.label) + ' (+' + next.reward + ')</button>') +
+        ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
+        : '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn adopt-action-primary" data-id="' +
+          esc(token.id) +
+          '">Mint → ' +
+          esc(next.label) +
+          ' (+' +
+          next.reward +
+          ')</button>') +
+      '<div class="adopt-token-actions-secondary">' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' + esc(token.id) + '">Burn</button>' +
+      '</div>' +
       '</div>' +
       '</div>' +
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
@@ -836,18 +847,27 @@
 
   async function handleWalletConnect(btn) {
     if (busy) return;
-    setBusy(true);
     const original = btn ? btn.textContent : '';
-    if (btn) btn.textContent = 'Connecting…';
+    if (btn) btn.textContent = 'Choose wallet…';
+    // Do not set global busy while the picker is open — Solflare may stay
+    // pending until the user approves, cancels, or the timeout fires.
     try {
       const wallet = await PlantToken.connect();
+      busy = true;
       render();
       renderGlobalWalletUI();
       if (wallet && wallet.linkError) {
-        alert('Wallet connected, but account link failed:\n\n' + wallet.linkError + '\n\nUse "Link account" to try again.');
+        alert(
+          'Wallet connected, but account link failed:\n\n' +
+            wallet.linkError +
+            '\n\nUse "Link account" to try again.'
+        );
       }
     } catch (err) {
-      flashError(err);
+      // Ignore cancel; surface real errors.
+      if (!err || !/cancel/i.test(String(err.message || ''))) {
+        flashError(err);
+      }
     } finally {
       if (btn) btn.textContent = original || 'Connect wallet';
       setBusy(false);
@@ -869,6 +889,9 @@
   }
 
   function isWatchOnlyProvider(provider) {
+    if (window.SolanaWallet && typeof window.SolanaWallet.isWatchOnly === 'function' && SolanaWallet.isWatchOnly()) {
+      return true;
+    }
     return provider === 'watch-only' || provider === 'manual';
   }
 
@@ -884,16 +907,22 @@
     if (!profile.solanaPubkey) {
       return (
         watchBadge +
-        '<span class="wallet-link-badge wallet-link-badge--muted">Not linked</span>' +
+        '<span class="wallet-link-badge wallet-link-badge--warn">Not linked</span>' +
         '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button>'
       );
     }
-    const linkedUnverified = isWatchOnlyProvider(profile.walletProvider);
+    const linkedUnverified =
+      isWatchOnlyProvider(profile.walletProvider) || profile.walletProvider === 'watch-only';
     const linkedLabel = linkedUnverified ? 'Linked · unverified' : 'Account linked';
     if (wallet.connected && wallet.address === profile.solanaPubkey) {
       return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">' + linkedLabel + '</span>';
     }
-    return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' + esc(shortAddr(profile.solanaPubkey)) + '</span>';
+    return (
+      watchBadge +
+      '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' +
+      esc(shortAddr(profile.solanaPubkey)) +
+      '</span>'
+    );
   }
 
   function walletControlsHtml(variant) {
@@ -906,7 +935,7 @@
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
           '<span class="wallet-controls-label">Solana</span>' +
-          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect wallet</button>' +
+          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect</button>' +
           '</div>'
         );
       }
