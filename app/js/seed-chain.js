@@ -124,6 +124,9 @@
     async requestSeedMint(seed) {
       const user = currentUser();
       if (!user) return null;
+      if (!seed || !seed.plantId) {
+        throw new Error('Link a journal plant before minting a seed RWA.');
+      }
 
       const linked = window.WalletLink ? WalletLink.getProfile() : {};
       const request = {
@@ -131,7 +134,7 @@
         name: String(seed.name || '').trim().slice(0, 32),
         strain: String(seed.strain || seed.name || '').trim(),
         batch: String(seed.batch || '').trim() || defaultBatch(),
-        plantId: seed.plantId || null,
+        plantId: String(seed.plantId),
         status: 'pending',
         cluster: 'devnet',
         requestedAt: new Date().toISOString(),
@@ -159,6 +162,9 @@
       if (!params || !params.mintAddress) {
         throw new Error('Seed NFT is not minted on devnet yet.');
       }
+      if (!params.plantId) {
+        throw new Error('Growth mint requires a linked journal plant.');
+      }
 
       const linked = window.WalletLink ? WalletLink.getProfile() : {};
       const request = {
@@ -169,11 +175,22 @@
         name: String(params.name || '').trim().slice(0, 32),
         strain: String(params.strain || params.name || '').trim(),
         batch: String(params.batch || '').trim() || defaultBatch(),
-        plantId: params.plantId || null,
+        plantId: String(params.plantId),
         status: 'pending',
         cluster: 'devnet',
         requestedAt: new Date().toISOString(),
       };
+      if (params.journalProof && typeof params.journalProof === 'object') {
+        request.journalProof = {
+          plantId: params.journalProof.plantId || params.plantId || null,
+          targetStage: params.journalProof.targetStage || params.stage,
+          checkedAt: params.journalProof.checkedAt || new Date().toISOString(),
+          ready: !!params.journalProof.ready,
+          items: Array.isArray(params.journalProof.items)
+            ? params.journalProof.items.slice(0, 12)
+            : [],
+        };
+      }
       if (linked.solanaPubkey) {
         request.recipient = linked.solanaPubkey;
       }

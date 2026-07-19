@@ -101,8 +101,46 @@ body.app-loading::before {
   display: none;
 }
 
+.grower-only,
+.adopter-only {
+  display: none !important;
+}
+
+body.profile-grower .grower-only,
+body.profile-adopter .adopter-only {
+  display: revert !important;
+}
+
+body.profile-grower .sidebar-nav > .nav-item.grower-only,
+body.profile-grower .bottom-nav > .nav-item.grower-only,
+body.profile-adopter .sidebar-nav > .nav-item.adopter-only,
+body.profile-adopter .bottom-nav > .nav-item.adopter-only {
+  display: flex !important;
+}
+
 .admin-visible {
   display: flex !important;
+}
+
+.profile-type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.profile-type-badge--grower {
+  color: #1f3d28;
+  background: rgba(47, 93, 58, 0.18);
+  border: 1px solid rgba(47, 93, 58, 0.35);
+}
+.profile-type-badge--adopter {
+  color: #5c2416;
+  background: rgba(142, 53, 32, 0.14);
+  border: 1px solid rgba(142, 53, 32, 0.35);
 }
 .danas-list {
   display: flex;
@@ -4094,6 +4132,140 @@ body:not(.app-loading) {
 }
 .adopt-token-chain--failed {
   color: #f87171;
+}
+.adopt-token-link--warn {
+  color: #f59e0b;
+}
+.adopt-mint-btn--locked {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+.adopt-link-plant {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0 0 0.75rem;
+}
+.adopt-link-plant-label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+.adopt-link-plant-select {
+  width: 100%;
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--text);
+}
+.adopt-link-plant .btn {
+  justify-self: start;
+}
+
+/* Grower quests (journal proof for RWA mints) */
+.grower-quest {
+  margin: 0 0 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.18);
+}
+.grower-quest--ready {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.08);
+}
+.grower-quest--blocked {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.06);
+}
+.grower-quest-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+}
+.grower-quest-head strong {
+  font-weight: 600;
+  color: var(--text);
+}
+.grower-quest-head span {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.grower-quest-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+.grower-quest-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.grower-quest-item--ok {
+  color: #34d399;
+}
+.grower-quest-item--optional:not(.grower-quest-item--ok) {
+  opacity: 0.75;
+}
+.grower-quest-mark {
+  flex: 0 0 auto;
+  width: 1em;
+  text-align: center;
+}
+.grower-quest-msg {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.grower-quest--ready .grower-quest-msg {
+  color: #34d399;
+}
+
+.grower-profile {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.grower-profile-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.grower-profile-level {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent-bright, #c4a574);
+}
+.grower-profile-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.grower-profile-xp {
+  margin-left: auto;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.grower-profile-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.35;
 }
 
 /* ── Marketplace (M4) ─────────────────────────────────────── */

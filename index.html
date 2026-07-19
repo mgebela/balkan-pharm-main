@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260717e" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260719c" />
 </head>
 <body>
 
@@ -20,11 +20,9 @@
         <span class="nav-toggle-bar"></span>
       </button>
       <nav class="nav" id="main-nav">
-        <a href="#platform" class="nav-link">Platform</a>
-        <a href="#ai" class="nav-link">AI coach</a>
-        <a href="#adopt" class="nav-link">Seed tokens</a>
-        <a href="#guides" class="nav-link">Guides</a>
-        <a href="dnevnik/" class="btn btn-primary">Open journal</a>
+        <a href="#journal" class="nav-link">Journal</a>
+        <a href="#tokens" class="nav-link">Tokens</a>
+        <a href="dnevnik/" class="btn btn-primary">Sign in</a>
       </nav>
     </div>
     <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
@@ -37,443 +35,59 @@
       </div>
       <div class="container hero-inner">
         <div class="hero-content hero-card">
-          <span class="hero-eyebrow">The operating system for modern CBD cultivation</span>
-          <h1>Journal, AI coach and sensors<br />— everything from seed to harvest</h1>
-          <p class="hero-sub">Log your grow in a structured way, predict stress before it becomes visible, and track every plant in one place. From hobby tents to licensed CBD operations.</p>
+          <h1 class="logo-hero">dnevnik.live</h1>
+          <p class="hero-sub">Grow journal and on-chain plant tokens — for growers who log, and adopters who track.</p>
           <div class="hero-cta">
-            <a href="dnevnik/" class="btn btn-primary btn-lg">Start the journal for free</a>
-            <a href="#platform" class="btn btn-ghost btn-lg">See the features</a>
-          </div>
-          <div class="hero-stats">
-            <div class="stat"><strong>Journal</strong> plants · cycles</div>
-            <div class="stat"><strong>Seed NFTs</strong> on-chain · RWA</div>
-            <div class="stat"><strong>$GROW</strong> stage rewards</div>
-            <div class="stat"><strong>Market</strong> trade · redeem</div>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="platform" class="section section-alt">
+    <section id="journal" class="section section-alt">
       <div class="container">
         <div class="section-header">
-          <h2>One system, from seed to harvest</h2>
-          <p class="section-lead">
-            Structured journaling, AI coaching and sensor timelines in a single app — built for CBD from day one.
-          </p>
+          <h2>Journal</h2>
+          <p class="section-lead">Everything you need to run and document a CBD grow.</p>
         </div>
-        <div class="features-grid features-grid--pillars">
+        <div class="features-grid features-grid--pillars features-grid--key">
           <div class="feature-card feature-card--green">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3.5h11A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H8" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 3.5h3A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5H4A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.6"/><path d="M10 9h7M10 12.5h7M10 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Structured journal</h3>
-            <p>Plants, environments and cycles — every action logged and connected, no chaos between grows.</p>
+            <h3>Plants &amp; stages</h3>
+            <p>Track each plant from germination through harvest — indoor or outdoor.</p>
           </div>
           <div class="feature-card feature-card--blue">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="7" width="14" height="11" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M12 7V4M9 4h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9.5" cy="12" r="1.3" fill="currentColor"/><circle cx="14.5" cy="12" r="1.3" fill="currentColor"/><path d="M9.5 15.2h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M2.5 11v3M21.5 11v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>AI coach</h3>
-            <p>A co-pilot that predicts stress before it becomes visible and gives recommendations tuned to your strain and room.</p>
+            <h3>Watering &amp; feeding</h3>
+            <p>Log watering, nutrients, and notes so every cycle has a clear history.</p>
           </div>
           <div class="feature-card feature-card--warm">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19V7.5a3 3 0 013-3h.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="6.5" cy="19" r="2" stroke="currentColor" stroke-width="1.6"/><path d="M11 19a8 8 0 00-4-6.9M15 19A12 12 0 007 8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16.5 5l2 2 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <h3>Sensors &amp; meteo</h3>
-            <p>Temperature, humidity and VPD on the timeline; an on-plant stress sensor closes the loop with early warnings.</p>
+            <h3>Tools &amp; Today</h3>
+            <p>Quick actions, environment logs, and daily tasks in one workspace.</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tokens" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Tokens</h2>
+          <p class="section-lead">Turn cultivation data into Seed RWAs and $GROW on Solana (devnet).</p>
+        </div>
+        <div class="features-grid features-grid--pillars features-grid--key">
           <div class="feature-card feature-card--purple">
-            <span class="feature-badge feature-badge--live">Devnet</span>
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="11" r="2.3" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 16c.6-1.6 1.8-2.4 3-2.4s2.4.8 3 2.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M14 9.5h4M14 12.5h4M14 15.5h2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Seed RWA tokens</h3>
-            <p>Mint a Seed NFT for every physical seed — strain, batch and journal plant ID in verifiable on-chain metadata.</p>
+            <h3>Seed NFTs</h3>
+            <p>Mint a seed token linked to a journal plant — strain and batch on-chain.</p>
           </div>
           <div class="feature-card feature-card--pink">
-            <span class="feature-badge feature-badge--live">Devnet</span>
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8.2C2 8.5 3.8 5.5 7 5.5c1.8 0 3.2 1 5 3 1.8-2 3.2-3 5-3 3.2 0 5 3 3.5 6.3C18.5 15.8 12 20 12 20z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 8.5v6M9.5 11.5c1 .6 4 .6 5 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Adopt a plant</h3>
-            <p>Connect a wallet, mint a seed token, grow through six stages and earn $GROW — then trade or redeem.</p>
+            <h3>Growth &amp; $GROW</h3>
+            <p>Advance stages with journal proof and earn $GROW at each milestone.</p>
           </div>
           <div class="feature-card feature-card--teal">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 8.2-7 9.5C8 19.2 5 15.4 5 11V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9.2 11.8l2 2 3.6-3.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
-            <h3>Privacy (local-first)</h3>
-            <p>Your data stays on your device. Sync is optional and under your control.</p>
+            <h3>Adopt &amp; market</h3>
+            <p>Adopters hold and track plants; buy and sell RWAs on the marketplace.</p>
           </div>
         </div>
-        <div class="chip-row">
-          <span class="chip">Journal</span>
-          <span class="chip">AI coach</span>
-          <span class="chip">Seed NFTs</span>
-          <span class="chip">$GROW rewards</span>
-          <span class="chip">Marketplace</span>
-        </div>
-      </div>
-    </section>
-
-    <section id="ai" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2>AI co-pilot for cultivation</h2>
-          <p class="section-lead">
-            Combines your logs and sensor data with agronomic rules — recommendations for <em>your</em> strain and room, not generic forum advice.
-          </p>
-        </div>
-
-        <div class="app-preview">
-          <div class="app-preview-bar">
-            <span></span><span></span><span></span>
-            <span class="app-preview-url">dnevnik.live</span>
-          </div>
-          <div class="app-preview-body">
-            <div class="apv-stats">
-              <div class="apv-stat"><span class="apv-label">Day</span><span class="apv-value">42</span></div>
-              <div class="apv-stat"><span class="apv-label">Health</span><span class="apv-value apv-value--good">92<i>%</i></span></div>
-              <div class="apv-stat"><span class="apv-label">VPD</span><span class="apv-value apv-value--blue">1.21<i>kPa</i></span></div>
-              <div class="apv-stat"><span class="apv-label">EC</span><span class="apv-value apv-value--warm">1.8<i>mS</i></span></div>
-            </div>
-
-            <div class="apv-charts">
-              <div class="apv-chart-card">
-                <div class="apv-chart-head"><span>Health &amp; VPD</span><span class="apv-trend apv-trend--up">▲ 6%</span></div>
-                <svg class="apv-area" viewBox="0 0 560 170" preserveAspectRatio="none" aria-hidden="true">
-                  <defs>
-                    <linearGradient id="apvG" x1="0" x2="0" y1="0" y2="1">
-                      <stop offset="0%" stop-color="rgba(45,212,191,0.55)"/>
-                      <stop offset="100%" stop-color="rgba(45,212,191,0)"/>
-                    </linearGradient>
-                  </defs>
-                  <line x1="0" y1="42" x2="560" y2="42" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                  <line x1="0" y1="85" x2="560" y2="85" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                  <line x1="0" y1="128" x2="560" y2="128" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                  <path d="M0,120 C60,110 90,80 140,75 C200,68 230,95 280,85 C340,72 370,40 430,38 C490,36 520,55 560,30 L560,170 L0,170 Z" fill="url(#apvG)"/>
-                  <path d="M0,120 C60,110 90,80 140,75 C200,68 230,95 280,85 C340,72 370,40 430,38 C490,36 520,55 560,30" fill="none" stroke="#2dd4bf" stroke-width="2.5"/>
-                  <path d="M0,150 C70,140 120,150 180,130 C250,108 300,125 360,110 C420,96 470,108 560,88" fill="none" stroke="#5fb6ff" stroke-width="2" stroke-dasharray="5 5" opacity="0.85"/>
-                  <circle cx="430" cy="38" r="4" fill="#2dd4bf"/>
-                </svg>
-              </div>
-
-              <div class="apv-chart-card apv-chart-card--bars">
-                <div class="apv-chart-head"><span>Watering (ml)</span></div>
-                <div class="apv-bars">
-                  <span style="--h:40%"></span>
-                  <span style="--h:62%"></span>
-                  <span style="--h:48%"></span>
-                  <span style="--h:80%"></span>
-                  <span style="--h:55%"></span>
-                  <span style="--h:70%"></span>
-                  <span style="--h:90%"></span>
-                </div>
-                <div class="apv-ring" aria-hidden="true">
-                  <svg viewBox="0 0 80 80">
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
-                    <circle cx="40" cy="40" r="32" fill="none" stroke="#78e08f" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="16" transform="rotate(-90 40 40)"/>
-                  </svg>
-                  <span class="apv-ring-label">92%</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="apv-alert">
-              <span class="apv-dot"></span>
-              <div><strong>AI coach</strong><p>VPD optimal · watch EC at the next feed</p></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="pipeline">
-          <div class="pipe-step pipe-step--c1">
-            <span class="pipe-num">1</span>
-            <h3>Collect</h3>
-            <p>Logs · sensors · genetics</p>
-          </div>
-          <span class="pipe-arrow" aria-hidden="true">→</span>
-          <div class="pipe-step pipe-step--c2">
-            <span class="pipe-num">2</span>
-            <h3>Correlate</h3>
-            <p>Strain · room · cycle</p>
-          </div>
-          <span class="pipe-arrow" aria-hidden="true">→</span>
-          <div class="pipe-step pipe-step--c3">
-            <span class="pipe-num">3</span>
-            <h3>Predict</h3>
-            <p>Stress before it shows</p>
-          </div>
-          <span class="pipe-arrow" aria-hidden="true">→</span>
-          <div class="pipe-step pipe-step--c4 pipe-step--final">
-            <span class="pipe-num">4</span>
-            <h3>Guide</h3>
-            <p>Your grow, not generic</p>
-          </div>
-        </div>
-        <div class="chip-row">
-          <span class="chip chip--green">Personalized per cycle</span>
-          <span class="chip chip--blue">Hybrid: agronomy + ML</span>
-          <span class="chip">Privacy · local data</span>
-        </div>
-      </div>
-    </section>
-
-    <section id="features" class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <h2>Replace guesswork with confidence</h2>
-          <p class="section-lead">
-            CBD growing guides give you expert cultivation knowledge. Perfect for beginners.
-          </p>
-        </div>
-        <div class="use-cases">
-          <div class="use-case use-case-image">
-            <div class="use-case-img-wrap">
-              <img src="images/3.jpg" alt="Tracking plant growth and health" />
-            </div>
-            <h3>Your cultivation partner</h3>
-            <p>The most effective way to track plant growth and health. With journals, reminders, feeding and more – success from seed to harvest. An intuitive CBD grow journal that simplifies the whole process and guides you through to harvest. Ideal for beginners and experienced growers alike. Ditch the paper journal; focus on your plants while dnevnik.live tracks your progress.</p>
-          </div>
-          <div class="use-case">
-            <div class="use-case-img-wrap use-case-img-small">
-              <img src="images/4.jpg" alt="Grow planning" />
-            </div>
-            <h3>Use dnevnik.live to:</h3>
-            <ul>
-              <li>Create as many CBD plants and environments as you want – indoor or outdoor.</li>
-              <li>Track everything you do with your plants – watering and feeding reminders.</li>
-              <li>Set notifications and plan your grow smartly.</li>
-              <li>Keep plant photos and notes safely on your device.</li>
-              <li>Build charts, track measurements and use calculators for precise results.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="adopt" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2>Journal tokens &amp; seed RWAs <span class="badge-live">Live on devnet</span></h2>
-          <p class="section-lead">
-            Your grow journal is not just notes — each adopted seed becomes a real-world asset (RWA) on Solana.
-            Mint a Seed NFT, link it to your journal plant, earn $GROW as you grow, trade on the marketplace,
-            and follow every transaction on-chain.
-          </p>
-        </div>
-
-        <div class="features-grid features-grid--pillars token-benefits">
-          <div class="feature-card feature-card--green">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2" stroke="currentColor" stroke-width="1.6"/></svg>
-            </span>
-            <h3>Seed NFT minting</h3>
-            <p>Mint a real Seed NFT for every physical seed you adopt. Strain name, batch code and linked journal plant ID are stored in verifiable metadata on Arweave.</p>
-          </div>
-          <div class="feature-card feature-card--blue">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3.5h11A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H8" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M5 3.5h3A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5H4A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.6"/><path d="M10 9h7M10 12.5h7M10 16h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Journal-linked provenance</h3>
-            <p>The NFT and your grow journal stay connected. Document watering, feeding and stage changes in the app — the on-chain record reflects the same plant lifecycle.</p>
-          </div>
-          <div class="feature-card feature-card--warm">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v4l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Six growth stages on-chain</h3>
-            <p>Advance from Seed → Germination → Seedling → Vegetative → Flowering → Harvest. Each stage updates the NFT metadata with a full growth history log.</p>
-          </div>
-          <div class="feature-card feature-card--purple">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8l-6.2 4.5 2.4-7.4L2 9.4h7.6L12 2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </span>
-            <h3>Earn $GROW rewards</h3>
-            <p>Collect the $GROW SPL token at every growth milestone — up to <strong>225 $GROW</strong> per plant from seed to harvest. Rewards mint directly to your connected wallet.</p>
-          </div>
-          <div class="feature-card feature-card--pink">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="1.6"/><path d="M4 11h16M8 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2" stroke="currentColor" stroke-width="1.6"/></svg>
-            </span>
-            <h3>Real transaction history</h3>
-            <p>Every seed mint and growth step produces a Solana devnet transaction. Inspect signatures in the app and open them on Solscan — full transparency, no simulated hashes.</p>
-          </div>
-          <div class="feature-card feature-card--teal">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18M7 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <h3>Multi-wallet connect</h3>
-            <p>Connect Phantom, Solflare, Backpack or enter a watch-only address. Link your wallet to your dnevnik.live account with a signed message for a verified pubkey.</p>
-          </div>
-          <div class="feature-card feature-card--green">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg>
-            </span>
-            <h3>Devnet marketplace</h3>
-            <p>List your minted seed RWAs and flower-stage tokens for $GROW. Browse listings from other growers and buy with a wallet-signed payment — two tradeable asset types.</p>
-          </div>
-          <div class="feature-card feature-card--warm">
-            <span class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M12 9.4c-.8-2.6.4-4.9 2.6-5.4.6 2.2-.4 4.6-2.6 5.4zM12 14.6c.8 2.6-.4 4.9-2.6 5.4-.6-2.2.4-4.6 2.6-5.4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            </span>
-            <h3>Redeem or trade harvest</h3>
-            <p>At harvest, your token represents a documented physical plant. Redeem CBD flower from your grow or trade the asset on the marketplace for $GROW and partner products.</p>
-          </div>
-        </div>
-
-        <div class="token-rewards-wrap">
-          <h3 class="token-subheading">$GROW rewards per stage</h3>
-          <div class="token-rewards-table-wrap">
-            <table class="token-rewards-table">
-              <thead>
-                <tr>
-                  <th>Stage</th>
-                  <th>$GROW reward</th>
-                  <th>On-chain metadata</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td>🌰 Seed</td><td>—</td><td>Initial Seed NFT mint</td></tr>
-                <tr><td>🌱 Germination</td><td>+10</td><td>Stage trait updated</td></tr>
-                <tr><td>🌿 Seedling</td><td>+20</td><td>Growth history logged</td></tr>
-                <tr><td>☘️ Vegetative</td><td>+35</td><td>Growth history logged</td></tr>
-                <tr><td>🌸 Flowering</td><td>+60</td><td>Asset type → flower token</td></tr>
-                <tr><td>🌼 Harvest</td><td>+100</td><td>Ready for redemption / trade</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="token-rewards-note">225 $GROW total per full seed → harvest cycle on devnet.</p>
-        </div>
-
-        <div class="section-header token-flow-header">
-          <h3>How it works</h3>
-          <p class="section-lead">From journal entry to on-chain asset in five steps.</p>
-        </div>
-        <div class="flow flow-5">
-          <div class="flow-step">
-            <span class="flow-step-num">1</span>
-            <h3>Log in journal</h3>
-            <p>Create a plant, track strain, batch and every grow action.</p>
-          </div>
-          <span class="flow-arrow" aria-hidden="true">→</span>
-          <div class="flow-step">
-            <span class="flow-step-num">2</span>
-            <h3>Mint Seed NFT</h3>
-            <p>Connect a wallet and mint a Seed RWA linked to your journal plant.</p>
-          </div>
-          <span class="flow-arrow" aria-hidden="true">→</span>
-          <div class="flow-step">
-            <span class="flow-step-num">3</span>
-            <h3>Grow &amp; earn</h3>
-            <p>Advance stages in the app — metadata updates and $GROW mints to your wallet.</p>
-          </div>
-          <span class="flow-arrow" aria-hidden="true">→</span>
-          <div class="flow-step">
-            <span class="flow-step-num">4</span>
-            <h3>Trade</h3>
-            <p>List seed or flower tokens on the devnet marketplace for $GROW.</p>
-          </div>
-          <span class="flow-arrow" aria-hidden="true">→</span>
-          <div class="flow-step flow-step--final">
-            <span class="flow-step-num">5</span>
-            <h3>Redeem</h3>
-            <p>Harvest-stage token → physical CBD flower from your documented grow.</p>
-          </div>
-        </div>
-
-        <div class="product-cards product-cards--2">
-          <article class="product-card product-card--flower">
-            <span class="product-icon product-icon--green">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M12 9.4c-.8-2.6.4-4.9 2.6-5.4.6 2.2-.4 4.6-2.6 5.4zM12 14.6c.8 2.6-.4 4.9-2.6 5.4-.6-2.2.4-4.6 2.6-5.4zM9.4 12c-2.6.8-4.9-.4-5.4-2.6 2.2-.6 4.6.4 5.4 2.6zM14.6 12c2.6-.8 4.9.4 5.4 2.6-2.2.6-4.6-.4-5.4-2.6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
-            </span>
-            <h4>CBD flower redemption</h4>
-            <p>Harvest-stage NFT holders can redeem physical flower tied to batch code and COA — the journal is the evidence trail.</p>
-          </article>
-          <article class="product-card product-card--oil">
-            <span class="product-icon product-icon--warm">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg>
-            </span>
-            <h4>Marketplace &amp; $GROW</h4>
-            <p>Trade seed RWAs and flower tokens for $GROW on devnet — or hold rewards for future partner products.</p>
-          </article>
-        </div>
-
-        <div class="token-cta-row">
-          <a href="dnevnik/" class="btn btn-primary btn-lg">Start free &amp; adopt a plant</a>
-          <a href="rwa-docs/" class="btn btn-ghost btn-lg">Read RWA documentation</a>
-        </div>
-
-        <div class="chip-row">
-          <span class="chip chip--green">Solana devnet</span>
-          <span class="chip chip--blue">Metaplex NFTs</span>
-          <span class="chip">Arweave metadata</span>
-          <span class="chip">dnevnik.live/seed-rwa v1.0</span>
-        </div>
-      </div>
-    </section>
-
-    <section id="who" class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <h2>For hobbyists and commercial growers</h2>
-          <p class="section-lead">
-            The same system grows with you — from your first tent to multi-site operations.
-          </p>
-        </div>
-        <div class="personas">
-          <article class="persona persona--green">
-            <span class="persona-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21c-4-3.5-7-6.5-7-10a7 7 0 0114 0c0 3.5-3 6.5-7 10z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 14c-1.6-2-1-4.5 1-6 .6 2.4-.2 4.6-1 6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-            </span>
-            <span class="persona-tag">Hobby</span>
-            <h3>Guided grows</h3>
-            <p>A step-by-step journal and reminders for your first cycles.</p>
-          </article>
-          <article class="persona persona--mid">
-            <span class="persona-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 18l4-5 3.5 3L16 9l4 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="13" r="1.4" fill="currentColor"/><circle cx="16" cy="9" r="1.4" fill="currentColor"/><path d="M4 21h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <span class="persona-tag">Advanced</span>
-            <h3>AI + sensors</h3>
-            <p>Predictions, charts and optimization for every cycle.</p>
-          </article>
-          <article class="persona persona--purple">
-            <span class="persona-icon">
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V8l5-3 5 3 5-3v15" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 5v15M14 8v12" stroke="currentColor" stroke-width="1.4"/><path d="M3 20h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-            <span class="persona-tag">Commercial</span>
-            <h3>Audit · multi-site</h3>
-            <p>Traceability, plant passport and compliance tools.</p>
-          </article>
-        </div>
-        <div class="roadmap" aria-label="Roadmap">
-          <div class="rm-node"><span class="rm-q">Q1–2</span><span class="rm-title">AI coach</span></div>
-          <span class="rm-line" aria-hidden="true"></span>
-          <div class="rm-node"><span class="rm-q">Q2–3</span><span class="rm-title">Mobile · sensors</span></div>
-          <span class="rm-line" aria-hidden="true"></span>
-          <div class="rm-node"><span class="rm-q">Q3–4</span><span class="rm-title">Commercial tools</span></div>
-          <span class="rm-line" aria-hidden="true"></span>
-          <div class="rm-node rm-node--final"><span class="rm-q">Y2</span><span class="rm-title">API · Passport</span></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="guides" class="section">
-      <div class="container">
-        <div class="section-header">
-          <h2>CBD growing guides</h2>
-          <p class="section-lead">Short guides for beginners and advanced growers.</p>
-        </div>
-        <ul class="guide-list">
-          <li><strong>What do I need to start growing CBD?</strong> – A beginner's checklist.</li>
-          <li><strong>Seed germination</strong> – Step by step for beginners.</li>
-          <li><strong>The plant life cycle</strong> – Stages week by week.</li>
-          <li><strong>Nutrients for CBD plants</strong> – A feeding guide.</li>
-          <li><strong>Pests and prevention</strong> – How to protect your plants.</li>
-        </ul>
       </div>
     </section>
 
@@ -483,15 +97,15 @@
       </div>
       <div class="container cta-inner">
         <div class="section-header">
-          <h2>Get started for free</h2>
-          <p class="section-lead">No sign-up required. Your data stays on your device.</p>
+          <h2>Start free</h2>
+          <p class="section-lead">Choose Grower for the journal, or Adopter for the garden.</p>
         </div>
-        <a href="dnevnik/" class="btn btn-primary btn-lg">Open the CBD journal</a>
+        <div class="hero-cta" style="justify-content:center">
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower signup</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter signup</a>
+        </div>
       </div>
     </section>
-
-
-
   </main>
 
   <footer class="footer">
@@ -499,13 +113,12 @@
       <div class="footer-grid">
         <div>
           <strong>dnevnik.live</strong>
-          <p>CBD grow journal – your partner from seed to harvest.</p>
+          <p>CBD grow journal and plant tokens.</p>
         </div>
         <div>
           <a href="dnevnik/">App</a>
-          <a href="#platform">Platform</a>
-          <a href="#ai">AI coach</a>
-          <a href="#adopt">Seed tokens</a>
+          <a href="#journal">Journal</a>
+          <a href="#tokens">Tokens</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
       </div>

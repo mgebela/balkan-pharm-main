@@ -160,5 +160,16 @@
     "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
     "artUpdatedAt": "2026-07-17T17:20:08.963Z",
     "artUpdateSignature": "3JCLcb58RgiNkKghJ1KMM47uVg6RZbW2JJSKKe3hx4dnFitvHQm3prVSwcUk4K7529E8ADa9DQmMGDfx98rmZHCq"
+  },
+  {
+    "name": "Charlotte's Web #2",
+    "strain": "Charlotte's Web",
+    "batch": "B-2026-07-B",
+    "plantId": null,
+    "mint": "4ZJyDn7LPtVipw6Aa3dZpg2i733YnRLFx8wBN9A7asss",
+    "metadataUri": "https://gateway.irys.xyz/UD54ER4fmiqRCyA17L8x1LHibfsJhk8yhbAXqML7fz7",
+    "signature": "46C4r2fydWDDGxGydLrzXjXYXFRix17ZpcnQQfAAcDSsM1328HHWuGCcivj4J2srzBHh9GozMUuertHbeVdf8bfq",
+    "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
+    "mintedAt": "2026-07-19T18:38:32.960Z"
   }
 ]

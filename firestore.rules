@@ -65,6 +65,10 @@ service cloud.firestore {
         && pk.size() <= 44;
     }
 
+    function isValidProfileType(t) {
+      return t in ['grower', 'adopter'];
+    }
+
     function walletLinkPatchAllowed() {
       return request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
@@ -76,7 +80,22 @@ service cloud.firestore {
         && request.resource.data.walletLinkedAt.size() > 0
         // Keep identity fields stable when present
         && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
-        && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email);
+        && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email)
+        && (!('profileType' in request.resource.data)
+          || request.resource.data.profileType == resource.data.profileType);
+    }
+
+    // Allow setting profileType once if missing; otherwise keep it immutable.
+    function profileTypeUpdateAllowed() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['profileType', 'lastLoginAt'])
+        && isValidProfileType(request.resource.data.profileType)
+        && (
+          !('profileType' in resource.data)
+          || resource.data.profileType == null
+          || resource.data.profileType == ''
+          || request.resource.data.profileType == resource.data.profileType
+        );
     }
 
   // ── users ────────────────────────────────────────────────
@@ -91,11 +110,16 @@ service cloud.firestore {
 
     allow create: if signedIn()
       && request.auth.uid == userId
-      && request.resource.data.role == 'user';
+      && request.resource.data.role == 'user'
+      && isValidProfileType(request.resource.data.profileType);
 
     allow update: if signedIn() && (
-      (request.auth.uid == userId && selfRoleUpdateAllowed())
+      (request.auth.uid == userId && selfRoleUpdateAllowed()
+        && (!('profileType' in request.resource.data)
+          || request.resource.data.profileType == resource.data.profileType
+          || (!('profileType' in resource.data) && isValidProfileType(request.resource.data.profileType))))
       || (request.auth.uid == userId && walletLinkPatchAllowed())
+      || (request.auth.uid == userId && profileTypeUpdateAllowed())
       || isSuperadmin()
     );
 
@@ -153,6 +177,8 @@ service cloud.firestore {
       && request.resource.data.strain.size() > 0
       && request.resource.data.batch is string
       && request.resource.data.batch.size() > 0
+      && request.resource.data.plantId is string
+      && request.resource.data.plantId.size() > 0
       && (!('recipient' in request.resource.data)
         || isValidSolanaPubkey(request.resource.data.recipient));
 
@@ -165,8 +191,8 @@ service cloud.firestore {
 
   // ── Growth mint requests (M3) ────────────────────────────
   // Filed when a plant token with a real Seed NFT advances a stage.
-  // The backend minter updates the NFT metadata and mints the $GROW
-  // reward; rewards are computed server-side.
+  // Requires a linked journal plantId; the backend validates watering /
+  // feeding / stage logs in users/{uid}/app/state before minting $GROW.
 
   match /growthMints/{requestId} {
     allow create: if signedIn()
@@ -174,6 +200,8 @@ service cloud.firestore {
       && request.resource.data.status == 'pending'
       && request.resource.data.mintAddress is string
       && request.resource.data.mintAddress.size() > 0
+      && request.resource.data.plantId is string
+      && request.resource.data.plantId.size() > 0
       && request.resource.data.stage in
         ['germination', 'seedling', 'vegetative', 'flowering', 'harvest']
       && (!('recipient' in request.resource.data)

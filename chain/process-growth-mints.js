@@ -31,6 +31,7 @@ import { createMintClient } from './mint-seed-lib.js';
 import { buildStageMetadata, toPublicMetadataUri } from './seed-metadata.js';
 import { stageByKey, stageIndexByKey } from './stages.js';
 import { readDeployed } from './common.js';
+import { validateJournalProof } from './grower-quests.js';
 
 const db = initFirestore();
 const umi = createMintClient().use(mplToolbox());
@@ -72,6 +73,13 @@ async function loadSeedData(data) {
   };
 }
 
+async function loadGrowerAppState(uid) {
+  if (!uid) return null;
+  const snap = await db.collection('users').doc(uid).collection('app').doc('state').get();
+  if (!snap.exists) return null;
+  return snap.data() || {};
+}
+
 async function loadGrowthHistory(mintAddress) {
   const snap = await db
     .collection('growthMints')
@@ -100,6 +108,21 @@ async function processDoc(doc) {
     console.log(`Processing ${label}…`);
     const mint = publicKey(data.mintAddress);
     const seed = await loadSeedData(data);
+    const plantId = data.plantId || seed.plantId || null;
+    const appState = await loadGrowerAppState(data.uid);
+    if (!appState) {
+      throw new Error(
+        'Grower journal state missing — sync plants/entries to dnevnik.live before minting.'
+      );
+    }
+    const proof = validateJournalProof(appState, plantId, stage.key);
+    if (!proof.ok) {
+      throw new Error('Journal proof failed: ' + proof.errors.join('; '));
+    }
+    console.log(
+      `  journal proof ok · plant ${proof.summary.plantName || plantId} · water ${proof.summary.wateringCount} · feed ${proof.summary.feedingCount}`
+    );
+
     const recipient = publicKey(data.recipient || seed.recipient || umi.identity.publicKey);
     const reward = stage.reward;
 
@@ -138,6 +161,9 @@ async function processDoc(doc) {
     await doc.ref.update({
       status: 'minted',
       reward,
+      plantId: plantId || null,
+      journalValidatedAt: new Date().toISOString(),
+      journalSummary: proof.summary,
       metadataUri,
       signature: updateSignature,
       rewardSignature,

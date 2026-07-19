@@ -1,5 +1,7 @@
 (function () {
   const STORAGE_AUTH = 'dnevnik-live-auth';
+  const STORAGE_PENDING_PROFILE = 'dnevnik-live-pending-profile-type';
+  const PROFILE_TYPES = { grower: 'grower', adopter: 'adopter' };
   if (!localStorage.getItem(STORAGE_AUTH)) {
     window.location.replace('../dnevnik/');
     return;
@@ -1043,27 +1045,119 @@ async function ensureUserExists(user) {
 
   const email = (user.email || '').toLowerCase();
   const hybridUser = isSharedHybridUser(email);
+  const pendingType = readPendingProfileType();
 
   if (!docSnap.exists) {
+    const profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
     await userRef.set({
       email: user.email || "",
       uId: user.uid,
       role: 'user',
+      profileType: profileType,
       createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString()
     });
-
-    console.log("User created");
+    clearPendingProfileType();
+    currentProfileType = profileType;
+    console.log("User created", profileType);
   } else {
     const data = docSnap.data() || {};
     const patch = { lastLoginAt: new Date().toISOString() };
     if (hybridUser && data.role === 'viewer') {
       patch.role = 'user';
     }
+    const existingType = normalizeProfileType(data.profileType);
+    if (!existingType) {
+      patch.profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
+    }
     await userRef.update(patch);
-
+    clearPendingProfileType();
+    currentProfileType = existingType || patch.profileType || PROFILE_TYPES.grower;
     console.log("User updated");
   }
+}
+
+function readPendingProfileType() {
+  try {
+    return localStorage.getItem(STORAGE_PENDING_PROFILE) || '';
+  } catch {
+    return '';
+  }
+}
+
+function clearPendingProfileType() {
+  try {
+    localStorage.removeItem(STORAGE_PENDING_PROFILE);
+  } catch {
+    // ignore
+  }
+}
+
+function normalizeProfileType(type) {
+  const t = String(type == null ? '' : type).trim().toLowerCase();
+  if (t === 'adopter' || t === 'adoption' || t === 'adopt') return PROFILE_TYPES.adopter;
+  if (t === 'grower' || t === 'grow') return PROFILE_TYPES.grower;
+  return '';
+}
+
+function getProfileType() {
+  return currentProfileType || PROFILE_TYPES.grower;
+}
+
+function isAdopterProfile() {
+  return getProfileType() === PROFILE_TYPES.adopter;
+}
+
+function isGrowerProfile() {
+  return getProfileType() === PROFILE_TYPES.grower;
+}
+
+function applyProfileTypeUI(profileType) {
+  const type = normalizeProfileType(profileType) || PROFILE_TYPES.grower;
+  currentProfileType = type;
+  document.body.classList.remove('profile-grower', 'profile-adopter');
+  document.body.classList.add(type === PROFILE_TYPES.adopter ? 'profile-adopter' : 'profile-grower');
+  document.body.dataset.profileType = type;
+
+  document.querySelectorAll('[data-label-grower][data-label-adopter]').forEach((el) => {
+    const label = type === PROFILE_TYPES.adopter ? el.dataset.labelAdopter : el.dataset.labelGrower;
+    if (label) el.textContent = label;
+  });
+
+  const badge = document.getElementById('profile-type-badge');
+  if (badge) {
+    badge.textContent = type === PROFILE_TYPES.adopter ? 'Adopter' : 'Grower';
+    badge.hidden = false;
+    badge.className =
+      'profile-type-badge profile-type-badge--' +
+      (type === PROFILE_TYPES.adopter ? 'adopter' : 'grower');
+  }
+
+  const title = document.querySelector('title');
+  if (title) {
+    title.textContent =
+      type === PROFILE_TYPES.adopter
+        ? 'dnevnik.live – Adopt & track'
+        : 'dnevnik.live – Grow journal';
+  }
+
+  if (window.AdoptPlant && typeof window.AdoptPlant.applyProfileType === 'function') {
+    window.AdoptPlant.applyProfileType(type);
+  }
+}
+
+function defaultViewForProfile() {
+  return isAdopterProfile() ? 'adopt' : 'plants';
+}
+
+function isViewAllowedForProfile(viewId) {
+  if (!viewId) return false;
+  if (viewId === 'admin') return isAdminPanelRole(currentUserRole);
+  if (viewId === 'growlog') return isGrowerProfile();
+  if (['plants', 'toolbox', 'danas'].includes(viewId)) return isGrowerProfile();
+  if (viewId === 'market') return isAdopterProfile();
+  if (['dashboard', 'adopt'].includes(viewId)) return true;
+  return false;
 }
 
 function applyRoleUI(role) {
@@ -1090,10 +1184,13 @@ function applyRoleUI(role) {
     superHub.style.display = isSuperadminRole(role) ? 'flex' : 'none';
     superHub.setAttribute('aria-hidden', !isSuperadminRole(role));
   }
+
+  applyProfileTypeUI(currentProfileType || PROFILE_TYPES.grower);
 }
 
 
 let currentUserRole = null;
+let currentProfileType = null;
 
 function normalizeUserRole(role) {
   const r = String(role == null ? '' : role).trim().toLowerCase();
@@ -1132,7 +1229,15 @@ async function getCurrentUserRole(user) {
 
   if (!docSnap.exists) return "user";
 
-  return normalizeUserRole(docSnap.data().role || "user");
+  const data = docSnap.data() || {};
+  const fromDoc = normalizeProfileType(data.profileType);
+  if (fromDoc) {
+    currentProfileType = fromDoc;
+  } else if (!currentProfileType) {
+    currentProfileType = PROFILE_TYPES.grower;
+  }
+
+  return normalizeUserRole(data.role || "user");
 }
 
 function getInitialViewFromUrl() {
@@ -1230,14 +1335,12 @@ function initFirebaseSync() {
       refreshAllViewsAfterRemoteLoad();
 
       const initialView = getInitialViewFromUrl();
-      if (initialView) {
-        if (initialView === 'admin' && !isAdminPanelRole(currentUserRole)) {
-          showView('dashboard');
-        } else if (
-          ['dashboard', 'plants', 'adopt', 'market', 'toolbox', 'admin', 'danas'].includes(initialView)
-        ) {
-          showView(initialView);
-        }
+      if (initialView && isViewAllowedForProfile(initialView)) {
+        showView(initialView);
+      } else if (initialView && !isViewAllowedForProfile(initialView)) {
+        showView(defaultViewForProfile());
+      } else {
+        showView(defaultViewForProfile());
       }
     } catch (err) {
       console.error('App init failed', err);
@@ -1396,6 +1499,13 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
+    if (id !== 'growlog' && !isViewAllowedForProfile(id)) {
+      id = defaultViewForProfile();
+    }
+    if (id === 'growlog' && !isGrowerProfile()) {
+      id = defaultViewForProfile();
+      extra = null;
+    }
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
     if (id === 'growlog' && extra) {
@@ -1411,7 +1521,15 @@ function initFirebaseSync() {
     const view = document.getElementById('view-' + id);
     document.querySelectorAll('.nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
     if (view) view.classList.add('active');
-    if (viewTitle && titles[id]) viewTitle.textContent = titles[id];
+    if (viewTitle) {
+      if (id === 'adopt' && isAdopterProfile()) {
+        viewTitle.textContent = 'My garden';
+      } else if (id === 'adopt' && isGrowerProfile()) {
+        viewTitle.textContent = 'Tokenise';
+      } else if (titles[id]) {
+        viewTitle.textContent = titles[id];
+      }
+    }
     if (id === 'dashboard') renderDashboard();
     if (id === 'plants') {
       initPlantsWeatherWidget();
@@ -1462,6 +1580,11 @@ function initFirebaseSync() {
   function openGrowlog(plantId) {
     showView('growlog', plantId);
   }
+
+  window.addEventListener('dnevnik:open-growlog', (e) => {
+    const plantId = e && e.detail && e.detail.plantId;
+    if (plantId) openGrowlog(plantId);
+  });
 
   function getPlantEntries(plantId) {
     return getEntries().filter((e) => e.plantId === plantId).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
@@ -1787,37 +1910,11 @@ function initFirebaseSync() {
 
     if (metricsEl && window.MetricUI) {
       const M = MetricUI;
-      metricsEl.innerHTML = M.panel(
-        '',
-        M.card({
-          label: 'Grow overview',
-          value: totalPlantCount.toLocaleString('en-US'),
-          meta:
-            M.row('Individual plants', plants.length, 'metric-dot--teal') +
-            M.row('Plants in batch', totalPlantCount, 'metric-dot--blue'),
-          donut: { pct: plants.length ? Math.round((indoorCount / plants.length) * 100) : 0, color: '#2dd4bf' },
-          modifier: 'teal',
-        }) +
+      if (isAdopterProfile()) {
+        metricsEl.innerHTML = M.panel(
+          '',
           M.card({
-            label: 'Journal activity',
-            value: entries.length.toLocaleString('en-US'),
-            meta:
-              M.row('Last 7 days', entriesWeek, 'metric-dot--blue') +
-              M.row('Plant profiles', plants.length, 'metric-dot--muted'),
-            donut: { pct: entries.length ? Math.min(100, Math.round((entriesWeek / entries.length) * 100)) : 0, color: '#5fb6ff' },
-            modifier: 'blue',
-          }) +
-          M.card({
-            label: 'Active stages',
-            value: stageSet.size.toLocaleString('en-US'),
-            meta:
-              M.row(topStage ? STAGES[topStage] || topStage : 'No plants', topStagePct + '%', 'metric-dot--violet') +
-              M.row('Outdoor', outdoorCount, 'metric-dot--amber'),
-            donut: { pct: topStagePct, color: '#c79bff' },
-            modifier: 'violet',
-          }) +
-          M.card({
-            label: 'Token portfolio',
+            label: '$GROW balance',
             value: growBalance,
             meta:
               M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
@@ -1825,20 +1922,98 @@ function initFirebaseSync() {
             donut: { pct: growPct, color: '#f59e0b' },
             modifier: 'amber',
           }) +
+            M.card({
+              label: 'Garden progress',
+              value: tokenCount ? growPct + '%' : '0%',
+              meta:
+                M.row('Harvested', Math.max(0, tokenCount - growingCount), 'metric-dot--teal') +
+                M.row('In growth', growingCount, 'metric-dot--violet'),
+              donut: { pct: growPct, color: '#2dd4bf' },
+              modifier: 'teal',
+            }) +
+            M.card({
+              label: 'Solana wallet',
+              value: walletDisplay,
+              meta:
+                M.row('Network', 'devnet', 'metric-dot--teal') +
+                M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
+              donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
+              modifier: 'teal',
+            }) +
+            M.card({
+              label: 'Market',
+              value: 'Browse',
+              meta:
+                M.row('Action', 'Buy & track RWAs', 'metric-dot--amber') +
+                M.row('Profile', 'Adopter', 'metric-dot--violet'),
+              donut: { pct: 100, color: '#c79bff' },
+              modifier: 'violet',
+            })
+        );
+      } else {
+        metricsEl.innerHTML = M.panel(
+          '',
           M.card({
-            label: 'Solana wallet',
-            value: walletDisplay,
+            label: 'Grow overview',
+            value: totalPlantCount.toLocaleString('en-US'),
             meta:
-              M.row('Network', 'devnet', 'metric-dot--teal') +
-              M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
-            donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
+              M.row('Individual plants', plants.length, 'metric-dot--teal') +
+              M.row('Plants in batch', totalPlantCount, 'metric-dot--blue'),
+            donut: { pct: plants.length ? Math.round((indoorCount / plants.length) * 100) : 0, color: '#2dd4bf' },
             modifier: 'teal',
-          })
-      );
+          }) +
+            M.card({
+              label: 'Journal activity',
+              value: entries.length.toLocaleString('en-US'),
+              meta:
+                M.row('Last 7 days', entriesWeek, 'metric-dot--blue') +
+                M.row('Plant profiles', plants.length, 'metric-dot--muted'),
+              donut: { pct: entries.length ? Math.min(100, Math.round((entriesWeek / entries.length) * 100)) : 0, color: '#5fb6ff' },
+              modifier: 'blue',
+            }) +
+            M.card({
+              label: 'Active stages',
+              value: stageSet.size.toLocaleString('en-US'),
+              meta:
+                M.row(topStage ? STAGES[topStage] || topStage : 'No plants', topStagePct + '%', 'metric-dot--violet') +
+                M.row('Outdoor', outdoorCount, 'metric-dot--amber'),
+              donut: { pct: topStagePct, color: '#c79bff' },
+              modifier: 'violet',
+            }) +
+            M.card({
+              label: 'Token portfolio',
+              value: growBalance,
+              meta:
+                M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
+                M.row('Still growing', growingCount, 'metric-dot--teal'),
+              donut: { pct: growPct, color: '#f59e0b' },
+              modifier: 'amber',
+            }) +
+            M.card({
+              label: 'Solana wallet',
+              value: walletDisplay,
+              meta:
+                M.row('Network', 'devnet', 'metric-dot--teal') +
+                M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
+              donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
+              modifier: 'teal',
+            })
+        );
+      }
     }
 
     if (window.AdoptPlant && typeof window.AdoptPlant.renderDashboard === 'function') {
       window.AdoptPlant.renderDashboard(document.getElementById('dashboard-adopt-panel'), () => showView('adopt'));
+    }
+
+    const chartsSection = document.getElementById('dashboard-charts-section');
+    const recentSection = document.querySelector('#view-dashboard .recent-section');
+    if (chartsSection) chartsSection.hidden = isAdopterProfile();
+    if (recentSection) recentSection.hidden = isAdopterProfile();
+
+    if (isAdopterProfile()) {
+      if (recentEl) recentEl.innerHTML = '';
+      return;
     }
 
     const recent = entries.slice(-5).reverse();
@@ -1863,7 +2038,6 @@ function initFirebaseSync() {
     }
 
     const MIN_CHART_ENTRIES = 2;
-    const chartsSection = document.getElementById('dashboard-charts-section');
     const chartsContainer = document.getElementById('dashboard-charts');
     if (chartsSection && chartsContainer && typeof getToolboxData === 'function') {
       const toolbox = getToolboxData();
@@ -3323,5 +3497,12 @@ document.addEventListener("click", (e) => {
   }
 
 });
+
+  window.DnevnikProfile = {
+    getType: getProfileType,
+    isAdopter: isAdopterProfile,
+    isGrower: isGrowerProfile,
+    TYPES: PROFILE_TYPES,
+  };
 
 })();

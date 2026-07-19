@@ -197,6 +197,16 @@
         const name = String(o.name || '').trim();
         if (!name) throw new Error('Seed name is required.');
 
+        const plantId = o.plantId || null;
+        if (window.GrowerQuests) {
+          const seedQuest = GrowerQuests.evaluateSeedQuest({ plantId: plantId });
+          if (!seedQuest.ready) {
+            throw new Error(seedQuest.message || 'Link a journal plant before minting.');
+          }
+        } else if (!plantId) {
+          throw new Error('Link a journal plant before minting a seed RWA.');
+        }
+
         const now = Date.now();
         const tx = mockTxHash();
         const token = {
@@ -204,7 +214,7 @@
           name,
           strain: String(o.strain || '').trim(),
           batch: String(o.batch || '').trim(),
-          plantId: o.plantId || null,
+          plantId: plantId,
           stageIndex: 0,
           createdAt: now,
           history: [
@@ -219,6 +229,9 @@
         };
         wallet.tokens.unshift(token);
         writeWallet(wallet);
+        if (window.GrowerQuests) {
+          GrowerQuests.awardXp('seed_mint_linked', GrowerQuests.QUEST_XP.linkPlant);
+        }
         return { token, tx };
       }, 700).then(async (result) => {
         const SC = window.SeedChain;
@@ -260,6 +273,13 @@
         if (token.stageIndex >= GROWTH_STAGES.length - 1) {
           throw new Error('This plant is already fully grown.');
         }
+        const nextStage = GROWTH_STAGES[token.stageIndex + 1];
+        if (window.GrowerQuests) {
+          const quest = GrowerQuests.evaluateGrowthQuest(token, nextStage.key);
+          if (!quest.ready) {
+            throw new Error(quest.message || 'Complete grower journal quests first.');
+          }
+        }
         token.stageIndex += 1;
         const stage = GROWTH_STAGES[token.stageIndex];
         const tx = mockTxHash();
@@ -272,7 +292,10 @@
           tx,
         });
         writeWallet(wallet);
-        return { token, reward: stage.reward, tx };
+        if (window.GrowerQuests) {
+          GrowerQuests.awardXp('growth_mint_' + stage.key, GrowerQuests.QUEST_XP.mintReady);
+        }
+        return { token, reward: stage.reward, tx, targetStage: stage.key };
       }, 800).then(async (result) => {
         const SC = window.SeedChain;
         const token = result.token;
@@ -280,6 +303,10 @@
         if (SC && SC.isEnabled() && seedMint && seedMint.mintAddress) {
           try {
             const stage = GROWTH_STAGES[token.stageIndex];
+            const journalProof =
+              window.GrowerQuests && typeof GrowerQuests.buildProof === 'function'
+                ? GrowerQuests.buildProof(token, stage.key)
+                : null;
             const requestId = await SC.requestGrowthMint({
               mintAddress: seedMint.mintAddress,
               seedMintRequestId: token.mintRequestId,
@@ -288,6 +315,7 @@
               strain: token.strain || token.name,
               batch: token.batch,
               plantId: token.plantId,
+              journalProof: journalProof,
             });
             if (requestId) {
               const wallet = readWallet();
@@ -315,6 +343,24 @@
         if (wallet.tokens.length !== before) writeWallet(wallet);
         return wallet;
       }, 300);
+    },
+
+    // Attach an existing journal plant to a token (required for growth mints).
+    linkPlant(tokenId, plantId) {
+      return chainCall(() => {
+        const wallet = readWallet();
+        const token = wallet.tokens.find((t) => t.id === tokenId);
+        if (!token) throw new Error('Token not found.');
+        const plant = readPlants().find((p) => p && String(p.id) === String(plantId));
+        if (!plant) throw new Error('Journal plant not found.');
+        token.plantId = String(plant.id);
+        if (!token.strain && plant.strain) token.strain = plant.strain;
+        writeWallet(wallet);
+        if (window.GrowerQuests) {
+          GrowerQuests.awardXp('link_plant_' + token.id, GrowerQuests.QUEST_XP.linkPlant);
+        }
+        return token;
+      }, 200);
     },
   };
 
@@ -490,6 +536,28 @@
     );
   }
 
+  function growerProfileHtml() {
+    if (isAdopterUi()) return '';
+    if (!window.GrowerQuests || typeof GrowerQuests.getGrowerProfile !== 'function') return '';
+    const profile = GrowerQuests.getGrowerProfile();
+    return (
+      '<div class="grower-profile" aria-label="Grower level">' +
+      '<div class="grower-profile-row">' +
+      '<span class="grower-profile-level">Lv ' +
+      profile.level +
+      '</span>' +
+      '<strong class="grower-profile-title">' +
+      esc(profile.title) +
+      '</strong>' +
+      '<span class="grower-profile-xp">' +
+      profile.xp +
+      ' XP</span>' +
+      '</div>' +
+      '<p class="grower-profile-hint">Log stages, watering, and feeding in the journal to unlock growth mints.</p>' +
+      '</div>'
+    );
+  }
+
   function renderWalletPanel(wallet) {
     const el = document.getElementById('adopt-wallet');
     if (!el) return;
@@ -557,7 +625,9 @@
         linkStatusHtml(wallet) +
         addrLink +
         '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
-        '</div></div>';
+        '</div>' +
+        growerProfileHtml() +
+        '</div>';
       return;
     }
 
@@ -573,6 +643,7 @@
       '<div class="adopt-stat"><span class="adopt-stat-value">' + seeds + '</span><span class="adopt-stat-label">Plant tokens</span></div>' +
       '<div class="adopt-stat"><span class="adopt-stat-value">' + grown + '</span><span class="adopt-stat-label">Fully grown</span></div>' +
       '</div>' +
+      growerProfileHtml() +
       '</div>';
   }
 
@@ -664,8 +735,11 @@
       (token.strain ? '<p class="adopt-token-strain">' + esc(token.strain) + '</p>' : '') +
       '</div>' +
       '</div>' +
-      (token.plantId ? '<p class="adopt-token-link">🔗 linked to a journal plant</p>' : '') +
+      (token.plantId
+        ? '<p class="adopt-token-link">Linked journal plant</p>'
+        : linkPlantControlHtml(token)) +
       chainMintHtml(token) +
+      growerQuestHtml(token, next) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
@@ -675,21 +749,101 @@
       '<div class="adopt-token-actions">' +
       (isMax
         ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
-        : '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn adopt-action-primary" data-id="' +
-          esc(token.id) +
-          '">Mint → ' +
-          esc(next.label) +
-          ' (+' +
-          next.reward +
-          ')</button>') +
+        : mintButtonHtml(token, next)) +
       '<div class="adopt-token-actions-secondary">' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
+      (token.plantId && !isAdopterUi()
+        ? '<button type="button" class="btn btn-ghost btn-sm adopt-open-journal-btn" data-plant-id="' +
+          esc(token.plantId) +
+          '">Journal</button>'
+        : '') +
       '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' + esc(token.id) + '">Burn</button>' +
       '</div>' +
       '</div>' +
       '</div>' +
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
+    );
+  }
+
+  function growerQuestHtml(token, nextStage) {
+    if (isAdopterUi()) {
+      if (!nextStage) return '';
+      return (
+        '<div class="grower-quest grower-quest--blocked">' +
+        '<div class="grower-quest-head"><strong>Growth tracking</strong></div>' +
+        '<p class="grower-quest-msg">Stage advances are minted by the linked grower’s journal proof. Track progress here or buy later stages on the market.</p>' +
+        '</div>'
+      );
+    }
+    if (!nextStage || !window.GrowerQuests) return '';
+    const quest = GrowerQuests.evaluateGrowthQuest(token, nextStage.key);
+    return GrowerQuests.checklistHtml(quest, esc);
+  }
+
+  function linkPlantControlHtml(token) {
+    if (isAdopterUi()) {
+      return '<p class="adopt-token-link adopt-token-link--warn">Adopted asset — growth updates from the grower / market</p>';
+    }
+    const plants = readPlants();
+    if (!plants.length) {
+      return (
+        '<p class="adopt-token-link adopt-token-link--warn">Not linked — add a plant in Plants &amp; journal first</p>'
+      );
+    }
+    const opts = plants
+      .map((p) => '<option value="' + esc(p.id) + '">' + esc(p.name || 'Plant') + '</option>')
+      .join('');
+    return (
+      '<div class="adopt-link-plant">' +
+      '<p class="adopt-token-link adopt-token-link--warn">Not linked to a journal plant</p>' +
+      '<label class="adopt-link-plant-label">Link plant' +
+      '<select class="adopt-link-plant-select" data-token-id="' +
+      esc(token.id) +
+      '">' +
+      '<option value="">— choose —</option>' +
+      opts +
+      '</select></label>' +
+      '<button type="button" class="btn btn-ghost btn-sm adopt-link-plant-btn" data-token-id="' +
+      esc(token.id) +
+      '">Link</button>' +
+      '</div>'
+    );
+  }
+
+  function mintButtonHtml(token, next) {
+    if (!next) return '';
+    if (isAdopterUi()) {
+      return (
+        '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Awaiting grower stage mint</button>'
+      );
+    }
+    let ready = true;
+    let title = '';
+    if (window.GrowerQuests) {
+      const quest = GrowerQuests.evaluateGrowthQuest(token, next.key);
+      ready = quest.ready;
+      title = quest.ready ? '' : ' title="' + esc(quest.message) + '"';
+    }
+    if (!ready) {
+      return (
+        '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary adopt-mint-btn adopt-mint-btn--locked" data-id="' +
+        esc(token.id) +
+        '" disabled' +
+        title +
+        '>Complete quests to mint → ' +
+        esc(next.label) +
+        '</button>'
+      );
+    }
+    return (
+      '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn adopt-action-primary" data-id="' +
+      esc(token.id) +
+      '">Mint → ' +
+      esc(next.label) +
+      ' (+' +
+      next.reward +
+      ')</button>'
     );
   }
 
@@ -743,11 +897,28 @@
     return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint pending…</p>';
   }
 
+  function isAdopterUi() {
+    if (window.DnevnikProfile && typeof DnevnikProfile.isAdopter === 'function') {
+      return DnevnikProfile.isAdopter();
+    }
+    return document.body.classList.contains('profile-adopter');
+  }
+
+  function applyProfileChrome() {
+    const marketCta = document.getElementById('adopt-market-cta');
+    const wallet = readWallet();
+    if (marketCta) {
+      marketCta.hidden = !(isAdopterUi() && wallet.connected);
+    }
+  }
+
   function renderGarden(wallet) {
     const grid = document.getElementById('adopt-token-grid');
     if (!grid) return;
     if (!wallet.tokens.length) {
-      grid.innerHTML = '<div class="empty-state">No tokens yet. Mint a seed above to start growing.</div>';
+      grid.innerHTML = isAdopterUi()
+        ? '<div class="empty-state">No adopted plants yet. Open the market to find one.</div>'
+        : '<div class="empty-state">No tokens yet. Mint a seed above to start growing.</div>';
       return;
     }
     grid.innerHTML = wallet.tokens.map(tokenCardHtml).join('');
@@ -759,7 +930,7 @@
     const plants = readPlants();
     const current = sel.value;
     sel.innerHTML =
-      '<option value="">— none —</option>' +
+      '<option value="">— choose a plant —</option>' +
       plants
         .map((p) => '<option value="' + esc(p.id) + '">' + esc(p.name || 'Plant') + '</option>')
         .join('');
@@ -785,12 +956,15 @@
     if (growthPreviewStage != null && highlightStage >= 0 && growthPreviewStage > highlightStage) {
       growthPreviewStage = highlightStage;
     }
-    renderGrowthGuide(highlightStage);
+    if (!isAdopterUi()) {
+      renderGrowthGuide(highlightStage);
+    }
     renderWalletPanel(wallet);
-    if (seedSection) seedSection.hidden = !wallet.connected;
+    if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
     if (gardenSection) gardenSection.hidden = !wallet.connected;
+    applyProfileChrome();
     if (wallet.connected) {
-      fillSeedPlantOptions();
+      if (!isAdopterUi()) fillSeedPlantOptions();
       renderGarden(wallet);
     }
   }
@@ -1055,8 +1229,42 @@
         return;
       }
 
-      if (mintBtn) {
+      const journalBtn = e.target.closest('.adopt-open-journal-btn');
+      if (journalBtn) {
+        const plantId = journalBtn.dataset.plantId;
+        if (plantId) {
+          window.dispatchEvent(
+            new CustomEvent('dnevnik:open-growlog', { detail: { plantId: plantId } })
+          );
+        }
+        return;
+      }
+
+      const linkPlantBtn = e.target.closest('.adopt-link-plant-btn');
+      if (linkPlantBtn) {
         if (busy) return;
+        const tokenId = linkPlantBtn.dataset.tokenId;
+        const card = linkPlantBtn.closest('.adopt-token-card');
+        const sel = card ? card.querySelector('.adopt-link-plant-select') : null;
+        const plantId = sel ? sel.value : '';
+        if (!plantId) {
+          flashError(new Error('Choose a journal plant to link.'));
+          return;
+        }
+        setBusy(true);
+        try {
+          await PlantToken.linkPlant(tokenId, plantId);
+          render();
+        } catch (err) {
+          flashError(err);
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+
+      if (mintBtn) {
+        if (busy || mintBtn.disabled || mintBtn.classList.contains('adopt-mint-btn--locked')) return;
         const id = mintBtn.dataset.id;
         setBusy(true);
         const original = mintBtn.textContent;
@@ -1095,6 +1303,13 @@
         }
         return;
       }
+
+      const marketBtn = e.target.closest('#adopt-open-market-btn');
+      if (marketBtn) {
+        const marketNav = document.querySelector('.nav-item[data-view="market"]');
+        if (marketNav) marketNav.click();
+        return;
+      }
     });
 
     const seedForm = document.getElementById('adopt-seed-form');
@@ -1131,10 +1346,11 @@
     }
   }
 
-  window.AdoptPlant = {
+    window.AdoptPlant = {
     render() {
       bindGlobalWalletControls();
       bindEvents();
+      applyProfileChrome();
       const SW = window.SolanaWallet;
       if (SW && typeof SW.tryRestore === 'function') {
         SW.tryRestore()
@@ -1167,30 +1383,51 @@
 
     renderGlobalWalletUI: renderGlobalWalletUI,
 
+    applyProfileType(type) {
+      applyProfileChrome();
+      const adoptView = document.getElementById('view-adopt');
+      if (adoptView && adoptView.classList.contains('active')) {
+        render();
+      }
+    },
+
     renderDashboard(container, onOpen) {
       if (!container) return;
       syncWalletFromSolana();
       const wallet = readWallet();
       const maxStage = GROWTH_STAGES.length - 1;
       const M = window.MetricUI;
+      const adopter = isAdopterUi();
+      const panelTitle = adopter ? 'My garden' : 'Tokenise';
+      const openLabel = adopter ? 'Open garden' : 'Open Tokenise';
+      const emptyCta = adopter ? 'Browse market' : 'Mint a seed';
+      const emptyCopy = adopter
+        ? 'Adopt your first plant from the market and track growth & $GROW here.'
+        : 'Mint your first seed to start the growth cycle and earn rewards at each stage.';
 
       if (!wallet.connected) {
         container.innerHTML =
           '<div class="metric-panel metric-panel--adopt">' +
-          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant</h2></header>' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">' +
+          esc(panelTitle) +
+          '</h2></header>' +
           '<div class="dashboard-adopt-panel">' +
           '<div class="dashboard-adopt-visual">' +
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
           '<p>' + esc(devnetNotice()) + '</p>' +
-          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Open Adopt a plant</button>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">' +
+          esc(openLabel) +
+          '</button>' +
           '<button type="button" class="btn btn-ghost wallet-connect-btn">Connect wallet</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
         container.innerHTML =
           '<div class="metric-panel metric-panel--adopt">' +
-          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant</h2></header>' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">' +
+          esc(panelTitle) +
+          '</h2></header>' +
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
@@ -1203,7 +1440,7 @@
               M.card({
                 label: 'Plant tokens',
                 value: '0',
-                meta: M.row('Next step', 'Mint a seed', 'metric-dot--blue'),
+                meta: M.row('Next step', esc(emptyCta), 'metric-dot--blue'),
                 modifier: 'blue',
               }) +
               '</div>'
@@ -1213,8 +1450,12 @@
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
-          '<p>Mint your first seed to start the growth cycle and earn rewards at each stage.</p>' +
-          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">Mint a seed</button>' +
+          '<p>' +
+          esc(emptyCopy) +
+          '</p>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">' +
+          esc(emptyCta) +
+          '</button>' +
           '</div></div></div>';
       } else {
         const top = wallet.tokens.reduce((best, t) => (t.stageIndex > best.stageIndex ? t : best), wallet.tokens[0]);
@@ -1247,7 +1488,9 @@
 
         container.innerHTML =
           '<div class="metric-panel metric-panel--adopt">' +
-          '<header class="metric-panel-head"><h2 class="metric-panel-title">Adopt a plant · Token garden</h2></header>' +
+          '<header class="metric-panel-head"><h2 class="metric-panel-title">' +
+          esc(panelTitle) +
+          ' · Token garden</h2></header>' +
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
