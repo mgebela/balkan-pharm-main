@@ -3535,6 +3535,159 @@ document.addEventListener("click", (e) => {
     TYPES: PROFILE_TYPES,
   };
 
+  function refreshAfterJournalWrite(plantId) {
+    try {
+      renderPlants();
+      renderDashboard();
+      renderJournal();
+      fillEntryPlantSelect();
+      fillJournalPlantFilter();
+      if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
+      if (plantId && currentGrowlogPlantId === plantId) renderGrowlog(plantId);
+      if (window.AdoptPlant && typeof window.AdoptPlant.render === 'function') {
+        const adoptView = document.getElementById('view-adopt');
+        if (adoptView && adoptView.classList.contains('active')) window.AdoptPlant.render();
+      }
+    } catch (err) {
+      console.warn('Journal refresh after coach action', err);
+    }
+  }
+
+  function createPlantProgrammatic(opts) {
+    const o = opts || {};
+    if (blockAdminWrite()) throw new Error('Writes are disabled for this account.');
+    const name = String(o.name || '').trim();
+    if (!name) throw new Error('Plant name is required.');
+    const newId = uuid();
+    const stage = canonicalPlantStage(o.stage || 'klijanje');
+    const day0 = o.startDate || localDateYYYYMMDD();
+    const strain = String(o.strain || '').trim();
+    const envType = o.environmentType === 'outdoor' ? 'outdoor' : 'indoor';
+    const count = Math.max(1, Number(o.count || 1) || 1);
+    const stageHistory = [{ from: null, to: stage, date: day0 }];
+    const stageDates = {};
+    stageDates[stage] = day0;
+    const plant = {
+      id: newId,
+      name: name,
+      strain: strain,
+      count: count,
+      stage: stage,
+      subphase: null,
+      startDate: day0,
+      environmentName: o.environmentName || null,
+      environmentType: envType,
+      fieldLocation: null,
+      plantingLocation: null,
+      exposureHours: null,
+      notes: String(o.notes || '').trim(),
+      photo: null,
+      updatedAt: new Date().toISOString(),
+      views: 0,
+      stageHistory: stageHistory,
+      stageDates: stageDates,
+      subphaseHistory: [],
+    };
+    setPlants(getPlants().concat([plant]));
+    setEntries(
+      getEntries().concat([
+        {
+          id: uuid(),
+          plantId: newId,
+          date: day0,
+          type: 'faza',
+          note: 'Grow started — stage: ' + (STAGES[stage] || stage) + ' (via Grower Coach)',
+          photo: null,
+          meta: { faza: { from: null, to: stage }, source: 'ai-coach' },
+        },
+      ])
+    );
+    refreshAfterJournalWrite(newId);
+    return plant;
+  }
+
+  function setPlantStageProgrammatic(plantId, stage, note) {
+    if (blockWrite({ plantId: plantId })) throw new Error('Cannot edit this plant.');
+    const plants = getPlants();
+    const idx = plants.findIndex((p) => p && String(p.id) === String(plantId));
+    if (idx < 0) throw new Error('Plant not found.');
+    const prev = plants[idx];
+    const newStage = canonicalPlantStage(stage);
+    const oldStage = canonicalPlantStage(prev.stage);
+    if (oldStage === newStage) return prev;
+    const td = localDateYYYYMMDD();
+    const stageHistory = Array.isArray(prev.stageHistory) ? prev.stageHistory.slice() : [];
+    const stageDates =
+      prev.stageDates && typeof prev.stageDates === 'object' ? Object.assign({}, prev.stageDates) : {};
+    stageHistory.push({ from: oldStage, to: newStage, date: td });
+    stageDates[newStage] = td;
+    const updated = Object.assign({}, prev, {
+      stage: newStage,
+      stageHistory: stageHistory,
+      stageDates: stageDates,
+      updatedAt: new Date().toISOString(),
+    });
+    plants[idx] = updated;
+    setPlants(plants);
+    const base =
+      'Stage transition: ' +
+      (STAGES[oldStage] || oldStage) +
+      ' → ' +
+      (STAGES[newStage] || newStage);
+    setEntries(
+      getEntries().concat([
+        {
+          id: uuid(),
+          plantId: String(plantId),
+          date: td,
+          type: 'faza',
+          note: (note ? base + '. ' + String(note) : base) + ' (via Grower Coach)',
+          photo: null,
+          meta: { faza: { from: oldStage, to: newStage }, source: 'ai-coach' },
+        },
+      ])
+    );
+    refreshAfterJournalWrite(plantId);
+    return updated;
+  }
+
+  function addJournalEntryProgrammatic(opts) {
+    const o = opts || {};
+    const plantId = o.plantId || null;
+    if (blockWrite({ plantId: plantId })) throw new Error('Cannot add entry for this plant.');
+    if (!plantId) throw new Error('plantId is required.');
+    const plant = getPlants().find((p) => p && String(p.id) === String(plantId));
+    if (!plant) throw new Error('Plant not found.');
+    const type = String(o.type || o.entryType || 'opcenito').trim() || 'opcenito';
+    const note = String(o.note || '').trim() || 'Logged via Grower Coach';
+    const date = o.date || localDateYYYYMMDD();
+    const entry = {
+      id: uuid(),
+      plantId: String(plantId),
+      date: date,
+      type: type,
+      note: note,
+      photo: null,
+      video: null,
+      meta: Object.assign({}, o.meta || {}, { source: 'ai-coach' }),
+    };
+    setEntries(getEntries().concat([entry]));
+    refreshAfterJournalWrite(plantId);
+    return entry;
+  }
+
+  function findPlantByNameOrId(query) {
+    const q = String(query || '').trim().toLowerCase();
+    if (!q) return null;
+    const plants = getPlants();
+    return (
+      plants.find((p) => p && String(p.id) === String(query)) ||
+      plants.find((p) => p && String(p.name || '').toLowerCase() === q) ||
+      plants.find((p) => p && String(p.name || '').toLowerCase().includes(q)) ||
+      null
+    );
+  }
+
   window.DnevnikJournal = {
     getPlants: getPlants,
     getEntries: getEntries,
@@ -3542,6 +3695,11 @@ document.addEventListener("click", (e) => {
       return currentGrowlogPlantId;
     },
     STAGES: STAGES,
+    createPlant: createPlantProgrammatic,
+    setPlantStage: setPlantStageProgrammatic,
+    addEntry: addJournalEntryProgrammatic,
+    findPlant: findPlantByNameOrId,
+    refresh: refreshAfterJournalWrite,
   };
 
 })();

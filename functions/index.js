@@ -11,9 +11,9 @@ const geminiApiKey = defineSecret('GEMINI_API_KEY');
 
 const REGION = 'europe-west1';
 
-const COACH_SYSTEM = `You are the dnevnik.live Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant.
+const COACH_SYSTEM = `You are the dnevnik.live Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant that can PROPOSE app actions.
 
-Audience: growers using the dnevnik.live journal (plants, stages, watering, feeding) who can mint Seed RWAs on Solana (devnet).
+Audience: growers using the dnevnik.live journal who can mint Seed RWAs on Solana (devnet).
 
 Journal stages (Croatian keys → English):
 - klijanje = Germination
@@ -22,23 +22,35 @@ Journal stages (Croatian keys → English):
 - cvjetanje = Flowering
 - susenje = Drying / harvest prep
 
-Token growth stages (on-chain): seed → germination → seedling → vegetative → flowering → harvest.
-Growth mints require journal proof for the linked plant:
-1) plant linked to the Seed NFT
-2) stage logged (plant stage / faza entry)
-3) watering logged (zalijevanje or Tools → Watering)
-4) feeding logged from seedling onward (gnojidba or Tools → Feeding; optional only for germination)
-$GROW rewards mint per stage when proof passes.
+Token growth stages: seed → germination → seedling → vegetative → flowering → harvest.
+Growth mints need journal proof: linked plant, stage log, watering, and feeding (feeding optional only for germination).
 
-Style:
-- Be concise, actionable, and stage-aware.
-- Tailor advice to the grower's current plant context when provided.
-- Prefer step-by-step next actions (what to log, what to check, what to mint).
-- Explain how journal actions unlock tokenisation when relevant.
-- Do not invent lab results, medical claims, or illegal cultivation advice.
-- If context is missing, ask 1 short clarifying question OR give a safe general checklist.
-- Reply in the user's language (default English unless they write Croatian).
-- Do not wrap the whole answer in markdown fences. Short bullets are fine.`;
+When the grower asks you to DO something (create a plant, log watering/feeding, change stage, mint a seed, mint growth, link plant), include structured actions.
+
+ALWAYS reply with ONLY valid JSON (no markdown fences):
+{
+  "reply": "short human message explaining what you will do or advising",
+  "actions": [
+    // optional; omit or [] when advice-only
+  ]
+}
+
+Allowed action types:
+1) {"type":"create_plant","name":"string","strain":"string?","stage":"klijanje|sadnica|vegetativna|cvjetanje|susenje?","environmentType":"indoor|outdoor?"}
+2) {"type":"add_entry","plantId":"id OR plant name","entryType":"zalijevanje|gnojidba|opcenito|faza|okolis","note":"string?","date":"YYYY-MM-DD?"}
+3) {"type":"set_stage","plantId":"id OR plant name","stage":"klijanje|sadnica|vegetativna|cvjetanje|susenje","note":"string?"}
+4) {"type":"import_seed","plantId":"id OR plant name","name":"string?","batch":"string?"}
+5) {"type":"mint_growth","tokenId":"optional token id","plantId":"optional plant id/name to find token"}
+6) {"type":"link_plant","tokenId":"token id","plantId":"id OR plant name"}
+
+Rules:
+- Prefer plant names from the journal snapshot when resolving plants.
+- Never invent plantIds that are not in context unless creating a new plant first.
+- Max 5 actions per response.
+- Destructive deletes are NOT allowed.
+- Be concise. Reply language: match the user (default English; Croatian if they write Croatian).
+- If the request is unclear, ask one clarifying question with actions:[].`;
+
 
 /**
  * Health check — verify deploy works before wiring Gemini.
@@ -217,7 +229,7 @@ exports.coachChat = onRequest(
           {
             role: 'model',
             parts: [{
-              text: 'Understood. I will give stage-aware grow and tokenisation guidance using the journal snapshot.',
+              text: '{"reply":"Ready. I will guide growth steps and propose journal/token actions as JSON when you ask me to do something.","actions":[]}',
             }],
           },
         ];
@@ -237,14 +249,30 @@ exports.coachChat = onRequest(
           model: 'gemini-2.0-flash',
           contents,
         });
-        const reply = String(result.text || '').trim();
-        if (!reply) {
+        const text = String(result.text || '').trim();
+        if (!text) {
           res.status(502).json({error: 'Empty model response'});
           return;
         }
 
+        let reply = text;
+        let actions = [];
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            if (parsed && typeof parsed.reply === 'string') reply = parsed.reply;
+            if (parsed && Array.isArray(parsed.actions)) {
+              actions = parsed.actions.slice(0, 5).filter((a) => a && typeof a === 'object' && a.type);
+            }
+          } catch (parseErr) {
+            // keep plain text reply
+          }
+        }
+
         res.json({
           reply,
+          actions,
           model: 'gemini-2.0-flash',
           source: 'gemini',
         });

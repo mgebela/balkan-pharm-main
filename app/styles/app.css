@@ -5024,6 +5024,26 @@ body:not(.app-loading) {
   border-color: var(--accent, #8e3520);
 }
 
+.ai-coach-mic.is-listening {
+  border-color: #b4472b;
+  color: #8e3520;
+  box-shadow: 0 0 0 2px rgba(180, 71, 43, 0.25);
+}
+
+.ai-coach-actions {
+  margin: 0.55rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+
+.ai-coach-action-bar {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  flex-wrap: wrap;
+}
+
 @media (max-width: 720px) {
   .ai-coach-root {
     right: 0.75rem;
