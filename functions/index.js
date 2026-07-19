@@ -44,7 +44,7 @@ Style:
  * Health check — verify deploy works before wiring Gemini.
  * GET https://<region>-<project>.cloudfunctions.net/healthCheck
  */
-exports.healthCheck = onRequest({region: REGION}, (req, res) => {
+exports.healthCheck = onRequest({region: REGION, invoker: 'public'}, (req, res) => {
   res.json({ok: true, service: 'dnevnik-live-functions'});
 });
 
@@ -62,6 +62,7 @@ exports.analyzeGrowFrames = onRequest(
       region: REGION,
       secrets: [geminiApiKey],
       cors: true,
+      invoker: 'public',
       maxInstances: 10,
       timeoutSeconds: 60,
       memory: '512MiB',
@@ -164,6 +165,7 @@ exports.coachChat = onRequest(
       region: REGION,
       secrets: [geminiApiKey],
       cors: true,
+      invoker: 'public',
       maxInstances: 20,
       timeoutSeconds: 60,
       memory: '512MiB',

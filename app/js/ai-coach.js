@@ -10,8 +10,7 @@
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
   const STORAGE_CHAT = 'dnevnik-live-coach-chat';
 
-  const COACH_URL =
-    'https://europe-west1-balpha-9dab9.cloudfunctions.net/coachChat';
+  const COACH_URL = 'https://coachchat-zwul5y4amq-ew.a.run.app';
 
   const STAGE_LABELS = {
     klijanje: 'Germination',
