@@ -4859,3 +4859,187 @@ body:not(.app-loading) {
     grid-template-columns: 1fr;
   }
 }
+
+/* Grower AI Coach */
+.ai-coach-root {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.ai-coach-root[hidden] {
+  display: none !important;
+}
+
+.ai-coach-fab,
+.ai-coach-panel {
+  pointer-events: auto;
+}
+
+.ai-coach-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.7rem 0.95rem;
+  border-radius: 10px;
+  border: 1px solid rgba(180, 71, 43, 0.45);
+  background: linear-gradient(135deg, #8e3520, #b4472b);
+  color: #f7eee1;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(31, 20, 10, 0.28);
+}
+
+.ai-coach-fab:hover {
+  filter: brightness(1.05);
+}
+
+.ai-coach-fab-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.ai-coach-panel {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 0.65rem);
+  width: min(380px, calc(100vw - 1.5rem));
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  border: 1px solid var(--border, rgba(31, 46, 34, 0.18));
+  background: var(--bg-alt, #dccfaf);
+  box-shadow: 0 18px 48px rgba(31, 20, 10, 0.22);
+  overflow: hidden;
+}
+
+.ai-coach-panel[hidden] {
+  display: none !important;
+}
+
+.ai-coach-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 0.95rem;
+  border-bottom: 1px solid rgba(31, 46, 34, 0.12);
+}
+
+.ai-coach-head strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.ai-coach-head p {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.ai-coach-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.65rem 0.85rem 0.25rem;
+}
+
+.ai-coach-chip {
+  border: 1px solid rgba(31, 46, 34, 0.18);
+  background: rgba(255, 255, 255, 0.35);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 0.28rem 0.55rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ai-coach-chip:hover {
+  border-color: rgba(142, 53, 32, 0.45);
+}
+
+.ai-coach-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-height: 180px;
+}
+
+.ai-coach-bubble {
+  max-width: 92%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.ai-coach-bubble p {
+  margin: 0;
+}
+
+.ai-coach-bubble--assistant {
+  align-self: flex-start;
+  background: rgba(31, 46, 34, 0.08);
+  border: 1px solid rgba(31, 46, 34, 0.1);
+}
+
+.ai-coach-bubble--user {
+  align-self: flex-end;
+  background: rgba(142, 53, 32, 0.14);
+  border: 1px solid rgba(142, 53, 32, 0.22);
+}
+
+.ai-coach-form {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.7rem 0.85rem 0.85rem;
+  border-top: 1px solid rgba(31, 46, 34, 0.12);
+}
+
+.ai-coach-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid rgba(31, 46, 34, 0.18);
+  background: rgba(255, 255, 255, 0.45);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+}
+
+.ai-coach-form input:focus {
+  outline: none;
+  border-color: var(--accent, #8e3520);
+}
+
+@media (max-width: 720px) {
+  .ai-coach-root {
+    right: 0.75rem;
+    bottom: 4.75rem;
+  }
+
+  .ai-coach-fab-label {
+    display: none;
+  }
+
+  .ai-coach-fab {
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+  }
+}
+

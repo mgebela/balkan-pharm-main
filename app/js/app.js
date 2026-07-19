@@ -1144,6 +1144,9 @@ function applyProfileTypeUI(profileType) {
   if (window.AdoptPlant && typeof window.AdoptPlant.applyProfileType === 'function') {
     window.AdoptPlant.applyProfileType(type);
   }
+  if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
+    window.AICoach.applyVisibility();
+  }
 }
 
 function defaultViewForProfile() {
@@ -2958,6 +2961,33 @@ function initFirebaseSync() {
     });
   }
 
+  const btnOpenCoach = document.getElementById('btn-open-coach');
+  if (btnOpenCoach) {
+    btnOpenCoach.addEventListener('click', () => {
+      if (window.AICoach) AICoach.open();
+    });
+  }
+  const btnCoachGrowlog = document.getElementById('btn-coach-growlog');
+  if (btnCoachGrowlog) {
+    btnCoachGrowlog.addEventListener('click', () => {
+      if (window.AICoach) {
+        AICoach.open();
+        const plant = currentGrowlogPlantId
+          ? getPlants().find((p) => p.id === currentGrowlogPlantId)
+          : null;
+        if (plant) {
+          AICoach.ask(
+            'What should I do next for "' +
+              plant.name +
+              '" in stage ' +
+              (STAGES[plant.stage] || plant.stage || 'unknown') +
+              '? Include tokenisation tips.'
+          );
+        }
+      }
+    });
+  }
+
   document.getElementById('entry-photo').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     const dataEl = document.getElementById('entry-photo-data');
@@ -3503,6 +3533,15 @@ document.addEventListener("click", (e) => {
     isAdopter: isAdopterProfile,
     isGrower: isGrowerProfile,
     TYPES: PROFILE_TYPES,
+  };
+
+  window.DnevnikJournal = {
+    getPlants: getPlants,
+    getEntries: getEntries,
+    getCurrentGrowlogPlantId: function () {
+      return currentGrowlogPlantId;
+    },
+    STAGES: STAGES,
   };
 
 })();
