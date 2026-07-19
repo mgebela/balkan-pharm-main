@@ -700,6 +700,80 @@ body {
   opacity: 0.8;
 }
 
+.footer-powered {
+  margin-top: 1.25rem;
+}
+
+.powered-by-solana {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.powered-by-solana:hover {
+  color: var(--text);
+}
+
+.powered-by-solana strong {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.solana-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  color: inherit;
+}
+
+.solana-badge-mark {
+  display: inline-flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.solana-badge--hero {
+  margin-top: -1rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  width: fit-content;
+}
+
+.solana-badge--hero:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.solana-badge--inline {
+  margin-left: 0.55rem;
+  vertical-align: middle;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #1f2e22;
+  background: rgba(20, 241, 149, 0.14);
+  border: 1px solid rgba(153, 69, 255, 0.28);
+}
+
+.section-header h2 .solana-badge--inline {
+  position: relative;
+  top: -0.15em;
+}
+
 /* Mobile nav toggle */
 .nav-toggle {
   display: none;
