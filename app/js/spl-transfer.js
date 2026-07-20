@@ -12,13 +12,21 @@
   const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
   const ATA_PROGRAM = 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL';
   const SYSTEM_PROGRAM = '11111111111111111111111111111111';
-  const MAX_ATTEMPTS = 3;
+  const MAX_SIGN_ATTEMPTS = 3;
+  const CONFIRM_POLLS = 40;
+  const CONFIRM_POLL_MS = 1500;
 
   let web3Module = null;
 
   async function loadWeb3() {
     if (!web3Module) web3Module = await import(WEB3_CDN);
     return web3Module;
+  }
+
+  function sleep(ms) {
+    return new Promise(function (resolve) {
+      setTimeout(resolve, ms);
+    });
   }
 
   function deriveAta(web3, owner, mint) {
@@ -96,34 +104,54 @@
     );
   }
 
-  async function signatureLanded(connection, signature) {
-    if (!signature) return false;
-    try {
-      const res = await connection.getSignatureStatuses([signature], {
-        searchTransactionHistory: true,
-      });
-      const status = res && res.value && res.value[0];
-      if (!status || status.err) return false;
-      const conf = status.confirmationStatus;
-      return conf === 'confirmed' || conf === 'finalized' || status.confirmations != null;
-    } catch {
-      return false;
-    }
+  function friendlyConfirmTimeoutError(signature) {
+    return new Error(
+      'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: ' +
+        signature +
+        '. Refresh and check whether the offer/NFT already moved before trying again.'
+    );
   }
 
-  async function confirmOrRecover(connection, signature, blockhash, lastValidBlockHeight) {
-    try {
-      await connection.confirmTransaction(
-        { signature, blockhash, lastValidBlockHeight },
-        'confirmed'
-      );
-      return signature;
-    } catch (err) {
-      // Public RPC / slow confirm can throw "block height exceeded" even when
-      // the tx already landed. Treat an on-chain success as done.
-      if (await signatureLanded(connection, signature)) return signature;
-      throw err;
+  async function readSignatureStatus(connection, signature) {
+    for (let i = 0; i < 5; i += 1) {
+      try {
+        const res = await connection.getSignatureStatuses([signature], {
+          searchTransactionHistory: true,
+        });
+        return res && res.value && res.value[0];
+      } catch {
+        await sleep(400 * (i + 1));
+      }
     }
+    return null;
+  }
+
+  /*
+   * Avoid Connection.confirmTransaction websockets — public Devnet RPC 429s them
+   * and then falsely reports "block height exceeded" for txs that already landed.
+   */
+  async function confirmByPolling(connection, signature) {
+    for (let i = 0; i < CONFIRM_POLLS; i += 1) {
+      const status = await readSignatureStatus(connection, signature);
+      if (status) {
+        if (status.err) {
+          throw new Error('Transaction failed on-chain: ' + JSON.stringify(status.err));
+        }
+        const conf = status.confirmationStatus;
+        if (conf === 'confirmed' || conf === 'finalized' || status.confirmations != null) {
+          return signature;
+        }
+      }
+      await sleep(CONFIRM_POLL_MS);
+    }
+    const last = await readSignatureStatus(connection, signature);
+    if (last && !last.err) {
+      const conf = last.confirmationStatus;
+      if (conf === 'confirmed' || conf === 'finalized' || last.confirmations != null) {
+        return signature;
+      }
+    }
+    throw friendlyConfirmTimeoutError(signature);
   }
 
   function buildTransferTx(web3, owner, mint, toOwner, amount, decimals) {
@@ -136,6 +164,16 @@
     return tx;
   }
 
+  async function tokenRawBalance(connection, web3, owner, mint) {
+    const ata = deriveAta(web3, owner, mint);
+    try {
+      const bal = await connection.getTokenAccountBalance(ata);
+      return BigInt((bal && bal.value && bal.value.amount) || '0');
+    } catch {
+      return 0n;
+    }
+  }
+
   const SplTransfer = {
     // Whole-token UI amount held by the connected wallet for `mint` (0 if none).
     async getBalance(mintAddress) {
@@ -145,13 +183,30 @@
       const connection = await SW.getConnection();
       const owner = new web3.PublicKey(SW.getPublicKey());
       const mint = new web3.PublicKey(mintAddress);
-      const ata = deriveAta(web3, owner, mint);
-      try {
-        const bal = await connection.getTokenAccountBalance(ata);
-        return Number((bal && bal.value && bal.value.uiAmount) || 0);
-      } catch {
-        return 0;
-      }
+      const raw = await tokenRawBalance(connection, web3, owner, mint);
+      // Best-effort UI amount for 0-decimal NFTs / whole tokens.
+      return Number(raw);
+    },
+
+    async getRawBalance(mintAddress) {
+      const SW = window.SolanaWallet;
+      if (!SW || !SW.isConnected()) return 0n;
+      const web3 = await loadWeb3();
+      const connection = await SW.getConnection();
+      const owner = new web3.PublicKey(SW.getPublicKey());
+      const mint = new web3.PublicKey(mintAddress);
+      return tokenRawBalance(connection, web3, owner, mint);
+    },
+
+    // Raw balance of `mint` held by an arbitrary wallet (e.g. escrow).
+    async getRawBalanceOf(ownerAddress, mintAddress) {
+      const SW = window.SolanaWallet;
+      if (!SW) return 0n;
+      const web3 = await loadWeb3();
+      const connection = await SW.getConnection();
+      const owner = new web3.PublicKey(ownerAddress);
+      const mint = new web3.PublicKey(mintAddress);
+      return tokenRawBalance(connection, web3, owner, mint);
     },
 
     /*
@@ -168,42 +223,46 @@
       const owner = new web3.PublicKey(SW.getPublicKey());
       const mint = new web3.PublicKey(params.mint);
       const toOwner = new web3.PublicKey(params.to);
-      const amount = params.amount;
+      const amount = BigInt(params.amount);
       const decimals = Number(params.decimals || 0);
 
-      const sourceAta = deriveAta(web3, owner, mint);
-      try {
-        const bal = await connection.getTokenAccountBalance(sourceAta);
-        const raw = BigInt((bal && bal.value && bal.value.amount) || '0');
-        if (raw < BigInt(amount)) throw friendlyMissingTokenError(params);
-      } catch (err) {
-        if (err && err.message && /does not hold|does not have enough/i.test(err.message)) throw err;
-        throw friendlyMissingTokenError(params);
-      }
+      const held = await tokenRawBalance(connection, web3, owner, mint);
+      if (held < amount) throw friendlyMissingTokenError(params);
 
       let lastErr = null;
-      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+      for (let attempt = 1; attempt <= MAX_SIGN_ATTEMPTS; attempt += 1) {
         try {
-          // Fresh blockhash immediately before wallet prompt — slow approval
-          // still expires, but we retry with a new prompt instead of failing once.
+          // Fresh blockhash immediately before wallet prompt.
           const tx = buildTransferTx(web3, owner, mint, toOwner, amount, decimals);
-          const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(
-            'confirmed'
-          );
-          tx.recentBlockhash = blockhash;
+          const latest = await connection.getLatestBlockhash('confirmed');
+          tx.recentBlockhash = latest.blockhash;
 
           const signed = await SW.signTransaction(tx);
           const raw = typeof signed.serialize === 'function' ? signed.serialize() : signed;
-          const signature = await connection.sendRawTransaction(raw, {
-            skipPreflight: false,
-            preflightCommitment: 'confirmed',
-            maxRetries: 5,
-          });
-          return await confirmOrRecover(connection, signature, blockhash, lastValidBlockHeight);
+
+          let signature;
+          try {
+            signature = await connection.sendRawTransaction(raw, {
+              skipPreflight: false,
+              preflightCommitment: 'confirmed',
+              maxRetries: 5,
+            });
+          } catch (sendErr) {
+            // If send fails with expired blockhash before broadcast, resign.
+            if (isBlockhashExpiredError(sendErr) && attempt < MAX_SIGN_ATTEMPTS) {
+              lastErr = sendErr;
+              continue;
+            }
+            throw sendErr;
+          }
+
+          // Once broadcast, never resign/retry a new transfer — the NFT/$GROW
+          // may already have moved. Only poll for confirmation.
+          return await confirmByPolling(connection, signature);
         } catch (err) {
           lastErr = err;
-          if (!isBlockhashExpiredError(err) || attempt === MAX_ATTEMPTS) break;
-          // Ask the wallet to sign again with a fresh blockhash.
+          // Only resign when we never successfully broadcast.
+          if (!isBlockhashExpiredError(err) || attempt === MAX_SIGN_ATTEMPTS) break;
         }
       }
 

@@ -2,10 +2,19 @@
   "name": "GROW",
   "symbol": "GROW",
   "description": "$GROW is the growth reward token of dnevnik.live — earned as adopted CBD plants advance through real growth stages documented in the grow journal. Devnet deployment (M1).",
-  "image": "https://dnevnik.live/images/bp.png",
+  "image": "https://dnevnik.live/token-metadata/images/plant-seed.png",
   "external_url": "https://dnevnik.live",
   "attributes": [
     { "trait_type": "Network", "value": "Solana devnet" },
     { "trait_type": "Project", "value": "dnevnik.live" }
-  ]
+  ],
+  "properties": {
+    "category": "image",
+    "files": [
+      {
+        "uri": "https://dnevnik.live/token-metadata/images/plant-seed.png",
+        "type": "image/png"
+      }
+    ]
+  }
 }

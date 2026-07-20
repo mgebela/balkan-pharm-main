@@ -216,8 +216,22 @@
     const SW = await ensureSigningWallet('post an offer (escrow the NFT)');
     const escrow = cfg().escrowAddress;
     if (!escrow) throw new Error('Escrow address is not configured.');
+    if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
 
-    const escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
+    let escrowSignature = null;
+    const held = await window.SplTransfer.getRawBalance(tokenEntry.mintAddress);
+    if (held >= 1n) {
+      escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
+    } else {
+      // Recover from a prior success where confirm timed out after escrow moved.
+      const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
+      if (escrowHeld < 1n) {
+        throw new Error(
+          'This wallet no longer holds that NFT and escrow does not either. Refresh and check ownership before posting again.'
+        );
+      }
+      escrowSignature = 'recovered-escrow-' + Date.now();
+    }
 
     const token = tokenEntry.token;
     await firebase.firestore().collection('marketListings').add({

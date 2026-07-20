@@ -89,24 +89,95 @@ async function transferNftFromEscrow(mintAddress, destinationPubkey) {
   const destOwner = publicKey(destinationPubkey);
   const source = findAssociatedTokenPda(umi, { mint, owner: umi.identity.publicKey });
   const destination = findAssociatedTokenPda(umi, { mint, owner: destOwner });
-  const result = await transactionBuilder()
-    .add(createTokenIfMissing(umi, { mint, owner: destOwner }))
-    .add(
-      transferTokens(umi, {
-        source,
-        destination,
-        amount: 1n,
-      })
-    )
-    .sendAndConfirm(umi);
-  return base58.deserialize(result.signature)[0];
+
+  // If destination already holds the NFT, a prior settle already landed.
+  try {
+    const destAccounts = await connection.getParsedTokenAccountsByOwner(
+      new PublicKey(destinationPubkey),
+      { mint: new PublicKey(mintAddress) }
+    );
+    if (
+      destAccounts.value.some(
+        (a) => Number(a.account.data.parsed.info.tokenAmount.amount) >= 1
+      )
+    ) {
+      return 'already-delivered';
+    }
+  } catch {
+    // fall through to transfer
+  }
+
+  try {
+    const result = await transactionBuilder()
+      .add(createTokenIfMissing(umi, { mint, owner: destOwner }))
+      .add(
+        transferTokens(umi, {
+          source,
+          destination,
+          amount: 1n,
+        })
+      )
+      .sendAndConfirm(umi);
+    return base58.deserialize(result.signature)[0];
+  } catch (err) {
+    const msg = String(err && err.message ? err.message : err);
+    const match = msg.match(/Signature\s+([1-9A-HJ-NP-Za-km-z]{64,100})\s+has expired/i);
+    if (match) {
+      const sig = match[1];
+      // Public RPC often throws block-height exceeded after the tx already landed.
+      for (let i = 0; i < 10; i += 1) {
+        await new Promise((r) => setTimeout(r, 1500 * (i + 1)));
+        try {
+          const st = await connection.getSignatureStatuses([sig], {
+            searchTransactionHistory: true,
+          });
+          const status = st.value && st.value[0];
+          if (status && !status.err) {
+            const conf = status.confirmationStatus;
+            if (conf === 'confirmed' || conf === 'finalized' || status.confirmations != null) {
+              return sig;
+            }
+          }
+        } catch {
+          // retry
+        }
+      }
+      // Last chance: destination may already hold the NFT.
+      try {
+        const destAccounts = await connection.getParsedTokenAccountsByOwner(
+          new PublicKey(destinationPubkey),
+          { mint: new PublicKey(mintAddress) }
+        );
+        if (
+          destAccounts.value.some(
+            (a) => Number(a.account.data.parsed.info.tokenAmount.amount) >= 1
+          )
+        ) {
+          return sig;
+        }
+      } catch {
+        // ignore
+      }
+    }
+    throw err;
+  }
 }
 
 async function fail(doc, label, err) {
   console.error(`✘ ${label}: ${err.message}`);
+  // Don't permanently fail on RPC confirm timeouts — leave pending for retry.
+  const msg = String(err && err.message ? err.message : err);
+  if (/block height exceeded|has expired|429|Too Many Requests/i.test(msg)) {
+    await doc.ref.update({
+      lastError: msg,
+      lastErrorAt: new Date().toISOString(),
+    });
+    console.warn(`… ${label}: left pending for retry (RPC/confirm flake)`);
+    return;
+  }
   await doc.ref.update({
     status: 'failed',
-    error: String(err.message || err),
+    error: msg,
     failedAt: new Date().toISOString(),
   });
 }
