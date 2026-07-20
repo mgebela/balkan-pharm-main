@@ -3713,7 +3713,7 @@ document.addEventListener("click", (e) => {
       note: note,
       photo: null,
       video: null,
-      meta: Object.assign({}, o.meta || {}, { source: 'ai-coach' }),
+      meta: Object.assign({ source: 'ai-coach' }, o.meta || {}),
     };
     setEntries(getEntries().concat([entry]));
     refreshAfterJournalWrite(plantId);

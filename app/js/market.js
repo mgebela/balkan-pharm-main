@@ -173,16 +173,47 @@
 
   // --- actions ----------------------------------------------------------------
 
+  /** Ensure a live extension session that can sign (not just a linked profile). */
+  async function ensureSigningWallet(purpose) {
+    const why = purpose || 'sign';
+    const SW = window.SolanaWallet;
+    if (!SW) throw new Error('Solana wallet module failed to load. Refresh and try again.');
+
+    function assertSigningSession() {
+      if (!SW.isConnected() || !SW.getPublicKey()) {
+        throw new Error(
+          'Reconnect your wallet extension to ' + why + '. The account is linked, but Phantom/Solflare is not signed in for this tab.'
+        );
+      }
+      const provider = SW.getProviderName();
+      if (provider === 'watch-only' || provider === 'manual') {
+        throw new Error(
+          'Watch-only wallets cannot ' + why + '. Connect Phantom or Solflare.'
+        );
+      }
+      return SW;
+    }
+
+    if (SW.isConnected() && SW.getPublicKey()) {
+      return assertSigningSession();
+    }
+
+    // Open the normal connect flow so the user can approve in the extension.
+    if (window.PlantToken && typeof PlantToken.connect === 'function') {
+      await PlantToken.connect();
+    } else if (typeof SW.connect === 'function') {
+      await SW.connect();
+    }
+
+    return assertSigningSession();
+  }
+
   async function createListing(tokenEntry, priceGrow) {
     const user = currentUser();
     if (!user) throw new Error('Sign in to post an RWA offer.');
     if (!isGrowerUi()) throw new Error('Only grower accounts can post RWA offers.');
-    const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to post an offer.');
-    const provider = SW.getProviderName();
-    if (provider === 'watch-only' || provider === 'manual') {
-      throw new Error('Watch-only wallets cannot sign the escrow transfer. Connect a wallet extension.');
-    }
+
+    const SW = await ensureSigningWallet('post an offer (escrow the NFT)');
     const escrow = cfg().escrowAddress;
     if (!escrow) throw new Error('Escrow address is not configured.');
 
@@ -217,12 +248,8 @@
     const user = currentUser();
     if (!user) throw new Error('Sign in to invest.');
     if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in RWAs.');
-    const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to invest.');
-    const provider = SW.getProviderName();
-    if (provider === 'watch-only' || provider === 'manual') {
-      throw new Error('Watch-only wallets cannot sign the payment. Connect a wallet extension.');
-    }
+
+    const SW = await ensureSigningWallet('invest ($GROW payment)');
 
     const paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
 
@@ -405,8 +432,14 @@
       const mine = listings.filter(function (l) {
         return l.uid === uid;
       });
+      // Adopters see live + settling offers; also show escrow_pending so the
+      // board is not empty while the settlement worker confirms NFT escrow.
       const open = listings.filter(function (l) {
-        return l.status === 'active' || l.status === 'sale_pending';
+        return (
+          l.status === 'active' ||
+          l.status === 'sale_pending' ||
+          l.status === 'escrow_pending'
+        );
       });
 
       if (browseGrid) {

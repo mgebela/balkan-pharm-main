@@ -4239,6 +4239,86 @@ body:not(.app-loading) {
   color: #34d399;
 }
 
+/* Tokenise — grower care tools (dashboard Tools, on-card) */
+.adopt-care-tools {
+  margin: 0 0 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(180, 71, 43, 0.18);
+  background: rgba(180, 71, 43, 0.06);
+}
+.adopt-care-tools-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+}
+.adopt-care-tools-head strong {
+  font-weight: 700;
+  color: var(--text);
+}
+.adopt-care-tools-head span {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}
+.adopt-care-hint {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.adopt-care-tools-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.adopt-care-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(31, 46, 34, 0.16);
+  background: rgba(255, 252, 245, 0.85);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+.adopt-care-btn:hover:not(:disabled) {
+  border-color: rgba(142, 53, 32, 0.45);
+  background: #fff;
+  transform: translateY(-1px);
+}
+.adopt-care-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.adopt-care-btn--done {
+  border-color: rgba(52, 211, 153, 0.45);
+  background: rgba(52, 211, 153, 0.12);
+  color: #1f6b4a;
+}
+.adopt-care-btn--primary {
+  border-color: rgba(142, 53, 32, 0.35);
+  background: rgba(142, 53, 32, 0.1);
+  color: #8e3520;
+}
+.adopt-care-xp {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #b4472b;
+  opacity: 0.9;
+}
+.adopt-care-check {
+  font-weight: 800;
+}
+
 .grower-profile {
   margin-top: 0.85rem;
   padding-top: 0.75rem;

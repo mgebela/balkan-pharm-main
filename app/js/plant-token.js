@@ -830,17 +830,43 @@
   function syncWalletFromSolana() {
     const SW = window.SolanaWallet;
     const wallet = readWallet();
-    if (!SW || !SW.isConnected()) return wallet;
+
+    // Clear stale "connected" flags after refresh — header must match a live signing session.
+    if (!SW || !SW.isConnected()) {
+      if (wallet.connected || wallet.address) {
+        wallet.connected = false;
+        wallet.address = '';
+        wallet.provider = '';
+        writeWallet(wallet);
+      }
+      return readWallet();
+    }
+
     const address = SW.getPublicKey();
-    if (!address) return wallet;
+    if (!address) {
+      if (wallet.connected || wallet.address) {
+        wallet.connected = false;
+        wallet.address = '';
+        wallet.provider = '';
+        writeWallet(wallet);
+      }
+      return readWallet();
+    }
 
     // Only mirror the extension when this account has linked that pubkey.
-    // Never auto-attach a shared Phantom session to an empty / unlinked profile.
     const linked =
       window.WalletLink && WalletLink.getProfile
         ? String(WalletLink.getProfile().solanaPubkey || '')
         : '';
-    if (!linked || linked !== address) return wallet;
+    if (!linked || linked !== address) {
+      if (wallet.connected && wallet.address && wallet.address !== linked) {
+        wallet.connected = false;
+        wallet.address = '';
+        wallet.provider = '';
+        writeWallet(wallet);
+      }
+      return readWallet();
+    }
 
     const provider = SW.getProviderName() || 'solana';
     const chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
@@ -1120,6 +1146,7 @@
           '</code></a></p>'
         : '') +
       growerQuestHtml(token, next) +
+      careToolsHtml(token, next) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
@@ -1167,6 +1194,221 @@
     if (!nextStage || !window.GrowerQuests) return '';
     const quest = GrowerQuests.evaluateGrowthQuest(token, nextStage.key);
     return GrowerQuests.checklistHtml(quest, esc);
+  }
+
+  function careToolBtn(tokenId, action, label, done, opts) {
+    const o = opts || {};
+    return (
+      '<button type="button" class="adopt-care-btn' +
+      (done ? ' adopt-care-btn--done' : '') +
+      (o.primary ? ' adopt-care-btn--primary' : '') +
+      '" data-care="' +
+      esc(action) +
+      '" data-token-id="' +
+      esc(tokenId) +
+      '"' +
+      (o.disabled ? ' disabled' : '') +
+      (o.title ? ' title="' + esc(o.title) + '"' : '') +
+      '>' +
+      (done ? '<span class="adopt-care-check" aria-hidden="true">✓</span> ' : '') +
+      esc(label) +
+      (o.xp && !done ? '<span class="adopt-care-xp">+' + o.xp + ' XP</span>' : '') +
+      '</button>'
+    );
+  }
+
+  /** Quick Tools row — same care actions as dashboard Tools / journal, on the card. */
+  function careToolsHtml(token, nextStage) {
+    if (isAdopterUi() || token.adopted) return '';
+
+    if (!token.plantId) {
+      return (
+        '<div class="adopt-care-tools">' +
+        '<div class="adopt-care-tools-head"><strong>Grower tools</strong></div>' +
+        '<p class="adopt-care-hint">Link a journal plant above to unlock watering, feeding, stage, and environment logs.</p>' +
+        '</div>'
+      );
+    }
+
+    const quest =
+      nextStage && window.GrowerQuests
+        ? GrowerQuests.evaluateGrowthQuest(token, nextStage.key)
+        : null;
+    const byId = {};
+    (quest && quest.items ? quest.items : []).forEach(function (item) {
+      byId[item.id] = item;
+    });
+    const xp = (window.GrowerQuests && GrowerQuests.QUEST_XP) || {};
+
+    return (
+      '<div class="adopt-care-tools" aria-label="Grower tools">' +
+      '<div class="adopt-care-tools-head">' +
+      '<strong>Grower tools</strong>' +
+      '<span>Log care here to unlock the next mint</span>' +
+      '</div>' +
+      '<div class="adopt-care-tools-grid">' +
+      careToolBtn(token.id, 'water', 'Water', !!(byId.watering && byId.watering.ok), {
+        xp: xp.watering,
+        title: 'Log watering for this plant',
+      }) +
+      careToolBtn(token.id, 'feed', 'Feed', !!(byId.feeding && byId.feeding.ok), {
+        xp: xp.feeding,
+        title: 'Log feeding / nutrients',
+      }) +
+      careToolBtn(
+        token.id,
+        'stage',
+        nextStage ? 'Set stage → ' + nextStage.label : 'Set stage',
+        !!(byId.stageLogged && byId.stageLogged.ok),
+        {
+          xp: xp.stageLogged,
+          disabled: !nextStage,
+          title: nextStage
+            ? 'Update journal stage for ' + nextStage.label
+            : 'Fully grown',
+        }
+      ) +
+      careToolBtn(token.id, 'environment', 'Environment', false, {
+        title: 'Log an environment check',
+      }) +
+      careToolBtn(token.id, 'transplant', 'Transplant', false, {
+        title: 'Log a transplant note',
+      }) +
+      careToolBtn(token.id, 'stress', 'Stress note', false, {
+        title: 'Log pests / stress observation',
+      }) +
+      careToolBtn(token.id, 'tools', 'All tools', false, {
+        title: 'Open the full Tools dashboard',
+      }) +
+      careToolBtn(token.id, 'coach', 'Ask Coach', false, {
+        primary: true,
+        title: 'Open Grower Coach for this plant',
+      }) +
+      '</div></div>'
+    );
+  }
+
+  async function runCareAction(action, tokenId) {
+    const wallet = readWallet();
+    const token = wallet.tokens.find(function (t) {
+      return t.id === tokenId;
+    });
+    if (!token) throw new Error('Token not found.');
+
+    if (action === 'tools') {
+      const nav = document.querySelector('.nav-item[data-view="toolbox"]');
+      if (nav) nav.click();
+      return;
+    }
+    if (action === 'coach') {
+      if (window.AICoach) {
+        AICoach.open();
+        const name = token.name || 'my plant';
+        setTimeout(function () {
+          AICoach.ask(
+            'Help me complete grower quests for ' +
+              name +
+              (token.plantId ? ' (plant linked)' : '') +
+              '. What should I log next?'
+          );
+        }, 200);
+      }
+      return;
+    }
+
+    if (!token.plantId) throw new Error('Link a journal plant first.');
+    const DJ = window.DnevnikJournal;
+    if (!DJ || typeof DJ.addEntry !== 'function') {
+      throw new Error('Journal tools are not ready. Refresh the page.');
+    }
+
+    const next =
+      token.stageIndex < GROWTH_STAGES.length - 1
+        ? GROWTH_STAGES[token.stageIndex + 1]
+        : null;
+    const stageMap =
+      (window.GrowerQuests && GrowerQuests.TOKEN_TO_PLANT_STAGE) || {
+        germination: 'klijanje',
+        seedling: 'sadnica',
+        vegetative: 'vegetativna',
+        flowering: 'cvjetanje',
+        harvest: 'susenje',
+      };
+
+    if (action === 'water') {
+      DJ.addEntry({
+        plantId: token.plantId,
+        type: 'zalijevanje',
+        note: 'Watering logged from Tokenise',
+        meta: { source: 'tokenise-tools' },
+      });
+      if (window.GrowerQuests) {
+        GrowerQuests.awardXp(
+          'water_' + token.id + '_' + Date.now(),
+          GrowerQuests.QUEST_XP.watering
+        );
+      }
+      return;
+    }
+    if (action === 'feed') {
+      DJ.addEntry({
+        plantId: token.plantId,
+        type: 'gnojidba',
+        note: 'Feeding logged from Tokenise',
+        meta: { source: 'tokenise-tools' },
+      });
+      if (window.GrowerQuests) {
+        GrowerQuests.awardXp(
+          'feed_' + token.id + '_' + Date.now(),
+          GrowerQuests.QUEST_XP.feeding
+        );
+      }
+      return;
+    }
+    if (action === 'stage') {
+      if (!next) throw new Error('Already at final stage.');
+      const plantStage = stageMap[next.key];
+      if (!plantStage) throw new Error('Unknown target stage.');
+      if (typeof DJ.setPlantStage !== 'function') {
+        throw new Error('Stage update is not available.');
+      }
+      DJ.setPlantStage(token.plantId, plantStage, 'Stage set from Tokenise for ' + next.label);
+      if (window.GrowerQuests) {
+        GrowerQuests.awardXp(
+          'stage_' + token.id + '_' + next.key,
+          GrowerQuests.QUEST_XP.stageLogged
+        );
+      }
+      return;
+    }
+    if (action === 'environment') {
+      DJ.addEntry({
+        plantId: token.plantId,
+        type: 'okolis',
+        note: 'Environment check logged from Tokenise',
+        meta: { source: 'tokenise-tools' },
+      });
+      return;
+    }
+    if (action === 'transplant') {
+      DJ.addEntry({
+        plantId: token.plantId,
+        type: 'opcenito',
+        note: 'Transplant / pot-up logged from Tokenise',
+        meta: { source: 'tokenise-tools', tool: 'transplant' },
+      });
+      return;
+    }
+    if (action === 'stress') {
+      DJ.addEntry({
+        plantId: token.plantId,
+        type: 'opcenito',
+        note: 'Stress / pest observation logged from Tokenise',
+        meta: { source: 'tokenise-tools', tool: 'stressors' },
+      });
+      return;
+    }
+    throw new Error('Unknown care action.');
   }
 
   function linkPlantControlHtml(token) {
@@ -1665,6 +1907,27 @@
           window.dispatchEvent(
             new CustomEvent('dnevnik:open-growlog', { detail: { plantId: plantId } })
           );
+        }
+        return;
+      }
+
+      const careBtn = e.target.closest('.adopt-care-btn');
+      if (careBtn) {
+        if (busy || careBtn.disabled) return;
+        const action = careBtn.dataset.care;
+        const tokenId = careBtn.dataset.tokenId;
+        if (!action || !tokenId) return;
+        setBusy(true);
+        const original = careBtn.innerHTML;
+        careBtn.textContent = '…';
+        try {
+          await runCareAction(action, tokenId);
+          render();
+        } catch (err) {
+          flashError(err);
+          careBtn.innerHTML = original;
+        } finally {
+          setBusy(false);
         }
         return;
       }
