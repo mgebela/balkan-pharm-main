@@ -14,8 +14,22 @@ export const SEED_RWA_STANDARD = 'dnevnik.live/seed-rwa';
 export const SEED_RWA_VERSION = '1.0.0';
 export const SEED_SYMBOL = 'SEED';
 /** Default seed NFT artwork (hosted on dnevnik.live for wallet reliability). */
-export const SEED_IMAGE_URL = 'https://dnevnik.live/token-metadata/images/seed-rwa.png';
+export const SEED_IMAGE_URL = 'https://dnevnik.live/token-metadata/images/plant-seed.png';
 export const EXTERNAL_URL = 'https://dnevnik.live';
+
+const STAGE_IMAGE_FILES = {
+  seed: 'plant-seed.png',
+  germination: 'plant-germination.png',
+  seedling: 'plant-seedling.png',
+  vegetative: 'plant-vegetative.png',
+  flowering: 'plant-flowering.png',
+  harvest: 'plant-harvest.png',
+};
+
+export function stageImageUrl(stageKey) {
+  const file = STAGE_IMAGE_FILES[stageKey] || STAGE_IMAGE_FILES.seed;
+  return `${EXTERNAL_URL}/token-metadata/images/${file}`;
+}
 
 /** Irys-devnet uploads are NOT on arweave.net — rewrite so wallets can fetch JSON/images. */
 export function toPublicMetadataUri(uri) {
@@ -100,6 +114,10 @@ export function buildSeedMetadata(seed) {
 export function buildStageMetadata(seed, stage, history) {
   const metadata = buildSeedMetadata(seed);
   const assetType = stage.key === 'flowering' || stage.key === 'harvest' ? 'flower' : 'seed';
+  const image = seed.image || stageImageUrl(stage.key);
+
+  metadata.image = image;
+  metadata.properties.files = [{ uri: image, type: 'image/png' }];
 
   metadata.description =
     `dnevnik.live plant RWA — strain "${metadata.rwa.strain}", batch ${metadata.rwa.batch}, ` +

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260719e" />
+  <link rel="stylesheet" href="styles/app.css?v=20260720i" />
 </head>
 <body class="app-loading">
   <div class="app">
@@ -26,9 +26,9 @@
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
           <span data-label-grower="Tokenise" data-label-adopter="My garden">Adopt a plant</span>
         </a>
-        <a href="#" class="nav-item adopter-only" data-view="market">
+        <a href="#" class="nav-item" data-view="market">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
-          <span>Market</span>
+          <span data-label-grower="Post to market" data-label-adopter="Market">Market</span>
         </a>
         <a href="#" class="nav-item grower-only" data-view="toolbox">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
@@ -58,9 +58,9 @@
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
         <span class="bottom-nav-label" data-label-grower="Tokenise" data-label-adopter="Garden">Adopt</span>
       </a>
-      <a href="#" class="nav-item adopter-only" data-view="market">
+      <a href="#" class="nav-item" data-view="market">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
-        <span class="bottom-nav-label">Market</span>
+        <span class="bottom-nav-label" data-label-grower="Market" data-label-adopter="Market">Market</span>
       </a>
       <a href="#" class="nav-item grower-only" data-view="toolbox">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
@@ -198,8 +198,8 @@
         </section>
 
         <section class="adopt-section adopter-only" id="adopt-market-cta" hidden>
-          <h2 class="section-heading">Find plants to adopt</h2>
-          <p class="market-hint">Browse the market for seed and growth-stage RWAs. Track everything you hold here in your garden.</p>
+          <h2 class="section-heading">Invest in grower RWAs</h2>
+          <p class="market-hint">Browse open offers and stake $GROW to adopt a real seed or growth-stage NFT. Settled investments show up in your garden.</p>
           <button type="button" class="btn btn-primary" id="adopt-open-market-btn">Open market</button>
         </section>
 
@@ -209,11 +209,11 @@
       <div id="view-market" class="view">
         <p class="market-notice" id="market-notice" hidden></p>
 
-        <section class="plants-journal-section" id="market-list-section" hidden>
-          <h2 class="section-heading">List an asset</h2>
+        <section class="plants-journal-section grower-only" id="market-list-section" hidden>
+          <h2 class="section-heading">Post an RWA offer</h2>
           <p class="market-hint">
-            Sell your devnet-minted seed RWAs and flower-stage tokens for $GROW.
-            Listing escrows the NFT to the marketplace wallet; you can cancel while it is live.
+            List a real devnet-minted seed or growth-stage NFT for adopters to invest in with $GROW.
+            Listing escrows the NFT to the marketplace wallet until an adopter invests (or you cancel).
           </p>
           <form class="adopt-seed-form" id="market-list-form">
             <label>
@@ -221,20 +221,26 @@
               <select id="market-asset-select"><option value="">— choose a minted asset —</option></select>
             </label>
             <label>
-              Price ($GROW) *
+              Invest price ($GROW) *
               <input type="number" id="market-price-input" min="1" step="1" placeholder="e.g. 50" required />
             </label>
-            <button type="submit" class="btn btn-primary">List for sale</button>
+            <button type="submit" class="btn btn-primary">Post to market</button>
           </form>
         </section>
 
-        <section class="plants-journal-section">
-          <h2 class="section-heading">My listings</h2>
+        <section class="plants-journal-section grower-only">
+          <h2 class="section-heading">My offers</h2>
           <div class="market-grid" id="market-mine-grid"></div>
         </section>
 
         <section class="plants-journal-section">
-          <h2 class="section-heading">Browse market</h2>
+          <h2 class="section-heading">
+            <span class="adopter-only">Invest in RWAs</span>
+            <span class="grower-only">Browse market</span>
+          </h2>
+          <p class="market-hint adopter-only">
+            Stake $GROW to adopt a grower’s real seed RWA. When the investment settles, the NFT moves into your wallet and garden.
+          </p>
           <div class="market-grid" id="market-grid"></div>
         </section>
       </div>
@@ -731,16 +737,17 @@
     })();
   </script>
   <script src="js/chain-config.js?v=20260713"></script>
-  <script src="js/solana-wallet.js?v=20260717i"></script>
-  <script src="js/wallet-link.js?v=20260717h"></script>
+  <script src="js/solana-wallet.js?v=20260720c"></script>
+  <script src="js/wallet-link.js?v=20260720c"></script>
   <script src="js/seed-chain.js?v=20260719a"></script>
   <script src="js/spl-transfer.js?v=20260713"></script>
-  <script src="js/market.js?v=20260713"></script>
+  <script src="js/market.js?v=20260720h"></script>
   <script src="js/metric-ui.js?v=20260708f"></script>
-  <script src="js/plant-pixel-sprites.js?v=20260708f"></script>
+  <script src="js/token-pixel-art.js?v=20260720b"></script>
+  <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
   <script src="js/grower-quests.js?v=20260719a"></script>
-  <script src="js/plant-token.js?v=20260719b"></script>
-  <script src="js/ai-coach.js?v=20260719e"></script>
-  <script src="js/app.js?v=20260719e"></script>
+  <script src="js/plant-token.js?v=20260720h"></script>
+  <script src="js/ai-coach.js?v=20260720i"></script>
+  <script src="js/app.js?v=20260720h"></script>
 </body>
 </html>

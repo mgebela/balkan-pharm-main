@@ -90,12 +90,42 @@
   };
 
   const QUICK_PROMPTS = [
-    { id: 'next', label: 'Next steps', text: 'What should I do next for my current plants?' },
-    { id: 'create', label: 'New plant', text: 'Create a new indoor plant named CBD Auto starting at germination.' },
-    { id: 'water', label: 'Log water', text: 'Log watering for my current plant.' },
-    { id: 'feed', label: 'Log feed', text: 'Log feeding for my current plant.' },
-    { id: 'mint', label: 'Mint seed', text: 'Mint a seed token for my current plant.' },
-    { id: 'grow', label: 'Mint growth', text: 'Mint the next growth stage for my linked token if journal proof is ready.' },
+    {
+      id: 'next',
+      label: 'What next?',
+      hint: 'Priorities for today',
+      text: 'What should I do next for my current plants?',
+    },
+    {
+      id: 'create',
+      label: 'Add a plant',
+      hint: 'Start a new journal',
+      text: 'Create a new indoor plant named CBD Auto starting at germination.',
+    },
+    {
+      id: 'water',
+      label: 'Log watering',
+      hint: 'Quick care entry',
+      text: 'Log watering for my current plant.',
+    },
+    {
+      id: 'feed',
+      label: 'Log feeding',
+      hint: 'Nutrients entry',
+      text: 'Log feeding for my current plant.',
+    },
+    {
+      id: 'stage',
+      label: 'Update stage',
+      hint: 'Move growth phase',
+      text: 'Help me update my plant to the next growth stage.',
+    },
+    {
+      id: 'mint',
+      label: 'Mint / grow',
+      hint: 'Tokenise progress',
+      text: 'Mint a seed or the next growth stage for my linked plant if journal proof is ready.',
+    },
   ];
 
   let open = false;
@@ -104,6 +134,7 @@
   let pendingActions = [];
   let recognition = null;
   let listening = false;
+  let typing = false;
 
   function readJson(key, fallback) {
     try {
@@ -502,6 +533,15 @@
   async function runPendingActions() {
     if (!pendingActions.length || busy) return;
     busy = true;
+    setStatus('Running actions…');
+    // Clear confirm UI on the last assistant message while running.
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === 'assistant' && history[i].actions) {
+        delete history[i].actions;
+        break;
+      }
+    }
+    renderMessages();
     const results = [];
     for (let i = 0; i < pendingActions.length; i++) {
       try {
@@ -514,25 +554,33 @@
     pendingActions = [];
     history.push({
       role: 'assistant',
-      content: 'Actions finished:\n' + results.join('\n'),
+      content: 'Done:\n' + results.join('\n'),
       at: Date.now(),
       source: 'actions',
     });
     saveHistory();
     renderMessages();
     busy = false;
+    setStatus('Ready to help');
   }
 
   function cancelPendingActions() {
     pendingActions = [];
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === 'assistant' && history[i].actions) {
+        delete history[i].actions;
+        break;
+      }
+    }
     history.push({
       role: 'assistant',
-      content: 'Cancelled — no changes were made.',
+      content: 'No problem — nothing was changed. Ask anytime.',
       at: Date.now(),
       source: 'actions',
     });
     saveHistory();
     renderMessages();
+    setStatus('Ready to help');
   }
 
   function localReply(message, context) {
@@ -559,52 +607,85 @@
     root.className = 'ai-coach-root grower-only';
     root.innerHTML =
       '<button type="button" class="ai-coach-fab" id="ai-coach-fab" aria-expanded="false" aria-controls="ai-coach-panel">' +
-      '<span class="ai-coach-fab-icon" aria-hidden="true">✦</span>' +
+      '<span class="ai-coach-fab-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
+      '</svg></span>' +
       '<span class="ai-coach-fab-label">Coach</span>' +
       '</button>' +
-      '<aside class="ai-coach-panel" id="ai-coach-panel" hidden>' +
+      '<aside class="ai-coach-panel" id="ai-coach-panel" hidden role="dialog" aria-label="Grower Coach">' +
       '<header class="ai-coach-head">' +
-      '<div>' +
+      '<div class="ai-coach-brand">' +
+      '<span class="ai-coach-avatar" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
+      '</svg></span>' +
+      '<div class="ai-coach-brand-copy">' +
       '<strong>Grower Coach</strong>' +
-      '<p>Ask in text or voice — I can create plants, log care, and mint</p>' +
-      '</div>' +
-      '<button type="button" class="btn btn-ghost btn-sm" id="ai-coach-close" aria-label="Close">Close</button>' +
-      '</header>' +
-      '<div class="ai-coach-quick" id="ai-coach-quick"></div>' +
+      '<span class="ai-coach-status" id="ai-coach-status">Ready to help</span>' +
+      '</div></div>' +
+      '<div class="ai-coach-head-actions">' +
+      '<button type="button" class="ai-coach-icon-btn" id="ai-coach-clear" title="New chat" aria-label="Clear chat">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12h10l1-12"/></svg>' +
+      '</button>' +
+      '<button type="button" class="ai-coach-icon-btn" id="ai-coach-close" aria-label="Close coach">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+      '</button>' +
+      '</div></header>' +
       '<div class="ai-coach-messages" id="ai-coach-messages" role="log" aria-live="polite"></div>' +
+      '<div class="ai-coach-composer">' +
+      '<div class="ai-coach-quick" id="ai-coach-quick" aria-label="Suggestions"></div>' +
       '<form class="ai-coach-form" id="ai-coach-form">' +
-      '<button type="button" class="btn btn-ghost btn-sm ai-coach-mic" id="ai-coach-mic" title="Voice input" aria-pressed="false">🎙</button>' +
-      '<input type="text" id="ai-coach-input" maxlength="2000" placeholder="Say or type: create plant…, log watering…" autocomplete="off" />' +
-      '<button type="submit" class="btn btn-primary btn-sm" id="ai-coach-send">Send</button>' +
-      '</form>' +
-      '</aside>';
+      '<label class="ai-coach-field">' +
+      '<span class="visually-hidden">Message</span>' +
+      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask anything about your grow…" autocomplete="off"></textarea>' +
+      '</label>' +
+      '<div class="ai-coach-form-actions">' +
+      '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3"/>' +
+      '</svg></button>' +
+      '<button type="submit" class="ai-coach-send" id="ai-coach-send" aria-label="Send">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
+      '</svg></button>' +
+      '</div></form>' +
+      '<p class="ai-coach-foot">Can create plants, log care, update stages, and mint — always asks before changing anything.</p>' +
+      '</div></aside>';
     document.body.appendChild(root);
 
-    const quick = document.getElementById('ai-coach-quick');
-    if (quick) {
-      quick.innerHTML = QUICK_PROMPTS.map(function (p) {
-        return (
-          '<button type="button" class="ai-coach-chip" data-prompt="' +
-          esc(p.text) +
-          '">' +
-          esc(p.label) +
-          '</button>'
-        );
-      }).join('');
-    }
+    renderQuickPrompts();
 
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
     document.getElementById('ai-coach-close').addEventListener('click', close);
+    document.getElementById('ai-coach-clear').addEventListener('click', clearChat);
     document.getElementById('ai-coach-form').addEventListener('submit', onSubmit);
     document.getElementById('ai-coach-mic').addEventListener('click', toggleVoice);
-    quick.addEventListener('click', function (e) {
+    document.getElementById('ai-coach-quick').addEventListener('click', function (e) {
       const chip = e.target.closest('.ai-coach-chip');
       if (!chip) return;
       const text = chip.getAttribute('data-prompt');
       if (text) ask(text);
     });
 
+    const input = document.getElementById('ai-coach-input');
+    if (input) {
+      input.addEventListener('input', autoResizeInput);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          onSubmit(e);
+        }
+      });
+    }
+
     document.getElementById('ai-coach-messages').addEventListener('click', function (e) {
+      const promptBtn = e.target.closest('[data-coach-prompt]');
+      if (promptBtn) {
+        const text = promptBtn.getAttribute('data-coach-prompt');
+        if (text) ask(text);
+        return;
+      }
       if (e.target.closest('[data-coach-run]')) {
         runPendingActions();
         return;
@@ -615,23 +696,121 @@
     });
   }
 
+  function renderQuickPrompts() {
+    const quick = document.getElementById('ai-coach-quick');
+    if (!quick) return;
+    // Empty state already shows starter cards — keep chips for mid-chat only.
+    if (!history.length) {
+      quick.innerHTML = '';
+      quick.hidden = true;
+      return;
+    }
+    quick.hidden = false;
+    quick.classList.add('ai-coach-quick--compact');
+    quick.innerHTML = QUICK_PROMPTS.map(function (p) {
+      return (
+        '<button type="button" class="ai-coach-chip" data-prompt="' +
+        esc(p.text) +
+        '">' +
+        '<span class="ai-coach-chip-label">' +
+        esc(p.label) +
+        '</span>' +
+        '</button>'
+      );
+    }).join('');
+  }
+
+  function autoResizeInput() {
+    const input = document.getElementById('ai-coach-input');
+    if (!input) return;
+    input.style.height = 'auto';
+    input.style.height = Math.min(120, Math.max(44, input.scrollHeight)) + 'px';
+  }
+
+  function setStatus(text) {
+    const el = document.getElementById('ai-coach-status');
+    if (el) el.textContent = text || 'Ready to help';
+  }
+
+  function clearChat() {
+    if (busy) return;
+    history = [];
+    pendingActions = [];
+    typing = false;
+    saveHistory();
+    renderMessages();
+    renderQuickPrompts();
+    setStatus('Fresh chat');
+    const input = document.getElementById('ai-coach-input');
+    if (input) {
+      input.value = '';
+      autoResizeInput();
+      input.focus();
+    }
+  }
+
+  function emptyStateHtml() {
+    return (
+      '<div class="ai-coach-empty">' +
+      '<div class="ai-coach-empty-hero">' +
+      '<span class="ai-coach-empty-mark" aria-hidden="true">🌱</span>' +
+      '<h3>Hey grower — what are we working on?</h3>' +
+      '<p>I can advise on stages, write journal entries, and prepare mints. Pick a starter or type below.</p>' +
+      '</div>' +
+      '<div class="ai-coach-empty-grid">' +
+      QUICK_PROMPTS.slice(0, 4)
+        .map(function (p) {
+          return (
+            '<button type="button" class="ai-coach-starter" data-coach-prompt="' +
+            esc(p.text) +
+            '">' +
+            '<strong>' +
+            esc(p.label) +
+            '</strong>' +
+            '<span>' +
+            esc(p.hint || '') +
+            '</span>' +
+            '</button>'
+          );
+        })
+        .join('') +
+      '</div></div>'
+    );
+  }
+
+  function typingHtml() {
+    return (
+      '<div class="ai-coach-bubble ai-coach-bubble--assistant ai-coach-bubble--typing" aria-label="Coach is thinking">' +
+      '<span class="ai-coach-typing"><i></i><i></i><i></i></span>' +
+      '<span>Thinking…</span>' +
+      '</div>'
+    );
+  }
+
   function renderMessages() {
     const el = document.getElementById('ai-coach-messages');
     if (!el) return;
-    if (!history.length) {
-      el.innerHTML =
-        '<div class="ai-coach-bubble ai-coach-bubble--assistant">' +
-        '<p>Hi — I am your Grower Coach. Ask in text or voice and I can <strong>create plants</strong>, <strong>log watering/feeding</strong>, <strong>change stages</strong>, and <strong>mint seed/growth tokens</strong> (with your confirmation).</p>' +
-        '</div>';
+    if (!history.length && !typing) {
+      el.innerHTML = emptyStateHtml();
+      renderQuickPrompts();
       return;
     }
-    el.innerHTML = history
+
+    let html = history
       .map(function (m) {
         const cls =
-          'ai-coach-bubble ai-coach-bubble--' + (m.role === 'user' ? 'user' : 'assistant');
-        let body = '<p>' + esc(m.content).replace(/\n/g, '<br/>') + '</p>';
+          'ai-coach-row ai-coach-row--' + (m.role === 'user' ? 'user' : 'assistant');
+        let body =
+          '<div class="ai-coach-bubble ai-coach-bubble--' +
+          (m.role === 'user' ? 'user' : 'assistant') +
+          '">' +
+          '<p>' +
+          esc(m.content).replace(/\n/g, '<br/>') +
+          '</p>';
         if (m.actions && m.actions.length) {
           body +=
+            '<div class="ai-coach-confirm">' +
+            '<p class="ai-coach-confirm-title">I can do this for you</p>' +
             '<ul class="ai-coach-actions">' +
             m.actions
               .map(function (a) {
@@ -640,14 +819,26 @@
               .join('') +
             '</ul>' +
             '<div class="ai-coach-action-bar">' +
-            '<button type="button" class="btn btn-primary btn-sm" data-coach-run>Run actions</button>' +
-            '<button type="button" class="btn btn-ghost btn-sm" data-coach-cancel>Cancel</button>' +
-            '</div>';
+            '<button type="button" class="btn btn-primary btn-sm" data-coach-run>Yes, run it</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-coach-cancel>Not now</button>' +
+            '</div></div>';
+        }
+        body += '</div>';
+        if (m.role === 'assistant' && m.source) {
+          body +=
+            '<span class="ai-coach-meta">' +
+            (m.source === 'gemini' ? 'Live coach' : 'Local helper') +
+            '</span>';
         }
         return '<div class="' + cls + '">' + body + '</div>';
       })
       .join('');
+
+    if (typing) html += '<div class="ai-coach-row ai-coach-row--assistant">' + typingHtml() + '</div>';
+
+    el.innerHTML = html;
     el.scrollTop = el.scrollHeight;
+    renderQuickPrompts();
   }
 
   function setOpen(next) {
@@ -657,11 +848,19 @@
     if (!panel || !fab) return;
     panel.hidden = !open;
     fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+    fab.classList.toggle('is-open', open);
     document.body.classList.toggle('ai-coach-open', open);
     if (open) {
       renderMessages();
+      renderQuickPrompts();
+      setStatus(busy ? 'Thinking…' : listening ? 'Listening…' : 'Ready to help');
       const input = document.getElementById('ai-coach-input');
-      if (input) input.focus();
+      if (input) {
+        autoResizeInput();
+        setTimeout(function () {
+          input.focus();
+        }, 40);
+      }
     } else {
       stopVoice();
     }
@@ -691,6 +890,7 @@
       mic.classList.remove('is-listening');
       mic.setAttribute('aria-pressed', 'false');
     }
+    if (!busy) setStatus('Ready to help');
     if (recognition) {
       try {
         recognition.stop();
@@ -742,6 +942,7 @@
       };
     }
     listening = true;
+    setStatus('Listening… speak now');
     const mic = document.getElementById('ai-coach-mic');
     if (mic) {
       mic.classList.add('is-listening');
@@ -805,18 +1006,21 @@
     const text = String(message || '').trim();
     if (!text || busy) return;
     const input = document.getElementById('ai-coach-input');
-    if (input) input.value = '';
+    if (input) {
+      input.value = '';
+      autoResizeInput();
+    }
 
     history.push({ role: 'user', content: text, at: Date.now() });
+    typing = true;
+    busy = true;
+    setStatus('Thinking…');
     renderMessages();
     saveHistory();
 
-    busy = true;
     const sendBtn = document.getElementById('ai-coach-send');
-    if (sendBtn) {
-      sendBtn.disabled = true;
-      sendBtn.textContent = '…';
-    }
+    if (sendBtn) sendBtn.disabled = true;
+    if (input) input.disabled = true;
 
     const context = buildContext();
     let reply = '';
@@ -842,15 +1046,16 @@
       reply = local.reply;
       actions = local.actions || [];
       if (err && err.code === 'auth') {
-        reply += '\n\n(Live Gemini coach needs you signed in. Using local actions/knowledge.)';
+        reply += '\n\n(Sign in to use the live coach. Using local helpers for now.)';
       }
       source = 'local';
     }
 
+    typing = false;
     pendingActions = actions.slice();
     history.push({
       role: 'assistant',
-      content: reply || 'Ready when you are.',
+      content: reply || 'Ready when you are — try a suggestion below.',
       at: Date.now(),
       source: source,
       actions: actions.length ? actions : undefined,
@@ -858,9 +1063,11 @@
     saveHistory();
     renderMessages();
     busy = false;
-    if (sendBtn) {
-      sendBtn.disabled = false;
-      sendBtn.textContent = 'Send';
+    setStatus(actions.length ? 'Confirm actions below' : 'Ready to help');
+    if (sendBtn) sendBtn.disabled = false;
+    if (input) {
+      input.disabled = false;
+      input.focus();
     }
   }
 

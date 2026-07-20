@@ -171,5 +171,16 @@
     "signature": "46C4r2fydWDDGxGydLrzXjXYXFRix17ZpcnQQfAAcDSsM1328HHWuGCcivj4J2srzBHh9GozMUuertHbeVdf8bfq",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-19T18:38:32.960Z"
+  },
+  {
+    "name": "Gold Bloom #1",
+    "strain": "CBD Auto",
+    "batch": "B-2026-07-GOLD",
+    "mint": "ChQymAm7zNmMjWKGE2ax99qjRLsCwB9dmdGGt8U2msGG",
+    "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
+    "metadataUri": "https://gateway.irys.xyz/8hCWmWCW1Y1Y7AFXiPU35ELQTgWRtVKMxq4piKy6GK8",
+    "imageUri": "https://gateway.irys.xyz/GRe4rhRQYKzbG3xbkWjtnMK1RxcRsyuC629pLBERi1Rq",
+    "signature": "2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH",
+    "mintedAt": "2026-07-19T22:05:07.803Z"
   }
 ]

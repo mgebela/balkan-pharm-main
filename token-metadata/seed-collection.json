@@ -2,7 +2,7 @@
   "name": "dnevnik.live Seeds",
   "symbol": "SEED",
   "description": "The dnevnik.live seed NFT collection. Each seed NFT represents an adopted CBD plant that grows through six documented stages — from seed to harvest — backed by the public grow journal. Devnet deployment.",
-  "image": "https://dnevnik.live/token-metadata/images/seed-rwa.png",
+  "image": "https://dnevnik.live/token-metadata/images/plant-seed.png",
   "external_url": "https://dnevnik.live",
   "attributes": [
     { "trait_type": "Network", "value": "Solana devnet" },
@@ -12,7 +12,7 @@
   "properties": {
     "category": "image",
     "files": [
-      { "uri": "https://dnevnik.live/token-metadata/images/seed-rwa.png", "type": "image/png" }
+      { "uri": "https://dnevnik.live/token-metadata/images/plant-seed.png", "type": "image/png" }
     ]
   }
 }

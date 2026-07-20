@@ -1,12 +1,10 @@
 /*
- * Marketplace MVP (M4, devnet).
+ * Marketplace (devnet): growers post real RWA NFTs; adopters invest with $GROW.
  *
- * List and swap seed RWAs / flower-stage tokens for $GROW on devnet.
- * Listings live in Firestore (`marketListings`); the on-chain legs are:
- *   - seller escrows the NFT to the authority wallet (signed in-app),
- *   - buyer pays the seller in $GROW (signed in-app),
- *   - the settlement script (chain/process-market.js) verifies both and
- *     releases the NFT to the buyer.
+ * Listings live in Firestore (`marketListings`); on-chain legs:
+ *   - grower escrows the NFT to the authority wallet (signed in-app),
+ *   - adopter pays the grower in $GROW (signed in-app),
+ *   - chain/process-market.js verifies both and releases the NFT to the adopter.
  */
 (function () {
   'use strict';
@@ -38,6 +36,14 @@
 
   function cfg() {
     return window.ChainConfig || {};
+  }
+
+  function isAdopterUi() {
+    return document.body.classList.contains('profile-adopter');
+  }
+
+  function isGrowerUi() {
+    return document.body.classList.contains('profile-grower') || !isAdopterUi();
   }
 
   function explorerAddress(addr) {
@@ -72,6 +78,7 @@
             next.push(Object.assign({ id: doc.id }, doc.data()));
           });
           listings = next;
+          syncMyInvestments();
           emit();
         },
         function (err) {
@@ -115,29 +122,63 @@
     return set;
   }
 
-  // My tokens that exist as real devnet NFTs and are not yet listed.
+  // Grower tokens that exist as real devnet NFTs and are not yet listed.
   function listableTokens() {
     const PT = window.PlantToken;
     const SC = window.SeedChain;
     if (!PT || !SC) return [];
+    if (typeof PT.syncFromSeedMints === 'function') {
+      try {
+        PT.syncFromSeedMints();
+      } catch {
+        // ignore
+      }
+    }
     const listed = listedMintAddresses();
     return PT.getWallet()
       .tokens.map(function (token) {
+        if (token.adopted) return null;
         const mint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
-        if (!mint || mint.status !== 'minted' || !mint.mintAddress) return null;
-        if (listed.has(mint.mintAddress)) return null;
-        return { token, mintAddress: mint.mintAddress };
+        const mintAddress =
+          (mint && mint.status === 'minted' && mint.mintAddress) ||
+          token.mintAddress ||
+          null;
+        if (!mintAddress) return null;
+        if (mint && mint.status && mint.status !== 'minted') return null;
+        if (listed.has(mintAddress)) return null;
+        return {
+          token: token,
+          mintAddress: mintAddress,
+          mintRequestId: token.mintRequestId || (mint && mint.id) || null,
+        };
       })
       .filter(Boolean);
+  }
+
+  /** Pull settled / in-flight investments into the adopter garden. */
+  function syncMyInvestments() {
+    const user = currentUser();
+    const PT = window.PlantToken;
+    if (!user || !PT || typeof PT.adoptFromListing !== 'function') return;
+    listings.forEach(function (l) {
+      if (l.buyerUid !== user.uid) return;
+      if (l.status !== 'sold' && l.status !== 'sale_pending') return;
+      try {
+        PT.adoptFromListing(l);
+      } catch (err) {
+        console.warn('adoptFromListing failed', err);
+      }
+    });
   }
 
   // --- actions ----------------------------------------------------------------
 
   async function createListing(tokenEntry, priceGrow) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to list assets.');
+    if (!user) throw new Error('Sign in to post an RWA offer.');
+    if (!isGrowerUi()) throw new Error('Only grower accounts can post RWA offers.');
     const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to list assets.');
+    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to post an offer.');
     const provider = SW.getProviderName();
     if (provider === 'watch-only' || provider === 'manual') {
       throw new Error('Watch-only wallets cannot sign the escrow transfer. Connect a wallet extension.');
@@ -145,7 +186,6 @@
     const escrow = cfg().escrowAddress;
     if (!escrow) throw new Error('Escrow address is not configured.');
 
-    // Seller signs: NFT → escrow.
     const escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
 
     const token = tokenEntry.token;
@@ -153,30 +193,37 @@
       uid: user.uid,
       sellerPubkey: SW.getPublicKey(),
       mintAddress: tokenEntry.mintAddress,
+      mintRequestId: tokenEntry.mintRequestId || token.mintRequestId || null,
+      plantId: token.plantId || null,
       name: token.name,
       strain: token.strain || token.name,
       batch: token.batch || '',
       stage: stageLabel(token.stageIndex),
       assetType: assetTypeForStage(token.stageIndex),
+      offerType: 'invest',
       priceGrow: Math.round(priceGrow),
       status: 'escrow_pending',
       escrowSignature,
       cluster: 'devnet',
       createdAt: new Date().toISOString(),
     });
+
+    if (window.PlantToken && typeof PlantToken.markTokenListed === 'function') {
+      PlantToken.markTokenListed(tokenEntry.mintAddress, tokenEntry.mintRequestId);
+    }
   }
 
-  async function buyListing(listing) {
+  async function investInListing(listing) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to buy assets.');
+    if (!user) throw new Error('Sign in to invest.');
+    if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in RWAs.');
     const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to buy.');
+    if (!SW || !SW.isConnected()) throw new Error('Connect a wallet to invest.');
     const provider = SW.getProviderName();
     if (provider === 'watch-only' || provider === 'manual') {
       throw new Error('Watch-only wallets cannot sign the payment. Connect a wallet extension.');
     }
 
-    // Buyer signs: price in $GROW → seller.
     const paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
 
     await firebase.firestore().collection('marketListings').doc(listing.id).update({
@@ -184,7 +231,19 @@
       buyerUid: user.uid,
       buyerPubkey: SW.getPublicKey(),
       paymentSignature,
+      investedAt: new Date().toISOString(),
     });
+
+    if (window.PlantToken && typeof PlantToken.adoptFromListing === 'function') {
+      PlantToken.adoptFromListing(
+        Object.assign({}, listing, {
+          status: 'sale_pending',
+          buyerUid: user.uid,
+          buyerPubkey: SW.getPublicKey(),
+          paymentSignature: paymentSignature,
+        })
+      );
+    }
   }
 
   async function cancelListing(listing) {
@@ -197,51 +256,81 @@
 
   const STATUS_LABELS = {
     escrow_pending: 'Escrow confirming…',
-    active: 'Live',
-    sale_pending: 'Sale settling…',
+    active: 'Open for investment',
+    sale_pending: 'Investment settling…',
     cancel_requested: 'Cancelling…',
-    sold: 'Sold',
+    sold: 'Adopted',
     cancelled: 'Cancelled',
     failed: 'Failed',
   };
 
   function statusBadge(status) {
     return (
-      '<span class="market-status market-status--' + esc(status) + '">' +
+      '<span class="market-status market-status--' +
+      esc(status) +
+      '">' +
       esc(STATUS_LABELS[status] || status) +
       '</span>'
     );
   }
 
   function assetBadge(assetType) {
-    const label = assetType === 'flower' ? '🌸 Flower' : '🌰 Seed RWA';
-    return '<span class="market-asset-badge market-asset-badge--' + esc(assetType || 'seed') + '">' + label + '</span>';
+    const label = assetType === 'flower' ? 'Flower RWA' : 'Seed RWA';
+    return (
+      '<span class="market-asset-badge market-asset-badge--' +
+      esc(assetType || 'seed') +
+      '">' +
+      label +
+      '</span>'
+    );
   }
 
   function listingCardHtml(listing, uid) {
     const isMine = listing.uid === uid;
-    const canBuy = !isMine && listing.status === 'active';
-    const canCancel = isMine && listing.status === 'active';
+    const isBuyer = listing.buyerUid === uid;
+    const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
+    const canCancel = isGrowerUi() && isMine && listing.status === 'active';
     return (
-      '<article class="market-card" data-id="' + esc(listing.id) + '">' +
+      '<article class="market-card" data-id="' +
+      esc(listing.id) +
+      '">' +
       '<div class="market-card-head">' +
       assetBadge(listing.assetType) +
       statusBadge(listing.status) +
       '</div>' +
-      '<h4 class="market-card-name">' + esc(listing.name) + '</h4>' +
+      '<h4 class="market-card-name">' +
+      esc(listing.name) +
+      '</h4>' +
       '<p class="market-card-meta">' +
       esc(listing.strain || '') +
       (listing.batch ? ' · batch ' + esc(listing.batch) : '') +
       (listing.stage ? ' · ' + esc(listing.stage) : '') +
       '</p>' +
-      '<p class="market-card-meta">NFT: <a href="' + esc(explorerAddress(listing.mintAddress)) + '" target="_blank" rel="noopener noreferrer"><code>' + esc(shortAddr(listing.mintAddress)) + '</code></a>' +
-      ' · seller <code>' + esc(shortAddr(listing.sellerPubkey)) + '</code>' +
+      '<p class="market-card-meta">NFT: <a href="' +
+      esc(explorerAddress(listing.mintAddress)) +
+      '" target="_blank" rel="noopener noreferrer"><code>' +
+      esc(shortAddr(listing.mintAddress)) +
+      '</code></a>' +
+      ' · grower <code>' +
+      esc(shortAddr(listing.sellerPubkey)) +
+      '</code>' +
       (isMine ? ' (you)' : '') +
+      (isBuyer ? ' · your investment' : '') +
       '</p>' +
       '<div class="market-card-foot">' +
-      '<span class="market-price">' + Number(listing.priceGrow).toLocaleString('en-US') + ' $GROW</span>' +
-      (canBuy ? '<button type="button" class="btn btn-primary btn-sm market-buy-btn" data-id="' + esc(listing.id) + '">Buy</button>' : '') +
-      (canCancel ? '<button type="button" class="btn btn-ghost btn-sm market-cancel-btn" data-id="' + esc(listing.id) + '">Cancel</button>' : '') +
+      '<span class="market-price">' +
+      Number(listing.priceGrow).toLocaleString('en-US') +
+      ' $GROW</span>' +
+      (canInvest
+        ? '<button type="button" class="btn btn-primary btn-sm market-invest-btn" data-id="' +
+          esc(listing.id) +
+          '">Invest</button>'
+        : '') +
+      (canCancel
+        ? '<button type="button" class="btn btn-ghost btn-sm market-cancel-btn" data-id="' +
+          esc(listing.id) +
+          '">Cancel</button>'
+        : '') +
       '</div>' +
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
@@ -250,67 +339,96 @@
     );
   }
 
+  let marketRenderBusy = false;
+
   function render() {
+    if (marketRenderBusy) return;
     const view = document.getElementById('view-market');
     if (!view || !view.classList.contains('active')) return;
+    marketRenderBusy = true;
+    try {
+      const user = currentUser();
+      const uid = user ? user.uid : '';
+      const notice = document.getElementById('market-notice');
+      const listSection = document.getElementById('market-list-section');
+      const browseGrid = document.getElementById('market-grid');
+      const mineGrid = document.getElementById('market-mine-grid');
+      const sel = document.getElementById('market-asset-select');
 
-    const user = currentUser();
-    const uid = user ? user.uid : '';
-    const notice = document.getElementById('market-notice');
-    const listSection = document.getElementById('market-list-section');
-    const browseGrid = document.getElementById('market-grid');
-    const mineGrid = document.getElementById('market-mine-grid');
-    const sel = document.getElementById('market-asset-select');
-
-    if (notice) {
-      if (!uid) {
-        notice.hidden = false;
-        notice.textContent = 'Sign in to use the devnet marketplace.';
-      } else if (!cfg().growMint) {
-        notice.hidden = false;
-        notice.textContent =
-          'Devnet marketplace is live once the $GROW mint and seed collection are deployed (M1 funding pending). Listings below are read-only until then.';
-      } else {
-        notice.hidden = true;
+      if (notice) {
+        if (!uid) {
+          notice.hidden = false;
+          notice.textContent = 'Sign in to use the market.';
+        } else if (!cfg().growMint) {
+          notice.hidden = false;
+          notice.textContent =
+            'Marketplace needs the $GROW mint and seed collection on devnet. Offers below are read-only until then.';
+        } else if (isGrowerUi()) {
+          notice.hidden = false;
+          notice.textContent =
+            'Post real minted seed / growth RWAs. Adopters invest with $GROW; the NFT transfers when settlement confirms.';
+        } else {
+          notice.hidden = false;
+          notice.textContent =
+            'Invest $GROW to adopt a grower’s real RWA. Connect your wallet, then tap Invest on an open offer.';
+        }
       }
-    }
 
-    // Listable assets dropdown.
-    if (sel) {
-      const options = listableTokens();
-      const current = sel.value;
-      sel.innerHTML =
-        '<option value="">— choose a minted asset —</option>' +
-        options
-          .map(function (o) {
-            return (
-              '<option value="' + esc(o.mintAddress) + '">' +
-              esc(o.token.name) + ' · ' + esc(stageLabel(o.token.stageIndex)) +
-              ' (' + esc(shortAddr(o.mintAddress)) + ')' +
-              '</option>'
-            );
-          })
-          .join('');
-      if (current) sel.value = current;
-      if (listSection) listSection.hidden = !uid;
-    }
+      if (sel) {
+        const options = listableTokens();
+        const current = sel.value;
+        sel.innerHTML =
+          '<option value="">— choose a minted RWA —</option>' +
+          options
+            .map(function (o) {
+              return (
+                '<option value="' +
+                esc(o.mintAddress) +
+                '">' +
+                esc(o.token.name) +
+                ' · ' +
+                esc(stageLabel(o.token.stageIndex)) +
+                ' (' +
+                esc(shortAddr(o.mintAddress)) +
+                ')' +
+                '</option>'
+              );
+            })
+            .join('');
+        if (current) sel.value = current;
+      }
 
-    const mine = listings.filter(function (l) {
-      return l.uid === uid;
-    });
-    const open = listings.filter(function (l) {
-      return l.status === 'active' || l.status === 'sale_pending';
-    });
+      if (listSection) {
+        listSection.hidden = !(uid && isGrowerUi());
+      }
 
-    if (browseGrid) {
-      browseGrid.innerHTML = open.length
-        ? open.map(function (l) { return listingCardHtml(l, uid); }).join('')
-        : '<div class="empty-state">No live listings yet. Mint and grow a plant, then list it here.</div>';
-    }
-    if (mineGrid) {
-      mineGrid.innerHTML = mine.length
-        ? mine.map(function (l) { return listingCardHtml(l, uid); }).join('')
-        : '<div class="empty-state">You have no listings.</div>';
+      const mine = listings.filter(function (l) {
+        return l.uid === uid;
+      });
+      const open = listings.filter(function (l) {
+        return l.status === 'active' || l.status === 'sale_pending';
+      });
+
+      if (browseGrid) {
+        browseGrid.innerHTML = open.length
+          ? open.map(function (l) {
+              return listingCardHtml(l, uid);
+            }).join('')
+          : '<div class="empty-state">' +
+            (isGrowerUi()
+              ? 'No live offers yet. Mint an RWA in Tokenise, then post it here.'
+              : 'No open investment offers yet. Check back when growers post RWAs.') +
+            '</div>';
+      }
+      if (mineGrid) {
+        mineGrid.innerHTML = mine.length
+          ? mine.map(function (l) {
+              return listingCardHtml(l, uid);
+            }).join('')
+          : '<div class="empty-state">You have not posted any RWA offers yet.</div>';
+      }
+    } finally {
+      marketRenderBusy = false;
     }
   }
 
@@ -329,26 +447,44 @@
     if (!view) return;
 
     view.addEventListener('click', async function (e) {
-      const buyBtn = e.target.closest('.market-buy-btn');
+      const investBtn = e.target.closest('.market-invest-btn');
       const cancelBtn = e.target.closest('.market-cancel-btn');
-      if (!buyBtn && !cancelBtn) return;
+      if (!investBtn && !cancelBtn) return;
       if (busy) return;
-      const id = (buyBtn || cancelBtn).dataset.id;
+      const id = (investBtn || cancelBtn).dataset.id;
       const listing = listings.find(function (l) {
         return l.id === id;
       });
       if (!listing) return;
       busy = true;
-      const btn = buyBtn || cancelBtn;
+      const btn = investBtn || cancelBtn;
       const prevText = btn.textContent;
-      btn.textContent = buyBtn ? 'Paying…' : 'Cancelling…';
+      btn.textContent = investBtn ? 'Investing…' : 'Cancelling…';
       btn.disabled = true;
       try {
-        if (buyBtn) {
-          if (!confirm('Buy "' + listing.name + '" for ' + listing.priceGrow + ' $GROW on devnet?')) {
+        if (investBtn) {
+          if (
+            !confirm(
+              'Invest ' +
+                listing.priceGrow +
+                ' $GROW to adopt "' +
+                listing.name +
+                '" on Solana devnet?\n\nYou will receive the RWA NFT when settlement completes.'
+            )
+          ) {
             return;
           }
-          await buyListing(listing);
+          await investInListing(listing);
+          if (window.AdoptPlant && typeof window.AdoptPlant.render === 'function') {
+            try {
+              window.AdoptPlant.render();
+            } catch {
+              // ignore
+            }
+          }
+          alert(
+            'Investment submitted. $GROW payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
+          );
         } else {
           await cancelListing(listing);
         }
@@ -370,8 +506,8 @@
         const priceEl = document.getElementById('market-price-input');
         const mintAddress = sel ? sel.value : '';
         const price = priceEl ? parseInt(priceEl.value, 10) : 0;
-        if (!mintAddress) return flash(new Error('Choose an asset to list.'));
-        if (!price || price <= 0) return flash(new Error('Enter a price in $GROW.'));
+        if (!mintAddress) return flash(new Error('Choose an RWA to post.'));
+        if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROW.'));
         const entry = listableTokens().find(function (o) {
           return o.mintAddress === mintAddress;
         });
@@ -386,13 +522,14 @@
         try {
           await createListing(entry, price);
           form.reset();
+          alert('Offer posted. Adopters can invest once escrow confirms (status: Open for investment).');
         } catch (err) {
           flash(err);
         } finally {
           busy = false;
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'List for sale';
+            submitBtn.textContent = 'Post to market';
           }
         }
       });
@@ -403,6 +540,7 @@
     render() {
       bindEvents();
       startWatch();
+      syncMyInvestments();
       render();
     },
     onChange(fn) {

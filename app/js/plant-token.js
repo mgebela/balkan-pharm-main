@@ -14,8 +14,24 @@
 (function () {
   'use strict';
 
-  const STORAGE_WALLET = 'dnevnik-live-wallet';
+  const STORAGE_WALLET_LEGACY = 'dnevnik-live-wallet';
   const STORAGE_PLANTS = 'dnevnik-live-plants'; // shared with the main app (read-only here)
+
+  /** Active Firebase uid — wallet localStorage is scoped per account. */
+  let accountUid = '';
+
+  function walletStorageKey() {
+    return accountUid ? STORAGE_WALLET_LEGACY + ':' + accountUid : STORAGE_WALLET_LEGACY;
+  }
+
+  function currentAuthUid() {
+    try {
+      const user = window.firebase && firebase.auth && firebase.auth().currentUser;
+      return user && user.uid ? String(user.uid) : '';
+    } catch {
+      return '';
+    }
+  }
 
   // Lifecycle of a token. "seed" is the minted starting point; every later
   // stage is reached by minting growth, which also mints fungible GROW tokens.
@@ -46,7 +62,7 @@
 
   function readWallet() {
     try {
-      const raw = localStorage.getItem(STORAGE_WALLET);
+      const raw = localStorage.getItem(walletStorageKey());
       if (!raw) return emptyWallet();
       const w = JSON.parse(raw);
       return Object.assign(emptyWallet(), w, {
@@ -58,18 +74,50 @@
   }
 
   function writeWallet(wallet) {
+    const normalized = Object.assign(emptyWallet(), wallet || {}, {
+      tokens: Array.isArray(wallet && wallet.tokens) ? wallet.tokens : [],
+    });
+    let next;
     try {
-      localStorage.setItem(STORAGE_WALLET, JSON.stringify(wallet));
+      next = JSON.stringify(normalized);
+    } catch {
+      return;
+    }
+    try {
+      const prev = localStorage.getItem(walletStorageKey());
+      if (prev === next) return; // unchanged — do not re-emit (prevents render loops)
+      localStorage.setItem(walletStorageKey(), next);
     } catch {
       // ignore quota / serialization errors
+      return;
     }
     listeners.forEach((fn) => {
       try {
-        fn(wallet);
+        fn(normalized);
       } catch {
         // ignore listener errors
       }
     });
+  }
+
+  /**
+   * Only migrate the old shared wallet blob when it matches this account's
+   * linked pubkey — never copy another profile's garden into an empty account.
+   */
+  function migrateLegacyWalletIfNeeded(uid, linkedPubkey) {
+    if (!uid || !linkedPubkey) return;
+    const scopedKey = STORAGE_WALLET_LEGACY + ':' + uid;
+    try {
+      if (localStorage.getItem(scopedKey)) return;
+      const legacyRaw = localStorage.getItem(STORAGE_WALLET_LEGACY);
+      if (!legacyRaw) return;
+      const legacy = JSON.parse(legacyRaw);
+      if (!legacy || legacy.address !== linkedPubkey) return;
+      localStorage.setItem(scopedKey, legacyRaw);
+      localStorage.removeItem(STORAGE_WALLET_LEGACY);
+    } catch {
+      // ignore
+    }
   }
 
   function readPlants() {
@@ -146,8 +194,136 @@
       return () => listeners.delete(fn);
     },
 
+    getAccountUid() {
+      return accountUid;
+    },
+
+    /**
+     * Bind wallet storage to a Firebase account.
+     * Switching accounts disconnects the shared browser wallet session
+     * so each profile connects its own wallet.
+     */
+    bindAccount(uid) {
+      return (async function () {
+        const next = uid ? String(uid) : '';
+        const prev = accountUid;
+        if (prev && next && prev !== next) {
+          const SW = window.SolanaWallet;
+          if (SW && typeof SW.disconnect === 'function') {
+            try {
+              await SW.disconnect();
+            } catch {
+              // ignore
+            }
+          }
+        }
+        accountUid = next;
+        try {
+          if (typeof document !== 'undefined' && document.body) {
+            document.body.dataset.walletRestored = '';
+          }
+        } catch {
+          // ignore
+        }
+        const wallet = readWallet();
+        listeners.forEach((fn) => {
+          try {
+            fn(wallet);
+          } catch {
+            // ignore
+          }
+        });
+        return wallet;
+      })();
+    },
+
+    clearAccount() {
+      return PlantToken.bindAccount('');
+    },
+
+    /**
+     * After WalletLink.loadProfile(): keep this account empty unless it has
+     * its own linked Solana pubkey. Drops leaked shared-session data.
+     */
+    reconcileWithProfile() {
+      return (async function () {
+        const uid = accountUid || currentAuthUid();
+        if (uid && accountUid !== uid) {
+          await PlantToken.bindAccount(uid);
+        }
+
+        const linked =
+          window.WalletLink && WalletLink.getProfile
+            ? String(WalletLink.getProfile().solanaPubkey || '')
+            : '';
+
+        if (uid) migrateLegacyWalletIfNeeded(uid, linked);
+
+        const SW = window.SolanaWallet;
+
+        if (!linked) {
+          if (SW && typeof SW.isConnected === 'function' && SW.isConnected()) {
+            try {
+              await SW.disconnect();
+            } catch {
+              // ignore
+            }
+          }
+          const current = readWallet();
+          const hasLocalData =
+            current.connected ||
+            !!current.address ||
+            Number(current.growthBalance || 0) > 0 ||
+            (current.tokens && current.tokens.length > 0);
+          if (hasLocalData) writeWallet(emptyWallet());
+          return readWallet();
+        }
+
+        let wallet = readWallet();
+        if (wallet.address && wallet.address !== linked) {
+          wallet = emptyWallet();
+          writeWallet(wallet);
+          wallet = readWallet();
+        }
+
+        if (SW && typeof SW.isConnected === 'function' && SW.isConnected()) {
+          const live = SW.getPublicKey && SW.getPublicKey();
+          if (live && live !== linked) {
+            try {
+              await SW.disconnect();
+            } catch {
+              // ignore
+            }
+            if (wallet.connected || wallet.address) {
+              wallet.connected = false;
+              wallet.address = '';
+              wallet.provider = '';
+              writeWallet(wallet);
+              wallet = readWallet();
+            }
+          }
+        }
+
+        // Linked but session disconnected: clear stale session address only.
+        if (!wallet.connected && wallet.address) {
+          wallet.address = '';
+          wallet.provider = '';
+          writeWallet(wallet);
+        }
+
+        return readWallet();
+      })();
+    },
+
     connect() {
       return (async function () {
+        const uid = currentAuthUid();
+        if (!uid) {
+          throw new Error('Sign in to your dnevnik.live account before connecting a wallet.');
+        }
+        if (accountUid !== uid) {
+          await PlantToken.bindAccount(uid);
+        }
         const SW = window.SolanaWallet;
         if (!SW) throw new Error('Solana wallet module failed to load. Refresh the page and try again.');
         const address = await SW.connect();
@@ -160,6 +336,13 @@
         writeWallet(wallet);
         if (window.WalletLink) {
           try {
+            const profile = WalletLink.getProfile();
+            const force =
+              !!profile.solanaPubkey && profile.solanaPubkey !== address;
+            if (force) {
+              // Replacing this account's linked wallet after an explicit connect.
+              await WalletLink.unlinkWallet();
+            }
             await WalletLink.linkWallet(address);
             wallet.linkError = '';
             writeWallet(wallet);
@@ -178,13 +361,165 @@
       return (async function () {
         const SW = window.SolanaWallet;
         if (SW) await SW.disconnect();
+        if (window.WalletLink && typeof WalletLink.unlinkWallet === 'function') {
+          try {
+            await WalletLink.unlinkWallet();
+          } catch (err) {
+            console.warn('Wallet unlink failed', err);
+          }
+        }
         const wallet = readWallet();
         wallet.connected = false;
         wallet.address = '';
         wallet.provider = '';
+        wallet.linkError = '';
         writeWallet(wallet);
         return wallet;
       })();
+    },
+
+    /** Stage index from market listing stage label. */
+    stageIndexFromLabel(label) {
+      const key = String(label || '').trim().toLowerCase();
+      const idx = GROWTH_STAGES.findIndex(function (s) {
+        return s.label.toLowerCase() === key || s.key === key;
+      });
+      return idx >= 0 ? idx : 0;
+    },
+
+    /**
+     * Record an adopter investment (market purchase) in this account's garden.
+     */
+    adoptFromListing(listing) {
+      if (!listing || !listing.mintAddress) return null;
+      const wallet = readWallet();
+      const existing = wallet.tokens.find(function (t) {
+        return (
+          t.mintAddress === listing.mintAddress ||
+          (listing.id && t.listingId === listing.id)
+        );
+      });
+      if (existing) {
+        existing.mintAddress = listing.mintAddress;
+        existing.listingId = listing.id || existing.listingId;
+        existing.adopted = true;
+        existing.investStatus = listing.status || existing.investStatus;
+        writeWallet(wallet);
+        return existing;
+      }
+
+      const now = Date.now();
+      const stageIndex = PlantToken.stageIndexFromLabel(listing.stage);
+      const token = {
+        id: tokenId(),
+        name: String(listing.name || 'Adopted RWA').trim(),
+        strain: String(listing.strain || '').trim(),
+        batch: String(listing.batch || '').trim(),
+        plantId: listing.plantId || null,
+        mintAddress: listing.mintAddress,
+        mintRequestId: listing.mintRequestId || null,
+        listingId: listing.id || null,
+        adopted: true,
+        investedGrow: Number(listing.priceGrow || 0),
+        investStatus: listing.status || 'sale_pending',
+        sellerPubkey: listing.sellerPubkey || '',
+        stageIndex: stageIndex,
+        createdAt: now,
+        history: [
+          {
+            ts: now,
+            type: 'invest',
+            stage: GROWTH_STAGES[stageIndex].key,
+            amount: Number(listing.priceGrow || 0),
+            tx: listing.paymentSignature || listing.transferSignature || mockTxHash(),
+          },
+        ],
+      };
+      wallet.tokens.unshift(token);
+      writeWallet(wallet);
+      return token;
+    },
+
+    /** Remove / lock a token after the grower posts it to the market. */
+    markTokenListed(mintAddress, mintRequestId) {
+      const wallet = readWallet();
+      const before = wallet.tokens.length;
+      wallet.tokens = wallet.tokens.filter(function (t) {
+        if (mintAddress && t.mintAddress === mintAddress) return false;
+        if (mintRequestId && t.mintRequestId === mintRequestId) return false;
+        // Also match via SeedChain when only mintRequestId is on the token.
+        if (mintAddress && t.mintRequestId && window.SeedChain) {
+          const mint = SeedChain.getMint(t.mintRequestId);
+          if (mint && mint.mintAddress === mintAddress) return false;
+        }
+        return true;
+      });
+      if (wallet.tokens.length !== before) writeWallet(wallet);
+      return wallet;
+    },
+
+    /**
+     * Pull minted seedMints for this account into the Tokenise garden
+     * (e.g. externally registered RWAs assigned to a grower).
+     */
+    syncFromSeedMints() {
+      const SC = window.SeedChain;
+      if (!SC || typeof SC.getMints !== 'function') return readWallet();
+      const mints = SC.getMints() || {};
+      const wallet = readWallet();
+      let changed = false;
+
+      Object.keys(mints).forEach(function (requestId) {
+        const m = mints[requestId];
+        if (!m || m.status !== 'minted' || !m.mintAddress) return;
+
+        const existing = wallet.tokens.find(function (t) {
+          return (
+            t.mintRequestId === requestId ||
+            t.mintAddress === m.mintAddress
+          );
+        });
+        if (existing) {
+          if (!existing.mintAddress) {
+            existing.mintAddress = m.mintAddress;
+            existing.mintRequestId = existing.mintRequestId || requestId;
+            changed = true;
+          }
+          return;
+        }
+
+        let stageIndex = 0;
+        if (typeof m.stageIndex === 'number') stageIndex = m.stageIndex;
+        else if (m.stage) stageIndex = PlantToken.stageIndexFromLabel(m.stage);
+        else if (/bloom|flower|harvest/i.test(String(m.name || ''))) stageIndex = 4;
+
+        const now = Date.now();
+        wallet.tokens.unshift({
+          id: tokenId(),
+          name: String(m.name || 'Seed RWA').trim(),
+          strain: String(m.strain || '').trim(),
+          batch: String(m.batch || '').trim(),
+          plantId: m.plantId || null,
+          mintRequestId: requestId,
+          mintAddress: m.mintAddress,
+          stageIndex: stageIndex,
+          createdAt: now,
+          importedExternal: !!m.importedExternal,
+          history: [
+            {
+              ts: now,
+              type: 'mint',
+              stage: GROWTH_STAGES[stageIndex].key,
+              amount: 0,
+              tx: m.signature || mockTxHash(),
+            },
+          ],
+        });
+        changed = true;
+      });
+
+      if (changed) writeWallet(wallet);
+      return wallet;
     },
 
     // Mint a new seed token into the wallet. When signed in, also files a
@@ -494,14 +829,34 @@
 
   function syncWalletFromSolana() {
     const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) return readWallet();
     const wallet = readWallet();
+    if (!SW || !SW.isConnected()) return wallet;
     const address = SW.getPublicKey();
     if (!address) return wallet;
+
+    // Only mirror the extension when this account has linked that pubkey.
+    // Never auto-attach a shared Phantom session to an empty / unlinked profile.
+    const linked =
+      window.WalletLink && WalletLink.getProfile
+        ? String(WalletLink.getProfile().solanaPubkey || '')
+        : '';
+    if (!linked || linked !== address) return wallet;
+
+    const provider = SW.getProviderName() || 'solana';
+    const chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
+    if (
+      wallet.connected &&
+      wallet.address === address &&
+      wallet.provider === provider &&
+      wallet.chain === chain
+    ) {
+      return wallet;
+    }
+
     wallet.connected = true;
     wallet.address = address;
-    wallet.chain = (window.ChainConfig && window.ChainConfig.cluster) || 'devnet';
-        wallet.provider = SW.getProviderName() || 'solana';
+    wallet.chain = chain;
+    wallet.provider = provider;
     writeWallet(wallet);
     return wallet;
   }
@@ -707,8 +1062,20 @@
       .reverse()
       .map((h) => {
         const date = new Date(h.ts).toLocaleString('en-GB');
-        const label = h.type === 'mint' ? 'Seed minted' : 'Grew to ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
-        const amt = h.amount ? ' · +' + h.amount + ' $GROW' : '';
+        const label =
+          h.type === 'invest'
+            ? 'Invested / adopted'
+            : h.type === 'mint'
+              ? 'Seed minted'
+              : 'Grew to ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
+        const amt =
+          h.type === 'invest'
+            ? h.amount
+              ? ' · ' + h.amount + ' $GROW'
+              : ''
+            : h.amount
+              ? ' · +' + h.amount + ' $GROW'
+              : '';
         const real = realTxForHistoryEntry(token, h);
         const txHtml = real
           ? '<a href="' + esc(real.url) + '" target="_blank" rel="noopener noreferrer"><code title="' + esc(real.sig) + '">' + esc(shortTx(real.sig)) + '</code></a> · devnet'
@@ -735,21 +1102,42 @@
       (token.strain ? '<p class="adopt-token-strain">' + esc(token.strain) + '</p>' : '') +
       '</div>' +
       '</div>' +
-      (token.plantId
-        ? '<p class="adopt-token-link">Linked journal plant</p>'
-        : linkPlantControlHtml(token)) +
+      (token.adopted
+        ? '<p class="adopt-token-link">Market investment' +
+          (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString('en-US') + ' $GROW' : '') +
+          (token.investStatus === 'sale_pending' ? ' · settling…' : '') +
+          (token.investStatus === 'sold' ? ' · NFT adopted' : '') +
+          '</p>'
+        : token.plantId
+          ? '<p class="adopt-token-link">Linked journal plant</p>'
+          : linkPlantControlHtml(token)) +
       chainMintHtml(token) +
+      (token.mintAddress && !token.mintRequestId
+        ? '<p class="adopt-token-chain adopt-token-chain--ok">⛓ NFT <a href="' +
+          esc(explorerAddressUrl(token.mintAddress)) +
+          '" target="_blank" rel="noopener noreferrer"><code>' +
+          esc(shortAddr(token.mintAddress)) +
+          '</code></a></p>'
+        : '') +
       growerQuestHtml(token, next) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
-      '<span>Earned: <strong>' + earned + ' $GROW</strong></span>' +
+      '<span>' +
+      (token.adopted ? 'Invested' : 'Earned') +
+      ': <strong>' +
+      (token.adopted ? Number(token.investedGrow || 0) : earned) +
+      ' $GROW</strong></span>' +
       '<span class="adopt-token-id" title="' + esc(token.id) + '">#' + esc(token.id.slice(-6)) + '</span>' +
       '</div>' +
       '<div class="adopt-token-actions">' +
-      (isMax
-        ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
-        : mintButtonHtml(token, next)) +
+      (token.adopted
+        ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
+          (token.investStatus === 'sale_pending' ? 'Settlement pending' : 'Adopted RWA') +
+          '</button>'
+        : isMax
+          ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
+          : mintButtonHtml(token, next)) +
       '<div class="adopt-token-actions-secondary">' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
       (token.plantId && !isAdopterUi()
@@ -906,9 +1294,8 @@
 
   function applyProfileChrome() {
     const marketCta = document.getElementById('adopt-market-cta');
-    const wallet = readWallet();
     if (marketCta) {
-      marketCta.hidden = !(isAdopterUi() && wallet.connected);
+      marketCta.hidden = !isAdopterUi();
     }
   }
 
@@ -943,29 +1330,41 @@
     if (view) view.classList.toggle('adopt-busy', state);
   }
 
+  let renderAdoptBusy = false;
+  let renderWalletUiBusy = false;
+
   function render() {
-    syncWalletFromSolana();
-    refreshOnchainGrowBalance();
-    const wallet = readWallet();
-    const seedSection = document.getElementById('adopt-seed-section');
-    const gardenSection = document.getElementById('adopt-garden-section');
-    const highlightStage =
-      wallet.tokens.length > 0
-        ? Math.max.apply(null, wallet.tokens.map((t) => t.stageIndex))
-        : -1;
-    if (growthPreviewStage != null && highlightStage >= 0 && growthPreviewStage > highlightStage) {
-      growthPreviewStage = highlightStage;
-    }
-    if (!isAdopterUi()) {
-      renderGrowthGuide(highlightStage);
-    }
-    renderWalletPanel(wallet);
-    if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
-    if (gardenSection) gardenSection.hidden = !wallet.connected;
-    applyProfileChrome();
-    if (wallet.connected) {
-      if (!isAdopterUi()) fillSeedPlantOptions();
-      renderGarden(wallet);
+    if (renderAdoptBusy) return;
+    renderAdoptBusy = true;
+    try {
+      syncWalletFromSolana();
+      refreshOnchainGrowBalance();
+      const wallet = readWallet();
+      const seedSection = document.getElementById('adopt-seed-section');
+      const gardenSection = document.getElementById('adopt-garden-section');
+      const highlightStage =
+        wallet.tokens.length > 0
+          ? Math.max.apply(null, wallet.tokens.map((t) => t.stageIndex))
+          : -1;
+      if (growthPreviewStage != null && highlightStage >= 0 && growthPreviewStage > highlightStage) {
+        growthPreviewStage = highlightStage;
+      }
+      if (!isAdopterUi()) {
+        renderGrowthGuide(highlightStage);
+      }
+      renderWalletPanel(wallet);
+      if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
+      // Show garden when connected OR when this account already has tokens (e.g. synced mints).
+      if (gardenSection) {
+        gardenSection.hidden = !(wallet.connected || (wallet.tokens && wallet.tokens.length > 0));
+      }
+      applyProfileChrome();
+      if (wallet.connected || (wallet.tokens && wallet.tokens.length > 0)) {
+        if (!isAdopterUi() && wallet.connected) fillSeedPlantOptions();
+        renderGarden(wallet);
+      }
+    } finally {
+      renderAdoptBusy = false;
     }
   }
 
@@ -1103,24 +1502,48 @@
     syncWalletFromSolana();
     const wallet = readWallet();
     const compact = variant === 'compact';
+    const profileHint = 'Each dnevnik.live account links its own Solana wallet.';
+    const linkedPubkey =
+      window.WalletLink && WalletLink.getProfile
+        ? String(WalletLink.getProfile().solanaPubkey || '')
+        : '';
 
     if (!wallet.connected) {
+      const linkedHint = linkedPubkey
+        ? '<p class="wallet-controls-meta">Linked to this account: ' +
+          esc(shortAddr(linkedPubkey)) +
+          ' — reconnect to sign.</p>'
+        : '';
       if (compact) {
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
           '<span class="wallet-controls-label">Solana</span>' +
-          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">Connect</button>' +
+          (linkedPubkey
+            ? '<span class="wallet-controls-addr" title="' +
+              esc(linkedPubkey) +
+              '">' +
+              esc(shortAddr(linkedPubkey)) +
+              '</span>'
+            : '') +
+          walletLinkBadgeHtml() +
+          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">' +
+          (linkedPubkey ? 'Reconnect' : 'Connect') +
+          '</button>' +
           '</div>'
         );
       }
       return (
         '<div class="wallet-controls wallet-controls--panel">' +
         '<div class="wallet-controls-copy">' +
-        '<h3>Connect wallet</h3>' +
+        '<h3>Connect wallet for this account</h3>' +
         '<p>' + esc(devnetNotice()) + '</p>' +
+        '<p class="wallet-controls-hint">' + esc(profileHint) + '</p>' +
+        linkedHint +
         walletLinkBadgeHtml() +
         '</div>' +
-        '<button type="button" class="btn btn-primary wallet-connect-btn">Connect wallet</button>' +
+        '<button type="button" class="btn btn-primary wallet-connect-btn">' +
+        (linkedPubkey ? 'Reconnect wallet' : 'Connect wallet') +
+        '</button>' +
         '</div>'
       );
     }
@@ -1160,11 +1583,17 @@
   }
 
   function renderGlobalWalletUI() {
-    const headerBar = document.getElementById('app-wallet-bar');
-    if (headerBar) headerBar.innerHTML = walletControlsHtml('compact');
+    if (renderWalletUiBusy) return;
+    renderWalletUiBusy = true;
+    try {
+      const headerBar = document.getElementById('app-wallet-bar');
+      if (headerBar) headerBar.innerHTML = walletControlsHtml('compact');
 
-    const adminPanel = document.getElementById('admin-wallet-panel');
-    if (adminPanel) adminPanel.innerHTML = walletControlsHtml('panel');
+      const adminPanel = document.getElementById('admin-wallet-panel');
+      if (adminPanel) adminPanel.innerHTML = walletControlsHtml('panel');
+    } finally {
+      renderWalletUiBusy = false;
+    }
   }
 
   function bindGlobalWalletControls() {
@@ -1352,22 +1781,46 @@
       bindEvents();
       applyProfileChrome();
       const SW = window.SolanaWallet;
-      if (SW && typeof SW.tryRestore === 'function') {
+      const alreadyRestored =
+        typeof document !== 'undefined' &&
+        document.body &&
+        document.body.dataset.walletRestored === '1';
+
+      if (!alreadyRestored && SW && typeof SW.tryRestore === 'function') {
+        if (document.body) document.body.dataset.walletRestored = '1';
         SW.tryRestore()
           .then(async function () {
-            syncWalletFromSolana();
-            const w = readWallet();
-            if (w.connected && window.WalletLink) {
+            if (window.WalletLink) {
               try {
                 await WalletLink.loadProfile();
-                const profile = WalletLink.getProfile();
-                if (!profile.solanaPubkey || profile.solanaPubkey !== w.address) {
-                  await WalletLink.linkWallet(w.address);
-                }
-              } catch (err) {
-                console.warn('Wallet link restore', err);
+              } catch {
+                // ignore
               }
             }
+            const linked =
+              window.WalletLink && WalletLink.getProfile
+                ? String(WalletLink.getProfile().solanaPubkey || '')
+                : '';
+            const live = SW.isConnected() ? SW.getPublicKey() : '';
+
+            // Only keep a restored extension session if this account linked it.
+            if (!linked || !live || live !== linked) {
+              if (SW.isConnected()) {
+                try {
+                  await SW.disconnect();
+                } catch {
+                  // ignore
+                }
+              }
+              if (window.PlantToken && typeof PlantToken.reconcileWithProfile === 'function') {
+                await PlantToken.reconcileWithProfile();
+              }
+              render();
+              renderGlobalWalletUI();
+              return;
+            }
+
+            syncWalletFromSolana();
             render();
             renderGlobalWalletUI();
           })
@@ -1543,6 +1996,11 @@
   if (window.SeedChain && typeof window.SeedChain.onChange === 'function') {
     // Re-render token cards when devnet mint results land in Firestore.
     window.SeedChain.onChange(function () {
+      try {
+        PlantToken.syncFromSeedMints();
+      } catch (err) {
+        console.warn('syncFromSeedMints', err);
+      }
       render();
     });
   }

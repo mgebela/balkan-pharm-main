@@ -1158,7 +1158,8 @@ function isViewAllowedForProfile(viewId) {
   if (viewId === 'admin') return isAdminPanelRole(currentUserRole);
   if (viewId === 'growlog') return isGrowerProfile();
   if (['plants', 'toolbox', 'danas'].includes(viewId)) return isGrowerProfile();
-  if (viewId === 'market') return isAdopterProfile();
+  // Growers post RWA offers; adopters browse & invest.
+  if (viewId === 'market') return true;
   if (['dashboard', 'adopt'].includes(viewId)) return true;
   return false;
 }
@@ -1262,12 +1263,25 @@ function initFirebaseSync() {
     return;
   }
 
+  let authBootstrapInFlight = false;
+  let authBootstrapUid = '';
+
   firebase.auth().onAuthStateChanged(async (user) => {
     if (!user) {
+      authBootstrapUid = '';
       localStorage.removeItem(STORAGE_AUTH);
       window.location.replace('../dnevnik/');
       return;
     }
+
+    // Ignore duplicate auth callbacks for the same user while bootstrapping.
+    if (authBootstrapInFlight && authBootstrapUid === user.uid) return;
+    if (authBootstrapUid === user.uid && remoteSyncReady) {
+      // Already booted this session — skip full reload on token refresh.
+      return;
+    }
+    authBootstrapInFlight = true;
+    authBootstrapUid = user.uid;
 
     try {
       localStorage.setItem(
@@ -1280,24 +1294,52 @@ function initFirebaseSync() {
       );
 
       await ensureUserExists(user);
+      if (window.PlantToken && typeof PlantToken.bindAccount === 'function') {
+        await PlantToken.bindAccount(user.uid);
+      }
       if (window.WalletLink) {
         await WalletLink.loadProfile();
-        WalletLink.onChange(function () {
-          try {
-            renderDashboard();
-          } catch {
-            // ignore
-          }
-        });
       }
-      if (window.PlantToken && typeof PlantToken.onChange === 'function') {
-        PlantToken.onChange(function () {
-          try {
-            renderDashboard();
-          } catch {
-            // ignore
-          }
-        });
+      if (window.PlantToken && typeof PlantToken.reconcileWithProfile === 'function') {
+        await PlantToken.reconcileWithProfile();
+      }
+      if (window.PlantToken && typeof PlantToken.syncFromSeedMints === 'function') {
+        try {
+          PlantToken.syncFromSeedMints();
+        } catch {
+          // ignore
+        }
+      }
+      if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+        window.AdoptPlant.renderGlobalWalletUI();
+      }
+      if (window.AdoptPlant && typeof window.AdoptPlant.render === 'function') {
+        try {
+          window.AdoptPlant.render();
+        } catch {
+          // ignore if garden panel not mounted yet
+        }
+      }
+      // Bind once — auth can re-fire and would otherwise stack listeners (crash loop).
+      if (!window.__dnevnikWalletUiBound) {
+        window.__dnevnikWalletUiBound = true;
+        let dashTimer = null;
+        function scheduleDashboardRefresh() {
+          if (dashTimer) clearTimeout(dashTimer);
+          dashTimer = setTimeout(function () {
+            try {
+              renderDashboard();
+            } catch {
+              // ignore
+            }
+          }, 80);
+        }
+        if (window.WalletLink && typeof WalletLink.onChange === 'function') {
+          WalletLink.onChange(scheduleDashboardRefresh);
+        }
+        if (window.PlantToken && typeof PlantToken.onChange === 'function') {
+          PlantToken.onChange(scheduleDashboardRefresh);
+        }
       }
       currentUserRole = await getCurrentUserRole(user);
       await recordUserLogin(user, currentUserRole);
@@ -1347,7 +1389,9 @@ function initFirebaseSync() {
       }
     } catch (err) {
       console.error('App init failed', err);
+      authBootstrapUid = '';
     } finally {
+      authBootstrapInFlight = false;
       finishAppLoading();
     }
   });

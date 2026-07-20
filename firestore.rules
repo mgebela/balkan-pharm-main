@@ -85,6 +85,19 @@ service cloud.firestore {
           || request.resource.data.profileType == resource.data.profileType);
     }
 
+    // Allow clearing this account's linked wallet (disconnect).
+    function walletUnlinkAllowed() {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
+        && !('solanaPubkey' in request.resource.data)
+        && !('walletProvider' in request.resource.data)
+        && !('walletLinkedAt' in request.resource.data)
+        && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
+        && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email)
+        && (!('profileType' in request.resource.data)
+          || request.resource.data.profileType == resource.data.profileType);
+    }
+
     // Allow setting profileType once if missing; otherwise keep it immutable.
     function profileTypeUpdateAllowed() {
       return request.resource.data.diff(resource.data).affectedKeys()
@@ -119,6 +132,7 @@ service cloud.firestore {
           || request.resource.data.profileType == resource.data.profileType
           || (!('profileType' in resource.data) && isValidProfileType(request.resource.data.profileType))))
       || (request.auth.uid == userId && walletLinkPatchAllowed())
+      || (request.auth.uid == userId && walletUnlinkAllowed())
       || (request.auth.uid == userId && profileTypeUpdateAllowed())
       || isSuperadmin()
     );
@@ -241,11 +255,15 @@ service cloud.firestore {
         resource.data.status == 'active'
         && request.resource.data.status == 'sale_pending'
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['status', 'buyerUid', 'buyerPubkey', 'paymentSignature'])
+          .hasOnly(['status', 'buyerUid', 'buyerPubkey', 'paymentSignature', 'investedAt'])
         && request.resource.data.buyerUid == request.auth.uid
         && isValidSolanaPubkey(request.resource.data.buyerPubkey)
         && request.resource.data.paymentSignature is string
         && request.resource.data.paymentSignature.size() > 0
+        && (
+          !('investedAt' in request.resource.data)
+          || request.resource.data.investedAt is string
+        )
       )
       // …or the seller requests a cancel while the listing is live.
       || (
