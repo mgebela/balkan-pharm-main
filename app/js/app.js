@@ -10,6 +10,7 @@
   const STORAGE_PLANTS = 'dnevnik-live-plants';
   const STORAGE_ENTRIES = 'dnevnik-live-entries';
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
+  const STORAGE_TODAY_STATE = 'dnevnik-live-today-state';
 
   // One-time migration from previous storage keys (older branding).
   (function migrateOldStorageKeys() {
@@ -1515,6 +1516,72 @@ function initFirebaseSync() {
     return y + '-' + m + '-' + day;
   }
 
+  function readTodayState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_TODAY_STATE);
+      const data = raw ? JSON.parse(raw) : null;
+      if (!data || typeof data !== 'object') return { dayKey: localDateYYYYMMDD(), done: {} };
+      if (data.dayKey !== localDateYYYYMMDD()) return { dayKey: localDateYYYYMMDD(), done: {} };
+      return {
+        dayKey: String(data.dayKey || localDateYYYYMMDD()),
+        done: data.done && typeof data.done === 'object' ? data.done : {},
+      };
+    } catch {
+      return { dayKey: localDateYYYYMMDD(), done: {} };
+    }
+  }
+
+  function writeTodayState(state) {
+    try {
+      localStorage.setItem(STORAGE_TODAY_STATE, JSON.stringify(state || { dayKey: localDateYYYYMMDD(), done: {} }));
+    } catch {
+      // ignore
+    }
+  }
+
+  function renderToday() {
+    const container = document.querySelector('#view-danas .danas-list');
+    if (!container) return;
+    const reminders =
+      window.AICoach && typeof window.AICoach.getReminders === 'function'
+        ? window.AICoach.getReminders()
+        : [];
+    const state = readTodayState();
+
+    if (!reminders.length) {
+      container.innerHTML =
+        '<div class="empty-state">No urgent reminders right now. Keep logging care and stage updates to get smart prompts.</div>';
+      return;
+    }
+
+    container.innerHTML = reminders
+      .slice(0, 8)
+      .map(function (r) {
+        const done = !!state.done[String(r.id || '')];
+        return (
+          '<label class="danas-item">' +
+          '<input type="checkbox" data-today-id="' +
+          escapeHtml(String(r.id || '')) +
+          '"' +
+          (done ? ' checked' : '') +
+          ' />' +
+          '<div class="danas-content">' +
+          '<span class="danas-title">' +
+          escapeHtml(String(r.title || 'Reminder')) +
+          '</span>' +
+          '<span class="danas-desc">' +
+          escapeHtml(String(r.message || '')) +
+          '</span>' +
+          '<button type="button" class="link-btn danas-open-coach" data-coach-prompt="' +
+          escapeHtml(String(r.prompt || '')) +
+          '">Ask Coach</button>' +
+          '</div>' +
+          '</label>'
+        );
+      })
+      .join('');
+  }
+
   // --- Navigation ---
   const navItems = document.querySelectorAll('.nav-item');
   const views = document.querySelectorAll('.view');
@@ -1586,6 +1653,7 @@ function initFirebaseSync() {
     if (id === 'adopt' && window.AdoptPlant) window.AdoptPlant.render();
     if (id === 'market' && window.Market) window.Market.render();
     if (id === 'toolbox') renderToolbox();
+    if (id === 'danas') renderToday();
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
@@ -1620,6 +1688,32 @@ function initFirebaseSync() {
       if (e.target.closest('#growlog-back')) {
         e.preventDefault();
         showView('plants');
+      }
+    });
+  }
+
+  const viewDanasEl = document.getElementById('view-danas');
+  if (viewDanasEl) {
+    viewDanasEl.addEventListener('change', (e) => {
+      const input = e.target.closest('[data-today-id]');
+      if (!input) return;
+      const id = String(input.getAttribute('data-today-id') || '');
+      if (!id) return;
+      const state = readTodayState();
+      state.done[id] = !!input.checked;
+      writeTodayState(state);
+    });
+    viewDanasEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-coach-prompt]');
+      if (!btn) return;
+      e.preventDefault();
+      const prompt = btn.getAttribute('data-coach-prompt');
+      if (!prompt) return;
+      if (window.AICoach) {
+        AICoach.open();
+        setTimeout(function () {
+          AICoach.ask(prompt);
+        }, 90);
       }
     });
   }
@@ -3592,6 +3686,8 @@ document.addEventListener("click", (e) => {
         const adoptView = document.getElementById('view-adopt');
         if (adoptView && adoptView.classList.contains('active')) window.AdoptPlant.render();
       }
+      const todayView = document.getElementById('view-danas');
+      if (todayView && todayView.classList.contains('active')) renderToday();
     } catch (err) {
       console.warn('Journal refresh after coach action', err);
     }

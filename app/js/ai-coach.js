@@ -9,6 +9,7 @@
   const STORAGE_ENTRIES = 'dnevnik-live-entries';
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
   const STORAGE_CHAT = 'dnevnik-live-coach-chat';
+  const STORAGE_REMINDER_DISMISS = 'dnevnik-live-coach-reminder-dismiss';
 
   const COACH_URL = 'https://coachchat-zwul5y4amq-ew.a.run.app';
 
@@ -40,6 +41,12 @@
   };
 
   const STAGE_ORDER = ['klijanje', 'sadnica', 'vegetativna', 'cvjetanje', 'susenje'];
+  const SUBPHASE_LABELS = {
+    pot_1_5dcl: '1.5 dcl pot',
+    pot_5l: '5 L pot',
+    pot_30l: '30 L pot',
+    na_polju: 'In the field',
+  };
 
   const STAGE_PLAYBOOK = {
     klijanje: {
@@ -179,6 +186,227 @@
     return box && typeof box === 'object' ? box : {};
   }
 
+  function toMs(value) {
+    if (!value) return 0;
+    const t = Date.parse(String(value));
+    return Number.isNaN(t) ? 0 : t;
+  }
+
+  function nowMs() {
+    return Date.now();
+  }
+
+  function daysSinceMs(ms) {
+    if (!ms) return null;
+    const diff = Math.max(0, nowMs() - ms);
+    return Math.floor(diff / 86400000);
+  }
+
+  function subphaseLabel(subphase) {
+    return SUBPHASE_LABELS[subphase] || subphase || 'not set';
+  }
+
+  function readDismissedReminders() {
+    const raw = readJson(STORAGE_REMINDER_DISMISS, {});
+    return raw && typeof raw === 'object' ? raw : {};
+  }
+
+  function saveDismissedReminders(state) {
+    try {
+      localStorage.setItem(STORAGE_REMINDER_DISMISS, JSON.stringify(state || {}));
+    } catch {
+      // ignore
+    }
+  }
+
+  function dismissReminder(id) {
+    const key = String(id || '');
+    if (!key) return;
+    const state = readDismissedReminders();
+    state[key] = new Date().toISOString();
+    saveDismissedReminders(state);
+    renderMessages();
+  }
+
+  function isReminderDismissed(id, daily) {
+    const state = readDismissedReminders();
+    const raw = state[String(id || '')];
+    if (!raw) return false;
+    if (!daily) return true;
+    const ts = toMs(raw);
+    if (!ts) return false;
+    return nowMs() - ts < 86400000;
+  }
+
+  function latestToolboxDateMs(list, plantId) {
+    if (!Array.isArray(list)) return 0;
+    let latest = 0;
+    list.forEach(function (row) {
+      if (!row) return;
+      const pid = String(row.plantId || row.value2 || '');
+      if (String(plantId) !== pid) return;
+      const t = toMs(row.date);
+      if (t > latest) latest = t;
+    });
+    return latest;
+  }
+
+  function latestEntryDateMs(entries, plantId, types) {
+    const allow = Array.isArray(types) ? types : [];
+    let latest = 0;
+    (entries || []).forEach(function (e) {
+      if (!e || String(e.plantId || '') !== String(plantId)) return;
+      if (allow.length && allow.indexOf(e.type) < 0) return;
+      const t = toMs(e.date || e.createdAt);
+      if (t > latest) latest = t;
+    });
+    return latest;
+  }
+
+  function lastCareDateMs(plantId, entries, toolbox, careType) {
+    if (careType === 'watering') {
+      return Math.max(
+        latestEntryDateMs(entries, plantId, ['zalijevanje']),
+        latestToolboxDateMs(toolbox && toolbox.watering, plantId)
+      );
+    }
+    if (careType === 'feeding') {
+      return Math.max(
+        latestEntryDateMs(entries, plantId, ['gnojidba']),
+        latestToolboxDateMs(toolbox && toolbox.feeding, plantId)
+      );
+    }
+    if (careType === 'transplant') {
+      return Math.max(
+        latestEntryDateMs(entries, plantId, ['presadjivanje', 'faza']),
+        latestToolboxDateMs(toolbox && toolbox.transplant, plantId)
+      );
+    }
+    return 0;
+  }
+
+  function pushReminder(list, reminder) {
+    if (!reminder || !reminder.id) return;
+    if (isReminderDismissed(reminder.id, true)) return;
+    list.push(reminder);
+  }
+
+  function buildReminders(plants, entries, toolbox) {
+    const list = [];
+    (plants || []).forEach(function (plant) {
+      if (!plant || !plant.id) return;
+      const stage = plant.stage || '';
+      const stageLabel = STAGE_LABELS[stage] || stage || 'Unknown stage';
+      const subphase = plant.subphase || '';
+      const plantName = plant.name || 'Plant';
+      const transplantAt = lastCareDateMs(plant.id, entries, toolbox, 'transplant');
+      const wateringAt = lastCareDateMs(plant.id, entries, toolbox, 'watering');
+      const feedingAt = lastCareDateMs(plant.id, entries, toolbox, 'feeding');
+      const sinceTransplant = daysSinceMs(transplantAt);
+      const sinceWatering = daysSinceMs(wateringAt);
+      const sinceFeeding = daysSinceMs(feedingAt);
+      const stageAt = toMs((plant.stageDates && plant.stageDates[stage]) || plant.startDate);
+      const daysInStage = daysSinceMs(stageAt);
+
+      if (subphase === 'pot_1_5dcl' && (stage === 'sadnica' || stage === 'vegetativna')) {
+        if (sinceTransplant == null || sinceTransplant >= 8) {
+          pushReminder(list, {
+            id: 'pot-up-5l:' + plant.id,
+            plantId: plant.id,
+            title: 'Pot-up check: 1.5 dcl → 5 L',
+            message:
+              plantName +
+              ' is in ' +
+              subphaseLabel(subphase) +
+              '. Roots may be ready for a bigger pot — confirm transplant timing.',
+            prompt:
+              'For plant "' +
+              plantName +
+              '", should I move from 1.5 dcl pot to 5 L now? Give me a quick checklist, then log transplant if ready.',
+          });
+        }
+      }
+
+      if (subphase === 'pot_5l' && stage !== 'klijanje') {
+        if (sinceTransplant == null || sinceTransplant >= 10) {
+          pushReminder(list, {
+            id: 'pot-up-30l:' + plant.id,
+            plantId: plant.id,
+            title: 'Pot-up check: 5 L → 30 L',
+            message:
+              plantName +
+              ' has been in 5 L long enough to review root space and water cadence before moving to 30 L.',
+            prompt:
+              'Review plant "' +
+              plantName +
+              '" for transplant from 5 L to 30 L. What signs should I confirm today?',
+          });
+        }
+      }
+
+      if (plant.environmentType === 'indoor' && subphase === 'pot_30l') {
+        const floweringLong = stage === 'cvjetanje' && daysInStage != null && daysInStage >= 14;
+        if (floweringLong || (stage === 'vegetativna' && daysInStage != null && daysInStage >= 21)) {
+          pushReminder(list, {
+            id: 'tent-to-field:' + plant.id,
+            plantId: plant.id,
+            title: 'Tent → field transition review',
+            message:
+              plantName +
+              ' is still indoor in ' +
+              subphaseLabel(subphase) +
+              ' during ' +
+              stageLabel +
+              '. Decide if it should move to field conditions.',
+            prompt:
+              'Should plant "' +
+              plantName +
+              '" move from grow tent to field this week? Give me transition steps and risk checks.',
+          });
+        }
+      }
+
+      if (sinceWatering == null || sinceWatering >= 2) {
+        pushReminder(list, {
+          id: 'watering:' + plant.id,
+          plantId: plant.id,
+          title: 'Watering reminder',
+          message:
+            plantName +
+            ' has no recent watering log' +
+            (sinceWatering == null ? '' : ' for ' + sinceWatering + ' days') +
+            '.',
+          prompt:
+            'Check watering status for "' +
+            plantName +
+            '" and help me log watering if needed.',
+        });
+      }
+
+      if (stage !== 'klijanje' && (sinceFeeding == null || sinceFeeding >= 5)) {
+        pushReminder(list, {
+          id: 'feeding:' + plant.id,
+          plantId: plant.id,
+          title: 'Nutrient cadence check',
+          message:
+            plantName +
+            ' is in ' +
+            stageLabel +
+            ' with no recent feeding log' +
+            (sinceFeeding == null ? '' : ' for ' + sinceFeeding + ' days') +
+            '.',
+          prompt:
+            'Review feeding plan for "' +
+            plantName +
+            '" in ' +
+            stageLabel +
+            " and suggest today's nutrients.",
+        });
+      }
+    });
+    return list.slice(0, 8);
+  }
+
   function resolveStage(raw) {
     const key = String(raw || '')
       .trim()
@@ -287,6 +515,8 @@
       }
     }
 
+    const reminders = buildReminders(plants, entries, toolbox);
+
     return {
       focusPlant: focus
         ? {
@@ -305,6 +535,7 @@
         feeding: Array.isArray(toolbox.feeding) ? toolbox.feeding.length : 0,
         environment: Array.isArray(toolbox.environment) ? toolbox.environment.length : 0,
       },
+      reminders: reminders,
       mintQuest: questHint,
       profileType: 'grower',
       canAct: true,
@@ -686,6 +917,11 @@
         if (text) ask(text);
         return;
       }
+      const dismissBtn = e.target.closest('[data-reminder-dismiss]');
+      if (dismissBtn) {
+        dismissReminder(dismissBtn.getAttribute('data-reminder-dismiss'));
+        return;
+      }
       if (e.target.closest('[data-coach-run]')) {
         runPendingActions();
         return;
@@ -749,7 +985,45 @@
     }
   }
 
-  function emptyStateHtml() {
+  function reminderCardsHtml(reminders) {
+    const list = Array.isArray(reminders) ? reminders : [];
+    if (!list.length) return '';
+    return (
+      '<div class="ai-coach-reminders">' +
+      '<div class="ai-coach-reminders-head">' +
+      '<strong>Smart reminders</strong>' +
+      '<span>Based on your logs</span>' +
+      '</div>' +
+      '<div class="ai-coach-reminder-list">' +
+      list
+        .slice(0, 4)
+        .map(function (r) {
+          return (
+            '<article class="ai-coach-reminder">' +
+            '<div class="ai-coach-reminder-top">' +
+            '<h4>' +
+            esc(r.title) +
+            '</h4>' +
+            '<button type="button" class="ai-coach-reminder-dismiss" data-reminder-dismiss="' +
+            esc(r.id) +
+            '" aria-label="Dismiss reminder">×</button>' +
+            '</div>' +
+            '<p>' +
+            esc(r.message) +
+            '</p>' +
+            '<button type="button" class="ai-coach-reminder-action" data-coach-prompt="' +
+            esc(r.prompt) +
+            '">Plan this now</button>' +
+            '</article>'
+          );
+        })
+        .join('') +
+      '</div></div>'
+    );
+  }
+
+  function emptyStateHtml(context) {
+    const reminders = (context && context.reminders) || [];
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
@@ -774,7 +1048,9 @@
           );
         })
         .join('') +
-      '</div></div>'
+      '</div>' +
+      reminderCardsHtml(reminders) +
+      '</div>'
     );
   }
 
@@ -791,7 +1067,7 @@
     const el = document.getElementById('ai-coach-messages');
     if (!el) return;
     if (!history.length && !typing) {
-      el.innerHTML = emptyStateHtml();
+      el.innerHTML = emptyStateHtml(buildContext());
       renderQuickPrompts();
       return;
     }
@@ -1107,6 +1383,9 @@
     ask: ask,
     applyVisibility: applyVisibility,
     buildContext: buildContext,
+    getReminders: function () {
+      return (buildContext().reminders || []).slice();
+    },
     runPendingActions: runPendingActions,
     STAGE_PLAYBOOK: STAGE_PLAYBOOK,
     STAGE_ORDER: STAGE_ORDER,
