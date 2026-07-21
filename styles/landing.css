@@ -1759,3 +1759,112 @@ body {
 .persona--mid {
   border-color: color-mix(in srgb, var(--persona-accent) 45%, transparent);
 }
+
+/* Public market board (landing) */
+.landing-market-loading,
+.landing-market-empty {
+  text-align: center;
+  color: var(--text-muted);
+  margin: 0 0 1.25rem;
+  font-size: 0.95rem;
+}
+
+.landing-market-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-market-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem 1.05rem 1.1rem;
+  border-radius: 14px;
+  background: rgba(255, 252, 245, 0.78);
+  border: 1px solid rgba(31, 46, 34, 0.12);
+}
+
+.landing-market-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.landing-market-asset,
+.landing-market-status {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+}
+
+.landing-market-asset {
+  color: #5c2416;
+  background: rgba(142, 53, 32, 0.12);
+}
+
+.landing-market-status {
+  color: #1f3d28;
+  background: rgba(47, 93, 58, 0.14);
+}
+
+.landing-market-status--escrow_pending,
+.landing-market-status--sale_pending {
+  color: #5a4712;
+  background: rgba(196, 149, 42, 0.16);
+}
+
+.landing-market-name {
+  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.landing-market-meta,
+.landing-market-mint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.landing-market-mint a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.landing-market-mint a:hover {
+  text-decoration: underline;
+}
+
+.landing-market-mint code {
+  font-family: \"JetBrains Mono\", ui-monospace, monospace;
+  font-size: 0.78rem;
+}
+
+.landing-market-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(31, 46, 34, 0.08);
+}
+
+.landing-market-price {
+  font-weight: 700;
+  color: #8e3520;
+  font-size: 1rem;
+}
+
+.landing-market-card .btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}

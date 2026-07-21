@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260719d" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260721c" />
 </head>
 <body>
 
@@ -22,6 +22,7 @@
       <nav class="nav" id="main-nav">
         <a href="#journal" class="nav-link">Journal</a>
         <a href="#tokens" class="nav-link">Tokens</a>
+        <a href="#market" class="nav-link">Market</a>
         <a href="dnevnik/" class="btn btn-primary">Sign in</a>
       </nav>
     </div>
@@ -122,6 +123,25 @@
       </div>
     </section>
 
+    <section id="market" class="section section-alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Live market</h2>
+          <p class="section-lead">
+            Public Seed and growth RWAs posted by growers. Sign in as an adopter to invest with $GROW.
+          </p>
+        </div>
+        <p class="landing-market-loading" id="landing-market-loading">Loading open offers…</p>
+        <p class="landing-market-empty" id="landing-market-empty" hidden>
+          No open offers right now. Growers can post RWAs after minting in the app.
+        </p>
+        <div class="landing-market-grid" id="landing-market-grid" aria-live="polite"></div>
+        <p class="section-cta">
+          <a href="dnevnik/?mode=signup&type=adopter">Browse &amp; invest in the app →</a>
+        </p>
+      </div>
+    </section>
+
     <section class="section cta-section">
       <div class="cta-bg" aria-hidden="true">
         <img src="images/5.jpg" alt="" />
@@ -150,6 +170,7 @@
           <a href="dnevnik/">App</a>
           <a href="#journal">Journal</a>
           <a href="#tokens">Tokens</a>
+          <a href="#market">Market</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
       </div>
@@ -176,6 +197,25 @@
     </div>
   </footer>
 
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+  <script>
+    (function () {
+      var firebaseConfig = {
+        apiKey: 'AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg',
+        authDomain: 'balpha-9dab9.firebaseapp.com',
+        projectId: 'balpha-9dab9',
+        storageBucket: 'balpha-9dab9.firebasestorage.app',
+        messagingSenderId: '398537397385',
+        appId: '1:398537397385:web:9bd3aec82f44ddec20e258',
+        measurementId: 'G-HLXHTQP41H',
+      };
+      if (window.firebase && !window.firebase.apps.length) {
+        window.firebase.initializeApp(firebaseConfig);
+      }
+    })();
+  </script>
+  <script src="js/landing-market.js?v=20260721c"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

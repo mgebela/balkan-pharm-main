@@ -233,8 +233,9 @@ service cloud.firestore {
   // the listing through escrow_pending → active → sale_pending → sold.
 
   match /marketListings/{listingId} {
-    // Anyone signed in can browse the market.
-    allow read: if signedIn();
+    // Public browse: landing page and signed-in market share the same board.
+    // Writes stay auth-gated below.
+    allow read: if true;
 
     allow create: if signedIn()
       && request.resource.data.uid == request.auth.uid
