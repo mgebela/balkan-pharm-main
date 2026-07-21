@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260721g" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260721h" />
 </head>
 <body>
 
@@ -101,15 +101,30 @@
       </div>
     </section>
 
-    <section id="join" class="section join-section">
+    <section id="join" class="section desk-section">
       <div class="container">
-        <div class="section-header">
-          <h2>Sign in</h2>
+        <div class="desk-header">
+          <span class="desk-tag">ACCESS</span>
+          <h2>Open a desk</h2>
           <p class="section-lead">Grower for the journal and minting, or Adopter to invest in live RWAs.</p>
         </div>
-        <div class="hero-cta join-cta">
-          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower</a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter</a>
+        <div class="desk-split">
+          <a href="dnevnik/?mode=signup&type=grower" class="desk-seat desk-seat--grower">
+            <span class="desk-seat-code">GRW</span>
+            <div class="desk-seat-body">
+              <h3>Grower</h3>
+              <p>Run the journal, mint Seed RWAs, and post contracts to the board.</p>
+            </div>
+            <span class="desk-seat-cta">Enter as Grower</span>
+          </a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="desk-seat desk-seat--adopter">
+            <span class="desk-seat-code">ADP</span>
+            <div class="desk-seat-body">
+              <h3>Adopter</h3>
+              <p>Stake $GROW into open contracts and track adopted plants.</p>
+            </div>
+            <span class="desk-seat-cta">Enter as Adopter</span>
+          </a>
         </div>
         <p class="join-signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
@@ -117,76 +132,110 @@
       </div>
     </section>
 
-    <section id="journal" class="section section-alt">
+    <section id="journal" class="section desk-section desk-section--alt">
       <div class="container">
-        <div class="section-header">
-          <h2>Journal</h2>
+        <div class="desk-header">
+          <span class="desk-tag">JOURNAL</span>
+          <h2>Grow instruments</h2>
           <p class="section-lead">Everything you need to run and document a CBD grow.</p>
         </div>
-        <div class="features-grid features-grid--pillars features-grid--key">
-          <div class="feature-card feature-card--green">
-            <h3>Plants &amp; stages</h3>
-            <p>Track each plant from germination through harvest — indoor or outdoor.</p>
+        <div class="desk-panel">
+          <div class="desk-panel-bar">
+            <span>Field ledger</span>
+            <span class="desk-panel-meta">INDOOR · OUTDOOR</span>
           </div>
-          <div class="feature-card feature-card--blue">
-            <h3>Watering &amp; feeding</h3>
-            <p>Log watering, nutrients, and notes so every cycle has a clear history.</p>
-          </div>
-          <div class="feature-card feature-card--warm">
-            <h3>Tools &amp; Today</h3>
-            <p>Quick actions, environment logs, and daily tasks in one workspace.</p>
+          <div class="desk-spec-list">
+            <div class="desk-spec">
+              <span class="desk-spec-code">PLT</span>
+              <div>
+                <h3>Plants &amp; stages</h3>
+                <p>Track each plant from germination through harvest.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">FED</span>
+              <div>
+                <h3>Watering &amp; feeding</h3>
+                <p>Log water, nutrients, and notes so every cycle has a clear tape.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">DAY</span>
+              <div>
+                <h3>Tools &amp; Today</h3>
+                <p>Quick actions, environment logs, and daily tasks in one workspace.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="tokens" class="section">
+    <section id="tokens" class="section desk-section">
       <div class="container">
-        <div class="section-header">
-          <h2>Tokens <span class="solana-badge solana-badge--inline" aria-label="Solana">
-            <span class="solana-badge-mark" aria-hidden="true">
-              <svg viewBox="0 0 397.7 311.7" width="16" height="12" focusable="false">
-                <defs>
-                  <linearGradient id="solana-g-tokens" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#00FFA3"/>
-                    <stop offset="1" stop-color="#DC1FFF"/>
-                  </linearGradient>
-                </defs>
-                <path fill="url(#solana-g-tokens)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
-                <path fill="url(#solana-g-tokens)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-                <path fill="url(#solana-g-tokens)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
-              </svg>
+        <div class="desk-header">
+          <span class="desk-tag">ON-CHAIN</span>
+          <h2>RWA rails
+            <span class="solana-badge solana-badge--inline" aria-label="Solana">
+              <span class="solana-badge-mark" aria-hidden="true">
+                <svg viewBox="0 0 397.7 311.7" width="16" height="12" focusable="false">
+                  <defs>
+                    <linearGradient id="solana-g-tokens" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientUnits="userSpaceOnUse">
+                      <stop offset="0" stop-color="#00FFA3"/>
+                      <stop offset="1" stop-color="#DC1FFF"/>
+                    </linearGradient>
+                  </defs>
+                  <path fill="url(#solana-g-tokens)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
+                  <path fill="url(#solana-g-tokens)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
+                  <path fill="url(#solana-g-tokens)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
+                </svg>
+              </span>
+              Solana
             </span>
-            Solana
-          </span></h2>
+          </h2>
           <p class="section-lead">Turn cultivation data into Seed RWAs and $GROW on Solana (devnet).</p>
         </div>
-        <div class="features-grid features-grid--pillars features-grid--key">
-          <div class="feature-card feature-card--purple">
-            <h3>Seed NFTs</h3>
-            <p>Mint a seed token linked to a journal plant — strain and batch on-chain.</p>
+        <div class="desk-panel">
+          <div class="desk-panel-bar">
+            <span>Settlement stack</span>
+            <span class="desk-panel-meta">DEVNET</span>
           </div>
-          <div class="feature-card feature-card--pink">
-            <h3>Growth &amp; $GROW</h3>
-            <p>Advance stages with journal proof and earn $GROW at each milestone.</p>
-          </div>
-          <div class="feature-card feature-card--teal">
-            <h3>Adopt &amp; market</h3>
-            <p>Adopters hold and track plants; buy and sell RWAs on the marketplace.</p>
+          <div class="desk-spec-list desk-spec-list--cols">
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--brass">SEED</span>
+              <div>
+                <h3>Seed NFTs</h3>
+                <p>Mint a seed token linked to a journal plant — strain and batch on-chain.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--green">GROW</span>
+              <div>
+                <h3>Growth &amp; $GROW</h3>
+                <p>Advance stages with journal proof and earn $GROW at each milestone.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--rust">MKT</span>
+              <div>
+                <h3>Adopt &amp; market</h3>
+                <p>Adopters hold plants and trade RWAs on the live commodity board.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="footer">
+  <footer class="footer desk-footer">
     <div class="container">
       <div class="footer-grid">
         <div>
-          <strong>dnevnik.live</strong>
-          <p>CBD grow journal and plant tokens.</p>
+          <strong class="footer-brand">dnevnik.live</strong>
+          <p>CBD grow journal and RWA commodity desk.</p>
         </div>
-        <div>
+        <div class="footer-links">
           <a href="dnevnik/">App</a>
           <a href="#market">Market</a>
           <a href="#join">Join</a>
@@ -236,7 +285,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260721g"></script>
+  <script src="js/landing-market.js?v=20260721h"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');
