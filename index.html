@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260721c" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260721d" />
 </head>
 <body>
 
@@ -20,9 +20,10 @@
         <span class="nav-toggle-bar"></span>
       </button>
       <nav class="nav" id="main-nav">
+        <a href="#market" class="nav-link">Market</a>
+        <a href="#join" class="nav-link">Join</a>
         <a href="#journal" class="nav-link">Journal</a>
         <a href="#tokens" class="nav-link">Tokens</a>
-        <a href="#market" class="nav-link">Market</a>
         <a href="dnevnik/" class="btn btn-primary">Sign in</a>
       </nav>
     </div>
@@ -30,35 +31,37 @@
   </header>
 
   <main>
-    <section class="hero">
+    <section id="market" class="hero hero--market">
       <div class="hero-bg" aria-hidden="true">
         <img src="images/1.jpg" alt="" />
       </div>
-      <div class="container hero-inner">
-        <div class="hero-content hero-card">
-          <h1 class="logo-hero">dnevnik.live</h1>
-          <p class="hero-sub">Grow journal and on-chain plant tokens — for growers who log, and adopters who track.</p>
-          <div class="hero-cta">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower</a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter</a>
-          </div>
-          <a class="solana-badge solana-badge--hero" href="https://solana.com" target="_blank" rel="noopener noreferrer" aria-label="Built on Solana">
-            <span class="solana-badge-mark" aria-hidden="true">
-              <svg viewBox="0 0 397.7 311.7" width="18" height="14" focusable="false">
-                <defs>
-                  <linearGradient id="solana-g-hero" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientUnits="userSpaceOnUse">
-                    <stop offset="0" stop-color="#00FFA3"/>
-                    <stop offset="1" stop-color="#DC1FFF"/>
-                  </linearGradient>
-                </defs>
-                <path fill="url(#solana-g-hero)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
-                <path fill="url(#solana-g-hero)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-                <path fill="url(#solana-g-hero)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
-              </svg>
-            </span>
-            <span>Built on Solana</span>
-          </a>
+      <div class="container hero-market-inner">
+        <div class="hero-market-intro">
+          <p class="hero-brand">dnevnik.live</p>
+          <h1 class="hero-market-title">Live market</h1>
+          <p class="hero-sub">Open Seed and growth RWAs from growers — invest with $GROW on Solana devnet.</p>
         </div>
+        <p class="landing-market-loading" id="landing-market-loading">Loading open offers…</p>
+        <p class="landing-market-empty" id="landing-market-empty" hidden>
+          No open offers right now. Growers can post RWAs after minting in the app.
+        </p>
+        <div class="landing-market-grid" id="landing-market-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section id="join" class="section join-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Sign in</h2>
+          <p class="section-lead">Grower for the journal and minting, or Adopter to invest in live RWAs.</p>
+        </div>
+        <div class="hero-cta join-cta">
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter</a>
+        </div>
+        <p class="join-signin">
+          Already have an account? <a href="dnevnik/">Sign in</a>
+        </p>
       </div>
     </section>
 
@@ -122,41 +125,6 @@
         </div>
       </div>
     </section>
-
-    <section id="market" class="section section-alt">
-      <div class="container">
-        <div class="section-header">
-          <h2>Live market</h2>
-          <p class="section-lead">
-            Public Seed and growth RWAs posted by growers. Sign in as an adopter to invest with $GROW.
-          </p>
-        </div>
-        <p class="landing-market-loading" id="landing-market-loading">Loading open offers…</p>
-        <p class="landing-market-empty" id="landing-market-empty" hidden>
-          No open offers right now. Growers can post RWAs after minting in the app.
-        </p>
-        <div class="landing-market-grid" id="landing-market-grid" aria-live="polite"></div>
-        <p class="section-cta">
-          <a href="dnevnik/?mode=signup&type=adopter">Browse &amp; invest in the app →</a>
-        </p>
-      </div>
-    </section>
-
-    <section class="section cta-section">
-      <div class="cta-bg" aria-hidden="true">
-        <img src="images/5.jpg" alt="" />
-      </div>
-      <div class="container cta-inner">
-        <div class="section-header">
-          <h2>Start free</h2>
-          <p class="section-lead">Choose Grower for the journal, or Adopter for the garden.</p>
-        </div>
-        <div class="hero-cta" style="justify-content:center">
-          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Grower signup</a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopter signup</a>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer class="footer">
@@ -168,9 +136,10 @@
         </div>
         <div>
           <a href="dnevnik/">App</a>
+          <a href="#market">Market</a>
+          <a href="#join">Join</a>
           <a href="#journal">Journal</a>
           <a href="#tokens">Tokens</a>
-          <a href="#market">Market</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
       </div>
@@ -215,7 +184,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260721c"></script>
+  <script src="js/landing-market.js?v=20260721d"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');
