@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Growtoo">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 512 512" role="img" aria-label="Growtoo">
   <defs>
-    <radialGradient id="disc" cx="50%" cy="42%" r="62%">
-      <stop offset="0%" stop-color="#12351f"/>
-      <stop offset="100%" stop-color="#0c1812"/>
+    <radialGradient id="disc" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#153d22"/>
+      <stop offset="100%" stop-color="#08140c"/>
     </radialGradient>
+    <g id="petal">
+      <rect x="-22" y="-108" width="44" height="124" rx="22" fill="#34a056"/>
+    </g>
   </defs>
-  <circle cx="100" cy="100" r="98" fill="url(#disc)"/>
-  <circle cx="100" cy="100" r="94" fill="none" stroke="#2f8f4e" stroke-width="3.5"/>
-  <circle cx="100" cy="100" r="88" fill="none" stroke="#1f6b38" stroke-width="1.25" opacity="0.7"/>
-  <g fill="#2f8f4e" font-family="Archivo, Avenir Next, Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="1">
-    <text x="27.68" y="70.78" transform="rotate(-68.00 27.68 70.78)" text-anchor="middle" dominant-baseline="middle">G</text><text x="44.53" y="45.17" transform="rotate(-45.33 44.53 45.17)" text-anchor="middle" dominant-baseline="middle">R</text><text x="69.94" y="28.02" transform="rotate(-22.67 69.94 28.02)" text-anchor="middle" dominant-baseline="middle">O</text><text x="100.00" y="22.00" transform="rotate(0.00 100.00 22.00)" text-anchor="middle" dominant-baseline="middle">W</text><text x="130.06" y="28.02" transform="rotate(22.67 130.06 28.02)" text-anchor="middle" dominant-baseline="middle">T</text><text x="155.47" y="45.17" transform="rotate(45.33 155.47 45.17)" text-anchor="middle" dominant-baseline="middle">O</text><text x="172.32" y="70.78" transform="rotate(68.00 172.32 70.78)" text-anchor="middle" dominant-baseline="middle">O</text>
+
+  <circle cx="256" cy="256" r="252" fill="url(#disc)"/>
+  <circle cx="256" cy="256" r="244" fill="none" stroke="#34a056" stroke-width="22"/>
+  <circle cx="256" cy="256" r="222" fill="none" stroke="#1f6b38" stroke-width="7"/>
+
+  <g fill="#34a056"
+     font-family="Arial Black, Helvetica Bold, Impact, sans-serif"
+     font-size="70"
+     font-weight="900"
+     stroke="#34a056"
+     stroke-width="3"
+     paint-order="stroke fill">
+    <text x="65.93" y="179.21" transform="rotate(-68.00 65.93 179.21)" text-anchor="middle" dominant-baseline="middle">G</text><text x="110.20" y="111.89" transform="rotate(-45.33 110.20 111.89)" text-anchor="middle" dominant-baseline="middle">R</text><text x="177.00" y="66.83" transform="rotate(-22.67 177.00 66.83)" text-anchor="middle" dominant-baseline="middle">O</text><text x="256.00" y="51.00" transform="rotate(0.00 256.00 51.00)" text-anchor="middle" dominant-baseline="middle">W</text><text x="335.00" y="66.83" transform="rotate(22.67 335.00 66.83)" text-anchor="middle" dominant-baseline="middle">T</text><text x="401.80" y="111.89" transform="rotate(45.33 401.80 111.89)" text-anchor="middle" dominant-baseline="middle">O</text><text x="446.07" y="179.21" transform="rotate(68.00 446.07 179.21)" text-anchor="middle" dominant-baseline="middle">O</text>
   </g>
-  <g fill="#2f8f4e">
-    <rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(0 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(45 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(90 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(135 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(180 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(225 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(270 100 112) translate(100 112)"/><rect x="-7" y="-28" width="14" height="34" rx="7" ry="7" transform="rotate(315 100 112) translate(100 112)"/>
-    <circle cx="100" cy="112" r="7" fill="#1f6b38"/>
-    <circle cx="100" cy="112" r="3.5" fill="#2f8f4e"/>
+
+  <g transform="translate(256 300)">
+    <use xlink:href="#petal" transform="rotate(0)"/><use xlink:href="#petal" transform="rotate(45)"/><use xlink:href="#petal" transform="rotate(90)"/><use xlink:href="#petal" transform="rotate(135)"/><use xlink:href="#petal" transform="rotate(180)"/><use xlink:href="#petal" transform="rotate(225)"/><use xlink:href="#petal" transform="rotate(270)"/><use xlink:href="#petal" transform="rotate(315)"/>
+    <circle r="24" fill="#1a5530"/>
+    <circle r="12" fill="#34a056"/>
   </g>
 </svg>
