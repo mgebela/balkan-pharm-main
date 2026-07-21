@@ -118,14 +118,51 @@ body > * {
 }
 
 .logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   color: #f4fff4;
   text-decoration: none;
   letter-spacing: -0.02em;
+}
+
+.logo-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: block;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(47, 143, 78, 0.45);
+}
+
+.logo-word {
+  line-height: 1;
+}
+
+.hero-logo-mark {
+  display: block;
+  width: clamp(88px, 14vw, 120px);
+  height: auto;
+  margin: 0 auto 0.85rem;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgba(47, 143, 78, 0.4),
+    0 12px 36px rgba(0, 0, 0, 0.4);
+  animation: hero-logo-in 0.7s ease both;
+}
+
+@keyframes hero-logo-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .nav {
@@ -325,7 +362,7 @@ body > * {
   font-size: clamp(1.85rem, 4.5vw, 2.6rem);
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: #fff;
+  color: #9dffb0;
   line-height: 1.1;
 }
 
@@ -1256,11 +1293,22 @@ body > * {
 }
 
 .footer-brand {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-family: var(--font-serif);
   font-size: 1.15rem;
   color: #f4fff4;
   margin-bottom: 0.35rem;
+}
+
+.footer-brand::before {
+  content: '';
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: url('../images/growtoo-logo.png') center / cover no-repeat;
+  box-shadow: 0 0 0 1px rgba(47, 143, 78, 0.4);
 }
 
 .footer-links {
@@ -2586,7 +2634,8 @@ body > * {
 @media (prefers-reduced-motion: reduce) {
   .market-live-dot,
   .market-ticker-track,
-  .landing-market-card.market-row {
+  .landing-market-card.market-row,
+  .hero-logo-mark {
     animation: none;
   }
 }
