@@ -4406,6 +4406,43 @@ body:not(.app-loading) {
   color: var(--text-muted);
   font-size: 0.88rem;
 }
+.market-stuck {
+  margin: 0 0 1.2rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: rgba(176, 72, 48, 0.12);
+  border: 1px solid rgba(176, 72, 48, 0.4);
+  color: var(--text);
+  font-size: 0.88rem;
+}
+.market-stuck-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+.market-stuck-copy {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+.market-stuck-copy strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+.market-stuck-copy p {
+  margin: 0 0 0.5rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.market-stuck-copy ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+}
+.market-stuck-copy code {
+  font-size: 0.8em;
+}
 .market-hint {
   margin: 0 0 1rem;
   font-size: 0.85rem;

@@ -28,6 +28,7 @@ import { base58 } from '@metaplex-foundation/umi/serializers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
+import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { buildStageMetadata, toPublicMetadataUri } from './seed-metadata.js';
 import { stageByKey, stageIndexByKey } from './stages.js';
 import { readDeployed } from './common.js';
@@ -46,6 +47,7 @@ const GROW_MINT = publicKey(deployed.growMint);
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
 
 console.log('Authority:', String(umi.identity.publicKey));
+console.log('Worker:', workerId());
 console.log('$GROWTOO mint:', deployed.growMint);
 
 async function loadSeedData(data) {
@@ -96,6 +98,11 @@ async function processDoc(doc) {
   const data = doc.data();
   const stage = stageByKey(data.stage);
   const label = `${data.name || doc.id} → ${data.stage} (uid ${data.uid || '?'})`;
+
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased by another worker, skipping`);
+    return;
+  }
 
   try {
     if (!stage || stage.key === 'seed') {
@@ -169,6 +176,7 @@ async function processDoc(doc) {
       rewardSignature,
       recipient: String(recipient),
       mintedAt: new Date().toISOString(),
+      mintedBy: workerId(),
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: metadata ${metadataUri}`);
@@ -180,6 +188,8 @@ async function processDoc(doc) {
       error: String(err.message || err),
       failedAt: new Date().toISOString(),
     });
+  } finally {
+    await clearLease(doc.ref);
   }
 }
 

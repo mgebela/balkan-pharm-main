@@ -1,0 +1,85 @@
+name: Chain queues (mint · grow · market)
+
+# Cloud-hosted settlement so listings/mints don't depend on a local laptop.
+# Required repo secrets:
+#   FIREBASE_SERVICE_ACCOUNT_JSON  — contents of chain/keys/firebase-service-account.json
+#   SOLANA_AUTHORITY_KEY_JSON      — contents of chain/keys/devnet-authority.json
+# Optional:
+#   SOLANA_RPC_URL                 — dedicated Devnet RPC (Helius/QuickNode)
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: chain-queues
+  cancel-in-progress: false
+
+jobs:
+  queues:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: chain/package-lock.json
+
+      - name: Install chain deps
+        working-directory: chain
+        run: npm ci
+
+      - name: Write secrets
+        working-directory: chain
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          SOLANA_AUTHORITY_KEY_JSON: ${{ secrets.SOLANA_AUTHORITY_KEY_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ] || [ -z "${SOLANA_AUTHORITY_KEY_JSON:-}" ]; then
+            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT_JSON or SOLANA_AUTHORITY_KEY_JSON secrets."
+            echo "Add both under Repo → Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          mkdir -p keys
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > keys/firebase-service-account.json
+          printf '%s' "$SOLANA_AUTHORITY_KEY_JSON" > keys/devnet-authority.json
+          python3 - <<'PY'
+          import json
+          for path in ('keys/firebase-service-account.json', 'keys/devnet-authority.json'):
+              json.load(open(path))
+              print('ok', path)
+          PY
+
+      - name: Run mint queue
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          QUEUE_WORKER_ID: github-actions
+        run: npm run mint:queue
+        continue-on-error: true
+
+      - name: Run grow queue
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          QUEUE_WORKER_ID: github-actions
+        run: npm run grow:queue
+        continue-on-error: true
+
+      - name: Run market queue
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          QUEUE_WORKER_ID: github-actions
+        run: npm run market:queue
+
+      - name: Scrub keys
+        if: always()
+        working-directory: chain
+        run: rm -f keys/firebase-service-account.json keys/devnet-authority.json

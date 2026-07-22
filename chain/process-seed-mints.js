@@ -12,16 +12,22 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMintClient, mintSeedNft } from './mint-seed-lib.js';
+import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 
 const db = initFirestore();
 const umi = createMintClient();
 const watch = process.argv.includes('--watch');
 
 console.log('Authority:', String(umi.identity.publicKey));
+console.log('Worker:', workerId());
 
 async function processDoc(doc) {
   const data = doc.data();
   const label = `${data.name || doc.id} (uid ${data.uid || '?'})`;
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased by another worker, skipping`);
+    return;
+  }
   console.log(`Minting ${label}…`);
   try {
     const result = await mintSeedNft(
@@ -42,6 +48,7 @@ async function processDoc(doc) {
       signature: result.signature,
       owner: result.owner,
       mintedAt: new Date().toISOString(),
+      mintedBy: workerId(),
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: ${result.mint}`);
@@ -52,6 +59,8 @@ async function processDoc(doc) {
       error: String(err.message || err),
       failedAt: new Date().toISOString(),
     });
+  } finally {
+    await clearLease(doc.ref);
   }
 }
 

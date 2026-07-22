@@ -56,8 +56,20 @@ async function escrowHoldsNft(mintAddress) {
   });
 }
 
+async function countSettlementPending() {
+  const db = getFirestore();
+  const [sales, cancels] = await Promise.all([
+    db.collection('marketListings').where('status', '==', 'sale_pending').get(),
+    db.collection('marketListings').where('status', '==', 'cancel_requested').get(),
+  ]);
+  return {
+    salePending: sales.size,
+    cancelRequested: cancels.size,
+  };
+}
+
 /**
- * @returns {Promise<{checked:number, activated:number, staleFailed:number, skipped:number, errors:string[]}>}
+ * @returns {Promise<{checked:number, activated:number, staleFailed:number, skipped:number, errors:string[], salePending:number, cancelRequested:number}>}
  */
 async function reconcileEscrowPending() {
   const db = getFirestore();
@@ -65,12 +77,15 @@ async function reconcileEscrowPending() {
       .where('status', '==', 'escrow_pending')
       .get();
 
+  const settlement = await countSettlementPending();
   const result = {
     checked: snap.size,
     activated: 0,
     staleFailed: 0,
     skipped: 0,
     errors: [],
+    salePending: settlement.salePending,
+    cancelRequested: settlement.cancelRequested,
   };
 
   const now = Date.now();

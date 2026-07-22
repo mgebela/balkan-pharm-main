@@ -30,6 +30,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
 import { RPC_URL, readDeployed } from './common.js';
+import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 
 const db = initFirestore();
 const umi = createMintClient().use(mplToolbox());
@@ -46,6 +47,7 @@ const GROW_DECIMALS = Number(deployed.growDecimals || 9);
 const ESCROW = String(umi.identity.publicKey);
 
 console.log('Escrow (authority):', ESCROW);
+console.log('Worker:', workerId());
 
 async function escrowHoldsNft(mintAddress) {
   const accounts = await connection.getParsedTokenAccountsByOwner(new PublicKey(ESCROW), {
@@ -185,6 +187,10 @@ async function fail(doc, label, err) {
 async function processEscrowPending(doc) {
   const data = doc.data();
   const label = `listing ${data.name || doc.id} (escrow check)`;
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased by another worker, skipping`);
+    return;
+  }
   try {
     if (!(await escrowHoldsNft(data.mintAddress))) {
       // NFT not received yet — leave pending, transfer may still be confirming.
@@ -194,17 +200,24 @@ async function processEscrowPending(doc) {
     await doc.ref.update({
       status: 'active',
       activatedAt: new Date().toISOString(),
+      activatedBy: workerId(),
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: NFT in escrow, listing is live`);
   } catch (err) {
     await fail(doc, label, err);
+  } finally {
+    await clearLease(doc.ref);
   }
 }
 
 async function processSalePending(doc) {
   const data = doc.data();
   const label = `listing ${data.name || doc.id} (sale to ${data.buyerPubkey || '?'})`;
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased by another worker, skipping`);
+    return;
+  }
   try {
     if (!data.buyerPubkey || !data.paymentSignature) {
       throw new Error('Sale is missing buyerPubkey or paymentSignature.');
@@ -215,28 +228,38 @@ async function processSalePending(doc) {
       status: 'sold',
       transferSignature,
       soldAt: new Date().toISOString(),
+      settledBy: workerId(),
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: payment verified, NFT released (${transferSignature})`);
   } catch (err) {
     await fail(doc, label, err);
+  } finally {
+    await clearLease(doc.ref);
   }
 }
 
 async function processCancelRequested(doc) {
   const data = doc.data();
   const label = `listing ${data.name || doc.id} (cancel)`;
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased by another worker, skipping`);
+    return;
+  }
   try {
     const transferSignature = await transferNftFromEscrow(data.mintAddress, data.sellerPubkey);
     await doc.ref.update({
       status: 'cancelled',
       transferSignature,
       cancelledAt: new Date().toISOString(),
+      settledBy: workerId(),
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: NFT returned to seller (${transferSignature})`);
   } catch (err) {
     await fail(doc, label, err);
+  } finally {
+    await clearLease(doc.ref);
   }
 }
 

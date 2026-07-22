@@ -157,6 +157,132 @@
   }
 
   const OPEN_STATUSES = ['escrow_pending', 'active', 'sale_pending', 'cancel_requested'];
+  const STUCK_MS = 5 * 60 * 1000;
+
+  const STUCK_STATUS_LABELS = {
+    escrow_pending: 'Activating escrow…',
+    sale_pending: 'Investment settling…',
+    cancel_requested: 'Cancelling…',
+  };
+
+  function stuckSinceRaw(listing) {
+    if (!listing) return null;
+    if (listing.status === 'sale_pending') return listing.investedAt || listing.createdAt;
+    if (listing.status === 'cancel_requested') {
+      return listing.cancelRequestedAt || listing.updatedAt || null;
+    }
+    return listing.createdAt;
+  }
+
+  function listingAgeMs(listing) {
+    const raw = stuckSinceRaw(listing);
+    if (!raw) return 0;
+    if (typeof raw.toDate === 'function') return Date.now() - raw.toDate().getTime();
+    const t = Date.parse(raw);
+    return Number.isFinite(t) ? Date.now() - t : 0;
+  }
+
+  function stuckListings(rows, uid) {
+    return (rows || []).filter(function (l) {
+      if (!l) return false;
+      const mine = l.uid === uid || l.buyerUid === uid;
+      if (!mine) return false;
+      if (l.status !== 'escrow_pending' && l.status !== 'sale_pending' && l.status !== 'cancel_requested') {
+        return false;
+      }
+      if (l.status === 'cancel_requested' && !stuckSinceRaw(l)) return false;
+      return listingAgeMs(l) >= STUCK_MS;
+    });
+  }
+
+  function renderStuckBanner(rows, uid) {
+    const el = document.getElementById('market-stuck');
+    if (!el) return;
+    if (!el._retryBound) {
+      el._retryBound = true;
+      el.addEventListener('click', function (e) {
+        const btn = e.target.closest('#market-stuck-retry');
+        if (!btn) return;
+        const count = Number(el.dataset.stuckCount || 0);
+        forceReconcileNow(count);
+      });
+    }
+    const stuck = stuckListings(rows, uid);
+    if (!stuck.length) {
+      el.hidden = true;
+      el.dataset.stuckCount = '0';
+      el.innerHTML = '';
+      return;
+    }
+    const parts = stuck.map(function (l) {
+      const mins = Math.max(1, Math.round(listingAgeMs(l) / 60000));
+      return (
+        '<li><strong>' +
+        esc(l.name || 'Offer') +
+        '</strong> — ' +
+        esc(STUCK_STATUS_LABELS[l.status] || l.status) +
+        ' for ~' +
+        mins +
+        ' min</li>'
+      );
+    });
+    el.hidden = false;
+    el.dataset.stuckCount = String(stuck.length);
+    el.innerHTML =
+      '<div class="market-stuck-inner">' +
+      '<div class="market-stuck-copy">' +
+      '<strong>Settlement pending</strong>' +
+      '<p>Cloud queues retry every few minutes. Escrow activation is automatic; buys/cancels settle via the market worker (GitHub Actions or local <code>market:queue</code>).</p>' +
+      '<ul>' +
+      parts.join('') +
+      '</ul>' +
+      '</div>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="market-stuck-retry">Retry now</button>' +
+      '</div>';
+  }
+
+  function forceReconcileNow(count) {
+    const url = cfg().marketReconcileUrl;
+    const btn = document.getElementById('market-stuck-retry');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Retrying…';
+    }
+    lastReconcileAt = 0;
+    const ping = url
+      ? fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source: 'app-stuck-retry', count: count || 0 }),
+        })
+          .then(function (res) {
+            return res.json().catch(function () {
+              return { ok: res.ok };
+            });
+          })
+          .catch(function () {
+            return { ok: false };
+          })
+      : Promise.resolve({ ok: false });
+
+    ping.then(function (data) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Retry now';
+      }
+      if (data && data.activated > 0) {
+        flashOk('Activated ' + data.activated + ' listing(s). Refresh if status lags.');
+        return;
+      }
+      const settle =
+        data && (Number(data.salePending || 0) + Number(data.cancelRequested || 0) > 0)
+          ? ' ' +
+            (Number(data.salePending || 0) + Number(data.cancelRequested || 0)) +
+            ' buy/cancel still need the market queue (GitHub Actions every ~5 min).'
+          : ' Buys/cancels settle via the cloud market queue once GitHub secrets are set.';
+      flashOk('Escrow retry sent.' + settle);
+    });
+  }
 
   function listedMintAddresses() {
     const set = new Set();
@@ -334,6 +460,7 @@
   async function cancelListing(listing) {
     await firebase.firestore().collection('marketListings').doc(listing.id).update({
       status: 'cancel_requested',
+      cancelRequestedAt: new Date().toISOString(),
     });
   }
 
@@ -459,6 +586,8 @@
         }
       }
 
+      renderStuckBanner(listings, uid);
+
       if (sel) {
         const options = listableTokens();
         const current = sel.value;
@@ -526,6 +655,10 @@
   function flash(err) {
     console.error('Market error', err);
     alert(err && err.message ? err.message : 'Something went wrong.');
+  }
+
+  function flashOk(msg) {
+    alert(msg || 'Done.');
   }
 
   let eventsBound = false;
