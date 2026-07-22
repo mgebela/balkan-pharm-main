@@ -3,7 +3,7 @@
  *
  * Builds a transfer transaction (ATA create-if-missing + transferChecked),
  * has it signed by the connected wallet (SolanaWallet) and sends it to
- * devnet. Used to escrow NFTs when listing and to pay $GROW when buying.
+ * devnet. Used to escrow NFTs when listing and to pay $GROWTOO when buying.
  */
 (function () {
   'use strict';
@@ -256,7 +256,7 @@
             throw sendErr;
           }
 
-          // Once broadcast, never resign/retry a new transfer — the NFT/$GROW
+          // Once broadcast, never resign/retry a new transfer — the NFT/$GROWTOO
           // may already have moved. Only poll for confirmation.
           return await confirmByPolling(connection, signature);
         } catch (err) {
@@ -276,10 +276,10 @@
       return SplTransfer.transferToken({ mint, to, amount: 1n, decimals: 0 });
     },
 
-    // Convenience: pay whole $GROW tokens.
+    // Convenience: pay whole $GROWTOO tokens.
     async payGrow(to, wholeTokens) {
       const cfg = window.ChainConfig || {};
-      if (!cfg.growMint) throw new Error('$GROW mint is not deployed yet.');
+      if (!cfg.growMint) throw new Error('$GROWTOO mint is not deployed yet.');
       const decimals = Number(cfg.growDecimals || 9);
       return SplTransfer.transferToken({
         mint: cfg.growMint,

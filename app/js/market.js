@@ -1,9 +1,9 @@
 /*
- * Marketplace (devnet): growers post real RWA NFTs; adopters invest with $GROW.
+ * Marketplace (devnet): growers post real RWA NFTs; adopters invest with $GROWTOO.
  *
  * Listings live in Firestore (`marketListings`); on-chain legs:
  *   - grower escrows the NFT to the authority wallet (signed in-app),
- *   - adopter pays the grower in $GROW (signed in-app),
+ *   - adopter pays the grower in $GROWTOO (signed in-app),
  *   - chain/process-market.js verifies both and releases the NFT to the adopter.
  */
 (function () {
@@ -263,7 +263,7 @@
     if (!user) throw new Error('Sign in to invest.');
     if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in RWAs.');
 
-    const SW = await ensureSigningWallet('invest ($GROW payment)');
+    const SW = await ensureSigningWallet('invest ($GROWTOO payment)');
 
     const paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
 
@@ -361,7 +361,7 @@
       '<div class="market-card-foot">' +
       '<span class="market-price">' +
       Number(listing.priceGrow).toLocaleString('en-US') +
-      ' $GROW</span>' +
+      ' $GROWTOO</span>' +
       (canInvest
         ? '<button type="button" class="btn btn-primary btn-sm market-invest-btn" data-id="' +
           esc(listing.id) +
@@ -403,15 +403,15 @@
         } else if (!cfg().growMint) {
           notice.hidden = false;
           notice.textContent =
-            'Marketplace needs the $GROW mint and seed collection on devnet. Offers below are read-only until then.';
+            'Marketplace needs the $GROWTOO mint and seed collection on devnet. Offers below are read-only until then.';
         } else if (isGrowerUi()) {
           notice.hidden = false;
           notice.textContent =
-            'Post real minted seed / growth RWAs. Adopters invest with $GROW; the NFT transfers when settlement confirms.';
+            'Post real minted seed / growth RWAs. Adopters invest with $GROWTOO; the NFT transfers when settlement confirms.';
         } else {
           notice.hidden = false;
           notice.textContent =
-            'Invest $GROW to adopt a grower’s real RWA. Connect your wallet, then tap Invest on an open offer.';
+            'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet, then tap Invest on an open offer.';
         }
       }
 
@@ -514,7 +514,7 @@
             !confirm(
               'Invest ' +
                 listing.priceGrow +
-                ' $GROW to adopt "' +
+                ' $GROWTOO to adopt "' +
                 listing.name +
                 '" on Solana devnet?\n\nYou will receive the RWA NFT when settlement completes.'
             )
@@ -530,7 +530,7 @@
             }
           }
           alert(
-            'Investment submitted. $GROW payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
+            'Investment submitted. $GROWTOO payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
           );
         } else {
           await cancelListing(listing);
@@ -554,7 +554,7 @@
         const mintAddress = sel ? sel.value : '';
         const price = priceEl ? parseInt(priceEl.value, 10) : 0;
         if (!mintAddress) return flash(new Error('Choose an RWA to post.'));
-        if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROW.'));
+        if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROWTOO.'));
         const entry = listableTokens().find(function (o) {
           return o.mintAddress === mintAddress;
         });

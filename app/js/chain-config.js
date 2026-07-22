@@ -19,7 +19,7 @@
     // Authority wallet; also acts as the marketplace escrow on devnet.
     escrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
     devnetNotice:
-      'Connect a Solana wallet on devnet. Seed NFTs are minted for real on devnet via the mint queue; $GROW SPL rewards are still simulated locally.',
+      'Connect a Solana wallet on devnet. Seed NFTs are minted for real on devnet via the mint queue; $GROWTOO SPL rewards are still simulated locally.',
     explorerAddress: function (address) {
       return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
     },

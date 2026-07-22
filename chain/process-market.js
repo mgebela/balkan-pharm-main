@@ -5,7 +5,7 @@
  *   1. Seller escrows the NFT: signs a transfer to the authority wallet in
  *      the app and creates the listing with status "escrow_pending".
  *      → this script verifies the escrow holds the NFT and flips it "active".
- *   2. Buyer pays the seller in $GROW (signed in the app) and sets the
+ *   2. Buyer pays the seller in $GROWTOO (signed in the app) and sets the
  *      listing to "sale_pending" with the payment signature.
  *      → this script verifies the payment on-chain, transfers the NFT from
  *        escrow to the buyer and marks the listing "sold".
@@ -38,7 +38,7 @@ const watch = process.argv.includes('--watch');
 
 const deployed = readDeployed();
 if (!deployed.growMint) {
-  console.error('$GROW mint not deployed yet. Run "npm run deploy:grow" first.');
+  console.error('$GROWTOO mint not deployed yet. Run "npm run deploy:grow" first.');
   process.exit(1);
 }
 const GROW_MINT = deployed.growMint;
@@ -57,8 +57,8 @@ async function escrowHoldsNft(mintAddress) {
 }
 
 /*
- * Verify the buyer's $GROW payment: the referenced transaction must be
- * confirmed and increase the seller's $GROW balance by at least the price.
+ * Verify the buyer's $GROWTOO payment: the referenced transaction must be
+ * confirmed and increase the seller's $GROWTOO balance by at least the price.
  */
 async function verifyGrowPayment(signature, sellerPubkey, priceGrow) {
   const tx = await connection.getParsedTransaction(signature, {

@@ -6,7 +6,7 @@
  * this script:
  *   1. uploads new stage metadata to Arweave (Stage trait + growthHistory),
  *   2. updates the NFT's on-chain metadata URI (updateV1),
- *   3. mints the $GROW SPL stage reward to the holder's wallet.
+ *   3. mints the $GROWTOO SPL stage reward to the holder's wallet.
  *
  * Rewards are computed server-side from stages.js — the client-sent reward
  * is ignored.
@@ -39,14 +39,14 @@ const watch = process.argv.includes('--watch');
 
 const deployed = readDeployed();
 if (!deployed.growMint) {
-  console.error('$GROW mint not deployed yet. Run "npm run deploy:grow" first.');
+  console.error('$GROWTOO mint not deployed yet. Run "npm run deploy:grow" first.');
   process.exit(1);
 }
 const GROW_MINT = publicKey(deployed.growMint);
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
 
 console.log('Authority:', String(umi.identity.publicKey));
-console.log('$GROW mint:', deployed.growMint);
+console.log('$GROWTOO mint:', deployed.growMint);
 
 async function loadSeedData(data) {
   if (data.seedMintRequestId) {
@@ -141,7 +141,7 @@ async function processDoc(doc) {
     }).sendAndConfirm(umi);
     const updateSignature = base58.deserialize(updateResult.signature)[0];
 
-    // 3. Mint the $GROW reward to the holder.
+    // 3. Mint the $GROWTOO reward to the holder.
     let rewardSignature = '';
     if (reward > 0) {
       const token = findAssociatedTokenPda(umi, { mint: GROW_MINT, owner: recipient });

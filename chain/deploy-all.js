@@ -1,6 +1,6 @@
 /*
  * Run the full devnet deploy pipeline (M1 + M2 deliverable):
- *   1. $GROW SPL mint
+ *   1. $GROWTOO SPL mint
  *   2. Seed NFT collection
  *   3. 12 test seed mints
  * Skips steps already recorded in deployed.devnet.json / mints.devnet.json.

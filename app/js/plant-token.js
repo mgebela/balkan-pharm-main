@@ -598,7 +598,7 @@
 
     // Advance a token to the next growth stage and mint the GROW reward.
     // When the token has a real devnet Seed NFT, also files an on-chain
-    // growth request (metadata update + $GROW SPL reward) — see seed-chain.js.
+    // growth request (metadata update + $GROWTOO SPL reward) — see seed-chain.js.
     mintGrowth(id) {
       return chainCall(() => {
         const wallet = readWallet();
@@ -740,7 +740,7 @@
     const stage = GROWTH_STAGES[stageIndex] || GROWTH_STAGES[0];
     if (stageIndex >= GROWTH_STAGES.length - 1) return 'Fully grown · harvest complete';
     const next = GROWTH_STAGES[stageIndex + 1];
-    return 'Next mint → ' + next.label + ' (+' + next.reward + ' $GROW)';
+    return 'Next mint → ' + next.label + ' (+' + next.reward + ' $GROWTOO)';
   }
 
   function renderGrowthGuide(activeStageIndex) {
@@ -816,7 +816,7 @@
   function devnetNotice() {
     return (
       (window.ChainConfig && window.ChainConfig.devnetNotice) ||
-      'Connect a Solana wallet on devnet. Seed NFT minting and $GROW SPL rewards are still simulated locally until M2 on-chain deploy.'
+      'Connect a Solana wallet on devnet. Seed NFT minting and $GROWTOO SPL rewards are still simulated locally until M2 on-chain deploy.'
     );
   }
 
@@ -948,7 +948,7 @@
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
         '<h3>Connect to start</h3>' +
-        '<p>Link a Solana wallet on Devnet to mint seed NFTs and earn $GROW.</p>' +
+        '<p>Link a Solana wallet on Devnet to mint seed NFTs and earn $GROWTOO.</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
         '</div></div>';
@@ -978,11 +978,11 @@
           modifier: 'teal',
         }) +
         M.card({
-          label: '$GROW balance',
+          label: '$GROWTOO balance',
           value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
           meta:
             onchainGrowBalance != null
-              ? M.row('On-chain', onchainGrowBalance.toLocaleString('en-US') + ' $GROW', 'metric-dot--amber')
+              ? M.row('On-chain', onchainGrowBalance.toLocaleString('en-US') + ' $GROWTOO', 'metric-dot--amber')
               : M.row('Rewards', 'Simulated', 'metric-dot--amber'),
           donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
           modifier: 'amber',
@@ -1020,7 +1020,7 @@
       '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
       '</div>' +
       '<div class="adopt-wallet-stats">' +
-      '<div class="adopt-stat"><span class="adopt-stat-value">' + (Number(wallet.growthBalance || 0)) + '</span><span class="adopt-stat-label">$GROW balance</span></div>' +
+      '<div class="adopt-stat"><span class="adopt-stat-value">' + (Number(wallet.growthBalance || 0)) + '</span><span class="adopt-stat-label">$GROWTOO balance</span></div>' +
       '<div class="adopt-stat"><span class="adopt-stat-value">' + seeds + '</span><span class="adopt-stat-label">Plant tokens</span></div>' +
       '<div class="adopt-stat"><span class="adopt-stat-value">' + grown + '</span><span class="adopt-stat-label">Fully grown</span></div>' +
       '</div>' +
@@ -1028,8 +1028,8 @@
       '</div>';
   }
 
-  // --- On-chain $GROW balance (M3) -----------------------------------------
-  // Once the $GROW mint is deployed and configured in chain-config.js, the
+  // --- On-chain $GROWTOO balance (M3) -----------------------------------------
+  // Once the $GROWTOO mint is deployed and configured in chain-config.js, the
   // wallet's real devnet balance is shown next to the simulated one.
 
   let onchainGrowBalance = null;
@@ -1052,7 +1052,7 @@
       })
       .catch(function (err) {
         onchainGrowFetchedFor = '';
-        console.warn('On-chain $GROW balance fetch failed', err);
+        console.warn('On-chain $GROWTOO balance fetch failed', err);
       });
   }
 
@@ -1097,10 +1097,10 @@
         const amt =
           h.type === 'invest'
             ? h.amount
-              ? ' · ' + h.amount + ' $GROW'
+              ? ' · ' + h.amount + ' $GROWTOO'
               : ''
             : h.amount
-              ? ' · +' + h.amount + ' $GROW'
+              ? ' · +' + h.amount + ' $GROWTOO'
               : '';
         const real = realTxForHistoryEntry(token, h);
         const txHtml = real
@@ -1130,7 +1130,7 @@
       '</div>' +
       (token.adopted
         ? '<p class="adopt-token-link">Market investment' +
-          (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString('en-US') + ' $GROW' : '') +
+          (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString('en-US') + ' $GROWTOO' : '') +
           (token.investStatus === 'sale_pending' ? ' · settling…' : '') +
           (token.investStatus === 'sold' ? ' · NFT adopted' : '') +
           '</p>'
@@ -1154,7 +1154,7 @@
       (token.adopted ? 'Invested' : 'Earned') +
       ': <strong>' +
       (token.adopted ? Number(token.investedGrow || 0) : earned) +
-      ' $GROW</strong></span>' +
+      ' $GROWTOO</strong></span>' +
       '<span class="adopt-token-id" title="' + esc(token.id) + '">#' + esc(token.id.slice(-6)) + '</span>' +
       '</div>' +
       '<div class="adopt-token-actions">' +
@@ -2118,7 +2118,7 @@
       const openLabel = adopter ? 'Open garden' : 'Open Tokenise';
       const emptyCta = adopter ? 'Browse market' : 'Mint a seed';
       const emptyCopy = adopter
-        ? 'Adopt your first plant from the market and track growth & $GROW here.'
+        ? 'Adopt your first plant from the market and track growth & $GROWTOO here.'
         : 'Mint your first seed to start the growth cycle and earn rewards at each stage.';
 
       if (!wallet.connected) {
@@ -2147,7 +2147,7 @@
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
-                label: '$GROW balance',
+                label: '$GROWTOO balance',
                 value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
                 meta: M.row('Wallet', esc(shortAddr(wallet.address)), 'metric-dot--teal'),
                 donut: { pct: 0, color: '#f59e0b' },
@@ -2210,7 +2210,7 @@
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
-                label: '$GROW balance',
+                label: '$GROWTOO balance',
                 value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
                 meta: M.row('Top plant', esc(top.name), 'metric-dot--amber'),
                 donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },

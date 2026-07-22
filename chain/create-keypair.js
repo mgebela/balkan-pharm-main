@@ -1,5 +1,5 @@
 /*
- * Generate the devnet authority keypair (mint authority for $GROW + collection).
+ * Generate the devnet authority keypair (mint authority for $GROWTOO + collection).
  * Saved to chain/keys/devnet-authority.json — gitignored, keep a backup.
  */
 import fs from 'node:fs';

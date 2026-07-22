@@ -130,7 +130,7 @@
       '<span class="landing-market-price">' +
       esc(price) +
       '</span>' +
-      '<span class="market-row-unit">$GROW</span>' +
+      '<span class="market-row-unit">$GROWTOO</span>' +
       '</div>' +
       '<a class="btn btn-primary btn-sm market-row-action" href="dnevnik/?mode=signup&type=adopter">Invest</a>' +
       '</article>'
@@ -179,13 +179,13 @@
     var totalValue = askVolume + stakedValue;
 
     if (openEl) openEl.textContent = String(openListings.length);
-    if (volEl) volEl.textContent = formatPrice(askVolume) + ' $GROW';
+    if (volEl) volEl.textContent = formatPrice(askVolume) + ' $GROWTOO';
     if (stakedCountEl) {
       stakedCountEl.textContent =
         String(stakedList.length) + (stakedList.length === 1 ? ' contract' : ' contracts');
     }
-    if (stakedValueEl) stakedValueEl.textContent = formatPrice(stakedValue) + ' $GROW';
-    if (totalEl) totalEl.textContent = formatPrice(totalValue) + ' $GROW';
+    if (stakedValueEl) stakedValueEl.textContent = formatPrice(stakedValue) + ' $GROWTOO';
+    if (totalEl) totalEl.textContent = formatPrice(totalValue) + ' $GROWTOO';
     if (clockEl) clockEl.textContent = 'Last print ' + formatClock(new Date());
   }
 

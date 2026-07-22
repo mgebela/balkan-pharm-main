@@ -153,7 +153,7 @@
 
     /*
      * File an on-chain growth request (M3): the minter updates the seed
-     * NFT's stage metadata and mints the $GROW reward to the holder.
+     * NFT's stage metadata and mints the $GROWTOO reward to the holder.
      * Returns the request id, or null when not signed in.
      */
     async requestGrowthMint(params) {
@@ -200,8 +200,8 @@
     },
 
     /*
-     * On-chain $GROW balance (whole tokens) for a wallet address.
-     * Returns null when the $GROW mint is not deployed/configured yet.
+     * On-chain $GROWTOO balance (whole tokens) for a wallet address.
+     * Returns null when the $GROWTOO mint is not deployed/configured yet.
      */
     async fetchGrowBalance(ownerAddress) {
       const cfg = window.ChainConfig || {};

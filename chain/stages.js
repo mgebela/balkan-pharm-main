@@ -1,6 +1,6 @@
 /*
  * Growth stage table — single source of truth for the chain scripts.
- * Mirrors GROWTH_STAGES in app/js/plant-token.js; rewards are $GROW
+ * Mirrors GROWTH_STAGES in app/js/plant-token.js; rewards are $GROWTOO
  * (whole tokens, converted with growDecimals at mint time).
  */
 export const GROWTH_STAGES = [

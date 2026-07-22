@@ -91,7 +91,7 @@
         'Slow dry in controlled humidity; log harvest and drying notes.',
         'Complete final watering/feeding history for the cycle.',
         'Set stage to susenje to unlock the harvest mint.',
-        'Token tip: harvest stage is the last $GROW milestone on the growth path.',
+        'Token tip: harvest stage is the last $GROWTOO milestone on the growth path.',
       ],
     },
   };
@@ -744,7 +744,7 @@
       if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
       return (
         'Growth minted' +
-        (result && result.reward != null ? ' (+' + result.reward + ' $GROW)' : '') +
+        (result && result.reward != null ? ' (+' + result.reward + ' $GROWTOO)' : '') +
         '.'
       );
     }

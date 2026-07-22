@@ -3,8 +3,14 @@
   "authority": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
   "growMint": "3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp",
   "growDecimals": 9,
-  "growMetadataUri": "https://gateway.irys.xyz/5eCMoztQWoHvMNcqsDvhryFKQ2HuqhJhH2EvdQmS7Wgf",
-  "updatedAt": "2026-07-20T20:45:17.353Z",
+  "growMetadataUri": "https://gateway.irys.xyz/HRU2JpjusGu7WnMhwzmHQnjph4ddhi5iLKoghsampoPc",
+  "updatedAt": "2026-07-22T08:59:21.879Z",
   "seedCollection": "79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa",
-  "seedCollectionMetadataUri": "https://dnevnik.live/token-metadata/seed-collection.json"
+  "seedCollectionMetadataUri": "https://dnevnik.live/token-metadata/seed-collection.json",
+  "growImageUri": "https://gateway.irys.xyz/79zdjjjzGJ3YaeLUaP3QUi6kE7QwV4VRsAAKdvZL9Pm4",
+  "growSiteMetadataUri": "https://dnevnik.live/token-metadata/grow.json",
+  "growName": "GROWTOO",
+  "growSymbol": "GROWTOO",
+  "growMetadataUpdatedAt": "2026-07-22T08:59:21.876Z",
+  "growMetadataUpdateSignature": "rv8HdhMWxJbQoXga9ovnz8fVh69QY39xkoKfBLgs96hPqo7GKqyRZCUhUvfvYpsQas8yeFGbHHq1C1aENnw89jC"
 }

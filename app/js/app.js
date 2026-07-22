@@ -2055,7 +2055,7 @@ function initFirebaseSync() {
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
-            label: '$GROW balance',
+            label: '$GROWTOO balance',
             value: growBalance,
             meta:
               M.row('Plant tokens', tokenCount, 'metric-dot--amber') +

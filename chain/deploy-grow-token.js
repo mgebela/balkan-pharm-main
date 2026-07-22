@@ -1,5 +1,5 @@
 /*
- * Deploy the $GROW SPL fungible token on Solana devnet with Metaplex metadata.
+ * Deploy the $GROWTOO SPL fungible token on Solana devnet with Metaplex metadata.
  * One-time script — records the mint address in deployed.devnet.json.
  */
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
@@ -19,7 +19,7 @@ const DECIMALS = 9;
 
 const existing = readDeployed();
 if (existing.growMint) {
-  console.log('$GROW mint already deployed:', existing.growMint);
+  console.log('$GROWTOO mint already deployed:', existing.growMint);
   console.log('Solscan:', solscanAddress(existing.growMint));
   process.exit(0);
 }
@@ -29,14 +29,14 @@ const authority = umi.eddsa.createKeypairFromSecretKey(loadAuthoritySecret());
 umi.use(keypairIdentity(authority));
 
 console.log('Authority:', authority.publicKey);
-console.log('Deploying $GROW fungible token (decimals:', DECIMALS + ')…');
+console.log('Deploying $GROWTOO fungible token (decimals:', DECIMALS + ')…');
 
 const mint = generateSigner(umi);
 
 await createFungible(umi, {
   mint,
-  name: 'GROW',
-  symbol: 'GROW',
+  name: 'GROWTOO',
+  symbol: 'GROWTOO',
   uri: METADATA_URI,
   sellerFeeBasisPoints: percentAmount(0),
   decimals: DECIMALS,
@@ -48,8 +48,10 @@ const record = writeDeployed({
   growMint: String(mint.publicKey),
   growDecimals: DECIMALS,
   growMetadataUri: METADATA_URI,
+  growName: 'GROWTOO',
+  growSymbol: 'GROWTOO',
 });
 
-console.log('\n$GROW deployed on devnet.');
+console.log('\n$GROWTOO deployed on devnet.');
 console.log('Mint address:', record.growMint);
 console.log('Solscan:', solscanAddress(record.growMint));

@@ -104,12 +104,12 @@
     <ul>
       <li><strong>App (dnevnik.live/app)</strong> — Firebase-authenticated grow journal. Users connect a Solana wallet (multi-wallet or watch-only) and link it to their account by signing a message.</li>
       <li><strong>Seed NFTs</strong> — one per physical seed; strain, batch and linked plant ID live in the metadata (Arweave, uploaded via Irys).</li>
-      <li><strong>$GROW SPL token</strong> — fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
+      <li><strong>$GROWTOO SPL token</strong> — fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
       <li><strong>Mint queue</strong> — mint and settlement requests are filed in Firestore; an authority-operated worker executes them on devnet and writes back transaction signatures. This queue is the devnet stand-in for backend services / on-chain programs planned for mainnet.</li>
     </ul>
     <h3>Trust model (devnet MVP)</h3>
     <p>
-      On devnet, the collection authority also acts as metadata update authority, $GROW mint
+      On devnet, the collection authority also acts as metadata update authority, $GROWTOO mint
       authority and marketplace escrow. Growth-stage updates are only executed by the authority
       after the corresponding journal progress exists, and rewards are computed server-side.
       The mainnet path replaces the queue with an on-chain escrow program and oracle-verified
@@ -152,7 +152,7 @@
       <code>seed</code> to <code>flower</code> at the flowering stage, which is what makes
       seed RWAs and flower-stage tokens two distinct tradeable asset types on the marketplace.
     </p>
-    <h3>$GROW (fungible, SPL)</h3>
+    <h3>$GROWTOO (fungible, SPL)</h3>
     <table>
       <tr><th>Property</th><th>Value</th></tr>
       <tr><td>Standard</td><td>SPL token + Metaplex fungible metadata</td></tr>
@@ -166,14 +166,14 @@
       <li>User documents growth in the journal and advances the plant token a stage in the app.</li>
       <li>The app files a <code>growthMints</code> request referencing the Seed NFT mint address.</li>
       <li>The worker uploads new stage metadata to Arweave (Stage trait + <code>growthHistory</code>) and updates the NFT metadata URI on-chain.</li>
-      <li>The worker mints the stage's $GROW reward to the holder's wallet.</li>
+      <li>The worker mints the stage's $GROWTOO reward to the holder's wallet.</li>
       <li>The app displays the real transaction signatures (Solscan links) in the token's history.</li>
     </ol>
 
     <h2 id="marketplace">4. Marketplace (devnet MVP)</h2>
     <ol class="flow">
-      <li><strong>List:</strong> the seller signs a transfer of the NFT to the marketplace escrow wallet and the listing goes live with a $GROW price.</li>
-      <li><strong>Buy:</strong> the buyer signs a $GROW payment directly to the seller.</li>
+      <li><strong>List:</strong> the seller signs a transfer of the NFT to the marketplace escrow wallet and the listing goes live with a $GROWTOO price.</li>
+      <li><strong>Buy:</strong> the buyer signs a $GROWTOO payment directly to the seller.</li>
       <li><strong>Settle:</strong> the worker verifies the payment on-chain and releases the NFT from escrow to the buyer. Sellers can cancel live listings; the NFT is returned.</li>
     </ol>
     <p>
@@ -190,7 +190,7 @@
       <li>A harvest-stage NFT holder requests redemption in the app (planned M5; devnet mock until then).</li>
       <li>The redemption burns the NFT (or marks it redeemed via a frozen redemption trait), permanently retiring the claim.</li>
       <li>The operator fulfils the physical delivery / payout recorded against the batch code, and publishes the fulfilment reference in the journal.</li>
-      <li>$GROW earned by the plant remains with the holder — only the asset NFT is retired.</li>
+      <li>$GROWTOO earned by the plant remains with the holder — only the asset NFT is retired.</li>
     </ol>
 
     <h2 id="addresses">6. Deployed addresses (devnet)</h2>
