@@ -121,7 +121,15 @@
           searchTransactionHistory: true,
         });
         return res && res.value && res.value[0];
-      } catch {
+      } catch (err) {
+        const msg = String((err && err.message) || err || '');
+        if (/429|Too Many Requests|503|fetch/i.test(msg) && window.SolanaWallet) {
+          try {
+            connection = await window.SolanaWallet.getConnection({ rotate: true });
+          } catch {
+            // keep going
+          }
+        }
         await sleep(400 * (i + 1));
       }
     }

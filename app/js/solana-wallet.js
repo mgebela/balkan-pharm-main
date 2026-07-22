@@ -867,6 +867,9 @@
     },
 
     rpcUrl: function () {
+      if (window.SolanaRpc && typeof SolanaRpc.currentUrl === 'function') {
+        return SolanaRpc.currentUrl();
+      }
       return cfg().rpcUrl;
     },
 
@@ -910,11 +913,21 @@
       };
     },
 
-    getConnection: async function () {
+    getConnection: async function (opts) {
       const web3 = await loadWeb3();
-      const c = cfg();
-      if (!connection) {
-        connection = new web3.Connection(c.rpcUrl, 'confirmed');
+      const forceRotate = !!(opts && opts.rotate);
+      const url =
+        window.SolanaRpc && typeof SolanaRpc.currentUrl === 'function'
+          ? forceRotate
+            ? SolanaRpc.rotateUrl()
+            : SolanaRpc.currentUrl()
+          : cfg().rpcUrl;
+      if (
+        !connection ||
+        forceRotate ||
+        (connection._rpcEndpoint && connection._rpcEndpoint !== url)
+      ) {
+        connection = new web3.Connection(url, 'confirmed');
       }
       return connection;
     },

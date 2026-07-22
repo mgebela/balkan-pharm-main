@@ -1,15 +1,17 @@
 const {onRequest} = require('firebase-functions/v2/https');
 const {onSchedule} = require('firebase-functions/v2/scheduler');
-const {defineSecret} = require('firebase-functions/params');
+const {defineSecret, defineString} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI} = require('@google/genai');
-const {reconcileEscrowPending} = require('./market-reconcile');
+const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 
 initializeApp();
 
 // Set after: firebase functions:secrets:set GEMINI_API_KEY
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+/** Optional dedicated Devnet RPC (Helius/QuickNode). Empty → public failover list. */
+const solanaRpcUrl = defineString('SOLANA_RPC_URL', {default: ''});
 
 const REGION = 'europe-west1';
 
@@ -106,6 +108,7 @@ exports.reconcileMarketEscrow = onRequest(
         return;
       }
       try {
+        setPreferredRpc(solanaRpcUrl.value());
         const result = await reconcileEscrowPending();
         res.json({ok: true, ...result});
       } catch (err) {
@@ -127,6 +130,7 @@ exports.reconcileMarketEscrowSchedule = onSchedule(
       memory: '256MiB',
     },
     async () => {
+      setPreferredRpc(solanaRpcUrl.value());
       const result = await reconcileEscrowPending();
       console.log('scheduled reconcile', result);
     },

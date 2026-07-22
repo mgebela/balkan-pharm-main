@@ -3,14 +3,35 @@
  * once the NFT is confirmed in the escrow wallet.
  *
  * Uses plain Solana JSON-RPC (no @solana/web3.js) so Cloud Functions stay CJS-safe.
+ * Rotates across public Devnet endpoints; prefer SOLANA_RPC_URL when set.
  */
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 
 const ESCROW_ADDRESS = 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
-const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
 const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 /** If NFT never arrives after this, mark failed so the board stays clean. */
 const STALE_MS = 48 * 60 * 60 * 1000;
+
+const PUBLIC_DEVNET_RPCS = [
+  'https://api.devnet.solana.com',
+  'https://rpc.ankr.com/solana_devnet',
+  'https://endpoints.omniatech.io/v1/sol/devnet/public',
+];
+
+let preferredRpc = (process.env.SOLANA_RPC_URL || '').trim();
+
+function setPreferredRpc(url) {
+  preferredRpc = String(url || '').trim();
+}
+
+function rpcEndpoints() {
+  const list = [];
+  if (preferredRpc) list.push(preferredRpc);
+  for (const url of PUBLIC_DEVNET_RPCS) {
+    if (!list.includes(url)) list.push(url);
+  }
+  return list;
+}
 
 function createdMs(data) {
   if (data.createdAt && typeof data.createdAt.toDate === 'function') {
@@ -24,16 +45,39 @@ function createdMs(data) {
 }
 
 async function rpc(method, params) {
-  const res = await fetch(RPC_URL, {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({jsonrpc: '2.0', id: 1, method, params}),
-  });
-  const json = await res.json();
-  if (json.error) {
-    throw new Error(json.error.message || JSON.stringify(json.error));
+  const urls = rpcEndpoints();
+  let lastErr = null;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({jsonrpc: '2.0', id: 1, method, params}),
+      });
+      const json = await res.json();
+      if (res.status === 429 || res.status === 503) {
+        lastErr = new Error(`RPC ${res.status} from ${url}`);
+        continue;
+      }
+      if (json.error) {
+        const msg = json.error.message || JSON.stringify(json.error);
+        if (/429|Too Many Requests|rate limit|capacity/i.test(msg)) {
+          lastErr = new Error(msg);
+          continue;
+        }
+        throw new Error(msg);
+      }
+      return json.result;
+    } catch (err) {
+      lastErr = err;
+      const msg = String((err && err.message) || err);
+      if (/429|Too Many|fetch failed|ECONNRESET|ETIMEDOUT|503/i.test(msg)) {
+        continue;
+      }
+      throw err;
+    }
   }
-  return json.result;
+  throw lastErr || new Error('All Solana RPC endpoints failed for ' + method);
 }
 
 async function escrowHoldsNft(mintAddress) {
@@ -151,6 +195,7 @@ async function reconcileEscrowPending() {
 
 module.exports = {
   reconcileEscrowPending,
+  setPreferredRpc,
   ESCROW_ADDRESS,
   TOKEN_PROGRAM,
 };

@@ -5,13 +5,20 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { RPC_URL, rpcEndpoints } from './rpc.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export const RPC_URL = process.env.SOLANA_RPC_URL || 'https://api.devnet.solana.com';
+export { RPC_URL, rpcEndpoints };
 export const KEYS_DIR = path.join(__dirname, 'keys');
 export const AUTHORITY_KEY_PATH = path.join(KEYS_DIR, 'devnet-authority.json');
 export const DEPLOYED_PATH = path.join(__dirname, 'deployed.devnet.json');
+
+if (!process.env.SOLANA_RPC_URL) {
+  console.warn(
+    'SOLANA_RPC_URL unset — using public Devnet failover list. Set a Helius/QuickNode URL to avoid 429s.'
+  );
+}
 
 export function loadAuthoritySecret() {
   if (!fs.existsSync(AUTHORITY_KEY_PATH)) {

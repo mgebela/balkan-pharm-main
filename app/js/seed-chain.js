@@ -206,18 +206,25 @@
     async fetchGrowBalance(ownerAddress) {
       const cfg = window.ChainConfig || {};
       if (!cfg.growMint || !ownerAddress) return null;
-      const res = await fetch(cfg.rpcUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getTokenAccountsByOwner',
-          params: [ownerAddress, { mint: cfg.growMint }, { encoding: 'jsonParsed' }],
-        }),
-      });
-      const json = await res.json();
-      const accounts = (json.result && json.result.value) || [];
+      const params = [ownerAddress, { mint: cfg.growMint }, { encoding: 'jsonParsed' }];
+      let accounts = [];
+      if (window.SolanaRpc && typeof SolanaRpc.rpc === 'function') {
+        const result = await SolanaRpc.rpc('getTokenAccountsByOwner', params);
+        accounts = (result && result.value) || [];
+      } else {
+        const res = await fetch(cfg.rpcUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getTokenAccountsByOwner',
+            params: params,
+          }),
+        });
+        const json = await res.json();
+        accounts = (json.result && json.result.value) || [];
+      }
       let total = 0;
       accounts.forEach(function (a) {
         try {

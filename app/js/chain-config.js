@@ -1,6 +1,8 @@
 /*
- * Solana chain config — devnet for Adopt-a-plant (M1).
- * Replace rpcUrl with a dedicated RPC (Helius, QuickNode) for production load.
+ * Solana chain config — Devnet for Adopt-a-plant (M1).
+ *
+ * rpcUrl: preferred endpoint (set to a Helius/QuickNode Devnet URL when you have one).
+ * rpcUrls: public failover list used by SolanaRpc / wallet connection rotation.
  */
 (function () {
   'use strict';
@@ -8,6 +10,11 @@
   window.ChainConfig = {
     cluster: 'devnet',
     rpcUrl: 'https://api.devnet.solana.com',
+    rpcUrls: [
+      'https://rpc.ankr.com/solana_devnet',
+      'https://endpoints.omniatech.io/v1/sol/devnet/public',
+      'https://api.devnet.solana.com',
+    ],
     networkLabel: 'Solana · devnet',
     walletName: 'Solana wallet',
     walletDownloadUrl: 'https://solana.com/solutions/wallets',
@@ -22,7 +29,7 @@
     marketReconcileUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow',
     devnetNotice:
-      'Connect a Solana wallet on devnet. Seed NFTs are minted for real on devnet via the mint queue; $GROWTOO SPL rewards are still simulated locally.',
+      'Connect a Solana wallet on Devnet. Seed NFTs mint via the cloud queue; $GROWTOO rewards settle on-chain.',
     explorerAddress: function (address) {
       return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
     },
