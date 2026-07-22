@@ -1,6 +1,6 @@
 const {onRequest} = require('firebase-functions/v2/https');
 const {onSchedule} = require('firebase-functions/v2/scheduler');
-const {defineSecret, defineString} = require('firebase-functions/params');
+const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI} = require('@google/genai');
@@ -10,10 +10,6 @@ initializeApp();
 
 // Set after: firebase functions:secrets:set GEMINI_API_KEY
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
-/** Preferred Devnet RPC. Override with a Helius/QuickNode URL when available. */
-const solanaRpcUrl = defineString('SOLANA_RPC_URL', {
-  default: 'https://api.devnet.solana.com',
-});
 
 const REGION = 'europe-west1';
 
@@ -110,7 +106,8 @@ exports.reconcileMarketEscrow = onRequest(
         return;
       }
       try {
-        setPreferredRpc(solanaRpcUrl.value());
+        // Optional: set Cloud Run env SOLANA_RPC_URL to a Helius/QuickNode Devnet URL.
+        setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         const result = await reconcileEscrowPending();
         res.json({ok: true, ...result});
       } catch (err) {
@@ -132,7 +129,7 @@ exports.reconcileMarketEscrowSchedule = onSchedule(
       memory: '256MiB',
     },
     async () => {
-      setPreferredRpc(solanaRpcUrl.value());
+      setPreferredRpc(process.env.SOLANA_RPC_URL || '');
       const result = await reconcileEscrowPending();
       console.log('scheduled reconcile', result);
     },
