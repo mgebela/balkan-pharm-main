@@ -14,6 +14,8 @@
   let unsubscribe = null;
   let watchedUid = '';
   let busy = false;
+  let reconcileTimer = null;
+  let lastReconcileAt = 0;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => {
@@ -80,11 +82,53 @@
           listings = next;
           syncMyInvestments();
           emit();
+          maybeRequestEscrowReconcile(next);
         },
         function (err) {
           console.warn('marketListings watch failed', err);
         }
       );
+  }
+
+  /**
+   * If any listing is stuck in escrow_pending, ping the Cloud Function that
+   * activates it once the NFT is confirmed in escrow. Debounced so we do not
+   * hammer RPC while the grower waits on the market screen.
+   */
+  function maybeRequestEscrowReconcile(rows) {
+    const pending = (rows || []).filter(function (l) {
+      return l && l.status === 'escrow_pending';
+    });
+    if (!pending.length) return;
+
+    const url = cfg().marketReconcileUrl;
+    if (!url) return;
+
+    const now = Date.now();
+    if (now - lastReconcileAt < 45000) return;
+
+    if (reconcileTimer) clearTimeout(reconcileTimer);
+    reconcileTimer = setTimeout(function () {
+      lastReconcileAt = Date.now();
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: 'app-market', count: pending.length }),
+      })
+        .then(function (res) {
+          return res.json().catch(function () {
+            return null;
+          });
+        })
+        .then(function (data) {
+          if (data && data.activated > 0) {
+            console.info('market escrow reconcile activated', data.activated);
+          }
+        })
+        .catch(function (err) {
+          console.warn('market escrow reconcile ping failed', err);
+        });
+    }, 1500);
   }
 
   function emit() {
@@ -296,7 +340,7 @@
   // --- UI --------------------------------------------------------------------
 
   const STATUS_LABELS = {
-    escrow_pending: 'Escrow confirming…',
+    escrow_pending: 'Activating escrow…',
     active: 'Open for investment',
     sale_pending: 'Investment settling…',
     cancel_requested: 'Cancelling…',

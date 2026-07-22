@@ -1,0 +1,31 @@
+name: Reconcile market escrow
+
+# Backup for Cloud Scheduler: activate escrow_pending listings once the NFT
+# is confirmed in the escrow wallet (no local market:queue required).
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping reconcileMarketEscrow
+        run: |
+          set -euo pipefail
+          URL="${{ secrets.MARKET_RECONCILE_URL }}"
+          if [ -z "$URL" ]; then
+            URL="https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow"
+          fi
+          echo "POST $URL"
+          curl -sfS -X POST "$URL" \
+            -H 'Content-Type: application/json' \
+            -d '{"source":"github-actions"}' \
+            | tee /tmp/reconcile.json
+          python3 - <<'PY'
+          import json
+          data = json.load(open('/tmp/reconcile.json'))
+          assert data.get('ok') is True, data
+          print('activated=', data.get('activated'), 'checked=', data.get('checked'))
+          PY

@@ -1,8 +1,10 @@
 const {onRequest} = require('firebase-functions/v2/https');
+const {onSchedule} = require('firebase-functions/v2/scheduler');
 const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI} = require('@google/genai');
+const {reconcileEscrowPending} = require('./market-reconcile');
 
 initializeApp();
 
@@ -59,6 +61,52 @@ Rules:
 exports.healthCheck = onRequest({region: REGION, invoker: 'public'}, (req, res) => {
   res.json({ok: true, service: 'dnevnik-live-functions'});
 });
+
+/**
+ * Activate escrow_pending listings once the NFT is confirmed in escrow.
+ * Safe to call repeatedly (idempotent). Used by:
+ *   - Cloud Scheduler (every 5 minutes)
+ *   - GitHub Actions cron
+ *   - App market view auto-ping
+ *
+ * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow
+ */
+exports.reconcileMarketEscrow = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 120,
+      memory: '256MiB',
+      maxInstances: 2,
+    },
+    async (req, res) => {
+      try {
+        const result = await reconcileEscrowPending();
+        res.json({ok: true, ...result});
+      } catch (err) {
+        console.error('reconcileMarketEscrow', err);
+        res.status(500).json({ok: false, error: (err && err.message) || 'reconcile failed'});
+      }
+    },
+);
+
+/**
+ * Scheduled backup so listings never sit in "Escrow confirming…" for hours
+ * when the NFT already landed in the escrow wallet.
+ */
+exports.reconcileMarketEscrowSchedule = onSchedule(
+    {
+      schedule: 'every 5 minutes',
+      region: REGION,
+      timeoutSeconds: 120,
+      memory: '256MiB',
+    },
+    async () => {
+      const result = await reconcileEscrowPending();
+      console.log('scheduled reconcile', result);
+    },
+);
 
 /**
  * Analyze 1–2 JPEG frames from a grow video and return a text report.

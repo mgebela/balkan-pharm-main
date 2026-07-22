@@ -23,7 +23,7 @@
 
   var STATUS_LABELS = {
     active: 'Open',
-    escrow_pending: 'Confirming',
+    escrow_pending: 'Activating',
     sale_pending: 'Settling',
   };
 

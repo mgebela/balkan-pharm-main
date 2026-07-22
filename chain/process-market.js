@@ -249,7 +249,19 @@ const HANDLERS = {
 async function processPending() {
   for (const [status, handler] of Object.entries(HANDLERS)) {
     const snap = await db.collection('marketListings').where('status', '==', status).get();
+    if (snap.size) {
+      console.log(`… ${status}: ${snap.size} listing(s)`);
+    }
     for (const doc of snap.docs) {
+      const data = doc.data() || {};
+      const created = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : null;
+      const ageMin = created ? Math.round((Date.now() - created.getTime()) / 60000) : null;
+      if (ageMin != null && ageMin >= 30) {
+        console.warn(
+          `⚠ ${data.name || doc.id} has been ${status} for ~${ageMin} min` +
+            ' — Cloud Function reconcileMarketEscrow should pick this up if NFT is in escrow.'
+        );
+      }
       await handler(doc);
     }
   }

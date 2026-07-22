@@ -231,6 +231,9 @@ service cloud.firestore {
   // Seller escrows the NFT to the authority wallet, buyer pays $GROW to
   // the seller; the settlement script verifies both on-chain and moves
   // the listing through escrow_pending → active → sale_pending → sold.
+  // Cloud Function reconcileMarketEscrow auto-activates escrow_pending when
+  // the NFT is confirmed in the escrow wallet (so local market:queue is not
+  // required for that step).
 
   match /marketListings/{listingId} {
     // Public browse: landing page and signed-in market share the same board.
