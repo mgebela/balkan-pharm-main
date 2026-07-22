@@ -3,3 +3,12 @@ functions/node_modules/
 .DS_Store
 *.local
 app/dev-preview.html
+
+# Secrets / local env (RPC keys, service accounts)
+.env
+.env.*
+!.env.example
+chain/.env
+chain/keys/
+functions/.env
+functions/.env.*
