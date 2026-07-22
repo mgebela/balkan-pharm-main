@@ -11,9 +11,9 @@
     sale_pending: true,
   };
 
+  /** Investable / ask volume — only fully active listings. */
   var ASK_STATUSES = {
     active: true,
-    escrow_pending: true,
   };
 
   var STAKED_STATUSES = {
@@ -91,6 +91,9 @@
     var price = formatPrice(listing.priceGrow);
     var sym = symbolFrom(listing);
     var delay = Math.min(index * 45, 360);
+    var canInvest = listing.status === 'active';
+    var actionLabel = canInvest ? 'Invest' : status || 'View';
+    var actionClass = canInvest ? 'btn btn-primary btn-sm market-row-action' : 'btn btn-ghost btn-sm market-row-action';
 
     return (
       '<article class="landing-market-card market-row" style="--row-delay:' +
@@ -132,7 +135,11 @@
       '</span>' +
       '<span class="market-row-unit">$GROWTOO</span>' +
       '</div>' +
-      '<a class="btn btn-primary btn-sm market-row-action" href="dnevnik/?mode=signup&type=adopter">Invest</a>' +
+      '<a class="' +
+      actionClass +
+      '" href="dnevnik/?mode=signup&type=adopter">' +
+      esc(actionLabel) +
+      '</a>' +
       '</article>'
     );
   }
@@ -178,7 +185,7 @@
     var stakedValue = sumPrice(stakedList);
     var totalValue = askVolume + stakedValue;
 
-    if (openEl) openEl.textContent = String(openListings.length);
+    if (openEl) openEl.textContent = String(askList.length);
     if (volEl) volEl.textContent = formatPrice(askVolume) + ' $GROWTOO';
     if (stakedCountEl) {
       stakedCountEl.textContent =

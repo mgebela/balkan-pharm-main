@@ -232,7 +232,7 @@
       '<div class="market-stuck-inner">' +
       '<div class="market-stuck-copy">' +
       '<strong>Settlement pending</strong>' +
-      '<p>Cloud queues retry every few minutes. Escrow activation is automatic; buys/cancels settle via the market worker (GitHub Actions or local <code>market:queue</code>).</p>' +
+      '<p>Escrow activation retries automatically. Buys and cancels settle via the cloud market queue (~every 5 min). Retry now only re-checks escrow; it does not settle payments.</p>' +
       '<ul>' +
       parts.join('') +
       '</ul>' +
@@ -434,14 +434,56 @@
     if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in RWAs.');
 
     const SW = await ensureSigningWallet('invest ($GROWTOO payment)');
+    const ref = firebase.firestore().collection('marketListings').doc(listing.id);
+    const reservationId = 'pending-' + user.uid.slice(0, 8) + '-' + Date.now();
 
-    const paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
+    // Reserve before paying so a second buyer cannot also send $GROWTOO.
+    await firebase.firestore().runTransaction(async function (tx) {
+      const snap = await tx.get(ref);
+      if (!snap.exists) throw new Error('Offer no longer exists.');
+      const data = snap.data() || {};
+      if (data.status !== 'active') {
+        throw new Error('This offer is no longer open for investment.');
+      }
+      tx.update(ref, {
+        status: 'sale_pending',
+        buyerUid: user.uid,
+        buyerPubkey: SW.getPublicKey(),
+        paymentSignature: reservationId,
+        investedAt: new Date().toISOString(),
+      });
+    });
 
-    await firebase.firestore().collection('marketListings').doc(listing.id).update({
-      status: 'sale_pending',
-      buyerUid: user.uid,
-      buyerPubkey: SW.getPublicKey(),
-      paymentSignature,
+    let paymentSignature = null;
+    try {
+      paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
+    } catch (err) {
+      // Confirm timeout after broadcast still includes the signature — recover it.
+      const recovered =
+        (err && err.signature) ||
+        (String((err && err.message) || '').match(
+          /Signature:\s*([1-9A-HJ-NP-Za-km-z]{64,100})/
+        ) || [])[1];
+      if (recovered) {
+        paymentSignature = recovered;
+      } else {
+        try {
+          await ref.update({
+            status: 'active',
+            buyerUid: firebase.firestore.FieldValue.delete(),
+            buyerPubkey: firebase.firestore.FieldValue.delete(),
+            paymentSignature: firebase.firestore.FieldValue.delete(),
+            investedAt: firebase.firestore.FieldValue.delete(),
+          });
+        } catch (releaseErr) {
+          console.warn('Failed to release invest reservation', releaseErr);
+        }
+        throw err;
+      }
+    }
+
+    await ref.update({
+      paymentSignature: paymentSignature,
       investedAt: new Date().toISOString(),
     });
 

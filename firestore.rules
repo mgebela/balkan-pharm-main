@@ -269,12 +269,50 @@ service cloud.firestore {
           || request.resource.data.investedAt is string
         )
       )
+      // Buyer attaches the real payment signature after a pre-pay reservation.
+      || (
+        resource.data.status == 'sale_pending'
+        && resource.data.buyerUid == request.auth.uid
+        && request.resource.data.status == 'sale_pending'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['paymentSignature', 'investedAt'])
+        && resource.data.paymentSignature is string
+        && resource.data.paymentSignature.size() >= 8
+        && resource.data.paymentSignature[0:8] == 'pending-'
+        && request.resource.data.paymentSignature is string
+        && request.resource.data.paymentSignature.size() > 0
+        && request.resource.data.paymentSignature[0:8] != 'pending-'
+        && (
+          !('investedAt' in request.resource.data)
+          || request.resource.data.investedAt is string
+        )
+      )
+      // Buyer releases an unpaid reservation (pay failed / abandoned).
+      || (
+        resource.data.status == 'sale_pending'
+        && resource.data.buyerUid == request.auth.uid
+        && request.resource.data.status == 'active'
+        && resource.data.paymentSignature is string
+        && resource.data.paymentSignature.size() >= 8
+        && resource.data.paymentSignature[0:8] == 'pending-'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'buyerUid', 'buyerPubkey', 'paymentSignature', 'investedAt'])
+        && !('buyerUid' in request.resource.data)
+        && !('buyerPubkey' in request.resource.data)
+        && !('paymentSignature' in request.resource.data)
+        && !('investedAt' in request.resource.data)
+      )
       // …or the seller requests a cancel while the listing is live.
       || (
         resource.data.uid == request.auth.uid
         && resource.data.status == 'active'
         && request.resource.data.status == 'cancel_requested'
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'cancelRequestedAt'])
+        && (
+          !('cancelRequestedAt' in request.resource.data)
+          || request.resource.data.cancelRequestedAt is string
+        )
       )
     );
 

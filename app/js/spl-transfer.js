@@ -105,11 +105,13 @@
   }
 
   function friendlyConfirmTimeoutError(signature) {
-    return new Error(
+    const err = new Error(
       'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: ' +
         signature +
         '. Refresh and check whether the offer/NFT already moved before trying again.'
     );
+    err.signature = signature;
+    return err;
   }
 
   async function readSignatureStatus(connection, signature) {

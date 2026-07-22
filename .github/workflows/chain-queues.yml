@@ -39,6 +39,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           SOLANA_AUTHORITY_KEY_JSON: ${{ secrets.SOLANA_AUTHORITY_KEY_JSON }}
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
         run: |
           set -euo pipefail
           if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ] || [ -z "${SOLANA_AUTHORITY_KEY_JSON:-}" ]; then
@@ -55,6 +56,9 @@ jobs:
               json.load(open(path))
               print('ok', path)
           PY
+          if [ -z "${SOLANA_RPC_URL:-}" ]; then
+            echo "::warning::SOLANA_RPC_URL secret is empty — public Devnet RPC will 429 under load. Add a Helius/QuickNode URL."
+          fi
 
       - name: Run mint queue
         working-directory: chain
@@ -62,7 +66,6 @@ jobs:
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
           QUEUE_WORKER_ID: github-actions
         run: npm run mint:queue
-        continue-on-error: true
 
       - name: Run grow queue
         working-directory: chain
@@ -70,7 +73,6 @@ jobs:
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
           QUEUE_WORKER_ID: github-actions
         run: npm run grow:queue
-        continue-on-error: true
 
       - name: Run market queue
         working-directory: chain

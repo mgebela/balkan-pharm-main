@@ -31,8 +31,11 @@ import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
 import { RPC_URL, readDeployed } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
+import { isRetryableChainError } from './retryable.js';
 
 const db = initFirestore();
+/** Unpaid invest reservations older than this are released back to active. */
+const RESERVATION_TTL_MS = 15 * 60 * 1000;
 const umi = createMintClient().use(mplToolbox());
 const connection = new Connection(RPC_URL, 'confirmed');
 const watch = process.argv.includes('--watch');
@@ -45,9 +48,16 @@ if (!deployed.growMint) {
 const GROW_MINT = deployed.growMint;
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
 const ESCROW = String(umi.identity.publicKey);
+const EXPECTED_ESCROW = 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
 
 console.log('Escrow (authority):', ESCROW);
 console.log('Worker:', workerId());
+if (ESCROW !== EXPECTED_ESCROW) {
+  console.error(
+    `Authority key ${ESCROW} does not match app escrow ${EXPECTED_ESCROW}. Refusing to settle.`
+  );
+  process.exit(1);
+}
 
 async function escrowHoldsNft(mintAddress) {
   const accounts = await connection.getParsedTokenAccountsByOwner(new PublicKey(ESCROW), {
@@ -61,8 +71,9 @@ async function escrowHoldsNft(mintAddress) {
 /*
  * Verify the buyer's $GROWTOO payment: the referenced transaction must be
  * confirmed and increase the seller's $GROWTOO balance by at least the price.
+ * When buyerPubkey is known, also require that buyer’s $GROWTOO decreased.
  */
-async function verifyGrowPayment(signature, sellerPubkey, priceGrow) {
+async function verifyGrowPayment(signature, sellerPubkey, priceGrow, buyerPubkey) {
   const tx = await connection.getParsedTransaction(signature, {
     maxSupportedTransactionVersion: 0,
   });
@@ -83,6 +94,22 @@ async function verifyGrowPayment(signature, sellerPubkey, priceGrow) {
     throw new Error(
       `Payment too low: seller received ${received} base units, listing requires ${required}.`
     );
+  }
+
+  if (buyerPubkey) {
+    const preBuyer = (tx.meta.preTokenBalances || []).filter(
+      (b) => b.mint === GROW_MINT && b.owner === buyerPubkey
+    );
+    const postBuyer = (tx.meta.postTokenBalances || []).filter(
+      (b) => b.mint === GROW_MINT && b.owner === buyerPubkey
+    );
+    const preB = preBuyer.reduce((s, b) => s + BigInt(b.uiTokenAmount.amount), 0n);
+    const postB = postBuyer.reduce((s, b) => s + BigInt(b.uiTokenAmount.amount), 0n);
+    if (preB - postB < required) {
+      throw new Error(
+        'Payment does not debit the claimed buyer wallet by the listing price.'
+      );
+    }
   }
 }
 
@@ -167,9 +194,9 @@ async function transferNftFromEscrow(mintAddress, destinationPubkey) {
 
 async function fail(doc, label, err) {
   console.error(`✘ ${label}: ${err.message}`);
-  // Don't permanently fail on RPC confirm timeouts — leave pending for retry.
   const msg = String(err && err.message ? err.message : err);
-  if (/block height exceeded|has expired|429|Too Many Requests/i.test(msg)) {
+  // Don't permanently fail on RPC/confirm flakes — leave pending for retry.
+  if (isRetryableChainError(err)) {
     await doc.ref.update({
       lastError: msg,
       lastErrorAt: new Date().toISOString(),
@@ -182,6 +209,30 @@ async function fail(doc, label, err) {
     error: msg,
     failedAt: new Date().toISOString(),
   });
+}
+
+function statusEnteredAt(data, status) {
+  if (status === 'sale_pending') return data.investedAt || data.createdAt;
+  if (status === 'cancel_requested') return data.cancelRequestedAt || data.updatedAt || data.createdAt;
+  if (status === 'escrow_pending') return data.createdAt;
+  return data.activatedAt || data.createdAt;
+}
+
+function ageMinutes(raw) {
+  if (!raw) return null;
+  let ms = null;
+  if (typeof raw.toDate === 'function') ms = raw.toDate().getTime();
+  else {
+    const t = Date.parse(raw);
+    if (Number.isFinite(t)) ms = t;
+  }
+  if (ms == null) return null;
+  return Math.round((Date.now() - ms) / 60000);
+}
+
+function isPendingPaymentReservation(data) {
+  const sig = String(data.paymentSignature || '');
+  return sig.startsWith('pending-');
 }
 
 async function processEscrowPending(doc) {
@@ -222,7 +273,33 @@ async function processSalePending(doc) {
     if (!data.buyerPubkey || !data.paymentSignature) {
       throw new Error('Sale is missing buyerPubkey or paymentSignature.');
     }
-    await verifyGrowPayment(data.paymentSignature, data.sellerPubkey, data.priceGrow);
+
+    // Pre-pay reservation: wait for the buyer to attach a real signature, or release.
+    if (isPendingPaymentReservation(data)) {
+      const ageMin = ageMinutes(statusEnteredAt(data, 'sale_pending'));
+      if (ageMin != null && ageMin * 60000 >= RESERVATION_TTL_MS) {
+        await doc.ref.update({
+          status: 'active',
+          buyerUid: FieldValue.delete(),
+          buyerPubkey: FieldValue.delete(),
+          paymentSignature: FieldValue.delete(),
+          investedAt: FieldValue.delete(),
+          reservationExpiredAt: new Date().toISOString(),
+          lastError: FieldValue.delete(),
+        });
+        console.warn(`… ${label}: unpaid reservation expired, listing reopened`);
+      } else {
+        console.log(`… ${label}: waiting for payment signature`);
+      }
+      return;
+    }
+
+    await verifyGrowPayment(
+      data.paymentSignature,
+      data.sellerPubkey,
+      data.priceGrow,
+      data.buyerPubkey
+    );
     const transferSignature = await transferNftFromEscrow(data.mintAddress, data.buyerPubkey);
     await doc.ref.update({
       status: 'sold',
@@ -269,6 +346,21 @@ const HANDLERS = {
   cancel_requested: processCancelRequested,
 };
 
+const inFlight = new Set();
+
+async function runHandler(doc) {
+  const status = doc.data() && doc.data().status;
+  const handler = HANDLERS[status];
+  if (!handler) return;
+  if (inFlight.has(doc.id)) return;
+  inFlight.add(doc.id);
+  try {
+    await handler(doc);
+  } finally {
+    inFlight.delete(doc.id);
+  }
+}
+
 async function processPending() {
   for (const [status, handler] of Object.entries(HANDLERS)) {
     const snap = await db.collection('marketListings').where('status', '==', status).get();
@@ -277,12 +369,13 @@ async function processPending() {
     }
     for (const doc of snap.docs) {
       const data = doc.data() || {};
-      const created = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate() : null;
-      const ageMin = created ? Math.round((Date.now() - created.getTime()) / 60000) : null;
+      const ageMin = ageMinutes(statusEnteredAt(data, status));
       if (ageMin != null && ageMin >= 30) {
         console.warn(
           `⚠ ${data.name || doc.id} has been ${status} for ~${ageMin} min` +
-            ' — Cloud Function reconcileMarketEscrow should pick this up if NFT is in escrow.'
+            (status === 'escrow_pending'
+              ? ' — Cloud Function reconcileMarketEscrow should pick this up if NFT is in escrow.'
+              : ' — GitHub Actions market:queue / local market:queue should settle this.')
         );
       }
       await handler(doc);
@@ -300,8 +393,7 @@ if (watch) {
     .onSnapshot((snap) => {
       snap.docChanges().forEach((change) => {
         if (change.type === 'added' || change.type === 'modified') {
-          const handler = HANDLERS[change.doc.data().status];
-          if (handler) handler(change.doc);
+          runHandler(change.doc);
         }
       });
     });

@@ -4,14 +4,16 @@
  */
 import { FieldValue } from 'firebase-admin/firestore';
 
-const DEFAULT_LEASE_MS = 5 * 60 * 1000;
+/** Long enough for Arweave + metadata + reward mint under slow public RPC. */
+const DEFAULT_LEASE_MS = 20 * 60 * 1000;
 
 export function workerId() {
   return process.env.QUEUE_WORKER_ID || 'local';
 }
 
 /**
- * Try to claim a doc for processing. Returns false if another worker holds a live lease.
+ * Try to claim a doc for processing. Returns false if any worker holds a live lease
+ * (including the same worker id — prevents --watch re-entry double-processing).
  * @param {FirebaseFirestore.DocumentReference} ref
  * @param {number} [leaseMs]
  */
@@ -24,7 +26,7 @@ export async function tryClaimLease(ref, leaseMs = DEFAULT_LEASE_MS) {
       if (!snap.exists) throw new Error('missing');
       const data = snap.data() || {};
       const until = data.processingUntil ? Date.parse(data.processingUntil) : 0;
-      if (Number.isFinite(until) && until > Date.now() && data.processingBy !== id) {
+      if (Number.isFinite(until) && until > Date.now()) {
         throw new Error('leased');
       }
       tx.update(ref, {
@@ -47,7 +49,7 @@ export async function clearLease(ref) {
       processingUntil: FieldValue.delete(),
       processingBy: FieldValue.delete(),
     });
-  } catch {
-    // ignore
+  } catch (err) {
+    console.warn('clearLease failed', ref.path, err && err.message ? err.message : err);
   }
 }

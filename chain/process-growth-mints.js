@@ -29,6 +29,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMintClient } from './mint-seed-lib.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
+import { isRetryableChainError } from './retryable.js';
 import { buildStageMetadata, toPublicMetadataUri } from './seed-metadata.js';
 import { stageByKey, stageIndexByKey } from './stages.js';
 import { readDeployed } from './common.js';
@@ -183,11 +184,19 @@ async function processDoc(doc) {
     console.log(`  update tx: ${updateSignature}${rewardSignature ? ` · reward tx: ${rewardSignature}` : ''}`);
   } catch (err) {
     console.error(`✘ ${label}: ${err.message}`);
-    await doc.ref.update({
-      status: 'failed',
-      error: String(err.message || err),
-      failedAt: new Date().toISOString(),
-    });
+    if (isRetryableChainError(err)) {
+      await doc.ref.update({
+        lastError: String(err.message || err),
+        lastErrorAt: new Date().toISOString(),
+      });
+      console.warn(`… ${label}: left pending for retry`);
+    } else {
+      await doc.ref.update({
+        status: 'failed',
+        error: String(err.message || err),
+        failedAt: new Date().toISOString(),
+      });
+    }
   } finally {
     await clearLease(doc.ref);
   }

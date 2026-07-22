@@ -1522,7 +1522,7 @@
       );
     }
     if (mint.status === 'failed') {
-      return '<p class="adopt-token-chain adopt-token-chain--failed">⛓ Devnet mint failed — it will be retried.</p>';
+      return '<p class="adopt-token-chain adopt-token-chain--failed">⛓ Devnet mint failed — open the mint request again or ask an admin to reset it (it is not auto-retried).</p>';
     }
     return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint pending…</p>';
   }

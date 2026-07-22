@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "growthMints",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mintAddress", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

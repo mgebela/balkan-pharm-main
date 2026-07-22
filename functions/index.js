@@ -13,6 +13,26 @@ const geminiApiKey = defineSecret('GEMINI_API_KEY');
 
 const REGION = 'europe-west1';
 
+/** Simple in-memory rate limit for the public reconcile HTTP endpoint. */
+const reconcileHits = new Map();
+function allowReconcileRequest(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  const ip =
+    (forwarded && String(forwarded).split(',')[0].trim()) ||
+    req.ip ||
+    'unknown';
+  const now = Date.now();
+  const windowMs = 60 * 1000;
+  const max = 12;
+  let entry = reconcileHits.get(ip);
+  if (!entry || now - entry.start > windowMs) {
+    entry = {start: now, count: 0};
+  }
+  entry.count += 1;
+  reconcileHits.set(ip, entry);
+  return entry.count <= max;
+}
+
 const COACH_SYSTEM = `You are the dnevnik.live Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant that can PROPOSE app actions.
 
 Audience: growers using the dnevnik.live journal who can mint Seed RWAs on Solana (devnet).
@@ -81,6 +101,10 @@ exports.reconcileMarketEscrow = onRequest(
       maxInstances: 2,
     },
     async (req, res) => {
+      if (!allowReconcileRequest(req)) {
+        res.status(429).json({ok: false, error: 'Too many reconcile requests'});
+        return;
+      }
       try {
         const result = await reconcileEscrowPending();
         res.json({ok: true, ...result});

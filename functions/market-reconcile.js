@@ -114,6 +114,10 @@ async function reconcileEscrowPending() {
       }
 
       const age = now - createdMs(data);
+      if (!createdMs(data)) {
+        result.skipped += 1;
+        continue;
+      }
       if (age > STALE_MS) {
         await doc.ref.update({
           status: 'failed',
