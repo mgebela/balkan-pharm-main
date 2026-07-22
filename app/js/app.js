@@ -1138,8 +1138,8 @@ function applyProfileTypeUI(profileType) {
   if (title) {
     title.textContent =
       type === PROFILE_TYPES.adopter
-        ? 'dnevnik.live – Adopt & track'
-        : 'dnevnik.live – Grow journal';
+        ? 'growtoo – Adopt & track'
+        : 'growtoo – Grow journal';
   }
 
   if (window.AdoptPlant && typeof window.AdoptPlant.applyProfileType === 'function') {

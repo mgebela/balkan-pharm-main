@@ -3,22 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign in – dnevnik.live</title>
+  <title>Sign in – growtoo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
   <style>
     :root {
-      --bg: #e4d9c2;
-      --bg-alt: #dccfaf;
-      --surface: rgba(31, 26, 15, 0.05);
-      --text: rgba(31, 46, 34, 0.92);
-      --text-muted: rgba(31, 46, 34, 0.62);
-      --accent: #8e3520;
-      --accent-bright: #b4472b;
-      --border: rgba(31, 46, 34, 0.18);
-      --grower: #2f5d3a;
-      --adopter: #8e3520;
+      --bg: #0a1410;
+      --bg-alt: #0e1a14;
+      --surface: rgba(180, 220, 180, 0.05);
+      --text: rgba(232, 255, 233, 0.92);
+      --text-muted: rgba(190, 220, 190, 0.62);
+      --accent: #b4472b;
+      --accent-bright: #d45a38;
+      --border: rgba(140, 200, 140, 0.16);
+      --grower: #7dff9c;
+      --adopter: #d45a38;
+      --desk-panel: linear-gradient(180deg, rgba(10, 28, 18, 0.94) 0%, rgba(8, 18, 12, 0.98) 100%);
     }
     * { box-sizing: border-box; }
     body {
@@ -28,22 +30,39 @@
       place-items: center;
       padding: 1rem;
       font-family: 'Archivo', sans-serif;
-      background: radial-gradient(900px 500px at 50% -10%, rgba(180,71,43,0.1), transparent), var(--bg);
+      background:
+        radial-gradient(900px 480px at 80% -10%, rgba(180, 71, 43, 0.14) 0%, transparent 55%),
+        radial-gradient(700px 420px at 10% 40%, rgba(60, 140, 80, 0.12) 0%, transparent 50%),
+        linear-gradient(180deg, #07110d 0%, var(--bg) 35%, #08140f 100%);
       color: var(--text);
     }
     .login-card {
       width: 100%;
       max-width: 460px;
-      background: var(--bg-alt);
+      background: var(--desk-panel);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 1.25rem;
-      box-shadow: 0 8px 24px rgba(31, 20, 10, 0.12);
+      border-radius: 12px;
+      padding: 1.35rem 1.25rem;
+      box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+    }
+    .login-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 0.85rem;
+    }
+    .login-brand img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(47, 143, 78, 0.45);
     }
     h1 {
       margin: 0 0 0.35rem;
       font-size: 1.25rem;
       text-align: center;
+      color: #f4fff4;
     }
     .lead {
       margin: 0 0 1rem;
@@ -58,7 +77,8 @@
       margin-bottom: 1rem;
       padding: 0.25rem;
       border-radius: 6px;
-      background: rgba(31, 46, 34, 0.06);
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border);
     }
     .auth-tab {
       border: 0;
@@ -72,9 +92,9 @@
       cursor: pointer;
     }
     .auth-tab.is-active {
-      color: var(--text);
-      background: var(--bg);
-      box-shadow: 0 1px 3px rgba(31, 20, 10, 0.1);
+      color: #f4fff4;
+      background: rgba(120, 200, 130, 0.12);
+      box-shadow: inset 0 0 0 1px rgba(120, 220, 140, 0.25);
     }
     .profile-pick {
       display: grid;
@@ -87,9 +107,9 @@
       gap: 0.2rem;
       text-align: left;
       padding: 0.75rem 0.85rem;
-      border-radius: 6px;
+      border-radius: 8px;
       border: 1.5px solid var(--border);
-      background: var(--bg);
+      background: rgba(0, 12, 6, 0.45);
       color: var(--text);
       font: inherit;
       cursor: pointer;
@@ -104,12 +124,12 @@
       line-height: 1.35;
     }
     .profile-option.is-selected[data-type="grower"] {
-      border-color: var(--grower);
-      background: rgba(47, 93, 58, 0.1);
+      border-color: rgba(120, 220, 140, 0.45);
+      background: rgba(40, 120, 60, 0.18);
     }
     .profile-option.is-selected[data-type="adopter"] {
-      border-color: var(--adopter);
-      background: rgba(142, 53, 32, 0.1);
+      border-color: rgba(255, 160, 120, 0.4);
+      background: rgba(180, 71, 43, 0.18);
     }
     label {
       display: block;
@@ -120,24 +140,24 @@
       width: 100%;
       margin-bottom: 0.85rem;
       padding: 0.65rem 0.75rem;
-      border-radius: 4px;
+      border-radius: 6px;
       border: 1px solid var(--border);
-      background: var(--bg);
+      background: rgba(0, 12, 6, 0.55);
       color: var(--text);
       font-family: inherit;
     }
     input:focus {
       outline: none;
-      border-color: var(--accent);
+      border-color: #7dff9c;
     }
     button[type="submit"] {
       width: 100%;
-      border: 0;
-      border-radius: 4px;
+      border: 1px solid rgba(255, 180, 140, 0.28);
+      border-radius: 6px;
       padding: 0.7rem 0.9rem;
       font-weight: 700;
       color: #f7eee1;
-      background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+      background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
       cursor: pointer;
     }
     button[type="submit"]:disabled {
@@ -149,7 +169,7 @@
       text-align: center;
       font-size: 0.9rem;
     }
-    .back-link a { color: var(--accent-bright); text-decoration: none; }
+    .back-link a { color: #b8ffc8; text-decoration: none; }
     #login-status {
       margin-top: 0.75rem;
       font-size: 0.85rem;
@@ -160,7 +180,10 @@
 </head>
 <body>
   <form class="login-card" id="login-form">
-    <h1 id="auth-title">Sign in to dnevnik.live</h1>
+    <div class="login-brand">
+      <img src="../images/growtoo-logo.png?v=20260722b" alt="" width="64" height="64" />
+    </div>
+    <h1 id="auth-title">Sign in to growtoo</h1>
     <p class="lead" id="auth-lead">Choose how you use the app, then continue with email.</p>
 
     <div class="auth-tabs" role="tablist" aria-label="Auth mode">
@@ -248,7 +271,7 @@
         document.getElementById('password').autocomplete = 'new-password';
         if (!profileType) profileType = 'grower';
       } else {
-        titleEl.textContent = 'Sign in to dnevnik.live';
+        titleEl.textContent = 'Sign in to growtoo';
         leadEl.textContent = 'Welcome back. Your Grower or Adopter workspace opens automatically.';
         submitBtn.textContent = 'Sign in';
         document.getElementById('password').autocomplete = 'current-password';

@@ -1,29 +1,29 @@
 :root {
-  /* Field Ledger — kraft paper, chlorophyll ink, rust stamp accent. */
-  --bg: #e4d9c2;
-  --bg-alt: #dccfaf;
-  --surface: rgba(31, 26, 15, 0.045);
-  --green: #1f2e22;
-  --green-light: #4b5c46;
-  --accent: #8e3520;
-  --accent-hover: #6e2a1a;
-  --accent-bright: #b4472b;
-  --accent-warm: #b9862e;
-  --text: rgba(31, 46, 34, 0.92);
-  --text-muted: rgba(31, 46, 34, 0.62);
-  --border: rgba(31, 46, 34, 0.16);
-  --shadow: 0 8px 24px rgba(31, 20, 10, 0.1);
-  --shadow-md: 0 16px 48px rgba(31, 20, 10, 0.14);
+  /* Commodity desk — forest terminal, brass tickers, rust stamps (matches landing). */
+  --bg: #0a1410;
+  --bg-alt: #0e1a14;
+  --surface: rgba(180, 220, 180, 0.05);
+  --green: #9dffb0;
+  --green-light: #7dff9c;
+  --accent: #b4472b;
+  --accent-hover: #8e3520;
+  --accent-bright: #d45a38;
+  --accent-warm: #e8c46a;
+  --text: rgba(232, 255, 233, 0.92);
+  --text-muted: rgba(190, 220, 190, 0.62);
+  --border: rgba(140, 200, 140, 0.16);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 16px 48px rgba(0, 0, 0, 0.45);
   --font: 'Archivo', sans-serif;
   --font-serif: 'Lora', serif;
   --font-mono: 'JetBrains Mono', monospace;
-  /* Trading-style metric panels stay a deliberately dark "stamped ledger box"
-     regardless of the page theme — only their undertone shifts from the old
-     teal-black to a warm ink-umber; the internal white-on-dark rules below
-     this block are contrast against that dark plate, not the page bg. */
-  --metric-panel-bg: rgba(23, 16, 8, 0.72);
-  --metric-panel-border: rgba(180, 71, 43, 0.28);
-  --metric-card-bg: rgba(23, 16, 8, 0.96);
+  --desk-panel: linear-gradient(180deg, rgba(10, 28, 18, 0.92) 0%, rgba(8, 18, 12, 0.96) 100%);
+  --desk-line: rgba(140, 200, 140, 0.14);
+  --card-bg: rgba(180, 220, 180, 0.05);
+  --card-hover: rgba(180, 220, 180, 0.09);
+  --metric-panel-bg: rgba(8, 22, 14, 0.88);
+  --metric-panel-border: rgba(140, 200, 140, 0.22);
+  --metric-card-bg: rgba(6, 18, 12, 0.96);
   --metric-card-border: rgba(255, 255, 255, 0.07);
 }
 
@@ -37,6 +37,10 @@ body.app-loading::before {
   background: var(--bg);
   color: var(--text-muted);
   font-size: 1.2rem;
+  z-index: 999998;
+  opacity: 1;
+  mask-image: none;
+  background-image: none;
 }
 .toolbox-card {
   display: flex;
@@ -133,14 +137,14 @@ body.profile-adopter .bottom-nav > .nav-item.adopter-only {
   text-transform: uppercase;
 }
 .profile-type-badge--grower {
-  color: #1f3d28;
-  background: rgba(47, 93, 58, 0.18);
-  border: 1px solid rgba(47, 93, 58, 0.35);
+  color: #9dffb0;
+  background: rgba(40, 120, 60, 0.28);
+  border: 1px solid rgba(120, 220, 140, 0.3);
 }
 .profile-type-badge--adopter {
-  color: #5c2416;
-  background: rgba(142, 53, 32, 0.14);
-  border: 1px solid rgba(142, 53, 32, 0.35);
+  color: #ffd9c8;
+  background: rgba(180, 71, 43, 0.28);
+  border: 1px solid rgba(255, 160, 120, 0.28);
 }
 .danas-list {
   display: flex;
@@ -492,37 +496,68 @@ html {
 
 body {
   font-family: var(--font);
-  background: var(--bg);
+  background:
+    radial-gradient(900px 480px at 80% -10%, rgba(180, 71, 43, 0.12) 0%, transparent 55%),
+    radial-gradient(700px 420px at 10% 30%, rgba(60, 140, 80, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #07110d 0%, var(--bg) 40%, #08140f 100%);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.28;
+  background-image:
+    linear-gradient(rgba(140, 200, 140, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(140, 200, 140, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 90%);
+}
+
 .app {
   display: flex;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
 /* Sidebar */
 .sidebar {
   width: 240px;
   min-width: 240px;
-  background: var(--bg-alt);
-  border-right: 1px solid rgba(180, 71, 43, 0.35);
+  background: rgba(6, 16, 12, 0.92);
+  border-right: 1px solid var(--desk-line);
   padding: 1.25rem 0;
   box-shadow: none;
+  backdrop-filter: blur(10px);
 }
 
 .sidebar-logo {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  gap: 0.55rem;
   padding: 0 1.25rem;
-  font-weight: 700;
-  font-size: 1.1rem;
-  color: var(--accent-bright);
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #f4fff4;
   text-decoration: none;
   margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
+}
+
+.sidebar-logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: block;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgba(47, 143, 78, 0.45);
 }
 
 .sidebar-nav {
@@ -543,14 +578,14 @@ body {
 }
 
 .nav-item:hover {
-  background: var(--surface);
+  background: rgba(120, 200, 130, 0.08);
   color: var(--text);
 }
 
 .nav-item.active {
-  background: var(--surface);
-  color: var(--accent-bright);
-  border-left: 3px solid var(--accent);
+  background: rgba(120, 200, 130, 0.1);
+  color: var(--green);
+  border-left: 3px solid var(--green-light);
   padding-left: calc(1.25rem - 3px);
 }
 
@@ -992,28 +1027,28 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%);
-  color: #06201a;
-  border: 1px solid rgba(31, 46, 34, 0.14);
-  box-shadow: 0 14px 34px rgba(180, 71, 43, 0.18);
+  background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
+  color: #f7eee1;
+  border: 1px solid rgba(255, 180, 140, 0.28);
+  box-shadow: 0 10px 28px rgba(180, 71, 43, 0.28);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(90deg, var(--accent-hover) 0%, var(--accent) 100%);
-  color: #06201a;
+  background: linear-gradient(180deg, #e06848 0%, #a04028 100%);
+  color: #f7eee1;
   transform: translateY(-1px);
-  box-shadow: 0 18px 44px rgba(180, 71, 43, 0.22);
+  box-shadow: 0 14px 34px rgba(180, 71, 43, 0.34);
 }
 
 .btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+  background: rgba(120, 200, 130, 0.06);
+  color: #b8ffc8;
+  border: 1px solid rgba(120, 220, 140, 0.28);
 }
 
 .btn-ghost:hover {
-  background: var(--surface);
-  color: var(--text);
+  background: rgba(120, 200, 130, 0.14);
+  color: #e8ffe9;
 }
 
 .btn-sm {
@@ -3632,12 +3667,12 @@ body.admin-readonly .toolbox-form textarea {
    Design refresh — align app with landing page & pitch deck
    =========================================================== */
 
-/* Subtle background depth (deck-style radial glow) */
+/* Subtle background depth — forest desk (landing-aligned) */
 body:not(.app-loading) {
   background:
-    radial-gradient(900px 500px at 12% -8%, rgba(180, 71, 43, 0.10), transparent 60%),
-    radial-gradient(800px 520px at 100% 0%, rgba(95, 182, 255, 0.07), transparent 55%),
-    var(--bg);
+    radial-gradient(900px 480px at 80% -10%, rgba(180, 71, 43, 0.12) 0%, transparent 55%),
+    radial-gradient(700px 420px at 10% 30%, rgba(60, 140, 80, 0.1) 0%, transparent 50%),
+    linear-gradient(180deg, #07110d 0%, var(--bg) 40%, #08140f 100%);
   background-attachment: fixed;
 }
 
@@ -3672,15 +3707,15 @@ body:not(.app-loading) {
 }
 
 .nav-item:hover {
-  background: rgba(31, 46, 34, 0.05);
+  background: rgba(120, 200, 130, 0.08);
 }
 
 .nav-item.active {
-  background: linear-gradient(90deg, rgba(180, 71, 43, 0.18), rgba(180, 71, 43, 0.04));
-  color: var(--accent-bright);
+  background: linear-gradient(90deg, rgba(120, 200, 130, 0.16), rgba(120, 200, 130, 0.04));
+  color: var(--green);
   border-left: none;
   padding-left: 0.75rem;
-  box-shadow: inset 0 0 0 1px rgba(180, 71, 43, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(120, 220, 140, 0.28);
 }
 
 .nav-item.active .nav-icon {
@@ -3771,11 +3806,11 @@ body:not(.app-loading) {
   opacity: 1;
 }
 
-/* Colorful dashboard cards (cycle deck palette) */
-.dashboard-card:nth-child(4n + 1) { --card-accent: #8e3520; --card-accent-2: #b4472b; }
-.dashboard-card:nth-child(4n + 2) { --card-accent: #3b82f6; --card-accent-2: #5fb6ff; }
-.dashboard-card:nth-child(4n + 3) { --card-accent: #8b5cf6; --card-accent-2: #c79bff; }
-.dashboard-card:nth-child(4n + 4) { --card-accent: #946720; --card-accent-2: #b9862e; }
+/* Colorful dashboard cards (desk palette: rust / chlorophyll / brass) */
+.dashboard-card:nth-child(4n + 1) { --card-accent: #8e3520; --card-accent-2: #d45a38; }
+.dashboard-card:nth-child(4n + 2) { --card-accent: #2f8f4e; --card-accent-2: #7dff9c; }
+.dashboard-card:nth-child(4n + 3) { --card-accent: #b9862e; --card-accent-2: #e8c46a; }
+.dashboard-card:nth-child(4n + 4) { --card-accent: #1f6b38; --card-accent-2: #9dffb0; }
 
 .dashboard-card .value {
   color: var(--card-accent-2, var(--accent-bright));
@@ -3790,20 +3825,21 @@ body:not(.app-loading) {
   opacity: 0.45;
 }
 
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 1) { --card-accent: #8e3520; --card-accent-2: #b4472b; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 2) { --card-accent: #3b82f6; --card-accent-2: #5fb6ff; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 3) { --card-accent: #8b5cf6; --card-accent-2: #c79bff; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 4) { --card-accent: #946720; --card-accent-2: #b9862e; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 5) { --card-accent: #db2777; --card-accent-2: #f472b6; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 6) { --card-accent: #059669; --card-accent-2: #34d399; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 1) { --card-accent: #8e3520; --card-accent-2: #d45a38; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 2) { --card-accent: #2f8f4e; --card-accent-2: #7dff9c; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 3) { --card-accent: #b9862e; --card-accent-2: #e8c46a; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 4) { --card-accent: #1f6b38; --card-accent-2: #9dffb0; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 5) { --card-accent: #a04028; --card-accent-2: #ffb4a0; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 6) { --card-accent: #1f6b38; --card-accent-2: #34d399; }
 
 .toolbox-card-btn:hover {
   box-shadow: var(--shadow-md);
 }
 
-/* Primary button: brighter gradient + lift consistent with landing */
+/* Primary button: desk rust stamp */
 .btn-primary {
-  border: 1px solid rgba(31, 46, 34, 0.18);
+  border: 1px solid rgba(255, 180, 140, 0.28);
+  color: #f7eee1;
 }
 
 /* Recent notes: left accent strip */
@@ -4381,13 +4417,14 @@ body:not(.app-loading) {
   gap: 1rem;
 }
 .market-card {
-  background: rgba(31, 46, 34, 0.04);
-  border: 1px solid rgba(31, 46, 34, 0.08);
-  border-radius: 14px;
+  background: var(--desk-panel);
+  border: 1px solid var(--desk-line);
+  border-radius: 12px;
   padding: 1rem 1.1rem;
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
 }
 .market-card-head {
   display: flex;
@@ -4398,6 +4435,7 @@ body:not(.app-loading) {
 .market-card-name {
   margin: 0;
   font-size: 1.02rem;
+  color: #f4fff4;
 }
 .market-card-meta {
   margin: 0;
@@ -4406,7 +4444,7 @@ body:not(.app-loading) {
   word-break: break-word;
 }
 .market-card-meta a {
-  color: inherit;
+  color: #b8ffc8;
   text-decoration: underline;
 }
 .market-card-foot {
@@ -4415,42 +4453,58 @@ body:not(.app-loading) {
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--desk-line);
 }
 .market-price {
+  font-family: var(--font-mono);
   font-weight: 700;
-  color: #b9862e;
+  color: #7dff9c;
+  letter-spacing: -0.02em;
 }
 .market-asset-badge {
-  font-size: 0.72rem;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(180, 71, 43, 0.12);
-  border: 1px solid rgba(180, 71, 43, 0.35);
-  color: #b4472b;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.45rem;
+  border-radius: 3px;
+  background: rgba(180, 71, 43, 0.28);
+  border: 1px solid rgba(255, 160, 120, 0.25);
+  color: #ffd9c8;
 }
 .market-asset-badge--flower {
-  background: rgba(199, 155, 255, 0.12);
-  border-color: rgba(199, 155, 255, 0.35);
-  color: #c79bff;
+  background: rgba(120, 200, 130, 0.16);
+  border-color: rgba(120, 220, 140, 0.3);
+  color: #b8ffc8;
 }
 .market-status {
-  font-size: 0.72rem;
-  padding: 0.15rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(31, 46, 34, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.45rem;
+  border-radius: 3px;
+  background: rgba(120, 200, 130, 0.1);
   color: var(--text-muted);
+  border: 1px solid var(--desk-line);
 }
 .market-status--active {
-  background: rgba(52, 211, 153, 0.12);
-  color: #34d399;
+  background: rgba(40, 120, 60, 0.28);
+  color: #9dffb0;
+  border-color: rgba(120, 220, 140, 0.28);
 }
 .market-status--sold {
-  background: rgba(96, 165, 250, 0.12);
-  color: #60a5fa;
+  background: rgba(160, 120, 20, 0.22);
+  color: #ffe39a;
+  border-color: rgba(230, 190, 80, 0.28);
 }
 .market-status--failed {
-  background: rgba(248, 113, 113, 0.12);
-  color: #f87171;
+  background: rgba(180, 60, 50, 0.22);
+  color: #ffb4a8;
+  border-color: rgba(255, 140, 120, 0.28);
 }
 .market-card-error {
   margin: 0.3rem 0 0;
@@ -5563,3 +5617,105 @@ body:not(.app-loading) {
   }
 }
 
+
+/* ── Desk theme hardening (align with landing commodity board) ── */
+.view-title {
+  letter-spacing: -0.02em;
+  color: #f4fff4;
+}
+
+.main-header {
+  border-bottom: 1px solid var(--desk-line);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.plant-card,
+.toolbox-card,
+.dashboard-card,
+.token-card,
+.quest-card,
+.panel,
+.card,
+.modal-content,
+.wallet-panel,
+.adopt-card,
+.growlog-entry,
+.ai-coach-panel {
+  background: var(--desk-panel) !important;
+  border-color: var(--desk-line) !important;
+  color: var(--text);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="date"],
+input[type="datetime-local"],
+select,
+textarea,
+.form-control {
+  background: rgba(0, 12, 6, 0.55) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--desk-line) !important;
+  border-radius: 6px;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(190, 220, 190, 0.4);
+}
+
+.modal,
+.modal-backdrop {
+  background: rgba(4, 12, 8, 0.72);
+}
+
+.bottom-nav {
+  background: rgba(6, 16, 12, 0.94) !important;
+  border-top: 1px solid var(--desk-line) !important;
+  backdrop-filter: blur(12px);
+}
+
+.bottom-nav .nav-item.active {
+  color: var(--green) !important;
+}
+
+.nav-item.active .nav-icon {
+  color: var(--green-light);
+}
+
+.btn-primary {
+  color: #f7eee1 !important;
+}
+
+table th {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(190, 220, 190, 0.55);
+  border-bottom-color: var(--desk-line);
+}
+
+table td {
+  border-bottom-color: var(--desk-line);
+}
+
+.market-notice,
+.hint,
+.empty-state,
+.section-lead {
+  color: var(--text-muted);
+}
+
+/* Remap leftover kraft ink washes to chlorophyll desk washes */
+.plant-card,
+.token-list-item,
+.entry-card,
+.list-row {
+  background-image: none;
+}
