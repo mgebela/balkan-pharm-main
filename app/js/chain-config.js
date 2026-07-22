@@ -23,8 +23,15 @@
     growMint: '3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp',
     growDecimals: 9,
     seedCollection: '79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa',
-    // Authority wallet; also acts as the marketplace escrow on devnet.
-    escrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
+    // Role-split wallets (Devnet):
+    // mintAuthority — $GROWTOO + seed collection authority
+    // escrowAddress — holds listed NFTs (new listings)
+    // feePayerAddress — pays market settlement fees
+    // legacyEscrowAddress — pre-split vault; still settled for open listings
+    mintAuthority: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
+    escrowAddress: 'EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD',
+    feePayerAddress: 'Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975',
+    legacyEscrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
     // Activates escrow_pending → active when NFT is already in escrow.
     marketReconcileUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow',

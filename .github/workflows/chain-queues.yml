@@ -3,8 +3,10 @@ name: Chain queues (mint · grow · market)
 # Cloud-hosted settlement so listings/mints don't depend on a local laptop.
 # Required repo secrets:
 #   FIREBASE_SERVICE_ACCOUNT_JSON  — contents of chain/keys/firebase-service-account.json
-#   SOLANA_AUTHORITY_KEY_JSON      — contents of chain/keys/devnet-authority.json
-# Optional:
+#   SOLANA_AUTHORITY_KEY_JSON      — mint authority (keys/devnet-authority.json)
+# Optional (role split — fall back to authority if unset):
+#   SOLANA_ESCROW_KEY_JSON         — NFT escrow vault (keys/devnet-escrow.json)
+#   SOLANA_FEE_PAYER_KEY_JSON      — market fee payer (keys/devnet-fee-payer.json)
 #   SOLANA_RPC_URL                 — dedicated Devnet RPC (Helius/QuickNode)
 on:
   schedule:
@@ -39,6 +41,8 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           SOLANA_AUTHORITY_KEY_JSON: ${{ secrets.SOLANA_AUTHORITY_KEY_JSON }}
+          SOLANA_ESCROW_KEY_JSON: ${{ secrets.SOLANA_ESCROW_KEY_JSON }}
+          SOLANA_FEE_PAYER_KEY_JSON: ${{ secrets.SOLANA_FEE_PAYER_KEY_JSON }}
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
         run: |
           set -euo pipefail
@@ -50,14 +54,31 @@ jobs:
           mkdir -p keys
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > keys/firebase-service-account.json
           printf '%s' "$SOLANA_AUTHORITY_KEY_JSON" > keys/devnet-authority.json
+          if [ -n "${SOLANA_ESCROW_KEY_JSON:-}" ]; then
+            printf '%s' "$SOLANA_ESCROW_KEY_JSON" > keys/devnet-escrow.json
+          else
+            cp keys/devnet-authority.json keys/devnet-escrow.json
+            echo "::warning::SOLANA_ESCROW_KEY_JSON unset — using mint authority as escrow."
+          fi
+          if [ -n "${SOLANA_FEE_PAYER_KEY_JSON:-}" ]; then
+            printf '%s' "$SOLANA_FEE_PAYER_KEY_JSON" > keys/devnet-fee-payer.json
+          else
+            cp keys/devnet-authority.json keys/devnet-fee-payer.json
+            echo "::warning::SOLANA_FEE_PAYER_KEY_JSON unset — using mint authority as fee payer."
+          fi
           python3 - <<'PY'
           import json
-          for path in ('keys/firebase-service-account.json', 'keys/devnet-authority.json'):
+          for path in (
+              'keys/firebase-service-account.json',
+              'keys/devnet-authority.json',
+              'keys/devnet-escrow.json',
+              'keys/devnet-fee-payer.json',
+          ):
               json.load(open(path))
               print('ok', path)
           PY
           if [ -z "${SOLANA_RPC_URL:-}" ]; then
-            echo "::warning::SOLANA_RPC_URL secret is empty — public Devnet RPC will 429 under load. Add a Helius/QuickNode URL."
+            echo "::warning::SOLANA_RPC_URL secret is empty — public Devnet RPC will 429 under load."
           fi
 
       - name: Run mint queue
@@ -84,4 +105,4 @@ jobs:
       - name: Scrub keys
         if: always()
         working-directory: chain
-        run: rm -f keys/firebase-service-account.json keys/devnet-authority.json
+        run: rm -f keys/firebase-service-account.json keys/devnet-authority.json keys/devnet-escrow.json keys/devnet-fee-payer.json

@@ -5,6 +5,7 @@
   "description": "Solana devnet deploy scripts for growtoo ($GROWTOO SPL token + seed NFT collection)",
   "scripts": {
     "create-keypair": "node create-keypair.js",
+    "create-role-keypairs": "node create-role-keypairs.js",
     "airdrop": "node airdrop.js",
     "firebase:setup": "node firebase-setup.js",
     "deploy:grow": "node deploy-grow-token.js",

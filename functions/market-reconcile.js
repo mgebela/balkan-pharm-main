@@ -7,7 +7,12 @@
  */
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 
-const ESCROW_ADDRESS = 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
+const ESCROW_ADDRESS =
+  process.env.MARKET_ESCROW_ADDRESS ||
+  'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
+const LEGACY_ESCROW_ADDRESS =
+  process.env.MARKET_LEGACY_ESCROW_ADDRESS ||
+  'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
 const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 /** If NFT never arrives after this, mark failed so the board stays clean. */
 const STALE_MS = 48 * 60 * 60 * 1000;
@@ -81,23 +86,31 @@ async function rpc(method, params) {
 }
 
 async function escrowHoldsNft(mintAddress) {
-  const result = await rpc('getTokenAccountsByOwner', [
-    ESCROW_ADDRESS,
-    {mint: mintAddress},
-    {encoding: 'jsonParsed', commitment: 'confirmed'},
-  ]);
-  const values = (result && result.value) || [];
-  return values.some((a) => {
-    const amount =
-      a &&
-      a.account &&
-      a.account.data &&
-      a.account.data.parsed &&
-      a.account.data.parsed.info &&
-      a.account.data.parsed.info.tokenAmount &&
-      a.account.data.parsed.info.tokenAmount.amount;
-    return Number(amount || 0) >= 1;
-  });
+  const owners = [ESCROW_ADDRESS];
+  if (LEGACY_ESCROW_ADDRESS && LEGACY_ESCROW_ADDRESS !== ESCROW_ADDRESS) {
+    owners.push(LEGACY_ESCROW_ADDRESS);
+  }
+  for (const owner of owners) {
+    const result = await rpc('getTokenAccountsByOwner', [
+      owner,
+      {mint: mintAddress},
+      {encoding: 'jsonParsed', commitment: 'confirmed'},
+    ]);
+    const values = (result && result.value) || [];
+    const held = values.some((a) => {
+      const amount =
+        a &&
+        a.account &&
+        a.account.data &&
+        a.account.data.parsed &&
+        a.account.data.parsed.info &&
+        a.account.data.parsed.info.tokenAmount &&
+        a.account.data.parsed.info.tokenAmount.amount;
+      return Number(amount || 0) >= 1;
+    });
+    if (held) return true;
+  }
+  return false;
 }
 
 async function countSettlementPending() {

@@ -18,7 +18,7 @@
  * Usage: node process-market.js [--watch]
  */
 import { Connection, PublicKey } from '@solana/web3.js';
-import { publicKey, transactionBuilder } from '@metaplex-foundation/umi';
+import { publicKey, transactionBuilder, createSignerFromKeypair } from '@metaplex-foundation/umi';
 import {
   mplToolbox,
   createTokenIfMissing,
@@ -28,17 +28,27 @@ import {
 import { base58 } from '@metaplex-foundation/umi/serializers';
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
-import { createMintClient } from './mint-seed-lib.js';
-import { RPC_URL, readDeployed } from './common.js';
+import { createMarketClient } from './mint-seed-lib.js';
+import { RPC_URL, readDeployed, LEGACY_ESCROW_ADDRESS } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
 
 const db = initFirestore();
 /** Unpaid invest reservations older than this are released back to active. */
 const RESERVATION_TTL_MS = 15 * 60 * 1000;
-const umi = createMintClient().use(mplToolbox());
+const {
+  umi,
+  escrowSigner,
+  escrowAddress: ESCROW,
+  feePayerAddress,
+  legacyEscrowAddress,
+  mintAuthoritySecret,
+} = createMarketClient();
+umi.use(mplToolbox());
 const connection = new Connection(RPC_URL, 'confirmed');
 const watch = process.argv.includes('--watch');
+const legacyEscrowSigner = umi.eddsa.createKeypairFromSecretKey(mintAuthoritySecret);
+const LEGACY_ESCROW = legacyEscrowAddress || LEGACY_ESCROW_ADDRESS;
 
 const deployed = readDeployed();
 if (!deployed.growMint) {
@@ -47,25 +57,40 @@ if (!deployed.growMint) {
 }
 const GROW_MINT = deployed.growMint;
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
-const ESCROW = String(umi.identity.publicKey);
-const EXPECTED_ESCROW = 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
+const EXPECTED_ESCROW = deployed.escrowAddress || ESCROW;
 
-console.log('Escrow (authority):', ESCROW);
+console.log('Escrow vault:', ESCROW);
+console.log('Fee payer:   ', feePayerAddress);
+console.log('Legacy escrow (open listings):', LEGACY_ESCROW);
 console.log('Worker:', workerId());
 if (ESCROW !== EXPECTED_ESCROW) {
   console.error(
-    `Authority key ${ESCROW} does not match app escrow ${EXPECTED_ESCROW}. Refusing to settle.`
+    `Escrow key ${ESCROW} does not match deployed.escrowAddress ${EXPECTED_ESCROW}. Refusing to settle.`
   );
   process.exit(1);
 }
 
-async function escrowHoldsNft(mintAddress) {
-  const accounts = await connection.getParsedTokenAccountsByOwner(new PublicKey(ESCROW), {
+async function walletHoldsNft(ownerAddress, mintAddress) {
+  const accounts = await connection.getParsedTokenAccountsByOwner(new PublicKey(ownerAddress), {
     mint: new PublicKey(mintAddress),
   });
   return accounts.value.some(
     (a) => Number(a.account.data.parsed.info.tokenAmount.amount) >= 1
   );
+}
+
+async function findEscrowHolder(mintAddress) {
+  if (await walletHoldsNft(ESCROW, mintAddress)) {
+    return { address: ESCROW, signer: escrowSigner };
+  }
+  if (LEGACY_ESCROW !== ESCROW && (await walletHoldsNft(LEGACY_ESCROW, mintAddress))) {
+    return { address: LEGACY_ESCROW, signer: legacyEscrowSigner };
+  }
+  return null;
+}
+
+async function escrowHoldsNft(mintAddress) {
+  return !!(await findEscrowHolder(mintAddress));
 }
 
 /*
@@ -116,20 +141,26 @@ async function verifyGrowPayment(signature, sellerPubkey, priceGrow, buyerPubkey
 async function transferNftFromEscrow(mintAddress, destinationPubkey) {
   const mint = publicKey(mintAddress);
   const destOwner = publicKey(destinationPubkey);
-  const source = findAssociatedTokenPda(umi, { mint, owner: umi.identity.publicKey });
+  const holder = await findEscrowHolder(mintAddress);
+  if (!holder) {
+    // Maybe already delivered.
+    try {
+      if (await walletHoldsNft(destinationPubkey, mintAddress)) {
+        return 'already-delivered';
+      }
+    } catch {
+      // ignore
+    }
+    throw new Error('NFT is not in the current or legacy escrow wallet.');
+  }
+
+  const authority = createSignerFromKeypair(umi, holder.signer);
+  const source = findAssociatedTokenPda(umi, { mint, owner: publicKey(holder.address) });
   const destination = findAssociatedTokenPda(umi, { mint, owner: destOwner });
 
   // If destination already holds the NFT, a prior settle already landed.
   try {
-    const destAccounts = await connection.getParsedTokenAccountsByOwner(
-      new PublicKey(destinationPubkey),
-      { mint: new PublicKey(mintAddress) }
-    );
-    if (
-      destAccounts.value.some(
-        (a) => Number(a.account.data.parsed.info.tokenAmount.amount) >= 1
-      )
-    ) {
+    if (await walletHoldsNft(destinationPubkey, mintAddress)) {
       return 'already-delivered';
     }
   } catch {
@@ -144,6 +175,7 @@ async function transferNftFromEscrow(mintAddress, destinationPubkey) {
           source,
           destination,
           amount: 1n,
+          authority,
         })
       )
       .sendAndConfirm(umi);
@@ -173,15 +205,7 @@ async function transferNftFromEscrow(mintAddress, destinationPubkey) {
       }
       // Last chance: destination may already hold the NFT.
       try {
-        const destAccounts = await connection.getParsedTokenAccountsByOwner(
-          new PublicKey(destinationPubkey),
-          { mint: new PublicKey(mintAddress) }
-        );
-        if (
-          destAccounts.value.some(
-            (a) => Number(a.account.data.parsed.info.tokenAmount.amount) >= 1
-          )
-        ) {
+        if (await walletHoldsNft(destinationPubkey, mintAddress)) {
           return sig;
         }
       } catch {

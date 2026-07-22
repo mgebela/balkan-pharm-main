@@ -20,18 +20,46 @@ import {
 } from '@metaplex-foundation/umi';
 import { base58 } from '@metaplex-foundation/umi/serializers';
 import { irysUploader } from '@metaplex-foundation/umi-uploader-irys';
-import { RPC_URL, loadAuthoritySecret, readDeployed } from './common.js';
+import {
+  RPC_URL,
+  loadMintSecret,
+  loadEscrowSecret,
+  loadFeePayerSecret,
+  LEGACY_ESCROW_ADDRESS,
+  readDeployed,
+} from './common.js';
 import { buildSeedMetadata, SEED_SYMBOL, toPublicMetadataUri } from './seed-metadata.js';
 
 const IRYS_DEVNET = 'https://devnet.irys.xyz';
 
+/** Umi client signed by the mint / collection / $GROWTOO authority. */
 export function createMintClient() {
   const umi = createUmi(RPC_URL)
     .use(mplTokenMetadata())
     .use(irysUploader({ address: IRYS_DEVNET }));
-  const authority = umi.eddsa.createKeypairFromSecretKey(loadAuthoritySecret());
+  const authority = umi.eddsa.createKeypairFromSecretKey(loadMintSecret());
   umi.use(keypairIdentity(authority));
   return umi;
+}
+
+/**
+ * Market client: fee payer is umi.identity; escrow vault is a separate signer.
+ * Falls back to mint authority for either role if role key files are missing.
+ */
+export function createMarketClient() {
+  const umi = createUmi(RPC_URL).use(mplTokenMetadata());
+  const feeKp = umi.eddsa.createKeypairFromSecretKey(loadFeePayerSecret());
+  const escrowKp = umi.eddsa.createKeypairFromSecretKey(loadEscrowSecret());
+  umi.use(keypairIdentity(feeKp));
+  const deployed = readDeployed();
+  return {
+    umi,
+    escrowSigner: escrowKp,
+    escrowAddress: String(escrowKp.publicKey),
+    feePayerAddress: String(feeKp.publicKey),
+    legacyEscrowAddress: deployed.legacyEscrowAddress || LEGACY_ESCROW_ADDRESS,
+    mintAuthoritySecret: loadMintSecret(),
+  };
 }
 
 export async function uploadSeedMetadata(umi, metadata) {
