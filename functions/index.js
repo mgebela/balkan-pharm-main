@@ -10,8 +10,10 @@ initializeApp();
 
 // Set after: firebase functions:secrets:set GEMINI_API_KEY
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
-/** Optional dedicated Devnet RPC (Helius/QuickNode). Empty → public failover list. */
-const solanaRpcUrl = defineString('SOLANA_RPC_URL', {default: ''});
+/** Preferred Devnet RPC. Override with a Helius/QuickNode URL when available. */
+const solanaRpcUrl = defineString('SOLANA_RPC_URL', {
+  default: 'https://api.devnet.solana.com',
+});
 
 const REGION = 'europe-west1';
 
