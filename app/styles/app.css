@@ -214,7 +214,7 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 }
 
 #view-plants .plants-weather-widget {
-  margin-bottom: 1.35rem;
+  margin-bottom: 1rem;
 }
 
 #view-plants .plants-weather-widget-inner {
@@ -225,8 +225,8 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
   color: var(--text);
   background: linear-gradient(145deg, rgba(142, 53, 32, 0.22) 0%, rgba(23, 16, 8, 0.95) 55%);
   border: 1px solid rgba(180, 71, 43, 0.35);
-  border-radius: 18px;
-  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 16px;
+  padding: 0.85rem 0.9rem 0.9rem;
   box-shadow: var(--shadow);
 }
 
@@ -235,19 +235,19 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 0.85rem 1rem;
-  margin-bottom: 1rem;
+  gap: 0.55rem 0.75rem;
+  margin-bottom: 0.55rem;
 }
 
 #view-plants .plants-weather-widget-brand {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.55rem;
   min-width: 0;
 }
 
 #view-plants .plants-weather-widget-icon {
-  font-size: 2rem;
+  font-size: 1.55rem;
   line-height: 1;
   flex-shrink: 0;
   filter: drop-shadow(0 0 12px rgba(180, 71, 43, 0.45));
@@ -255,25 +255,25 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 
 #view-plants .plants-weather-widget-title {
   margin: 0;
-  font-size: 1.12rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: -0.02em;
 }
 
 #view-plants .plants-weather-widget-sub {
-  margin: 0.2rem 0 0;
-  font-size: 0.8rem;
+  margin: 0.1rem 0 0;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
 #view-plants .plants-weather-city-form {
   display: flex;
   flex-wrap: nowrap;
-  gap: 0.5rem;
+  gap: 0.4rem;
   align-items: center;
-  flex: 1 1 220px;
-  max-width: 360px;
+  flex: 1 1 200px;
+  max-width: 320px;
   min-width: 0;
 }
 
@@ -281,14 +281,14 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
   flex: 1 1 auto;
   min-width: 0;
   width: auto;
-  height: 44px;
-  padding: 0 0.75rem;
-  border-radius: 10px;
+  height: 38px;
+  padding: 0 0.65rem;
+  border-radius: 9px;
   border: 1px solid var(--border);
   background: var(--bg-alt);
   color: var(--text);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
 }
 
 #view-plants .plants-weather-city-form input::placeholder {
@@ -304,12 +304,12 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 #view-plants .plants-weather-refresh-btn {
   flex: 0 0 auto;
   align-self: center;
-  height: 44px;
+  height: 38px;
   border: 0;
-  border-radius: 10px;
-  padding: 0 0.9rem;
+  border-radius: 9px;
+  padding: 0 0.75rem;
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -322,15 +322,15 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 }
 
 #view-plants .plants-weather-location {
-  margin: 0 0 0.75rem;
-  font-size: 0.84rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
 }
 
 #view-plants .plants-weather-loading,
 #view-plants .plants-weather-error {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
 }
 
@@ -338,23 +338,34 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
   color: #fca5a5;
 }
 
-#view-plants .plants-weather-body .weather-container {
+#view-plants .plants-weather-body .weather-container,
+#view-plants .plants-weather-days {
   display: flex;
-  gap: 0.65rem;
+  align-items: stretch;
+  gap: 0.45rem;
+  margin-top: 0;
   overflow-x: auto;
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.2rem;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 #view-plants .plants-weather-days .weather-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.12rem;
   flex: 0 0 auto;
-  min-width: 112px;
+  width: 5.65rem;
+  min-width: 5.65rem;
+  max-width: 5.65rem;
   scroll-snap-align: start;
   background: rgba(0, 0, 0, 0.28);
   border: 1px solid var(--border);
-  padding: 0.7rem 0.55rem;
-  border-radius: 14px;
+  padding: 0.5rem 0.35rem 0.45rem;
+  border-radius: 12px;
   text-align: center;
   box-shadow: none;
 }
@@ -367,48 +378,57 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 
 #view-plants .plants-weather-day-label {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--accent-bright);
-  margin-bottom: 0.3rem;
+  line-height: 1.2;
+  margin: 0;
 }
 
 #view-plants .plants-weather-day img {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 0.25rem;
+  width: 34px;
+  height: 34px;
+  margin: 0;
   display: block;
 }
 
 #view-plants .plants-weather-temp {
   display: block;
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.15;
   color: var(--text);
+  margin: 0;
 }
 
 #view-plants .plants-weather-range {
   display: block;
-  font-size: 0.72rem;
+  font-size: 0.65rem;
+  line-height: 1.2;
   color: var(--text-muted);
-  margin-bottom: 0.25rem;
+  margin: 0;
 }
 
 #view-plants .plants-weather-condition {
   display: block;
-  font-size: 0.72rem;
-  line-height: 1.3;
+  font-size: 0.65rem;
+  line-height: 1.25;
   color: var(--text-muted);
-  min-height: 2.4em;
+  min-height: 0;
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #view-plants .plants-weather-rain {
   display: block;
-  font-size: 0.7rem;
-  margin-top: 0.25rem;
+  font-size: 0.65rem;
+  line-height: 1.2;
+  margin: 0.1rem 0 0;
   color: var(--accent-bright);
 }
 
@@ -433,36 +453,39 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 }
 
 @media (min-width: 900px) {
-  #view-plants .plants-weather-body .weather-container {
-    overflow-x: visible;
-    flex-wrap: wrap;
+  #view-plants .plants-weather-body .weather-container,
+  #view-plants .plants-weather-days {
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
 
   #view-plants .plants-weather-days .weather-card {
-    flex: 1 1 0;
-    min-width: 100px;
+    flex: 0 0 auto;
+    width: 6rem;
+    min-width: 6rem;
+    max-width: 6rem;
   }
 }
 
 @media (max-width: 560px) {
   #view-plants .plants-weather-widget-inner {
-    padding: 0.9rem 0.85rem 1rem;
+    padding: 0.75rem 0.7rem 0.8rem;
     border-radius: 14px;
   }
 
   #view-plants .plants-weather-widget-head {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 0.45rem;
   }
 
   #view-plants .plants-weather-widget-icon {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
 
   #view-plants .plants-weather-widget-title {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   #view-plants .plants-weather-city-form {
@@ -470,18 +493,26 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
     width: 100%;
   }
 
+  #view-plants .plants-weather-city-form input,
+  #view-plants .plants-weather-refresh-btn {
+    height: 36px;
+  }
+
   #view-plants .plants-weather-days .weather-card {
-    min-width: 96px;
-    padding: 0.55rem 0.45rem;
+    width: 5.25rem;
+    min-width: 5.25rem;
+    max-width: 5.25rem;
+    padding: 0.45rem 0.3rem 0.4rem;
+    gap: 0.08rem;
   }
 
   #view-plants .plants-weather-day img {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
   }
 
   #view-plants .plants-weather-temp {
-    font-size: 1.05rem;
+    font-size: 0.98rem;
   }
 }
 
