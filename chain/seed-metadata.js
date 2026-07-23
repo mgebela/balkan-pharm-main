@@ -137,3 +137,39 @@ export function buildStageMetadata(seed, stage, history) {
 
   return metadata;
 }
+
+/**
+ * Attach care progress to existing metadata (adopt-stake unlock path).
+ * @param {object} metadata  Metaplex JSON (mutated + returned)
+ * @param {Array}  careHistory [{ monthKey|weekKey, daysHit, ts }, …]
+ */
+export function applyCareHistory(metadata, careHistory) {
+  if (!metadata || typeof metadata !== 'object') return metadata;
+  const history = (careHistory || [])
+    .filter((h) => h && (h.monthKey || h.weekKey))
+    .map((h) => ({
+      monthKey: h.monthKey ? String(h.monthKey) : null,
+      weekKey: h.weekKey ? String(h.weekKey) : null,
+      daysHit: Number(h.daysHit || 0),
+      ts: h.ts || null,
+    }));
+  if (!metadata.rwa) metadata.rwa = {};
+  metadata.rwa.careHistory = history;
+  const months = history.filter((h) => h.monthKey).length || history.length;
+  const attrs = Array.isArray(metadata.attributes) ? metadata.attributes : [];
+  const setTrait = (trait, value) => {
+    const existing = attrs.find((a) => a && a.trait_type === trait);
+    if (existing) existing.value = String(value);
+    else attrs.push({ trait_type: trait, value: String(value) });
+  };
+  setTrait('Care Months', months);
+  const rankScore = months * 25;
+  let rankTitle = 'Sprout';
+  if (rankScore >= 160) rankTitle = 'Legendary';
+  else if (rankScore >= 120) rankTitle = 'Elite';
+  else if (rankScore >= 80) rankTitle = 'Proven';
+  else if (rankScore >= 40) rankTitle = 'Rising';
+  setTrait('Plant Rank', rankTitle);
+  metadata.attributes = attrs;
+  return metadata;
+}

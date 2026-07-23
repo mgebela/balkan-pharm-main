@@ -921,6 +921,10 @@
     if (isAdopterUi()) return '';
     if (!window.GrowerQuests || typeof GrowerQuests.getGrowerProfile !== 'function') return '';
     const profile = GrowerQuests.getGrowerProfile();
+    const rank =
+      typeof GrowerQuests.growerRankFromLocal === 'function'
+        ? GrowerQuests.growerRankFromLocal()
+        : null;
     return (
       '<div class="grower-profile" aria-label="Grower level">' +
       '<div class="grower-profile-row">' +
@@ -934,7 +938,14 @@
       profile.xp +
       ' XP</span>' +
       '</div>' +
-      '<p class="grower-profile-hint">Log stages, watering, and feeding in the journal to unlock growth mints.</p>' +
+      (rank
+        ? '<p class="adopt-rank-badge adopt-rank-badge--grower adopt-rank-badge--tier-' +
+          esc(String(rank.tier)) +
+          '">' +
+          esc(rank.label) +
+          '</p>'
+        : '') +
+      '<p class="grower-profile-hint">Weekly progress is private to you. Monthly care unlocks the locked adopt stake; ranks rise with care + mints.</p>' +
       '</div>'
     );
   }
@@ -1146,7 +1157,11 @@
           '</code></a></p>'
         : '') +
       growerQuestHtml(token, next) +
+      careWeekHtml(token) +
+      careMonthHtml(token) +
+      rankBadgeHtml(token) +
       careToolsHtml(token, next) +
+      adoptStakeActionsHtml(token) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
@@ -1178,6 +1193,166 @@
       '</div>' +
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
+    );
+  }
+
+  function careWeekHtml(token) {
+    // Grower-only weekly progress (not the harvest unlock rule).
+    if (isAdopterUi() || token.adopted || !token.plantId || !window.GrowerQuests) return '';
+    const week = GrowerQuests.currentWeekCareProgress(token.plantId);
+    if (!week) return '';
+    const cls = week.ok ? 'grower-quest--ready' : 'grower-quest--blocked';
+    return (
+      '<div class="grower-quest ' +
+      cls +
+      ' grower-quest--care grower-quest--weekly">' +
+      '<div class="grower-quest-head">' +
+      '<strong>Weekly progress</strong>' +
+      '<span>' +
+      week.daysHit +
+      '/' +
+      week.minDays +
+      ' · ' +
+      esc(week.weekKey) +
+      '</span>' +
+      '</div>' +
+      '<p class="grower-quest-msg">' +
+      esc(week.message) +
+      ' Visible to you only — harvest unlock uses monthly care.</p>' +
+      '</div>'
+    );
+  }
+
+  function careMonthHtml(token) {
+    if (!window.GrowerQuests) return '';
+    const listing =
+      token.mintAddress && window.Market && typeof Market.findAdoptStakeForMint === 'function'
+        ? Market.findAdoptStakeForMint(token.mintAddress)
+        : null;
+
+    // Adopters: monthly unlock view only (no weekly).
+    if (isAdopterUi() || token.adopted) {
+      if (!listing || listing.settlement !== 'adopt_stake') return '';
+      const months =
+        (listing.qualifyingMonthKeys && listing.qualifyingMonthKeys.length) ||
+        (listing.harvestProofSummary &&
+          listing.harvestProofSummary.monthKeys &&
+          listing.qualifyingMonthKeys &&
+          listing.qualifyingMonthKeys.length) ||
+        0;
+      const needed =
+        (listing.harvestProofSummary && listing.harvestProofSummary.monthKeys
+          ? listing.harvestProofSummary.monthKeys.length
+          : null) || (listing.adoptedAt ? '…' : '1+');
+      const status = listing.careStatus || 'active';
+      return (
+        '<div class="grower-quest grower-quest--care grower-quest--monthly">' +
+        '<div class="grower-quest-head">' +
+        '<strong>Monthly care unlock</strong>' +
+        '<span>' +
+        esc(String(status)) +
+        '</span>' +
+        '</div>' +
+        '<p class="grower-quest-msg">Grower must qualify each calendar month (≥12 care days). ' +
+        'Progress: ' +
+        esc(String(months)) +
+        '/' +
+        esc(String(needed)) +
+        ' months. Locked stake releases only if all months pass at harvest.</p>' +
+        '</div>'
+      );
+    }
+
+    if (!token.plantId) return '';
+    const month = GrowerQuests.currentMonthCareProgress(token.plantId);
+    if (!month) return '';
+    const cls = month.ok ? 'grower-quest--ready' : 'grower-quest--blocked';
+    let pathExtra = '';
+    if (listing && listing.careStatus === 'active' && listing.adoptedAt) {
+      const path = GrowerQuests.validateHarvestCarePath(token.plantId, listing.adoptedAt);
+      pathExtra =
+        ' Stake path: ' +
+        (path.qualifyingMonthKeys || []).length +
+        '/' +
+        (path.monthKeys || []).length +
+        ' months qualify.';
+    }
+    return (
+      '<div class="grower-quest ' +
+      cls +
+      ' grower-quest--care grower-quest--monthly">' +
+      '<div class="grower-quest-head">' +
+      '<strong>Monthly care unlock</strong>' +
+      '<span>' +
+      month.daysHit +
+      '/' +
+      month.minDays +
+      ' · ' +
+      esc(month.monthKey) +
+      '</span>' +
+      '</div>' +
+      '<p class="grower-quest-msg">' +
+      esc(month.message) +
+      pathExtra +
+      '</p>' +
+      '</div>'
+    );
+  }
+
+  function rankBadgeHtml(token) {
+    if (!window.GrowerQuests || typeof GrowerQuests.plantRankForToken !== 'function') return '';
+    const listing =
+      token.mintAddress && window.Market && typeof Market.findAdoptStakeForMint === 'function'
+        ? Market.findAdoptStakeForMint(token.mintAddress)
+        : null;
+    const rank = GrowerQuests.plantRankForToken(token, listing);
+    if (!rank) return '';
+    return (
+      '<p class="adopt-rank-badge adopt-rank-badge--tier-' +
+      esc(String(rank.tier)) +
+      '" title="Score ' +
+      esc(String(rank.score)) +
+      '">' +
+      esc(rank.label) +
+      '</p>'
+    );
+  }
+
+  function adoptStakeActionsHtml(token) {
+    if (isAdopterUi() || token.adopted || !token.mintAddress || !window.Market) return '';
+    const listing =
+      typeof Market.findAdoptStakeForMint === 'function'
+        ? Market.findAdoptStakeForMint(token.mintAddress)
+        : null;
+    if (!listing || listing.careStatus !== 'active') return '';
+    const locked = listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
+    const isHarvest =
+      token.stageIndex >= GROWTH_STAGES.length - 1 ||
+      (GROWTH_STAGES[token.stageIndex] && GROWTH_STAGES[token.stageIndex].key === 'harvest');
+    let pathMsg = '';
+    if (token.plantId && window.GrowerQuests && listing.adoptedAt) {
+      const path = GrowerQuests.validateHarvestCarePath(token.plantId, listing.adoptedAt);
+      pathMsg =
+        (path.qualifyingMonthKeys || []).length +
+        '/' +
+        (path.monthKeys || []).length +
+        ' months qualify';
+    }
+    return (
+      '<div class="adopt-stake-panel">' +
+      '<p class="adopt-care-hint">Adopt stake locked: <strong>' +
+      esc(String(locked)) +
+      ' $GROWTOO</strong>' +
+      (pathMsg ? ' · ' + esc(pathMsg) : '') +
+      '</p>' +
+      (isHarvest
+        ? '<button type="button" class="btn btn-primary btn-sm adopt-harvest-claim-btn" data-listing-id="' +
+          esc(listing.id) +
+          '" data-plant-id="' +
+          esc(token.plantId || '') +
+          '">Claim harvest stake</button>'
+        : '<p class="adopt-care-hint">Reach harvest stage to claim the locked half (all months must qualify).</p>') +
+      '</div>'
     );
   }
 
@@ -1575,6 +1750,45 @@
   let renderAdoptBusy = false;
   let renderWalletUiBusy = false;
 
+  function renderPlatformBonusPanel() {
+    const el = document.getElementById('platform-bonus-panel');
+    if (!el) return;
+    if (isAdopterUi()) {
+      el.innerHTML = '';
+      return;
+    }
+    const monthKey =
+      window.Market && typeof Market.currentMonthKey === 'function'
+        ? Market.currentMonthKey()
+        : new Date().toISOString().slice(0, 7);
+    const status =
+      window.Market && typeof Market.platformBonusStatus === 'function'
+        ? Market.platformBonusStatus()
+        : null;
+    let body =
+      '<p class="market-hint">Month <code>' +
+      esc(monthKey) +
+      '</code> · formula: base 5 + plants/seeds/weeks/flower (cap 50). Platform funds only.</p>';
+    if (status && status.status === 'minted') {
+      body +=
+        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed: <strong>' +
+        esc(String(status.reward || 0)) +
+        ' $GROWTOO</strong></p>';
+    } else if (status && status.status === 'pending') {
+      body += '<p class="market-hint">Claim pending in the platform rewards queue…</p>';
+    } else if (status && status.status === 'failed') {
+      body +=
+        '<p class="market-card-error">' +
+        esc(status.error || 'Claim failed') +
+        '</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Retry claim</button>';
+    } else {
+      body +=
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Claim this month</button>';
+    }
+    el.innerHTML = body;
+  }
+
   function render() {
     if (renderAdoptBusy) return;
     renderAdoptBusy = true;
@@ -1595,6 +1809,7 @@
         renderGrowthGuide(highlightStage);
       }
       renderWalletPanel(wallet);
+      renderPlatformBonusPanel();
       if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
       // Show garden when connected OR when this account already has tokens (e.g. synced mints).
       if (gardenSection) {
@@ -1926,6 +2141,60 @@
         } catch (err) {
           flashError(err);
           careBtn.innerHTML = original;
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+
+      const harvestBtn = e.target.closest('.adopt-harvest-claim-btn');
+      if (harvestBtn) {
+        if (busy || harvestBtn.disabled) return;
+        const listingId = harvestBtn.dataset.listingId;
+        if (!listingId || !window.Market || typeof Market.requestHarvestClaim !== 'function') {
+          flashError(new Error('Harvest claim is not available.'));
+          return;
+        }
+        if (
+          !confirm(
+            'Claim harvest stake?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% $GROWTOO releases to you. Otherwise it refunds to the adopter (all-or-nothing).'
+          )
+        ) {
+          return;
+        }
+        setBusy(true);
+        const original = harvestBtn.textContent;
+        harvestBtn.textContent = 'Claiming…';
+        try {
+          await Market.requestHarvestClaim(listingId, harvestBtn.dataset.plantId || null);
+          alert('Harvest claim submitted. The adopt-stake queue will settle release or refund.');
+          render();
+        } catch (err) {
+          flashError(err);
+          harvestBtn.textContent = original;
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+
+      const platformBtn = e.target.closest('#platform-bonus-claim-btn');
+      if (platformBtn) {
+        if (busy || platformBtn.disabled) return;
+        if (!window.Market || typeof Market.claimPlatformBonus !== 'function') {
+          flashError(new Error('Platform bonus is not available.'));
+          return;
+        }
+        setBusy(true);
+        const original = platformBtn.textContent;
+        platformBtn.textContent = 'Claiming…';
+        try {
+          await Market.claimPlatformBonus();
+          alert('Platform bonus request submitted for this month. The queue will mint $GROWTOO when scored.');
+          renderPlatformBonusPanel();
+        } catch (err) {
+          flashError(err);
+          platformBtn.textContent = original;
         } finally {
           setBusy(false);
         }

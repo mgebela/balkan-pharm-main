@@ -102,6 +102,20 @@ jobs:
           QUEUE_WORKER_ID: github-actions
         run: npm run market:queue
 
+      - name: Run adopt-stake queue
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          QUEUE_WORKER_ID: github-actions
+        run: npm run adopt:queue
+
+      - name: Run platform rewards queue
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          QUEUE_WORKER_ID: github-actions
+        run: npm run platform:queue
+
       - name: Scrub keys
         if: always()
         working-directory: chain

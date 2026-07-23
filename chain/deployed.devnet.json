@@ -15,6 +15,7 @@
   "growMetadataUpdateSignature": "rv8HdhMWxJbQoXga9ovnz8fVh69QY39xkoKfBLgs96hPqo7GKqyRZCUhUvfvYpsQas8yeFGbHHq1C1aENnw89jC",
   "mintAuthority": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
   "escrowAddress": "EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD",
+  "careEscrowAddress": "EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD",
   "feePayerAddress": "Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975",
   "legacyEscrowAddress": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
   "escrowProgramId": "GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb",

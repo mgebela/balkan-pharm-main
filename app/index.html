@@ -167,6 +167,15 @@
 
         <section class="adopt-wallet" id="adopt-wallet"></section>
 
+        <section class="plants-journal-section grower-only" id="platform-bonus-section">
+          <h2 class="section-heading">Platform monthly bonus</h2>
+          <p class="market-hint">
+            Extra $GROWTOO from growtoo (not adopter funds) for adding plants, tokenising, weekly progress, and flower stages.
+            Claim once per calendar month — separate from adopt-stake harvest unlock. Growers only.
+          </p>
+          <div id="platform-bonus-panel" class="platform-bonus-panel"></div>
+        </section>
+
         <div class="adopt-notice grower-only" id="adopt-notice">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
           <p>Use Phantom or Solflare on <strong>Devnet</strong>. Seed NFTs mint on-chain after you log cultivation data.</p>
@@ -229,6 +238,18 @@
               Invest price ($GROWTOO) *
               <input type="number" id="market-price-input" min="1" step="1" placeholder="e.g. 50" required />
             </label>
+            <label>
+              Offer type *
+              <select id="market-settlement-select">
+                <option value="instant">Instant sale (full price to you on buy)</option>
+                <option value="adopt_stake">Adopt stake (50% now · 50% locked until harvest care)</option>
+              </select>
+            </label>
+            <p class="market-hint" id="market-stake-hint">
+              Adopt stake: adopter pays the full price up front. Half is released to you on settle;
+              half stays locked until every calendar month of care qualifies (all-or-nothing at harvest).
+              Weekly progress stays private to growers; adopters see monthly unlock status.
+            </p>
             <button type="submit" class="btn btn-primary">Post to market</button>
           </form>
         </section>
@@ -741,19 +762,19 @@
       }
     })();
   </script>
-  <script src="js/chain-config.js?v=20260723c"></script>
+  <script src="js/chain-config.js?v=20260723f"></script>
   <script src="js/solana-rpc.js?v=20260723c"></script>
   <script src="js/solana-wallet.js?v=20260722d"></script>
   <script src="js/wallet-link.js?v=20260720c"></script>
   <script src="js/seed-chain.js?v=20260722d"></script>
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260723a"></script>
-  <script src="js/market.js?v=20260723b"></script>
+  <script src="js/market.js?v=20260723f"></script>
   <script src="js/metric-ui.js?v=20260708f"></script>
   <script src="js/token-pixel-art.js?v=20260720b"></script>
   <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
-  <script src="js/grower-quests.js?v=20260719a"></script>
-  <script src="js/plant-token.js?v=20260722a"></script>
+  <script src="js/grower-quests.js?v=20260723f"></script>
+  <script src="js/plant-token.js?v=20260723f"></script>
   <script src="js/ai-coach.js?v=20260721a"></script>
   <script src="js/app.js?v=20260722b"></script>
 </body>

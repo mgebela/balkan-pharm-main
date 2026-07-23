@@ -143,3 +143,17 @@ export function validateJournalProof(state, plantId, targetStage) {
     },
   };
 }
+
+export {
+  validateWeeklyCareProof,
+  validateMonthlyCareProof,
+  validateHarvestCarePath,
+  isoWeekKey,
+  monthKey,
+  enumerateWeekKeys,
+  enumerateMonthKeys,
+  computePlantRank,
+  computeGrowerRank,
+  WEEKLY_CARE_MIN_DAYS,
+  MONTHLY_CARE_MIN_DAYS,
+} from './weekly-care.js';

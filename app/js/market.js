@@ -11,7 +11,9 @@
 
   const listeners = new Set();
   let listings = [];
+  let platformRewards = [];
   let unsubscribe = null;
+  let platformUnsub = null;
   let watchedUid = '';
   let busy = false;
   let reconcileTimer = null;
@@ -54,6 +56,42 @@
       : 'https://solscan.io/account/' + encodeURIComponent(addr) + '?cluster=devnet';
   }
 
+  function startPlatformWatch(uid) {
+    if (platformUnsub) {
+      platformUnsub();
+      platformUnsub = null;
+    }
+    platformRewards = [];
+    if (!uid || !firebaseReady()) return;
+    platformUnsub = firebase
+      .firestore()
+      .collection('platformRewards')
+      .where('uid', '==', uid)
+      .limit(24)
+      .onSnapshot(
+        function (snap) {
+          const next = [];
+          snap.forEach(function (doc) {
+            next.push(Object.assign({ id: doc.id }, doc.data()));
+          });
+          next.sort(function (a, b) {
+            return String(b.monthKey || '').localeCompare(String(a.monthKey || ''));
+          });
+          platformRewards = next;
+          if (window.PlantToken && typeof PlantToken.render === 'function') {
+            try {
+              PlantToken.render();
+            } catch {
+              // ignore
+            }
+          }
+        },
+        function (err) {
+          console.warn('platformRewards watch failed', err);
+        }
+      );
+  }
+
   function startWatch() {
     const user = currentUser();
     const uid = user ? user.uid : '';
@@ -65,9 +103,11 @@
     watchedUid = uid;
     listings = [];
     if (!uid || !firebaseReady()) {
+      startPlatformWatch('');
       emit();
       return;
     }
+    startPlatformWatch(uid);
     unsubscribe = firebase
       .firestore()
       .collection('marketListings')
@@ -181,6 +221,13 @@
       }
     });
     render();
+    if (window.PlantToken && typeof PlantToken.render === 'function') {
+      try {
+        PlantToken.render();
+      } catch {
+        // ignore
+      }
+    }
   }
 
   // --- data helpers ---------------------------------------------------------
@@ -434,7 +481,7 @@
     return assertSigningSession();
   }
 
-  async function createListing(tokenEntry, priceGrow) {
+  async function createListing(tokenEntry, priceGrow, opts) {
     const user = currentUser();
     if (!user) throw new Error('Sign in to post an RWA offer.');
     if (!isGrowerUi()) throw new Error('Only grower accounts can post RWA offers.');
@@ -442,7 +489,11 @@
     const SW = await ensureSigningWallet('post an offer (escrow the NFT)');
     const token = tokenEntry.token;
     const priceRounded = Math.round(priceGrow);
-    const useProgram = cfg().settlementMode === 'program' && cfg().escrowProgramId;
+    const stakeMode = opts && opts.settlement === 'adopt_stake';
+    const useProgram = !stakeMode && cfg().settlementMode === 'program' && cfg().escrowProgramId;
+    const lockedGrow = stakeMode ? Math.floor(priceRounded / 2) : 0;
+    const immediateGrow = stakeMode ? priceRounded - lockedGrow : priceRounded;
+    const careEscrow = cfg().careEscrowAddress || cfg().escrowAddress;
 
     if (useProgram) {
       if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
@@ -472,13 +523,13 @@
       const escrow = cfg().escrowAddress;
       if (!escrow) throw new Error('Escrow address is not configured.');
       if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
+      if (stakeMode && !careEscrow) throw new Error('Care escrow address is not configured.');
 
       let escrowSignature = null;
       const held = await window.SplTransfer.getRawBalance(tokenEntry.mintAddress);
       if (held >= 1n) {
         escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
       } else {
-        // Recover from a prior success where confirm timed out after escrow moved.
         const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
         if (escrowHeld < 1n) {
           throw new Error(
@@ -488,7 +539,7 @@
         escrowSignature = 'recovered-escrow-' + Date.now();
       }
 
-      await firebase.firestore().collection('marketListings').add({
+      const listing = {
         uid: user.uid,
         sellerPubkey: SW.getPublicKey(),
         mintAddress: tokenEntry.mintAddress,
@@ -499,14 +550,23 @@
         batch: token.batch || '',
         stage: stageLabel(token.stageIndex),
         assetType: assetTypeForStage(token.stageIndex),
-        offerType: 'invest',
+        offerType: stakeMode ? 'adopt_stake' : 'invest',
         priceGrow: priceRounded,
         status: 'escrow_pending',
-        settlement: 'legacy',
+        settlement: stakeMode ? 'adopt_stake' : 'legacy',
         escrowSignature,
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
-      });
+      };
+      if (stakeMode) {
+        listing.stakeLockedBps = 5000;
+        listing.immediateGrow = immediateGrow;
+        listing.lockedGrow = lockedGrow;
+        listing.totalGrow = priceRounded;
+        listing.careEscrowAddress = careEscrow;
+        listing.careStatus = 'listed';
+      }
+      await firebase.firestore().collection('marketListings').add(listing);
     }
 
     if (window.PlantToken && typeof PlantToken.markTokenListed === 'function') {
@@ -581,7 +641,12 @@
 
     let paymentSignature = null;
     try {
-      paymentSignature = await window.SplTransfer.payGrow(listing.sellerPubkey, listing.priceGrow);
+      const payTo =
+        listing.settlement === 'adopt_stake'
+          ? listing.careEscrowAddress || cfg().careEscrowAddress || cfg().escrowAddress
+          : listing.sellerPubkey;
+      if (!payTo) throw new Error('Payment destination is not configured.');
+      paymentSignature = await window.SplTransfer.payGrow(payTo, listing.priceGrow);
     } catch (err) {
       // Confirm timeout after broadcast still includes the signature — recover it.
       const recovered =
@@ -688,17 +753,41 @@
     );
   }
 
+  function settlementBadge(listing) {
+    if (listing.settlement !== 'adopt_stake') return '';
+    const locked = listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
+    const immediate =
+      listing.immediateGrow != null ? listing.immediateGrow : Number(listing.priceGrow || 0) - locked;
+    return (
+      '<span class="market-asset-badge market-asset-badge--stake" title="50% now · 50% locked until monthly harvest care">' +
+      'Stake ' +
+      immediate +
+      '/' +
+      locked +
+      '</span>'
+    );
+  }
+
   function listingCardHtml(listing, uid) {
     const isMine = listing.uid === uid;
     const isBuyer = listing.buyerUid === uid;
     const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
     const canCancel = isGrowerUi() && isMine && listing.status === 'active';
+    const careLine =
+      listing.settlement === 'adopt_stake' && listing.careStatus
+        ? '<p class="market-card-meta">Care escrow: <strong>' +
+          esc(listing.careStatus) +
+          '</strong>' +
+          (listing.lockedGrow != null ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO' : '') +
+          '</p>'
+        : '';
     return (
       '<article class="market-card" data-id="' +
       esc(listing.id) +
       '">' +
       '<div class="market-card-head">' +
       assetBadge(listing.assetType) +
+      settlementBadge(listing) +
       statusBadge(listing.status) +
       '</div>' +
       '<h4 class="market-card-name">' +
@@ -709,6 +798,7 @@
       (listing.batch ? ' · batch ' + esc(listing.batch) : '') +
       (listing.stage ? ' · ' + esc(listing.stage) : '') +
       '</p>' +
+      careLine +
       '<p class="market-card-meta">NFT: <a href="' +
       esc(explorerAddress(listing.mintAddress)) +
       '" target="_blank" rel="noopener noreferrer"><code>' +
@@ -887,7 +977,9 @@
                 '" on Solana devnet?\n\n' +
                 (listing.settlement === 'program'
                   ? 'You will receive the RWA NFT in this transaction.'
-                  : 'You will receive the RWA NFT when settlement completes.')
+                  : listing.settlement === 'adopt_stake'
+                    ? 'Adopt stake: you pay the full price now. 50% goes to the grower on settle; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the NFT when settlement completes.'
+                    : 'You will receive the RWA NFT when settlement completes.')
             )
           ) {
             return;
@@ -928,8 +1020,11 @@
         if (busy) return;
         const sel = document.getElementById('market-asset-select');
         const priceEl = document.getElementById('market-price-input');
+        const settleEl = document.getElementById('market-settlement-select');
         const mintAddress = sel ? sel.value : '';
         const price = priceEl ? parseInt(priceEl.value, 10) : 0;
+        const settlement =
+          settleEl && settleEl.value === 'adopt_stake' ? 'adopt_stake' : 'instant';
         if (!mintAddress) return flash(new Error('Choose an RWA to post.'));
         if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROWTOO.'));
         const entry = listableTokens().find(function (o) {
@@ -944,9 +1039,15 @@
           submitBtn.textContent = 'Escrowing NFT…';
         }
         try {
-          await createListing(entry, price);
+          await createListing(entry, price, {
+            settlement: settlement === 'adopt_stake' ? 'adopt_stake' : undefined,
+          });
           form.reset();
-          alert('Offer posted. Adopters can invest once escrow confirms (status: Open for investment).');
+          alert(
+            settlement === 'adopt_stake'
+              ? 'Adopt-stake offer posted. Adopters pay full price; 50% unlocks to you on settle, 50% stays locked until monthly harvest care.'
+              : 'Offer posted. Adopters can invest once escrow confirms (status: Open for investment).'
+          );
         } catch (err) {
           flash(err);
         } finally {
@@ -958,6 +1059,99 @@
         }
       });
     }
+  }
+
+  function currentMonthKey(d) {
+    const date = d || new Date();
+    return (
+      date.getUTCFullYear() +
+      '-' +
+      String(date.getUTCMonth() + 1).padStart(2, '0')
+    );
+  }
+
+  function platformBonusStatus() {
+    const user = currentUser();
+    if (!user) return null;
+    const monthKey = currentMonthKey();
+    return (
+      platformRewards.find(function (r) {
+        return r.uid === user.uid && r.monthKey === monthKey;
+      }) || null
+    );
+  }
+
+  function findAdoptStakeForMint(mintAddress) {
+    if (!mintAddress) return null;
+    return (
+      listings.find(function (l) {
+        return (
+          l &&
+          l.settlement === 'adopt_stake' &&
+          l.mintAddress === mintAddress &&
+          (l.status === 'sold' || l.careStatus === 'active' || l.careStatus === 'released' || l.careStatus === 'refunded')
+        );
+      }) || null
+    );
+  }
+
+  async function requestHarvestClaim(listingId, plantId) {
+    const user = currentUser();
+    if (!user) throw new Error('Sign in to claim harvest.');
+    if (!isGrowerUi()) throw new Error('Only growers can claim harvest stakes.');
+    const listing = listings.find(function (l) {
+      return l.id === listingId;
+    });
+    if (!listing) throw new Error('Listing not found.');
+    if (listing.uid !== user.uid) throw new Error('Not your listing.');
+    if (listing.settlement !== 'adopt_stake') throw new Error('Not an adopt-stake listing.');
+    if (listing.careStatus !== 'active') throw new Error('Care stake is not active.');
+
+    const ref = firebase.firestore().collection('harvestClaims').doc(listingId);
+    const existing = await ref.get();
+    if (existing.exists) {
+      const st = (existing.data() || {}).status;
+      if (st === 'pending') throw new Error('A harvest claim is already pending for this stake.');
+      if (st === 'released' || st === 'refunded') {
+        throw new Error('Harvest stake already settled for this listing.');
+      }
+    }
+
+    await ref.set({
+      uid: user.uid,
+      listingId: listingId,
+      plantId: plantId || listing.plantId || null,
+      mintAddress: listing.mintAddress || null,
+      status: 'pending',
+      requestedAt: new Date().toISOString(),
+      cluster: 'devnet',
+    });
+  }
+
+  async function claimPlatformBonus() {
+    const user = currentUser();
+    if (!user) throw new Error('Sign in to claim the platform bonus.');
+    if (!isGrowerUi()) throw new Error('Only growers can claim the platform bonus.');
+    const SW = await ensureSigningWallet('claim platform monthly bonus');
+    const monthKey = currentMonthKey();
+    const docId = user.uid + '_' + monthKey;
+    const ref = firebase.firestore().collection('platformRewards').doc(docId);
+    const priorSnap = await ref.get();
+    if (priorSnap.exists) {
+      const st = (priorSnap.data() || {}).status;
+      if (st === 'pending' || st === 'minted') {
+        throw new Error('You already claimed (or have a pending claim) for ' + monthKey + '.');
+      }
+    }
+    await ref.set({
+      uid: user.uid,
+      monthKey: monthKey,
+      recipient: SW.getPublicKey(),
+      status: 'pending',
+      source: 'platform',
+      requestedAt: new Date().toISOString(),
+      cluster: 'devnet',
+    });
   }
 
   window.Market = {
@@ -973,6 +1167,14 @@
         listeners.delete(fn);
       };
     },
+    getListings() {
+      return listings.slice();
+    },
+    findAdoptStakeForMint: findAdoptStakeForMint,
+    requestHarvestClaim: requestHarvestClaim,
+    claimPlatformBonus: claimPlatformBonus,
+    currentMonthKey: currentMonthKey,
+    platformBonusStatus: platformBonusStatus,
   };
 
   if (firebaseReady()) {

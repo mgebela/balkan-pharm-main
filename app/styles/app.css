@@ -4516,6 +4516,65 @@ body:not(.app-loading) {
   border-color: rgba(120, 220, 140, 0.3);
   color: #b8ffc8;
 }
+.market-asset-badge--stake {
+  background: rgba(90, 140, 200, 0.18);
+  border-color: rgba(120, 170, 230, 0.35);
+  color: #c8e4ff;
+}
+.platform-bonus-panel {
+  margin-top: 0.5rem;
+}
+.adopt-stake-panel {
+  margin: 0.65rem 0 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--desk-line);
+  border-radius: 6px;
+  background: rgba(90, 140, 200, 0.06);
+}
+.grower-quest--care {
+  margin-top: 0.5rem;
+}
+.grower-quest--weekly {
+  opacity: 0.95;
+}
+.adopt-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  margin: 0.35rem 0 0.15rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--desk-line);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.adopt-rank-badge--grower {
+  margin-top: 0.45rem;
+}
+.adopt-rank-badge--tier-1 {
+  border-color: rgba(160, 180, 160, 0.35);
+  color: #c5d6c5;
+}
+.adopt-rank-badge--tier-2 {
+  border-color: rgba(100, 180, 220, 0.4);
+  color: #b8e0ff;
+}
+.adopt-rank-badge--tier-3 {
+  border-color: rgba(120, 220, 140, 0.45);
+  color: #9dffb0;
+}
+.adopt-rank-badge--tier-4 {
+  border-color: rgba(220, 180, 90, 0.45);
+  color: #ffe0a0;
+}
+.adopt-rank-badge--tier-5 {
+  border-color: rgba(220, 140, 255, 0.5);
+  color: #e8c4ff;
+}
 .market-status {
   font-family: var(--font-mono);
   font-size: 0.62rem;

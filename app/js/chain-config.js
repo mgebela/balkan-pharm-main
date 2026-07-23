@@ -34,6 +34,9 @@
     escrowAddress: 'EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD',
     feePayerAddress: 'Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975',
     legacyEscrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
+    // Holds adopter full stake for adopt_stake (50% released now, 50% until harvest).
+    // Same vault as NFT escrow on Devnet MVP.
+    careEscrowAddress: 'EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD',
     // On-chain Anchor escrow (parallel path). 'program' = PDA vault; 'legacy' = hot-wallet queue.
     escrowProgramId: 'GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb',
     settlementMode: 'program',

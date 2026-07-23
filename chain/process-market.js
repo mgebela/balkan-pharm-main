@@ -288,6 +288,8 @@ async function processEscrowPending(doc) {
 
 async function processSalePending(doc) {
   const data = doc.data();
+  // 50/50 adopt-stake sales are settled by process-adopt-stakes.js
+  if (data.settlement === 'adopt_stake') return;
   const label = `listing ${data.name || doc.id} (sale to ${data.buyerPubkey || '?'})`;
   if (!(await tryClaimLease(doc.ref))) {
     console.log(`… ${label}: leased by another worker, skipping`);

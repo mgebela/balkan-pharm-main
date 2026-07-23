@@ -28,13 +28,16 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | Seed collection | `79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa` |
 | Escrow program | `GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb` |
 | Marketplace PDA | `2a887xGdhztkvfHn1BdR5xSkXjunzTG1StdTdtrRddAm` |
-| Settlement mode | `program` (new listings) |
-| Hot-wallet escrow (legacy) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
+| Settlement mode | `program` (instant) · `adopt_stake` (50/50 care escrow) |
+| Hot-wallet escrow (legacy / adopt_stake NFT + locked $GROWTOO) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
+| Care escrow | same as hot-wallet escrow (Devnet MVP) |
 | Mint authority | `F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3` |
 | Fee payer | `Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975` |
 | Browser RPC | `https://europe-west1-balpha-9dab9.cloudfunctions.net/solanaRpc` |
 | Reconcile CF | `…/reconcileMarketEscrow` |
 | Settle CF | `…/settleMarketQueue` |
+| Adopt-stake queue | `npm run adopt:queue` (GH Actions every 5m) |
+| Platform bonus queue | `npm run platform:queue` |
 
 ### Ops wallet balances (snapshot 2026-07-23)
 
@@ -115,3 +118,25 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [ ] Cancel returns NFT  
 - [ ] Browser confirmations do not flake on public RPC (proxy preferred)  
 - [ ] Authority / fee-payer stay funded for queue + legacy settle  
+- [ ] **Adopt stake:** post offer as “Adopt stake”, adopter pays full price to care escrow; settle releases 50% to grower, locks 50%  
+- [ ] **Monthly care:** ≥12 distinct care days / calendar month on linked plant (unlock rule)  
+- [ ] **Weekly progress:** grower-only on Tokenise; adopters see monthly unlock status only  
+- [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
+- [ ] **Harvest claim:** all months qualify → locked half to grower; fail → refund to adopter  
+- [ ] **Platform monthly bonus:** grower claims once per month; queue mints platform $GROWTOO (not adopter funds)  
+
+---
+
+## Adopt stake + platform bonus (quick reference)
+
+| Piece | Rule |
+|-------|------|
+| Adopter payment | Full `priceGrow` to care escrow up front |
+| Immediate | 50% `$GROWTOO` → grower on settle |
+| Locked | 50% held until harvest claim |
+| Month qualify | ≥12 distinct days with plant-linked journal/toolbox logs |
+| Harvest | All-or-nothing across every calendar month from adopt → claim |
+| Visibility | Weekly progress = grower only · Monthly unlock = grower + adopter |
+| Plant rank | Stage + qualifying care months + care intensity (Sprout→Legendary) |
+| Grower rank | XP + care months + mints (New→Elite cultivator) |
+| Platform bonus | Separate mint: base 5 + 2/plant + 5/seed + 3/week + 10 flower (cap 50) |
