@@ -617,6 +617,24 @@
           })
         );
       }
+      await notifySellerStake(
+        Object.assign({}, listing, {
+          status: 'sold',
+          buyerUid: user.uid,
+        }),
+        SW.getPublicKey()
+      );
+      if (window.DnevnikNotifications) {
+        DnevnikNotifications.push({
+          type: 'sale_settled',
+          title: 'Investment complete',
+          body: 'You adopted "' + (listing.name || 'plant') + '" for ' + listing.priceGrow + ' $GROWTOO.',
+          meta: { key: 'buy:' + listing.id, listingId: listing.id },
+          action: { view: 'adopt' },
+          kind: 'success',
+          dedupKey: 'buy:' + listing.id,
+        });
+      }
       return;
     }
 
@@ -686,6 +704,30 @@
           paymentSignature: paymentSignature,
         })
       );
+    }
+
+    await notifySellerStake(
+      Object.assign({}, listing, {
+        status: 'sale_pending',
+        buyerUid: user.uid,
+      }),
+      SW.getPublicKey()
+    );
+    if (window.DnevnikNotifications) {
+      DnevnikNotifications.push({
+        type: 'sale_settled',
+        title: 'Investment submitted',
+        body:
+          'Paid ' +
+          listing.priceGrow +
+          ' $GROWTOO for "' +
+          (listing.name || 'plant') +
+          '". NFT settles via queue.',
+        meta: { key: 'buy-pending:' + listing.id, listingId: listing.id },
+        action: { view: 'adopt' },
+        kind: 'success',
+        dedupKey: 'buy-pending:' + listing.id,
+      });
     }
   }
 
@@ -935,11 +977,56 @@
 
   function flash(err) {
     console.error('Market error', err);
-    alert(err && err.message ? err.message : 'Something went wrong.');
+    const msg = err && err.message ? err.message : 'Something went wrong.';
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg, 'error');
+    else alert(msg);
   }
 
   function flashOk(msg) {
-    alert(msg || 'Done.');
+    const text = msg || 'Done.';
+    if (window.DnevnikNotifications) {
+      DnevnikNotifications.toast(text, 'success');
+      return;
+    }
+    alert(text);
+  }
+
+  async function notifySellerStake(listing, buyerPubkey) {
+    if (!listing || !listing.uid) return;
+    const N = window.DnevnikNotifications;
+    if (!N || typeof N.pushToUser !== 'function') return;
+    const locked =
+      listing.settlement === 'adopt_stake'
+        ? listing.lockedGrow != null
+          ? listing.lockedGrow
+          : Math.floor(Number(listing.priceGrow || 0) / 2)
+        : 0;
+    const body =
+      listing.settlement === 'adopt_stake'
+        ? 'An adopter staked ' +
+          listing.priceGrow +
+          ' $GROWTOO on "' +
+          (listing.name || 'your plant') +
+          '" (50% locked until monthly care).'
+        : 'An adopter invested ' +
+          listing.priceGrow +
+          ' $GROWTOO in "' +
+          (listing.name || 'your plant') +
+          '".';
+    await N.pushToUser(listing.uid, {
+      type: 'stake_received',
+      title: listing.settlement === 'adopt_stake' ? 'New adopt stake' : 'New market investment',
+      body: body,
+      meta: {
+        listingId: listing.id,
+        mintAddress: listing.mintAddress || null,
+        priceGrow: listing.priceGrow,
+        lockedGrow: locked,
+        buyerPubkey: buyerPubkey || null,
+        key: 'stake:' + listing.id,
+      },
+      action: { view: 'market', listingId: listing.id },
+    });
   }
 
   let eventsBound = false;
@@ -993,12 +1080,10 @@
             }
           }
           if (listing.settlement === 'program') {
-            alert(
-              'Investment complete. The RWA NFT is in your wallet and the listing is marked sold — no queue settlement needed.'
-            );
+            flashOk('Investment complete. The RWA NFT is in your wallet.');
           } else {
-            alert(
-              'Investment submitted. $GROWTOO payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
+            flashOk(
+              'Investment submitted. NFT appears in My garden when settlement finishes.'
             );
           }
         } else {
@@ -1043,10 +1128,10 @@
             settlement: settlement === 'adopt_stake' ? 'adopt_stake' : undefined,
           });
           form.reset();
-          alert(
+          flashOk(
             settlement === 'adopt_stake'
-              ? 'Adopt-stake offer posted. Adopters pay full price; 50% unlocks to you on settle, 50% stays locked until monthly harvest care.'
-              : 'Offer posted. Adopters can invest once escrow confirms (status: Open for investment).'
+              ? 'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'
+              : 'Offer posted. Adopters can invest once escrow confirms.'
           );
         } catch (err) {
           flash(err);

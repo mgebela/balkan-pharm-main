@@ -1846,7 +1846,13 @@
       }
       return;
     }
-    alert(msg);
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg, 'error');
+    else alert(msg);
+  }
+
+  function flashOk(msg) {
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg || 'Done.', 'success');
+    else alert(msg || 'Done.');
   }
 
   async function handleWalletLink(btn) {
@@ -2167,7 +2173,19 @@
         harvestBtn.textContent = 'Claiming…';
         try {
           await Market.requestHarvestClaim(listingId, harvestBtn.dataset.plantId || null);
-          alert('Harvest claim submitted. The adopt-stake queue will settle release or refund.');
+          flashOk('Harvest claim submitted. Queue will settle release or refund.');
+          if (window.DnevnikNotifications) {
+            DnevnikNotifications.push({
+              type: 'harvest_claim',
+              title: 'Harvest claim filed',
+              body: 'Waiting for monthly care proof settle.',
+              meta: { key: 'hclaim-pending:' + listingId, listingId: listingId },
+              action: { view: 'adopt' },
+              kind: 'info',
+              dedupKey: 'hclaim-pending:' + listingId,
+              toast: false,
+            });
+          }
           render();
         } catch (err) {
           flashError(err);
@@ -2190,7 +2208,19 @@
         platformBtn.textContent = 'Claiming…';
         try {
           await Market.claimPlatformBonus();
-          alert('Platform bonus request submitted for this month. The queue will mint $GROWTOO when scored.');
+          flashOk('Platform bonus requested for this month.');
+          if (window.DnevnikNotifications) {
+            DnevnikNotifications.push({
+              type: 'platform_bonus',
+              title: 'Platform bonus claimed',
+              body: 'Queue will mint $GROWTOO when scored.',
+              meta: { key: 'platform-pending:' + (Market.currentMonthKey ? Market.currentMonthKey() : '') },
+              action: { view: 'adopt' },
+              kind: 'info',
+              dedupKey: 'platform-pending:' + (Market.currentMonthKey ? Market.currentMonthKey() : ''),
+              toast: false,
+            });
+          }
           renderPlatformBonusPanel();
         } catch (err) {
           flashError(err);

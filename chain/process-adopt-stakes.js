@@ -32,6 +32,7 @@ import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
 import { validateHarvestCarePath, monthKey } from './weekly-care.js';
 import { applyCareHistory, toPublicMetadataUri } from './seed-metadata.js';
+import { notifyUser } from './notify-user.js';
 
 const db = initFirestore();
 const {
@@ -280,6 +281,47 @@ async function processAdoptSale(doc) {
     console.log(
       `✔ ${label}: NFT → buyer, ${amounts.immediate} $GROWTOO → grower, ${amounts.locked} locked`
     );
+    try {
+      if (data.uid) {
+        await notifyUser(db, data.uid, {
+          type: 'stake_received',
+          title: 'Adopt stake settled',
+          body:
+            'Adopter staked ' +
+            amounts.total +
+            ' $GROWTOO on "' +
+            (data.name || 'plant') +
+            '". ' +
+            amounts.immediate +
+            ' released · ' +
+            amounts.locked +
+            ' locked until monthly care.',
+          meta: {
+            listingId: doc.id,
+            priceGrow: amounts.total,
+            lockedGrow: amounts.locked,
+            key: 'adopt-sold:' + doc.id,
+          },
+          action: { view: 'market', listingId: doc.id },
+          source: 'process-adopt-stakes',
+        });
+      }
+      if (data.buyerUid) {
+        await notifyUser(db, data.buyerUid, {
+          type: 'sale_settled',
+          title: 'Adopt stake active',
+          body:
+            'You hold "' +
+            (data.name || 'plant') +
+            '". Locked half unlocks when monthly care qualifies at harvest.',
+          meta: { listingId: doc.id, key: 'adopt-buy:' + doc.id },
+          action: { view: 'adopt' },
+          source: 'process-adopt-stakes',
+        });
+      }
+    } catch (notifyErr) {
+      console.warn('notify after adopt-stake failed', notifyErr.message || notifyErr);
+    }
   } catch (err) {
     await fail(doc, label, err);
   } finally {
@@ -420,6 +462,41 @@ async function processHarvestClaim(doc) {
     console.log(
       `✔ ${label}: ${careStatus} · locked ${locked} $GROWTOO · months ${proof.qualifyingMonthKeys?.length || 0}/${proof.monthKeys?.length || 0}`
     );
+    try {
+      if (listing.uid) {
+        await notifyUser(db, listing.uid, {
+          type: 'harvest_claim',
+          title: careStatus === 'released' ? 'Harvest stake released' : 'Harvest stake refunded',
+          body:
+            careStatus === 'released'
+              ? 'Locked $GROWTOO for "' + (listing.name || 'plant') + '" released to you.'
+              : 'Locked $GROWTOO for "' + (listing.name || 'plant') + '" refunded to the adopter.',
+          meta: {
+            listingId,
+            careStatus,
+            key: 'harvest-settle:' + listingId + ':' + careStatus,
+          },
+          action: { view: 'adopt' },
+          source: 'process-adopt-stakes',
+        });
+      }
+      if (listing.buyerUid) {
+        await notifyUser(db, listing.buyerUid, {
+          type: 'sale_settled',
+          title: careStatus === 'released' ? 'Grower unlocked full stake' : 'Locked stake refunded',
+          body: '"' + (listing.name || 'Plant') + '" monthly care settled · ' + careStatus + '.',
+          meta: {
+            listingId,
+            careStatus,
+            key: 'harvest-buyer:' + listingId + ':' + careStatus,
+          },
+          action: { view: 'adopt' },
+          source: 'process-adopt-stakes',
+        });
+      }
+    } catch (notifyErr) {
+      console.warn('notify after harvest failed', notifyErr.message || notifyErr);
+    }
   } catch (err) {
     await fail(doc, label, err);
   } finally {

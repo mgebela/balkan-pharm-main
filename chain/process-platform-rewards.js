@@ -33,6 +33,7 @@ import {
   validateWeeklyCareProof,
   weekKeyToUtcMonday,
 } from './weekly-care.js';
+import { notifyUser } from './notify-user.js';
 
 const db = initFirestore();
 const umi = createMintClient().use(mplToolbox());
@@ -213,6 +214,18 @@ async function processDoc(doc) {
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: minted ${reward} $GROWTOO → ${data.recipient}`);
+    try {
+      await notifyUser(db, data.uid, {
+        type: 'platform_bonus',
+        title: 'Platform bonus minted',
+        body: '+' + reward + ' $GROWTOO for ' + (data.monthKey || 'this month') + '.',
+        meta: { monthKey: data.monthKey, reward, key: 'platform-mint:' + doc.id },
+        action: { view: 'adopt' },
+        source: 'process-platform-rewards',
+      });
+    } catch (notifyErr) {
+      console.warn('notify platform bonus failed', notifyErr.message || notifyErr);
+    }
   } catch (err) {
     console.error(`✘ ${label}: ${err.message}`);
     if (isRetryableChainError(err)) {

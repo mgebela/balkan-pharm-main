@@ -1295,6 +1295,11 @@ function initFirebaseSync() {
       );
 
       await ensureUserExists(user);
+      if (window.DnevnikNotifications) {
+        DnevnikNotifications.init();
+        DnevnikNotifications.startWatch(user.uid);
+        DnevnikNotifications.bindStatusHooks();
+      }
       if (window.PlantToken && typeof PlantToken.bindAccount === 'function') {
         await PlantToken.bindAccount(user.uid);
       }
@@ -1658,9 +1663,45 @@ function initFirebaseSync() {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
     }
-    if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
-      window.AdoptPlant.renderGlobalWalletUI();
+
+    maybeNotifyCareProgress();
+  }
+
+  window.showAppView = function (id, plantId) {
+    if (id === 'growlog' || (id === 'plants' && plantId)) {
+      showView(plantId ? 'growlog' : id, plantId || null);
+      return;
     }
+    showView(id, plantId || null);
+  };
+
+  function maybeNotifyCareProgress() {
+    if (!window.DnevnikNotifications || !window.GrowerQuests || !isGrowerProfile()) return;
+    getPlants().forEach(function (p) {
+      if (!p || !p.id) return;
+      const week = GrowerQuests.currentWeekCareProgress(p.id);
+      if (week && week.ok) {
+        DnevnikNotifications.notifyCareProgress(
+          'week',
+          p.id,
+          p.name,
+          week.weekKey,
+          week.daysHit,
+          week.minDays
+        );
+      }
+      const month = GrowerQuests.currentMonthCareProgress(p.id);
+      if (month && month.ok) {
+        DnevnikNotifications.notifyCareProgress(
+          'month',
+          p.id,
+          p.name,
+          month.monthKey,
+          month.daysHit,
+          month.minDays
+        );
+      }
+    });
   }
 
   navItems.forEach((item) => {
@@ -3209,7 +3250,7 @@ function initFirebaseSync() {
       }
     }
     const entries = getEntries();
-    entries.push({
+    const newEntry = {
       id: uuid(),
       plantId: document.getElementById('entry-plant').value || null,
       date: document.getElementById('entry-date').value,
@@ -3218,8 +3259,21 @@ function initFirebaseSync() {
       photo: document.getElementById('entry-photo-data').value.trim() || null,
       video: document.getElementById('entry-video-data').value.trim() || null,
       meta: meta || undefined,
-    });
+    };
+    entries.push(newEntry);
     setEntries(entries);
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
+      const plantName =
+        (getPlants().find(function (p) {
+          return p && p.id === newEntry.plantId;
+        }) || {}).name || null;
+      try {
+        DnevnikNotifications.notifyJournalEntry(newEntry, plantName);
+        maybeNotifyCareProgress();
+      } catch {
+        // ignore
+      }
+    }
     if (type === 'faza' && plantIdForEntry && meta && (meta.fieldLocation || meta.plantingLocation)) {
       const plants = getPlants();
       const idx = plants.findIndex((p) => p.id === plantIdForEntry);
@@ -3813,6 +3867,14 @@ document.addEventListener("click", (e) => {
     };
     setEntries(getEntries().concat([entry]));
     refreshAfterJournalWrite(plantId);
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
+      try {
+        DnevnikNotifications.notifyJournalEntry(entry, plant.name);
+      } catch {
+        // ignore
+      }
+    }
+    maybeNotifyCareProgress();
     return entry;
   }
 

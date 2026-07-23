@@ -123,11 +123,21 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [ ] **Weekly progress:** grower-only on Tokenise; adopters see monthly unlock status only  
 - [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
 - [ ] **Harvest claim:** all months qualify → locked half to grower; fail → refund to adopter  
-- [ ] **Platform monthly bonus:** grower claims once per month; queue mints platform $GROWTOO (not adopter funds)  
+- [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
+- [ ] **Stake notify:** adopter invest → grower gets `stake_received` in inbox  
+- [ ] **Mark all read** clears badge; click item navigates to related view  
 
 ---
 
-## Adopt stake + platform bonus (quick reference)
+## Notifications (quick reference)
+
+| Event | Who sees it |
+|-------|-------------|
+| Journal / care log | Grower (toast + inbox) |
+| Weekly / monthly care qualifies | Grower (deduped per period) |
+| Someone invests / adopt-stakes | Grower inbox (`stake_received`) |
+| Seed / growth mint settled | Grower |
+| Harvest / platform bonus | Grower (+ adopter on stake settle) |
 
 | Piece | Rule |
 |-------|------|

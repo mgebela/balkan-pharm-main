@@ -32,6 +32,7 @@ import { createMarketClient } from './mint-seed-lib.js';
 import { RPC_URL, readDeployed, LEGACY_ESCROW_ADDRESS } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
+import { notifyUser } from './notify-user.js';
 
 const db = initFirestore();
 /** Unpaid invest reservations older than this are released back to active. */
@@ -335,6 +336,40 @@ async function processSalePending(doc) {
       error: FieldValue.delete(),
     });
     console.log(`✔ ${label}: payment verified, NFT released (${transferSignature})`);
+    try {
+      if (data.uid) {
+        await notifyUser(db, data.uid, {
+          type: 'stake_received',
+          title: 'Investment settled',
+          body:
+            'Your offer "' +
+            (data.name || 'plant') +
+            '" sold for ' +
+            data.priceGrow +
+            ' $GROWTOO.',
+          meta: {
+            listingId: doc.id,
+            priceGrow: data.priceGrow,
+            buyerUid: data.buyerUid || null,
+            key: 'sold:' + doc.id,
+          },
+          action: { view: 'market', listingId: doc.id },
+          source: 'process-market',
+        });
+      }
+      if (data.buyerUid) {
+        await notifyUser(db, data.buyerUid, {
+          type: 'sale_settled',
+          title: 'NFT delivered',
+          body: '"' + (data.name || 'Plant') + '" is in your garden.',
+          meta: { listingId: doc.id, key: 'delivered:' + doc.id },
+          action: { view: 'adopt' },
+          source: 'process-market',
+        });
+      }
+    } catch (notifyErr) {
+      console.warn('notify after sale failed', notifyErr.message || notifyErr);
+    }
   } catch (err) {
     await fail(doc, label, err);
   } finally {

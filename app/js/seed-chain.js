@@ -117,6 +117,10 @@
       return requestId ? cache.mints[requestId] || null : null;
     },
 
+    getGrowthMints() {
+      return Object.assign({}, cache.growth);
+    },
+
     /*
      * File a mint request. Returns the Firestore request id, or null when
      * the user is not signed in (local mock continues to work offline).
@@ -150,7 +154,6 @@
     getGrowth(requestId) {
       return requestId ? cache.growth[requestId] || null : null;
     },
-
     /*
      * File an on-chain growth request (M3): the minter updates the seed
      * NFT's stage metadata and mints the $GROWTOO reward to the holder.

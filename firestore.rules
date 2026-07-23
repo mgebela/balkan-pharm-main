@@ -150,6 +150,49 @@ service cloud.firestore {
       allow write: if signedIn() && request.auth.uid == userId;
     }
 
+    // In-app notification inbox
+    match /notifications/{notifId} {
+      allow read: if signedIn() && (
+        request.auth.uid == userId || isAdminOrSuper()
+      );
+
+      // Owner creates own notifications
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.type is string
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 400
+        && request.resource.data.createdAt is string
+        && request.resource.data.read == false;
+
+      // Buyer may notify seller after investing (stake_received)
+      allow create: if signedIn()
+        && request.auth.uid != userId
+        && request.resource.data.uid == userId
+        && request.resource.data.type == 'stake_received'
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.body is string
+        && request.resource.data.createdAt is string
+        && request.resource.data.read == false
+        && request.resource.data.meta.listingId is string
+        && exists(/databases/$(database)/documents/marketListings/$(request.resource.data.meta.listingId))
+        && get(/databases/$(database)/documents/marketListings/$(request.resource.data.meta.listingId)).data.uid == userId
+        && get(/databases/$(database)/documents/marketListings/$(request.resource.data.meta.listingId)).data.buyerUid == request.auth.uid
+        && get(/databases/$(database)/documents/marketListings/$(request.resource.data.meta.listingId)).data.status in ['sold', 'sale_pending'];
+
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
+        && request.resource.data.read is bool;
+
+      allow delete: if signedIn() && request.auth.uid == userId;
+    }
+
     // Superadmin shares plants/journal/tools with viewers / hybrid users
     match /sharedGrants/{viewerUid} {
       allow read: if signedIn() && (
