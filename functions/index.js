@@ -6,6 +6,7 @@ const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI} = require('@google/genai');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
+const {handleSolanaRpc} = require('./solana-rpc-proxy');
 
 initializeApp();
 
@@ -82,6 +83,22 @@ Rules:
 exports.healthCheck = onRequest({region: REGION, invoker: 'public'}, (req, res) => {
   res.json({ok: true, service: 'dnevnik-live-functions'});
 });
+
+/**
+ * Browser → QuickNode/Helius JSON-RPC proxy (SOLANA_RPC_URL stays server-side).
+ * POST https://europe-west1-balpha-9dab9.cloudfunctions.net/solanaRpc
+ */
+exports.solanaRpc = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 30,
+      memory: '256MiB',
+      maxInstances: 10,
+    },
+    handleSolanaRpc,
+);
 
 /**
  * Activate escrow_pending listings once the NFT is confirmed in escrow.

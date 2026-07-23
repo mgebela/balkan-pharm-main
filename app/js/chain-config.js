@@ -9,8 +9,10 @@
 
   window.ChainConfig = {
     cluster: 'devnet',
-    rpcUrl: 'https://api.devnet.solana.com',
+    // Proxied QuickNode/Helius via Cloud Function (secret never in the browser).
+    rpcUrl: 'https://europe-west1-balpha-9dab9.cloudfunctions.net/solanaRpc',
     rpcUrls: [
+      'https://europe-west1-balpha-9dab9.cloudfunctions.net/solanaRpc',
       'https://rpc.ankr.com/solana_devnet',
       'https://endpoints.omniatech.io/v1/sol/devnet/public',
       'https://api.devnet.solana.com',
