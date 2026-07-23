@@ -146,22 +146,35 @@
 
   function renderPanelList() {
     const list = document.getElementById('notif-panel-list');
+    const sub = document.getElementById('notif-panel-sub');
+    if (sub) {
+      const unread = unreadCount();
+      sub.textContent = items.length
+        ? unread
+          ? unread + ' unread · ' + items.length + ' total'
+          : items.length + ' notification' + (items.length === 1 ? '' : 's')
+        : 'Stay on top of logs, stakes & rewards';
+    }
     if (!list) return;
     if (!items.length) {
       list.innerHTML =
         '<p class="notif-empty">No notifications yet.</p>' +
-        '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>';
+        '<div class="notif-panel-foot">' +
+        '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>' +
+        '</div>';
       return;
     }
     list.innerHTML =
       items
         .map(function (n) {
+          const typeLabel = n.type ? String(n.type).replace(/_/g, ' ') : '';
           return (
             '<button type="button" class="notif-item' +
             (n.read ? '' : ' notif-item--unread') +
             '" data-id="' +
             esc(n.id) +
             '">' +
+            '<span class="notif-item-dot" aria-hidden="true"></span>' +
             '<span class="notif-item-title">' +
             esc(n.title || 'Update') +
             '</span>' +
@@ -169,16 +182,18 @@
             esc(n.body || '') +
             '</span>' +
             '<span class="notif-item-meta">' +
-            esc(relativeTime(n.createdAt)) +
-            (n.type ? ' · ' + esc(n.type.replace(/_/g, ' ')) : '') +
-            (n.meta && n.meta.demo ? ' · example' : '') +
+            '<span class="notif-chip">' +
+            esc(relativeTime(n.createdAt) || 'now') +
+            '</span>' +
+            (typeLabel ? '<span class="notif-chip">' + esc(typeLabel) + '</span>' : '') +
+            (n.meta && n.meta.demo ? '<span class="notif-chip">example</span>' : '') +
             '</span>' +
             '</button>'
           );
         })
         .join('') +
       '<div class="notif-panel-foot">' +
-      '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load more examples</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>' +
       '</div>';
   }
 
@@ -191,17 +206,18 @@
       badge.textContent = count > 99 ? '99+' : String(count);
     }
     if (btn) {
-      btn.setAttribute('aria-label', count ? 'Notifications, ' + count + ' unread' : 'Notifications');
+      btn.setAttribute('aria-label', count ? 'Inbox, ' + count + ' unread' : 'Inbox');
     }
     if (panelOpen) renderPanelList();
   }
 
   function setPanelOpen(open) {
     panelOpen = !!open;
-    const panel = document.getElementById('notif-panel');
+    const overlay = document.getElementById('notif-overlay');
     const btn = document.getElementById('notif-bell-btn');
-    if (panel) panel.hidden = !panelOpen;
+    if (overlay) overlay.hidden = !panelOpen;
     if (btn) btn.setAttribute('aria-expanded', panelOpen ? 'true' : 'false');
+    document.body.classList.toggle('notif-open', panelOpen);
     if (panelOpen) {
       renderPanelList();
       markAllRead();
@@ -662,8 +678,11 @@
 
   function bindUi() {
     const btn = document.getElementById('notif-bell-btn');
+    const overlay = document.getElementById('notif-overlay');
     const panel = document.getElementById('notif-panel');
     const markAll = document.getElementById('notif-mark-all');
+    const closeBtn = document.getElementById('notif-close');
+    const backdrop = document.getElementById('notif-backdrop');
     if (!btn || btn.dataset.bound === '1') return;
     btn.dataset.bound = '1';
 
@@ -676,6 +695,19 @@
       markAll.addEventListener('click', function (e) {
         e.stopPropagation();
         markAllRead();
+      });
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        setPanelOpen(false);
+      });
+    }
+
+    if (backdrop) {
+      backdrop.addEventListener('click', function () {
+        setPanelOpen(false);
       });
     }
 
@@ -701,10 +733,15 @@
       });
     }
 
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && panelOpen) setPanelOpen(false);
+    });
+
     document.addEventListener('click', function (e) {
       if (!panelOpen) return;
-      const wrap = document.getElementById('notif-wrap');
-      if (wrap && !wrap.contains(e.target)) setPanelOpen(false);
+      if (e.target.closest('#notif-overlay') || e.target.closest('#notif-bell-btn')) return;
+      // Desktop: ignore; overlay backdrop handles dismiss
+      if (overlay && !overlay.hidden) return;
     });
   }
 
