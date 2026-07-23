@@ -17,6 +17,7 @@
   --overlay: rgba(8, 18, 12, 0.72);
   --font: 'Archivo', sans-serif;
   --font-serif: 'Lora', serif;
+  --font-brand: 'Fredoka', 'Archivo', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --desk-panel: linear-gradient(180deg, rgba(10, 28, 18, 0.92) 0%, rgba(8, 18, 12, 0.96) 100%);
   --desk-line: rgba(140, 200, 140, 0.14);
@@ -121,12 +122,12 @@ body > * {
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: 1.15rem;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 1.2rem;
   color: #f4fff4;
   text-decoration: none;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
 }
 
 .logo-mark {
@@ -358,12 +359,12 @@ body > * {
 
 .hero-brand {
   margin: 0 0 0.55rem;
-  font-family: var(--font-serif);
-  font-size: clamp(1.85rem, 4.5vw, 2.6rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--font-brand);
+  font-size: clamp(2rem, 5vw, 2.85rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: #9dffb0;
-  line-height: 1.1;
+  line-height: 1;
 }
 
 .market-live-heading {
