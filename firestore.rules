@@ -228,12 +228,8 @@ service cloud.firestore {
   }
 
   // ── Marketplace listings (M4, devnet MVP) ────────────────
-  // Seller escrows the NFT to the authority wallet, buyer pays $GROW to
-  // the seller; the settlement script verifies both on-chain and moves
-  // the listing through escrow_pending → active → sale_pending → sold.
-  // Cloud Function reconcileMarketEscrow auto-activates escrow_pending when
-  // the NFT is confirmed in the escrow wallet (so local market:queue is not
-  // required for that step).
+  // Legacy: seller escrows NFT to hot wallet; CF/queue settles.
+  // Program: seller locks NFT into growtoo_escrow PDA; buy/cancel are atomic.
 
   match /marketListings/{listingId} {
     // Public browse: landing page and signed-in market share the same board.
@@ -242,16 +238,36 @@ service cloud.firestore {
 
     allow create: if signedIn()
       && request.resource.data.uid == request.auth.uid
-      && request.resource.data.status == 'escrow_pending'
+      && isValidSolanaPubkey(request.resource.data.sellerPubkey)
       && request.resource.data.mintAddress is string
       && request.resource.data.mintAddress.size() > 0
-      && isValidSolanaPubkey(request.resource.data.sellerPubkey)
       && request.resource.data.priceGrow is int
       && request.resource.data.priceGrow > 0
       && request.resource.data.name is string
       && request.resource.data.name.size() > 0
-      && request.resource.data.escrowSignature is string
-      && request.resource.data.escrowSignature.size() > 0;
+      && (
+        // Legacy hot-wallet escrow path
+        (
+          request.resource.data.status == 'escrow_pending'
+          && request.resource.data.escrowSignature is string
+          && request.resource.data.escrowSignature.size() > 0
+          && (
+            !('settlement' in request.resource.data)
+            || request.resource.data.settlement == 'legacy'
+          )
+        )
+        // On-chain program escrow path (already active after list ix)
+        || (
+          request.resource.data.status == 'active'
+          && request.resource.data.settlement == 'program'
+          && request.resource.data.listingPda is string
+          && request.resource.data.listingPda.size() > 0
+          && request.resource.data.listSignature is string
+          && request.resource.data.listSignature.size() > 0
+          && request.resource.data.escrowSignature is string
+          && request.resource.data.escrowSignature.size() > 0
+        )
+      );
 
     // Buyer claims an active listing with their payment signature…
     allow update: if signedIn() && (
@@ -302,7 +318,27 @@ service cloud.firestore {
         && !('paymentSignature' in request.resource.data)
         && !('investedAt' in request.resource.data)
       )
-      // …or the seller requests a cancel while the listing is live.
+      // Program path: buyer completes atomic buy → sold
+      || (
+        resource.data.status == 'active'
+        && resource.data.settlement == 'program'
+        && request.resource.data.status == 'sold'
+        && request.resource.data.buyerUid == request.auth.uid
+        && isValidSolanaPubkey(request.resource.data.buyerPubkey)
+        && request.resource.data.paymentSignature is string
+        && request.resource.data.paymentSignature.size() > 0
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly([
+            'status',
+            'buyerUid',
+            'buyerPubkey',
+            'paymentSignature',
+            'buySignature',
+            'investedAt',
+            'soldAt'
+          ])
+      )
+      // …or the seller requests a cancel while the listing is live (legacy).
       || (
         resource.data.uid == request.auth.uid
         && resource.data.status == 'active'
@@ -313,6 +349,15 @@ service cloud.firestore {
           !('cancelRequestedAt' in request.resource.data)
           || request.resource.data.cancelRequestedAt is string
         )
+      )
+      // Program path: seller cancels atomically → cancelled
+      || (
+        resource.data.uid == request.auth.uid
+        && resource.data.status == 'active'
+        && resource.data.settlement == 'program'
+        && request.resource.data.status == 'cancelled'
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['status', 'cancelSignature', 'cancelledAt'])
       )
     );
 

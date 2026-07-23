@@ -440,44 +440,74 @@
     if (!isGrowerUi()) throw new Error('Only grower accounts can post RWA offers.');
 
     const SW = await ensureSigningWallet('post an offer (escrow the NFT)');
-    const escrow = cfg().escrowAddress;
-    if (!escrow) throw new Error('Escrow address is not configured.');
-    if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
-
-    let escrowSignature = null;
-    const held = await window.SplTransfer.getRawBalance(tokenEntry.mintAddress);
-    if (held >= 1n) {
-      escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
-    } else {
-      // Recover from a prior success where confirm timed out after escrow moved.
-      const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
-      if (escrowHeld < 1n) {
-        throw new Error(
-          'This wallet no longer holds that NFT and escrow does not either. Refresh and check ownership before posting again.'
-        );
-      }
-      escrowSignature = 'recovered-escrow-' + Date.now();
-    }
-
     const token = tokenEntry.token;
-    await firebase.firestore().collection('marketListings').add({
-      uid: user.uid,
-      sellerPubkey: SW.getPublicKey(),
-      mintAddress: tokenEntry.mintAddress,
-      mintRequestId: tokenEntry.mintRequestId || token.mintRequestId || null,
-      plantId: token.plantId || null,
-      name: token.name,
-      strain: token.strain || token.name,
-      batch: token.batch || '',
-      stage: stageLabel(token.stageIndex),
-      assetType: assetTypeForStage(token.stageIndex),
-      offerType: 'invest',
-      priceGrow: Math.round(priceGrow),
-      status: 'escrow_pending',
-      escrowSignature,
-      cluster: 'devnet',
-      createdAt: new Date().toISOString(),
-    });
+    const priceRounded = Math.round(priceGrow);
+    const useProgram = cfg().settlementMode === 'program' && cfg().escrowProgramId;
+
+    if (useProgram) {
+      if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
+      const result = await window.EscrowProgram.listNft(tokenEntry.mintAddress, priceRounded);
+      await firebase.firestore().collection('marketListings').add({
+        uid: user.uid,
+        sellerPubkey: SW.getPublicKey(),
+        mintAddress: tokenEntry.mintAddress,
+        mintRequestId: tokenEntry.mintRequestId || token.mintRequestId || null,
+        plantId: token.plantId || null,
+        name: token.name,
+        strain: token.strain || token.name,
+        batch: token.batch || '',
+        stage: stageLabel(token.stageIndex),
+        assetType: assetTypeForStage(token.stageIndex),
+        offerType: 'invest',
+        priceGrow: priceRounded,
+        status: 'active',
+        settlement: 'program',
+        listingPda: result.listingPda,
+        listSignature: result.signature,
+        escrowSignature: result.signature,
+        cluster: 'devnet',
+        createdAt: new Date().toISOString(),
+      });
+    } else {
+      const escrow = cfg().escrowAddress;
+      if (!escrow) throw new Error('Escrow address is not configured.');
+      if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
+
+      let escrowSignature = null;
+      const held = await window.SplTransfer.getRawBalance(tokenEntry.mintAddress);
+      if (held >= 1n) {
+        escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
+      } else {
+        // Recover from a prior success where confirm timed out after escrow moved.
+        const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
+        if (escrowHeld < 1n) {
+          throw new Error(
+            'This wallet no longer holds that NFT and escrow does not either. Refresh and check ownership before posting again.'
+          );
+        }
+        escrowSignature = 'recovered-escrow-' + Date.now();
+      }
+
+      await firebase.firestore().collection('marketListings').add({
+        uid: user.uid,
+        sellerPubkey: SW.getPublicKey(),
+        mintAddress: tokenEntry.mintAddress,
+        mintRequestId: tokenEntry.mintRequestId || token.mintRequestId || null,
+        plantId: token.plantId || null,
+        name: token.name,
+        strain: token.strain || token.name,
+        batch: token.batch || '',
+        stage: stageLabel(token.stageIndex),
+        assetType: assetTypeForStage(token.stageIndex),
+        offerType: 'invest',
+        priceGrow: priceRounded,
+        status: 'escrow_pending',
+        settlement: 'legacy',
+        escrowSignature,
+        cluster: 'devnet',
+        createdAt: new Date().toISOString(),
+      });
+    }
 
     if (window.PlantToken && typeof PlantToken.markTokenListed === 'function') {
       PlantToken.markTokenListed(tokenEntry.mintAddress, tokenEntry.mintRequestId);
@@ -491,6 +521,45 @@
 
     const SW = await ensureSigningWallet('invest ($GROWTOO payment)');
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
+
+    if (listing.settlement === 'program') {
+      if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
+      let buySignature = null;
+      try {
+        buySignature = await window.EscrowProgram.buyListing(listing);
+      } catch (err) {
+        const recovered =
+          (err && err.signature) ||
+          (String((err && err.message) || '').match(
+            /Signature:\s*([1-9A-HJ-NP-Za-km-z]{64,100})/
+          ) || [])[1];
+        if (!recovered) throw err;
+        buySignature = recovered;
+      }
+
+      await ref.update({
+        status: 'sold',
+        buyerUid: user.uid,
+        buyerPubkey: SW.getPublicKey(),
+        paymentSignature: buySignature,
+        buySignature: buySignature,
+        investedAt: new Date().toISOString(),
+        soldAt: new Date().toISOString(),
+      });
+
+      if (window.PlantToken && typeof PlantToken.adoptFromListing === 'function') {
+        PlantToken.adoptFromListing(
+          Object.assign({}, listing, {
+            status: 'sold',
+            buyerUid: user.uid,
+            buyerPubkey: SW.getPublicKey(),
+            paymentSignature: buySignature,
+          })
+        );
+      }
+      return;
+    }
+
     const reservationId = 'pending-' + user.uid.slice(0, 8) + '-' + Date.now();
 
     // Reserve before paying so a second buyer cannot also send $GROWTOO.
@@ -556,7 +625,31 @@
   }
 
   async function cancelListing(listing) {
-    await firebase.firestore().collection('marketListings').doc(listing.id).update({
+    const ref = firebase.firestore().collection('marketListings').doc(listing.id);
+    if (listing.settlement === 'program') {
+      await ensureSigningWallet('cancel offer (reclaim NFT)');
+      if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
+      let cancelSignature = null;
+      try {
+        cancelSignature = await window.EscrowProgram.cancelListing(listing);
+      } catch (err) {
+        const recovered =
+          (err && err.signature) ||
+          (String((err && err.message) || '').match(
+            /Signature:\s*([1-9A-HJ-NP-Za-km-z]{64,100})/
+          ) || [])[1];
+        if (!recovered) throw err;
+        cancelSignature = recovered;
+      }
+      await ref.update({
+        status: 'cancelled',
+        cancelSignature: cancelSignature,
+        cancelledAt: new Date().toISOString(),
+      });
+      return;
+    }
+
+    await ref.update({
       status: 'cancel_requested',
       cancelRequestedAt: new Date().toISOString(),
     });
@@ -791,7 +884,10 @@
                 listing.priceGrow +
                 ' $GROWTOO to adopt "' +
                 listing.name +
-                '" on Solana devnet?\n\nYou will receive the RWA NFT when settlement completes.'
+                '" on Solana devnet?\n\n' +
+                (listing.settlement === 'program'
+                  ? 'You will receive the RWA NFT in this transaction.'
+                  : 'You will receive the RWA NFT when settlement completes.')
             )
           ) {
             return;
@@ -804,9 +900,15 @@
               // ignore
             }
           }
-          alert(
-            'Investment submitted. $GROWTOO payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
-          );
+          if (listing.settlement === 'program') {
+            alert(
+              'Investment complete. The RWA NFT is in your wallet and the listing is marked sold — no queue settlement needed.'
+            );
+          } else {
+            alert(
+              'Investment submitted. $GROWTOO payment is confirming — the NFT will appear in My garden when settlement finishes. Keep the market worker running if you operate the chain queue.'
+            );
+          }
         } else {
           await cancelListing(listing);
         }

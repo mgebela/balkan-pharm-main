@@ -373,7 +373,9 @@ const HANDLERS = {
 const inFlight = new Set();
 
 async function runHandler(doc) {
-  const status = doc.data() && doc.data().status;
+  const data = doc.data() || {};
+  if (data.settlement === 'program') return; // on-chain path — no queue settle
+  const status = data.status;
   const handler = HANDLERS[status];
   if (!handler) return;
   if (inFlight.has(doc.id)) return;
@@ -393,6 +395,7 @@ async function processPending() {
     }
     for (const doc of snap.docs) {
       const data = doc.data() || {};
+      if (data.settlement === 'program') continue;
       const ageMin = ageMinutes(statusEnteredAt(data, status));
       if (ageMin != null && ageMin >= 30) {
         console.warn(

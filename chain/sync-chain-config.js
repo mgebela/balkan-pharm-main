@@ -37,6 +37,30 @@ if (/mintAuthority:/.test(src)) {
   );
 }
 
+if (deployed.escrowProgramId) {
+  if (/escrowProgramId:/.test(src)) {
+    src = src.replace(
+      /escrowProgramId: '[^']*'/,
+      `escrowProgramId: '${deployed.escrowProgramId}'`
+    );
+  } else {
+    src = src.replace(
+      /legacyEscrowAddress: '[^']*'/,
+      (m) => `${m},\n    escrowProgramId: '${deployed.escrowProgramId}'`
+    );
+  }
+}
+if (deployed.settlementMode) {
+  if (/settlementMode:/.test(src)) {
+    src = src.replace(/settlementMode: '[^']*'/, `settlementMode: '${deployed.settlementMode}'`);
+  } else {
+    src = src.replace(
+      /escrowProgramId: '[^']*'/,
+      (m) => `${m},\n    settlementMode: '${deployed.settlementMode}'`
+    );
+  }
+}
+
 fs.writeFileSync(configPath, src);
 console.log('Updated app/js/chain-config.js');
 console.log('  growMint:', deployed.growMint);
@@ -44,3 +68,10 @@ console.log('  seedCollection:', deployed.seedCollection);
 console.log('  mintAuthority:', mintAuthority);
 console.log('  escrowAddress:', escrowAddress);
 console.log('  feePayerAddress:', feePayerAddress);
+if (deployed.escrowProgramId) {
+  console.log('  escrowProgramId:', deployed.escrowProgramId);
+  console.log('  settlementMode:', deployed.settlementMode || 'program');
+}
+if (deployed.escrowProgramId) {
+  console.log('  escrowProgramId:', deployed.escrowProgramId);
+}

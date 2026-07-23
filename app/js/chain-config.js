@@ -32,6 +32,9 @@
     escrowAddress: 'EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD',
     feePayerAddress: 'Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975',
     legacyEscrowAddress: 'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3',
+    // On-chain Anchor escrow (parallel path). 'program' = PDA vault; 'legacy' = hot-wallet queue.
+    escrowProgramId: 'GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb',
+    settlementMode: 'program',
     // Activates escrow_pending → active when NFT is already in escrow.
     marketReconcileUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow',

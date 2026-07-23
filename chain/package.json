@@ -19,6 +19,7 @@
     "mint:queue:watch": "node process-seed-mints.js --watch",
     "grow:queue": "node process-growth-mints.js",
     "grow:queue:watch": "node process-growth-mints.js --watch",
+    "deploy:escrow": "node deploy-escrow-program.js",
     "market:queue": "node process-market.js",
     "market:queue:watch": "node process-market.js --watch",
     "queue:all": "node process-seed-mints.js && node process-growth-mints.js && node process-market.js"

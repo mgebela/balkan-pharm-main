@@ -12,3 +12,9 @@ chain/.env
 chain/keys/
 functions/.env
 functions/.env.*
+
+# Anchor / Solana build artifacts (keep IDL in /idl)
+/target/
+/test-ledger/
+**/*-keypair.json
+*.so
