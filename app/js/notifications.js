@@ -148,31 +148,38 @@
     const list = document.getElementById('notif-panel-list');
     if (!list) return;
     if (!items.length) {
-      list.innerHTML = '<p class="notif-empty">No notifications yet.</p>';
+      list.innerHTML =
+        '<p class="notif-empty">No notifications yet.</p>' +
+        '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>';
       return;
     }
-    list.innerHTML = items
-      .map(function (n) {
-        return (
-          '<button type="button" class="notif-item' +
-          (n.read ? '' : ' notif-item--unread') +
-          '" data-id="' +
-          esc(n.id) +
-          '">' +
-          '<span class="notif-item-title">' +
-          esc(n.title || 'Update') +
-          '</span>' +
-          '<span class="notif-item-body">' +
-          esc(n.body || '') +
-          '</span>' +
-          '<span class="notif-item-meta">' +
-          esc(relativeTime(n.createdAt)) +
-          (n.type ? ' · ' + esc(n.type.replace(/_/g, ' ')) : '') +
-          '</span>' +
-          '</button>'
-        );
-      })
-      .join('');
+    list.innerHTML =
+      items
+        .map(function (n) {
+          return (
+            '<button type="button" class="notif-item' +
+            (n.read ? '' : ' notif-item--unread') +
+            '" data-id="' +
+            esc(n.id) +
+            '">' +
+            '<span class="notif-item-title">' +
+            esc(n.title || 'Update') +
+            '</span>' +
+            '<span class="notif-item-body">' +
+            esc(n.body || '') +
+            '</span>' +
+            '<span class="notif-item-meta">' +
+            esc(relativeTime(n.createdAt)) +
+            (n.type ? ' · ' + esc(n.type.replace(/_/g, ' ')) : '') +
+            (n.meta && n.meta.demo ? ' · example' : '') +
+            '</span>' +
+            '</button>'
+          );
+        })
+        .join('') +
+      '<div class="notif-panel-foot">' +
+      '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load more examples</button>' +
+      '</div>';
   }
 
   function renderBell() {
@@ -342,6 +349,10 @@
           });
           items = next;
           emit();
+          if (!next.length && !window.__dnevnikNotifDemoSeeded) {
+            window.__dnevnikNotifDemoSeeded = true;
+            seedDemoInbox({ force: false, toast: false, both: true }).catch(function () {});
+          }
         },
         function (err) {
           console.warn('notifications watch failed', err);
@@ -357,6 +368,10 @@
               });
               items = next;
               emit();
+              if (!next.length && !window.__dnevnikNotifDemoSeeded) {
+                window.__dnevnikNotifDemoSeeded = true;
+                seedDemoInbox({ force: false, toast: false, both: true }).catch(function () {});
+              }
             });
           }
         }
@@ -666,6 +681,14 @@
 
     if (panel) {
       panel.addEventListener('click', function (e) {
+        const loadBtn = e.target.closest('#notif-load-examples');
+        if (loadBtn) {
+          e.stopPropagation();
+          seedDemoInbox({ force: true, both: true }).then(function () {
+            renderPanelList();
+          });
+          return;
+        }
         const item = e.target.closest('.notif-item');
         if (!item) return;
         const id = item.dataset.id;
@@ -685,6 +708,180 @@
     });
   }
 
+  function isAdopterProfile() {
+    return document.body.classList.contains('profile-adopter');
+  }
+
+  function demoSamples(role) {
+    const now = Date.now();
+    const iso = function (minsAgo) {
+      return new Date(now - minsAgo * 60 * 1000).toISOString();
+    };
+    const grower = [
+      {
+        type: 'journal_entry',
+        title: 'Journal log saved',
+        body: 'Northern Lights · zalijevanje — Morning feed complete.',
+        createdAt: iso(5),
+        meta: { key: 'demo:journal', plantId: null, demo: true },
+        action: { view: 'plants' },
+      },
+      {
+        type: 'care_week',
+        title: 'Weekly care qualified',
+        body: 'OG Kush hit 5/5 care days · this week (grower progress).',
+        createdAt: iso(25),
+        meta: { key: 'demo:care_week', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'care_month',
+        title: 'Monthly care qualified',
+        body: 'OG Kush hit 12/12 care days · harvest unlock path.',
+        createdAt: iso(40),
+        meta: { key: 'demo:care_month', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'stake_received',
+        title: 'New adopt stake',
+        body: 'An adopter staked 100 $GROWTOO on "Batch B-2026-07" (50% locked until monthly care).',
+        createdAt: iso(90),
+        meta: { key: 'demo:stake', demo: true, priceGrow: 100 },
+        action: { view: 'market' },
+      },
+      {
+        type: 'seed_mint',
+        title: 'Seed NFT minted',
+        body: 'Northern Lights is on-chain.',
+        createdAt: iso(180),
+        meta: { key: 'demo:seed', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'growth_mint',
+        title: 'Growth stage minted',
+        body: 'Northern Lights → vegetative · +35 $GROWTOO',
+        createdAt: iso(200),
+        meta: { key: 'demo:growth', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'platform_bonus',
+        title: 'Platform bonus minted',
+        body: '+18 $GROWTOO for this month (plants, weeks, flower).',
+        createdAt: iso(360),
+        meta: { key: 'demo:platform', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'harvest_claim',
+        title: 'Harvest stake released',
+        body: 'Locked $GROWTOO for "Batch B-2026-07" released to you.',
+        createdAt: iso(500),
+        meta: { key: 'demo:harvest', demo: true },
+        action: { view: 'adopt' },
+      },
+    ];
+    const adopter = [
+      {
+        type: 'sale_settled',
+        title: 'Investment complete',
+        body: 'You adopted "Northern Lights" for 80 $GROWTOO.',
+        createdAt: iso(8),
+        meta: { key: 'demo:buy', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'sale_settled',
+        title: 'Adopt stake active',
+        body: 'You hold "Batch B-2026-07". Locked half unlocks when monthly care qualifies at harvest.',
+        createdAt: iso(30),
+        meta: { key: 'demo:adopt_active', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'sale_settled',
+        title: 'Grower unlocked full stake',
+        body: '"Batch B-2026-07" monthly care settled · released.',
+        createdAt: iso(120),
+        meta: { key: 'demo:unlock', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'sale_settled',
+        title: 'NFT delivered',
+        body: '"OG Kush" is in your garden.',
+        createdAt: iso(240),
+        meta: { key: 'demo:delivered', demo: true },
+        action: { view: 'adopt' },
+      },
+      {
+        type: 'system',
+        title: 'Monthly care update',
+        body: 'Grower is documenting care on your adopted plant — unlock status updates at harvest.',
+        createdAt: iso(400),
+        meta: { key: 'demo:monthly_status', demo: true },
+        action: { view: 'adopt' },
+      },
+    ];
+    if (role === 'adopter') return adopter;
+    if (role === 'both') return grower.concat(adopter);
+    return grower;
+  }
+
+  async function seedDemoInbox(opts) {
+    const o = opts || {};
+    const user = currentUser();
+    if (!user || !firebaseReady()) return 0;
+    const role = o.role || (isAdopterProfile() ? 'adopter' : 'grower');
+    const samples = demoSamples(o.both ? 'both' : role);
+    const force = !!o.force;
+
+    if (!force) {
+      const existingDemo = items.some(function (n) {
+        return n && n.meta && n.meta.demo;
+      });
+      if (existingDemo || items.length > 0) return 0;
+    } else {
+      // Replace prior examples so reloads stay clean
+      const demos = items.filter(function (n) {
+        return n && n.meta && n.meta.demo;
+      });
+      for (let d = 0; d < demos.length; d += 1) {
+        try {
+          await colRef(user.uid).doc(demos[d].id).delete();
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    let written = 0;
+    for (let i = 0; i < samples.length; i += 1) {
+      const s = samples[i];
+      try {
+        await colRef(user.uid).add({
+          uid: user.uid,
+          type: s.type,
+          title: s.title,
+          body: s.body,
+          createdAt: s.createdAt,
+          read: false,
+          meta: s.meta || {},
+          action: s.action || null,
+        });
+        written += 1;
+      } catch (err) {
+        console.warn('demo notification failed', err);
+      }
+    }
+    if (written && o.toast !== false) {
+      toast('Loaded ' + written + ' example notifications', 'info');
+    }
+    return written;
+  }
+
   function init() {
     ensureToastHost();
     bindUi();
@@ -702,6 +899,7 @@
     markAllRead: markAllRead,
     dismiss: dismiss,
     unreadCount: unreadCount,
+    seedDemoInbox: seedDemoInbox,
     onChange: function (fn) {
       if (typeof fn === 'function') listeners.add(fn);
       return function () {
