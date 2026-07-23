@@ -1691,22 +1691,50 @@ body.notif-open {
   align-self: center;
 }
 
-.metric-donut {
-  width: 52px;
-  height: 52px;
-  transform: rotate(-90deg);
+.metric-eq {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3px;
+  width: 46px;
+  height: 44px;
+  padding: 2px 1px 0;
 }
 
-.metric-donut-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 5;
+.metric-eq-bar {
+  flex: 1 1 0;
+  min-width: 4px;
+  max-width: 7px;
+  height: var(--eq-h, 20%);
+  border-radius: 2px 2px 1px 1px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--eq-color, #2dd4bf) 88%, #fff) 0%,
+    var(--eq-color, #2dd4bf) 55%,
+    color-mix(in srgb, var(--eq-color, #2dd4bf) 55%, #000) 100%
+  );
+  box-shadow: 0 0 10px color-mix(in srgb, var(--eq-color, #2dd4bf) 28%, transparent);
+  transform-origin: bottom center;
+  animation: metric-eq-pulse 1.8s ease-in-out infinite;
+  animation-delay: var(--eq-delay, 0s);
 }
 
-.metric-donut-fill {
-  fill: none;
-  stroke-width: 5;
-  stroke-linecap: round;
+@keyframes metric-eq-pulse {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0.88;
+  }
+  50% {
+    transform: scaleY(0.72);
+    opacity: 0.62;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric-eq-bar {
+    animation: none;
+  }
 }
 
 .metric-card--teal:hover { border-color: rgba(180, 71, 43, 0.22); }
@@ -4144,9 +4172,14 @@ body.admin-readonly .toolbox-form textarea {
     flex-shrink: 0;
   }
 
-  .metric-donut {
-    width: 44px;
-    height: 44px;
+  .metric-eq {
+    width: 40px;
+    height: 40px;
+    gap: 2.5px;
+  }
+
+  .metric-eq-bar {
+    max-width: 6px;
   }
 
   .plants-list {

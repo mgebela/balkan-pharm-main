@@ -4,27 +4,27 @@
 (function () {
   'use strict';
 
-  function metricDonutSvg(pct, color) {
+  /** Equalizer bars — pct drives overall energy; pattern keeps a readable EQ shape. */
+  function metricEqHtml(pct, color) {
     const p = Math.min(100, Math.max(0, Number(pct) || 0));
-    const r = 17;
-    const c = 2 * Math.PI * r;
-    const offset = c * (1 - p / 100);
-    return (
-      '<svg class="metric-donut" viewBox="0 0 44 44" aria-hidden="true">' +
-      '<circle class="metric-donut-track" cx="22" cy="22" r="' +
-      r +
-      '"/>' +
-      '<circle class="metric-donut-fill" cx="22" cy="22" r="' +
-      r +
-      '" stroke="' +
-      color +
-      '" stroke-dasharray="' +
-      c.toFixed(2) +
-      '" stroke-dashoffset="' +
-      offset.toFixed(2) +
-      '"/>' +
-      '</svg>'
-    );
+    const energy = Math.max(0.12, p / 100);
+    const peaks = [0.38, 0.72, 1, 0.58, 0.86];
+    const bars = peaks
+      .map(function (peak, i) {
+        const h = Math.round(Math.max(0.14, peak * energy) * 100);
+        const delay = (i * 0.08).toFixed(2) + 's';
+        return (
+          '<span class="metric-eq-bar" style="--eq-h:' +
+          h +
+          '%;--eq-color:' +
+          (color || '#2dd4bf') +
+          ';--eq-delay:' +
+          delay +
+          '"></span>'
+        );
+      })
+      .join('');
+    return '<div class="metric-eq" aria-hidden="true">' + bars + '</div>';
   }
 
   function metricRow(label, value, dotClass) {
@@ -45,7 +45,11 @@
 
   function metricCard(opts) {
     const o = opts || {};
-    const chart = o.donut != null ? '<div class="metric-card-chart">' + metricDonutSvg(o.donut.pct, o.donut.color) + '</div>' : '';
+    const chartSrc = o.eq || o.donut;
+    const chart =
+      chartSrc != null
+        ? '<div class="metric-card-chart">' + metricEqHtml(chartSrc.pct, chartSrc.color) + '</div>'
+        : '';
     return (
       '<article class="metric-card' +
       (o.modifier ? ' metric-card--' + o.modifier : '') +
@@ -77,7 +81,9 @@
   }
 
   window.MetricUI = {
-    donut: metricDonutSvg,
+    eq: metricEqHtml,
+    /** @deprecated alias — cards now render equalizer bars */
+    donut: metricEqHtml,
     row: metricRow,
     card: metricCard,
     panel: metricPanel,
