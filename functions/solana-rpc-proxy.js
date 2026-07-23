@@ -2,44 +2,63 @@
  * Public HTTPS proxy for Solana JSON-RPC.
  * Forwards browser requests to SOLANA_RPC_URL (QuickNode/Helius) so the
  * provider key never ships in the frontend bundle.
+ *
+ * Policy: allow standard wallet/read/send methods by prefix; deny a short
+ * blocklist. Denied methods are logged so we can extend safely.
  */
 'use strict';
 
 const PUBLIC_FALLBACK = 'https://api.devnet.solana.com';
 
-/** Methods wallets / market UI commonly need. Deny airdrop (not for browsers). */
-const ALLOWED = new Set([
-  'getAccountInfo',
-  'getBalance',
-  'getBlockHeight',
-  'getBlockTime',
-  'getEpochInfo',
-  'getFeeForMessage',
-  'getGenesisHash',
-  'getHealth',
-  'getLatestBlockhash',
-  'getMinimumBalanceForRentExemption',
-  'getMultipleAccounts',
-  'getProgramAccounts',
-  'getRecentPerformanceSamples',
-  'getRecentPrioritizationFees',
-  'getSignatureStatuses',
-  'getSignaturesForAddress',
-  'getSlot',
-  'getTokenAccountBalance',
-  'getTokenAccountsByOwner',
-  'getTokenLargestAccounts',
-  'getTokenSupply',
-  'getTransaction',
-  'getTransactionCount',
-  'getVersion',
-  'isBlockhashValid',
-  'sendTransaction',
-  'simulateTransaction',
+/** Never proxy these — abuse / faucet / admin. */
+const DENIED = new Set([
+  'requestAirdrop',
+  // Rare / unused by wallets; keep closed unless needed.
+  'accountSubscribe',
+  'accountUnsubscribe',
+  'logsSubscribe',
+  'logsUnsubscribe',
+  'programSubscribe',
+  'programUnsubscribe',
+  'signatureSubscribe',
+  'signatureUnsubscribe',
+  'slotSubscribe',
+  'slotUnsubscribe',
+  'rootSubscribe',
+  'rootUnsubscribe',
+  'blockSubscribe',
+  'blockUnsubscribe',
+  'slotsUpdatesSubscribe',
+  'slotsUpdatesUnsubscribe',
+  'voteSubscribe',
+  'voteUnsubscribe',
+]);
+
+/**
+ * Extra methods that do not match get*|is*|send*|simulate* but wallets use
+ * (legacy + niche). Prefer prefix rules for anything new.
+ */
+const ALLOWED_EXTRA = new Set([
+  'minimumLedgerSlot',
+  'getConfirmedBlock',
+  'getConfirmedBlocks',
+  'getConfirmedBlocksWithLimit',
   'getConfirmedSignaturesForAddress2',
   'getConfirmedTransaction',
   'getRecentBlockhash',
+  'getFeeCalculatorForBlockhash',
+  'getFees',
+  'getSnapshotSlot',
 ]);
+
+function isMethodAllowed(method) {
+  if (!method || typeof method !== 'string') return false;
+  if (DENIED.has(method)) return false;
+  if (ALLOWED_EXTRA.has(method)) return true;
+  // Standard Solana HTTP JSON-RPC used by @solana/web3.js + wallets
+  if (/^(get|is|send|simulate)[A-Za-z0-9]+$/.test(method)) return true;
+  return false;
+}
 
 const hits = new Map();
 
@@ -78,23 +97,20 @@ function methodOf(body) {
 }
 
 function assertAllowed(body) {
-  if (Array.isArray(body)) {
-    for (const item of body) {
-      const m = methodOf(item);
-      if (!m || !ALLOWED.has(m)) {
-        const err = new Error('RPC method not allowed: ' + (m || 'unknown'));
-        err.status = 403;
-        throw err;
-      }
+  const checkOne = (item) => {
+    const m = methodOf(item);
+    if (!isMethodAllowed(m)) {
+      console.warn('solanaRpc denied method', m || 'unknown');
+      const err = new Error('RPC method not allowed: ' + (m || 'unknown'));
+      err.status = 403;
+      throw err;
     }
+  };
+  if (Array.isArray(body)) {
+    body.forEach(checkOne);
     return;
   }
-  const m = methodOf(body);
-  if (!m || !ALLOWED.has(m)) {
-    const err = new Error('RPC method not allowed: ' + (m || 'unknown'));
-    err.status = 403;
-    throw err;
-  }
+  checkOne(body);
 }
 
 /**
@@ -166,7 +182,6 @@ async function handleSolanaRpc(req, res) {
     const text = await upstream.text();
     res.status(upstream.status);
     res.set('Content-Type', upstream.headers.get('content-type') || 'application/json');
-    // Hint caches / browsers: RPC is not cacheable.
     res.set('Cache-Control', 'no-store');
     res.send(text);
   } catch (err) {
@@ -182,4 +197,4 @@ async function handleSolanaRpc(req, res) {
   }
 }
 
-module.exports = {handleSolanaRpc, ALLOWED};
+module.exports = {handleSolanaRpc, isMethodAllowed, DENIED, ALLOWED_EXTRA};
