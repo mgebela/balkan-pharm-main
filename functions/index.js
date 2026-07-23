@@ -5,6 +5,7 @@ const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI} = require('@google/genai');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
+const {settleMarketPending} = require('./market-settle');
 
 initializeApp();
 
@@ -132,6 +133,50 @@ exports.reconcileMarketEscrowSchedule = onSchedule(
       setPreferredRpc(process.env.SOLANA_RPC_URL || '');
       const result = await reconcileEscrowPending();
       console.log('scheduled reconcile', result);
+    },
+);
+
+/**
+ * Settle sale_pending / cancel_requested without a laptop.
+ * Uses fee-payer + escrow (+ mint authority for legacy holdings).
+ *
+ * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/settleMarketQueue
+ */
+exports.settleMarketQueue = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 300,
+      memory: '512MiB',
+      maxInstances: 2,
+    },
+    async (req, res) => {
+      if (!allowReconcileRequest(req)) {
+        res.status(429).json({ok: false, error: 'Too many settle requests'});
+        return;
+      }
+      try {
+        const result = await settleMarketPending();
+        res.json(result);
+      } catch (err) {
+        console.error('settleMarketQueue', err);
+        res.status(500).json({ok: false, error: (err && err.message) || 'settle failed'});
+      }
+    },
+);
+
+/** Backup scheduler so buys/cancels do not wait on GitHub Actions alone. */
+exports.settleMarketQueueSchedule = onSchedule(
+    {
+      schedule: 'every 5 minutes',
+      region: REGION,
+      timeoutSeconds: 300,
+      memory: '512MiB',
+    },
+    async () => {
+      const result = await settleMarketPending();
+      console.log('scheduled market settle', result);
     },
 );
 

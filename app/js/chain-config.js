@@ -35,6 +35,9 @@
     // Activates escrow_pending → active when NFT is already in escrow.
     marketReconcileUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow',
+    // Settles sale_pending / cancel_requested (fee payer + escrow keys in Cloud Functions).
+    marketSettleUrl:
+      'https://europe-west1-balpha-9dab9.cloudfunctions.net/settleMarketQueue',
     devnetNotice:
       'Connect a Solana wallet on Devnet. Seed NFTs mint via the cloud queue; $GROWTOO rewards settle on-chain.',
     explorerAddress: function (address) {

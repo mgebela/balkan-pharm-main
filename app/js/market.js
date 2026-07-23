@@ -83,12 +83,16 @@
           syncMyInvestments();
           emit();
           maybeRequestEscrowReconcile(next);
+          maybeRequestMarketSettle(next);
         },
         function (err) {
           console.warn('marketListings watch failed', err);
         }
       );
   }
+
+  let lastSettleAt = 0;
+  let settleTimer = null;
 
   /**
    * If any listing is stuck in escrow_pending, ping the Cloud Function that
@@ -127,6 +131,43 @@
         })
         .catch(function (err) {
           console.warn('market escrow reconcile ping failed', err);
+        });
+    }, 1500);
+  }
+
+  /** Ping Cloud Function that settles buys/cancels (no laptop / GH Actions required). */
+  function maybeRequestMarketSettle(rows) {
+    const pending = (rows || []).filter(function (l) {
+      return l && (l.status === 'sale_pending' || l.status === 'cancel_requested');
+    });
+    if (!pending.length) return;
+
+    const url = cfg().marketSettleUrl;
+    if (!url) return;
+
+    const now = Date.now();
+    if (now - lastSettleAt < 45000) return;
+
+    if (settleTimer) clearTimeout(settleTimer);
+    settleTimer = setTimeout(function () {
+      lastSettleAt = Date.now();
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: 'app-market', count: pending.length }),
+      })
+        .then(function (res) {
+          return res.json().catch(function () {
+            return null;
+          });
+        })
+        .then(function (data) {
+          if (data && (data.sold > 0 || data.cancelled > 0)) {
+            console.info('market settle', data);
+          }
+        })
+        .catch(function (err) {
+          console.warn('market settle ping failed', err);
         });
     }, 1500);
   }
@@ -232,7 +273,7 @@
       '<div class="market-stuck-inner">' +
       '<div class="market-stuck-copy">' +
       '<strong>Settlement pending</strong>' +
-      '<p>Escrow activation retries automatically. Buys and cancels settle via the cloud market queue (~every 5 min). Retry now only re-checks escrow; it does not settle payments.</p>' +
+      '<p>Cloud workers auto-activate escrow and settle buys/cancels about every 5 minutes. Retry now nudges both.</p>' +
       '<ul>' +
       parts.join('') +
       '</ul>' +
@@ -242,45 +283,60 @@
   }
 
   function forceReconcileNow(count) {
-    const url = cfg().marketReconcileUrl;
+    const reconcileUrl = cfg().marketReconcileUrl;
+    const settleUrl = cfg().marketSettleUrl;
     const btn = document.getElementById('market-stuck-retry');
     if (btn) {
       btn.disabled = true;
       btn.textContent = 'Retrying…';
     }
     lastReconcileAt = 0;
-    const ping = url
-      ? fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ source: 'app-stuck-retry', count: count || 0 }),
-        })
-          .then(function (res) {
-            return res.json().catch(function () {
-              return { ok: res.ok };
-            });
-          })
-          .catch(function () {
-            return { ok: false };
-          })
-      : Promise.resolve({ ok: false });
+    lastSettleAt = 0;
 
-    ping.then(function (data) {
+    function ping(url, body) {
+      if (!url) return Promise.resolve({ ok: false });
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+        .then(function (res) {
+          return res.json().catch(function () {
+            return { ok: res.ok };
+          });
+        })
+        .catch(function () {
+          return { ok: false };
+        });
+    }
+
+    Promise.all([
+      ping(reconcileUrl, { source: 'app-stuck-retry', count: count || 0 }),
+      ping(settleUrl, { source: 'app-stuck-retry', count: count || 0 }),
+    ]).then(function (results) {
+      const esc = results[0] || {};
+      const settle = results[1] || {};
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Retry now';
       }
-      if (data && data.activated > 0) {
-        flashOk('Activated ' + data.activated + ' listing(s). Refresh if status lags.');
+      if (esc.activated > 0) {
+        flashOk('Activated ' + esc.activated + ' listing(s). Refresh if status lags.');
         return;
       }
-      const settle =
-        data && (Number(data.salePending || 0) + Number(data.cancelRequested || 0) > 0)
-          ? ' ' +
-            (Number(data.salePending || 0) + Number(data.cancelRequested || 0)) +
-            ' buy/cancel still need the market queue (GitHub Actions every ~5 min).'
-          : ' Buys/cancels settle via the cloud market queue once GitHub secrets are set.';
-      flashOk('Escrow retry sent.' + settle);
+      if (settle.sold > 0 || settle.cancelled > 0) {
+        flashOk(
+          'Settled ' +
+            (settle.sold || 0) +
+            ' sale(s) and ' +
+            (settle.cancelled || 0) +
+            ' cancel(s). Refresh if status lags.'
+        );
+        return;
+      }
+      flashOk(
+        'Retry sent to escrow + settle workers. Status should update within a minute if the chain confirms.'
+      );
     });
   }
 
