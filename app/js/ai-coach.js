@@ -844,7 +844,9 @@
       '</svg></span>' +
       '<span class="ai-coach-fab-label">Coach</span>' +
       '</button>' +
-      '<aside class="ai-coach-panel" id="ai-coach-panel" hidden role="dialog" aria-label="Grower Coach">' +
+      '<button type="button" class="ai-coach-backdrop" id="ai-coach-backdrop" aria-label="Close coach" hidden></button>' +
+      '<aside class="ai-coach-panel" id="ai-coach-panel" hidden role="dialog" aria-modal="true" aria-labelledby="ai-coach-title">' +
+      '<div class="ai-coach-sheet-handle" aria-hidden="true"></div>' +
       '<header class="ai-coach-head">' +
       '<div class="ai-coach-brand">' +
       '<span class="ai-coach-avatar" aria-hidden="true">' +
@@ -852,7 +854,7 @@
       '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
       '</svg></span>' +
       '<div class="ai-coach-brand-copy">' +
-      '<strong>Grower Coach</strong>' +
+      '<strong id="ai-coach-title">Grower Coach</strong>' +
       '<span class="ai-coach-status" id="ai-coach-status">Ready to help</span>' +
       '</div></div>' +
       '<div class="ai-coach-head-actions">' +
@@ -869,7 +871,7 @@
       '<form class="ai-coach-form" id="ai-coach-form">' +
       '<label class="ai-coach-field">' +
       '<span class="visually-hidden">Message</span>' +
-      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask anything about your grow…" autocomplete="off"></textarea>' +
+      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask about stages, care, or minting…" autocomplete="off"></textarea>' +
       '</label>' +
       '<div class="ai-coach-form-actions">' +
       '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
@@ -881,7 +883,7 @@
       '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
       '</svg></button>' +
       '</div></form>' +
-      '<p class="ai-coach-foot">Can create plants, log care, update stages, and mint — always asks before changing anything.</p>' +
+      '<p class="ai-coach-foot">Can create plants, log care, update stages, and mint — always asks first.</p>' +
       '</div></aside>';
     document.body.appendChild(root);
 
@@ -890,6 +892,7 @@
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
     document.getElementById('ai-coach-close').addEventListener('click', close);
     document.getElementById('ai-coach-clear').addEventListener('click', clearChat);
+    document.getElementById('ai-coach-backdrop').addEventListener('click', close);
     document.getElementById('ai-coach-form').addEventListener('submit', onSubmit);
     document.getElementById('ai-coach-mic').addEventListener('click', toggleVoice);
     document.getElementById('ai-coach-quick').addEventListener('click', function (e) {
@@ -909,6 +912,14 @@
         }
       });
     }
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', syncCoachKeyboardInset);
+      window.visualViewport.addEventListener('scroll', syncCoachKeyboardInset);
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && open) close();
+    });
 
     document.getElementById('ai-coach-messages').addEventListener('click', function (e) {
       const promptBtn = e.target.closest('[data-coach-prompt]');
@@ -930,6 +941,16 @@
         cancelPendingActions();
       }
     });
+  }
+
+  function syncCoachKeyboardInset() {
+    if (!open || !window.visualViewport) {
+      document.documentElement.style.setProperty('--coach-kbd-inset', '0px');
+      return;
+    }
+    const vv = window.visualViewport;
+    const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    document.documentElement.style.setProperty('--coach-kbd-inset', inset + 'px');
   }
 
   function renderQuickPrompts() {
@@ -1027,17 +1048,17 @@
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
-      '<span class="ai-coach-empty-mark" aria-hidden="true">🌱</span>' +
-      '<h3>Hey grower — what are we working on?</h3>' +
-      '<p>I can advise on stages, write journal entries, and prepare mints. Pick a starter or type below.</p>' +
+      '<p class="ai-coach-empty-kicker">Grower Coach</p>' +
+      '<h3>What should we work on?</h3>' +
+      '<p>Advice on stages, journal logs, and mint prep. Tap a starter or type below.</p>' +
       '</div>' +
-      '<div class="ai-coach-empty-grid">' +
+      '<div class="ai-coach-empty-grid" role="list">' +
       QUICK_PROMPTS.slice(0, 4)
         .map(function (p) {
           return (
             '<button type="button" class="ai-coach-starter" data-coach-prompt="' +
             esc(p.text) +
-            '">' +
+            '" role="listitem">' +
             '<strong>' +
             esc(p.label) +
             '</strong>' +
@@ -1121,11 +1142,15 @@
     open = !!next;
     const panel = document.getElementById('ai-coach-panel');
     const fab = document.getElementById('ai-coach-fab');
+    const backdrop = document.getElementById('ai-coach-backdrop');
     if (!panel || !fab) return;
     panel.hidden = !open;
+    if (backdrop) backdrop.hidden = !open;
     fab.setAttribute('aria-expanded', open ? 'true' : 'false');
     fab.classList.toggle('is-open', open);
+    fab.hidden = open;
     document.body.classList.toggle('ai-coach-open', open);
+    syncCoachKeyboardInset();
     if (open) {
       renderMessages();
       renderQuickPrompts();
@@ -1139,6 +1164,7 @@
       }
     } else {
       stopVoice();
+      document.documentElement.style.setProperty('--coach-kbd-inset', '0px');
     }
   }
 
