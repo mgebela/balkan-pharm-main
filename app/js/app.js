@@ -1148,6 +1148,26 @@ function applyProfileTypeUI(profileType) {
   if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
     window.AICoach.applyVisibility();
   }
+  syncMoreNavVisibility();
+}
+
+function syncMoreNavVisibility() {
+  const moreBtn = document.getElementById('bottom-nav-more');
+  if (!moreBtn) return;
+  const items = document.querySelectorAll('.more-nav-item');
+  let visible = 0;
+  items.forEach(function (el) {
+    const style = window.getComputedStyle(el);
+    if (style.display !== 'none' && style.visibility !== 'hidden') visible += 1;
+  });
+  moreBtn.hidden = visible === 0;
+  if (visible === 0) {
+    const overlay = document.getElementById('more-nav-overlay');
+    if (overlay) overlay.hidden = true;
+    document.body.classList.remove('more-nav-open');
+    moreBtn.classList.remove('active');
+    moreBtn.setAttribute('aria-expanded', 'false');
+  }
 }
 
 function defaultViewForProfile() {
@@ -1588,10 +1608,11 @@ function initFirebaseSync() {
   }
 
   // --- Navigation ---
-  const navItems = document.querySelectorAll('.nav-item');
+  const navItems = document.querySelectorAll('.nav-item[data-view], .more-nav-item[data-view]');
   const views = document.querySelectorAll('.view');
   const viewTitle = document.querySelector('.view-title');
   const logoutBtn = document.getElementById('btn-logout');
+  const MORE_NAV_VIEWS = ['toolbox', 'danas', 'admin'];
   const titles = {
     dashboard: 'Dashboard',
     plants: 'Plants & journal',
@@ -1633,12 +1654,21 @@ function initFirebaseSync() {
       if (view) view.classList.add('active');
       const plant = getPlants().find((p) => p.id === extra);
       if (viewTitle) viewTitle.textContent = plant ? plant.name : 'Growlog';
+      document.querySelectorAll('.nav-item[data-view="plants"]').forEach((n) => n.classList.add('active'));
+      const moreBtnEarly = document.getElementById('bottom-nav-more');
+      if (moreBtnEarly) moreBtnEarly.classList.remove('active');
+      setMoreNavOpen(false);
       renderGrowlog(extra);
       return;
     }
     currentGrowlogPlantId = null;
     const view = document.getElementById('view-' + id);
-    document.querySelectorAll('.nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
+    document.querySelectorAll('.nav-item[data-view="' + id + '"], .more-nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
+    const moreBtn = document.getElementById('bottom-nav-more');
+    if (moreBtn) {
+      moreBtn.classList.toggle('active', MORE_NAV_VIEWS.indexOf(id) !== -1);
+    }
+    setMoreNavOpen(false);
     if (view) view.classList.add('active');
     if (viewTitle) {
       if (id === 'adopt' && isAdopterProfile()) {
@@ -1722,6 +1752,34 @@ function initFirebaseSync() {
     showView(view);
   });
 });
+
+  function setMoreNavOpen(open) {
+    const overlay = document.getElementById('more-nav-overlay');
+    const btn = document.getElementById('bottom-nav-more');
+    if (overlay) overlay.hidden = !open;
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('more-nav-open', !!open);
+  }
+
+  (function bindMoreNav() {
+    const btn = document.getElementById('bottom-nav-more');
+    const backdrop = document.getElementById('more-nav-backdrop');
+    const closeBtn = document.getElementById('more-nav-close');
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const overlay = document.getElementById('more-nav-overlay');
+        setMoreNavOpen(!(overlay && !overlay.hidden));
+      });
+    }
+    if (backdrop) backdrop.addEventListener('click', function () { setMoreNavOpen(false); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setMoreNavOpen(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && document.body.classList.contains('more-nav-open')) {
+        setMoreNavOpen(false);
+      }
+    });
+  })();
 
   const viewGrowlogEl = document.getElementById('view-growlog');
   if (viewGrowlogEl) {

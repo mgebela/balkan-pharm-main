@@ -1980,6 +1980,7 @@
       if (compact) {
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
+          '<div class="wallet-controls-info">' +
           '<span class="wallet-controls-label">Solana</span>' +
           (linkedPubkey
             ? '<span class="wallet-controls-addr" title="' +
@@ -1989,6 +1990,7 @@
               '</span>'
             : '') +
           walletLinkBadgeHtml() +
+          '</div>' +
           '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">' +
           (linkedPubkey ? 'Reconnect' : 'Connect') +
           '</button>' +
@@ -2021,9 +2023,11 @@
     if (compact) {
       return (
         '<div class="wallet-controls wallet-controls--compact wallet-controls--connected">' +
+        '<div class="wallet-controls-info">' +
         '<span class="wallet-controls-addr" title="' + esc(wallet.address) + '">' + esc(shortAddr(wallet.address)) + '</span>' +
         walletLinkBadgeHtml() +
         explorer +
+        '</div>' +
         '<button type="button" class="btn btn-ghost btn-sm wallet-disconnect-btn">Disconnect</button>' +
         '</div>'
       );
