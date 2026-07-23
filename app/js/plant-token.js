@@ -958,8 +958,14 @@
         '<div class="metric-panel metric-panel--inline adopt-wallet-panel">' +
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
-        '<h3>Connect to start</h3>' +
-        '<p>Link a Solana wallet on Devnet to mint seed NFTs and earn $GROWTOO.</p>' +
+        '<h3>' +
+        (isAdopterUi() ? 'Connect when you stake' : 'Connect to mint') +
+        '</h3>' +
+        '<p>' +
+        (isAdopterUi()
+          ? 'Browse your garden anytime. Connect a Solana wallet on Devnet when you invest or claim rewards.'
+          : 'Link a Solana wallet on Devnet to mint seed NFTs and earn $GROWTOO.') +
+        '</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
         '</div></div>';
@@ -1961,6 +1967,20 @@
     );
   }
 
+  /** Views where signing is expected — only these show the header connect bar when disconnected. */
+  var HEADER_WALLET_VIEWS = { adopt: 1, market: 1, admin: 1 };
+
+  function currentAppViewId() {
+    var active = document.querySelector('.view.active');
+    if (!active || !active.id || active.id.indexOf('view-') !== 0) return '';
+    return active.id.slice(5);
+  }
+
+  function headerNeedsWalletPrompt(wallet) {
+    if (wallet && wallet.connected) return false;
+    return !!HEADER_WALLET_VIEWS[currentAppViewId()];
+  }
+
   function walletControlsHtml(variant) {
     syncWalletFromSolana();
     const wallet = readWallet();
@@ -1978,6 +1998,7 @@
           ' — reconnect to sign.</p>'
         : '';
       if (compact) {
+        if (!headerNeedsWalletPrompt(wallet)) return '';
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
           '<div class="wallet-controls-info">' +
@@ -2013,25 +2034,15 @@
       );
     }
 
+    // Connected: no persistent header chrome — status lives on Tokenise / Market / Admin panels.
+    if (compact) return '';
+
     const explorer =
       wallet.address
         ? '<a class="adopt-wallet-explorer wallet-explorer-link" href="' +
           esc(explorerAddressUrl(wallet.address)) +
           '" target="_blank" rel="noopener noreferrer" title="View on Solscan">Solscan ↗</a>'
         : '';
-
-    if (compact) {
-      return (
-        '<div class="wallet-controls wallet-controls--compact wallet-controls--connected">' +
-        '<div class="wallet-controls-info">' +
-        '<span class="wallet-controls-addr" title="' + esc(wallet.address) + '">' + esc(shortAddr(wallet.address)) + '</span>' +
-        walletLinkBadgeHtml() +
-        explorer +
-        '</div>' +
-        '<button type="button" class="btn btn-ghost btn-sm wallet-disconnect-btn">Disconnect</button>' +
-        '</div>'
-      );
-    }
 
     return (
       '<div class="wallet-controls wallet-controls--panel wallet-controls--connected">' +
@@ -2054,7 +2065,10 @@
     renderWalletUiBusy = true;
     try {
       const headerBar = document.getElementById('app-wallet-bar');
-      if (headerBar) headerBar.innerHTML = walletControlsHtml('compact');
+      if (headerBar) {
+        headerBar.innerHTML = walletControlsHtml('compact');
+        headerBar.hidden = !headerBar.innerHTML.trim();
+      }
 
       const adminPanel = document.getElementById('admin-wallet-panel');
       if (adminPanel) adminPanel.innerHTML = walletControlsHtml('panel');
@@ -2435,11 +2449,16 @@
           buildPlantGrowSvg(0, { hero: true, noBg: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
-          '<p>' + esc(devnetNotice()) + '</p>' +
+          '<p>' +
+          esc(
+            adopter
+              ? 'Browse the market and connect your wallet when you are ready to stake $GROWTOO.'
+              : 'Open Tokenise to mint seeds. Connect your wallet when you are ready to sign.'
+          ) +
+          '</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">' +
-          esc(openLabel) +
+          esc(adopter ? 'Browse market' : openLabel) +
           '</button>' +
-          '<button type="button" class="btn btn-ghost wallet-connect-btn">Connect wallet</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
         container.innerHTML =
@@ -2549,7 +2568,15 @@
       }
 
       const openBtn = document.getElementById('dashboard-adopt-open');
-      if (openBtn && typeof onOpen === 'function') openBtn.addEventListener('click', onOpen);
+      if (openBtn) {
+        openBtn.addEventListener('click', function () {
+          if (!wallet.connected && adopter && window.showAppView) {
+            window.showAppView('market');
+            return;
+          }
+          if (typeof onOpen === 'function') onOpen();
+        });
+      }
       renderGlobalWalletUI();
     },
   };

@@ -4003,6 +4003,18 @@ body.admin-readonly .toolbox-form textarea {
     min-width: 0;
   }
 
+  .main-header .app-wallet-bar:empty,
+  .main-header .app-wallet-bar[hidden] {
+    display: none !important;
+  }
+
+  /* When wallet bar is hidden, keep header as a single row */
+  .main-header:has(.app-wallet-bar[hidden]),
+  .main-header:has(.app-wallet-bar:empty) {
+    grid-template-areas: 'title notif logout';
+    grid-template-columns: 1fr auto auto;
+  }
+
   /* Inbox → bottom sheet on phones */
   .notif-overlay {
     align-items: flex-end;

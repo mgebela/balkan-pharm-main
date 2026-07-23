@@ -905,7 +905,7 @@
         } else {
           notice.hidden = false;
           notice.textContent =
-            'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet, then tap Invest on an open offer.';
+            'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet when you tap Invest on an open offer.';
         }
       }
 

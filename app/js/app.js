@@ -1658,6 +1658,9 @@ function initFirebaseSync() {
       const moreBtnEarly = document.getElementById('bottom-nav-more');
       if (moreBtnEarly) moreBtnEarly.classList.remove('active');
       setMoreNavOpen(false);
+      if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+        window.AdoptPlant.renderGlobalWalletUI();
+      }
       renderGrowlog(extra);
       return;
     }
@@ -1670,6 +1673,9 @@ function initFirebaseSync() {
     }
     setMoreNavOpen(false);
     if (view) view.classList.add('active');
+    if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+      window.AdoptPlant.renderGlobalWalletUI();
+    }
     if (viewTitle) {
       if (id === 'adopt' && isAdopterProfile()) {
         viewTitle.textContent = 'My garden';
