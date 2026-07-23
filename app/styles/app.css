@@ -6386,7 +6386,8 @@ textarea::placeholder {
   backdrop-filter: blur(12px);
 }
 
-.bottom-nav .nav-item.active {
+.bottom-nav .nav-item.active,
+.bottom-nav .bottom-nav-more-btn.active {
   color: var(--green) !important;
 }
 
