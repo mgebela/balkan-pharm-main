@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724k" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724m" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -43,8 +43,10 @@
       </div>
       <div class="container hero-journal-inner">
         <div class="hero-journal-copy">
-          <img src="images/growtoo-logo.png?v=20260721m" alt="growtoo" width="96" height="96" class="hero-logo-mark" />
-          <p class="hero-brand">growtoo</p>
+          <p class="hero-brand hero-brand--inline">
+            <img src="images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="hero-brand-mark" />
+            <span>growtoo</span>
+          </p>
           <p class="hero-eyebrow">Grow journal + verified RWA market</p>
           <h1 class="hero-headline">Log every stage of your grow. Prove it on-chain.</h1>
           <p class="hero-sub">
@@ -55,6 +57,10 @@
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal — free</a>
             <a href="#proof" class="btn btn-ghost btn-lg">See how verification works ↓</a>
           </div>
+          <p class="hero-cta-note">
+            Opens the <strong>Grower</strong> desk.
+            <a href="#adopters">Adopting a plant instead?</a>
+          </p>
         </div>
 
         <div class="hero-app-mock" aria-hidden="true">
@@ -118,6 +124,13 @@
         <p class="proof-caption">
           Every stage update links to a real Solana transaction — click through and check it yourself.
         </p>
+        <div class="proof-fork" id="join">
+          <p class="proof-fork-lead">Choose a desk</p>
+          <div class="proof-fork-row">
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost">Enter as Adopter</a>
+          </div>
+        </div>
       </div>
     </section>
 
