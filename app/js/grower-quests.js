@@ -570,7 +570,7 @@
       tier = 2;
       title = 'Rising';
     }
-    return { tier: tier, title: title, score: score, label: 'Plant rank ' + tier + ' · ' + title };
+    return { tier: tier, title: title, score: score, label: 'Care level ' + tier + ' · ' + title };
   }
 
   function computeGrowerRank(opts) {
@@ -674,13 +674,17 @@
         );
       })
       .join('');
-    const statusCls = quest.ready ? 'grower-quest--ready' : 'grower-quest--blocked';
+    const statusCls =
+      (quest.ready ? 'grower-quest--ready' : 'grower-quest--blocked') +
+      (quest.ready ? ' grower-quest--next' : '');
     return (
       '<div class="grower-quest ' +
       statusCls +
       '">' +
       '<div class="grower-quest-head">' +
-      '<strong>Grower quests</strong>' +
+      '<strong>' +
+      (quest.ready ? 'Next action · Quests ready' : 'Grower quests') +
+      '</strong>' +
       '<span>' +
       quest.done +
       '/' +

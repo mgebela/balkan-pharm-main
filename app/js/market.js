@@ -815,6 +815,13 @@
     const isBuyer = listing.buyerUid === uid;
     const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
     const canCancel = isGrowerUi() && isMine && listing.status === 'active';
+    const isDead =
+      listing.status === 'cancelled' ||
+      listing.status === 'failed' ||
+      listing.status === 'sold';
+    const nameNorm = String(listing.name || '').trim().toLowerCase();
+    const strainNorm = String(listing.strain || '').trim().toLowerCase();
+    const showStrain = strainNorm && strainNorm !== nameNorm;
     const careLine =
       listing.settlement === 'adopt_stake' && listing.careStatus
         ? '<p class="market-card-meta">Care escrow: <strong>' +
@@ -823,8 +830,16 @@
           (listing.lockedGrow != null ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO' : '') +
           '</p>'
         : '';
+    const priceLabel =
+      listing.status === 'sold' || listing.status === 'sale_pending'
+        ? 'Stake / sale'
+        : listing.status === 'cancelled'
+          ? 'Was listed at'
+          : 'Ask price';
     return (
-      '<article class="market-card" data-id="' +
+      '<article class="market-card' +
+      (isDead ? ' market-card--dead' : '') +
+      '" data-id="' +
       esc(listing.id) +
       '">' +
       '<div class="market-card-head">' +
@@ -836,9 +851,11 @@
       esc(listing.name) +
       '</h4>' +
       '<p class="market-card-meta">' +
-      esc(listing.strain || '') +
-      (listing.batch ? ' · batch ' + esc(listing.batch) : '') +
-      (listing.stage ? ' · ' + esc(listing.stage) : '') +
+      (showStrain ? esc(listing.strain) : '') +
+      (showStrain && listing.batch ? ' · ' : '') +
+      (listing.batch ? 'batch ' + esc(listing.batch) : '') +
+      ((showStrain || listing.batch) && listing.stage ? ' · ' : '') +
+      (listing.stage ? esc(listing.stage) : '') +
       '</p>' +
       careLine +
       '<p class="market-card-meta">NFT: <a href="' +
@@ -853,7 +870,9 @@
       (isBuyer ? ' · your investment' : '') +
       '</p>' +
       '<div class="market-card-foot">' +
-      '<span class="market-price">' +
+      '<span class="market-price"><span class="market-price-label">' +
+      esc(priceLabel) +
+      '</span>' +
       Number(listing.priceGrow).toLocaleString('en-US') +
       ' $GROWTOO</span>' +
       (canInvest
@@ -949,12 +968,15 @@
       });
       // Adopters see live + settling offers; also show escrow_pending so the
       // board is not empty while the settlement worker confirms NFT escrow.
+      // Growers' own posts stay under "My offers" — keep Open market public-only.
       const open = listings.filter(function (l) {
-        return (
+        const live =
           l.status === 'active' ||
           l.status === 'sale_pending' ||
-          l.status === 'escrow_pending'
-        );
+          l.status === 'escrow_pending';
+        if (!live) return false;
+        if (isGrowerUi() && uid && l.uid === uid) return false;
+        return true;
       });
 
       if (browseGrid) {

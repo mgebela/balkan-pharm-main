@@ -1094,6 +1094,28 @@
       .filter((h) => h.type === 'growth')
       .reduce((sum, h) => sum + Number(h.amount || 0), 0);
     const pct = progressPercent(token.stageIndex);
+    const nameNorm = String(token.name || '').trim().toLowerCase();
+    const strainNorm = String(token.strain || '').trim().toLowerCase();
+    const showStrain = strainNorm && strainNorm !== nameNorm;
+    const linkedPlant = (function () {
+      if (!token.plantId) return null;
+      let plants = [];
+      if (window.DnevnikJournal && typeof DnevnikJournal.getPlants === 'function') {
+        plants = DnevnikJournal.getPlants() || [];
+      } else {
+        try {
+          plants = JSON.parse(localStorage.getItem('dnevnik-live-plants') || '[]') || [];
+        } catch (e) {
+          plants = [];
+        }
+      }
+      return (
+        plants.find(function (p) {
+          return p && String(p.id) === String(token.plantId);
+        }) || null
+      );
+    })();
+    const plantPhoto = linkedPlant && linkedPlant.photo ? linkedPlant.photo : '';
 
     const dots = GROWTH_STAGES.map((s, i) => {
       const cls = i < token.stageIndex ? 'done' : i === token.stageIndex ? 'current' : 'todo';
@@ -1135,14 +1157,16 @@
     return (
       '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + token.stageIndex + '">' +
       '<div class="adopt-token-banner">' +
-      buildPlantGrowSvg(token.stageIndex, { compact: true, noBg: true }) +
+      (plantPhoto
+        ? '<img class="adopt-token-banner-photo" src="' + esc(plantPhoto) + '" alt="" />'
+        : buildPlantGrowSvg(token.stageIndex, { compact: true, noBg: true })) +
       '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>' +
       '</div>' +
       '<div class="adopt-token-body">' +
       '<div class="adopt-token-head">' +
       '<div class="adopt-token-titles">' +
       '<h4>' + esc(token.name) + '</h4>' +
-      (token.strain ? '<p class="adopt-token-strain">' + esc(token.strain) + '</p>' : '') +
+      (showStrain ? '<p class="adopt-token-strain">' + esc(token.strain) + '</p>' : '') +
       '</div>' +
       '</div>' +
       (token.adopted
@@ -1316,7 +1340,7 @@
     return (
       '<p class="adopt-rank-badge adopt-rank-badge--tier-' +
       esc(String(rank.tier)) +
-      '" title="Score ' +
+      '" title="Rises with stage progress and qualifying care months. Score ' +
       esc(String(rank.score)) +
       '">' +
       esc(rank.label) +
@@ -1772,16 +1796,23 @@
         ? Market.platformBonusStatus()
         : null;
     let body =
-      '<p class="market-hint">Month <code>' +
+      '<p class="market-hint">Monthly activity bonus — earn up to <strong>50 $GROWTOO</strong> based on plants, seed mints, care weeks, and flowering progress. Platform-funded (Devnet).</p>' +
+      '<details class="platform-bonus-disclosure">' +
+      '<summary>How is this calculated?</summary>' +
+      '<p>Base 5, plus points for new plants, seed mints, qualifying care weeks, and reaching flower — capped at 50 for ' +
       esc(monthKey) +
-      '</code> · formula: base 5 + plants/seeds/weeks/flower (cap 50). Platform funds only.</p>';
+      '.</p>' +
+      '</details>';
     if (status && status.status === 'minted') {
       body +=
-        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed: <strong>' +
+        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed this month: <strong>' +
         esc(String(status.reward || 0)) +
-        ' $GROWTOO</strong></p>';
+        ' $GROWTOO</strong>. Next claim opens next calendar month.</p>';
     } else if (status && status.status === 'pending') {
-      body += '<p class="market-hint">Claim pending in the platform rewards queue…</p>';
+      body +=
+        '<p class="market-hint">Claim pending in the platform rewards queue… Estimated reward: <strong>' +
+        esc(String(status.reward || '…')) +
+        ' $GROWTOO</strong></p>';
     } else if (status && status.status === 'failed') {
       body +=
         '<p class="market-card-error">' +
@@ -1790,7 +1821,8 @@
         '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Retry claim</button>';
     } else {
       body +=
-        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Claim this month</button>';
+        '<p class="market-hint">You have an unclaimed monthly bonus available.</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Claim this month’s bonus</button>';
     }
     el.innerHTML = body;
   }

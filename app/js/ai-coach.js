@@ -350,6 +350,7 @@
           pushReminder(list, {
             id: 'tent-to-field:' + plant.id,
             plantId: plant.id,
+            severity: 'info',
             title: 'Tent → field transition review',
             message:
               plantName +
@@ -370,6 +371,7 @@
         pushReminder(list, {
           id: 'watering:' + plant.id,
           plantId: plant.id,
+          severity: 'urgent',
           title: 'Watering reminder',
           message:
             plantName +
@@ -387,20 +389,17 @@
         pushReminder(list, {
           id: 'feeding:' + plant.id,
           plantId: plant.id,
-          title: 'Nutrient cadence check',
+          severity: 'info',
+          title: 'Nutrient check',
           message:
             plantName +
-            ' is in ' +
-            stageLabel +
-            ' with no recent feeding log' +
-            (sinceFeeding == null ? '' : ' for ' + sinceFeeding + ' days') +
-            '.',
+            (sinceFeeding == null
+              ? ' has no feeding log yet for this stage.'
+              : ' last feeding was ' + sinceFeeding + ' days ago.'),
           prompt:
-            'Review feeding plan for "' +
+            'Review feeding for "' +
             plantName +
-            '" in ' +
-            stageLabel +
-            " and suggest today's nutrients.",
+            '" and help me log nutrients if needed.',
         });
       }
     });
@@ -869,7 +868,7 @@
       '<span class="ai-coach-status" id="ai-coach-status">Ready to help</span>' +
       '</div></div>' +
       '<div class="ai-coach-head-actions">' +
-      '<button type="button" class="ai-coach-icon-btn" id="ai-coach-clear" title="New chat" aria-label="Clear chat">' +
+      '<button type="button" class="ai-coach-icon-btn" id="ai-coach-clear" title="Clear conversation" aria-label="Clear conversation">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12h10l1-12"/></svg>' +
       '</button>' +
       '<button type="button" class="ai-coach-icon-btn" id="ai-coach-close" aria-label="Close coach">' +
@@ -894,7 +893,7 @@
       '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
       '</svg></button>' +
       '</div></form>' +
-      '<p class="ai-coach-foot">Can create plants, log care, update stages, and mint — always asks first.</p>' +
+      '<p class="ai-coach-foot">Coach can suggest actions — it always asks before creating plants, logging care, updating stages, or minting.</p>' +
       '</div></aside>';
     document.body.appendChild(root);
 
@@ -1030,8 +1029,11 @@
       list
         .slice(0, 4)
         .map(function (r) {
+          const sev = r.severity === 'urgent' ? 'urgent' : 'info';
           return (
-            '<article class="ai-coach-reminder">' +
+            '<article class="ai-coach-reminder ai-coach-reminder--' +
+            sev +
+            '">' +
             '<div class="ai-coach-reminder-top">' +
             '<h4>' +
             esc(r.title) +
@@ -1056,6 +1058,19 @@
 
   function emptyStateHtml(context) {
     const reminders = (context && context.reminders) || [];
+    const trustSeen =
+      typeof localStorage !== 'undefined' && localStorage.getItem('dnevnik-live-coach-trust-seen') === '1';
+    const trustHtml = trustSeen
+      ? ''
+      : '<div class="ai-coach-trust" id="ai-coach-trust">' +
+        '<strong>Always asks first</strong>' +
+        'Coach can create plants, log care, update stages, and mint — only after you confirm.' +
+        '</div>';
+    if (!trustSeen && typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem('dnevnik-live-coach-trust-seen', '1');
+      } catch (e) {}
+    }
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
@@ -1063,6 +1078,7 @@
       '<h3>What should we work on?</h3>' +
       '<p>Advice on stages, journal logs, and mint prep. Tap a starter or type below.</p>' +
       '</div>' +
+      trustHtml +
       '<div class="ai-coach-empty-grid" role="list">' +
       QUICK_PROMPTS.slice(0, 4)
         .map(function (p) {

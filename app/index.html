@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260724b" />
+  <link rel="stylesheet" href="styles/app.css?v=20260724h" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
 <body class="app-loading">
@@ -27,7 +27,7 @@
           <span>Plants & journal</span>
         </a>
         <a href="#" class="nav-item" data-view="adopt">
-          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
+          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
           <span data-label-grower="Tokenise" data-label-adopter="My garden">Adopt a plant</span>
         </a>
         <a href="#" class="nav-item" data-view="market">
@@ -59,7 +59,7 @@
         <span class="bottom-nav-label">Plants</span>
       </a>
       <a href="#" class="nav-item" data-view="adopt">
-        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-7"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2.2"/></svg></span>
+        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
         <span class="bottom-nav-label" data-label-grower="Tokenise" data-label-adopter="Garden">Adopt</span>
       </a>
       <a href="#" class="nav-item" data-view="market">
@@ -200,17 +200,17 @@
                   <p class="plants-weather-widget-sub">7 days · for grow planning</p>
                 </div>
               </div>
-              <form class="plants-weather-city-form" id="plants-weather-city-form">
-                <input
-                  type="search"
-                  id="plants-weather-city"
-                  placeholder="City (e.g. Visnjevac)"
-                  autocomplete="off"
-                  aria-label="City for forecast"
-                />
-                <button type="submit" class="plants-weather-refresh-btn" id="plants-weather-refresh">Refresh</button>
-              </form>
             </div>
+            <form class="plants-weather-city-form" id="plants-weather-city-form">
+              <input
+                type="search"
+                id="plants-weather-city"
+                placeholder="City (e.g. Visnjevac)"
+                autocomplete="off"
+                aria-label="City for forecast"
+              />
+              <button type="submit" class="plants-weather-refresh-btn" id="plants-weather-refresh">Refresh</button>
+            </form>
             <div id="plants-weather" class="plants-weather-body" role="status">Loading forecast…</div>
           </div>
         </section>
@@ -340,16 +340,18 @@
 
         <section class="plants-journal-section grower-only">
           <h2 class="section-heading">My offers</h2>
+          <p class="market-hint">Your posted contracts — active, adopted, or cancelled.</p>
           <div class="market-grid" id="market-mine-grid"></div>
         </section>
 
         <section class="plants-journal-section">
           <h2 class="section-heading">
-            <span class="adopter-only">Invest in RWAs</span>
-            <span class="grower-only">Browse market</span>
+            <span class="adopter-only">Open market</span>
+            <span class="grower-only">Open market</span>
           </h2>
-          <p class="market-hint adopter-only">
-            Stake $GROWTOO to adopt a grower’s real seed RWA. When the investment settles, the NFT moves into your wallet and garden.
+          <p class="market-hint">
+            <span class="adopter-only">Live asks from growers. Stake $GROWTOO to adopt an RWA.</span>
+            <span class="grower-only">Public board — other growers’ open asks (yours appear under My offers).</span>
           </p>
           <div class="market-grid" id="market-grid"></div>
         </section>
@@ -853,15 +855,15 @@
   <script src="js/seed-chain.js?v=20260723g"></script>
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260723a"></script>
-  <script src="js/market.js?v=20260724c"></script>
+  <script src="js/market.js?v=20260724h"></script>
   <script src="js/metric-ui.js?v=20260723m"></script>
   <script src="js/token-pixel-art.js?v=20260720b"></script>
   <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
-  <script src="js/grower-quests.js?v=20260723f"></script>
+  <script src="js/grower-quests.js?v=20260724h"></script>
   <script src="js/notifications.js?v=20260723j"></script>
   <script src="js/signup.js?v=20260724d"></script>
-  <script src="js/plant-token.js?v=20260724c"></script>
-  <script src="js/ai-coach.js?v=20260724c"></script>
-  <script src="js/app.js?v=20260724d"></script>
+  <script src="js/plant-token.js?v=20260724h"></script>
+  <script src="js/ai-coach.js?v=20260724h"></script>
+  <script src="js/app.js?v=20260724h"></script>
 </body>
 </html>

@@ -2651,6 +2651,12 @@ function initFirebaseSync() {
     });
 
     html += '</div>';
+    if (days.length > 3) {
+      html +=
+        '<p class="plants-weather-scroll-hint">Swipe for all ' +
+        days.length +
+        ' days →</p>';
+    }
     weatherDiv.innerHTML = html;
   }
 
@@ -2748,12 +2754,29 @@ function initFirebaseSync() {
     list.innerHTML = plants
       .map((p) => {
         const shared = isSharedPlantId(p.id);
+        const stageLabelText = STAGES[p.stage] || p.stage;
+        const entries = getPlantEntries(p.id) || [];
+        const lastWater = entries
+          .filter(function (e) {
+            const t = String((e && (e.type || e.kind || e.category)) || '').toLowerCase();
+            return t.includes('water') || t.includes('zalij');
+          })
+          .sort(function (a, b) {
+            return new Date(b.date || b.ts || 0) - new Date(a.date || a.ts || 0);
+          })[0];
+        const lastWaterLabel = lastWater
+          ? 'Watered ' +
+            new Date(lastWater.date || lastWater.ts).toLocaleDateString('en-GB')
+          : 'No watering log yet';
+        const photoOverlay = p.photo
+          ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
+          : '';
         return `
       <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}">
-        ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" /></div>` : ''}
+        ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" />${photoOverlay}</div>` : ''}
         <div class="plant-card-header">
           <h3>${escapeHtml(p.name)}</h3>
-          <span class="stage-badge">${STAGES[p.stage] || p.stage}</span>
+          <span class="stage-badge">${escapeHtml(stageLabelText)}</span>
           ${shared ? '<span class="stage-badge plant-shared-badge" title="Shared library">Shared</span>' : ''}
         </div>
         ${
