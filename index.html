@@ -28,7 +28,6 @@
         <a href="#proof" class="nav-link">How it works</a>
         <a href="#growers" class="nav-link">Growers</a>
         <a href="#adopters" class="nav-link">Adopters</a>
-        <a href="#market" class="nav-link">Market</a>
         <a href="rwa-docs/" class="nav-link">Docs</a>
         <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
       </nav>
@@ -196,7 +195,7 @@
             <li>Every stage backed by a real journal entry, not just a listing</li>
             <li>On-chain history for every plant — check any transaction yourself</li>
             <li>Track adopted plants from seed through harvest</li>
-            <li>Trade Seed and Flower RWAs on the commodity board</li>
+            <li>Trade Seed and Flower RWAs in the app</li>
           </ul>
           <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-primary">Enter as Adopter</a>
         </div>
@@ -232,87 +231,7 @@
       </div>
     </section>
 
-    <!-- 5. Commodity board (interim framing) -->
-    <section id="market" class="section desk-section desk-section--board">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag desk-tag--market">Commodity board</span>
-          <h2 id="market-headline">This is what trading will look like</h2>
-          <p class="section-lead" id="market-lead">
-            The board is warming up — early contracts are being seeded now. Here’s a preview of how
-            Seed and Growth RWAs will trade once live.
-          </p>
-          <p class="market-pricing-note market-pricing-note--centered">
-            Pricing: seller sets the ask in $GROWTOO — no bonding curve, no oracle.
-            Fill settles through marketplace escrow.
-            <a href="risks/#ask">How asks work</a>
-          </p>
-        </div>
-
-        <div class="market-board market-board--loading" id="landing-market-board">
-          <div class="market-board-bar">
-            <div class="market-board-stats" id="landing-market-stats" aria-live="polite">
-              <div class="market-stat">
-                <span class="market-stat-label">Open</span>
-                <span class="market-stat-value market-stat-skeleton" id="landing-market-open">&nbsp;</span>
-              </div>
-              <div class="market-stat">
-                <span class="market-stat-label">Ask volume</span>
-                <span class="market-stat-value market-stat-skeleton" id="landing-market-volume">&nbsp;</span>
-              </div>
-              <div class="market-stat">
-                <span class="market-stat-label">Staked</span>
-                <span class="market-stat-value market-stat-skeleton" id="landing-market-staked-count">&nbsp;</span>
-              </div>
-              <div class="market-stat">
-                <span class="market-stat-label">Staked value</span>
-                <span class="market-stat-value market-stat-skeleton" id="landing-market-staked-value">&nbsp;</span>
-              </div>
-              <div class="market-stat">
-                <span class="market-stat-label">Total value</span>
-                <span class="market-stat-value market-stat-value--total market-stat-skeleton" id="landing-market-total">&nbsp;</span>
-              </div>
-              <div class="market-stat">
-                <span class="market-stat-label">Session</span>
-                <span class="market-stat-value market-stat-value--live">PREVIEW</span>
-              </div>
-            </div>
-            <p class="market-board-clock" id="landing-market-updated">Loading…</p>
-          </div>
-
-          <p class="market-demo-banner" id="landing-market-demo-banner" hidden>
-            Sample depth — not live asks yet.
-            <a class="market-demo-cta" href="dnevnik/?mode=signup&type=grower">Be the first grower to list</a>
-          </p>
-
-          <div class="market-ticker" id="landing-market-ticker" aria-hidden="true" hidden>
-            <div class="market-ticker-track" id="landing-market-ticker-track"></div>
-          </div>
-
-          <div class="market-board-head" aria-hidden="true">
-            <span>Contract</span>
-            <span>Grade</span>
-            <span>Status</span>
-            <span class="market-col-last">Ask</span>
-            <span class="market-col-action"></span>
-          </div>
-
-          <div class="landing-market-skeleton" id="landing-market-loading" aria-hidden="true">
-            <div class="landing-market-skeleton-row"></div>
-            <div class="landing-market-skeleton-row"></div>
-            <div class="landing-market-skeleton-row"></div>
-          </div>
-          <div class="landing-market-empty" id="landing-market-empty" hidden>
-            <p class="landing-market-empty-title">No open contracts yet</p>
-            <p class="landing-market-empty-copy">Mint a Seed RWA in the journal, then list it here.</p>
-            <a class="btn btn-primary btn-sm" href="dnevnik/?mode=signup&type=grower">Be the first grower to list</a>
-          </div>
-          <div class="landing-market-grid" id="landing-market-grid" aria-live="polite"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. Single Devnet / trust note -->
+    <!-- Devnet / trust note -->
     <section id="status" class="section desk-section desk-section--status">
       <div class="container status-block">
         <span class="desk-tag">Where we are right now</span>
@@ -362,7 +281,6 @@
           <a href="#proof">How it works</a>
           <a href="#growers">Growers</a>
           <a href="#adopters">Adopters</a>
-          <a href="#market">Market</a>
           <a href="risks/">Risks</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
@@ -390,25 +308,6 @@
     </div>
   </footer>
 
-  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
-  <script>
-    (function () {
-      var firebaseConfig = {
-        apiKey: 'AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg',
-        authDomain: 'balpha-9dab9.firebaseapp.com',
-        projectId: 'balpha-9dab9',
-        storageBucket: 'balpha-9dab9.firebasestorage.app',
-        messagingSenderId: '398537397385',
-        appId: '1:398537397385:web:9bd3aec82f44ddec20e258',
-        measurementId: 'G-HLXHTQP41H',
-      };
-      if (window.firebase && !window.firebase.apps.length) {
-        window.firebase.initializeApp(firebaseConfig);
-      }
-    })();
-  </script>
-  <script src="js/landing-market.js?v=20260724j"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');
