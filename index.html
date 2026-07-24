@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724r" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724s" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -26,7 +26,8 @@
       </button>
       <nav class="nav" id="main-nav">
         <a href="#proof" class="nav-link">How it works</a>
-        <a href="#growers" class="nav-link">For growers</a>
+        <a href="#growers" class="nav-link">Growers</a>
+        <a href="#adopters" class="nav-link">Adopters</a>
         <a href="#faq" class="nav-link">FAQ</a>
         <a href="rwa-docs/" class="nav-link">Docs</a>
         <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
@@ -59,6 +60,10 @@
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
             <a href="#trail" class="btn btn-ghost btn-lg">See one plant’s proof ↓</a>
           </div>
+          <p class="hero-cta-note">
+            Opens the <strong>Grower</strong> desk.
+            <a href="#adopters">Adopting a plant instead?</a>
+          </p>
           <aside class="founding-banner founding-banner--hero">
             <strong>Founding Growers get priority on mainnet.</strong>
             <p>
@@ -206,10 +211,10 @@
         </article>
 
         <div class="proof-fork" id="join">
-          <p class="proof-fork-lead">Start where the product starts</p>
+          <p class="proof-fork-lead">Pick your desk</p>
           <div class="proof-fork-row">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start your journal free</a>
-            <a href="#adopters" class="btn btn-ghost">Adopting later?</a>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
           </div>
         </div>
       </div>
@@ -218,49 +223,49 @@
     <section id="growers" class="section desk-section desk-section--journal desk-section--alt">
       <div class="container audience-grid">
         <div class="audience-copy">
-          <span class="desk-tag desk-tag--journal">Why start today</span>
-          <h2>Run your grow. Free.</h2>
+          <span class="desk-tag desk-tag--journal">For growers</span>
+          <h2>Easy to run. Free to keep.</h2>
           <p>
-            A journal built for the job: plant-by-plant stages, watering and feeding logs,
-            weather-aware planning, and an AI coach that tells you what to do next.
+            Built for daily cultivation work, not crypto homework. Add a plant, log watering and feeding,
+            follow weather and coach prompts. No wallet required to start.
           </p>
           <p>
-            Want more later? Mint verified stages as Seed RWAs and earn $GROWTOO on Devnet,
-            with no cost to use the journal itself.
+            Cost stays zero for the journal itself. Minting stages and earning $GROWTOO on Devnet is
+            optional when you want proof, not a paywall to use the tool.
           </p>
           <ul class="audience-bullets">
-            <li>Stops the notebook / camera-roll mess before a season is over</li>
-            <li>AI coach with daily priorities and smart reminders</li>
-            <li>7-day weather forecasting for grow planning</li>
-            <li>Optional on-chain stage proof when you’re ready</li>
+            <li>Minutes a day, not another spreadsheet</li>
+            <li>AI coach and reminders so care doesn’t slip</li>
+            <li>Indoor and outdoor grows, plant by plant</li>
+            <li>Free forever for journaling. Wallet only if you mint</li>
           </ul>
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
         </div>
         <div class="audience-panel desk-panel desk-panel--journal">
           <div class="desk-panel-bar">
-            <span>Field ledger</span>
-            <span class="desk-panel-meta">Free · Always</span>
+            <span>What you get today</span>
+            <span class="desk-panel-meta">$0 · No wallet</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
-              <span class="desk-spec-code">PLT</span>
+              <span class="desk-spec-code">DAY</span>
               <div>
-                <h3>Plants &amp; stages</h3>
-                <p>Germination → harvest, one timeline per plant.</p>
+                <h3>Daily desk</h3>
+                <p>Stages, water, feed, weather, coach in one place.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">FED</span>
+              <span class="desk-spec-code">FAST</span>
               <div>
-                <h3>Water &amp; feed</h3>
-                <p>Dated care logs that can back a stage mint.</p>
+                <h3>Fast logging</h3>
+                <p>Quick actions so notes happen when the work happens.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">AI</span>
+              <span class="desk-spec-code">OPT</span>
               <div>
-                <h3>Grower Coach</h3>
-                <p>What’s next, reminders. Always asks before acting.</p>
+                <h3>Proof optional</h3>
+                <p>Mint a stage later. The journal never depends on it.</p>
               </div>
             </div>
           </div>
@@ -268,18 +273,55 @@
       </div>
     </section>
 
-    <section id="adopters" class="section desk-section desk-section--adopter desk-section--adopter-soft">
-      <div class="container adopter-soft">
-        <span class="desk-tag desk-tag--adopter">For later</span>
-        <h2>Adopters come after supply.</h2>
-        <p>
-          Backing a grow only matters once growers have real journals and checkable stage trails.
-          We’re seeding that supply on Devnet first. When you’re ready to explore the desk,
-          you can enter as an Adopter and follow the same evidence trail growers see.
-        </p>
-        <div class="adopter-soft-row">
+    <section id="adopters" class="section desk-section desk-section--adopter">
+      <div class="container audience-grid audience-grid--flip">
+        <div class="audience-copy">
+          <span class="desk-tag desk-tag--adopter">For adopters</span>
+          <h2>Trust the trail, not the listing.</h2>
+          <p>
+            Adopting here is about verification first. Every plant you might back is supposed to carry
+            dated journal care and on-chain stage updates you can open yourself, not just a pitch.
+          </p>
+          <p>
+            Supply is still seeding on Devnet, so the market is early. What you can do now is enter the
+            Adopter desk, learn the evidence trail, and follow plants as growers mint real progress.
+          </p>
+          <ul class="audience-bullets audience-bullets--verify">
+            <li>Ask “where’s the journal entry?” before you trust a stage claim</li>
+            <li>Open the Solana transaction for each advance yourself</li>
+            <li>Follow the same plant trail the grower sees</li>
+            <li>No monetary value on Devnet. Practice the trust flow first</li>
+          </ul>
           <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
-          <a href="rwa-docs/" class="btn btn-ghost">Read how verification works</a>
+        </div>
+        <div class="audience-panel desk-panel desk-panel--adopter">
+          <div class="desk-panel-bar">
+            <span>What you check</span>
+            <span class="desk-panel-meta desk-panel-meta--verify">Verify</span>
+          </div>
+          <div class="desk-spec-list">
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--brass">LOG</span>
+              <div>
+                <h3>Care log</h3>
+                <p>Watering and feeding behind the claim.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--verify">TX</span>
+              <div>
+                <h3>On-chain mint</h3>
+                <p>Explorer link per stage advance.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--cool">TRACE</span>
+              <div>
+                <h3>Full trail</h3>
+                <p>Seed → flower history in one place.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -378,11 +420,11 @@
         </p>
         <div class="close-cta-row">
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter btn-lg">Enter as Adopter</a>
           <a href="rwa-docs/" class="btn btn-ghost btn-lg">Read the docs</a>
         </div>
         <p class="join-signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
-          · Looking to adopt later? <a href="#adopters">See the adopter note</a>
         </p>
       </div>
     </section>
@@ -398,7 +440,7 @@
         <div class="footer-links">
           <a href="dnevnik/">App</a>
           <a href="#proof">How it works</a>
-          <a href="#growers">For growers</a>
+          <a href="#growers">Growers</a>
           <a href="#adopters">Adopters</a>
           <a href="#faq">FAQ</a>
           <a href="risks/">Risks</a>

@@ -4295,3 +4295,30 @@ body:has(.devnet-banner) .header {
     margin-right: auto;
   }
 }
+
+/* ── Audience fork polish: early escape + distinct desks + jump anchors ── */
+#proof,
+#growers,
+#adopters,
+#faq,
+#trail,
+#status,
+#start,
+#join {
+  scroll-margin-top: 5.5rem;
+}
+
+.audience-bullets--verify li {
+  border-left: 2px solid rgba(94, 200, 216, 0.45);
+  padding-left: 0.75rem;
+}
+
+.audience-bullets--verify li::marker {
+  color: transparent;
+}
+
+@supports not (overflow-x: clip) {
+  html, body {
+    overflow-x: hidden;
+  }
+}
