@@ -3,20 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>growtoo – CBD grow journal</title>
+  <title>growtoo – CBD grow journal + verified RWA market</title>
+  <meta name="description" content="Free CBD grow journal with AI coaching and weather planning. Turn real cultivation data into verifiable on-chain records on Solana." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724g" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724j" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
-
-  <div class="devnet-banner" role="status">
-    <strong>Solana Devnet</strong>
-    <span>Test market only — Seed NFTs &amp; $GROWTOO have <em>no monetary value</em>.</span>
-    <a href="risks/">Risks</a>
-  </div>
 
   <header class="header">
     <div class="container header-inner">
@@ -30,41 +25,224 @@
         <span class="nav-toggle-bar"></span>
       </button>
       <nav class="nav" id="main-nav">
+        <a href="#proof" class="nav-link">How it works</a>
+        <a href="#growers" class="nav-link">Growers</a>
+        <a href="#adopters" class="nav-link">Adopters</a>
         <a href="#market" class="nav-link">Market</a>
-        <a href="#join" class="nav-link">Join</a>
-        <a href="#journal" class="nav-link">Journal</a>
-        <a href="#tokens" class="nav-link">Tokens</a>
-        <a href="risks/" class="nav-link">Risks</a>
-        <a href="dnevnik/" class="btn btn-primary">Sign in</a>
+        <a href="rwa-docs/" class="nav-link">Docs</a>
+        <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
       </nav>
     </div>
     <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
   </header>
 
   <main>
-    <section id="market" class="hero hero--market">
+    <!-- 1. Hero — journal first -->
+    <section id="top" class="hero hero--journal">
       <div class="hero-bg" aria-hidden="true">
         <img src="images/1.jpg" alt="" />
       </div>
-      <div class="container hero-market-inner">
-        <div class="hero-market-intro">
-          <img src="images/growtoo-logo.png?v=20260721m" alt="growtoo" width="112" height="112" class="hero-logo-mark" />
+      <div class="container hero-journal-inner">
+        <div class="hero-journal-copy">
+          <img src="images/growtoo-logo.png?v=20260721m" alt="growtoo" width="96" height="96" class="hero-logo-mark" />
           <p class="hero-brand">growtoo</p>
-          <div class="market-live-heading">
-            <span class="market-live-pill market-live-pill--devnet" aria-hidden="true">
-              <span class="market-live-dot"></span>
-              DEVNET
-            </span>
-            <h1 class="hero-market-title">Commodity board</h1>
-            <span class="market-session">RWA · TEST TAPE</span>
-          </div>
-          <p class="hero-sub">Open Seed and growth contracts from growers — last ask in $GROWTOO (devnet units).</p>
-          <p class="desk-benefit desk-benefit--hero">
-            <s>Opaque plant deals</s>
-            <span class="desk-benefit-sep" aria-hidden="true">→</span>
-            <span class="desk-benefit-gain">A live tape of real RWAs you can stake into</span>
+          <p class="hero-eyebrow">Grow journal + verified RWA market</p>
+          <h1 class="hero-headline">Log every stage of your grow. Prove it on-chain.</h1>
+          <p class="hero-sub">
+            A free CBD grow journal — with AI coaching, weather planning, and daily task tracking —
+            that turns your real cultivation data into verifiable on-chain records anyone can check.
           </p>
-          <p class="market-pricing-note">
+          <div class="hero-cta-row">
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal — free</a>
+            <a href="#proof" class="btn btn-ghost btn-lg">See how verification works ↓</a>
+          </div>
+        </div>
+
+        <div class="hero-app-mock" aria-hidden="true">
+          <div class="mock-panel mock-panel--plant">
+            <span class="mock-kicker">Plant</span>
+            <strong>CBD Auto · Vegetative</strong>
+            <span class="mock-meta">Last watered today · Care level 2</span>
+          </div>
+          <div class="mock-panel mock-panel--weather">
+            <span class="mock-kicker">7-day weather</span>
+            <div class="mock-weather-row">
+              <span>Today 22°</span>
+              <span>Thu 19°</span>
+              <span>Fri 21°</span>
+            </div>
+          </div>
+          <div class="mock-panel mock-panel--coach">
+            <span class="mock-kicker">Coach</span>
+            <strong>What’s next</strong>
+            <span class="mock-meta">Log feeding · Check humidity</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Proof chain -->
+    <section id="proof" class="section desk-section desk-section--proof">
+      <div class="container">
+        <div class="desk-header">
+          <span class="desk-tag">The proof chain</span>
+          <h2>Grow it. Verify it. Own or trade it.</h2>
+          <p class="section-lead">How a journal entry becomes something anyone can check on Solana.</p>
+        </div>
+        <ol class="proof-chain">
+          <li class="proof-step">
+            <span class="proof-num" aria-hidden="true">01</span>
+            <h3>Grow it.</h3>
+            <p>
+              Log watering, feeding, and stage changes as they happen. Get reminders and AI-guided
+              next steps so nothing gets missed.
+            </p>
+          </li>
+          <li class="proof-step proof-step--verify">
+            <span class="proof-num" aria-hidden="true">02</span>
+            <h3>Verify it.</h3>
+            <p>
+              Each completed stage — germination, seedling, vegetative, flowering, harvest — gets
+              minted as an on-chain update, linked to your journal entry. Every mint has a real
+              transaction you can check yourself.
+            </p>
+          </li>
+          <li class="proof-step">
+            <span class="proof-num" aria-hidden="true">03</span>
+            <h3>Own or trade it.</h3>
+            <p>
+              Growers hold Seed RWAs tied to their plants. Adopters can back a grow they trust and
+              follow its verified progress from seed to harvest.
+            </p>
+          </li>
+        </ol>
+        <p class="proof-caption">
+          Every stage update links to a real Solana transaction — click through and check it yourself.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. For Growers -->
+    <section id="growers" class="section desk-section desk-section--journal desk-section--alt">
+      <div class="container audience-grid">
+        <div class="audience-copy">
+          <span class="desk-tag desk-tag--journal">For growers</span>
+          <h2>Run your grow. Free.</h2>
+          <p>
+            Track every plant from germination to harvest with a journal built for the job —
+            stage tracking, watering and feeding logs, weather-aware planning, and an AI coach
+            that tells you what to do next.
+          </p>
+          <p>
+            Want more? Mint your verified progress as Seed RWAs and earn $GROWTOO at every stage —
+            germination through harvest — with no cost to use the journal itself.
+          </p>
+          <ul class="audience-bullets">
+            <li>Plant-by-plant journal, built for indoor and outdoor grows</li>
+            <li>AI coach with daily priorities and smart reminders</li>
+            <li>7-day weather forecasting for grow planning</li>
+            <li>Optional: mint verified stages on-chain and earn $GROWTOO</li>
+          </ul>
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
+        </div>
+        <div class="audience-panel desk-panel desk-panel--journal">
+          <div class="desk-panel-bar">
+            <span>Field ledger</span>
+            <span class="desk-panel-meta">Free · Always</span>
+          </div>
+          <div class="desk-spec-list">
+            <div class="desk-spec">
+              <span class="desk-spec-code">PLT</span>
+              <div>
+                <h3>Plants &amp; stages</h3>
+                <p>Germination → harvest, one timeline per plant.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">FED</span>
+              <div>
+                <h3>Water &amp; feed</h3>
+                <p>Dated care logs that can back a stage mint.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">AI</span>
+              <div>
+                <h3>Grower Coach</h3>
+                <p>What’s next, reminders — always asks before acting.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. For Adopters -->
+    <section id="adopters" class="section desk-section desk-section--market">
+      <div class="container audience-grid audience-grid--flip">
+        <div class="audience-copy">
+          <span class="desk-tag desk-tag--market">For adopters</span>
+          <h2>Back a grow you can actually verify.</h2>
+          <p>
+            Every plant on the market has a real journal behind it — logged care, timestamped stage
+            changes, and on-chain proof of progress. Instead of trusting a claim, you can trace it:
+            from the grower’s watering log to the transaction that advanced the plant to flowering.
+          </p>
+          <p>
+            Stake $GROWTOO into open contracts, track your adopted plants stage by stage, and see
+            the same evidence trail the grower sees.
+          </p>
+          <ul class="audience-bullets">
+            <li>Every stage backed by a real journal entry, not just a listing</li>
+            <li>On-chain history for every plant — check any transaction yourself</li>
+            <li>Track adopted plants from seed through harvest</li>
+            <li>Trade Seed and Flower RWAs on the commodity board</li>
+          </ul>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-primary">Enter as Adopter</a>
+        </div>
+        <div class="audience-panel desk-panel">
+          <div class="desk-panel-bar">
+            <span>Evidence trail</span>
+            <span class="desk-panel-meta">Checkable</span>
+          </div>
+          <div class="desk-spec-list">
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--brass">LOG</span>
+              <div>
+                <h3>Journal first</h3>
+                <p>Care entries sit behind every stage claim.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--green">TX</span>
+              <div>
+                <h3>On-chain mint</h3>
+                <p>Each advance has a Solana transaction you can open.</p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--rust">MKT</span>
+              <div>
+                <h3>Open contracts</h3>
+                <p>Stake into asks and follow verified progress.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Commodity board (interim framing) -->
+    <section id="market" class="section desk-section desk-section--board">
+      <div class="container">
+        <div class="desk-header">
+          <span class="desk-tag desk-tag--market">Commodity board</span>
+          <h2 id="market-headline">This is what trading will look like</h2>
+          <p class="section-lead" id="market-lead">
+            The board is warming up — early contracts are being seeded now. Here’s a preview of how
+            Seed and Growth RWAs will trade once live.
+          </p>
+          <p class="market-pricing-note market-pricing-note--centered">
             Pricing: seller sets the ask in $GROWTOO — no bonding curve, no oracle.
             Fill settles through marketplace escrow.
             <a href="risks/#ask">How asks work</a>
@@ -96,14 +274,14 @@
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Session</span>
-                <span class="market-stat-value market-stat-value--live">DEVNET</span>
+                <span class="market-stat-value market-stat-value--live">PREVIEW</span>
               </div>
             </div>
-            <p class="market-board-clock" id="landing-market-updated">Loading tape…</p>
+            <p class="market-board-clock" id="landing-market-updated">Loading…</p>
           </div>
 
           <p class="market-demo-banner" id="landing-market-demo-banner" hidden>
-            No live asks yet — showing sample depth so you can read the board.
+            Sample depth — not live asks yet.
             <a class="market-demo-cta" href="dnevnik/?mode=signup&type=grower">Be the first grower to list</a>
           </p>
 
@@ -134,187 +312,40 @@
       </div>
     </section>
 
-    <section id="trust" class="section desk-section desk-section--trust">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag">TRUST</span>
-          <h2>How trust works (Devnet)</h2>
-          <p class="section-lead">Transparent MVP limits — so adopters know what they are looking at.</p>
-        </div>
-        <div class="trust-strip">
-          <div class="trust-item">
-            <span class="trust-code">AUTH</span>
-            <p>One authority runs mint queue, metadata updates, and escrow settlement.</p>
-          </div>
-          <div class="trust-item">
-            <span class="trust-code">LOG</span>
-            <p>Stage advances need a journal entry — not an oracle or IoT feed yet.</p>
-          </div>
-          <div class="trust-item">
-            <span class="trust-code">VAL</span>
-            <p>Devnet assets carry no monetary value. Mainnet value is not promised.</p>
-          </div>
-        </div>
-        <p class="trust-more">
-          <a href="risks/">Risks &amp; scope</a>
-          ·
-          <a href="rwa-docs/">RWA docs</a>
+    <!-- 6. Single Devnet / trust note -->
+    <section id="status" class="section desk-section desk-section--status">
+      <div class="container status-block">
+        <span class="desk-tag">Where we are right now</span>
+        <h2>Solana Devnet — real system, test assets</h2>
+        <p>
+          growtoo runs on Solana Devnet while we build toward mainnet. Your plants, journal entries,
+          and grow data are real — the tokens are test assets with no monetary value yet. Every mint,
+          transfer, and trade you see is a real transaction on Devnet, so you can verify exactly how
+          the system works before real value is on the line.
+        </p>
+        <p class="status-links">
+          <a href="rwa-docs/">Read the RWA docs →</a>
+          <a href="risks/">Risks &amp; scope →</a>
         </p>
       </div>
     </section>
 
-    <section id="join" class="section desk-section">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag">ACCESS</span>
-          <h2>Open a desk</h2>
-          <p class="section-lead">Pick a starting desk. Same login either way — dual Grower + Adopter desks are on the roadmap.</p>
-          <p class="desk-benefit">
-            <s>One generic login</s>
-            <span class="desk-benefit-sep" aria-hidden="true">→</span>
-            <span class="desk-benefit-gain">Two desks, two jobs — journal &amp; mint, or stake &amp; track</span>
-          </p>
-        </div>
-        <div class="desk-split">
-          <a href="dnevnik/?mode=signup&type=grower" class="desk-seat desk-seat--grower">
-            <span class="desk-seat-register">Journal mode</span>
-            <span class="desk-seat-code">GRW</span>
-            <div class="desk-seat-body">
-              <h3>Grower</h3>
-              <p>Log watering, feeding, and stages. Mint Seed RWAs when the plant is ready to list.</p>
-            </div>
-            <span class="desk-seat-cta">Enter as Grower</span>
-          </a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="desk-seat desk-seat--adopter">
-            <span class="desk-seat-register">Market mode</span>
-            <span class="desk-seat-code">ADP</span>
-            <div class="desk-seat-body">
-              <h3>Adopter</h3>
-              <p>Read the tape, stake $GROWTOO into open asks, and follow adopted plants.</p>
-            </div>
-            <span class="desk-seat-cta">Enter as Adopter</span>
-          </a>
-        </div>
-        <p class="join-role-note">
-          Not locked forever — your primary desk sets the default UI today. Holding both desks on one account is planned.
+    <!-- 7. Closing CTA -->
+    <section id="start" class="section desk-section desk-section--close">
+      <div class="container close-block">
+        <h2>Start with the journal. The rest is optional.</h2>
+        <p>
+          Whether you’re growing or adopting, growtoo starts with real documentation —
+          everything else builds on top of that.
         </p>
+        <div class="close-cta-row">
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Enter as Grower</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Enter as Adopter</a>
+          <a href="rwa-docs/" class="btn btn-ghost btn-lg">Read the docs</a>
+        </div>
         <p class="join-signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
         </p>
-      </div>
-    </section>
-
-    <section id="journal" class="section desk-section desk-section--journal desk-section--alt">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag desk-tag--journal">FIELD</span>
-          <h2>Grow instruments</h2>
-          <p class="section-lead">Daily care language — plants, water, feed, today. Built for growers first.</p>
-          <p class="desk-benefit">
-            <s>Scattered notes &amp; chats</s>
-            <span class="desk-benefit-sep" aria-hidden="true">→</span>
-            <span class="desk-benefit-gain">One care ledger that can prove stages on-chain</span>
-          </p>
-        </div>
-        <div class="desk-panel desk-panel--journal">
-          <div class="desk-panel-bar">
-            <span>Field ledger</span>
-            <span class="desk-panel-meta">INDOOR · OUTDOOR</span>
-          </div>
-          <div class="desk-spec-list">
-            <div class="desk-spec">
-              <span class="desk-spec-code">PLT</span>
-              <div>
-                <h3>Plants &amp; stages</h3>
-                <p>Track each plant from germination through harvest.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Lost batch history</s> → stage timeline you can trust</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code">FED</span>
-              <div>
-                <h3>Watering &amp; feeding</h3>
-                <p>Log water, nutrients, and notes so every cycle has a clear record.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Guesswork care</s> → dated watering &amp; feed log</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code">DAY</span>
-              <div>
-                <h3>Tools &amp; Today</h3>
-                <p>Quick actions, environment logs, and daily tasks in one workspace.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Missed daily tasks</s> → one place for tools &amp; Today</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="tokens" class="section desk-section desk-section--market">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag desk-tag--market">MARKET</span>
-          <h2>RWA rails
-            <span class="solana-badge solana-badge--inline" aria-label="Solana">
-              <span class="solana-badge-mark" aria-hidden="true">
-                <svg viewBox="0 0 397.7 311.7" width="16" height="12" focusable="false">
-                  <defs>
-                    <linearGradient id="solana-g-tokens" x1="360.8791" y1="351.4553" x2="141.213" y2="-69.2936" gradientUnits="userSpaceOnUse">
-                      <stop offset="0" stop-color="#00FFA3"/>
-                      <stop offset="1" stop-color="#DC1FFF"/>
-                    </linearGradient>
-                  </defs>
-                  <path fill="url(#solana-g-tokens)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
-                  <path fill="url(#solana-g-tokens)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-                  <path fill="url(#solana-g-tokens)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
-                </svg>
-              </span>
-              Solana
-            </span>
-          </h2>
-          <p class="section-lead">Market language — asks, stakes, and on-chain settlement (devnet).</p>
-          <p class="desk-benefit">
-            <s>Journal that never leaves the farm</s>
-            <span class="desk-benefit-sep" aria-hidden="true">→</span>
-            <span class="desk-benefit-gain">Care proofs that mint RWAs and settle stakes</span>
-          </p>
-          <p class="tokens-honesty">
-            $GROWTOO stage rewards are Devnet test units for incentive design — not income, not redeemable cash, not a mainnet valuation.
-          </p>
-        </div>
-        <div class="desk-panel">
-          <div class="desk-panel-bar">
-            <span>Settlement stack</span>
-            <span class="desk-panel-meta">DEVNET</span>
-          </div>
-          <div class="desk-spec-list desk-spec-list--cols">
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--brass">SEED</span>
-              <div>
-                <h3>Seed NFTs</h3>
-                <p>Mint a seed token linked to a journal plant — strain and batch on-chain.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Unlinked plant claims</s> → seed RWA tied to a journal plant</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--green">GROWTOO</span>
-              <div>
-                <h3>Growth &amp; $GROWTOO</h3>
-                <p>Advance stages with journal proof and earn $GROWTOO at each milestone.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Rewards without proof</s> → stage mints backed by care logs</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--rust">MKT</span>
-              <div>
-                <h3>Adopt &amp; market</h3>
-                <p>Adopters hold plants and trade RWAs on the live commodity board.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Blind capital</s> → stake into open contracts, track the grow</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -324,23 +355,18 @@
       <div class="footer-grid">
         <div>
           <strong class="footer-brand">growtoo</strong>
-          <p>CBD grow journal and RWA commodity desk.</p>
+          <p>CBD grow journal and verified RWA desk.</p>
         </div>
         <div class="footer-links">
           <a href="dnevnik/">App</a>
+          <a href="#proof">How it works</a>
+          <a href="#growers">Growers</a>
+          <a href="#adopters">Adopters</a>
           <a href="#market">Market</a>
-          <a href="#join">Join</a>
-          <a href="#journal">Journal</a>
-          <a href="#tokens">Tokens</a>
           <a href="risks/">Risks</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
       </div>
-      <p class="footer-disclaimer">
-        Solana Devnet MVP. Seed NFTs and $GROWTOO have <strong>no monetary value</strong>.
-        Not an offer of securities or a legal claim on physical CBD.
-        <a href="risks/">Full risks &amp; scope</a>.
-      </p>
       <p class="footer-powered">
         <a href="https://solana.com" target="_blank" rel="noopener noreferrer" class="powered-by-solana">
           <span>Powered by</span>
@@ -382,7 +408,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260724g"></script>
+  <script src="js/landing-market.js?v=20260724j"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

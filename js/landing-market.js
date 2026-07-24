@@ -299,6 +299,24 @@
   function setDemoBanner(show) {
     var banner = document.getElementById('landing-market-demo-banner');
     if (banner) banner.hidden = !show;
+    var headline = document.getElementById('market-headline');
+    var lead = document.getElementById('market-lead');
+    var session = document.querySelector('#landing-market-board .market-stat-value--live');
+    if (show) {
+      if (headline) headline.textContent = 'This is what trading will look like';
+      if (lead) {
+        lead.textContent =
+          'The board is warming up — early contracts are being seeded now. Here\'s a preview of how Seed and Growth RWAs will trade once live.';
+      }
+      if (session) session.textContent = 'PREVIEW';
+    } else {
+      if (headline) headline.textContent = 'Live contracts from real growers';
+      if (lead) {
+        lead.textContent =
+          'Open Seed and growth contracts — seller-set asks in $GROWTOO, settled through marketplace escrow.';
+      }
+      if (session) session.textContent = 'OPEN';
+    }
   }
 
   function render(openListings, allListings, opts) {
