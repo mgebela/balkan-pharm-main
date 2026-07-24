@@ -3691,6 +3691,12 @@ body:has(.devnet-banner) .header {
     justify-content: center;
   }
 
+  .hero-enemy {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
   .hero-headline {
     margin-left: auto;
     margin-right: auto;
@@ -4140,5 +4146,152 @@ body:has(.devnet-banner) .header {
 
   .clip-badge--seed {
     display: none;
+  }
+}
+
+/* ── Selling-point pass: promise hero, trail, soft adopters ── */
+.hero-enemy {
+  margin: 0 0 0.85rem;
+  max-width: 34rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+  line-height: 1.45;
+  color: #ffe7a8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.hero--journal .hero-sub {
+  margin-top: 0;
+}
+
+.founding-banner--hero {
+  margin: 1rem 0 0;
+  max-width: 34rem;
+}
+
+.hero-preview--trail {
+  padding-bottom: 0.95rem;
+}
+
+.hero-trail {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hero-trail li {
+  display: grid;
+  grid-template-columns: 7.2rem 3.4rem minmax(0, 1fr);
+  gap: 0.45rem;
+  align-items: baseline;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 200, 140, 0.12);
+  background: rgba(4, 14, 9, 0.55);
+  font-size: 0.82rem;
+  color: rgba(210, 235, 210, 0.85);
+}
+
+.hero-trail li.is-live {
+  border-color: rgba(157, 255, 176, 0.35);
+  background: rgba(12, 40, 22, 0.65);
+}
+
+.hero-trail-stage {
+  font-weight: 650;
+  color: #f4fff4;
+}
+
+.hero-trail time {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: rgba(190, 220, 190, 0.55);
+}
+
+.hero-trail .verify-code,
+.example-timeline a.verify-code {
+  color: var(--verify, #9dffb0);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+}
+
+.hero-trail .verify-code:hover,
+.example-timeline a.verify-code:hover {
+  color: #c8ffd4;
+}
+
+.hero-trail-note {
+  margin: 0.7rem 0 0;
+  font-size: 0.74rem;
+  color: rgba(190, 220, 190, 0.62);
+  line-height: 1.4;
+}
+
+.trust-chips {
+  border-top: 1px solid rgba(140, 200, 140, 0.12);
+  border-bottom: 1px solid rgba(140, 200, 140, 0.12);
+  background: rgba(6, 18, 12, 0.72);
+}
+
+.trust-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.55rem 1.35rem;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(190, 220, 190, 0.7);
+}
+
+.desk-section--adopter-soft {
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+
+.adopter-soft {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.adopter-soft h2 {
+  margin: 0.55rem 0 0.65rem;
+  color: #f4fff4;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+}
+
+.adopter-soft > p {
+  margin: 0 0 1.15rem;
+  color: rgba(200, 230, 200, 0.75);
+  line-height: 1.55;
+}
+
+.adopter-soft-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  .hero-trail li {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .founding-banner--hero {
+    text-align: left;
+  }
+
+  .hero--journal .founding-banner--hero {
+    margin-left: auto;
+    margin-right: auto;
   }
 }

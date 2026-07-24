@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>growtoo: CBD grow journal + verified RWA market</title>
-  <meta name="description" content="Free CBD grow journal with AI coaching and weather planning. Turn real cultivation data into verifiable on-chain records on Solana." />
+  <title>growtoo: a CBD grow journal that can prove itself</title>
+  <meta name="description" content="Free CBD grow journal for real cultivation. Replace notebooks and camera rolls with dated care logs and optional on-chain stage proof anyone can check." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724q" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724r" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -26,8 +26,7 @@
       </button>
       <nav class="nav" id="main-nav">
         <a href="#proof" class="nav-link">How it works</a>
-        <a href="#growers" class="nav-link">Growers</a>
-        <a href="#adopters" class="nav-link">Adopters</a>
+        <a href="#growers" class="nav-link">For growers</a>
         <a href="#faq" class="nav-link">FAQ</a>
         <a href="rwa-docs/" class="nav-link">Docs</a>
         <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
@@ -47,58 +46,83 @@
             <img src="images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="hero-brand-mark" />
             <span>growtoo</span>
           </p>
-          <p class="hero-eyebrow">Grow journal + verified RWA market</p>
-          <h1 class="hero-headline">Log every stage of your grow. Prove it on-chain.</h1>
+          <p class="hero-eyebrow">Free CBD grow journal</p>
+          <h1 class="hero-headline">A grow journal that can prove itself.</h1>
+          <p class="hero-enemy">
+            Notebooks, camera rolls, and memory forget. growtoo keeps dated care logs you can still trust months later.
+          </p>
           <p class="hero-sub">
-            growtoo is a free CBD grow journal with AI coaching, weather planning, and daily task tracking
-            that turns your real cultivation data into verifiable on-chain records anyone can check.
+            Track watering, feeding, and stages for free. When you want proof, mint each stage on Solana
+            so anyone can check the trail. No wallet needed to start journaling.
           </p>
           <div class="hero-cta-row">
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
-            <a href="#proof" class="btn btn-ghost btn-lg">See how verification works ↓</a>
+            <a href="#trail" class="btn btn-ghost btn-lg">See one plant’s proof ↓</a>
           </div>
-          <p class="hero-cta-note">
-            Opens the <strong>Grower</strong> desk.
-            <a href="#adopters">Adopting a plant instead?</a>
-          </p>
+          <aside class="founding-banner founding-banner--hero">
+            <strong>Founding Growers get priority on mainnet.</strong>
+            <p>
+              Log and mint on Devnet now for a Founding Grower badge carried forward at launch,
+              plus early access before features go public.
+            </p>
+          </aside>
         </div>
 
-        <aside class="hero-preview" aria-label="Journal preview">
+        <aside class="hero-preview hero-preview--trail" aria-label="Proof trail preview">
           <p class="hero-preview-label">
             <span class="hero-preview-rule" aria-hidden="true"></span>
-            Inside the journal
+            CBD Auto #1 · Devnet
             <span class="hero-preview-rule" aria-hidden="true"></span>
           </p>
-          <div class="hero-app-mock" aria-hidden="true">
-            <div class="mock-panel mock-panel--plant">
-              <span class="mock-kicker">Plant</span>
-              <strong>CBD Auto · Vegetative</strong>
-              <span class="mock-meta">Last watered today · Care level 2</span>
-            </div>
-            <div class="mock-panel mock-panel--weather">
-              <span class="mock-kicker">7-day weather</span>
-              <div class="mock-weather-row">
-                <span>Today 22°</span>
-                <span>Thu 19°</span>
-                <span>Fri 21°</span>
-              </div>
-            </div>
-            <div class="mock-panel mock-panel--coach">
-              <span class="mock-kicker">Coach</span>
-              <strong>What’s next</strong>
-              <span class="mock-meta">Log feeding · Check humidity</span>
-            </div>
-          </div>
+          <ol class="hero-trail">
+            <li class="is-live">
+              <span class="hero-trail-stage">Seed minted</span>
+              <time>15 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 31H6…5emD</a>
+            </li>
+            <li>
+              <span class="hero-trail-stage">Transferred</span>
+              <time>17 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 38eu…wyzn</a>
+            </li>
+            <li>
+              <span class="hero-trail-stage">Art updated</span>
+              <time>17 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/3TWuswDMsrc6KGWWpdGR91GaUPvRqD5wDu4tnf9ooj3nfFEjF9osiadP7usjd84T4vEKh2tCuTmJhdnmi7dbmMWh?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 3TWu…bMWh</a>
+            </li>
+            <li>
+              <span class="hero-trail-stage">Stage mints</span>
+              <time>live</time>
+              <span class="example-pending">In journal → Tokenise</span>
+            </li>
+            <li>
+              <span class="hero-trail-stage">Harvest</span>
+              <time>next</time>
+              <span class="example-pending">M5 path</span>
+            </li>
+          </ol>
+          <p class="hero-trail-note">Real Devnet transactions. Click any tx and check it on Solana Explorer.</p>
         </aside>
       </div>
     </section>
 
+    <div class="trust-chips" aria-label="Product facts">
+      <div class="container trust-chips-row">
+        <span>Built for growers first</span>
+        <span>Journal free forever</span>
+        <span>Wallet optional</span>
+        <span>On-chain proof when you want it</span>
+      </div>
+    </div>
+
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag desk-tag--verify">The proof chain</span>
-          <h2>Grow it. Verify it. Own or trade it.</h2>
-          <p class="section-lead">How a journal entry becomes something anyone can check on Solana.</p>
+          <span class="desk-tag desk-tag--verify">How proof works</span>
+          <h2>Log it. Prove it. Keep going.</h2>
+          <p class="section-lead">
+            The product thesis in three beats: document the grow, mint the stage, keep the trail checkable.
+          </p>
         </div>
 
         <ol class="proof-chain proof-chain--motion">
@@ -110,13 +134,13 @@
                 <p class="clip-log"><span class="clip-check">✓</span> Watering · just now</p>
                 <p class="clip-reminder clip-reminder--fade">Reminder cleared</p>
               </div>
-              <p class="clip-caption">Every action, logged in seconds.</p>
+              <p class="clip-caption">Seconds to log. Months later, still there.</p>
             </div>
             <span class="proof-num" aria-hidden="true">01</span>
-            <h3>Grow it.</h3>
+            <h3>Log it.</h3>
             <p>
-              Log watering, feeding, and stage changes as they happen. Get reminders and AI-guided
-              next steps so nothing gets missed.
+              Watering, feeding, and stage changes as they happen, with reminders and an AI coach
+              so nothing slips between notebook pages and camera rolls.
             </p>
           </li>
           <li class="proof-step proof-step--verify">
@@ -127,60 +151,65 @@
                 <p class="clip-mint">Mint confirmed</p>
                 <p class="clip-tx">tx <code>6TDm7g…saTD</code></p>
               </div>
-              <p class="clip-caption clip-caption--verify">Verified on Solana. Click through, check it yourself.</p>
+              <p class="clip-caption clip-caption--verify">Verified on Solana. Open the tx yourself.</p>
             </div>
             <span class="proof-num" aria-hidden="true">02</span>
-            <h3>Verify it.</h3>
+            <h3>Prove it.</h3>
             <p>
-              Each completed stage (germination, seedling, vegetative, flowering, harvest) gets
-              minted as an on-chain update, linked to your journal entry. Every mint has a real
-              transaction you can check yourself.
+              Optional: mint each completed stage (germination through harvest) as an on-chain update
+              linked to the journal entry. Every mint has a transaction anyone can check.
             </p>
           </li>
           <li class="proof-step proof-step--trade">
             <div class="proof-clip proof-clip--trade" aria-hidden="true">
-              <div class="clip-frame clip-frame--cool">
-                <span class="clip-ui-label">Market</span>
-                <p class="clip-badge-row">
-                  <span class="clip-badge clip-badge--seed">Seed RWA</span>
-                  <span class="clip-badge clip-badge--flower">Flower RWA</span>
-                </p>
-                <p class="clip-balance">+$GROWTOO <span class="clip-tickup">↑</span></p>
+              <div class="clip-frame">
+                <span class="clip-ui-label">Trail</span>
+                <p class="clip-quest"><span class="clip-tick">✓</span> Seed → flower trail intact</p>
+                <p class="clip-mint">Same evidence forever</p>
               </div>
-              <p class="clip-caption">Track it, hold it, or trade it, stage by stage.</p>
+              <p class="clip-caption">Your documentation becomes the asset.</p>
             </div>
             <span class="proof-num" aria-hidden="true">03</span>
-            <h3>Own or trade it.</h3>
+            <h3>Keep going.</h3>
             <p>
-              Growers hold Seed RWAs tied to their plants. Adopters can back a grow they trust and
-              follow its verified progress from seed to harvest.
+              Hold Seed RWAs tied to your plants as you advance. Trading and adopters come later,
+              once there’s real grower supply to back.
             </p>
           </li>
         </ol>
-        <p class="proof-caption">
-          Every stage update links to a real Solana transaction. Click through and check it yourself.
-        </p>
 
-        <article class="example-plant">
+        <article id="trail" class="example-plant">
           <div class="example-plant-head">
-            <span class="desk-tag desk-tag--verify">Example trail</span>
-            <h3>CBD Auto #1: one plant, end to end</h3>
-            <p>A realistic stage timeline with a checkable mint link at each advance.</p>
+            <span class="desk-tag desk-tag--verify">The product thesis</span>
+            <h3>One plant. Real txs. Check them yourself.</h3>
+            <p>
+              CBD Auto #1 on Solana Devnet. This is what “prove it” looks like: not a claim on a listing page,
+              a trail you can open in Explorer.
+            </p>
           </div>
           <ol class="example-timeline">
-            <li><span>Germination</span><time>10 Jul</time><code class="verify-code">tx · 4kR2…nP1a</code></li>
-            <li><span>Seedling</span><time>18 Jul</time><code class="verify-code">tx · 8mQx…hT3c</code></li>
-            <li><span>Vegetative</span><time>02 Aug</time><code class="verify-code">tx · 2bLw…sK9e</code></li>
-            <li><span>Flowering</span><time>28 Aug</time><code class="verify-code">tx · 6TDm…saTD</code></li>
+            <li>
+              <span>Seed minted</span><time>15 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 31H6…5emD</a>
+            </li>
+            <li>
+              <span>Transferred</span><time>17 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 38eu…wyzn</a>
+            </li>
+            <li>
+              <span>Art updated</span><time>17 Jul</time>
+              <a class="verify-code" href="https://explorer.solana.com/tx/3TWuswDMsrc6KGWWpdGR91GaUPvRqD5wDu4tnf9ooj3nfFEjF9osiadP7usjd84T4vEKh2tCuTmJhdnmi7dbmMWh?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 3TWu…bMWh</a>
+            </li>
+            <li><span>Stage advances</span><time>ongoing</time><span class="example-pending">Logged in journal, minted in Tokenise</span></li>
             <li><span>Harvest</span><time>planned</time><span class="example-pending">M5 redemption path</span></li>
           </ol>
         </article>
 
         <div class="proof-fork" id="join">
-          <p class="proof-fork-lead">Choose a desk</p>
+          <p class="proof-fork-lead">Start where the product starts</p>
           <div class="proof-fork-row">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start your journal free</a>
+            <a href="#adopters" class="btn btn-ghost">Adopting later?</a>
           </div>
         </div>
       </div>
@@ -189,30 +218,22 @@
     <section id="growers" class="section desk-section desk-section--journal desk-section--alt">
       <div class="container audience-grid">
         <div class="audience-copy">
-          <span class="desk-tag desk-tag--journal">For growers</span>
+          <span class="desk-tag desk-tag--journal">Why start today</span>
           <h2>Run your grow. Free.</h2>
           <p>
-            Track every plant from germination to harvest with a journal built for the job:
-            stage tracking, watering and feeding logs, weather-aware planning, and an AI coach
-            that tells you what to do next.
+            A journal built for the job: plant-by-plant stages, watering and feeding logs,
+            weather-aware planning, and an AI coach that tells you what to do next.
           </p>
           <p>
-            Want more? Mint your verified progress as Seed RWAs and earn $GROWTOO at every stage,
-            germination through harvest, with no cost to use the journal itself.
+            Want more later? Mint verified stages as Seed RWAs and earn $GROWTOO on Devnet,
+            with no cost to use the journal itself.
           </p>
           <ul class="audience-bullets">
-            <li>Plant-by-plant journal, built for indoor and outdoor grows</li>
+            <li>Stops the notebook / camera-roll mess before a season is over</li>
             <li>AI coach with daily priorities and smart reminders</li>
             <li>7-day weather forecasting for grow planning</li>
-            <li>Optional: mint verified stages on-chain and earn $GROWTOO</li>
+            <li>Optional on-chain stage proof when you’re ready</li>
           </ul>
-          <aside class="founding-banner">
-            <strong>Founding Growers get priority on mainnet.</strong>
-            <p>
-              Growers who log and mint on Devnet now get a Founding Grower badge, carried forward
-              at mainnet launch, plus early access to new features before they roll out publicly.
-            </p>
-          </aside>
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
         </div>
         <div class="audience-panel desk-panel desk-panel--journal">
@@ -247,56 +268,18 @@
       </div>
     </section>
 
-    <section id="adopters" class="section desk-section desk-section--adopter">
-      <div class="container audience-grid audience-grid--flip">
-        <div class="audience-copy">
-          <span class="desk-tag desk-tag--adopter">For adopters</span>
-          <h2>Back a grow you can actually verify.</h2>
-          <p>
-            Every plant on the market has a real journal behind it: logged care, timestamped stage
-            changes, and on-chain proof of progress. Instead of trusting a claim, you can trace it:
-            from the grower’s watering log to the transaction that advanced the plant to flowering.
-          </p>
-          <p>
-            Stake $GROWTOO into open contracts, track your adopted plants stage by stage, and see
-            the same evidence trail the grower sees.
-          </p>
-          <ul class="audience-bullets">
-            <li>Every stage backed by a real journal entry, not just a listing</li>
-            <li>On-chain history for every plant. Check any transaction yourself</li>
-            <li>Track adopted plants from seed through harvest</li>
-            <li>Trade Seed and Flower RWAs in the app</li>
-          </ul>
+    <section id="adopters" class="section desk-section desk-section--adopter desk-section--adopter-soft">
+      <div class="container adopter-soft">
+        <span class="desk-tag desk-tag--adopter">For later</span>
+        <h2>Adopters come after supply.</h2>
+        <p>
+          Backing a grow only matters once growers have real journals and checkable stage trails.
+          We’re seeding that supply on Devnet first. When you’re ready to explore the desk,
+          you can enter as an Adopter and follow the same evidence trail growers see.
+        </p>
+        <div class="adopter-soft-row">
           <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
-        </div>
-        <div class="audience-panel desk-panel desk-panel--adopter">
-          <div class="desk-panel-bar">
-            <span>Evidence trail</span>
-            <span class="desk-panel-meta desk-panel-meta--verify">Checkable</span>
-          </div>
-          <div class="desk-spec-list">
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--brass">LOG</span>
-              <div>
-                <h3>Journal first</h3>
-                <p>Care entries sit behind every stage claim.</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--verify">TX</span>
-              <div>
-                <h3>On-chain mint</h3>
-                <p>Each advance has a Solana transaction you can open.</p>
-              </div>
-            </div>
-            <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--cool">MKT</span>
-              <div>
-                <h3>Open contracts</h3>
-                <p>Stake into asks and follow verified progress.</p>
-              </div>
-            </div>
-          </div>
+          <a href="rwa-docs/" class="btn btn-ghost">Read how verification works</a>
         </div>
       </div>
     </section>
@@ -326,7 +309,7 @@
       <div class="container">
         <div class="desk-header">
           <span class="desk-tag">Questions people actually ask</span>
-          <h2>Straight answers before you desk in</h2>
+          <h2>Straight answers before you start</h2>
           <p class="section-lead">For anyone who has heard “RWA” and “Devnet” and still wants the plain version.</p>
         </div>
         <div class="faq-list">
@@ -389,18 +372,17 @@
 
     <section id="start" class="section desk-section desk-section--close">
       <div class="container close-block">
-        <h2>Start with the journal. The rest is optional.</h2>
+        <h2>Start with the journal. Proof is optional.</h2>
         <p>
-          Whether you’re growing or adopting, growtoo starts with real documentation.
-          Everything else builds on top of that.
+          Today’s job is documentation. Everything else (minting, trading, adopting) builds on top of that.
         </p>
         <div class="close-cta-row">
-          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Enter as Grower</a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter btn-lg">Enter as Adopter</a>
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
           <a href="rwa-docs/" class="btn btn-ghost btn-lg">Read the docs</a>
         </div>
         <p class="join-signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
+          · Looking to adopt later? <a href="#adopters">See the adopter note</a>
         </p>
       </div>
     </section>
@@ -411,12 +393,12 @@
       <div class="footer-grid">
         <div>
           <strong class="footer-brand">growtoo</strong>
-          <p>CBD grow journal and verified RWA desk.</p>
+          <p>CBD grow journal that can prove itself.</p>
         </div>
         <div class="footer-links">
           <a href="dnevnik/">App</a>
           <a href="#proof">How it works</a>
-          <a href="#growers">Growers</a>
+          <a href="#growers">For growers</a>
           <a href="#adopters">Adopters</a>
           <a href="#faq">FAQ</a>
           <a href="risks/">Risks</a>
@@ -436,7 +418,7 @@
               </defs>
               <path fill="url(#solana-g-footer)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
               <path fill="url(#solana-g-footer)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-              <path fill="url(#solana-g-footer)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l-62.7-62.7z"/>
+              <path fill="url(#solana-g-footer)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7z"/>
             </svg>
           </span>
           <strong>Solana</strong>
