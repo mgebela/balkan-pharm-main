@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Risks &amp; scope — growtoo</title>
+  <meta name="description" content="Plain-language risks and scope for growtoo on Solana Devnet: trust model, pricing, redemption, and legal limits." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/landing.css?v=20260724f" />
+  <link rel="icon" href="../images/growtoo-logo.png?v=20260722a" type="image/png" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="../index.html" class="logo" aria-label="growtoo">
+        <img src="../images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="logo-mark" />
+        <span class="logo-word">growtoo</span>
+      </a>
+      <nav class="nav" id="main-nav">
+        <a href="../index.html#market" class="nav-link">Market</a>
+        <a href="../index.html#join" class="nav-link">Join</a>
+        <a href="../rwa-docs/" class="nav-link">RWA docs</a>
+        <a href="../dnevnik/" class="btn btn-primary">Sign in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="section desk-section risks-page">
+      <div class="container risks-wrap">
+        <div class="desk-header">
+          <span class="desk-tag">SCOPE</span>
+          <h1 class="risks-title">Risks &amp; scope</h1>
+          <p class="section-lead">
+            Honest limits of the Devnet MVP — what adopting a plant means today, and what it does not.
+          </p>
+        </div>
+
+        <div class="desk-panel risks-panel">
+          <div class="desk-panel-bar">
+            <span>Read before you desk in</span>
+            <span class="desk-panel-meta">DEVNET</span>
+          </div>
+          <div class="desk-spec-list">
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--rust">NET</span>
+              <div>
+                <h2>Devnet only — no monetary value</h2>
+                <p>
+                  All Seed NFTs and <strong>$GROWTOO</strong> on growtoo today live on
+                  <strong>Solana Devnet</strong>. They are for product testing. They are not
+                  mainnet assets, they are not cash equivalents, and they carry
+                  <strong>no monetary value</strong>.
+                </p>
+              </div>
+            </div>
+            <div class="desk-spec" id="ask">
+              <span class="desk-spec-code">ASK</span>
+              <div>
+                <h2>How prices form</h2>
+                <p>
+                  There is no bonding curve and no price oracle. A grower (or seller) sets an
+                  ask in <strong>$GROWTOO</strong> when they list. An adopter fills that ask
+                  through the marketplace escrow. Last price on the board is the most recent
+                  listed ask (or sample depth when the live tape is empty).
+                </p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">TRU</span>
+              <div>
+                <h2>Trust model (centralized MVP)</h2>
+                <p>
+                  One collection authority currently controls metadata updates, stage reward
+                  minting, and escrow settlement. Stage “proof” means the operator checked that
+                  a journal advance exists — not an independent oracle, photo attestation, or
+                  IoT feed. Fabricated journal entries are a real residual risk for adopters
+                  until verification hardens.
+                </p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--brass">RWA</span>
+              <div>
+                <h2>What “adopting” means today</h2>
+                <p>
+                  On Devnet, adopting means holding a test RWA and following the linked journal.
+                  It does <strong>not</strong> create a transferable legal title to physical CBD
+                  plant material, custody rights, or a guaranteed harvest payout. Redemption into
+                  a real harvest share is specified in architecture docs but is still a
+                  <strong>mock / planned</strong> path.
+                </p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code desk-spec-code--green">LAW</span>
+              <div>
+                <h2>Regulation &amp; CBD logistics</h2>
+                <p>
+                  CBD and related plant material are regulated differently by jurisdiction.
+                  Any future physical redemption would need to comply with local law, licensing,
+                  custody, shipping, and KYC/AML where required. growtoo does not currently
+                  operate a licensed fulfillment pipeline. Nothing on this site is legal, tax, or
+                  investment advice.
+                </p>
+              </div>
+            </div>
+            <div class="desk-spec">
+              <span class="desk-spec-code">AUD</span>
+              <div>
+                <h2>Audit &amp; team</h2>
+                <p>
+                  The mint-queue authority is a single operational trust point. A third-party
+                  audit is planned before any mainnet launch — not claimed as done. Public code
+                  and addresses live in the open repository and
+                  <a href="../rwa-docs/">RWA docs</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="risks-footer-note">
+          More detail:
+          <a href="../rwa-docs/">RWA architecture</a> ·
+          <a href="https://github.com/mgebela/balkan-pharm-main">GitHub</a> ·
+          <a href="../index.html">Back to growtoo</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer desk-footer">
+    <div class="container">
+      <p class="footer-disclaimer">
+        Solana Devnet MVP. Tokens have no monetary value. Not an offer of securities or a claim on physical CBD.
+      </p>
+      <p class="footer-copy">© growtoo. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

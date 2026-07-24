@@ -1,6 +1,8 @@
 /*
  * Public commodity-style market board for the landing page (no auth).
  * Fetches marketListings from Firestore: open tape + adopter stake totals.
+ * When the live tape is empty, shows a clearly labeled sample depth so the
+ * board never reads as a dead market on first visit.
  */
 (function () {
   'use strict';
@@ -26,6 +28,54 @@
     escrow_pending: 'Activating',
     sale_pending: 'Settling',
   };
+
+  /** Labeled sample depth when Firestore has no open contracts. */
+  var DEMO_TAPE = [
+    {
+      id: 'demo-seed-auto',
+      name: 'CBD Auto · Seed',
+      strain: 'CBD Auto',
+      batch: '2026-07-A',
+      stage: 'Germination',
+      assetType: 'seed',
+      status: 'active',
+      priceGrow: 120,
+      demo: true,
+    },
+    {
+      id: 'demo-seed-haze',
+      name: 'Haze Lite · Seed',
+      strain: 'Haze Lite',
+      batch: '2026-07-B',
+      stage: 'Seedling',
+      assetType: 'seed',
+      status: 'active',
+      priceGrow: 180,
+      demo: true,
+    },
+    {
+      id: 'demo-flower-auto',
+      name: 'CBD Auto · Flower',
+      strain: 'CBD Auto',
+      batch: '2026-06-C',
+      stage: 'Flowering',
+      assetType: 'flower',
+      status: 'active',
+      priceGrow: 420,
+      demo: true,
+    },
+    {
+      id: 'demo-staked',
+      name: 'Outdoor Mix · Staked',
+      strain: 'Outdoor Mix',
+      batch: '2026-05-D',
+      stage: 'Vegetative',
+      assetType: 'seed',
+      status: 'sold',
+      priceGrow: 250,
+      demo: true,
+    },
+  ];
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -87,16 +137,24 @@
 
   function rowHtml(listing, index) {
     var asset = listing.assetType === 'flower' ? 'FLWR' : 'SEED';
-    var status = STATUS_LABELS[listing.status] || listing.status || '';
+    var isDemo = !!listing.demo;
+    var status = isDemo ? 'Sample' : STATUS_LABELS[listing.status] || listing.status || '';
     var price = formatPrice(listing.priceGrow);
     var sym = symbolFrom(listing);
     var delay = Math.min(index * 45, 360);
-    var canInvest = listing.status === 'active';
-    var actionLabel = canInvest ? 'Invest' : status || 'View';
-    var actionClass = canInvest ? 'btn btn-primary btn-sm market-row-action' : 'btn btn-ghost btn-sm market-row-action';
+    var canInvest = !isDemo && listing.status === 'active';
+    var actionLabel = isDemo ? 'Open desk' : canInvest ? 'Invest' : status || 'View';
+    var actionClass = canInvest
+      ? 'btn btn-primary btn-sm market-row-action'
+      : 'btn btn-ghost btn-sm market-row-action';
+    var href = isDemo
+      ? 'dnevnik/?mode=signup&type=grower'
+      : 'dnevnik/?mode=signup&type=adopter';
 
     return (
-      '<article class="landing-market-card market-row" style="--row-delay:' +
+      '<article class="landing-market-card market-row' +
+      (isDemo ? ' market-row--demo' : '') +
+      '" style="--row-delay:' +
       delay +
       'ms">' +
       '<div class="market-row-contract">' +
@@ -106,6 +164,7 @@
       '<div class="market-row-names">' +
       '<h3 class="landing-market-name">' +
       esc(listing.name || 'RWA offer') +
+      (isDemo ? ' <span class="market-demo-pill">DEMO</span>' : '') +
       '</h3>' +
       '<p class="landing-market-mint">' +
       '<span class="landing-market-asset">' +
@@ -117,15 +176,17 @@
           '" target="_blank" rel="noopener noreferrer"><code>' +
           esc(shortAddr(listing.mintAddress)) +
           '</code></a>'
-        : '') +
+        : isDemo
+          ? ' <span class="landing-market-demo-note">illustrative ask</span>'
+          : '') +
       '</p>' +
       '</div>' +
       '</div>' +
       '<p class="landing-market-meta market-row-grade">' +
       esc(gradeLine(listing)) +
       '</p>' +
-      '<span class="landing-market-status landing-market-status--' +
-      esc(listing.status || '') +
+      '<span class="landing-market-status' +
+      (isDemo ? ' landing-market-status--demo' : ' landing-market-status--' + esc(listing.status || '')) +
       '">' +
       esc(status) +
       '</span>' +
@@ -137,7 +198,9 @@
       '</div>' +
       '<a class="' +
       actionClass +
-      '" href="dnevnik/?mode=signup&type=adopter">' +
+      '" href="' +
+      href +
+      '">' +
       esc(actionLabel) +
       '</a>' +
       '</article>'
@@ -157,7 +220,7 @@
           esc(formatPrice(listing.priceGrow)) +
           '</em>' +
           '<span class="market-ticker-tag">' +
-          esc(STATUS_LABELS[listing.status] || 'Open') +
+          esc(listing.demo ? 'DEMO' : STATUS_LABELS[listing.status] || 'Open') +
           '</span>' +
           '</span>'
         );
@@ -166,7 +229,7 @@
     return items + items;
   }
 
-  function updateStats(openListings, allListings) {
+  function updateStats(openListings, allListings, isDemo) {
     var openEl = document.getElementById('landing-market-open');
     var volEl = document.getElementById('landing-market-volume');
     var stakedCountEl = document.getElementById('landing-market-staked-count');
@@ -193,7 +256,11 @@
     }
     if (stakedValueEl) stakedValueEl.textContent = formatPrice(stakedValue) + ' $GROWTOO';
     if (totalEl) totalEl.textContent = formatPrice(totalValue) + ' $GROWTOO';
-    if (clockEl) clockEl.textContent = 'Last print ' + formatClock(new Date());
+    if (clockEl) {
+      clockEl.textContent = isDemo
+        ? 'Sample depth · not live asks'
+        : 'Last print ' + formatClock(new Date());
+    }
   }
 
   function updateTicker(listings) {
@@ -209,19 +276,29 @@
     ticker.hidden = false;
   }
 
-  function render(openListings, allListings) {
+  function setDemoBanner(show) {
+    var banner = document.getElementById('landing-market-demo-banner');
+    if (banner) banner.hidden = !show;
+  }
+
+  function render(openListings, allListings, opts) {
     var grid = document.getElementById('landing-market-grid');
     var empty = document.getElementById('landing-market-empty');
     var loading = document.getElementById('landing-market-loading');
     var board = document.getElementById('landing-market-board');
+    var isDemo = !!(opts && opts.demo);
     if (loading) loading.hidden = true;
     if (!grid) return;
 
-    updateStats(openListings, allListings || openListings);
-    updateTicker(openListings);
+    updateStats(openListings, allListings || openListings, isDemo);
+    updateTicker(openListings.filter(function (l) {
+      return ASK_STATUSES[l.status] || l.demo;
+    }));
+    setDemoBanner(isDemo);
 
     if (board) {
       board.classList.toggle('market-board--empty', !openListings.length);
+      board.classList.toggle('market-board--demo', isDemo);
     }
 
     if (!openListings.length) {
@@ -234,16 +311,22 @@
     grid.innerHTML = openListings.map(rowHtml).join('');
   }
 
+  function showDemoTape() {
+    var open = DEMO_TAPE.filter(function (l) {
+      return ASK_STATUSES[l.status];
+    });
+    render(open, DEMO_TAPE, { demo: true });
+  }
+
   function showError(msg) {
     var loading = document.getElementById('landing-market-loading');
     var empty = document.getElementById('landing-market-empty');
     var clockEl = document.getElementById('landing-market-updated');
-    if (loading) {
-      loading.hidden = false;
-      loading.textContent = msg || 'Could not load market offers.';
-    }
+    if (loading) loading.hidden = true;
     if (empty) empty.hidden = true;
-    if (clockEl) clockEl.textContent = 'Feed offline';
+    if (clockEl) clockEl.textContent = 'Feed offline · showing sample';
+    console.warn(msg || 'Could not load market offers.');
+    showDemoTape();
   }
 
   function load() {
@@ -273,7 +356,12 @@
           return OPEN_STATUSES[listing.status];
         });
 
-        render(open.slice(0, 12), all);
+        if (!open.length) {
+          showDemoTape();
+          return;
+        }
+
+        render(open.slice(0, 12), all, { demo: false });
       })
       .catch(function (err) {
         console.warn('landing market failed', err);
