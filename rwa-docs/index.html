@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>dnevnik.live — RWA documentation</title>
+  <title>dnevnik.live · RWA documentation</title>
   <meta name="description" content="Public documentation for the dnevnik.live real-world-asset (RWA) architecture: token standards, growth minting and redemption flow on Solana." />
   <style>
     :root {
@@ -94,7 +94,7 @@
     <h2 id="architecture">1. RWA architecture</h2>
     <p>
       Each physical seed adopted on <a href="https://dnevnik.live">dnevnik.live</a> is represented
-      by a <strong>Seed NFT</strong> — a Metaplex NFT in the verified
+      by a <strong>Seed NFT</strong>, a Metaplex NFT in the verified
       <em>dnevnik.live Seeds</em> collection. The NFT is the on-chain record of the asset;
       the public grow journal is the off-chain evidence trail. The two are linked in both
       directions: the NFT metadata references the journal plant ID, and the app shows the
@@ -102,10 +102,10 @@
     </p>
     <h3>Components</h3>
     <ul>
-      <li><strong>App (dnevnik.live/app)</strong> — Firebase-authenticated grow journal. Users connect a Solana wallet (multi-wallet or watch-only) and link it to their account by signing a message.</li>
-      <li><strong>Seed NFTs</strong> — one per physical seed; strain, batch and linked plant ID live in the metadata (Arweave, uploaded via Irys).</li>
-      <li><strong>$GROWTOO SPL token</strong> — fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
-      <li><strong>Mint queue</strong> — mint and settlement requests are filed in Firestore; an authority-operated worker executes them on devnet and writes back transaction signatures. This queue is the devnet stand-in for backend services / on-chain programs planned for mainnet.</li>
+      <li><strong>App (dnevnik.live/app)</strong>: Firebase-authenticated grow journal. Users connect a Solana wallet (multi-wallet or watch-only) and link it to their account by signing a message.</li>
+      <li><strong>Seed NFTs</strong>: one per physical seed; strain, batch and linked plant ID live in the metadata (Arweave, uploaded via Irys).</li>
+      <li><strong>$GROWTOO SPL token</strong>: fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
+      <li><strong>Mint queue</strong>: mint and settlement requests are filed in Firestore; an authority-operated worker executes them on devnet and writes back transaction signatures. This queue is the devnet stand-in for backend services / on-chain programs planned for mainnet.</li>
     </ul>
     <h3>Trust model (devnet MVP)</h3>
     <p>
@@ -177,7 +177,7 @@
       <li><strong>Settle:</strong> the worker verifies the payment on-chain and releases the NFT from escrow to the buyer. Sellers can cancel live listings; the NFT is returned.</li>
     </ol>
     <p>
-      The swap is escrow-mediated rather than atomic — an accepted trade-off for the devnet MVP.
+      The swap is escrow-mediated rather than atomic, an accepted trade-off for the devnet MVP.
       Mainnet uses an on-chain escrow program so neither leg depends on the operator.
     </p>
 
@@ -190,7 +190,7 @@
       <li>A harvest-stage NFT holder requests redemption in the app (planned M5; devnet mock until then).</li>
       <li>The redemption burns the NFT (or marks it redeemed via a frozen redemption trait), permanently retiring the claim.</li>
       <li>The operator fulfils the physical delivery / payout recorded against the batch code, and publishes the fulfilment reference in the journal.</li>
-      <li>$GROWTOO earned by the plant remains with the holder — only the asset NFT is retired.</li>
+      <li>$GROWTOO earned by the plant remains with the holder. Only the asset NFT is retired.</li>
     </ol>
 
     <h2 id="addresses">6. Deployed addresses (devnet)</h2>
@@ -198,7 +198,7 @@
       Published after the M1 devnet deploy in
       <a href="https://github.com/mgebela/balkan-pharm-main">the repository</a>
       (<code>chain/deployed.devnet.json</code>) and in the app's chain config.
-      All assets are on <strong>devnet</strong> — they carry no monetary value.
+      All assets are on <strong>devnet</strong>. They carry no monetary value.
     </p>
 
     <footer>
