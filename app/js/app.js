@@ -1046,26 +1046,40 @@ async function ensureUserExists(user) {
 
   const email = (user.email || '').toLowerCase();
   const hybridUser = isSharedHybridUser(email);
-  const pending = readPendingProfile();
+  const Signup = window.GrowtooSignup;
+  const pending = Signup ? Signup.readPending() : readPendingProfile();
   const pendingType = pending.profileType || '';
 
   if (!docSnap.exists) {
-    const profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
-    const profileDoc = {
-      email: user.email || "",
-      uId: user.uid,
-      role: 'user',
-      profileType: profileType,
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-    };
-    applyPendingFieldsToUserDoc(profileDoc, pending, profileType);
+    let profileDoc;
+    if (Signup) {
+      profileDoc = Signup.buildUserProfileDoc(user, pending);
+      if (hybridUser) profileDoc.role = 'user';
+    } else {
+      const profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
+      profileDoc = {
+        email: user.email || "",
+        uId: user.uid,
+        role: 'user',
+        profileType: profileType,
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        signupSource: 'website',
+      };
+      applyPendingFieldsToUserDoc(profileDoc, pending, profileType);
+    }
     await userRef.set(profileDoc);
-    applyPendingLocalDefaults(pending, profileType);
-    hydrateProfileLocalDefaults(profileDoc);
-    clearPendingProfile();
-    currentProfileType = profileType;
-    console.log("User created", profileType);
+    if (Signup) {
+      Signup.applyLocalDefaults(pending);
+      Signup.hydrateLocalFromUserDoc(profileDoc);
+      Signup.clearPending();
+    } else {
+      applyPendingLocalDefaults(pending, profileDoc.profileType);
+      hydrateProfileLocalDefaults(profileDoc);
+      clearPendingProfile();
+    }
+    currentProfileType = normalizeProfileType(profileDoc.profileType) || PROFILE_TYPES.grower;
+    console.log("User created", currentProfileType);
   } else {
     const data = docSnap.data() || {};
     const patch = { lastLoginAt: new Date().toISOString() };
@@ -1075,17 +1089,31 @@ async function ensureUserExists(user) {
     const existingType = normalizeProfileType(data.profileType);
     if (!existingType) {
       patch.profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
-      applyPendingFieldsToUserDoc(patch, pending, patch.profileType);
-      applyPendingLocalDefaults(pending, patch.profileType);
+      if (Signup) Signup.applyPayloadToUserDoc(patch, pending, patch.profileType);
+      else applyPendingFieldsToUserDoc(patch, pending, patch.profileType);
+      if (Signup) Signup.applyLocalDefaults(pending);
+      else applyPendingLocalDefaults(pending, patch.profileType);
     } else if (pending && pending.profileType) {
-      // Fresh signup payload for an existing auth user without profile extras — fill gaps once.
-      applyPendingFieldsToUserDoc(patch, pending, existingType, { onlyIfMissing: true, existing: data });
-      applyPendingLocalDefaults(pending, existingType);
+      if (Signup) {
+        Signup.applyPayloadToUserDoc(patch, pending, existingType, {
+          onlyIfMissing: true,
+          existing: data,
+        });
+        Signup.applyLocalDefaults(pending);
+      } else {
+        applyPendingFieldsToUserDoc(patch, pending, existingType, { onlyIfMissing: true, existing: data });
+        applyPendingLocalDefaults(pending, existingType);
+      }
     }
     await userRef.update(patch);
-    clearPendingProfile();
+    if (Signup) {
+      Signup.clearPending();
+      Signup.hydrateLocalFromUserDoc(Object.assign({}, data, patch));
+    } else {
+      clearPendingProfile();
+      hydrateProfileLocalDefaults(Object.assign({}, data, patch));
+    }
     currentProfileType = existingType || patch.profileType || PROFILE_TYPES.grower;
-    hydrateProfileLocalDefaults(Object.assign({}, data, patch));
     console.log("User updated");
   }
 }

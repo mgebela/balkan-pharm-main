@@ -246,6 +246,49 @@
       opacity: 0.65;
       cursor: wait;
     }
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0.85rem 0 0.75rem;
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(140, 200, 140, 0.16);
+    }
+    .btn-google {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      border: 1px solid rgba(140, 200, 140, 0.28);
+      border-radius: 6px;
+      padding: 0.7rem 0.9rem;
+      font: inherit;
+      font-weight: 650;
+      font-size: 0.9rem;
+      color: #f4fff4;
+      background: rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+    }
+    .btn-google:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-google:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+    .btn-google svg {
+      flex-shrink: 0;
+    }
     .back-link {
       margin-top: 0.85rem;
       text-align: center;
@@ -377,17 +420,44 @@
     </label>
 
     <button type="submit" id="submit-btn">Sign in</button>
+
+    <div class="auth-divider" aria-hidden="true">or</div>
+    <button type="button" class="btn-google" id="btn-google-auth">
+      <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.2 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39.6 16.3 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.2-3.5 5.7-6.5 7.1l.1.1 6.2 5.2C36.8 39.2 44 34 44 24c0-1.3-.1-2.5-.4-3.5z"/>
+      </svg>
+      <span id="google-auth-label">Continue with Google</span>
+    </button>
+
     <p id="login-status" aria-live="polite"></p>
     <div class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
+  <script src="../app/js/signup.js?v=20260724d"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider,
       onAuthStateChanged,
     } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+    const Signup = window.GrowtooSignup;
+    if (!Signup) {
+      console.error('GrowtooSignup model missing');
+    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg",
@@ -399,12 +469,11 @@
       measurementId: "G-HLXHTQP41H"
     };
 
-    const STORAGE_AUTH = 'dnevnik-live-auth';
-    const STORAGE_PENDING_PROFILE = 'dnevnik-live-pending-profile-type';
-
     const form = document.getElementById('login-form');
     const statusEl = document.getElementById('login-status');
     const submitBtn = document.getElementById('submit-btn');
+    const googleBtn = document.getElementById('btn-google-auth');
+    const googleLabel = document.getElementById('google-auth-label');
     const profilePick = document.getElementById('profile-pick');
     const titleEl = document.getElementById('auth-title');
     const leadEl = document.getElementById('auth-lead');
@@ -418,13 +487,24 @@
     let profileType = params.get('type') === 'adopter' ? 'adopter' : params.get('type') === 'grower' ? 'grower' : '';
     let growSetup = 'indoor';
     let adopterIntent = 'support_growers';
+    let authBusy = false;
+    let profileWritePromise = null;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
 
     function setStatus(msg, isError = false) {
       statusEl.textContent = msg || '';
       statusEl.style.color = isError ? '#fca5a5' : 'var(--text-muted)';
+    }
+
+    function setBusy(busy) {
+      authBusy = !!busy;
+      submitBtn.disabled = authBusy;
+      googleBtn.disabled = authBusy;
     }
 
     function syncProfileSelection() {
@@ -469,19 +549,23 @@
       if (isSignup && profileType === 'grower') {
         submitBtn.classList.add('submit--grower');
         submitBtn.textContent = 'Create grower account';
+        googleLabel.textContent = 'Sign up with Google';
         titleEl.textContent = 'Start your grow journal';
         leadEl.textContent = 'Log care, tokenise stages, unlock $GROWTOO.';
       } else if (isSignup && profileType === 'adopter') {
         submitBtn.classList.add('submit--adopter');
         submitBtn.textContent = 'Create adopter account';
+        googleLabel.textContent = 'Sign up with Google';
         titleEl.textContent = 'Start your garden';
         leadEl.textContent = 'Stake $GROWTOO, adopt RWAs, track growth.';
       } else if (isSignup) {
         submitBtn.textContent = 'Create account';
+        googleLabel.textContent = 'Sign up with Google';
         titleEl.textContent = 'Create your account';
         leadEl.textContent = 'Pick Grower or Adopter — each has its own app workspace.';
       } else {
         submitBtn.textContent = 'Sign in';
+        googleLabel.textContent = 'Continue with Google';
         titleEl.textContent = 'Sign in to growtoo';
         leadEl.textContent = 'Welcome back. Your Grower or Adopter workspace opens automatically.';
       }
@@ -503,6 +587,63 @@
       syncAdopterIntent();
       syncRoleFields();
       setStatus('');
+    }
+
+    function collectSignupInput(authProvider) {
+      return {
+        profileType: profileType,
+        displayName: document.getElementById('display-name').value.trim(),
+        acceptedTerms: !!document.getElementById('accept-terms').checked,
+        growSetup: growSetup,
+        homeCity: document.getElementById('home-city').value.trim(),
+        growStyleNote: document.getElementById('grow-style-note').value.trim(),
+        adopterIntent: adopterIntent,
+        acceptedDevnet: !!document.getElementById('accept-devnet').checked,
+        authProvider: authProvider || 'email',
+      };
+    }
+
+    async function writeWebsiteProfile(user) {
+      if (!Signup || !user) return;
+      const pending = Signup.readPending();
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        const profile = Signup.buildUserProfileDoc(user, pending);
+        await setDoc(ref, profile);
+        Signup.applyLocalDefaults(pending);
+        Signup.hydrateLocalFromUserDoc(profile);
+        Signup.clearPending();
+        return;
+      }
+      const data = snap.data() || {};
+      const patch = { lastLoginAt: new Date().toISOString() };
+      const existingType = Signup.normalizeProfileType(data.profileType);
+      if (!existingType) {
+        patch.profileType = Signup.normalizeProfileType(pending.profileType) || 'grower';
+        Signup.applyPayloadToUserDoc(patch, pending, patch.profileType);
+        Signup.applyLocalDefaults(pending);
+      } else if (pending && pending.profileType) {
+        Signup.applyPayloadToUserDoc(patch, pending, existingType, {
+          onlyIfMissing: true,
+          existing: data,
+        });
+        Signup.applyLocalDefaults(pending);
+      }
+      await updateDoc(ref, patch);
+      Signup.clearPending();
+      Signup.hydrateLocalFromUserDoc(Object.assign({}, data, patch));
+    }
+
+    function goToApp(user) {
+      if (Signup) Signup.rememberAuthSession(user);
+      else {
+        localStorage.setItem(
+          'dnevnik-live-auth',
+          JSON.stringify({ email: user.email || '', uid: user.uid, loggedAt: Date.now() })
+        );
+      }
+      window.location.href = '../app/dnevnik/';
     }
 
     tabSignin.addEventListener('click', () => setMode('signin'));
@@ -540,48 +681,30 @@
     syncAdopterIntent();
     syncRoleFields();
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        localStorage.setItem(
-          STORAGE_AUTH,
-          JSON.stringify({ email: user.email || '', uid: user.uid, loggedAt: Date.now() })
-        );
-        window.location.href = '../app/dnevnik/';
+    onAuthStateChanged(auth, async (user) => {
+      if (!user || authBusy) return;
+      try {
+        if (profileWritePromise) await profileWritePromise;
+        else await writeWebsiteProfile(user);
+      } catch (err) {
+        console.warn('profile write', err);
       }
+      goToApp(user);
     });
-
-    function buildPendingProfile() {
-      const displayName = document.getElementById('display-name').value.trim();
-      const payload = {
-        profileType: profileType,
-        displayName: displayName,
-      };
-      if (profileType === 'grower') {
-        payload.growSetup = growSetup;
-        payload.homeCity = document.getElementById('home-city').value.trim();
-        const note = document.getElementById('grow-style-note').value.trim();
-        if (note) payload.growStyleNote = note;
-      } else if (profileType === 'adopter') {
-        payload.adopterIntent = adopterIntent;
-        payload.acceptedDevnet = !!document.getElementById('accept-devnet').checked;
-      }
-      return payload;
-    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
-      if (!email || !password) return;
+      if (!email || !password) {
+        setStatus('Enter email and password.', true);
+        return;
+      }
 
       if (mode === 'signup') {
-        if (profileType !== 'grower' && profileType !== 'adopter') {
-          setStatus('Choose Grower or Adopter to continue.', true);
-          return;
-        }
-        const displayName = document.getElementById('display-name').value.trim();
-        if (!displayName) {
-          setStatus('Enter a display name.', true);
+        const checked = Signup.validateSignup(collectSignupInput('email'));
+        if (!checked.ok) {
+          setStatus(checked.error, true);
           return;
         }
         const confirm = document.getElementById('password-confirm').value;
@@ -589,41 +712,33 @@
           setStatus('Passwords do not match.', true);
           return;
         }
-        if (!document.getElementById('accept-terms').checked) {
-          setStatus('Please accept the terms to continue.', true);
-          return;
-        }
-        if (profileType === 'grower') {
-          const city = document.getElementById('home-city').value.trim();
-          if (!city) {
-            setStatus('Enter your home city for weather.', true);
-            return;
-          }
-        }
-        if (profileType === 'adopter' && !document.getElementById('accept-devnet').checked) {
-          setStatus('Confirm you understand Devnet staking.', true);
-          return;
-        }
+        Signup.savePending(checked.payload);
+      } else if (Signup) {
+        Signup.clearPending();
       }
 
-      submitBtn.disabled = true;
+      setBusy(true);
       setStatus(mode === 'signup' ? 'Creating account…' : 'Signing in…');
 
       try {
         if (mode === 'signup') {
-          localStorage.setItem(STORAGE_PENDING_PROFILE, JSON.stringify(buildPendingProfile()));
-          await createUserWithEmailAndPassword(auth, email, password);
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          profileWritePromise = writeWebsiteProfile(cred.user);
+          await profileWritePromise;
+          goToApp(cred.user);
           return;
         }
-        localStorage.removeItem(STORAGE_PENDING_PROFILE);
-        await signInWithEmailAndPassword(auth, email, password);
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        profileWritePromise = writeWebsiteProfile(cred.user);
+        await profileWritePromise;
+        goToApp(cred.user);
       } catch (err) {
         const code = err && err.code;
         if (mode === 'signin' && code === 'auth/user-not-found') {
           setStatus('No account yet — switch to Create account.', true);
           setMode('signup');
         } else if (code === 'auth/email-already-in-use') {
-          setStatus('Email already registered. Switch to Sign in.', true);
+          setStatus('Email already registered. Switch to Sign in or use Google.', true);
           setMode('signin');
         } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
           setStatus('Wrong email or password.', true);
@@ -631,11 +746,53 @@
           setStatus('Password must be at least 6 characters.', true);
         } else if (code === 'auth/invalid-email') {
           setStatus('Invalid email address.', true);
+        } else if (code === 'auth/popup-closed-by-user') {
+          setStatus('Google sign-in was cancelled.', true);
         } else {
           setStatus((mode === 'signup' ? 'Registration' : 'Sign-in') + ' failed. Please try again.', true);
         }
       } finally {
-        submitBtn.disabled = false;
+        setBusy(false);
+        profileWritePromise = null;
+      }
+    });
+
+    googleBtn.addEventListener('click', async () => {
+      if (mode === 'signup') {
+        const checked = Signup.validateSignup(collectSignupInput('google'));
+        if (!checked.ok) {
+          setStatus(checked.error, true);
+          return;
+        }
+        Signup.savePending(checked.payload);
+      } else if (Signup) {
+        Signup.clearPending();
+      }
+
+      setBusy(true);
+      setStatus(mode === 'signup' ? 'Opening Google signup…' : 'Opening Google…');
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        profileWritePromise = writeWebsiteProfile(result.user);
+        await profileWritePromise;
+        goToApp(result.user);
+      } catch (err) {
+        const code = err && err.code;
+        if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+          setStatus('Google sign-in was cancelled.', true);
+        } else if (code === 'auth/account-exists-with-different-credential') {
+          setStatus('This email already uses password sign-in. Use email/password instead.', true);
+        } else if (code === 'auth/unauthorized-domain') {
+          setStatus('This domain is not authorized for Google sign-in in Firebase.', true);
+        } else if (code === 'auth/operation-not-allowed') {
+          setStatus('Enable Google sign-in in Firebase Authentication → Sign-in method.', true);
+        } else {
+          setStatus('Google sign-in failed. Please try again.', true);
+          console.warn(err);
+        }
+      } finally {
+        setBusy(false);
+        profileWritePromise = null;
       }
     });
   </script>
