@@ -657,6 +657,56 @@ body > * {
   color: rgba(200, 230, 200, 0.7);
 }
 
+.desk-benefit {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(200, 230, 200, 0.72);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.desk-benefit--hero {
+  margin-top: 0.85rem;
+  justify-content: flex-start;
+  max-width: 34rem;
+}
+
+.desk-benefit--inline {
+  margin: 0.4rem 0 0;
+  justify-content: flex-start;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(190, 220, 190, 0.62);
+}
+
+.desk-benefit s {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(180, 71, 43, 0.55);
+  color: rgba(190, 220, 190, 0.42);
+  font-weight: 500;
+}
+
+.desk-benefit-sep {
+  color: rgba(157, 255, 176, 0.55);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.85em;
+}
+
+.desk-benefit-gain {
+  color: #c8ffd4;
+  font-weight: 650;
+}
+
+.desk-benefit--inline .desk-benefit-gain,
+.desk-benefit--inline {
+  color: rgba(200, 230, 200, 0.7);
+}
+
 .desk-split {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
