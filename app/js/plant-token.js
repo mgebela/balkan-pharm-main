@@ -2434,8 +2434,13 @@
       const panelTitle = adopter ? 'My garden' : 'Tokenise';
       const openLabel = adopter ? 'Open garden' : 'Open Tokenise';
       const emptyCta = adopter ? 'Browse market' : 'Mint a seed';
+      const intentCopy =
+        adopter && window.GrowtooProfile && typeof window.GrowtooProfile.adopterIntentCopy === 'function'
+          ? window.GrowtooProfile.adopterIntentCopy()
+          : null;
       const emptyCopy = adopter
-        ? 'Adopt your first plant from the market and track growth & $GROWTOO here.'
+        ? (intentCopy && intentCopy.empty) ||
+          'Adopt your first plant from the market and track growth & $GROWTOO here.'
         : 'Mint your first seed to start the growth cycle and earn rewards at each stage.';
 
       if (!wallet.connected) {
@@ -2452,7 +2457,8 @@
           '<p>' +
           esc(
             adopter
-              ? 'Browse the market and connect your wallet when you are ready to stake $GROWTOO.'
+              ? (intentCopy && intentCopy.empty) ||
+                  'Browse the market and connect your wallet when you are ready to stake $GROWTOO.'
               : 'Open Tokenise to mint seeds. Connect your wallet when you are ready to sign.'
           ) +
           '</p>' +

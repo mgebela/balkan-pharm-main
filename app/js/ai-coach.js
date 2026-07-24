@@ -517,6 +517,15 @@
 
     const reminders = buildReminders(plants, entries, toolbox);
 
+    let growSetup = null;
+    let growStyleNote = null;
+    try {
+      growSetup = localStorage.getItem('dnevnik-live-grow-setup') || null;
+      growStyleNote = localStorage.getItem('dnevnik-live-grow-style-note') || null;
+    } catch {
+      // ignore
+    }
+
     return {
       focusPlant: focus
         ? {
@@ -537,6 +546,8 @@
       },
       reminders: reminders,
       mintQuest: questHint,
+      growSetup: growSetup,
+      growStyleNote: growStyleNote,
       profileType: 'grower',
       canAct: true,
     };

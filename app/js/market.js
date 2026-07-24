@@ -904,7 +904,12 @@
             'Post real minted seed / growth RWAs. Adopters invest with $GROWTOO; the NFT transfers when settlement confirms.';
         } else {
           notice.hidden = false;
+          const intentMarket =
+            window.GrowtooProfile && typeof window.GrowtooProfile.adopterIntentCopy === 'function'
+              ? window.GrowtooProfile.adopterIntentCopy().market
+              : '';
           notice.textContent =
+            intentMarket ||
             'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet when you tap Invest on an open offer.';
         }
       }

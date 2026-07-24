@@ -1046,19 +1046,24 @@ async function ensureUserExists(user) {
 
   const email = (user.email || '').toLowerCase();
   const hybridUser = isSharedHybridUser(email);
-  const pendingType = readPendingProfileType();
+  const pending = readPendingProfile();
+  const pendingType = pending.profileType || '';
 
   if (!docSnap.exists) {
     const profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
-    await userRef.set({
+    const profileDoc = {
       email: user.email || "",
       uId: user.uid,
       role: 'user',
       profileType: profileType,
       createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString()
-    });
-    clearPendingProfileType();
+      lastLoginAt: new Date().toISOString(),
+    };
+    applyPendingFieldsToUserDoc(profileDoc, pending, profileType);
+    await userRef.set(profileDoc);
+    applyPendingLocalDefaults(pending, profileType);
+    hydrateProfileLocalDefaults(profileDoc);
+    clearPendingProfile();
     currentProfileType = profileType;
     console.log("User created", profileType);
   } else {
@@ -1070,28 +1075,193 @@ async function ensureUserExists(user) {
     const existingType = normalizeProfileType(data.profileType);
     if (!existingType) {
       patch.profileType = normalizeProfileType(pendingType) || PROFILE_TYPES.grower;
+      applyPendingFieldsToUserDoc(patch, pending, patch.profileType);
+      applyPendingLocalDefaults(pending, patch.profileType);
+    } else if (pending && pending.profileType) {
+      // Fresh signup payload for an existing auth user without profile extras — fill gaps once.
+      applyPendingFieldsToUserDoc(patch, pending, existingType, { onlyIfMissing: true, existing: data });
+      applyPendingLocalDefaults(pending, existingType);
     }
     await userRef.update(patch);
-    clearPendingProfileType();
+    clearPendingProfile();
     currentProfileType = existingType || patch.profileType || PROFILE_TYPES.grower;
+    hydrateProfileLocalDefaults(Object.assign({}, data, patch));
     console.log("User updated");
   }
 }
 
-function readPendingProfileType() {
-  try {
-    return localStorage.getItem(STORAGE_PENDING_PROFILE) || '';
-  } catch {
-    return '';
+function applyPendingFieldsToUserDoc(target, pending, profileType, opts) {
+  const o = opts || {};
+  const existing = o.existing || {};
+  const onlyIfMissing = !!o.onlyIfMissing;
+  if (!pending || typeof pending !== 'object') return;
+
+  function setField(key, value) {
+    if (value == null || value === '') return;
+    if (onlyIfMissing && existing[key] != null && existing[key] !== '') return;
+    target[key] = value;
+  }
+
+  setField('displayName', String(pending.displayName || '').trim().slice(0, 64));
+  if (profileType === PROFILE_TYPES.grower) {
+    const setup = normalizeGrowSetup(pending.growSetup);
+    if (setup) setField('growSetup', setup);
+    setField('homeCity', String(pending.homeCity || '').trim().slice(0, 80));
+    setField('growStyleNote', String(pending.growStyleNote || '').trim().slice(0, 240));
+  }
+  if (profileType === PROFILE_TYPES.adopter) {
+    const intent = normalizeAdopterIntent(pending.adopterIntent);
+    if (intent) setField('adopterIntent', intent);
+    if (pending.acceptedDevnet) setField('acceptedDevnet', true);
   }
 }
 
-function clearPendingProfileType() {
+function normalizeGrowSetup(value) {
+  const v = String(value == null ? '' : value).trim().toLowerCase();
+  if (v === 'indoor' || v === 'outdoor' || v === 'mixed') return v;
+  return '';
+}
+
+function normalizeAdopterIntent(value) {
+  const v = String(value == null ? '' : value).trim().toLowerCase();
+  if (v === 'support_growers' || v === 'collect_garden' || v === 'earn_rewards') return v;
+  return '';
+}
+
+function applyPendingLocalDefaults(pending, profileType) {
+  if (!pending || typeof pending !== 'object') return;
+  try {
+    const name = String(pending.displayName || '').trim();
+    if (name) localStorage.setItem('dnevnik-live-display-name', name);
+
+    if (profileType === PROFILE_TYPES.grower) {
+      const city = String(pending.homeCity || '').trim();
+      if (city) localStorage.setItem('dnevnik-live-weather-city', city);
+      const setup = normalizeGrowSetup(pending.growSetup);
+      if (setup) localStorage.setItem('dnevnik-live-grow-setup', setup);
+      const note = String(pending.growStyleNote || '').trim();
+      if (note) localStorage.setItem('dnevnik-live-grow-style-note', note);
+    }
+    if (profileType === PROFILE_TYPES.adopter) {
+      const intent = normalizeAdopterIntent(pending.adopterIntent);
+      if (intent) localStorage.setItem('dnevnik-live-adopter-intent', intent);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+/** Fill local defaults from Firestore user doc when local keys are empty. */
+function hydrateProfileLocalDefaults(data) {
+  if (!data || typeof data !== 'object') return;
+  try {
+    if (data.displayName && !localStorage.getItem('dnevnik-live-display-name')) {
+      localStorage.setItem('dnevnik-live-display-name', String(data.displayName).trim());
+    }
+    if (data.homeCity && !localStorage.getItem('dnevnik-live-weather-city')) {
+      localStorage.setItem('dnevnik-live-weather-city', String(data.homeCity).trim());
+    }
+    if (data.growSetup && !localStorage.getItem('dnevnik-live-grow-setup')) {
+      const setup = normalizeGrowSetup(data.growSetup);
+      if (setup) localStorage.setItem('dnevnik-live-grow-setup', setup);
+    }
+    if (data.growStyleNote && !localStorage.getItem('dnevnik-live-grow-style-note')) {
+      localStorage.setItem('dnevnik-live-grow-style-note', String(data.growStyleNote).trim());
+    }
+    if (data.adopterIntent && !localStorage.getItem('dnevnik-live-adopter-intent')) {
+      const intent = normalizeAdopterIntent(data.adopterIntent);
+      if (intent) localStorage.setItem('dnevnik-live-adopter-intent', intent);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+function getPreferredGrowEnvironment() {
+  try {
+    const setup = normalizeGrowSetup(localStorage.getItem('dnevnik-live-grow-setup') || '');
+    if (setup === 'outdoor') return 'outdoor';
+    return 'indoor';
+  } catch {
+    return 'indoor';
+  }
+}
+
+function getAdopterIntent() {
+  try {
+    return normalizeAdopterIntent(localStorage.getItem('dnevnik-live-adopter-intent') || '') || 'support_growers';
+  } catch {
+    return 'support_growers';
+  }
+}
+
+function adopterIntentCopy() {
+  const intent = getAdopterIntent();
+  if (intent === 'collect_garden') {
+    return {
+      hero: 'Collect adopted RWAs and follow each growth stage in your garden.',
+      empty: 'Browse the market to adopt your first plant NFT and grow your collection.',
+      market: 'Find open RWA offers and stake $GROWTOO to add plants to your garden.',
+    };
+  }
+  if (intent === 'earn_rewards') {
+    return {
+      hero: 'Track $GROWTOO stakes and harvest unlocks from the grows you support.',
+      empty: 'Stake on an open offer to start earning through growth and harvest care.',
+      market: 'Invest $GROWTOO in grower RWAs — follow monthly unlock progress toward harvest.',
+    };
+  }
+  return {
+    hero: 'Back real growers with $GROWTOO and follow the plants you help fund.',
+    empty: 'Browse the market and stake $GROWTOO when you are ready to support a grow.',
+    market: 'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet when you tap Invest.',
+  };
+}
+
+window.GrowtooProfile = {
+  getPreferredGrowEnvironment: getPreferredGrowEnvironment,
+  getAdopterIntent: getAdopterIntent,
+  adopterIntentCopy: adopterIntentCopy,
+};
+
+/** @returns {{ profileType?: string, displayName?: string, growSetup?: string, homeCity?: string, growStyleNote?: string, adopterIntent?: string, acceptedDevnet?: boolean }} */
+function readPendingProfile() {
+  try {
+    const raw = localStorage.getItem(STORAGE_PENDING_PROFILE) || '';
+    if (!raw) return {};
+    if (raw === 'grower' || raw === 'adopter') return { profileType: raw };
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      if (!parsed.profileType && (raw.includes('grower') || raw.includes('adopter'))) {
+        // no-op
+      }
+      return parsed;
+    }
+  } catch {
+    try {
+      const legacy = localStorage.getItem(STORAGE_PENDING_PROFILE) || '';
+      if (legacy === 'grower' || legacy === 'adopter') return { profileType: legacy };
+    } catch {
+      // ignore
+    }
+  }
+  return {};
+}
+
+function readPendingProfileType() {
+  return readPendingProfile().profileType || '';
+}
+
+function clearPendingProfile() {
   try {
     localStorage.removeItem(STORAGE_PENDING_PROFILE);
   } catch {
     // ignore
   }
+}
+
+function clearPendingProfileType() {
+  clearPendingProfile();
 }
 
 function normalizeProfileType(type) {
@@ -1149,6 +1319,20 @@ function applyProfileTypeUI(profileType) {
     window.AICoach.applyVisibility();
   }
   syncMoreNavVisibility();
+  applySignupProfileCopy(type);
+}
+
+function applySignupProfileCopy(profileType) {
+  const type = normalizeProfileType(profileType) || PROFILE_TYPES.grower;
+  if (type === PROFILE_TYPES.adopter && window.GrowtooProfile) {
+    const copy = window.GrowtooProfile.adopterIntentCopy();
+    const heroP = document.querySelector('#view-adopt .adopt-hero-text .adopter-only');
+    if (heroP && copy && copy.hero) heroP.textContent = copy.hero;
+    const marketHint = document.querySelector('#view-market .market-hint.adopter-only');
+    if (marketHint && copy && copy.market) marketHint.textContent = copy.market;
+    const ctaHint = document.querySelector('#adopt-market-cta .market-hint');
+    if (ctaHint && copy && copy.market) ctaHint.textContent = copy.market;
+  }
 }
 
 function syncMoreNavVisibility() {
@@ -1261,6 +1445,7 @@ async function getCurrentUserRole(user) {
   } else if (!currentProfileType) {
     currentProfileType = PROFILE_TYPES.grower;
   }
+  hydrateProfileLocalDefaults(data);
 
   return normalizeUserRole(data.role || "user");
 }
@@ -2738,6 +2923,8 @@ function initFirebaseSync() {
       if (fieldLocNew) fieldLocNew.value = '';
       const plantingNew = document.getElementById('plant-planting-location');
       if (plantingNew) plantingNew.value = '';
+      const envDefault = typeof getPreferredGrowEnvironment === 'function' ? getPreferredGrowEnvironment() : 'indoor';
+      document.getElementById('plant-environment-type').value = envDefault;
       photoData.value = '';
       photoPreview.innerHTML = '';
     }

@@ -38,7 +38,7 @@
     }
     .login-card {
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       background: var(--desk-panel);
       border: 1px solid var(--border);
       border-radius: 12px;
@@ -101,7 +101,11 @@
       gap: 0.55rem;
       margin-bottom: 1rem;
     }
-    .profile-pick[hidden] { display: none !important; }
+    .profile-pick[hidden],
+    .signup-only[hidden],
+    .role-fields[hidden] {
+      display: none !important;
+    }
     .profile-option {
       display: grid;
       gap: 0.2rem;
@@ -115,9 +119,7 @@
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
     }
-    .profile-option strong {
-      font-size: 0.95rem;
-    }
+    .profile-option strong { font-size: 0.95rem; }
     .profile-option span {
       font-size: 0.8rem;
       color: var(--text-muted);
@@ -131,34 +133,114 @@
       border-color: rgba(255, 160, 120, 0.4);
       background: rgba(180, 71, 43, 0.18);
     }
+    .field-block { margin-bottom: 0.85rem; }
     label {
       display: block;
       font-size: 0.9rem;
       margin-bottom: 0.35rem;
+      color: rgba(232, 255, 233, 0.88);
     }
-    input {
+    .field-hint {
+      margin: -0.15rem 0 0.4rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+    input,
+    select,
+    textarea {
       width: 100%;
-      margin-bottom: 0.85rem;
+      margin-bottom: 0;
       padding: 0.65rem 0.75rem;
       border-radius: 6px;
       border: 1px solid var(--border);
       background: rgba(0, 12, 6, 0.55);
       color: var(--text);
       font-family: inherit;
+      font-size: 0.92rem;
     }
-    input:focus {
+    textarea {
+      min-height: 4.2rem;
+      resize: vertical;
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
       outline: none;
       border-color: #7dff9c;
     }
+    .choice-grid {
+      display: grid;
+      gap: 0.4rem;
+    }
+    .choice-grid--3 {
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 420px) {
+      .choice-grid--3 { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    .choice-option {
+      display: grid;
+      gap: 0.15rem;
+      text-align: left;
+      padding: 0.65rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(0, 12, 6, 0.45);
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+    .choice-option strong {
+      font-size: 0.84rem;
+    }
+    .choice-option span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+    .choice-option.is-selected {
+      border-color: rgba(120, 220, 140, 0.45);
+      background: rgba(40, 120, 60, 0.18);
+    }
+    .choice-option.is-selected[data-intent] {
+      border-color: rgba(255, 160, 120, 0.45);
+      background: rgba(180, 71, 43, 0.16);
+    }
+    .check-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+      margin: 0.35rem 0 0.85rem;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      color: var(--text-muted);
+    }
+    .check-row input {
+      width: auto;
+      margin: 0.15rem 0 0;
+      flex-shrink: 0;
+    }
+    .check-row a { color: #b8ffc8; }
     button[type="submit"] {
       width: 100%;
       border: 1px solid rgba(255, 180, 140, 0.28);
       border-radius: 6px;
-      padding: 0.7rem 0.9rem;
+      padding: 0.75rem 0.9rem;
       font-weight: 700;
       color: #f7eee1;
       background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
       cursor: pointer;
+    }
+    button[type="submit"].submit--grower {
+      border-color: rgba(120, 220, 140, 0.35);
+      color: #06201a;
+      background: linear-gradient(180deg, #9dffb0 0%, #2f8f4e 100%);
+    }
+    button[type="submit"].submit--adopter {
+      border-color: rgba(255, 180, 140, 0.35);
+      color: #f7eee1;
+      background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
     }
     button[type="submit"]:disabled {
       opacity: 0.65;
@@ -176,15 +258,28 @@
       text-align: center;
       min-height: 1.2em;
     }
+    .role-fields {
+      margin-top: 0.15rem;
+      padding-top: 0.15rem;
+      border-top: 1px solid rgba(140, 200, 140, 0.12);
+    }
+    .role-fields-title {
+      margin: 0.75rem 0 0.65rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(190, 220, 190, 0.7);
+    }
   </style>
 </head>
 <body>
-  <form class="login-card" id="login-form">
+  <form class="login-card" id="login-form" novalidate>
     <div class="login-brand">
       <img src="../images/growtoo-logo.png?v=20260722b" alt="" width="64" height="64" />
     </div>
     <h1 id="auth-title">Sign in to growtoo</h1>
-    <p class="lead" id="auth-lead">Choose how you use the app, then continue with email.</p>
+    <p class="lead" id="auth-lead">Welcome back. Your Grower or Adopter workspace opens automatically.</p>
 
     <div class="auth-tabs" role="tablist" aria-label="Auth mode">
       <button type="button" class="auth-tab is-active" id="tab-signin" data-mode="signin">Sign in</button>
@@ -194,18 +289,93 @@
     <div class="profile-pick" id="profile-pick" hidden>
       <button type="button" class="profile-option" data-type="grower" id="pick-grower">
         <strong>Grower</strong>
-        <span>Log stages, watering &amp; feeding in the journal. Tokenise your grow and unlock $GROWTOO mints.</span>
+        <span>Log care, tokenise stages, unlock $GROWTOO.</span>
       </button>
       <button type="button" class="profile-option" data-type="adopter" id="pick-adopter">
         <strong>Adopter</strong>
-        <span>Adopt plant NFTs, track your garden &amp; $GROWTOO, and trade on the market.</span>
+        <span>Stake $GROWTOO, adopt RWAs, track growth.</span>
       </button>
     </div>
 
-    <label for="email">Email</label>
-    <input id="email" type="email" required placeholder="you@email.com" autocomplete="email" />
-    <label for="password">Password</label>
-    <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6" />
+    <div class="field-block signup-only" id="field-display-name" hidden>
+      <label for="display-name">Display name</label>
+      <input id="display-name" type="text" maxlength="64" placeholder="How you appear in growtoo" autocomplete="nickname" />
+    </div>
+
+    <div class="field-block">
+      <label for="email">Email</label>
+      <input id="email" type="email" required placeholder="you@email.com" autocomplete="email" />
+    </div>
+    <div class="field-block">
+      <label for="password">Password</label>
+      <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6" />
+    </div>
+    <div class="field-block signup-only" id="field-password-confirm" hidden>
+      <label for="password-confirm">Confirm password</label>
+      <input id="password-confirm" type="password" placeholder="••••••••" autocomplete="new-password" minlength="6" />
+    </div>
+
+    <div class="role-fields" id="signup-grower-fields" hidden>
+      <p class="role-fields-title">Grower setup</p>
+      <div class="field-block">
+        <label>Grow setup</label>
+        <p class="field-hint">Seeds plant defaults and coaching.</p>
+        <div class="choice-grid choice-grid--3" id="grow-setup-choices" role="group" aria-label="Grow setup">
+          <button type="button" class="choice-option is-selected" data-setup="indoor">
+            <strong>Indoor</strong>
+            <span>Tents &amp; rooms</span>
+          </button>
+          <button type="button" class="choice-option" data-setup="outdoor">
+            <strong>Outdoor</strong>
+            <span>Field &amp; garden</span>
+          </button>
+          <button type="button" class="choice-option" data-setup="mixed">
+            <strong>Mixed</strong>
+            <span>Both setups</span>
+          </button>
+        </div>
+      </div>
+      <div class="field-block">
+        <label for="home-city">Home city</label>
+        <p class="field-hint">Used for the Plants weather forecast.</p>
+        <input id="home-city" type="text" maxlength="80" placeholder="e.g. Osijek" autocomplete="address-level2" />
+      </div>
+      <div class="field-block">
+        <label for="grow-style-note">Grow style <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <textarea id="grow-style-note" maxlength="240" placeholder="e.g. autoflowers, 4 tents"></textarea>
+      </div>
+    </div>
+
+    <div class="role-fields" id="signup-adopter-fields" hidden>
+      <p class="role-fields-title">Adopter setup</p>
+      <div class="field-block">
+        <label>Why you’re here</label>
+        <div class="choice-grid" id="adopter-intent-choices" role="group" aria-label="Adopter intent">
+          <button type="button" class="choice-option is-selected" data-intent="support_growers">
+            <strong>Support growers</strong>
+            <span>Back real grows with $GROWTOO stakes</span>
+          </button>
+          <button type="button" class="choice-option" data-intent="collect_garden">
+            <strong>Collect a garden</strong>
+            <span>Adopt RWAs and follow growth stages</span>
+          </button>
+          <button type="button" class="choice-option" data-intent="earn_rewards">
+            <strong>Earn rewards</strong>
+            <span>Track $GROWTOO and harvest unlocks</span>
+          </button>
+        </div>
+      </div>
+      <label class="check-row signup-only">
+        <input type="checkbox" id="accept-devnet" />
+        <span>I understand staking uses Solana Devnet for now.</span>
+      </label>
+    </div>
+
+    <label class="check-row signup-only" id="field-accept-terms" hidden>
+      <input type="checkbox" id="accept-terms" />
+      <span>I agree to the growtoo terms of use.</span>
+    </label>
+
     <button type="submit" id="submit-btn">Sign in</button>
     <p id="login-status" aria-live="polite"></p>
     <div class="back-link"><a href="../index.html">← Back to home</a></div>
@@ -230,7 +400,7 @@
     };
 
     const STORAGE_AUTH = 'dnevnik-live-auth';
-    const STORAGE_PENDING_TYPE = 'dnevnik-live-pending-profile-type';
+    const STORAGE_PENDING_PROFILE = 'dnevnik-live-pending-profile-type';
 
     const form = document.getElementById('login-form');
     const statusEl = document.getElementById('login-status');
@@ -240,17 +410,21 @@
     const leadEl = document.getElementById('auth-lead');
     const tabSignin = document.getElementById('tab-signin');
     const tabSignup = document.getElementById('tab-signup');
+    const growerFields = document.getElementById('signup-grower-fields');
+    const adopterFields = document.getElementById('signup-adopter-fields');
 
     const params = new URLSearchParams(window.location.search);
     let mode = params.get('mode') === 'signup' ? 'signup' : 'signin';
     let profileType = params.get('type') === 'adopter' ? 'adopter' : params.get('type') === 'grower' ? 'grower' : '';
+    let growSetup = 'indoor';
+    let adopterIntent = 'support_growers';
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     function setStatus(msg, isError = false) {
       statusEl.textContent = msg || '';
-      statusEl.style.color = isError ? '#8e3520' : 'var(--text-muted)';
+      statusEl.style.color = isError ? '#fca5a5' : 'var(--text-muted)';
     }
 
     function syncProfileSelection() {
@@ -259,24 +433,75 @@
       });
     }
 
+    function syncGrowSetup() {
+      document.querySelectorAll('#grow-setup-choices .choice-option').forEach((btn) => {
+        btn.classList.toggle('is-selected', btn.dataset.setup === growSetup);
+      });
+    }
+
+    function syncAdopterIntent() {
+      document.querySelectorAll('#adopter-intent-choices .choice-option').forEach((btn) => {
+        btn.classList.toggle('is-selected', btn.dataset.intent === adopterIntent);
+      });
+    }
+
+    function syncRoleFields() {
+      const isSignup = mode === 'signup';
+      document.querySelectorAll('.signup-only').forEach((el) => {
+        el.hidden = !isSignup;
+      });
+      growerFields.hidden = !(isSignup && profileType === 'grower');
+      adopterFields.hidden = !(isSignup && profileType === 'adopter');
+
+      const confirm = document.getElementById('password-confirm');
+      const terms = document.getElementById('accept-terms');
+      const devnet = document.getElementById('accept-devnet');
+      const displayName = document.getElementById('display-name');
+      const homeCity = document.getElementById('home-city');
+
+      if (confirm) confirm.required = isSignup;
+      if (terms) terms.required = isSignup;
+      if (displayName) displayName.required = isSignup;
+      if (homeCity) homeCity.required = isSignup && profileType === 'grower';
+      if (devnet) devnet.required = isSignup && profileType === 'adopter';
+
+      submitBtn.classList.remove('submit--grower', 'submit--adopter');
+      if (isSignup && profileType === 'grower') {
+        submitBtn.classList.add('submit--grower');
+        submitBtn.textContent = 'Create grower account';
+        titleEl.textContent = 'Start your grow journal';
+        leadEl.textContent = 'Log care, tokenise stages, unlock $GROWTOO.';
+      } else if (isSignup && profileType === 'adopter') {
+        submitBtn.classList.add('submit--adopter');
+        submitBtn.textContent = 'Create adopter account';
+        titleEl.textContent = 'Start your garden';
+        leadEl.textContent = 'Stake $GROWTOO, adopt RWAs, track growth.';
+      } else if (isSignup) {
+        submitBtn.textContent = 'Create account';
+        titleEl.textContent = 'Create your account';
+        leadEl.textContent = 'Pick Grower or Adopter — each has its own app workspace.';
+      } else {
+        submitBtn.textContent = 'Sign in';
+        titleEl.textContent = 'Sign in to growtoo';
+        leadEl.textContent = 'Welcome back. Your Grower or Adopter workspace opens automatically.';
+      }
+    }
+
     function setMode(next) {
       mode = next === 'signup' ? 'signup' : 'signin';
       tabSignin.classList.toggle('is-active', mode === 'signin');
       tabSignup.classList.toggle('is-active', mode === 'signup');
       profilePick.hidden = mode !== 'signup';
       if (mode === 'signup') {
-        titleEl.textContent = 'Create your account';
-        leadEl.textContent = 'Pick Grower or Adopter — each has its own app workspace.';
-        submitBtn.textContent = 'Create account';
         document.getElementById('password').autocomplete = 'new-password';
         if (!profileType) profileType = 'grower';
       } else {
-        titleEl.textContent = 'Sign in to growtoo';
-        leadEl.textContent = 'Welcome back. Your Grower or Adopter workspace opens automatically.';
-        submitBtn.textContent = 'Sign in';
         document.getElementById('password').autocomplete = 'current-password';
       }
       syncProfileSelection();
+      syncGrowSetup();
+      syncAdopterIntent();
+      syncRoleFields();
       setStatus('');
     }
 
@@ -286,6 +511,19 @@
       btn.addEventListener('click', () => {
         profileType = btn.dataset.type;
         syncProfileSelection();
+        syncRoleFields();
+      });
+    });
+    document.querySelectorAll('#grow-setup-choices .choice-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        growSetup = btn.dataset.setup;
+        syncGrowSetup();
+      });
+    });
+    document.querySelectorAll('#adopter-intent-choices .choice-option').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        adopterIntent = btn.dataset.intent;
+        syncAdopterIntent();
       });
     });
 
@@ -298,6 +536,9 @@
       setMode('signin');
     }
     syncProfileSelection();
+    syncGrowSetup();
+    syncAdopterIntent();
+    syncRoleFields();
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -309,15 +550,60 @@
       }
     });
 
+    function buildPendingProfile() {
+      const displayName = document.getElementById('display-name').value.trim();
+      const payload = {
+        profileType: profileType,
+        displayName: displayName,
+      };
+      if (profileType === 'grower') {
+        payload.growSetup = growSetup;
+        payload.homeCity = document.getElementById('home-city').value.trim();
+        const note = document.getElementById('grow-style-note').value.trim();
+        if (note) payload.growStyleNote = note;
+      } else if (profileType === 'adopter') {
+        payload.adopterIntent = adopterIntent;
+        payload.acceptedDevnet = !!document.getElementById('accept-devnet').checked;
+      }
+      return payload;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       if (!email || !password) return;
 
-      if (mode === 'signup' && profileType !== 'grower' && profileType !== 'adopter') {
-        setStatus('Choose Grower or Adopter to continue.', true);
-        return;
+      if (mode === 'signup') {
+        if (profileType !== 'grower' && profileType !== 'adopter') {
+          setStatus('Choose Grower or Adopter to continue.', true);
+          return;
+        }
+        const displayName = document.getElementById('display-name').value.trim();
+        if (!displayName) {
+          setStatus('Enter a display name.', true);
+          return;
+        }
+        const confirm = document.getElementById('password-confirm').value;
+        if (password !== confirm) {
+          setStatus('Passwords do not match.', true);
+          return;
+        }
+        if (!document.getElementById('accept-terms').checked) {
+          setStatus('Please accept the terms to continue.', true);
+          return;
+        }
+        if (profileType === 'grower') {
+          const city = document.getElementById('home-city').value.trim();
+          if (!city) {
+            setStatus('Enter your home city for weather.', true);
+            return;
+          }
+        }
+        if (profileType === 'adopter' && !document.getElementById('accept-devnet').checked) {
+          setStatus('Confirm you understand Devnet staking.', true);
+          return;
+        }
       }
 
       submitBtn.disabled = true;
@@ -325,11 +611,11 @@
 
       try {
         if (mode === 'signup') {
-          localStorage.setItem(STORAGE_PENDING_TYPE, profileType);
+          localStorage.setItem(STORAGE_PENDING_PROFILE, JSON.stringify(buildPendingProfile()));
           await createUserWithEmailAndPassword(auth, email, password);
           return;
         }
-        localStorage.removeItem(STORAGE_PENDING_TYPE);
+        localStorage.removeItem(STORAGE_PENDING_PROFILE);
         await signInWithEmailAndPassword(auth, email, password);
       } catch (err) {
         const code = err && err.code;
