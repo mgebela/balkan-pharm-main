@@ -139,20 +139,25 @@
     var asset = listing.assetType === 'flower' ? 'FLWR' : 'SEED';
     var isDemo = !!listing.demo;
     var status = isDemo ? 'Sample' : STATUS_LABELS[listing.status] || listing.status || '';
+    var statusKey = isDemo ? 'demo' : listing.status || '';
     var price = formatPrice(listing.priceGrow);
     var sym = symbolFrom(listing);
     var delay = Math.min(index * 45, 360);
     var canInvest = !isDemo && listing.status === 'active';
-    var actionLabel = isDemo ? 'Open desk' : canInvest ? 'Invest' : status || 'View';
+    var actionLabel = isDemo ? 'List a plant' : canInvest ? 'Invest' : status || 'View';
     var actionClass = canInvest
       ? 'btn btn-primary btn-sm market-row-action'
       : 'btn btn-ghost btn-sm market-row-action';
     var href = isDemo
       ? 'dnevnik/?mode=signup&type=grower'
       : 'dnevnik/?mode=signup&type=adopter';
+    var title = listing.strain
+      ? listing.strain + (listing.batch ? ' · B' + listing.batch : '')
+      : listing.name || 'RWA offer';
 
     return (
-      '<article class="landing-market-card market-row' +
+      '<article class="landing-market-card market-row market-row--' +
+      esc(statusKey) +
       (isDemo ? ' market-row--demo' : '') +
       '" style="--row-delay:' +
       delay +
@@ -163,12 +168,18 @@
       '</span>' +
       '<div class="market-row-names">' +
       '<h3 class="landing-market-name">' +
-      esc(listing.name || 'RWA offer') +
+      esc(title) +
       (isDemo ? ' <span class="market-demo-pill">DEMO</span>' : '') +
       '</h3>' +
-      '<p class="landing-market-mint">' +
+      '<p class="landing-market-mint market-row-subhead">' +
       '<span class="landing-market-asset">' +
       esc(asset) +
+      '</span>' +
+      '<span class="market-row-subhead-ask">' +
+      esc(price) +
+      ' $GROWTOO</span>' +
+      '<span class="market-row-subhead-status">' +
+      esc(status) +
       '</span>' +
       (listing.mintAddress
         ? ' <a href="' +
@@ -185,8 +196,8 @@
       '<p class="landing-market-meta market-row-grade">' +
       esc(gradeLine(listing)) +
       '</p>' +
-      '<span class="landing-market-status' +
-      (isDemo ? ' landing-market-status--demo' : ' landing-market-status--' + esc(listing.status || '')) +
+      '<span class="landing-market-status landing-market-status--' +
+      esc(statusKey) +
       '">' +
       esc(status) +
       '</span>' +
@@ -229,7 +240,16 @@
     return items + items;
   }
 
+  function clearSkeletons() {
+    document.querySelectorAll('.market-stat-skeleton').forEach(function (el) {
+      el.classList.remove('market-stat-skeleton');
+    });
+    var board = document.getElementById('landing-market-board');
+    if (board) board.classList.remove('market-board--loading');
+  }
+
   function updateStats(openListings, allListings, isDemo) {
+    clearSkeletons();
     var openEl = document.getElementById('landing-market-open');
     var volEl = document.getElementById('landing-market-volume');
     var stakedCountEl = document.getElementById('landing-market-staked-count');

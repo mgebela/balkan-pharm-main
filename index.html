@@ -7,10 +7,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724f" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724g" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
+
+  <div class="devnet-banner" role="status">
+    <strong>Solana Devnet</strong>
+    <span>Test market only — Seed NFTs &amp; $GROWTOO have <em>no monetary value</em>.</span>
+    <a href="risks/">Risks</a>
+  </div>
 
   <header class="header">
     <div class="container header-inner">
@@ -45,14 +51,14 @@
           <img src="images/growtoo-logo.png?v=20260721m" alt="growtoo" width="112" height="112" class="hero-logo-mark" />
           <p class="hero-brand">growtoo</p>
           <div class="market-live-heading">
-            <span class="market-live-pill" aria-hidden="true">
+            <span class="market-live-pill market-live-pill--devnet" aria-hidden="true">
               <span class="market-live-dot"></span>
-              LIVE
+              DEVNET
             </span>
             <h1 class="hero-market-title">Commodity board</h1>
-            <span class="market-session">RWA · SOLANA DEVNET</span>
+            <span class="market-session">RWA · TEST TAPE</span>
           </div>
-          <p class="hero-sub">Open Seed and growth contracts from growers — last price in $GROWTOO.</p>
+          <p class="hero-sub">Open Seed and growth contracts from growers — last ask in $GROWTOO (devnet units).</p>
           <p class="desk-benefit desk-benefit--hero">
             <s>Opaque plant deals</s>
             <span class="desk-benefit-sep" aria-hidden="true">→</span>
@@ -65,39 +71,40 @@
           </p>
         </div>
 
-        <div class="market-board" id="landing-market-board">
+        <div class="market-board market-board--loading" id="landing-market-board">
           <div class="market-board-bar">
             <div class="market-board-stats" id="landing-market-stats" aria-live="polite">
               <div class="market-stat">
                 <span class="market-stat-label">Open</span>
-                <span class="market-stat-value" id="landing-market-open">—</span>
+                <span class="market-stat-value market-stat-skeleton" id="landing-market-open">&nbsp;</span>
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Ask volume</span>
-                <span class="market-stat-value" id="landing-market-volume">—</span>
+                <span class="market-stat-value market-stat-skeleton" id="landing-market-volume">&nbsp;</span>
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Staked</span>
-                <span class="market-stat-value" id="landing-market-staked-count">—</span>
+                <span class="market-stat-value market-stat-skeleton" id="landing-market-staked-count">&nbsp;</span>
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Staked value</span>
-                <span class="market-stat-value" id="landing-market-staked-value">—</span>
+                <span class="market-stat-value market-stat-skeleton" id="landing-market-staked-value">&nbsp;</span>
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Total value</span>
-                <span class="market-stat-value market-stat-value--total" id="landing-market-total">—</span>
+                <span class="market-stat-value market-stat-value--total market-stat-skeleton" id="landing-market-total">&nbsp;</span>
               </div>
               <div class="market-stat">
                 <span class="market-stat-label">Session</span>
-                <span class="market-stat-value market-stat-value--live">OPEN</span>
+                <span class="market-stat-value market-stat-value--live">DEVNET</span>
               </div>
             </div>
-            <p class="market-board-clock" id="landing-market-updated">Syncing…</p>
+            <p class="market-board-clock" id="landing-market-updated">Loading tape…</p>
           </div>
 
           <p class="market-demo-banner" id="landing-market-demo-banner" hidden>
-            Sample depth — no live asks yet. Growers mint Seed RWAs and list in the app; this tape shows how the board reads when contracts are open.
+            No live asks yet — showing sample depth so you can read the board.
+            <a class="market-demo-cta" href="dnevnik/?mode=signup&type=grower">Be the first grower to list</a>
           </p>
 
           <div class="market-ticker" id="landing-market-ticker" aria-hidden="true" hidden>
@@ -108,14 +115,20 @@
             <span>Contract</span>
             <span>Grade</span>
             <span>Status</span>
-            <span class="market-col-last">Last</span>
+            <span class="market-col-last">Ask</span>
             <span class="market-col-action"></span>
           </div>
 
-          <p class="landing-market-loading" id="landing-market-loading">Loading tape…</p>
-          <p class="landing-market-empty" id="landing-market-empty" hidden>
-            No open contracts. Growers post RWAs after minting in the app.
-          </p>
+          <div class="landing-market-skeleton" id="landing-market-loading" aria-hidden="true">
+            <div class="landing-market-skeleton-row"></div>
+            <div class="landing-market-skeleton-row"></div>
+            <div class="landing-market-skeleton-row"></div>
+          </div>
+          <div class="landing-market-empty" id="landing-market-empty" hidden>
+            <p class="landing-market-empty-title">No open contracts yet</p>
+            <p class="landing-market-empty-copy">Mint a Seed RWA in the journal, then list it here.</p>
+            <a class="btn btn-primary btn-sm" href="dnevnik/?mode=signup&type=grower">Be the first grower to list</a>
+          </div>
           <div class="landing-market-grid" id="landing-market-grid" aria-live="polite"></div>
         </div>
       </div>
@@ -155,7 +168,7 @@
         <div class="desk-header">
           <span class="desk-tag">ACCESS</span>
           <h2>Open a desk</h2>
-          <p class="section-lead">Grower for the journal and minting, or Adopter to invest in live RWAs.</p>
+          <p class="section-lead">Pick a starting desk. Same login either way — dual Grower + Adopter desks are on the roadmap.</p>
           <p class="desk-benefit">
             <s>One generic login</s>
             <span class="desk-benefit-sep" aria-hidden="true">→</span>
@@ -164,41 +177,46 @@
         </div>
         <div class="desk-split">
           <a href="dnevnik/?mode=signup&type=grower" class="desk-seat desk-seat--grower">
+            <span class="desk-seat-register">Journal mode</span>
             <span class="desk-seat-code">GRW</span>
             <div class="desk-seat-body">
               <h3>Grower</h3>
-              <p>Run the journal, mint Seed RWAs, and post contracts to the board.</p>
+              <p>Log watering, feeding, and stages. Mint Seed RWAs when the plant is ready to list.</p>
             </div>
             <span class="desk-seat-cta">Enter as Grower</span>
           </a>
           <a href="dnevnik/?mode=signup&type=adopter" class="desk-seat desk-seat--adopter">
+            <span class="desk-seat-register">Market mode</span>
             <span class="desk-seat-code">ADP</span>
             <div class="desk-seat-body">
               <h3>Adopter</h3>
-              <p>Stake $GROWTOO into open contracts and track adopted plants.</p>
+              <p>Read the tape, stake $GROWTOO into open asks, and follow adopted plants.</p>
             </div>
             <span class="desk-seat-cta">Enter as Adopter</span>
           </a>
         </div>
+        <p class="join-role-note">
+          Not locked forever — your primary desk sets the default UI today. Holding both desks on one account is planned.
+        </p>
         <p class="join-signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
         </p>
       </div>
     </section>
 
-    <section id="journal" class="section desk-section desk-section--alt">
+    <section id="journal" class="section desk-section desk-section--journal desk-section--alt">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag">JOURNAL</span>
+          <span class="desk-tag desk-tag--journal">FIELD</span>
           <h2>Grow instruments</h2>
-          <p class="section-lead">Everything you need to run and document a CBD grow.</p>
+          <p class="section-lead">Daily care language — plants, water, feed, today. Built for growers first.</p>
           <p class="desk-benefit">
             <s>Scattered notes &amp; chats</s>
             <span class="desk-benefit-sep" aria-hidden="true">→</span>
             <span class="desk-benefit-gain">One care ledger that can prove stages on-chain</span>
           </p>
         </div>
-        <div class="desk-panel">
+        <div class="desk-panel desk-panel--journal">
           <div class="desk-panel-bar">
             <span>Field ledger</span>
             <span class="desk-panel-meta">INDOOR · OUTDOOR</span>
@@ -216,8 +234,8 @@
               <span class="desk-spec-code">FED</span>
               <div>
                 <h3>Watering &amp; feeding</h3>
-                <p>Log water, nutrients, and notes so every cycle has a clear tape.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Guesswork care</s> → dated watering &amp; feed tape</p>
+                <p>Log water, nutrients, and notes so every cycle has a clear record.</p>
+                <p class="desk-benefit desk-benefit--inline"><s>Guesswork care</s> → dated watering &amp; feed log</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -225,7 +243,7 @@
               <div>
                 <h3>Tools &amp; Today</h3>
                 <p>Quick actions, environment logs, and daily tasks in one workspace.</p>
-                <p class="desk-benefit desk-benefit--inline"><s>Missed daily tasks</s> → one desk for tools &amp; Today</p>
+                <p class="desk-benefit desk-benefit--inline"><s>Missed daily tasks</s> → one place for tools &amp; Today</p>
               </div>
             </div>
           </div>
@@ -233,10 +251,10 @@
       </div>
     </section>
 
-    <section id="tokens" class="section desk-section">
+    <section id="tokens" class="section desk-section desk-section--market">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag">ON-CHAIN</span>
+          <span class="desk-tag desk-tag--market">MARKET</span>
           <h2>RWA rails
             <span class="solana-badge solana-badge--inline" aria-label="Solana">
               <span class="solana-badge-mark" aria-hidden="true">
@@ -255,7 +273,7 @@
               Solana
             </span>
           </h2>
-          <p class="section-lead">Turn cultivation data into Seed RWAs and $GROWTOO on Solana (devnet).</p>
+          <p class="section-lead">Market language — asks, stakes, and on-chain settlement (devnet).</p>
           <p class="desk-benefit">
             <s>Journal that never leaves the farm</s>
             <span class="desk-benefit-sep" aria-hidden="true">→</span>
@@ -364,7 +382,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260724f"></script>
+  <script src="js/landing-market.js?v=20260724g"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');
