@@ -3218,10 +3218,10 @@ body:has(.devnet-banner) .header {
 
 /* ── Homepage rewrite: journal-first ── */
 .hero--journal {
-  min-height: min(100vh, 920px);
+  min-height: 0;
   display: flex;
-  align-items: center;
-  padding: 5.5rem 0 3.5rem;
+  align-items: flex-start;
+  padding: 5.25rem 0 2.25rem;
   position: relative;
   overflow: hidden;
   max-width: 100%;
@@ -3236,8 +3236,8 @@ body:has(.devnet-banner) .header {
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 2rem 2.5rem;
-  align-items: center;
+  gap: 1.5rem 2rem;
+  align-items: start;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -3373,7 +3373,8 @@ body:has(.devnet-banner) .header {
 .hero-preview {
   min-width: 0;
   max-width: 100%;
-  padding: 1rem 1rem 1.1rem;
+  height: fit-content;
+  padding: 0.75rem 0.85rem 0.8rem;
   border-radius: 14px;
   border: 1px solid rgba(140, 200, 140, 0.22);
   background:
@@ -3724,7 +3725,8 @@ body:has(.devnet-banner) .header {
 @media (max-width: 560px) {
   .hero--journal {
     padding-top: 4.5rem;
-    min-height: auto;
+    padding-bottom: 1.75rem;
+    min-height: 0;
   }
 
   .close-cta-row .btn {
@@ -4170,7 +4172,7 @@ body:has(.devnet-banner) .header {
 }
 
 .hero-preview--trail {
-  padding-bottom: 0.95rem;
+  padding-bottom: 0.75rem;
 }
 
 .hero-trail {
@@ -4178,19 +4180,19 @@ body:has(.devnet-banner) .header {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
 .hero-trail li {
   display: grid;
-  grid-template-columns: 7.2rem 3.4rem minmax(0, 1fr);
-  gap: 0.45rem;
+  grid-template-columns: 6.5rem 3.1rem minmax(0, 1fr);
+  gap: 0.4rem;
   align-items: baseline;
-  padding: 0.45rem 0.55rem;
+  padding: 0.35rem 0.5rem;
   border-radius: 8px;
   border: 1px solid rgba(140, 200, 140, 0.12);
   background: rgba(4, 14, 9, 0.55);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: rgba(210, 235, 210, 0.85);
 }
 
@@ -4225,10 +4227,10 @@ body:has(.devnet-banner) .header {
 }
 
 .hero-trail-note {
-  margin: 0.7rem 0 0;
-  font-size: 0.74rem;
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
   color: rgba(190, 220, 190, 0.62);
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 .trust-chips {
