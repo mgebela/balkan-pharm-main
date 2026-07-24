@@ -4322,3 +4322,10 @@ body:has(.devnet-banner) .header {
     overflow-x: hidden;
   }
 }
+
+.adopter-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
