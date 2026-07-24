@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260724m" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260724o" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -28,6 +28,7 @@
         <a href="#proof" class="nav-link">How it works</a>
         <a href="#growers" class="nav-link">Growers</a>
         <a href="#adopters" class="nav-link">Adopters</a>
+        <a href="#faq" class="nav-link">FAQ</a>
         <a href="rwa-docs/" class="nav-link">Docs</a>
         <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
       </nav>
@@ -36,7 +37,6 @@
   </header>
 
   <main>
-    <!-- 1. Hero — journal first -->
     <section id="top" class="hero hero--journal">
       <div class="hero-bg" aria-hidden="true">
         <img src="images/3.jpg?v=20260724k" alt="" />
@@ -50,7 +50,7 @@
           <p class="hero-eyebrow">Grow journal + verified RWA market</p>
           <h1 class="hero-headline">Log every stage of your grow. Prove it on-chain.</h1>
           <p class="hero-sub">
-            A free CBD grow journal — with AI coaching, weather planning, and daily task tracking —
+            growtoo is a free CBD grow journal — with AI coaching, weather planning, and daily task tracking —
             that turns your real cultivation data into verifiable on-chain records anyone can check.
           </p>
           <div class="hero-cta-row">
@@ -86,16 +86,25 @@
       </div>
     </section>
 
-    <!-- 2. Proof chain -->
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag">The proof chain</span>
+          <span class="desk-tag desk-tag--verify">The proof chain</span>
           <h2>Grow it. Verify it. Own or trade it.</h2>
           <p class="section-lead">How a journal entry becomes something anyone can check on Solana.</p>
         </div>
-        <ol class="proof-chain">
+
+        <ol class="proof-chain proof-chain--motion">
           <li class="proof-step">
+            <div class="proof-clip proof-clip--grow" aria-hidden="true">
+              <div class="clip-frame">
+                <span class="clip-ui-label">Journal</span>
+                <button type="button" class="clip-tap" tabindex="-1">Log watering</button>
+                <p class="clip-log"><span class="clip-check">✓</span> Watering · just now</p>
+                <p class="clip-reminder clip-reminder--fade">Reminder cleared</p>
+              </div>
+              <p class="clip-caption">Every action, logged in seconds.</p>
+            </div>
             <span class="proof-num" aria-hidden="true">01</span>
             <h3>Grow it.</h3>
             <p>
@@ -104,6 +113,15 @@
             </p>
           </li>
           <li class="proof-step proof-step--verify">
+            <div class="proof-clip proof-clip--verify" aria-hidden="true">
+              <div class="clip-frame">
+                <span class="clip-ui-label">Tokenise</span>
+                <p class="clip-quest"><span class="clip-tick">✓</span> Log growth stage in journal</p>
+                <p class="clip-mint">Mint confirmed</p>
+                <p class="clip-tx">tx <code>6TDm7g…saTD</code></p>
+              </div>
+              <p class="clip-caption clip-caption--verify">Verified on Solana. Click through, check it yourself.</p>
+            </div>
             <span class="proof-num" aria-hidden="true">02</span>
             <h3>Verify it.</h3>
             <p>
@@ -112,7 +130,18 @@
               transaction you can check yourself.
             </p>
           </li>
-          <li class="proof-step">
+          <li class="proof-step proof-step--trade">
+            <div class="proof-clip proof-clip--trade" aria-hidden="true">
+              <div class="clip-frame clip-frame--cool">
+                <span class="clip-ui-label">Market</span>
+                <p class="clip-badge-row">
+                  <span class="clip-badge clip-badge--seed">Seed RWA</span>
+                  <span class="clip-badge clip-badge--flower">Flower RWA</span>
+                </p>
+                <p class="clip-balance">+$GROWTOO <span class="clip-tickup">↑</span></p>
+              </div>
+              <p class="clip-caption">Track it, hold it, or trade it — stage by stage.</p>
+            </div>
             <span class="proof-num" aria-hidden="true">03</span>
             <h3>Own or trade it.</h3>
             <p>
@@ -124,17 +153,32 @@
         <p class="proof-caption">
           Every stage update links to a real Solana transaction — click through and check it yourself.
         </p>
+
+        <article class="example-plant">
+          <div class="example-plant-head">
+            <span class="desk-tag desk-tag--verify">Example trail</span>
+            <h3>CBD Auto #1 — one plant, end to end</h3>
+            <p>A realistic stage timeline with a checkable mint link at each advance.</p>
+          </div>
+          <ol class="example-timeline">
+            <li><span>Germination</span><time>10 Jul</time><code class="verify-code">tx · 4kR2…nP1a</code></li>
+            <li><span>Seedling</span><time>18 Jul</time><code class="verify-code">tx · 8mQx…hT3c</code></li>
+            <li><span>Vegetative</span><time>02 Aug</time><code class="verify-code">tx · 2bLw…sK9e</code></li>
+            <li><span>Flowering</span><time>28 Aug</time><code class="verify-code">tx · 6TDm…saTD</code></li>
+            <li><span>Harvest</span><time>planned</time><span class="example-pending">M5 redemption path</span></li>
+          </ol>
+        </article>
+
         <div class="proof-fork" id="join">
           <p class="proof-fork-lead">Choose a desk</p>
           <div class="proof-fork-row">
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost">Enter as Adopter</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- 3. For Growers -->
     <section id="growers" class="section desk-section desk-section--journal desk-section--alt">
       <div class="container audience-grid">
         <div class="audience-copy">
@@ -155,6 +199,13 @@
             <li>7-day weather forecasting for grow planning</li>
             <li>Optional: mint verified stages on-chain and earn $GROWTOO</li>
           </ul>
+          <aside class="founding-banner">
+            <strong>Founding Growers get priority on mainnet.</strong>
+            <p>
+              Growers who log and mint on Devnet now get a Founding Grower badge, carried forward
+              at mainnet launch — plus early access to new features before they roll out publicly.
+            </p>
+          </aside>
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Enter as Grower</a>
         </div>
         <div class="audience-panel desk-panel desk-panel--journal">
@@ -189,11 +240,10 @@
       </div>
     </section>
 
-    <!-- 4. For Adopters -->
-    <section id="adopters" class="section desk-section desk-section--market">
+    <section id="adopters" class="section desk-section desk-section--adopter">
       <div class="container audience-grid audience-grid--flip">
         <div class="audience-copy">
-          <span class="desk-tag desk-tag--market">For adopters</span>
+          <span class="desk-tag desk-tag--adopter">For adopters</span>
           <h2>Back a grow you can actually verify.</h2>
           <p>
             Every plant on the market has a real journal behind it — logged care, timestamped stage
@@ -210,12 +260,12 @@
             <li>Track adopted plants from seed through harvest</li>
             <li>Trade Seed and Flower RWAs in the app</li>
           </ul>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-primary">Enter as Adopter</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter">Enter as Adopter</a>
         </div>
-        <div class="audience-panel desk-panel">
+        <div class="audience-panel desk-panel desk-panel--adopter">
           <div class="desk-panel-bar">
             <span>Evidence trail</span>
-            <span class="desk-panel-meta">Checkable</span>
+            <span class="desk-panel-meta desk-panel-meta--verify">Checkable</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
@@ -226,14 +276,14 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--green">TX</span>
+              <span class="desk-spec-code desk-spec-code--verify">TX</span>
               <div>
                 <h3>On-chain mint</h3>
                 <p>Each advance has a Solana transaction you can open.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--rust">MKT</span>
+              <span class="desk-spec-code desk-spec-code--cool">MKT</span>
               <div>
                 <h3>Open contracts</h3>
                 <p>Stake into asks and follow verified progress.</p>
@@ -244,7 +294,6 @@
       </div>
     </section>
 
-    <!-- Devnet / trust note -->
     <section id="status" class="section desk-section desk-section--status">
       <div class="container status-block">
         <span class="desk-tag">Where we are right now</span>
@@ -255,6 +304,10 @@
           transfer, and trade you see is a real transaction on Devnet, so you can verify exactly how
           the system works before real value is on the line.
         </p>
+        <p class="builder-voice">
+          “We started with the journal because documentation is the asset. Tokens only matter if
+          the grow behind them is real.” — the growtoo team
+        </p>
         <p class="status-links">
           <a href="rwa-docs/">Read the RWA docs →</a>
           <a href="risks/">Risks &amp; scope →</a>
@@ -262,7 +315,71 @@
       </div>
     </section>
 
-    <!-- 7. Closing CTA -->
+    <section id="faq" class="section desk-section desk-section--faq">
+      <div class="container">
+        <div class="desk-header">
+          <span class="desk-tag">Questions people actually ask</span>
+          <h2>Straight answers before you desk in</h2>
+          <p class="section-lead">For anyone who has heard “RWA” and “Devnet” and still wants the plain version.</p>
+        </div>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Is $GROWTOO worth anything right now?</summary>
+            <p>
+              No — it’s a Devnet test token with no monetary value. It exists so the whole
+              mint → verify → trade flow can be tested and shown publicly before real value is on the line.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Why build on Devnet instead of going live with real money?</summary>
+            <p>
+              So the system — journal proof, minting, escrow, redemption — can be battle-tested in the open
+              first. Growers and adopters can see exactly how it works before anything real is at stake.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>When does mainnet launch?</summary>
+            <p>
+              Targeting after the M5 redemption flow ships — see the architecture and roadmap notes in our
+              <a href="rwa-docs/">RWA docs</a>. We publish milestones, not a vague “soon.”
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Is this legal? What happens with an actual harvest?</summary>
+            <p>
+              Redemption converts a harvest-stage token into its real-world counterpart, subject to
+              applicable regulation in the grower’s jurisdiction. Today redemption is specified but still
+              mocked on Devnet — not a live fulfillment pipeline. Read
+              <a href="risks/">Risks &amp; scope</a> for the honest limits.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>What happens to my $GROWTOO when mainnet launches?</summary>
+            <p>
+              Devnet $GROWTOO is for testing the flow and should not be treated as transferable monetary
+              balance. Founding Grower recognition is intended to carry forward; exact mainnet migration
+              rules will be published before launch.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Who verifies that a journal entry is real, not fabricated?</summary>
+            <p>
+              Today, the platform operator reviews journal progress before minting. The mainnet roadmap
+              moves this toward stronger attestations so no single party has to be trusted forever.
+              Details live in the <a href="rwa-docs/">trust model docs</a>.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Do I need to know anything about crypto to use this?</summary>
+            <p>
+              No — the journal is free and usable with no wallet at all. A Solana wallet (Phantom or Solflare)
+              is only needed if you want to mint or trade.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <section id="start" class="section desk-section desk-section--close">
       <div class="container close-block">
         <h2>Start with the journal. The rest is optional.</h2>
@@ -272,7 +389,7 @@
         </p>
         <div class="close-cta-row">
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Enter as Grower</a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Enter as Adopter</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-adopter btn-lg">Enter as Adopter</a>
           <a href="rwa-docs/" class="btn btn-ghost btn-lg">Read the docs</a>
         </div>
         <p class="join-signin">
@@ -294,6 +411,7 @@
           <a href="#proof">How it works</a>
           <a href="#growers">Growers</a>
           <a href="#adopters">Adopters</a>
+          <a href="#faq">FAQ</a>
           <a href="risks/">Risks</a>
           <a href="rwa-docs/">RWA docs</a>
         </div>
@@ -311,7 +429,7 @@
               </defs>
               <path fill="url(#solana-g-footer)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
               <path fill="url(#solana-g-footer)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-              <path fill="url(#solana-g-footer)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
+              <path fill="url(#solana-g-footer)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l-62.7-62.7z"/>
             </svg>
           </span>
           <strong>Solana</strong>
