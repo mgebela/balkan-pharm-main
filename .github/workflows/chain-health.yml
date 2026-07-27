@@ -47,18 +47,10 @@ jobs:
           fi
           mkdir -p keys
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > keys/firebase-service-account.json
-          python3 - <<'PY'
-          import json
-          json.load(open('keys/firebase-service-account.json'))
-          print('ok keys/firebase-service-account.json')
-          PY
+          python3 -c 'import json; json.load(open("keys/firebase-service-account.json")); print("ok keys/firebase-service-account.json")'
           if [ -n "${SOLANA_ESCROW_KEY_JSON:-}" ]; then
             printf '%s' "$SOLANA_ESCROW_KEY_JSON" > keys/devnet-escrow.json
-            python3 - <<'PY'
-            import json
-            json.load(open('keys/devnet-escrow.json'))
-            print('ok keys/devnet-escrow.json')
-            PY
+            python3 -c 'import json; json.load(open("keys/devnet-escrow.json")); print("ok keys/devnet-escrow.json")'
           fi
 
       - name: Run health check
