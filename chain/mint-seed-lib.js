@@ -94,6 +94,8 @@ export async function mintSeedNft(umi, seed, options) {
   const mint = generateSigner(umi);
   const owner = opts.recipient ? publicKey(opts.recipient) : umi.identity.publicKey;
 
+  // Devnet RPCs often lag: verifyCollectionV1 right after createNft throws
+  // "Incorrect account owner" (0x39). Finalize create, then retry verify.
   const created = await createNft(umi, {
     mint,
     name: metadata.name,
@@ -102,18 +104,53 @@ export async function mintSeedNft(umi, seed, options) {
     sellerFeeBasisPoints: percentAmount(0),
     tokenOwner: owner,
     collection: { key: publicKey(collection), verified: false },
-  }).sendAndConfirm(umi);
+  }).sendAndConfirm(umi, {
+    send: { commitment: 'confirmed' },
+    confirm: { commitment: 'finalized' },
+  });
 
-  await verifyCollectionV1(umi, {
-    metadata: findMetadataPda(umi, { mint: mint.publicKey }),
-    collectionMint: publicKey(collection),
-    authority: umi.identity,
-  }).sendAndConfirm(umi);
+  const metadataPda = findMetadataPda(umi, { mint: mint.publicKey });
+  let verified = false;
+  let lastVerifyErr = null;
+  for (let attempt = 1; attempt <= 6; attempt += 1) {
+    try {
+      await verifyCollectionV1(umi, {
+        metadata: metadataPda,
+        collectionMint: publicKey(collection),
+        authority: umi.identity,
+      }).sendAndConfirm(umi, {
+        send: { commitment: 'confirmed' },
+        confirm: { commitment: 'confirmed' },
+      });
+      verified = true;
+      break;
+    } catch (err) {
+      lastVerifyErr = err;
+      const msg = String((err && err.message) || err || '');
+      const retryable = /Incorrect account owner|0x39|not found|timed out|block height|expired|429|Too Many Requests/i.test(
+        msg
+      );
+      if (!retryable || attempt === 6) break;
+      await new Promise(function (resolve) {
+        setTimeout(resolve, 1500 * attempt);
+      });
+    }
+  }
+
+  if (!verified) {
+    // NFT exists; leave it minted rather than failing the whole request.
+    // Collection can be verified later; grower already holds the token.
+    console.warn(
+      'verifyCollectionV1 failed after createNft; returning mint unverified:',
+      lastVerifyErr && lastVerifyErr.message ? lastVerifyErr.message : lastVerifyErr
+    );
+  }
 
   return {
     mint: String(mint.publicKey),
     metadataUri,
     signature: base58.deserialize(created.signature)[0],
     owner: String(owner),
+    collectionVerified: verified,
   };
 }
