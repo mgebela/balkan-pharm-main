@@ -240,6 +240,147 @@
     return items + items;
   }
 
+  function settlementLabel(listing) {
+    if (listing.settlement === 'adopt_stake') return 'Adopt stake';
+    if (listing.settlement === 'program' || listing.settlement === 'instant') return 'Instant sale';
+    if (listing.settlement === 'legacy') return 'Instant sale';
+    return listing.offerType === 'adopt_stake' ? 'Adopt stake' : 'Open ask';
+  }
+
+  function stakeRowHtml(listing, index) {
+    var isDemo = !!listing.demo;
+    var price = formatPrice(listing.priceGrow);
+    var delay = Math.min(index * 40, 320);
+    var settle = settlementLabel(listing);
+    var href = isDemo
+      ? 'dnevnik/?mode=signup&type=grower'
+      : 'dnevnik/?mode=signup&type=adopter';
+    return (
+      '<li class="stakes-row' +
+      (isDemo ? ' stakes-row--demo' : '') +
+      (index === 0 ? ' is-live' : '') +
+      '" style="--row-delay:' +
+      delay +
+      'ms">' +
+      '<span class="stakes-row-name">' +
+      esc(listing.name || listing.strain || 'RWA') +
+      (isDemo ? ' <em class="stakes-demo-pill">sample</em>' : '') +
+      '</span>' +
+      '<span class="stakes-row-settle">' +
+      esc(settle) +
+      '</span>' +
+      '<span class="stakes-row-price">' +
+      esc(price) +
+      ' <small>$GROWTOO</small></span>' +
+      '<a class="stakes-row-link" href="' +
+      href +
+      '">' +
+      (isDemo ? 'List →' : 'Adopt →') +
+      '</a>' +
+      '</li>'
+    );
+  }
+
+  function renderStakesBars(stakedList) {
+    var el = document.getElementById('stakes-bars');
+    if (!el) return;
+    if (!stakedList.length) {
+      el.innerHTML =
+        '<p class="stakes-bars-empty">No settled stakes yet. When adopters back a plant, bars appear here.</p>';
+      return;
+    }
+    var max = Math.max.apply(
+      null,
+      stakedList.map(function (l) {
+        return Number(l.priceGrow || 0);
+      }).concat([1])
+    );
+    el.innerHTML = stakedList
+      .slice(0, 8)
+      .map(function (listing, i) {
+        var price = Number(listing.priceGrow || 0);
+        var pct = Math.max(8, Math.round((price / max) * 100));
+        return (
+          '<div class="stakes-bar-row" style="--bar-delay:' +
+          Math.min(i * 50, 400) +
+          'ms">' +
+          '<span class="stakes-bar-label">' +
+          esc(listing.name || 'Stake') +
+          '</span>' +
+          '<span class="stakes-bar-track"><span class="stakes-bar-fill" style="width:' +
+          pct +
+          '%"></span></span>' +
+          '<span class="stakes-bar-val">' +
+          esc(formatPrice(price)) +
+          '</span>' +
+          '</div>'
+        );
+      })
+      .join('');
+  }
+
+  function renderStakesDesk(openListings, allListings, opts) {
+    var desk = document.getElementById('stakes-desk');
+    if (!desk) return;
+    var isDemo = !!(opts && opts.demo);
+    var all = allListings || openListings || [];
+    var open = (openListings || []).filter(function (l) {
+      return ASK_STATUSES[l.status] || l.demo;
+    });
+    var staked = all.filter(function (l) {
+      return STAKED_STATUSES[l.status];
+    });
+
+    desk.dataset.state = isDemo ? 'demo' : 'live';
+    desk.classList.toggle('stakes-desk--demo', isDemo);
+
+    var openList = document.getElementById('stakes-open-list');
+    var openEmpty = document.getElementById('stakes-open-empty');
+    var openMeta = document.getElementById('stakes-open-meta');
+    if (openList) {
+      openList.innerHTML = open.slice(0, 10).map(stakeRowHtml).join('');
+    }
+    if (openEmpty) openEmpty.hidden = open.length > 0;
+    if (openMeta) {
+      openMeta.textContent = isDemo
+        ? 'Sample depth · not live asks'
+        : open.length
+          ? open.length + (open.length === 1 ? ' open offer' : ' open offers')
+          : 'Board clear';
+    }
+
+    var askVolume = sumPrice(
+      all.filter(function (l) {
+        return ASK_STATUSES[l.status];
+      })
+    );
+    var stakedValue = sumPrice(staked);
+    var total = askVolume + stakedValue || 1;
+    var stakedPct = Math.round((stakedValue / total) * 100);
+    var openPct = Math.max(0, 100 - stakedPct);
+
+    var kpiCount = document.getElementById('stakes-kpi-count');
+    var kpiValue = document.getElementById('stakes-kpi-value');
+    var kpiOpen = document.getElementById('stakes-kpi-open');
+    if (kpiCount) kpiCount.textContent = String(staked.length);
+    if (kpiValue) kpiValue.textContent = formatPrice(stakedValue);
+    if (kpiOpen) kpiOpen.textContent = formatPrice(askVolume);
+
+    var mixStaked = document.getElementById('stakes-mix-staked');
+    var mixOpen = document.getElementById('stakes-mix-open');
+    if (mixStaked) mixStaked.style.width = stakedPct + '%';
+    if (mixOpen) mixOpen.style.width = openPct + '%';
+
+    renderStakesBars(staked);
+
+    var updated = document.getElementById('stakes-updated');
+    if (updated) {
+      updated.textContent = isDemo
+        ? 'Preview mix · seed the board from Tokenise + Market'
+        : 'Last print ' + formatClock(new Date()) + ' · Devnet';
+    }
+  }
+
   function clearSkeletons() {
     document.querySelectorAll('.market-stat-skeleton').forEach(function (el) {
       el.classList.remove('market-stat-skeleton');
@@ -326,6 +467,10 @@
     var board = document.getElementById('landing-market-board');
     var isDemo = !!(opts && opts.demo);
     if (loading) loading.hidden = true;
+
+    renderStakesDesk(openListings, allListings || openListings, opts);
+
+    // Legacy full market board (optional — only if markup is present).
     if (!grid) return;
 
     updateStats(openListings, allListings || openListings, isDemo);
