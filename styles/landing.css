@@ -3234,10 +3234,7 @@ body:has(.devnet-banner) .header {
 .hero-journal-inner {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 1.5rem 2rem;
-  align-items: start;
+  display: block;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -3245,7 +3242,7 @@ body:has(.devnet-banner) .header {
 
 .hero-journal-copy {
   text-align: left;
-  max-width: 36rem;
+  max-width: 40rem;
 }
 
 .hero--journal .hero-logo-mark {
