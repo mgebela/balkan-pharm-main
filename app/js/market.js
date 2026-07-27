@@ -880,19 +880,9 @@
 
   function settlementBadge(listing) {
     if (listing.settlement === 'adopt_stake') {
-      const locked =
-        listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
-      const immediate =
-        listing.immediateGrow != null
-          ? listing.immediateGrow
-          : Number(listing.priceGrow || 0) - locked;
       return (
         '<span class="market-asset-badge market-asset-badge--stake" title="You pay full price now. Half to grower on settle; half locked until harvest care.">' +
-        'Adopt stake · ' +
-        immediate +
-        ' now / ' +
-        locked +
-        ' locked</span>'
+        'Adopt stake</span>'
       );
     }
     return (
@@ -911,22 +901,22 @@
           ? listing.immediateGrow
           : Number(listing.priceGrow || 0) - locked;
       return (
-        '<p class="market-card-explain">' +
-        'You pay <strong>' +
+        '<p class="market-card-explain market-card-explain--stake">' +
+        'Pay <strong>' +
         esc(String(listing.priceGrow)) +
-        ' $GROWTOO</strong> now. ' +
+        '</strong> now · ' +
         '<strong>' +
         esc(String(immediate)) +
-        '</strong> goes to the grower on settle; ' +
+        '</strong> to grower on settle · ' +
         '<strong>' +
         esc(String(locked)) +
-        '</strong> stays locked until monthly care qualifies at harvest. NFT arrives when settlement finishes.' +
+        '</strong> locked until harvest care. NFT after settlement.' +
         '</p>'
       );
     }
     return (
-      '<p class="market-card-explain">' +
-      'Instant sale: you pay <strong>' +
+      '<p class="market-card-explain market-card-explain--instant">' +
+      'Pay <strong>' +
       esc(String(listing.priceGrow)) +
       ' $GROWTOO</strong> and receive the plant NFT in this flow.' +
       '</p>'

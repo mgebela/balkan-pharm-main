@@ -1798,6 +1798,7 @@
       '<div class="adopter-summary-inner">' +
       '<div class="adopter-summary-stat">' +
       '<span class="adopter-summary-label">Adopted</span>' +
+      '<div class="adopter-summary-row">' +
       '<strong class="adopter-summary-value">' +
       count +
       '</strong>' +
@@ -1805,14 +1806,18 @@
       (count === 1 ? 'plant' : 'plants') +
       '</span>' +
       '</div>' +
+      '</div>' +
+      '<div class="adopter-summary-divider" aria-hidden="true"></div>' +
       '<div class="adopter-summary-stat">' +
-      '<span class="adopter-summary-label">$GROWTOO</span>' +
+      '<span class="adopter-summary-label">Balance</span>' +
+      '<div class="adopter-summary-row">' +
       '<strong class="adopter-summary-value">' +
       esc(balLabel) +
       '</strong>' +
-      '<span class="adopter-summary-meta">' +
+      '<span class="adopter-summary-meta">$GROWTOO · ' +
       esc(balMeta) +
       '</span>' +
+      '</div>' +
       '</div>' +
       '<div class="adopter-summary-stat adopter-summary-stat--action">' +
       '<button type="button" class="btn btn-primary btn-sm" id="adopter-summary-market-btn">' +
