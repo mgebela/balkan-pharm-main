@@ -1776,6 +1776,52 @@
     return document.body.classList.contains('profile-adopter');
   }
 
+  function renderAdopterSummary(wallet) {
+    const el = document.getElementById('adopter-summary');
+    if (!el) return;
+    if (!isAdopterUi()) {
+      el.hidden = true;
+      el.innerHTML = '';
+      return;
+    }
+    el.hidden = false;
+    // Garden tokens for adopters are adopted / investment plants
+    const count = (wallet.tokens || []).length;
+    const growBal = Number(wallet.growthBalance || 0);
+    const onchain =
+      onchainGrowBalance != null ? onchainGrowBalance : null;
+    const balLabel =
+      onchain != null ? onchain.toLocaleString('en-US') : growBal.toLocaleString('en-US');
+    const balMeta = onchain != null ? 'on-chain' : wallet.connected ? 'wallet' : 'connect to see';
+
+    el.innerHTML =
+      '<div class="adopter-summary-inner">' +
+      '<div class="adopter-summary-stat">' +
+      '<span class="adopter-summary-label">Adopted</span>' +
+      '<strong class="adopter-summary-value">' +
+      count +
+      '</strong>' +
+      '<span class="adopter-summary-meta">' +
+      (count === 1 ? 'plant' : 'plants') +
+      '</span>' +
+      '</div>' +
+      '<div class="adopter-summary-stat">' +
+      '<span class="adopter-summary-label">$GROWTOO</span>' +
+      '<strong class="adopter-summary-value">' +
+      esc(balLabel) +
+      '</strong>' +
+      '<span class="adopter-summary-meta">' +
+      esc(balMeta) +
+      '</span>' +
+      '</div>' +
+      '<div class="adopter-summary-stat adopter-summary-stat--action">' +
+      '<button type="button" class="btn btn-primary btn-sm" id="adopter-summary-market-btn">' +
+      (count ? 'Adopt another' : 'Browse market') +
+      '</button>' +
+      '</div>' +
+      '</div>';
+  }
+
   function applyProfileChrome() {
     const marketCta = document.getElementById('adopt-market-cta');
     if (marketCta) {
@@ -1907,6 +1953,7 @@
       }
       renderWalletPanel(wallet);
       renderPlatformBonusPanel();
+      renderAdopterSummary(wallet);
       if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
       // Adopters always see the garden (empty state guides them). Growers when connected/tokens.
       if (gardenSection) {
@@ -2453,7 +2500,7 @@
       }
 
       const marketBtn = e.target.closest(
-        '#adopt-open-market-btn, #adopter-guide-market-btn, #adopt-empty-market-btn'
+        '#adopt-open-market-btn, #adopter-guide-market-btn, #adopt-empty-market-btn, #adopter-summary-market-btn'
       );
       if (marketBtn) {
         const marketNav = document.querySelector('.nav-item[data-view="market"]');

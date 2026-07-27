@@ -5219,6 +5219,88 @@ body:not(.app-loading) {
   margin: 0 0 0.3rem;
 }
 
+.adopter-summary {
+  margin: 0 0 1.15rem;
+}
+
+.adopter-summary-inner {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(94, 200, 216, 0.22);
+  background: rgba(8, 28, 32, 0.65);
+}
+
+.adopter-summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.adopter-summary-stat--action {
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.adopter-summary-label {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(180, 220, 220, 0.55);
+}
+
+.adopter-summary-value {
+  font-size: 1.25rem;
+  font-weight: 750;
+  color: #e8fbff;
+  line-height: 1.15;
+}
+
+.adopter-summary-meta {
+  font-size: 0.78rem;
+  color: rgba(190, 220, 200, 0.62);
+}
+
+.market-card-explain {
+  margin: 0.35rem 0 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(94, 200, 216, 0.08);
+  border: 1px solid rgba(94, 200, 216, 0.18);
+  color: rgba(210, 235, 220, 0.85);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.market-card-explain strong {
+  color: #e8fbff;
+}
+
+.market-asset-badge--instant {
+  background: rgba(157, 255, 176, 0.12);
+  border-color: rgba(157, 255, 176, 0.35);
+  color: #b8ffc8;
+}
+
+@media (max-width: 640px) {
+  .adopter-summary-inner {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .adopter-summary-stat--action {
+    grid-column: 1 / -1;
+    align-items: stretch;
+  }
+
+  .adopter-summary-stat--action .btn {
+    width: 100%;
+  }
+}
+
 /* ── Marketplace (M4) ─────────────────────────────────────── */
 
 .market-notice {

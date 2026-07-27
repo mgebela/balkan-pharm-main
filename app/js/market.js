@@ -879,17 +879,57 @@
   }
 
   function settlementBadge(listing) {
-    if (listing.settlement !== 'adopt_stake') return '';
-    const locked = listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
-    const immediate =
-      listing.immediateGrow != null ? listing.immediateGrow : Number(listing.priceGrow || 0) - locked;
+    if (listing.settlement === 'adopt_stake') {
+      const locked =
+        listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
+      const immediate =
+        listing.immediateGrow != null
+          ? listing.immediateGrow
+          : Number(listing.priceGrow || 0) - locked;
+      return (
+        '<span class="market-asset-badge market-asset-badge--stake" title="You pay full price now. Half to grower on settle; half locked until harvest care.">' +
+        'Adopt stake · ' +
+        immediate +
+        ' now / ' +
+        locked +
+        ' locked</span>'
+      );
+    }
     return (
-      '<span class="market-asset-badge market-asset-badge--stake" title="50% now · 50% locked until monthly harvest care">' +
-      'Stake ' +
-      immediate +
-      '/' +
-      locked +
-      '</span>'
+      '<span class="market-asset-badge market-asset-badge--instant" title="Full price to grower; NFT transfers on buy.">' +
+      'Instant sale</span>'
+    );
+  }
+
+  function offerExplainHtml(listing) {
+    if (!isAdopterUi() || listing.status !== 'active') return '';
+    if (listing.settlement === 'adopt_stake') {
+      const locked =
+        listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
+      const immediate =
+        listing.immediateGrow != null
+          ? listing.immediateGrow
+          : Number(listing.priceGrow || 0) - locked;
+      return (
+        '<p class="market-card-explain">' +
+        'You pay <strong>' +
+        esc(String(listing.priceGrow)) +
+        ' $GROWTOO</strong> now. ' +
+        '<strong>' +
+        esc(String(immediate)) +
+        '</strong> goes to the grower on settle; ' +
+        '<strong>' +
+        esc(String(locked)) +
+        '</strong> stays locked until monthly care qualifies at harvest. NFT arrives when settlement finishes.' +
+        '</p>'
+      );
+    }
+    return (
+      '<p class="market-card-explain">' +
+      'Instant sale: you pay <strong>' +
+      esc(String(listing.priceGrow)) +
+      ' $GROWTOO</strong> and receive the plant NFT in this flow.' +
+      '</p>'
     );
   }
 
@@ -919,6 +959,8 @@
         : listing.status === 'cancelled'
           ? 'Was listed at'
           : 'Ask price';
+    const investLabel =
+      listing.settlement === 'adopt_stake' ? 'Adopt · stake' : 'Adopt · buy';
     return (
       '<article class="market-card' +
       (isDead ? ' market-card--dead' : '') +
@@ -940,6 +982,7 @@
       ((showStrain || listing.batch) && listing.stage ? ' · ' : '') +
       (listing.stage ? esc(listing.stage) : '') +
       '</p>' +
+      offerExplainHtml(listing) +
       careLine +
       '<p class="market-card-meta">NFT: <a href="' +
       esc(explorerAddress(listing.mintAddress)) +
@@ -961,7 +1004,9 @@
       (canInvest
         ? '<button type="button" class="btn btn-primary btn-sm market-invest-btn" data-id="' +
           esc(listing.id) +
-          '">Invest</button>'
+          '">' +
+          esc(investLabel) +
+          '</button>'
         : '') +
       (canCancel
         ? '<button type="button" class="btn btn-ghost btn-sm market-cancel-btn" data-id="' +
