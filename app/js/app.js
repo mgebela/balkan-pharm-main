@@ -1356,9 +1356,13 @@ function applySignupProfileCopy(profileType) {
     const copy = window.GrowtooProfile.adopterIntentCopy();
     const heroP = document.querySelector('#view-adopt .adopt-hero-text .adopter-only');
     if (heroP && copy && copy.hero) heroP.textContent = copy.hero;
-    const marketHint = document.querySelector('#view-market .market-hint.adopter-only');
+    const marketHint =
+      document.querySelector('#market-open-hint .adopter-only') ||
+      document.querySelector('#view-market .market-hint .adopter-only');
     if (marketHint && copy && copy.market) marketHint.textContent = copy.market;
-    const ctaHint = document.querySelector('#adopt-market-cta .market-hint');
+    const ctaHint =
+      document.getElementById('adopt-market-cta-hint') ||
+      document.querySelector('#adopt-market-cta .market-hint');
     if (ctaHint && copy && copy.market) ctaHint.textContent = copy.market;
   }
 }

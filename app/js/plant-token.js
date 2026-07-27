@@ -1781,15 +1781,37 @@
     if (marketCta) {
       marketCta.hidden = !isAdopterUi();
     }
+    const guide = document.getElementById('adopter-guide');
+    if (guide) {
+      guide.hidden = !isAdopterUi();
+    }
   }
 
   function renderGarden(wallet) {
     const grid = document.getElementById('adopt-token-grid');
     if (!grid) return;
     if (!wallet.tokens.length) {
-      grid.innerHTML = isAdopterUi()
-        ? '<div class="empty-state">No adopted plants yet. Open the market to find one.</div>'
-        : '<div class="empty-state">No tokens yet. Mint a seed above to start growing.</div>';
+      if (isAdopterUi()) {
+        const emptyCopy =
+          window.GrowtooProfile && typeof window.GrowtooProfile.adopterIntentCopy === 'function'
+            ? window.GrowtooProfile.adopterIntentCopy().empty
+            : 'Browse the market and stake $GROWTOO when you are ready to support a grow.';
+        grid.innerHTML =
+          '<div class="empty-state adopt-empty-adopter">' +
+          '<p class="adopt-empty-lead">No adopted plants yet</p>' +
+          '<p class="adopt-empty-body">' +
+          esc(emptyCopy) +
+          '</p>' +
+          '<ol class="adopt-empty-steps">' +
+          '<li>Open Market and pick a live offer</li>' +
+          '<li>Tap Invest and confirm with your Devnet wallet</li>' +
+          '<li>The plant appears here after settlement</li>' +
+          '</ol>' +
+          '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">Browse market</button>' +
+          '</div>';
+      } else {
+        grid.innerHTML = '<div class="empty-state">No tokens yet. Mint a seed above to start growing.</div>';
+      }
       return;
     }
     grid.innerHTML = wallet.tokens.map(tokenCardHtml).join('');
@@ -1886,12 +1908,14 @@
       renderWalletPanel(wallet);
       renderPlatformBonusPanel();
       if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
-      // Show garden when connected OR when this account already has tokens (e.g. synced mints).
+      // Adopters always see the garden (empty state guides them). Growers when connected/tokens.
       if (gardenSection) {
-        gardenSection.hidden = !(wallet.connected || (wallet.tokens && wallet.tokens.length > 0));
+        gardenSection.hidden = isAdopterUi()
+          ? false
+          : !(wallet.connected || (wallet.tokens && wallet.tokens.length > 0));
       }
       applyProfileChrome();
-      if (wallet.connected || (wallet.tokens && wallet.tokens.length > 0)) {
+      if (isAdopterUi() || wallet.connected || (wallet.tokens && wallet.tokens.length > 0)) {
         if (!isAdopterUi() && wallet.connected) fillSeedPlantOptions();
         renderGarden(wallet);
       }
@@ -2428,10 +2452,26 @@
         return;
       }
 
-      const marketBtn = e.target.closest('#adopt-open-market-btn');
+      const marketBtn = e.target.closest(
+        '#adopt-open-market-btn, #adopter-guide-market-btn, #adopt-empty-market-btn'
+      );
       if (marketBtn) {
         const marketNav = document.querySelector('.nav-item[data-view="market"]');
         if (marketNav) marketNav.click();
+        return;
+      }
+
+      const guideWalletBtn = e.target.closest('#adopter-guide-wallet-btn');
+      if (guideWalletBtn) {
+        const connectBtn = document.getElementById('adopt-connect-btn');
+        if (connectBtn) {
+          connectBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          connectBtn.focus();
+          if (!busy) await handleWalletConnect(connectBtn);
+        } else {
+          const walletSec = document.getElementById('adopt-wallet');
+          if (walletSec) walletSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
         return;
       }
     });

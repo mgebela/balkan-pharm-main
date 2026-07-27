@@ -5091,6 +5091,134 @@ body:not(.app-loading) {
   line-height: 1.35;
 }
 
+/* ── Adopter guidance ─────────────────────────────────────── */
+
+.adopter-guide {
+  margin: 0 0 1.25rem;
+  padding: 1.1rem 1.15rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid rgba(94, 200, 216, 0.28);
+  background:
+    linear-gradient(165deg, rgba(20, 55, 62, 0.55) 0%, rgba(8, 22, 18, 0.75) 100%);
+}
+
+.adopter-guide-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #e8fbff;
+}
+
+.adopter-guide-steps {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.adopter-guide-steps li {
+  display: grid;
+  grid-template-columns: 1.75rem 1fr;
+  gap: 0.7rem;
+  align-items: start;
+}
+
+.adopter-guide-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: rgba(94, 200, 216, 0.2);
+  border: 1px solid rgba(94, 200, 216, 0.45);
+  color: #b8f0f8;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.adopter-guide-steps strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #f4fff8;
+  font-size: 0.95rem;
+}
+
+.adopter-guide-steps p {
+  margin: 0;
+  color: rgba(200, 230, 210, 0.72);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.adopter-guide-bullets {
+  margin: 0 0 0.85rem;
+  padding-left: 1.15rem;
+  color: rgba(210, 235, 220, 0.85);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.adopter-guide-bullets li {
+  margin: 0 0 0.4rem;
+}
+
+.adopter-guide-bullets strong {
+  color: #e8fbff;
+}
+
+.adopter-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.adopter-guide-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(190, 220, 200, 0.58);
+  line-height: 1.4;
+}
+
+.adopt-empty-adopter {
+  text-align: left;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 1.25rem 0.5rem;
+}
+
+.adopt-empty-lead {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f4fff4;
+}
+
+.adopt-empty-body {
+  margin: 0 0 0.85rem;
+  color: rgba(200, 230, 200, 0.75);
+  line-height: 1.45;
+}
+
+.adopt-empty-steps {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: rgba(210, 235, 210, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.adopt-empty-steps--bullets {
+  list-style: disc;
+}
+
+.adopt-empty-steps li {
+  margin: 0 0 0.3rem;
+}
+
 /* ── Marketplace (M4) ─────────────────────────────────────── */
 
 .market-notice {

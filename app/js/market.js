@@ -1094,11 +1094,18 @@
           ? open.map(function (l) {
               return listingCardHtml(l, uid);
             }).join('')
-          : '<div class="empty-state">' +
-            (isGrowerUi()
-              ? 'No live offers yet. Mint an RWA in Tokenise, then post it here.'
-              : 'No open investment offers yet. Check back when growers post RWAs.') +
-            '</div>';
+          : isGrowerUi()
+            ? '<div class="empty-state">No live offers yet. Mint an RWA in Tokenise, then post it here.</div>'
+            : '<div class="empty-state adopt-empty-adopter">' +
+              '<p class="adopt-empty-lead">No open offers right now</p>' +
+              '<p class="adopt-empty-body">Growers are still seeding the board on Devnet. When an ask goes live, it shows up here with Invest.</p>' +
+              '<ul class="adopt-empty-steps adopt-empty-steps--bullets">' +
+              '<li>Check back after growers mint and post RWAs</li>' +
+              '<li>Meanwhile, connect your Devnet wallet under My garden</li>' +
+              '<li>Read Risks &amp; FAQ on the marketing site if you are new to Devnet</li>' +
+              '</ul>' +
+              '<button type="button" class="btn btn-ghost" id="market-empty-garden-btn">Back to My garden</button>' +
+              '</div>';
       }
       if (mineGrid) {
         mineGrid.innerHTML = mine.length
@@ -1176,6 +1183,13 @@
     if (!view) return;
 
     view.addEventListener('click', async function (e) {
+      const gardenEmptyBtn = e.target.closest('#market-empty-garden-btn');
+      if (gardenEmptyBtn) {
+        const adoptNav = document.querySelector('.nav-item[data-view="adopt"]');
+        if (adoptNav) adoptNav.click();
+        return;
+      }
+
       const investBtn = e.target.closest('.market-invest-btn');
       const cancelBtn = e.target.closest('.market-cancel-btn');
       if (!investBtn && !cancelBtn) return;

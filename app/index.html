@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260727a" />
+  <link rel="stylesheet" href="styles/app.css?v=20260727d" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
 <body class="app-loading">
@@ -245,8 +245,49 @@
               <span class="adopt-chain-badge">◎ Devnet</span>
             </div>
             <p class="grower-only">Link journal plants, complete grower quests, and mint stage NFTs for <strong>$GROWTOO</strong>.</p>
-            <p class="adopter-only">Track adopted plant NFTs and <strong>$GROWTOO</strong>. Browse the market to expand your garden.</p>
+            <p class="adopter-only">Back a real grow with <strong>$GROWTOO</strong>, then track the plant’s verified stages here.</p>
           </div>
+        </section>
+
+        <section class="adopter-guide adopter-only" id="adopter-guide" aria-label="How adoption works">
+          <h3 class="adopter-guide-title">How to adopt a plant</h3>
+          <ol class="adopter-guide-steps">
+            <li>
+              <span class="adopter-guide-num">1</span>
+              <div>
+                <strong>Browse the market</strong>
+                <p>Open offers are real grower RWAs with a journal trail behind them.</p>
+              </div>
+            </li>
+            <li>
+              <span class="adopter-guide-num">2</span>
+              <div>
+                <strong>Connect a Devnet wallet</strong>
+                <p>Phantom or Solflare on Devnet. Needed only when you tap Invest.</p>
+              </div>
+            </li>
+            <li>
+              <span class="adopter-guide-num">3</span>
+              <div>
+                <strong>Stake $GROWTOO</strong>
+                <p>Instant sale transfers the NFT now. Adopt stake locks half until harvest care.</p>
+              </div>
+            </li>
+            <li>
+              <span class="adopter-guide-num">4</span>
+              <div>
+                <strong>Follow progress here</strong>
+                <p>Adopted plants land in this garden. Watch stages and monthly unlock status.</p>
+              </div>
+            </li>
+          </ol>
+          <div class="adopter-guide-actions">
+            <button type="button" class="btn btn-primary" id="adopter-guide-market-btn">Browse market</button>
+            <button type="button" class="btn btn-ghost" id="adopter-guide-wallet-btn">Connect wallet</button>
+          </div>
+          <p class="adopter-guide-note">
+            Devnet only — $GROWTOO has no monetary value. You’re testing the trust flow before mainnet.
+          </p>
         </section>
 
         <section class="adopt-wallet" id="adopt-wallet"></section>
@@ -266,7 +307,7 @@
         </div>
         <div class="adopt-notice adopter-only">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Connect a Devnet wallet to hold adopted plants. Growth progress comes from on-chain stage updates.</p>
+          <p>Wallet is optional until you invest. After that, adopted NFTs and unlock status show in your garden.</p>
         </div>
 
         <section class="adopt-section plants-journal-section grower-only" id="adopt-seed-section" hidden>
@@ -288,15 +329,17 @@
           </form>
         </section>
 
-        <section class="adopt-section plants-journal-section" id="adopt-garden-section" hidden>
+        <section class="adopt-section plants-journal-section" id="adopt-garden-section">
           <h2 class="section-heading grower-only">My tokenised plants</h2>
           <h2 class="section-heading adopter-only">My adopted plants</h2>
           <div class="adopt-token-grid" id="adopt-token-grid"></div>
         </section>
 
-        <section class="adopt-section adopter-only" id="adopt-market-cta" hidden>
-          <h2 class="section-heading">Invest in grower RWAs</h2>
-          <p class="market-hint">Browse open offers and stake $GROWTOO to adopt a real seed or growth-stage NFT. Settled investments show up in your garden.</p>
+        <section class="adopt-section adopter-only" id="adopt-market-cta">
+          <h2 class="section-heading">Ready to adopt?</h2>
+          <p class="market-hint" id="adopt-market-cta-hint">
+            Browse open offers and stake $GROWTOO. Settled plants appear in My adopted plants above.
+          </p>
           <button type="button" class="btn btn-primary" id="adopt-open-market-btn">Open market</button>
         </section>
 
@@ -306,6 +349,20 @@
       <div id="view-market" class="view">
         <p class="market-notice" id="market-notice" hidden></p>
         <div class="market-stuck" id="market-stuck" hidden></div>
+
+        <section class="adopter-guide adopter-only" id="market-adopter-guide" aria-label="Adopter market guide">
+          <h3 class="adopter-guide-title">Adopting on this board</h3>
+          <ul class="adopter-guide-bullets">
+            <li><strong>Open market</strong> lists live grower asks you can invest in.</li>
+            <li>Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.</li>
+            <li><strong>Instant sale</strong>: NFT comes to you in the same flow.</li>
+            <li><strong>Adopt stake</strong>: you pay full price; half locks until the grower’s monthly care qualifies at harvest.</li>
+            <li>After settle, track the plant under <strong>My garden</strong>.</li>
+          </ul>
+          <p class="adopter-guide-note">
+            Need $GROWTOO on Devnet? Ask a grower for a test transfer, or use faucet tooling your team set up — tokens here have no real value.
+          </p>
+        </section>
 
         <section class="plants-journal-section grower-only" id="market-list-section" hidden>
           <h2 class="section-heading">Post an RWA offer</h2>
@@ -347,11 +404,11 @@
 
         <section class="plants-journal-section">
           <h2 class="section-heading">
-            <span class="adopter-only">Open market</span>
+            <span class="adopter-only">Plants you can adopt</span>
             <span class="grower-only">Open market</span>
           </h2>
-          <p class="market-hint">
-            <span class="adopter-only">Live asks from growers. Stake $GROWTOO to adopt an RWA.</span>
+          <p class="market-hint" id="market-open-hint">
+            <span class="adopter-only">Live asks from growers. Stake $GROWTOO to adopt an RWA — then follow it in My garden.</span>
             <span class="grower-only">Public board: other growers’ open asks (yours appear under My offers).</span>
           </p>
           <div class="market-grid" id="market-grid"></div>
@@ -856,7 +913,7 @@
   <script src="js/seed-chain.js?v=20260727a"></script>
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260727a"></script>
-  <script src="js/market.js?v=20260727c"></script>
+  <script src="js/market.js?v=20260727d"></script>
   <script src="js/metric-ui.js?v=20260723m"></script>
   <script src="js/token-pixel-art.js?v=20260720b"></script>
   <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
