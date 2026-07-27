@@ -4863,6 +4863,18 @@ body:not(.app-loading) {
 }
 .adopt-token-chain--failed {
   color: #f87171;
+  display: grid;
+  gap: 0.45rem;
+}
+.adopt-token-chain--failed .adopt-mint-err {
+  color: #fecaca;
+  font-size: 0.85em;
+}
+.adopt-token-chain--failed .adopt-mint-hint {
+  margin: 0;
+  color: rgba(200, 220, 200, 0.65);
+  font-size: 0.8rem;
+  font-weight: 400;
 }
 .adopt-token-link--warn {
   color: #f59e0b;
