@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260727i" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260727j" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -60,7 +60,7 @@
           </p>
           <div class="hero-cta-row">
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
-            <a href="#stakes" class="btn btn-ghost btn-lg">See live stakes ↓</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopt a plant</a>
           </div>
           <p class="hero-cta-note">
             Opens the <strong>Grower</strong> desk.
@@ -74,6 +74,56 @@
             </p>
           </aside>
         </div>
+
+        <div class="hero-preview hero-preview--stakes" id="stakes">
+          <div class="stakes-desk stakes-desk--hero" id="stakes-desk" data-state="loading">
+            <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
+              <p class="stakes-panel-label">
+                <span class="hero-preview-rule" aria-hidden="true"></span>
+                Available stakes · Devnet
+                <span class="hero-preview-rule" aria-hidden="true"></span>
+              </p>
+              <p class="stakes-panel-meta" id="stakes-open-meta">Loading open offers…</p>
+              <ol class="stakes-list" id="stakes-open-list"></ol>
+              <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
+              <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
+            </aside>
+
+            <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
+              <p class="stakes-panel-label">
+                <span class="hero-preview-rule" aria-hidden="true"></span>
+                Already staked
+                <span class="hero-preview-rule" aria-hidden="true"></span>
+              </p>
+              <div class="stakes-kpis">
+                <div class="stakes-kpi">
+                  <span class="stakes-kpi-label">Contracts</span>
+                  <strong class="stakes-kpi-value" id="stakes-kpi-count">—</strong>
+                </div>
+                <div class="stakes-kpi">
+                  <span class="stakes-kpi-label">$GROWTOO in</span>
+                  <strong class="stakes-kpi-value" id="stakes-kpi-value">—</strong>
+                </div>
+                <div class="stakes-kpi">
+                  <span class="stakes-kpi-label">Open ask</span>
+                  <strong class="stakes-kpi-value" id="stakes-kpi-open">—</strong>
+                </div>
+              </div>
+              <div class="stakes-mix" aria-hidden="true">
+                <div class="stakes-mix-track">
+                  <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
+                  <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
+                </div>
+                <div class="stakes-mix-legend">
+                  <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
+                  <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
+                </div>
+              </div>
+              <div class="stakes-bars" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
+              <p class="stakes-panel-note" id="stakes-updated">Updating…</p>
+            </aside>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -85,67 +135,6 @@
         <span>Proof optional</span>
       </div>
     </div>
-
-    <section id="stakes" class="section desk-section desk-section--stakes">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag desk-tag--adopter">Live Devnet desk</span>
-          <h2>Available stakes &amp; what’s already backed</h2>
-          <p class="section-lead">
-            Open grower asks you can adopt, plus a live read on contracts already staked.
-            Test assets only. $GROWTOO has no monetary value.
-          </p>
-        </div>
-
-        <div class="stakes-desk" id="stakes-desk" data-state="loading">
-          <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
-            <p class="stakes-panel-label">
-              <span class="hero-preview-rule" aria-hidden="true"></span>
-              Available stakes · Devnet
-              <span class="hero-preview-rule" aria-hidden="true"></span>
-            </p>
-            <p class="stakes-panel-meta" id="stakes-open-meta">Loading open offers…</p>
-            <ol class="stakes-list" id="stakes-open-list"></ol>
-            <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
-            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
-          </aside>
-
-          <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
-            <p class="stakes-panel-label">
-              <span class="hero-preview-rule" aria-hidden="true"></span>
-              Already staked
-              <span class="hero-preview-rule" aria-hidden="true"></span>
-            </p>
-            <div class="stakes-kpis">
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Contracts</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-count">—</strong>
-              </div>
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">$GROWTOO in</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-value">—</strong>
-              </div>
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Open ask</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-open">—</strong>
-              </div>
-            </div>
-            <div class="stakes-mix" aria-hidden="true">
-              <div class="stakes-mix-track">
-                <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
-                <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
-              </div>
-              <div class="stakes-mix-legend">
-                <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
-                <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
-              </div>
-            </div>
-            <div class="stakes-bars" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
-            <p class="stakes-panel-note" id="stakes-updated">Updating…</p>
-          </aside>
-        </div>
-      </div>
-    </section>
 
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
@@ -528,7 +517,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260727h"></script>
+  <script src="js/landing-market.js?v=20260727j"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

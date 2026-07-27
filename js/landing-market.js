@@ -296,7 +296,7 @@
       }).concat([1])
     );
     el.innerHTML = stakedList
-      .slice(0, 8)
+      .slice(0, 5)
       .map(function (listing, i) {
         var price = Number(listing.priceGrow || 0);
         var pct = Math.max(8, Math.round((price / max) * 100));
@@ -338,7 +338,7 @@
     var openEmpty = document.getElementById('stakes-open-empty');
     var openMeta = document.getElementById('stakes-open-meta');
     if (openList) {
-      openList.innerHTML = open.slice(0, 10).map(stakeRowHtml).join('');
+      openList.innerHTML = open.slice(0, 5).map(stakeRowHtml).join('');
     }
     if (openEmpty) openEmpty.hidden = open.length > 0;
     if (openMeta) {
