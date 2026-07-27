@@ -511,6 +511,12 @@ service cloud.firestore {
     allow read, write: if isSuperadmin();
   }
 
+  // Ops: written only by Admin SDK (Cloud Functions). Superadmin can read.
+  match /opsHealthEvents/{eventId} {
+    allow read: if isSuperadmin();
+    allow write: if false;
+  }
+
   // Deny everything else by default
   match /{document=**} {
     allow read, write: if false;

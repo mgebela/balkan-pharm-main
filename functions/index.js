@@ -1,5 +1,6 @@
 const {onRequest} = require('firebase-functions/v2/https');
 const {onSchedule} = require('firebase-functions/v2/scheduler');
+const {onDocumentWritten} = require('firebase-functions/v2/firestore');
 const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
@@ -7,6 +8,14 @@ const {GoogleGenAI} = require('@google/genai');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
 const {handleSolanaRpc} = require('./solana-rpc-proxy');
+const {
+  onMarketListingChange,
+  onMintDocChange,
+  verifyListingCustody,
+  verifyMintDoc,
+  persistHealth,
+} = require('./tx-health');
+const {getFirestore} = require('firebase-admin/firestore');
 
 initializeApp();
 
@@ -417,6 +426,139 @@ exports.coachChat = onRequest(
         console.error('coachChat', err);
         const code = err.code === 'auth/id-token-expired' ? 401 : 500;
         res.status(code).json({error: err.message || 'Internal error'});
+      }
+    },
+);
+
+/**
+ * After each market listing status change (list / invest / cancel / sold),
+ * verify NFT custody on Devnet and write `txHealth` on the doc.
+ */
+exports.onMarketListingHealth = onDocumentWritten(
+    {
+      document: 'marketListings/{listingId}',
+      region: REGION,
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (event) => {
+      const before = event.data && event.data.before && event.data.before.exists
+        ? event.data.before.data()
+        : null;
+      const after = event.data && event.data.after && event.data.after.exists
+        ? event.data.after.data()
+        : null;
+      if (!after) return;
+      const ref = event.data.after.ref;
+      try {
+        setPreferredRpc(process.env.SOLANA_RPC_URL || '');
+        await onMarketListingChange(before, after, ref);
+      } catch (err) {
+        console.error('onMarketListingHealth', event.params.listingId, err);
+      }
+    },
+);
+
+/** After seed mint status → minted/failed. */
+exports.onSeedMintHealth = onDocumentWritten(
+    {
+      document: 'seedMints/{requestId}',
+      region: REGION,
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (event) => {
+      const before = event.data && event.data.before && event.data.before.exists
+        ? event.data.before.data()
+        : null;
+      const after = event.data && event.data.after && event.data.after.exists
+        ? event.data.after.data()
+        : null;
+      if (!after) return;
+      try {
+        setPreferredRpc(process.env.SOLANA_RPC_URL || '');
+        await onMintDocChange(before, after, event.data.after.ref, 'seedMints');
+      } catch (err) {
+        console.error('onSeedMintHealth', event.params.requestId, err);
+      }
+    },
+);
+
+/** After growth mint status → minted/failed. */
+exports.onGrowthMintHealth = onDocumentWritten(
+    {
+      document: 'growthMints/{requestId}',
+      region: REGION,
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (event) => {
+      const before = event.data && event.data.before && event.data.before.exists
+        ? event.data.before.data()
+        : null;
+      const after = event.data && event.data.after && event.data.after.exists
+        ? event.data.after.data()
+        : null;
+      if (!after) return;
+      try {
+        setPreferredRpc(process.env.SOLANA_RPC_URL || '');
+        await onMintDocChange(before, after, event.data.after.ref, 'growthMints');
+      } catch (err) {
+        console.error('onGrowthMintHealth', event.params.requestId, err);
+      }
+    },
+);
+
+/**
+ * Manual / CI: verify one listing or mint by id.
+ * POST { collection: 'marketListings'|'seedMints'|'growthMints', id: '...' }
+ */
+exports.verifyTxHealth = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 2,
+    },
+    async (req, res) => {
+      if (!allowReconcileRequest(req)) {
+        res.status(429).json({ok: false, error: 'Too many requests'});
+        return;
+      }
+      try {
+        setPreferredRpc(process.env.SOLANA_RPC_URL || '');
+        const body = req.method === 'GET' ? req.query : req.body || {};
+        const collection = String(body.collection || '');
+        const id = String(body.id || '');
+        const allowed = ['marketListings', 'seedMints', 'growthMints'];
+        if (!allowed.includes(collection) || !id) {
+          res.status(400).json({
+            ok: false,
+            error: 'Provide collection (marketListings|seedMints|growthMints) and id',
+          });
+          return;
+        }
+        const ref = getFirestore().collection(collection).doc(id);
+        const snap = await ref.get();
+        if (!snap.exists) {
+          res.status(404).json({ok: false, error: 'Document not found'});
+          return;
+        }
+        const data = snap.data() || {};
+        const result =
+          collection === 'marketListings'
+            ? await verifyListingCustody(data)
+            : await verifyMintDoc(data);
+        await persistHealth(ref, result, 'verifyTxHealth');
+        res.json({ok: result.ok, ...result});
+      } catch (err) {
+        console.error('verifyTxHealth', err);
+        res.status(500).json({ok: false, error: (err && err.message) || 'verify failed'});
       }
     },
 );
