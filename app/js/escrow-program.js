@@ -91,6 +91,28 @@
     );
   }
 
+  function friendlyProgramError(err) {
+    const msg = String((err && err.message) || err || '');
+    const logs = Array.isArray(err && err.logs) ? err.logs.join('\n') : '';
+    const blob = msg + '\n' + logs;
+    if (/MissingNft|6003|0x1773/i.test(blob)) {
+      return new Error(
+        'This connected wallet does not hold that NFT. Switch to the wallet that received the mint, or cancel an existing escrow listing if the NFT is already locked in the market vault.'
+      );
+    }
+    if (/ListingNotActive|6000/i.test(blob)) {
+      return new Error('That on-chain listing is not active. Refresh the market and try again.');
+    }
+    if (/SellerMismatch/i.test(blob)) {
+      return new Error('Connected wallet is not the seller on this listing.');
+    }
+    if (/simulation failed|SendTransactionError/i.test(msg) && logs) {
+      const anchor = logs.match(/Error Message: ([^\n]+)/i);
+      if (anchor) return new Error(anchor[1].trim());
+    }
+    return null;
+  }
+
   function friendlyConfirmTimeoutError(signature) {
     const err = new Error(
       'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: ' +
@@ -182,13 +204,32 @@
 
         return await confirmByPolling(connection, signature);
       } catch (err) {
-        lastErr = err;
+        lastErr = friendlyProgramError(err) || err;
         if (!isBlockhashExpiredError(err) || attempt === MAX_SIGN_ATTEMPTS) break;
       }
     }
 
     if (isBlockhashExpiredError(lastErr)) throw friendlyExpiredError();
-    throw lastErr;
+    throw friendlyProgramError(lastErr) || lastErr;
+  }
+
+  async function assertSellerHoldsNft(web3, seller, mint) {
+    if (!window.SplTransfer || typeof window.SplTransfer.getRawBalance !== 'function') {
+      return;
+    }
+    const held = await window.SplTransfer.getRawBalance(mint.toBase58());
+    if (held >= 1n) return;
+
+    const listing = deriveListing(web3, programId(web3), mint);
+    const vaultHeld = await window.SplTransfer.getRawBalanceOf(listing.toBase58(), mint.toBase58());
+    if (vaultHeld >= 1n) {
+      throw new Error(
+        'This NFT is already locked in the market escrow vault. Cancel that listing (or wait for settle) before posting again.'
+      );
+    }
+    throw new Error(
+      'This connected wallet does not hold that NFT (MissingNft). Connect the wallet that owns it, then try again.'
+    );
   }
 
   function listIx(web3, seller, mint, priceWhole) {
@@ -291,19 +332,24 @@
       const web3 = await loadWeb3();
       const seller = new web3.PublicKey(SW.getPublicKey());
       const mint = new web3.PublicKey(mintAddress);
+      await assertSellerHoldsNft(web3, seller, mint);
       const built = listIx(web3, seller, mint, Math.round(Number(priceWhole)));
 
-      const signature = await sendSignedTx(async function (w) {
-        const tx = new w.Transaction();
-        tx.add(listIx(w, seller, mint, Math.round(Number(priceWhole))).ix);
-        return tx;
-      });
+      try {
+        const signature = await sendSignedTx(async function (w) {
+          const tx = new w.Transaction();
+          tx.add(listIx(w, seller, mint, Math.round(Number(priceWhole))).ix);
+          return tx;
+        });
 
-      return {
-        signature,
-        listingPda: built.listingPda,
-        nftVault: built.nftVault,
-      };
+        return {
+          signature,
+          listingPda: built.listingPda,
+          nftVault: built.nftVault,
+        };
+      } catch (err) {
+        throw friendlyProgramError(err) || err;
+      }
     },
 
     async buyListing(listing) {
