@@ -412,20 +412,73 @@
       .tokens.map(function (token) {
         if (token.adopted) return null;
         const mint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
-        const mintAddress =
-          (mint && mint.status === 'minted' && mint.mintAddress) ||
-          token.mintAddress ||
-          null;
-        if (!mintAddress) return null;
-        if (mint && mint.status && mint.status !== 'minted') return null;
+        // Only list when Firestore says minted — local mintAddress alone is often a stale
+        // garden row after a failed / partial mint (causes MissingNft / “wallet no longer holds”).
+        if (!mint || mint.status !== 'minted' || !mint.mintAddress) return null;
+        const mintAddress = mint.mintAddress;
         if (listed.has(mintAddress)) return null;
         return {
           token: token,
           mintAddress: mintAddress,
-          mintRequestId: token.mintRequestId || (mint && mint.id) || null,
+          mintRequestId: token.mintRequestId || mint.id || null,
+          mintOwner: mint.owner || null,
         };
       })
       .filter(Boolean);
+  }
+
+  async function assertWalletHoldsListingNft(mintAddress, mintOwnerHint) {
+    if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
+    const SW = window.SolanaWallet;
+    const connected = SW && SW.isConnected() ? SW.getPublicKey() : '';
+    const held = await window.SplTransfer.getRawBalance(mintAddress);
+    if (held >= 1n) return;
+
+    const escrow = cfg().escrowAddress;
+    let escrowHeld = 0n;
+    if (escrow) {
+      escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, mintAddress);
+    }
+
+    let vaultHeld = 0n;
+    if (window.EscrowProgram && typeof EscrowProgram.deriveListingPda === 'function') {
+      try {
+        const listingPda = await EscrowProgram.deriveListingPda(mintAddress);
+        vaultHeld = await window.SplTransfer.getRawBalanceOf(listingPda, mintAddress);
+      } catch {
+        // ignore derive failures
+      }
+    }
+
+    if (vaultHeld >= 1n) {
+      throw new Error(
+        'This NFT is already locked in the on-chain market vault. Cancel that listing first, then post again.'
+      );
+    }
+    if (escrowHeld >= 1n) {
+      throw new Error(
+        'This NFT is already in the hot-wallet escrow. Refresh Market — it may still be activating.'
+      );
+    }
+
+    const ownerHint =
+      mintOwnerHint && connected && mintOwnerHint !== connected
+        ? ' On-chain owner is ' +
+          mintOwnerHint.slice(0, 4) +
+          '…' +
+          mintOwnerHint.slice(-4) +
+          ', but you connected ' +
+          connected.slice(0, 4) +
+          '…' +
+          connected.slice(-4) +
+          '.'
+        : '';
+
+    throw new Error(
+      'This connected wallet does not hold that NFT.' +
+        ownerHint +
+        ' Open Tokenise, confirm “Minted on devnet”, connect the wallet that received the mint (or Retry mint), then try posting again.'
+    );
   }
 
   /** Pull settled / in-flight investments into the adopter garden. */
@@ -497,6 +550,7 @@
 
     if (useProgram) {
       if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
+      await assertWalletHoldsListingNft(tokenEntry.mintAddress, tokenEntry.mintOwner);
       const result = await window.EscrowProgram.listNft(tokenEntry.mintAddress, priceRounded);
       await firebase.firestore().collection('marketListings').add({
         uid: user.uid,
@@ -525,15 +579,18 @@
       if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
       if (stakeMode && !careEscrow) throw new Error('Care escrow address is not configured.');
 
+      await assertWalletHoldsListingNft(tokenEntry.mintAddress, tokenEntry.mintOwner);
+
       let escrowSignature = null;
       const held = await window.SplTransfer.getRawBalance(tokenEntry.mintAddress);
       if (held >= 1n) {
         escrowSignature = await window.SplTransfer.transferNft(tokenEntry.mintAddress, escrow);
       } else {
+        // assertWalletHoldsListingNft already checked escrow/vault; recover if race filled escrow.
         const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
         if (escrowHeld < 1n) {
           throw new Error(
-            'This wallet no longer holds that NFT and escrow does not either. Refresh and check ownership before posting again.'
+            'This connected wallet does not hold that NFT. Confirm mint on Tokenise, then connect the owning wallet.'
           );
         }
         escrowSignature = 'recovered-escrow-' + Date.now();
