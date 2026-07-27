@@ -29,6 +29,7 @@
     "adopt:queue:watch": "node process-adopt-stakes.js --watch",
     "platform:queue": "node process-platform-rewards.js",
     "platform:queue:watch": "node process-platform-rewards.js --watch",
+    "health:check": "node health-check.js",
     "queue:all": "node process-seed-mints.js && node process-growth-mints.js && node process-market.js && node process-adopt-stakes.js && node process-platform-rewards.js"
   },
   "dependencies": {

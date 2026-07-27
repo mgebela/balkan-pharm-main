@@ -1,0 +1,75 @@
+name: Chain health check
+
+# Every 30 minutes: stuck mints, escrow/sale pending, NFT custody disputes.
+# Required repo secret:
+#   FIREBASE_SERVICE_ACCOUNT_JSON
+# Optional:
+#   SOLANA_RPC_URL
+#   SOLANA_ESCROW_KEY_JSON  — helps resolve escrow pubkey if deployed.json is stale
+on:
+  schedule:
+    - cron: '0,30 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: chain-health
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: chain/package-lock.json
+
+      - name: Install chain deps
+        working-directory: chain
+        run: npm ci
+
+      - name: Write secrets
+        working-directory: chain
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          SOLANA_ESCROW_KEY_JSON: ${{ secrets.SOLANA_ESCROW_KEY_JSON }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT_JSON secret."
+            exit 1
+          fi
+          mkdir -p keys
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > keys/firebase-service-account.json
+          python3 - <<'PY'
+          import json
+          json.load(open('keys/firebase-service-account.json'))
+          print('ok keys/firebase-service-account.json')
+          PY
+          if [ -n "${SOLANA_ESCROW_KEY_JSON:-}" ]; then
+            printf '%s' "$SOLANA_ESCROW_KEY_JSON" > keys/devnet-escrow.json
+            python3 - <<'PY'
+            import json
+            json.load(open('keys/devnet-escrow.json'))
+            print('ok keys/devnet-escrow.json')
+            PY
+          fi
+
+      - name: Run health check
+        working-directory: chain
+        env:
+          SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
+          STUCK_MINUTES: '30'
+          FAILED_LOOKBACK_HOURS: '24'
+        run: npm run health:check
+
+      - name: Scrub keys
+        if: always()
+        working-directory: chain
+        run: rm -f keys/firebase-service-account.json keys/devnet-escrow.json
