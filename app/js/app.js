@@ -2382,7 +2382,6 @@ function initFirebaseSync() {
             meta:
               M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
               M.row('Still growing', growingCount, 'metric-dot--teal'),
-            donut: { pct: growPct, color: '#f59e0b' },
             modifier: 'amber',
           }) +
             M.card({
@@ -2391,7 +2390,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Harvested', Math.max(0, tokenCount - growingCount), 'metric-dot--teal') +
                 M.row('In growth', growingCount, 'metric-dot--violet'),
-              donut: { pct: growPct, color: '#2dd4bf' },
               modifier: 'teal',
             }) +
             M.card({
@@ -2400,7 +2398,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Network', 'devnet', 'metric-dot--teal') +
                 M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
-              donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
               modifier: 'teal',
             }) +
             M.card({
@@ -2409,7 +2406,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Action', 'Buy & track RWAs', 'metric-dot--amber') +
                 M.row('Profile', 'Adopter', 'metric-dot--violet'),
-              donut: { pct: 100, color: '#c79bff' },
               modifier: 'violet',
             })
         );
@@ -2422,7 +2418,6 @@ function initFirebaseSync() {
             meta:
               M.row('Individual plants', plants.length, 'metric-dot--teal') +
               M.row('Plants in batch', totalPlantCount, 'metric-dot--blue'),
-            donut: { pct: plants.length ? Math.round((indoorCount / plants.length) * 100) : 0, color: '#2dd4bf' },
             modifier: 'teal',
           }) +
             M.card({
@@ -2431,7 +2426,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Last 7 days', entriesWeek, 'metric-dot--blue') +
                 M.row('Plant profiles', plants.length, 'metric-dot--muted'),
-              donut: { pct: entries.length ? Math.min(100, Math.round((entriesWeek / entries.length) * 100)) : 0, color: '#5fb6ff' },
               modifier: 'blue',
             }) +
             M.card({
@@ -2440,7 +2434,6 @@ function initFirebaseSync() {
               meta:
                 M.row(topStage ? STAGES[topStage] || topStage : 'No plants', topStagePct + '%', 'metric-dot--violet') +
                 M.row('Outdoor', outdoorCount, 'metric-dot--amber'),
-              donut: { pct: topStagePct, color: '#c79bff' },
               modifier: 'violet',
             }) +
             M.card({
@@ -2449,7 +2442,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
                 M.row('Still growing', growingCount, 'metric-dot--teal'),
-              donut: { pct: growPct, color: '#f59e0b' },
               modifier: 'amber',
             }) +
             M.card({
@@ -2458,7 +2450,6 @@ function initFirebaseSync() {
               meta:
                 M.row('Network', 'devnet', 'metric-dot--teal') +
                 M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
-              donut: { pct: walletLinked ? 100 : 0, color: '#2dd4bf' },
               modifier: 'teal',
             })
         );

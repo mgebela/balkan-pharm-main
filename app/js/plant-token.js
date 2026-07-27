@@ -1027,21 +1027,18 @@
             onchainGrowBalance != null
               ? M.row('On-chain', onchainGrowBalance.toLocaleString('en-US') + ' $GROWTOO', 'metric-dot--amber')
               : M.row('Rewards', 'Simulated', 'metric-dot--amber'),
-          donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
           modifier: 'amber',
         }) +
         M.card({
           label: 'Plant tokens',
           value: String(seeds),
           meta: M.row('Growing', growing, 'metric-dot--teal') + M.row('Harvested', grown, 'metric-dot--blue'),
-          donut: { pct: growPct, color: '#2dd4bf' },
           modifier: 'blue',
         }) +
         M.card({
           label: 'Growth progress',
           value: grown + ' / ' + seeds,
           meta: M.row('Complete', growPct + '%', 'metric-dot--violet'),
-          donut: { pct: growPct, color: '#c79bff' },
           modifier: 'violet',
         }) +
         '</div>' +
@@ -2685,7 +2682,6 @@
                 label: '$GROWTOO balance',
                 value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
                 meta: M.row('Wallet', esc(shortAddr(wallet.address)), 'metric-dot--teal'),
-                donut: { pct: 0, color: '#f59e0b' },
                 modifier: 'amber',
               }) +
               M.card({
@@ -2748,21 +2744,18 @@
                 label: '$GROWTOO balance',
                 value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
                 meta: M.row('Top plant', esc(top.name), 'metric-dot--amber'),
-                donut: { pct: Math.min(100, Number(wallet.growthBalance || 0) / 2), color: '#f59e0b' },
                 modifier: 'amber',
               }) +
               M.card({
                 label: 'Plant tokens',
                 value: String(wallet.tokens.length),
                 meta: M.row('Growing', growing, 'metric-dot--teal'),
-                donut: { pct: Math.round((growing / wallet.tokens.length) * 100), color: '#2dd4bf' },
                 modifier: 'teal',
               }) +
               M.card({
                 label: 'Lead grow',
                 value: pct + '%',
                 meta: M.row(esc(stage.label), esc(top.strain || '—'), 'metric-dot--violet'),
-                donut: { pct: pct, color: '#c79bff' },
                 modifier: 'violet',
               }) +
               '</div>'

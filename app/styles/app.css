@@ -1641,7 +1641,7 @@ body.notif-open {
   justify-content: space-between;
   align-items: flex-start;
   gap: 0.5rem;
-  min-height: 118px;
+  min-height: 0;
   padding: 0.95rem 1rem;
   border-radius: 10px;
   border: 1px solid var(--metric-card-border);
@@ -1717,57 +1717,6 @@ body.notif-open {
 .metric-dot--violet { background: #c79bff; }
 .metric-dot--amber { background: var(--accent-warm); }
 .metric-dot--muted { background: rgba(255, 255, 255, 0.28); }
-
-.metric-card-chart {
-  flex-shrink: 0;
-  align-self: center;
-}
-
-.metric-eq {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 3px;
-  width: 46px;
-  height: 44px;
-  padding: 2px 1px 0;
-}
-
-.metric-eq-bar {
-  flex: 1 1 0;
-  min-width: 4px;
-  max-width: 7px;
-  height: var(--eq-h, 20%);
-  border-radius: 2px 2px 1px 1px;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--eq-color, #2dd4bf) 88%, #fff) 0%,
-    var(--eq-color, #2dd4bf) 55%,
-    color-mix(in srgb, var(--eq-color, #2dd4bf) 55%, #000) 100%
-  );
-  box-shadow: 0 0 10px color-mix(in srgb, var(--eq-color, #2dd4bf) 28%, transparent);
-  transform-origin: bottom center;
-  animation: metric-eq-pulse 1.8s ease-in-out infinite;
-  animation-delay: var(--eq-delay, 0s);
-}
-
-@keyframes metric-eq-pulse {
-  0%,
-  100% {
-    transform: scaleY(1);
-    opacity: 0.88;
-  }
-  50% {
-    transform: scaleY(0.72);
-    opacity: 0.62;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .metric-eq-bar {
-    animation: none;
-  }
-}
 
 .metric-card--teal:hover { border-color: rgba(180, 71, 43, 0.22); }
 .metric-card--blue:hover { border-color: rgba(95, 182, 255, 0.22); }
@@ -4219,16 +4168,6 @@ body.admin-readonly .toolbox-form textarea {
 
   .metric-row-val {
     flex-shrink: 0;
-  }
-
-  .metric-eq {
-    width: 40px;
-    height: 40px;
-    gap: 2.5px;
-  }
-
-  .metric-eq-bar {
-    max-width: 6px;
   }
 
   .plants-list {
