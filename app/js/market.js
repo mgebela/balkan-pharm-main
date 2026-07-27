@@ -427,6 +427,32 @@
       .filter(Boolean);
   }
 
+  /** Garden RWAs that cannot be posted yet (failed / pending mint, or already listed). */
+  function unlistableGardenTokens() {
+    const PT = window.PlantToken;
+    const SC = window.SeedChain;
+    if (!PT || !SC) return [];
+    const listed = listedMintAddresses();
+    const listable = {};
+    listableTokens().forEach(function (o) {
+      listable[o.token.id] = true;
+    });
+    return PT.getWallet()
+      .tokens.map(function (token) {
+        if (token.adopted || listable[token.id]) return null;
+        const mint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
+        const mintAddress =
+          (mint && mint.mintAddress) || token.mintAddress || null;
+        let reason = 'Mint not confirmed on Devnet yet';
+        if (mint && mint.status === 'failed') reason = 'Mint failed — Retry mint on Tokenise';
+        else if (mint && mint.status === 'pending') reason = 'Mint still pending in queue';
+        else if (mintAddress && listed.has(mintAddress)) reason = 'Already listed';
+        else if (!mint && !mintAddress) reason = 'No Devnet mint yet — open Tokenise';
+        return { token: token, reason: reason };
+      })
+      .filter(Boolean);
+  }
+
   async function assertWalletHoldsListingNft(mintAddress, mintOwnerHint) {
     if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
     const SW = window.SolanaWallet;
@@ -994,6 +1020,7 @@
 
       if (sel) {
         const options = listableTokens();
+        const blocked = unlistableGardenTokens();
         const current = sel.value;
         sel.innerHTML =
           '<option value="">— choose a minted RWA —</option>' +
@@ -1012,8 +1039,34 @@
                 '</option>'
               );
             })
+            .join('') +
+          blocked
+            .map(function (b) {
+              return (
+                '<option value="" disabled>' +
+                esc(b.token.name) +
+                ' — ' +
+                esc(b.reason) +
+                '</option>'
+              );
+            })
             .join('');
         if (current) sel.value = current;
+
+        const hint = document.getElementById('market-list-hint');
+        if (hint) {
+          if (!options.length && blocked.length) {
+            hint.hidden = false;
+            hint.textContent =
+              'Only Devnet-minted RWAs can be posted. Finish mint on Tokenise (Retry mint if failed), then refresh this page.';
+          } else if (!options.length) {
+            hint.hidden = false;
+            hint.textContent = 'No listable RWAs yet. Mint a seed on Tokenise first.';
+          } else {
+            hint.hidden = true;
+            hint.textContent = '';
+          }
+        }
       }
 
       if (listSection) {

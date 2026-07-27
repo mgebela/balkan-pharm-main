@@ -473,16 +473,42 @@
         const m = mints[requestId];
         if (!m || m.status !== 'minted' || !m.mintAddress) return;
 
-        const existing = wallet.tokens.find(function (t) {
+        let existing = wallet.tokens.find(function (t) {
           return (
             t.mintRequestId === requestId ||
             t.mintAddress === m.mintAddress
           );
         });
+
+        // After Retry mint, the garden row may still point at a failed requestId.
+        // Attach the successful mint to the same plant / same name token.
+        if (!existing && m.plantId) {
+          existing = wallet.tokens.find(function (t) {
+            return (
+              !t.adopted &&
+              t.plantId === m.plantId &&
+              (!t.mintAddress || t.mintRequestId)
+            );
+          });
+        }
+        if (!existing && m.name) {
+          existing = wallet.tokens.find(function (t) {
+            return (
+              !t.adopted &&
+              !t.mintAddress &&
+              String(t.name || '').trim().toLowerCase() ===
+                String(m.name || '').trim().toLowerCase()
+            );
+          });
+        }
+
         if (existing) {
-          if (!existing.mintAddress) {
+          if (existing.mintAddress !== m.mintAddress) {
             existing.mintAddress = m.mintAddress;
-            existing.mintRequestId = existing.mintRequestId || requestId;
+            changed = true;
+          }
+          if (existing.mintRequestId !== requestId) {
+            existing.mintRequestId = requestId;
             changed = true;
           }
           return;
