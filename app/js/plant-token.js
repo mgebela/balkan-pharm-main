@@ -1727,7 +1727,18 @@
       );
     }
     if (mint.status === 'failed') {
-      return '<p class="adopt-token-chain adopt-token-chain--failed">⛓ Devnet mint failed — open the mint request again or ask an admin to reset it (it is not auto-retried).</p>';
+      const why = mint.error ? String(mint.error).slice(0, 160) : '';
+      return (
+        '<div class="adopt-token-chain adopt-token-chain--failed">' +
+        '<p>⛓ Devnet mint failed' +
+        (why ? ': <span class="adopt-mint-err">' + esc(why) + '</span>' : '.') +
+        '</p>' +
+        '<button type="button" class="btn btn-ghost btn-sm adopt-retry-mint-btn" data-token-id="' +
+        esc(token.id) +
+        '">Retry mint</button>' +
+        '<p class="adopt-mint-hint">Queues a new mint to your linked wallet. Connect the same Devnet wallet you want to own the NFT.</p>' +
+        '</div>'
+      );
     }
     return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint pending…</p>';
   }
@@ -2197,6 +2208,52 @@
         } catch (err) {
           flashError(err);
           careBtn.innerHTML = original;
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+
+      const retryMintBtn = e.target.closest('.adopt-retry-mint-btn');
+      if (retryMintBtn) {
+        if (busy || retryMintBtn.disabled) return;
+        const tokenId = retryMintBtn.dataset.tokenId;
+        const wallet = readWallet();
+        const token = wallet.tokens.find(function (t) {
+          return t.id === tokenId;
+        });
+        if (!token || !token.mintRequestId || !window.SeedChain) {
+          flashError(new Error('Mint request not found for this token.'));
+          return;
+        }
+        if (!token.plantId) {
+          flashError(new Error('Link a journal plant before retrying the mint.'));
+          return;
+        }
+        setBusy(true);
+        const original = retryMintBtn.textContent;
+        retryMintBtn.textContent = 'Retrying…';
+        retryMintBtn.disabled = true;
+        try {
+          const newId = await SeedChain.retrySeedMint(token.mintRequestId, {
+            name: token.name,
+            strain: token.strain || token.name,
+            batch: token.batch,
+            plantId: token.plantId,
+          });
+          if (!newId) throw new Error('Could not file a new mint request. Sign in and try again.');
+          mutate(function (w) {
+            const stored = w.tokens.find(function (t) {
+              return t.id === tokenId;
+            });
+            if (stored) stored.mintRequestId = newId;
+          });
+          flashOk('Mint queued again. Keep this wallet connected until it shows “Minted on devnet”.');
+          render();
+        } catch (err) {
+          flashError(err);
+          retryMintBtn.textContent = original;
+          retryMintBtn.disabled = false;
         } finally {
           setBusy(false);
         }

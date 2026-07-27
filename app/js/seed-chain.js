@@ -151,6 +151,24 @@
       return ref.id;
     },
 
+    /*
+     * Failed mints are not auto-retried (and clients cannot update seedMints).
+     * File a fresh pending request and return the new request id.
+     */
+    async retrySeedMint(failedRequestId, seed) {
+      const failed = this.getMint(failedRequestId);
+      const base = Object.assign({}, failed || {}, seed || {});
+      if (!base.plantId) {
+        throw new Error('Link a journal plant before retrying the seed mint.');
+      }
+      return this.requestSeedMint({
+        name: base.name,
+        strain: base.strain || base.name,
+        batch: base.batch,
+        plantId: base.plantId,
+      });
+    },
+
     getGrowth(requestId) {
       return requestId ? cache.growth[requestId] || null : null;
     },
