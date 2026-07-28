@@ -106,6 +106,20 @@
     if (/SellerMismatch/i.test(blob)) {
       return new Error('Connected wallet is not the seller on this listing.');
     }
+    if (
+      /expected this account to be already initialized|AccountNotInitialized|AccountOwnedByWrongProgram/i.test(
+        blob
+      )
+    ) {
+      return new Error(
+        'Your wallet still needs a $GROWTOO token account funded on Devnet. Ask a grower for a test transfer (or use the team faucet), then try Invest again.'
+      );
+    }
+    if (/insufficient|0x1\b|custom program error: 0x1/i.test(blob)) {
+      return new Error(
+        'Not enough $GROWTOO in this wallet for that ask price on Devnet. Top up and try again.'
+      );
+    }
     if (/simulation failed|SendTransactionError/i.test(msg) && logs) {
       const anchor = logs.match(/Error Message: ([^\n]+)/i);
       if (anchor) return new Error(anchor[1].trim());
@@ -264,6 +278,51 @@
     };
   }
 
+  function createAtaIdempotentIx(web3, payer, ata, owner, mint) {
+    return new web3.TransactionInstruction({
+      programId: new web3.PublicKey(ATA_PROGRAM),
+      keys: [
+        { pubkey: payer, isSigner: true, isWritable: true },
+        { pubkey: ata, isSigner: false, isWritable: true },
+        { pubkey: owner, isSigner: false, isWritable: false },
+        { pubkey: mint, isSigner: false, isWritable: false },
+        { pubkey: new web3.PublicKey(SYSTEM_PROGRAM), isSigner: false, isWritable: false },
+        { pubkey: new web3.PublicKey(TOKEN_PROGRAM), isSigner: false, isWritable: false },
+      ],
+      data: Uint8Array.from([1]),
+    });
+  }
+
+  async function accountExists(connection, pubkey) {
+    const info = await connection.getAccountInfo(pubkey, 'confirmed');
+    return !!(info && info.data && info.data.length);
+  }
+
+  async function assertBuyerHasGrow(web3, connection, buyer, priceWhole) {
+    const growMint = new web3.PublicKey(cfg().growMint);
+    const decimals = Number(cfg().growDecimals != null ? cfg().growDecimals : 9);
+    const buyerGrow = deriveAta(web3, buyer, growMint);
+    const exists = await accountExists(connection, buyerGrow);
+    if (!exists) {
+      throw new Error(
+        'This wallet has no $GROWTOO yet on Devnet. Ask a grower for a test transfer (or use the team faucet), then Invest again.'
+      );
+    }
+    const bal = await connection.getTokenAccountBalance(buyerGrow, 'confirmed');
+    const ui = Number((bal && bal.value && bal.value.uiAmount) || 0);
+    const need = Number(priceWhole || 0);
+    if (ui < need) {
+      throw new Error(
+        'Not enough $GROWTOO for this ask. Need ' +
+          need +
+          ', wallet has ' +
+          ui +
+          ' on Devnet.'
+      );
+    }
+    return { buyerGrow, growMint, decimals };
+  }
+
   function buyIx(web3, buyer, seller, mint) {
     const program = programId(web3);
     const growMint = new web3.PublicKey(cfg().growMint);
@@ -359,12 +418,32 @@
         throw new Error('Listing is missing mint or seller pubkey.');
       }
       const web3 = await loadWeb3();
+      const connection = await SW.getConnection();
       const buyer = new web3.PublicKey(SW.getPublicKey());
       const seller = new web3.PublicKey(listing.sellerPubkey);
       const mint = new web3.PublicKey(listing.mintAddress);
+      const priceWhole = Math.round(Number(listing.priceGrow || 0));
 
-      return sendSignedTx(async function (w) {
+      await assertBuyerHasGrow(web3, connection, buyer, priceWhole);
+
+      const growMint = new web3.PublicKey(cfg().growMint);
+      const buyerGrow = deriveAta(web3, buyer, growMint);
+      const sellerGrow = deriveAta(web3, seller, growMint);
+      const buyerNft = deriveAta(web3, buyer, mint);
+
+      return sendSignedTx(async function (w, conn) {
         const tx = new w.Transaction();
+        // Ensure ATAs that buy() may init_if_needed / require already exist when possible.
+        // buyer_grow must exist (program constraint); seller_grow + buyer_nft are init_if_needed.
+        if (!(await accountExists(conn, buyerGrow))) {
+          tx.add(createAtaIdempotentIx(w, buyer, buyerGrow, buyer, growMint));
+        }
+        if (!(await accountExists(conn, sellerGrow))) {
+          tx.add(createAtaIdempotentIx(w, buyer, sellerGrow, seller, growMint));
+        }
+        if (!(await accountExists(conn, buyerNft))) {
+          tx.add(createAtaIdempotentIx(w, buyer, buyerNft, buyer, mint));
+        }
         tx.add(buyIx(w, buyer, seller, mint));
         return tx;
       });
