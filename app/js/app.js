@@ -1553,6 +1553,18 @@ function initFirebaseSync() {
           // ignore
         }
       }
+      if (
+        window.DnevnikNotifications &&
+        typeof DnevnikNotifications.promptWalletReconnectIfNeeded === 'function'
+      ) {
+        try {
+          DnevnikNotifications.promptWalletReconnectIfNeeded({
+            view: isAdopterProfile() ? 'adopt' : 'market',
+          });
+        } catch {
+          // ignore
+        }
+      }
       if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
         window.AdoptPlant.renderGlobalWalletUI();
       }
@@ -1845,6 +1857,22 @@ function initFirebaseSync() {
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
+      const uid =
+        window.firebase && firebase.auth && firebase.auth().currentUser
+          ? firebase.auth().currentUser.uid
+          : '';
+      // End the browser wallet session only — keep Firestore wallet link.
+      // Phantom/Solflare cannot stay signed for the next Firebase account.
+      try {
+        if (window.SolanaWallet && typeof SolanaWallet.disconnect === 'function') {
+          await SolanaWallet.disconnect();
+        }
+      } catch {
+        // ignore
+      }
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.clearWalletReconnectPrompt === 'function') {
+        DnevnikNotifications.clearWalletReconnectPrompt(uid);
+      }
       try {
         if (window.firebase && firebase.auth) await firebase.auth().signOut();
       } catch {

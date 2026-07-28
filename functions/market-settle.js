@@ -257,6 +257,10 @@ async function failOrRetry(doc, err) {
 async function processSale(doc, connection, keys) {
   const data = doc.data() || {};
   const label = data.name || doc.id;
+  // 50/50 adopt-stake sales are settled by chain/process-adopt-stakes.js
+  // (payment goes to care escrow, not seller). Do not verify-as-seller here —
+  // that falsely marks paid stakes as failed ("seller received 0").
+  if (data.settlement === 'adopt_stake') return 'waiting';
   if (!(await tryClaimLease(doc.ref))) return 'leased';
 
   try {

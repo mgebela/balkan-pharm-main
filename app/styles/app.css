@@ -1110,6 +1110,11 @@ body.notif-open {
   border-color: rgba(120, 220, 140, 0.45);
 }
 
+.toast--warn {
+  border-color: rgba(220, 170, 70, 0.55);
+  background: rgba(36, 30, 14, 0.96);
+}
+
 .toast--error {
   border-color: rgba(220, 100, 90, 0.5);
 }
@@ -5524,6 +5529,128 @@ body.profile-adopter .adopt-hero-text h2 {
   border-color: rgba(220, 140, 255, 0.5);
   color: #e8c4ff;
 }
+/* Semafor / phase rail for invest + mint pipelines */
+.status-rail {
+  margin: 0.55rem 0 0.35rem;
+  padding: 0.55rem 0.65rem 0.45rem;
+  border-radius: 8px;
+  border: 1px solid rgba(140, 180, 120, 0.18);
+  background: rgba(12, 22, 16, 0.45);
+}
+.status-rail-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  width: 100%;
+}
+.status-rail-step {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  position: relative;
+  text-align: center;
+}
+.status-rail-step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0.42rem;
+  left: calc(50% + 0.55rem);
+  right: calc(-50% + 0.55rem);
+  height: 2px;
+  background: rgba(120, 150, 110, 0.28);
+  z-index: 0;
+}
+.status-rail-step--done:not(:last-child)::after {
+  background: rgba(120, 200, 130, 0.55);
+}
+.status-rail-step--fail:not(:last-child)::after,
+.status-rail-step--current:not(:last-child)::after {
+  background: rgba(220, 170, 70, 0.4);
+}
+.status-rail-dot {
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+  border: 2px solid rgba(140, 160, 130, 0.45);
+  background: rgba(30, 40, 32, 0.9);
+  z-index: 1;
+  box-sizing: border-box;
+}
+.status-rail-step--idle .status-rail-dot {
+  opacity: 0.55;
+}
+.status-rail-step--done .status-rail-dot {
+  border-color: rgba(120, 200, 130, 0.75);
+  background: #3d8f55;
+}
+.status-rail-step--current .status-rail-dot {
+  border-color: rgba(230, 180, 70, 0.9);
+  background: #c9922a;
+  box-shadow: 0 0 0 3px rgba(201, 146, 42, 0.22);
+  animation: status-rail-pulse 1.6s ease-in-out infinite;
+}
+.status-rail-step--fail .status-rail-dot {
+  border-color: rgba(220, 110, 90, 0.9);
+  background: #b85a45;
+  box-shadow: 0 0 0 3px rgba(184, 90, 69, 0.25);
+  animation: none;
+}
+.status-rail-label {
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--text-muted, #9aab9c);
+  line-height: 1.2;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.status-rail-step--done .status-rail-label {
+  color: #b8e0c2;
+}
+.status-rail-step--current .status-rail-label {
+  color: #f0d090;
+}
+.status-rail-step--fail .status-rail-label {
+  color: #ffb4a8;
+}
+.status-rail-caption {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-muted, #9aab9c);
+  text-align: center;
+}
+.status-rail--fail .status-rail-caption {
+  color: #ffb4a8;
+}
+.status-rail--ok .status-rail-caption {
+  color: #b8e0c2;
+}
+@keyframes status-rail-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(201, 146, 42, 0.18);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(201, 146, 42, 0.32);
+  }
+}
+@media (max-width: 480px) {
+  .status-rail {
+    padding: 0.45rem 0.4rem 0.35rem;
+  }
+  .status-rail-label {
+    font-size: 0.58rem;
+  }
+}
+
 .market-status {
   font-size: 0.68rem;
   font-weight: 650;

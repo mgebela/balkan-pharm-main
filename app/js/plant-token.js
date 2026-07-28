@@ -418,6 +418,10 @@
         existing.listingId = listing.id || existing.listingId;
         existing.adopted = true;
         existing.investStatus = listing.status || existing.investStatus;
+        if (listing.paymentSignature || listing.buySignature) {
+          existing.paymentSignature =
+            listing.paymentSignature || listing.buySignature || existing.paymentSignature;
+        }
         writeWallet(wallet);
         return existing;
       }
@@ -436,6 +440,7 @@
         adopted: true,
         investedGrow: Number(listing.priceGrow || 0),
         investStatus: listing.status || 'sale_pending',
+        paymentSignature: listing.paymentSignature || listing.buySignature || '',
         sellerPubkey: listing.sellerPubkey || '',
         stageIndex: stageIndex,
         createdAt: now,
@@ -452,6 +457,39 @@
       wallet.tokens.unshift(token);
       writeWallet(wallet);
       return token;
+    },
+
+    /**
+     * Drop local adopted cards that never settled: listing is open again,
+     * cancelled, or no longer reserved to this adopter (failed / cancelled pay).
+     */
+    pruneAbandonedAdoptions(listings, uid) {
+      if (!uid) return;
+      const byId = {};
+      (listings || []).forEach(function (l) {
+        if (l && l.id) byId[l.id] = l;
+      });
+      const wallet = readWallet();
+      let changed = false;
+      wallet.tokens = wallet.tokens.filter(function (t) {
+        if (!t.adopted || !t.listingId) return true;
+        if (t.investStatus === 'sold') return true;
+        const l = byId[t.listingId];
+        if (!l) {
+          // Listing gone — keep sold-like history only if we have a real payment sig.
+          const sig = String(t.paymentSignature || '');
+          if (sig && sig.indexOf('pending-') !== 0 && sig.length >= 32) return true;
+          changed = true;
+          return false;
+        }
+        const stillMine =
+          l.buyerUid === uid && (l.status === 'sold' || l.status === 'sale_pending');
+        if (stillMine) return true;
+        // active / cancelled / someone else — orphan from a failed reservation.
+        changed = true;
+        return false;
+      });
+      if (changed) writeWallet(wallet);
     },
 
     /** Remove / lock a token after the grower posts it to the market. */
@@ -1209,14 +1247,13 @@
       (token.adopted
         ? '<p class="adopt-token-link">Market investment' +
           (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString('en-US') + ' $GROWTOO' : '') +
-          (token.investStatus === 'sale_pending' ? ' · settling…' : '') +
-          (token.investStatus === 'sold' ? ' · NFT adopted' : '') +
-          '</p>'
+          '</p>' +
+          investPhaseHtml(token)
         : token.plantId
           ? '<p class="adopt-token-link">Linked journal plant</p>'
           : linkPlantControlHtml(token)) +
       chainMintHtml(token) +
-      (token.mintAddress && !token.mintRequestId
+      (token.mintAddress
         ? '<p class="adopt-token-chain adopt-token-chain--ok">⛓ NFT <a href="' +
           esc(explorerAddressUrl(token.mintAddress)) +
           '" target="_blank" rel="noopener noreferrer"><code>' +
@@ -1242,7 +1279,7 @@
       '<div class="adopt-token-actions">' +
       (token.adopted
         ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
-          (token.investStatus === 'sale_pending' ? 'Settlement pending' : 'Adopted RWA') +
+          esc(investActionLabel(token)) +
           '</button>'
         : isMax
           ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
@@ -1740,36 +1777,87 @@
     return { sig, url };
   }
 
+  function resolveInvestSource(token) {
+    const src = {
+      status: token.investStatus || '',
+      settlement: token.settlement || '',
+      paymentSignature: token.paymentSignature || '',
+      buySignature: token.buySignature || '',
+      error: token.error || '',
+    };
+    if (token.listingId && window.Market && typeof Market.getListings === 'function') {
+      const listings = Market.getListings() || [];
+      for (let i = 0; i < listings.length; i += 1) {
+        if (listings[i].id === token.listingId) {
+          const l = listings[i];
+          return {
+            status: l.status || src.status,
+            settlement: l.settlement || src.settlement,
+            paymentSignature: l.paymentSignature || src.paymentSignature,
+            buySignature: l.buySignature || src.buySignature,
+            error: l.error || l.lastError || src.error,
+          };
+        }
+      }
+    }
+    return src;
+  }
+
+  function investPhaseHtml(token) {
+    if (!token || !token.adopted || !window.StatusRail) return '';
+    return StatusRail.investPipeline(resolveInvestSource(token)) || '';
+  }
+
+  function investActionLabel(token) {
+    const src = resolveInvestSource(token);
+    const status = String(src.status || '');
+    if (status === 'failed') return 'Investment failed';
+    if (status === 'sold') return 'Adopted RWA';
+    if (status === 'sale_pending') {
+      if (window.StatusRail && StatusRail.hasConfirmedPayment(src)) return 'Settling…';
+      return 'Payment pending…';
+    }
+    return 'Adopted RWA';
+  }
+
   // On-chain (devnet) mint status for a token, from the seedMints queue.
   function chainMintHtml(token) {
+    // Adopter cards already have the NFT mint — don't mirror the grower's mint queue.
+    if (token.mintAddress) return '';
+    if (!token.mintRequestId) return '';
     const SC = window.SeedChain;
-    if (!SC || !token.mintRequestId) return '';
-    const mint = SC.getMint(token.mintRequestId);
-    if (!mint) {
-      return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint requested…</p>';
-    }
-    if (mint.status === 'minted' && mint.mintAddress) {
+    const mint = SC && typeof SC.getMint === 'function' ? SC.getMint(token.mintRequestId) : null;
+
+    const rail =
+      window.StatusRail && typeof StatusRail.mintPipeline === 'function'
+        ? StatusRail.mintPipeline(mint)
+        : '';
+
+    if (mint && mint.status === 'minted' && mint.mintAddress) {
       const explorer =
         window.ChainConfig && window.ChainConfig.explorerAddress
           ? ChainConfig.explorerAddress(mint.mintAddress)
           : 'https://solscan.io/account/' + encodeURIComponent(mint.mintAddress) + '?cluster=devnet';
       return (
+        rail +
         '<p class="adopt-token-chain adopt-token-chain--minted">⛓ Minted on devnet: ' +
-        '<a href="' + esc(explorer) + '" target="_blank" rel="noopener noreferrer"><code>' +
-        esc(shortAddr(mint.mintAddress)) + '</code></a>' +
+        '<a href="' +
+        esc(explorer) +
+        '" target="_blank" rel="noopener noreferrer"><code>' +
+        esc(shortAddr(mint.mintAddress)) +
+        '</code></a>' +
         (mint.metadataUri
-          ? ' · <a href="' + esc(mint.metadataUri) + '" target="_blank" rel="noopener noreferrer">metadata</a>'
+          ? ' · <a href="' +
+            esc(mint.metadataUri) +
+            '" target="_blank" rel="noopener noreferrer">metadata</a>'
           : '') +
         '</p>'
       );
     }
-    if (mint.status === 'failed') {
-      const why = mint.error ? String(mint.error).slice(0, 160) : '';
+    if (mint && mint.status === 'failed') {
       return (
+        rail +
         '<div class="adopt-token-chain adopt-token-chain--failed">' +
-        '<p>⛓ Devnet mint failed' +
-        (why ? ': <span class="adopt-mint-err">' + esc(why) + '</span>' : '.') +
-        '</p>' +
         '<button type="button" class="btn btn-ghost btn-sm adopt-retry-mint-btn" data-token-id="' +
         esc(token.id) +
         '">Retry mint</button>' +
@@ -1777,7 +1865,8 @@
         '</div>'
       );
     }
-    return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint pending…</p>';
+    if (rail) return rail;
+    return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint requested…</p>';
   }
 
   function isAdopterUi() {
@@ -2066,6 +2155,18 @@
       busy = true;
       render();
       renderGlobalWalletUI();
+      if (
+        wallet &&
+        wallet.address &&
+        window.DnevnikNotifications &&
+        typeof DnevnikNotifications.clearWalletReconnectPrompt === 'function'
+      ) {
+        const uid =
+          window.PlantToken && typeof PlantToken.getAccountUid === 'function'
+            ? PlantToken.getAccountUid()
+            : '';
+        DnevnikNotifications.clearWalletReconnectPrompt(uid);
+      }
       if (wallet && wallet.linkError) {
         const soft = /cancel|signature cancelled/i.test(String(wallet.linkError));
         const msg =
@@ -2834,6 +2935,16 @@
         console.warn('syncFromSeedMints', err);
       }
       render();
+    });
+  }
+  if (window.Market && typeof window.Market.onChange === 'function') {
+    // Keep invest phase rails in sync with listing settlement status.
+    window.Market.onChange(function () {
+      try {
+        render();
+      } catch {
+        // ignore
+      }
     });
   }
   if (document.readyState === 'loading') {

@@ -925,6 +925,82 @@
     renderBell();
   }
 
+  function shortPubkey(pk) {
+    const s = String(pk || '');
+    if (s.length < 12) return s;
+    return s.slice(0, 4) + '…' + s.slice(-4);
+  }
+
+  /**
+   * After login / account switch: account link stays in Firestore, but the
+   * browser wallet session (Phantom/Solflare) is gone — standard web3.
+   * Warn once per tab session until they reconnect or sign out.
+   */
+  function promptWalletReconnectIfNeeded(opts) {
+    const o = opts || {};
+    const user = currentUser();
+    if (!user) return false;
+
+    const linked =
+      (o.linkedPubkey && String(o.linkedPubkey)) ||
+      (window.WalletLink && typeof WalletLink.getProfile === 'function'
+        ? String((WalletLink.getProfile() || {}).solanaPubkey || '')
+        : '');
+    if (!linked) return false;
+
+    const SW = window.SolanaWallet;
+    const livePk =
+      SW && typeof SW.isConnected === 'function' && SW.isConnected() && typeof SW.getPublicKey === 'function'
+        ? String(SW.getPublicKey() || '')
+        : '';
+    if (livePk && livePk === linked) return false;
+
+    const sessionKey = 'dnevnik.walletReconnectWarned:' + user.uid;
+    try {
+      if (sessionStorage.getItem(sessionKey) === '1') return false;
+      sessionStorage.setItem(sessionKey, '1');
+    } catch {
+      // ignore — still push once via dedup
+    }
+
+    const view =
+      o.view ||
+      (document.body && document.body.dataset.profileType === 'adopter' ? 'adopt' : 'market');
+
+    push({
+      type: 'wallet_reconnect',
+      title: 'Reconnect your Solana wallet',
+      body:
+        'Signing out (or switching accounts) ends the browser wallet session — normal for Phantom/Solflare. Your account stays linked to ' +
+        shortPubkey(linked) +
+        '. Tap Reconnect to invest, mint, or list RWAs.',
+      action: { view: view },
+      kind: 'warn',
+      toastMsg: 'Wallet session ended — reconnect ' + shortPubkey(linked) + ' to sign.',
+      dedupKey: 'wallet-reconnect:' + user.uid,
+      meta: { key: 'wallet-reconnect:' + user.uid, pubkey: linked },
+    });
+    return true;
+  }
+
+  /** Call on logout so the next sign-in can warn again. */
+  function clearWalletReconnectPrompt(uid) {
+    const id = uid ? String(uid) : '';
+    try {
+      if (id) sessionStorage.removeItem('dnevnik.walletReconnectWarned:' + id);
+    } catch {
+      // ignore
+    }
+    if (!id) return;
+    try {
+      const map = readDedup();
+      delete map[dedupKey('wallet_reconnect', 'wallet-reconnect:' + id)];
+      writeDedup(map);
+    } catch {
+      // ignore
+    }
+  }
+
   window.DnevnikNotifications = {
     init: init,
     startWatch: startWatch,
@@ -932,6 +1008,8 @@
     push: push,
     pushToUser: pushToUser,
     toast: toast,
+    promptWalletReconnectIfNeeded: promptWalletReconnectIfNeeded,
+    clearWalletReconnectPrompt: clearWalletReconnectPrompt,
     markRead: markRead,
     markAllRead: markAllRead,
     dismiss: dismiss,

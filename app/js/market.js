@@ -507,20 +507,50 @@
     );
   }
 
-  /** Pull settled / in-flight investments into the adopter garden. */
+  /** True once $GROWTOO payment (or program buy) was recorded — not a pre-pay reservation. */
+  function hasConfirmedPayment(listing) {
+    const sig = String(listing.paymentSignature || listing.buySignature || '');
+    if (!sig || sig.indexOf('pending-') === 0) return false;
+    return sig.length >= 32;
+  }
+
+  /**
+   * Pull settled / in-flight investments into the adopter garden.
+   * Do not adopt on bare sale_pending reservations (pre-payment) — that left
+   * orphan "Settlement pending" cards when pay failed (e.g. no $GROWTOO ATA).
+   * Also drop garden orphans when the listing is open again without this buyer.
+   */
   function syncMyInvestments() {
     const user = currentUser();
     const PT = window.PlantToken;
     if (!user || !PT || typeof PT.adoptFromListing !== 'function') return;
+
     listings.forEach(function (l) {
       if (l.buyerUid !== user.uid) return;
-      if (l.status !== 'sold' && l.status !== 'sale_pending') return;
-      try {
-        PT.adoptFromListing(l);
-      } catch (err) {
-        console.warn('adoptFromListing failed', err);
+      if (l.status === 'sold') {
+        try {
+          PT.adoptFromListing(l);
+        } catch (err) {
+          console.warn('adoptFromListing failed', err);
+        }
+        return;
+      }
+      if (l.status === 'sale_pending' && hasConfirmedPayment(l)) {
+        try {
+          PT.adoptFromListing(l);
+        } catch (err) {
+          console.warn('adoptFromListing failed', err);
+        }
       }
     });
+
+    if (typeof PT.pruneAbandonedAdoptions === 'function') {
+      try {
+        PT.pruneAbandonedAdoptions(listings, user.uid);
+      } catch (err) {
+        console.warn('pruneAbandonedAdoptions failed', err);
+      }
+    }
   }
 
   // --- actions ----------------------------------------------------------------
@@ -943,6 +973,25 @@
           (listing.lockedGrow != null ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO' : '') +
           '</p>'
         : '';
+    let phaseRail = '';
+    if (window.StatusRail) {
+      if (isBuyer || listing.status === 'sale_pending' || listing.status === 'sold') {
+        phaseRail = StatusRail.investPipeline(listing) || '';
+      }
+      if (!phaseRail && (isMine || listing.status === 'escrow_pending' || listing.status === 'cancel_requested' || listing.status === 'failed' || listing.status === 'active' || listing.status === 'cancelled')) {
+        // Grower-facing listing lifecycle (and open offers get a quiet Live rail).
+        if (
+          isMine ||
+          listing.status === 'escrow_pending' ||
+          listing.status === 'cancel_requested' ||
+          listing.status === 'failed' ||
+          listing.status === 'cancelled' ||
+          (listing.status === 'active' && isGrowerUi())
+        ) {
+          phaseRail = StatusRail.listingPipeline(listing) || '';
+        }
+      }
+    }
     const priceLabel =
       listing.status === 'sold' || listing.status === 'sale_pending'
         ? 'Stake / sale'
@@ -972,6 +1021,7 @@
       ((showStrain || listing.batch) && listing.stage ? ' · ' : '') +
       (listing.stage ? esc(listing.stage) : '') +
       '</p>' +
+      phaseRail +
       offerExplainHtml(listing) +
       careLine +
       '<p class="market-card-meta">NFT: <a href="' +
