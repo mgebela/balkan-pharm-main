@@ -81,8 +81,16 @@
   function normalizeWalletError(err) {
     if (!err) return 'Something went wrong.';
     if (typeof err === 'string') return err;
+    const raw = String(err.message || err.error || '');
+    if (
+      err.code === 4001 ||
+      err.code === '4001' ||
+      /^(cancelled|canceled|user rejected|rejected by user)/i.test(raw.trim()) ||
+      /user rejected|request rejected|user cancelled|user canceled/i.test(raw)
+    ) {
+      return 'Signature cancelled in wallet. Tap Link account and approve the message to finish.';
+    }
     if (err.message) return err.message;
-    if (err.code === 4001 || err.code === '4001') return 'Request cancelled in wallet.';
     if (err.code === 'permission-denied') {
       return 'Could not save wallet link. Deploy the latest Firestore rules: firebase deploy --only firestore:rules';
     }

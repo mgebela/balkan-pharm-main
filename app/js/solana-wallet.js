@@ -291,9 +291,18 @@
         if (typeof provider.signMessage !== 'function') {
           throw new Error(name + ' does not support signMessage.');
         }
-        const result = await provider.signMessage(bytes, 'utf8');
-        if (result && result.signature) return result;
-        return result;
+        // Solflare often cancels if display encoding is wrong; try utf8 then bare bytes.
+        try {
+          const result = await provider.signMessage(bytes, 'utf8');
+          if (result && result.signature) return result;
+          return result;
+        } catch (err) {
+          const msg = String((err && err.message) || err || '');
+          if (/cancel|reject|4001/i.test(msg)) throw err;
+          const result = await provider.signMessage(bytes);
+          if (result && result.signature) return result;
+          return result;
+        }
       },
       signTransaction: async function (transaction) {
         if (typeof provider.signTransaction !== 'function') {

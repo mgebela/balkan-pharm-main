@@ -337,19 +337,33 @@
         if (window.WalletLink) {
           try {
             const profile = WalletLink.getProfile();
+            const alreadyLinked =
+              !!profile.solanaPubkey && profile.solanaPubkey === address;
+            if (alreadyLinked) {
+              wallet.linkError = '';
+              writeWallet(wallet);
+              return wallet;
+            }
             const force =
               !!profile.solanaPubkey && profile.solanaPubkey !== address;
             if (force) {
               // Replacing this account's linked wallet after an explicit connect.
               await WalletLink.unlinkWallet();
             }
+            // Let Solflare/Phantom finish the connect popup before signMessage.
+            // Immediate second prompts often return "Cancelled" and confuse users.
+            await new Promise(function (resolve) {
+              setTimeout(resolve, 700);
+            });
             await WalletLink.linkWallet(address);
             wallet.linkError = '';
             writeWallet(wallet);
           } catch (linkErr) {
             console.warn('Wallet account link failed', linkErr);
             wallet.linkError =
-              window.WalletLink.formatError ? WalletLink.formatError(linkErr) : linkErr.message || 'Account link failed.';
+              window.WalletLink.formatError
+                ? WalletLink.formatError(linkErr)
+                : linkErr.message || 'Account link failed.';
             writeWallet(wallet);
           }
         }
@@ -2031,6 +2045,18 @@
 
   async function handleWalletConnect(btn) {
     if (busy) return;
+    const existing = readWallet();
+    // Already connected but not linked: don't re-open a dead Solflare popup —
+    // go straight to the link signature (or tell the user to disconnect first).
+    if (
+      existing.connected &&
+      existing.address &&
+      window.WalletLink &&
+      !WalletLink.isLinked()
+    ) {
+      await handleWalletLink(btn);
+      return;
+    }
     const original = btn ? btn.textContent : '';
     if (btn) btn.textContent = 'Choose wallet…';
     // Do not set global busy while the picker is open — Solflare may stay
@@ -2041,11 +2067,18 @@
       render();
       renderGlobalWalletUI();
       if (wallet && wallet.linkError) {
-        alert(
-          'Wallet connected, but account link failed:\n\n' +
-            wallet.linkError +
-            '\n\nUse "Link account" to try again.'
-        );
+        const soft = /cancel|signature cancelled/i.test(String(wallet.linkError));
+        const msg =
+          'Wallet connected.\n\n' +
+          wallet.linkError +
+          (soft
+            ? '\n\nSolflare stays connected — tap Link account and approve the signature (no new connect popup).'
+            : '\n\nUse "Link account" to try again.');
+        if (window.DnevnikNotifications) {
+          DnevnikNotifications.toast(wallet.linkError, soft ? 'warn' : 'error');
+        } else {
+          alert(msg);
+        }
       }
     } catch (err) {
       // Ignore cancel; surface real errors.
