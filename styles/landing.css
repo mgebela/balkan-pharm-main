@@ -37,6 +37,9 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: clip;
+  /* Prevent mobile Safari scroll flashes: transparent sections must not reveal white root. */
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 body {
@@ -639,7 +642,7 @@ body:has(.devnet-banner) .header {
 .desk-section--journal {
   background:
     radial-gradient(700px 320px at 20% 0%, rgba(180, 110, 40, 0.1), transparent 55%),
-    transparent;
+    #0a1511;
 }
 
 .desk-panel--journal {
@@ -1364,7 +1367,7 @@ body:has(.devnet-banner) .header {
 }
 
 .desk-section--alt {
-  background: rgba(0, 0, 0, 0.18);
+  background: #0a1410;
   border-top: 1px solid var(--desk-line);
   border-bottom: 1px solid var(--desk-line);
 }
@@ -1468,7 +1471,7 @@ body:has(.devnet-banner) .header {
 }
 
 .section-alt {
-  background: rgba(0, 0, 0, 0.18);
+  background: #0a1410;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
 }
@@ -1979,7 +1982,7 @@ body:has(.devnet-banner) .header {
   color: var(--text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  z-index: 102;
+  z-index: 230;
   position: relative;
 }
 
@@ -2002,18 +2005,23 @@ body:has(.devnet-banner) .header {
   transform: translateY(-7px) rotate(-45deg);
 }
 
+/* Sibling of header so sticky backdrop-filter does not clip fixed inset */
 .nav-overlay {
-  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 98;
+  z-index: 210;
+  background: rgba(2, 8, 5, 0.62);
   opacity: 0;
-  transition: opacity 0.2s;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .nav-overlay.is-open {
   opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 @media (max-width: 960px) {
@@ -2021,26 +2029,32 @@ body:has(.devnet-banner) .header {
     display: flex;
   }
 
+  .header {
+    z-index: 220;
+  }
+
   .nav {
     position: fixed;
     top: 0;
     right: 0;
-    width: min(280px, 85vw);
+    width: min(22rem, calc(100vw - 2.75rem));
     height: 100%;
     height: 100dvh;
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
     gap: 0;
-    padding: 4.5rem 1.25rem 1.5rem;
-    background: #0c1812;
+    padding: 5rem 1.5rem 2rem;
+    background: #0a1410;
     border-left: 1px solid var(--border);
-    z-index: 101;
+    z-index: 225;
     transform: translateX(100%);
     transition: transform 0.25s ease, visibility 0.25s;
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.45);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.55);
     visibility: hidden;
     pointer-events: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav.is-open {
@@ -2052,25 +2066,36 @@ body:has(.devnet-banner) .header {
   .nav .nav-link {
     color: var(--text);
     display: flex;
-    padding: 0.85rem 0;
-    font-size: 1.05rem;
-    border-bottom: 1px solid var(--border);
-    min-height: 44px;
+    padding: 1rem 0.35rem;
+    font-size: 1.08rem;
+    border-bottom: 1px solid rgba(140, 200, 140, 0.14);
+    min-height: 52px;
     align-items: center;
   }
 
-  .nav .btn-primary {
-    margin-top: 0.5rem;
+  .nav .nav-cta,
+  .nav .btn-primary.nav-cta {
+    margin-top: 1.35rem;
+    padding: 0.95rem 1.15rem;
+    min-height: 52px;
     text-align: center;
     justify-content: center;
-  }
-
-  .nav-overlay.is-open {
-    display: block;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   body.nav-open {
     overflow: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    width: 100%;
+    border-left: none;
+    padding: 5rem 1.35rem 2.25rem;
   }
 }
 
@@ -3517,6 +3542,7 @@ body:has(.devnet-banner) .header {
 .desk-section--proof {
   padding-top: 3.5rem;
   padding-bottom: 3.25rem;
+  background: #08120e;
 }
 
 .proof-chain {
@@ -3590,6 +3616,7 @@ body:has(.devnet-banner) .header {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 1.75rem 2rem;
   align-items: start;
+  text-align: left;
 }
 
 .audience-grid--flip .audience-copy {
@@ -3598,6 +3625,10 @@ body:has(.devnet-banner) .header {
 
 .audience-grid--flip .audience-panel {
   order: 1;
+}
+
+.audience-copy {
+  text-align: left;
 }
 
 .audience-copy .desk-tag {
@@ -3620,13 +3651,16 @@ body:has(.devnet-banner) .header {
 
 .audience-bullets {
   margin: 0 0 1.25rem;
-  padding: 0 0 0 1.1rem;
+  padding: 0 0 0 1.15rem;
   color: var(--text-muted);
+  text-align: left;
+  list-style-position: outside;
 }
 
 .audience-bullets li {
-  margin-bottom: 0.4rem;
-  line-height: 1.4;
+  margin-bottom: 0.45rem;
+  line-height: 1.45;
+  text-align: left;
 }
 
 .desk-section--board {
@@ -3849,7 +3883,7 @@ body:has(.devnet-banner) .header {
 .desk-section--adopter {
   background:
     radial-gradient(700px 320px at 80% 0%, rgba(42, 143, 160, 0.12), transparent 55%),
-    transparent;
+    #08120e;
 }
 
 .desk-panel--adopter {
@@ -4407,7 +4441,7 @@ body:has(.devnet-banner) .header {
   padding-bottom: 2.75rem;
   background:
     radial-gradient(80% 60% at 90% 0%, rgba(180, 71, 43, 0.08) 0%, transparent 55%),
-    linear-gradient(180deg, rgba(6, 16, 11, 0.4) 0%, transparent 100%);
+    #08120e;
 }
 
 .stakes-desk {
