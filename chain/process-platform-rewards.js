@@ -11,6 +11,8 @@
  *   + 3 per qualifying care week that month
  *   + 10 if any linked growth mint reached flowering or harvest that month
  *
+ * Also processes source: 'adopter_faucet' docs (fixed test mint, no scoring).
+ *
  * Usage: node process-platform-rewards.js [--watch]
  */
 import { publicKey, transactionBuilder } from '@metaplex-foundation/umi';
@@ -148,27 +150,76 @@ function scorePlatformReward(parts) {
 
 async function processDoc(doc) {
   const data = doc.data();
-  const label = `platform ${data.uid || doc.id} ${data.monthKey || ''}`;
+  const label = `platform ${data.uid || doc.id} ${data.monthKey || data.dayKey || ''}`;
   if (data.status !== 'pending') return;
   if (!(await tryClaimLease(doc.ref))) {
     console.log(`… ${label}: leased, skipping`);
     return;
   }
   try {
-    const bounds = monthBounds(data.monthKey);
-    if (!bounds) throw new Error('Invalid monthKey (expected YYYY-MM)');
     if (!data.uid) throw new Error('uid required');
     if (!data.recipient) throw new Error('recipient pubkey required');
 
-    // Idempotency: only one minted reward per uid+monthKey
+    // Adopter Devnet test faucet — fixed mint, no grower activity scoring.
+    if (data.source === 'adopter_faucet') {
+      const amount = Math.max(1, Math.min(500, Number(data.amount || 100)));
+      const recipient = publicKey(data.recipient);
+      const token = findAssociatedTokenPda(umi, { mint: GROW_MINT, owner: recipient });
+      const rewardResult = await transactionBuilder()
+        .add(createTokenIfMissing(umi, { mint: GROW_MINT, owner: recipient }))
+        .add(
+          mintTokensTo(umi, {
+            mint: GROW_MINT,
+            token,
+            amount: BigInt(amount) * 10n ** BigInt(GROW_DECIMALS),
+          })
+        )
+        .sendAndConfirm(umi);
+      const rewardSignature = base58.deserialize(rewardResult.signature)[0];
+
+      await doc.ref.update({
+        status: 'minted',
+        reward: amount,
+        rewardSignature,
+        mintedAt: new Date().toISOString(),
+        mintedBy: workerId(),
+        source: 'adopter_faucet',
+        error: FieldValue.delete(),
+      });
+      console.log(`✔ faucet ${label}: minted ${amount} $GROWTOO → ${data.recipient}`);
+      try {
+        await notifyUser(db, data.uid, {
+          type: 'test_faucet',
+          title: 'Test $GROWTOO claimed',
+          body:
+            '+' +
+            amount +
+            ' $GROWTOO sent to your Devnet wallet. You can Invest on the market.',
+          meta: { dayKey: data.dayKey, reward: amount, key: 'faucet-mint:' + doc.id },
+          action: { view: 'market' },
+          source: 'process-platform-rewards',
+        });
+      } catch (notifyErr) {
+        console.warn('notify faucet failed', notifyErr.message || notifyErr);
+      }
+      return;
+    }
+
+    const bounds = monthBounds(data.monthKey);
+    if (!bounds) throw new Error('Invalid monthKey (expected YYYY-MM)');
+
+    // Idempotency: only one minted *platform* reward per uid+monthKey (faucets excluded).
     const prior = await db
       .collection('platformRewards')
       .where('uid', '==', data.uid)
       .where('monthKey', '==', data.monthKey)
       .where('status', '==', 'minted')
-      .limit(1)
       .get();
-    if (!prior.empty && prior.docs[0].id !== doc.id) {
+    const conflict = prior.docs.find((d) => {
+      if (d.id === doc.id) return false;
+      return (d.data() || {}).source !== 'adopter_faucet';
+    });
+    if (conflict) {
       throw new Error('Platform bonus already minted for this month.');
     }
 

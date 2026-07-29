@@ -112,7 +112,7 @@
       )
     ) {
       return new Error(
-        'Your wallet still needs a $GROWTOO token account funded on Devnet. Ask a grower for a test transfer (or use the team faucet), then try Invest again.'
+        'Your wallet still needs a $GROWTOO token account funded on Devnet. Claim the adopter test faucet on Market, then try Invest again.'
       );
     }
     if (/insufficient|0x1\b|custom program error: 0x1/i.test(blob)) {
@@ -305,7 +305,7 @@
     const exists = await accountExists(connection, buyerGrow);
     if (!exists) {
       throw new Error(
-        'This wallet has no $GROWTOO yet on Devnet. Ask a grower for a test transfer (or use the team faucet), then Invest again.'
+        'This wallet has no $GROWTOO yet on Devnet. Claim the test faucet on Market (adopter), then Invest again.'
       );
     }
     const bal = await connection.getTokenAccountBalance(buyerGrow, 'confirmed');

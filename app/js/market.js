@@ -1199,6 +1199,13 @@
             }).join('')
           : '<div class="empty-state">You have not posted any RWA offers yet.</div>';
       }
+      if (window.AdoptPlant && typeof AdoptPlant.renderTestFaucetPanel === 'function') {
+        try {
+          AdoptPlant.renderTestFaucetPanel();
+        } catch {
+          // ignore
+        }
+      }
     } finally {
       marketRenderBusy = false;
     }
@@ -1272,6 +1279,46 @@
       if (gardenEmptyBtn) {
         const adoptNav = document.querySelector('.nav-item[data-view="adopt"]');
         if (adoptNav) adoptNav.click();
+        return;
+      }
+
+      const faucetBtn = e.target.closest('#test-faucet-claim-btn');
+      if (faucetBtn) {
+        if (busy || faucetBtn.disabled) return;
+        if (typeof claimTestFaucet !== 'function') return;
+        busy = true;
+        const prev = faucetBtn.textContent;
+        faucetBtn.textContent = 'Claiming…';
+        faucetBtn.disabled = true;
+        try {
+          const result = await claimTestFaucet();
+          flashOk(
+            'Test faucet queued: +' +
+              (result && result.amount ? result.amount : TEST_FAUCET_AMOUNT) +
+              ' $GROWTOO. Mint usually lands within a few minutes.'
+          );
+          if (window.DnevnikNotifications) {
+            DnevnikNotifications.push({
+              type: 'test_faucet',
+              title: 'Test faucet claimed',
+              body: 'Queue is minting $GROWTOO to your Devnet wallet…',
+              meta: { key: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : '') },
+              action: { view: 'market' },
+              kind: 'info',
+              dedupKey: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : ''),
+              toast: false,
+            });
+          }
+          if (window.AdoptPlant && typeof AdoptPlant.renderTestFaucetPanel === 'function') {
+            AdoptPlant.renderTestFaucetPanel();
+          }
+        } catch (err) {
+          flash(err);
+          faucetBtn.textContent = prev;
+        } finally {
+          busy = false;
+          faucetBtn.disabled = false;
+        }
         return;
       }
 
@@ -1391,13 +1438,45 @@
     );
   }
 
+  function currentDayKey(d) {
+    const date = d || new Date();
+    return (
+      date.getUTCFullYear() +
+      '-' +
+      String(date.getUTCMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(date.getUTCDate()).padStart(2, '0')
+    );
+  }
+
+  const TEST_FAUCET_AMOUNT = 100;
+
   function platformBonusStatus() {
     const user = currentUser();
     if (!user) return null;
     const monthKey = currentMonthKey();
     return (
       platformRewards.find(function (r) {
-        return r.uid === user.uid && r.monthKey === monthKey;
+        return (
+          r.uid === user.uid &&
+          r.monthKey === monthKey &&
+          r.source !== 'adopter_faucet'
+        );
+      }) || null
+    );
+  }
+
+  function testFaucetStatus() {
+    const user = currentUser();
+    if (!user) return null;
+    const dayKey = currentDayKey();
+    return (
+      platformRewards.find(function (r) {
+        return (
+          r.uid === user.uid &&
+          r.source === 'adopter_faucet' &&
+          (r.dayKey === dayKey || String(r.id || '').indexOf('_faucet_' + dayKey) >= 0)
+        );
       }) || null
     );
   }
@@ -1475,6 +1554,54 @@
     });
   }
 
+  /** Adopter Devnet faucet: +100 $GROWTOO once per UTC day. */
+  async function claimTestFaucet() {
+    const user = currentUser();
+    if (!user) throw new Error('Sign in to claim test $GROWTOO.');
+    if (!isAdopterUi()) throw new Error('Switch to an adopter account to use the test faucet.');
+    const SW = await ensureSigningWallet('claim test $GROWTOO faucet');
+    const dayKey = currentDayKey();
+    const monthKey = currentMonthKey();
+    const docId = user.uid + '_faucet_' + dayKey;
+    const ref = firebase.firestore().collection('platformRewards').doc(docId);
+    const priorSnap = await ref.get();
+    if (priorSnap.exists) {
+      const st = (priorSnap.data() || {}).status;
+      if (st === 'pending' || st === 'minted') {
+        throw new Error(
+          'You already claimed today’s Devnet faucet (' +
+            dayKey +
+            '). Try again after UTC midnight.'
+        );
+      }
+      // failed → allow rewrite to pending
+      await ref.set({
+        uid: user.uid,
+        monthKey: monthKey,
+        dayKey: dayKey,
+        recipient: SW.getPublicKey(),
+        status: 'pending',
+        source: 'adopter_faucet',
+        amount: TEST_FAUCET_AMOUNT,
+        requestedAt: new Date().toISOString(),
+        cluster: 'devnet',
+      });
+      return { amount: TEST_FAUCET_AMOUNT, dayKey: dayKey };
+    }
+    await ref.set({
+      uid: user.uid,
+      monthKey: monthKey,
+      dayKey: dayKey,
+      recipient: SW.getPublicKey(),
+      status: 'pending',
+      source: 'adopter_faucet',
+      amount: TEST_FAUCET_AMOUNT,
+      requestedAt: new Date().toISOString(),
+      cluster: 'devnet',
+    });
+    return { amount: TEST_FAUCET_AMOUNT, dayKey: dayKey };
+  }
+
   window.Market = {
     render() {
       bindEvents();
@@ -1494,8 +1621,12 @@
     findAdoptStakeForMint: findAdoptStakeForMint,
     requestHarvestClaim: requestHarvestClaim,
     claimPlatformBonus: claimPlatformBonus,
+    claimTestFaucet: claimTestFaucet,
     currentMonthKey: currentMonthKey,
+    currentDayKey: currentDayKey,
     platformBonusStatus: platformBonusStatus,
+    testFaucetStatus: testFaucetStatus,
+    testFaucetAmount: TEST_FAUCET_AMOUNT,
   };
 
   if (firebaseReady()) {

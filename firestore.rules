@@ -472,7 +472,19 @@ service cloud.firestore {
       && request.resource.data.monthKey is string
       && request.resource.data.monthKey.matches('^[0-9]{4}-[0-9]{2}$')
       && isValidSolanaPubkey(request.resource.data.recipient)
-      && request.resource.data.keys().hasAll(['uid', 'monthKey', 'recipient', 'status', 'requestedAt']);
+      && request.resource.data.keys().hasAll(['uid', 'monthKey', 'recipient', 'status', 'requestedAt'])
+      && (
+        !('source' in request.resource.data)
+        || request.resource.data.source == 'platform'
+        || (
+          request.resource.data.source == 'adopter_faucet'
+          && request.resource.data.dayKey is string
+          && request.resource.data.dayKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && request.resource.data.amount is number
+          && request.resource.data.amount >= 1
+          && request.resource.data.amount <= 500
+        )
+      );
 
     allow update: if signedIn()
       && resource.data.uid == request.auth.uid

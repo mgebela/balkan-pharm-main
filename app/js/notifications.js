@@ -565,25 +565,43 @@
         snap.forEach(function (doc) {
           const d = Object.assign({ id: doc.id }, doc.data());
           trackStatusTransition('platform', d.id, d.status, function (from, to) {
+            const isFaucet = d.source === 'adopter_faucet';
             if (to === 'minted') {
               push({
-                type: 'platform_bonus',
-                title: 'Platform bonus minted',
-                body: '+' + (d.reward || 0) + ' $GROWTOO for ' + (d.monthKey || 'this month') + '.',
-                meta: { key: 'platform:' + d.id + ':minted', monthKey: d.monthKey },
-                action: { view: 'adopt' },
+                type: isFaucet ? 'test_faucet' : 'platform_bonus',
+                title: isFaucet ? 'Test $GROWTOO claimed' : 'Platform bonus minted',
+                body:
+                  '+' +
+                  (d.reward || 0) +
+                  ' $GROWTOO' +
+                  (isFaucet
+                    ? ' sent to your Devnet wallet.'
+                    : ' for ' + (d.monthKey || 'this month') + '.'),
+                meta: {
+                  key: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':minted',
+                  monthKey: d.monthKey,
+                  dayKey: d.dayKey,
+                },
+                action: { view: isFaucet ? 'market' : 'adopt' },
                 kind: 'success',
-                dedupKey: 'platform:' + d.id + ':minted',
+                dedupKey: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':minted',
               });
             } else if (to === 'failed') {
               push({
-                type: 'platform_bonus',
-                title: 'Platform bonus failed',
-                body: d.error || 'Try claiming again next month window.',
-                meta: { key: 'platform:' + d.id + ':failed', monthKey: d.monthKey },
-                action: { view: 'adopt' },
+                type: isFaucet ? 'test_faucet' : 'platform_bonus',
+                title: isFaucet ? 'Test faucet failed' : 'Platform bonus failed',
+                body:
+                  d.error ||
+                  (isFaucet
+                    ? 'Retry the faucet claim from Market.'
+                    : 'Try claiming again next month window.'),
+                meta: {
+                  key: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':failed',
+                  monthKey: d.monthKey,
+                },
+                action: { view: isFaucet ? 'market' : 'adopt' },
                 kind: 'error',
-                dedupKey: 'platform:' + d.id + ':failed',
+                dedupKey: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':failed',
               });
             }
           });

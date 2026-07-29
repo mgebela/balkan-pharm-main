@@ -1990,6 +1990,54 @@
   let renderAdoptBusy = false;
   let renderWalletUiBusy = false;
 
+  function renderTestFaucetPanel() {
+    const el = document.getElementById('test-faucet-panel');
+    if (!el) return;
+    if (!isAdopterUi()) {
+      el.innerHTML = '';
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    const amount =
+      window.Market && Market.testFaucetAmount != null ? Number(Market.testFaucetAmount) : 100;
+    const status =
+      window.Market && typeof Market.testFaucetStatus === 'function'
+        ? Market.testFaucetStatus()
+        : null;
+    let body =
+      '<div class="test-faucet-card">' +
+      '<div class="test-faucet-copy">' +
+      '<strong>Devnet test faucet</strong>' +
+      '<p>Claim <strong>' +
+      esc(String(amount)) +
+      ' $GROWTOO</strong> once per UTC day to your connected wallet — enough to try Invest / adopt stake.</p>' +
+      '</div>';
+
+    if (status && status.status === 'minted') {
+      body +=
+        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed today: <strong>+' +
+        esc(String(status.reward || amount)) +
+        ' $GROWTOO</strong>. Next claim after UTC midnight.</p>';
+    } else if (status && status.status === 'pending') {
+      body +=
+        '<p class="market-hint">Faucet pending in the rewards queue… usually within a few minutes.</p>';
+    } else if (status && status.status === 'failed') {
+      body +=
+        '<p class="market-card-error">' +
+        esc(status.error || 'Claim failed') +
+        '</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">Retry faucet</button>';
+    } else {
+      body +=
+        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">Claim ' +
+        esc(String(amount)) +
+        ' $GROWTOO</button>';
+    }
+    body += '</div>';
+    el.innerHTML = body;
+  }
+
   function renderPlatformBonusPanel() {
     const el = document.getElementById('platform-bonus-panel');
     if (!el) return;
@@ -2058,6 +2106,7 @@
       }
       renderWalletPanel(wallet);
       renderPlatformBonusPanel();
+      renderTestFaucetPanel();
       renderAdopterSummary(wallet);
       if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
       // Adopters always see the garden (empty state guides them). Growers when connected/tokens.
@@ -2571,6 +2620,45 @@
         return;
       }
 
+      const faucetBtn = e.target.closest('#test-faucet-claim-btn');
+      if (faucetBtn) {
+        if (busy || faucetBtn.disabled) return;
+        if (!window.Market || typeof Market.claimTestFaucet !== 'function') {
+          flashError(new Error('Test faucet is not available.'));
+          return;
+        }
+        setBusy(true);
+        const original = faucetBtn.textContent;
+        faucetBtn.textContent = 'Claiming…';
+        try {
+          const result = await Market.claimTestFaucet();
+          flashOk(
+            'Test faucet queued: +' +
+              (result && result.amount ? result.amount : 100) +
+              ' $GROWTOO. Mint usually lands within a few minutes.'
+          );
+          if (window.DnevnikNotifications) {
+            DnevnikNotifications.push({
+              type: 'test_faucet',
+              title: 'Test faucet claimed',
+              body: 'Queue is minting $GROWTOO to your Devnet wallet…',
+              meta: { key: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : '') },
+              action: { view: 'market' },
+              kind: 'info',
+              dedupKey: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : ''),
+              toast: false,
+            });
+          }
+          renderTestFaucetPanel();
+        } catch (err) {
+          flashError(err);
+          faucetBtn.textContent = original;
+        } finally {
+          setBusy(false);
+        }
+        return;
+      }
+
       const linkPlantBtn = e.target.closest('.adopt-link-plant-btn');
       if (linkPlantBtn) {
         if (busy) return;
@@ -2753,6 +2841,7 @@
     },
 
     renderGlobalWalletUI: renderGlobalWalletUI,
+    renderTestFaucetPanel: renderTestFaucetPanel,
 
     applyProfileType(type) {
       applyProfileChrome();
