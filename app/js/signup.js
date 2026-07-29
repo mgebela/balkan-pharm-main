@@ -74,8 +74,12 @@
       return { ok: false, error: 'Enter a display name.' };
     }
 
+    if (!raw.acceptedAge) {
+      return { ok: false, error: 'Confirm you are 18 or older to continue.' };
+    }
+
     if (!raw.acceptedTerms) {
-      return { ok: false, error: 'Please accept the terms to continue.' };
+      return { ok: false, error: 'Please accept the Terms and Privacy Policy to continue.' };
     }
 
     /** @type {SignupPayload} */
@@ -83,6 +87,7 @@
       profileType: profileType,
       displayName: displayName,
       acceptedTerms: true,
+      acceptedAge: true,
       authProvider: raw.authProvider === 'google' ? 'google' : 'email',
     };
 
@@ -211,6 +216,7 @@
     setField('displayName', trimStr(payload.displayName, 64));
     if (payload.authProvider) setField('authProvider', payload.authProvider === 'google' ? 'google' : 'email');
     if (payload.acceptedTerms) setField('acceptedTerms', true);
+    if (payload.acceptedAge) setField('acceptedAge', true);
 
     if (profileType === PROFILE_TYPES.grower) {
       var setup = normalizeGrowSetup(payload.growSetup);

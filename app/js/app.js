@@ -1906,6 +1906,9 @@ function initFirebaseSync() {
       if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
         window.AdoptPlant.renderGlobalWalletUI();
       }
+      if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
+        window.AICoach.applyVisibility();
+      }
       renderGrowlog(extra);
       return;
     }
@@ -1943,6 +1946,19 @@ function initFirebaseSync() {
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
+    }
+    if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
+      window.AICoach.applyVisibility();
+    }
+    if (
+      window.DnevnikNotifications &&
+      typeof window.DnevnikNotifications.syncCareDueFromCoach === 'function'
+    ) {
+      try {
+        window.DnevnikNotifications.syncCareDueFromCoach();
+      } catch {
+        // ignore
+      }
     }
 
     maybeNotifyCareProgress();
@@ -2399,9 +2415,96 @@ function initFirebaseSync() {
       }
     }
 
+    const adoptSection = document.getElementById('dashboard-adopt-section');
+    const quickSection = document.getElementById('dashboard-quick-section');
+    const quickEl = document.getElementById('dashboard-quick-actions');
+    const isEmptyGrower = !isAdopterProfile() && plants.length === 0;
+    const isEmptyAdopter = isAdopterProfile() && tokenCount === 0;
+
+    const hasWaterLog = entries.some((e) => e && e.type === 'zalijevanje');
+    let coachTried = false;
+    try {
+      coachTried =
+        localStorage.getItem('dnevnik-live-coach-trust-seen') === '1' ||
+        localStorage.getItem('dnevnik-live-getting-started-coach') === '1';
+    } catch {
+      coachTried = false;
+    }
+    const hasMint = tokenCount > 0;
+    const showGettingStarted =
+      !isAdopterProfile() && (!plants.length || !hasWaterLog || !coachTried);
+
+    function checklistItem(done, label, actionId, actionLabel) {
+      return (
+        '<li class="getting-started-item' +
+        (done ? ' is-done' : '') +
+        '">' +
+        '<span class="getting-started-check" aria-hidden="true">' +
+        (done ? '✓' : '') +
+        '</span>' +
+        '<span class="getting-started-label">' +
+        label +
+        '</span>' +
+        (done || !actionId
+          ? ''
+          : '<button type="button" class="btn btn-ghost btn-sm getting-started-action" data-gs-action="' +
+            actionId +
+            '">' +
+            actionLabel +
+            '</button>') +
+        '</li>'
+      );
+    }
+
     if (metricsEl && window.MetricUI) {
       const M = MetricUI;
-      if (isAdopterProfile()) {
+      if (showGettingStarted) {
+        metricsEl.innerHTML =
+          '<div class="dashboard-first-run" role="status">' +
+          '<p class="dashboard-first-run-eyebrow">Getting started</p>' +
+          '<h2 class="dashboard-first-run-title">' +
+          (plants.length ? 'Keep the streak going' : 'Start your grow journal') +
+          '</h2>' +
+          '<p class="dashboard-first-run-body">A short checklist — then your stats fill in with real activity.</p>' +
+          '<ol class="getting-started-list">' +
+          checklistItem(!!plants.length, 'Add your first plant', 'add-plant', 'Add plant') +
+          checklistItem(hasWaterLog, 'Log a watering', 'log-water', 'Log watering') +
+          checklistItem(coachTried, 'Try Grower Coach', 'open-coach', 'Ask Coach') +
+          checklistItem(hasMint, 'Mint a stage token (optional)', 'open-tokenise', 'Tokenise') +
+          '</ol>' +
+          '</div>';
+        metricsEl.querySelectorAll('[data-gs-action]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const action = btn.getAttribute('data-gs-action');
+            if (action === 'add-plant') {
+              if (blockAdminWrite()) return;
+              openPlantModal();
+            } else if (action === 'log-water') {
+              quickLogWatering();
+            } else if (action === 'open-coach') {
+              try {
+                localStorage.setItem('dnevnik-live-getting-started-coach', '1');
+              } catch {
+                // ignore
+              }
+              if (window.AICoach) AICoach.open();
+              renderDashboard();
+            } else if (action === 'open-tokenise') {
+              showView('adopt');
+            }
+          });
+        });
+      } else if (isEmptyAdopter) {
+        metricsEl.innerHTML =
+          '<div class="dashboard-first-run" role="status">' +
+          '<p class="dashboard-first-run-eyebrow">My garden</p>' +
+          '<h2 class="dashboard-first-run-title">No adopted plants yet</h2>' +
+          '<p class="dashboard-first-run-body">Browse the market for open offers, then invest with test $GROWTOO when you are ready.</p>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-open-market">Browse market</button>' +
+          '</div>';
+        const marketBtn = document.getElementById('dashboard-open-market');
+        if (marketBtn) marketBtn.addEventListener('click', () => showView('market'));
+      } else if (isAdopterProfile()) {
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
@@ -2427,6 +2530,7 @@ function initFirebaseSync() {
                 M.row('Network', 'test network', 'metric-dot--teal') +
                 M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
               modifier: 'teal',
+              attention: !walletLinked,
             }) +
             M.card({
               label: 'Market',
@@ -2435,6 +2539,7 @@ function initFirebaseSync() {
                 M.row('Action', 'Follow plant trails', 'metric-dot--amber') +
                 M.row('Profile', 'Adopter', 'metric-dot--violet'),
               modifier: 'violet',
+              attention: true,
             })
         );
       } else {
@@ -2474,26 +2579,69 @@ function initFirebaseSync() {
             }) +
             M.card({
               label: 'Solana wallet',
-              value: walletDisplay,
+              value: walletLinked ? walletDisplay : 'Not linked',
               meta:
-                M.row('Network', 'devnet', 'metric-dot--teal') +
-                M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
+                M.row('Network', 'test network', 'metric-dot--teal') +
+                M.row(
+                  'Next step',
+                  walletLinked ? 'Ready to sign' : 'Optional — for Tokenise',
+                  walletLinked ? 'metric-dot--teal' : 'metric-dot--amber'
+                ),
               modifier: 'teal',
+              attention: !walletLinked,
             })
         );
       }
     }
 
-    if (window.AdoptPlant && typeof window.AdoptPlant.renderDashboard === 'function') {
+    if (quickSection && quickEl) {
+      const showQuick = !isAdopterProfile() && plants.length > 0;
+      quickSection.hidden = !showQuick;
+      if (showQuick) {
+        quickEl.innerHTML =
+          '<div class="dashboard-quick-bar">' +
+          '<p class="dashboard-quick-label">Quick log</p>' +
+          '<button type="button" class="btn btn-primary btn-tap" id="dashboard-log-water">Log watering</button>' +
+          '<button type="button" class="btn btn-ghost btn-tap" id="dashboard-log-feed">Log feeding</button>' +
+          '<button type="button" class="btn btn-ghost btn-tap" id="dashboard-add-plant-quick">+ Plant</button>' +
+          '</div>';
+        const waterBtn = document.getElementById('dashboard-log-water');
+        const feedBtn = document.getElementById('dashboard-log-feed');
+        const addQuick = document.getElementById('dashboard-add-plant-quick');
+        if (waterBtn) waterBtn.addEventListener('click', () => quickLogWatering());
+        if (feedBtn) feedBtn.addEventListener('click', () => quickLogFeeding());
+        if (addQuick) {
+          addQuick.addEventListener('click', () => {
+            if (blockAdminWrite()) return;
+            openPlantModal();
+          });
+        }
+      } else {
+        quickEl.innerHTML = '';
+      }
+    }
+
+    if (adoptSection) {
+      adoptSection.hidden = showGettingStarted || isEmptyAdopter;
+    }
+    if (
+      !showGettingStarted &&
+      !isEmptyAdopter &&
+      window.AdoptPlant &&
+      typeof window.AdoptPlant.renderDashboard === 'function'
+    ) {
       window.AdoptPlant.renderDashboard(document.getElementById('dashboard-adopt-panel'), () => showView('adopt'));
+    } else if (adoptSection && (showGettingStarted || isEmptyAdopter)) {
+      const panel = document.getElementById('dashboard-adopt-panel');
+      if (panel) panel.innerHTML = '';
     }
 
     const chartsSection = document.getElementById('dashboard-charts-section');
     const recentSection = document.querySelector('#view-dashboard .recent-section');
-    if (chartsSection) chartsSection.hidden = isAdopterProfile();
-    if (recentSection) recentSection.hidden = isAdopterProfile();
+    if (chartsSection) chartsSection.hidden = isAdopterProfile() || showGettingStarted;
+    if (recentSection) recentSection.hidden = isAdopterProfile() || showGettingStarted;
 
-    if (isAdopterProfile()) {
+    if (isAdopterProfile() || showGettingStarted) {
       if (recentEl) recentEl.innerHTML = '';
       return;
     }
@@ -2538,6 +2686,54 @@ function initFirebaseSync() {
         if (hasEnv && typeof renderToolboxChart === 'function') renderToolboxChart('environment', document.getElementById('dashboard-chart-environment'));
       }
     }
+  }
+
+  function pickPlantForQuickLog() {
+    const plants = getPlants().filter((p) => p && p.id && !isSharedPlantId(p.id));
+    if (!plants.length) return null;
+    if (plants.length === 1) return plants[0];
+    const names = plants.map((p, i) => i + 1 + '. ' + p.name).join('\n');
+    const raw = window.prompt('Which plant?\n' + names + '\n\nEnter number or name:', '1');
+    if (raw == null) return null;
+    const trimmed = String(raw).trim();
+    const asNum = parseInt(trimmed, 10);
+    if (Number.isFinite(asNum) && asNum >= 1 && asNum <= plants.length) return plants[asNum - 1];
+    const lower = trimmed.toLowerCase();
+    return plants.find((p) => String(p.name || '').toLowerCase() === lower) || null;
+  }
+
+  function quickLogCare(type, note) {
+    if (blockAdminWrite()) return;
+    const plant = pickPlantForQuickLog();
+    if (!plant) {
+      if (!getPlants().length) {
+        openPlantModal();
+        return;
+      }
+      return;
+    }
+    try {
+      addJournalEntryProgrammatic({
+        plantId: plant.id,
+        type: type,
+        note: note,
+        meta: { source: 'dashboard-quick-log' },
+      });
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast('Logged for ' + plant.name, 'success');
+      }
+      renderDashboard();
+    } catch (err) {
+      alert((err && err.message) || 'Could not log entry.');
+    }
+  }
+
+  function quickLogWatering() {
+    quickLogCare('zalijevanje', 'Watered');
+  }
+
+  function quickLogFeeding() {
+    quickLogCare('gnojidba', 'Fed');
   }
 
   function escapeHtml(s) {
@@ -2904,18 +3100,132 @@ function initFirebaseSync() {
     if (fieldInput) fieldInput.focus();
   }
 
+  function showUndoToast(message, onUndo, ms) {
+    const host =
+      (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function'
+        ? document.getElementById('toast-host')
+        : null) || document.getElementById('toast-host');
+    let toastHost = host;
+    if (!toastHost) {
+      toastHost = document.createElement('div');
+      toastHost.id = 'toast-host';
+      toastHost.className = 'toast-host';
+      toastHost.setAttribute('aria-live', 'polite');
+      document.body.appendChild(toastHost);
+    }
+    const el = document.createElement('div');
+    el.className = 'toast toast--warn toast--undo';
+    el.innerHTML =
+      '<span class="toast-undo-msg"></span>' +
+      '<button type="button" class="toast-undo-btn">Undo</button>';
+    el.querySelector('.toast-undo-msg').textContent = message;
+    let undone = false;
+    let timer = null;
+    const cleanup = () => {
+      el.classList.remove('toast--show');
+      setTimeout(() => {
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 280);
+    };
+    el.querySelector('.toast-undo-btn').addEventListener('click', () => {
+      if (undone) return;
+      undone = true;
+      if (timer) clearTimeout(timer);
+      try {
+        onUndo();
+      } catch {
+        // ignore
+      }
+      cleanup();
+    });
+    toastHost.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('toast--show'));
+    timer = setTimeout(() => {
+      if (!undone) cleanup();
+    }, ms || 8000);
+  }
+
   function deletePlant(id) {
     if (blockWrite({ plantId: id })) return;
-    if (!confirm('Delete this plant?')) return;
-    const plants = getPlants().filter((p) => p.id !== id);
-    setPlants(plants);
-    const entries = getEntries().filter((e) => e.plantId !== id);
-    setEntries(entries);
+    const plant = getPlants().find((p) => p.id === id);
+    if (!plant) return;
+    if (
+      !confirm(
+        'Delete "' +
+          plant.name +
+          '" and its journal trail?\n\nYou can undo for a few seconds after.'
+      )
+    ) {
+      return;
+    }
+    const removedPlant = JSON.parse(JSON.stringify(plant));
+    const removedEntries = getEntries()
+      .filter((e) => e.plantId === id)
+      .map((e) => JSON.parse(JSON.stringify(e)));
+    setPlants(getPlants().filter((p) => p.id !== id));
+    setEntries(getEntries().filter((e) => e.plantId !== id));
     renderPlants();
     renderDashboard();
     fillEntryPlantSelect();
     fillJournalPlantFilter();
     if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+      // Brief notice; undo toast carries the recovery action.
+    }
+    showUndoToast('Plant deleted — undo available', () => {
+      setPlants(getPlants().concat([removedPlant]));
+      setEntries(getEntries().concat(removedEntries));
+      renderPlants();
+      renderDashboard();
+      fillEntryPlantSelect();
+      fillJournalPlantFilter();
+      if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
+      if (window.DnevnikNotifications) DnevnikNotifications.toast('Plant restored', 'success');
+    });
+  }
+
+  let plantWizardStep = 1;
+
+  function setPlantWizardStep(step) {
+    plantWizardStep = step === 2 ? 2 : 1;
+    const modal = document.getElementById('modal-plant');
+    const isCreate = modal && modal.classList.contains('plant-modal--create');
+    const step1 = document.getElementById('plant-form-step-1');
+    const step2 = document.getElementById('plant-form-step-2');
+    const advanced = document.getElementById('plant-form-advanced');
+    const progress = document.getElementById('plant-wizard-progress');
+    const backBtn = document.getElementById('plant-form-back');
+    const nextBtn = document.getElementById('plant-form-next');
+    const submitBtn = document.getElementById('plant-form-submit');
+    const createHint = document.getElementById('plant-form-create-hint');
+
+    if (!isCreate) {
+      if (step1) step1.hidden = false;
+      if (step2) step2.hidden = false;
+      if (advanced) advanced.hidden = false;
+      if (progress) progress.hidden = true;
+      if (backBtn) backBtn.hidden = true;
+      if (nextBtn) nextBtn.hidden = true;
+      if (createHint) createHint.hidden = true;
+      if (submitBtn) submitBtn.textContent = 'Save';
+      return;
+    }
+
+    if (progress) progress.hidden = false;
+    progress &&
+      progress.querySelectorAll('[data-wizard-label]').forEach(function (el) {
+        el.classList.toggle('is-active', String(el.getAttribute('data-wizard-label')) === String(plantWizardStep));
+      });
+    if (step1) step1.hidden = plantWizardStep !== 1;
+    if (step2) step2.hidden = plantWizardStep !== 2;
+    if (advanced) advanced.hidden = true;
+    if (createHint) createHint.hidden = plantWizardStep !== 1;
+    if (backBtn) backBtn.hidden = plantWizardStep !== 2;
+    if (nextBtn) nextBtn.hidden = plantWizardStep !== 1;
+    if (submitBtn) {
+      submitBtn.textContent = plantWizardStep === 1 ? 'Save plant' : 'Save plant';
+      submitBtn.hidden = false;
+    }
   }
 
   function openPlantModal(editId) {
@@ -2923,6 +3233,9 @@ function initFirebaseSync() {
     const modal = document.getElementById('modal-plant');
     const form = document.getElementById('form-plant');
     const titleEl = document.getElementById('modal-plant-title');
+    const isEdit = !!editId;
+    modal.classList.toggle('plant-modal--create', !isEdit);
+    modal.classList.toggle('plant-modal--edit', isEdit);
     const startDateInput = document.getElementById('plant-start-date');
     if (startDateInput) {
       startDateInput.removeAttribute('min');
@@ -3002,6 +3315,7 @@ function initFirebaseSync() {
       photoData.value = '';
       photoPreview.innerHTML = '';
     }
+    setPlantWizardStep(isEdit ? 0 : 1);
     updatePlantOutdoorFieldsVisibility();
     modal.classList.add('open');
   }
@@ -3014,6 +3328,22 @@ function initFirebaseSync() {
     if (blockAdminWrite()) return;
     openPlantModal();
   });
+
+  const plantFormNext = document.getElementById('plant-form-next');
+  if (plantFormNext) {
+    plantFormNext.addEventListener('click', () => {
+      const nameEl = document.getElementById('plant-name');
+      if (nameEl && !String(nameEl.value || '').trim()) {
+        nameEl.reportValidity();
+        return;
+      }
+      setPlantWizardStep(2);
+    });
+  }
+  const plantFormBack = document.getElementById('plant-form-back');
+  if (plantFormBack) {
+    plantFormBack.addEventListener('click', () => setPlantWizardStep(1));
+  }
 
   const plantEnvTypeEl = document.getElementById('plant-environment-type');
   if (plantEnvTypeEl) plantEnvTypeEl.addEventListener('change', updatePlantOutdoorFieldsVisibility);
@@ -3221,6 +3551,9 @@ function initFirebaseSync() {
       setEntries(getEntries().concat(journalAdds));
     }
     closePlantModal();
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+      DnevnikNotifications.toast(id ? 'Plant updated' : 'Plant added — ' + payload.name, 'success');
+    }
     renderPlants();
     renderDashboard();
     renderJournal();
@@ -3236,6 +3569,15 @@ function initFirebaseSync() {
 
   document.querySelector('#modal-plant .modal-close').addEventListener('click', closePlantModal);
   document.querySelector('#modal-plant .modal-cancel').addEventListener('click', closePlantModal);
+
+  function bindModalBackdropClose(modalEl, closeFn) {
+    if (!modalEl || modalEl.dataset.backdropBound === '1') return;
+    modalEl.dataset.backdropBound = '1';
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) closeFn();
+    });
+  }
+  bindModalBackdropClose(document.getElementById('modal-plant'), closePlantModal);
 
   // --- Journal ---
   function fillEntryPlantSelect() {
@@ -3380,10 +3722,15 @@ function initFirebaseSync() {
           }
         }
         return `
-          <div class="journal-entry">
+          <div class="journal-entry" data-entry-id="${escapeHtml(e.id)}">
             <div class="entry-meta">
               <span class="entry-type">${typeLabel}</span>
               ${plantName} · ${date}
+              ${
+                isSharedPlantId(e.plantId)
+                  ? ''
+                  : '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
+              }
             </div>
             <div class="entry-note">${escapeHtml(e.note || '')}</div>
             ${metaHtml ? '<div class="entry-meta-blocks">' + metaHtml + '</div>' : ''}
@@ -3392,6 +3739,38 @@ function initFirebaseSync() {
         `;
       })
       .join('');
+    container.querySelectorAll('.btn-delete-entry').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const wrap = btn.closest('.journal-entry');
+        const entryId = wrap && wrap.getAttribute('data-entry-id');
+        if (entryId) deleteJournalEntry(entryId);
+      });
+    });
+  }
+
+  function deleteJournalEntry(entryId) {
+    const entry = getEntries().find((e) => e && e.id === entryId);
+    if (!entry) return;
+    if (blockWrite({ plantId: entry.plantId })) return;
+    if (
+      !confirm(
+        'Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.'
+      )
+    ) {
+      return;
+    }
+    const removed = JSON.parse(JSON.stringify(entry));
+    setEntries(getEntries().filter((e) => e.id !== entryId));
+    renderJournal();
+    renderDashboard();
+    if (currentGrowlogPlantId === removed.plantId) renderGrowlog(removed.plantId);
+    showUndoToast('Entry deleted — undo available', () => {
+      setEntries(getEntries().concat([removed]));
+      renderJournal();
+      renderDashboard();
+      if (currentGrowlogPlantId === removed.plantId) renderGrowlog(removed.plantId);
+      if (window.DnevnikNotifications) DnevnikNotifications.toast('Entry restored', 'success');
+    });
   }
 
   const journalPlantFilterEl = document.getElementById('journal-plant-filter');
@@ -3618,6 +3997,10 @@ function initFirebaseSync() {
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+      const typeLabel = ENTRY_TYPE_LABELS[type] || type || 'Entry';
+      DnevnikNotifications.toast(typeLabel + ' logged', 'success');
+    }
     renderJournal();
     renderDashboard();
   });
@@ -3628,6 +4011,11 @@ function initFirebaseSync() {
     modalEntry.classList.remove('open');
   });
   modalEntry.querySelector('.modal-cancel').addEventListener('click', () => {
+    const plantSelect = document.getElementById('entry-plant');
+    if (plantSelect) plantSelect.disabled = false;
+    modalEntry.classList.remove('open');
+  });
+  bindModalBackdropClose(modalEntry, () => {
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');
@@ -3778,12 +4166,24 @@ function initFirebaseSync() {
       btn.addEventListener('click', () => {
         if (blockAdminWrite()) return;
         const id = btn.closest('.toolbox-list-item').dataset.id;
+        if (!confirm('Delete this Tools log?\n\nYou can undo for a few seconds after.')) return;
         const data = getToolboxData();
+        const removed = (data[tool] || []).find((x) => x.id === id);
+        if (!removed) return;
+        const snapshot = JSON.parse(JSON.stringify(removed));
         data[tool] = data[tool].filter((x) => x.id !== id);
         setToolboxData(data);
         renderToolboxList(tool);
         const chartEl = document.getElementById('toolbox-chart-' + tool);
         if (chartEl) renderToolboxChart(tool, chartEl);
+        showUndoToast('Tools log deleted — undo available', () => {
+          const next = getToolboxData();
+          next[tool] = (next[tool] || []).concat([snapshot]);
+          setToolboxData(next);
+          renderToolboxList(tool);
+          const chartRestore = document.getElementById('toolbox-chart-' + tool);
+          if (chartRestore) renderToolboxChart(tool, chartRestore);
+        });
       });
     });
   }

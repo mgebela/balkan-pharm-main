@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
+  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
   <style>
     :root {
       --bg: #0a1410;
@@ -397,11 +398,12 @@
     </div>
     <div class="field-block">
       <label for="password">Password</label>
-      <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6" />
+      <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="8" />
+      <p class="field-hint signup-only" id="password-hint" hidden>At least 8 characters. Use a unique password you don’t reuse elsewhere.</p>
     </div>
     <div class="field-block signup-only" id="field-password-confirm" hidden>
       <label for="password-confirm">Confirm password</label>
-      <input id="password-confirm" type="password" placeholder="••••••••" autocomplete="new-password" minlength="6" />
+      <input id="password-confirm" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" />
     </div>
 
     <div class="role-fields" id="signup-grower-fields" hidden>
@@ -460,9 +462,19 @@
       </label>
     </div>
 
+    <label class="check-row signup-only" id="field-accept-age" hidden>
+      <input type="checkbox" id="accept-age" />
+      <span>I confirm I am <strong>18 years of age or older</strong>.</span>
+    </label>
+
     <label class="check-row signup-only" id="field-accept-terms" hidden>
       <input type="checkbox" id="accept-terms" />
-      <span>I agree to the growtoo terms of use.</span>
+      <span>
+        I agree to the
+        <a href="../terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+        and
+        <a href="../privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
+      </span>
     </label>
 
     <button type="submit" id="submit-btn">Sign in</button>
@@ -481,13 +493,15 @@
     <p id="login-status" aria-live="polite"></p>
     <div class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
-  <script src="../app/js/signup.js?v=20260729c"></script>
+  <script src="../app/js/signup.js?v=20260729g"></script>
+  <script src="../js/site-trust.js?v=20260729g"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
       createUserWithEmailAndPassword,
+      sendEmailVerification,
       signInWithPopup,
       GoogleAuthProvider,
       onAuthStateChanged,
@@ -581,15 +595,21 @@
 
       const confirm = document.getElementById('password-confirm');
       const terms = document.getElementById('accept-terms');
+      const age = document.getElementById('accept-age');
+      const pwHint = document.getElementById('password-hint');
       const devnet = document.getElementById('accept-devnet');
       const displayName = document.getElementById('display-name');
       const homeCity = document.getElementById('home-city');
+      const password = document.getElementById('password');
 
       if (confirm) confirm.required = isSignup;
       if (terms) terms.required = isSignup;
+      if (age) age.required = isSignup;
+      if (pwHint) pwHint.hidden = !isSignup;
       if (displayName) displayName.required = isSignup;
       if (homeCity) homeCity.required = isSignup && profileType === 'grower';
       if (devnet) devnet.required = isSignup && profileType === 'adopter';
+      if (password) password.minLength = isSignup ? 8 : 6;
 
       submitBtn.classList.remove('submit--grower', 'submit--adopter');
       if (isSignup && profileType === 'grower') {
@@ -640,6 +660,7 @@
         profileType: profileType,
         displayName: document.getElementById('display-name').value.trim(),
         acceptedTerms: !!document.getElementById('accept-terms').checked,
+        acceptedAge: !!document.getElementById('accept-age').checked,
         growSetup: growSetup,
         homeCity: document.getElementById('home-city').value.trim(),
         growStyleNote: document.getElementById('grow-style-note').value.trim(),
@@ -753,6 +774,10 @@
           setStatus(checked.error, true);
           return;
         }
+        if (password.length < 8) {
+          setStatus('Password must be at least 8 characters.', true);
+          return;
+        }
         const confirm = document.getElementById('password-confirm').value;
         if (password !== confirm) {
           setStatus('Passwords do not match.', true);
@@ -769,8 +794,14 @@
       try {
         if (mode === 'signup') {
           const cred = await createUserWithEmailAndPassword(auth, email, password);
+          try {
+            await sendEmailVerification(cred.user);
+          } catch (verifyErr) {
+            console.warn('email verification', verifyErr);
+          }
           profileWritePromise = writeWebsiteProfile(cred.user);
           await profileWritePromise;
+          setStatus('Account created. Check your email to verify — opening the app…');
           goToApp(cred.user);
           return;
         }
@@ -789,7 +820,7 @@
         } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
           setStatus('Wrong email or password.', true);
         } else if (code === 'auth/weak-password') {
-          setStatus('Password must be at least 6 characters.', true);
+          setStatus('Password must be at least 8 characters.', true);
         } else if (code === 'auth/invalid-email') {
           setStatus('Invalid email address.', true);
         } else if (code === 'auth/popup-closed-by-user') {

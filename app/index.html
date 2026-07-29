@@ -7,7 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260729c" />
+  <link rel="stylesheet" href="styles/app.css?v=20260729h" />
+  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
 <body class="app-loading">
@@ -115,6 +116,18 @@
               <span>Platform controls</span>
             </span>
           </a>
+          <a href="../privacy/" class="more-nav-item more-nav-item--link" target="_blank" rel="noopener noreferrer">
+            <span class="more-nav-copy">
+              <strong>Privacy Policy</strong>
+              <span>How we handle your data</span>
+            </span>
+          </a>
+          <a href="../terms/" class="more-nav-item more-nav-item--link" target="_blank" rel="noopener noreferrer">
+            <span class="more-nav-copy">
+              <strong>Terms of Service</strong>
+              <span>Rules for using growtoo</span>
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -176,6 +189,9 @@
 
       <div id="view-dashboard" class="view active">
         <div id="dashboard-metrics" class="dashboard-metrics"></div>
+        <section class="dashboard-quick-section" id="dashboard-quick-section" hidden>
+          <div class="dashboard-quick-actions" id="dashboard-quick-actions"></div>
+        </section>
         <section class="dashboard-adopt-section" id="dashboard-adopt-section">
           <div id="dashboard-adopt-panel"></div>
         </section>
@@ -263,14 +279,14 @@
               <span class="adopter-guide-num">2</span>
               <div>
                 <strong>Connect a test-network wallet</strong>
-                <p>Phantom or Solflare on Devnet. Needed only when you tap Invest.</p>
+                <p>Phantom or Solflare on Devnet — you’ll be prompted when you Invest, or use <strong>Connect wallet</strong> on this page.</p>
               </div>
             </li>
             <li>
               <span class="adopter-guide-num">3</span>
               <div>
                 <strong>Back with $GROWTOO</strong>
-                <p>Instant sale transfers the NFT now. Adopt stake locks half until harvest care.</p>
+                <p>Instant sale moves the plant token to you now. Adopt stake locks half until harvest care checks out.</p>
               </div>
             </li>
             <li>
@@ -283,12 +299,31 @@
           </ol>
           <div class="adopter-guide-actions">
             <button type="button" class="btn btn-primary" id="adopter-guide-market-btn">Browse market</button>
-            <button type="button" class="btn btn-ghost" id="adopter-guide-wallet-btn">Connect wallet</button>
+            <button type="button" class="btn btn-ghost" id="adopter-guide-wallet-btn" hidden>Connect wallet</button>
           </div>
           <p class="adopter-guide-note">
             Test network only — $GROWTOO has no monetary value. You’re learning the trust flow before real stakes exist.
           </p>
         </section>
+
+        <aside class="tokenise-explainer grower-only" id="tokenise-explainer" hidden>
+          <div class="tokenise-explainer-copy">
+            <h3 class="tokenise-explainer-title">What Tokenise means (plain language)</h3>
+            <p>
+              Your journal stays free and local-first. Tokenise is optional: it turns a plant’s documented trail into a
+              <strong>plant token</strong> on Solana’s test network so others can back the grow with test $GROWTOO.
+            </p>
+            <details class="tokenise-explainer-details">
+              <summary>What do the crypto words mean?</summary>
+              <ul>
+                <li><strong>Plant token</strong> — a digital certificate linked to this plant’s journal (often called an NFT).</li>
+                <li><strong>Listing / hold</strong> — when you post to Market, the token is held until someone invests or you cancel (sometimes called escrow).</li>
+                <li><strong>Settle</strong> — the deal finishes and the token + $GROWTOO move as agreed.</li>
+              </ul>
+            </details>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="tokenise-explainer-dismiss">Got it</button>
+        </aside>
 
         <section class="adopt-wallet" id="adopt-wallet"></section>
 
@@ -297,7 +332,7 @@
         <section class="plants-journal-section grower-only" id="platform-bonus-section">
           <h2 class="section-heading">Platform monthly bonus</h2>
           <p class="market-hint">
-            Extra $GROWTOO from growtoo (not adopter funds) for adding plants, tokenising, weekly progress, and flower stages.
+            Extra $GROWTOO from growtoo (not adopter funds) for adding plants, minting tokens, weekly progress, and flower stages.
             Claim once per calendar month, separate from adopt-stake harvest unlock. Growers only.
           </p>
           <div id="platform-bonus-panel" class="platform-bonus-panel"></div>
@@ -305,11 +340,11 @@
 
         <div class="adopt-notice grower-only" id="adopt-notice">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Use Phantom or Solflare on Solana’s <strong>test network (Devnet)</strong>. Seed NFTs mint after you log cultivation data. Journal works without a wallet.</p>
+          <p>Use Phantom or Solflare on Solana’s <strong>test network (Devnet)</strong>. Plant tokens mint after you log cultivation data. Journal works without a wallet.</p>
         </div>
         <div class="adopt-notice adopter-only">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Wallet is optional until you invest. After that, adopted NFTs and unlock status show in your garden.</p>
+          <p>Wallet is optional until you invest. After that, adopted plants and unlock status show in your garden.</p>
         </div>
 
         <section class="adopt-section plants-journal-section grower-only" id="adopt-seed-section" hidden>
@@ -332,7 +367,7 @@
         </section>
 
         <section class="adopt-section plants-journal-section" id="adopt-garden-section">
-          <h2 class="section-heading grower-only">My tokenised plants</h2>
+          <h2 class="section-heading grower-only">My plant tokens</h2>
           <h2 class="section-heading adopter-only">My adopted plants</h2>
           <div class="adopt-token-grid" id="adopt-token-grid"></div>
         </section>
@@ -357,9 +392,9 @@
           <ul class="adopter-guide-bullets">
             <li><strong>Open market</strong> lists live grower asks you can invest in.</li>
             <li>Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.</li>
-            <li><strong>Instant sale</strong>: NFT comes to you in the same flow.</li>
+            <li><strong>Instant sale</strong>: the plant token comes to you in the same flow.</li>
             <li><strong>Adopt stake</strong>: you pay full price; half locks until the grower’s monthly care qualifies at harvest.</li>
-            <li>After settle, track the plant under <strong>My garden</strong>.</li>
+            <li>After it settles, track the plant under <strong>My garden</strong>.</li>
           </ul>
           <p class="adopter-guide-note">
             Need test $GROWTOO? Claim the free faucet below (once per day), then Invest.
@@ -371,13 +406,13 @@
         <section class="plants-journal-section grower-only" id="market-list-section" hidden>
           <h2 class="section-heading">Post a plant offer</h2>
           <p class="market-hint">
-            List a test-network mint (seed or growth stage) for adopters to back with $GROWTOO.
-            Listing escrows the NFT to the marketplace wallet until someone invests (or you cancel).
+            When you’re ready, list a plant you’ve already minted so adopters can back it with test $GROWTOO.
+            The listing holds your token safely until someone invests — or you cancel. Journal stays free either way.
           </p>
           <form class="adopt-seed-form" id="market-list-form">
             <label>
               Asset *
-              <select id="market-asset-select"><option value="">Choose a minted asset</option></select>
+              <select id="market-asset-select"><option value="">Choose a plant token</option></select>
             </label>
             <p class="market-hint" id="market-list-hint" hidden></p>
             <label>
@@ -392,7 +427,7 @@
               </select>
             </label>
             <p class="market-hint" id="market-stake-hint">
-              Adopt stake: adopter pays the full price up front. Half is released to you on settle;
+              Adopt stake: the adopter pays the full price up front. Half reaches you when the deal settles;
               half stays locked until every calendar month of care qualifies (all-or-nothing at harvest).
               Weekly progress stays private to growers; adopters see monthly unlock status.
             </p>
@@ -454,7 +489,8 @@
             </div>
             <div class="growlog-hero" id="growlog-hero" aria-label="Plant overview"></div>
             <section class="growlog-timeline-section">
-              <h3 class="growlog-section-title">Grow log timeline</h3>
+              <h3 class="growlog-section-title">Seed-to-harvest trail</h3>
+              <p class="field-hint growlog-timeline-hint">Journal entries and photos in order — the documentation trail for this plant.</p>
               <div class="growlog-timeline" id="growlog-timeline"></div>
             </section>
             <section class="growlog-new-photos">
@@ -500,7 +536,7 @@
           <div id="toolbox-panel-watering" class="toolbox-panel" data-tool="watering" aria-hidden="true">
             <h3 class="toolbox-panel-title">Watering</h3>
             <form class="toolbox-form" id="toolbox-form-watering">
-              <label>Date <input type="date" id="tool-watering-date" required /></label>
+              <label>Date <input type="date" lang="en-GB" id="tool-watering-date" required /></label>
               <label>Amount (mL) <input type="number" id="tool-watering-value1" min="0" placeholder="e.g. 500" required /></label>
               <label>Plant <select id="tool-watering-value2" required><option value="">-- Select a plant --</option></select></label>
               <button type="submit" class="btn btn-primary">Add</button>
@@ -511,7 +547,7 @@
           <div id="toolbox-panel-feeding" class="toolbox-panel" data-tool="feeding" aria-hidden="true">
             <h3 class="toolbox-panel-title">Feeding</h3>
             <form class="toolbox-form" id="toolbox-form-feeding">
-              <label>Date <input type="date" id="tool-feeding-date" required /></label>
+              <label>Date <input type="date" lang="en-GB" id="tool-feeding-date" required /></label>
               <label>Product / dose <input type="text" id="tool-feeding-value1" placeholder="e.g. NPK 1 mL/L" required /></label>
               <label>Note <input type="text" id="tool-feeding-value2" placeholder="Optional" /></label>
               <label>Plant <select id="tool-feeding-plant" required><option value="">-- Select a plant --</option></select></label>
@@ -523,7 +559,7 @@
           <div id="toolbox-panel-environment" class="toolbox-panel" data-tool="environment" aria-hidden="true">
             <h3 class="toolbox-panel-title">Environment</h3>
             <form class="toolbox-form" id="toolbox-form-environment">
-              <label>Date <input type="date" id="tool-environment-date" required /></label>
+              <label>Date <input type="date" lang="en-GB" id="tool-environment-date" required /></label>
               <label>Temperature (°C) <input type="number" id="tool-environment-value1" step="0.1" placeholder="e.g. 24" required /></label>
               <label>Humidity (%) <input type="number" id="tool-environment-value2" min="0" max="100" placeholder="e.g. 60" /></label>
               <label>pH (water/soil) <input type="number" id="tool-environment-value3" step="0.1" min="0" max="14" placeholder="e.g. 6.2" /></label>
@@ -536,7 +572,7 @@
           <div id="toolbox-panel-transplant" class="toolbox-panel" data-tool="transplant" aria-hidden="true">
             <h3 class="toolbox-panel-title">Transplanting</h3>
             <form class="toolbox-form" id="toolbox-form-transplant">
-              <label>Date <input type="date" id="tool-transplant-date" required /></label>
+              <label>Date <input type="date" lang="en-GB" id="tool-transplant-date" required /></label>
               <label>Soil quality <input type="text" id="tool-transplant-soil" placeholder="e.g. high-quality, organic" /></label>
               <label>Plant age at transplant <input type="text" id="tool-transplant-age" placeholder="e.g. 3 weeks" /></label>
               <label>Plant condition <input type="text" id="tool-transplant-condition" placeholder="e.g. healthy, well-rooted" /></label>
@@ -548,7 +584,7 @@
           <div id="toolbox-panel-stressors" class="toolbox-panel" data-tool="stressors" aria-hidden="true">
             <h3 class="toolbox-panel-title">Stressors</h3>
             <form class="toolbox-form" id="toolbox-form-stressors">
-              <label>Date <input type="date" id="tool-stressors-date" required /></label>
+              <label>Date <input type="date" lang="en-GB" id="tool-stressors-date" required /></label>
               <label>Temperature <input type="text" id="tool-stressors-temp" placeholder="e.g. high, low" /></label>
               <label>Humidity <input type="text" id="tool-stressors-humidity" placeholder="e.g. dry, humid" /></label>
               <label>VPD (vapor pressure deficit) <input type="text" id="tool-stressors-vpd" placeholder="e.g. a value or description" /></label>
@@ -695,27 +731,87 @@
         <input type="hidden" id="plant-id" />
         <input type="hidden" id="plant-stage-at-open" value="" />
         <input type="hidden" id="plant-subphase-at-open" value="" />
-        <label>
-          Plant name *
-          <input type="text" id="plant-name" required placeholder="e.g. CBD Auto #1" />
-        </label>
-        <label>
-          Strain
-          <input type="text" id="plant-strain" placeholder="e.g. CBD Auto" />
-        </label>
+        <div class="plant-wizard-progress" id="plant-wizard-progress" hidden>
+          <span class="plant-wizard-step is-active" data-wizard-label="1">1 · Basics</span>
+          <span class="plant-wizard-step" data-wizard-label="2">2 · Details</span>
+        </div>
+        <div class="plant-form-essentials" id="plant-form-step-1">
+          <label>
+            Plant name *
+            <input type="text" id="plant-name" required placeholder="e.g. CBD Auto #1" />
+          </label>
+          <label>
+            Stage
+            <select id="plant-stage">
+              <option value="klijanje">Germination</option>
+              <option value="sadnica">Seedling</option>
+              <option value="vegetativna">Vegetative</option>
+              <option value="cvjetanje">Flowering</option>
+              <option value="susenje">Drying</option>
+            </select>
+          </label>
+          <p class="field-hint plant-form-create-hint" id="plant-form-create-hint">
+            Save now, or add optional details next — photo, environment, notes.
+          </p>
+        </div>
+        <div class="plant-form-optional" id="plant-form-step-2" hidden>
+          <p class="field-hint">Optional — skip anytime and edit later from the plant page.</p>
+          <label>
+            Strain
+            <input type="text" id="plant-strain" placeholder="e.g. CBD Auto" />
+          </label>
+          <label>
+            Start date
+            <input type="date" lang="en-GB" id="plant-start-date" />
+          </label>
+          <label>
+            Environment (e.g. Grow tent)
+            <input type="text" id="plant-environment-name" placeholder="e.g. Grow tent, Greenhouse" />
+          </label>
+          <label>
+            Grow type
+            <select id="plant-environment-type">
+              <option value="indoor">Indoor</option>
+              <option value="outdoor">Outdoor</option>
+            </select>
+          </label>
+          <div id="plant-outdoor-fields" class="plant-outdoor-fields" hidden>
+            <label id="plant-field-location-wrap" class="plant-field-location-wrap">
+              Field location
+              <input
+                type="text"
+                id="plant-field-location"
+                placeholder="e.g. Field A, plot 3, GPS coordinates…"
+              />
+            </label>
+            <label id="plant-planting-location-wrap" class="plant-planting-location-wrap" hidden>
+              Planting location
+              <input
+                type="text"
+                id="plant-planting-location"
+                placeholder="e.g. row 2, spot 15, along the plot edge…"
+              />
+            </label>
+          </div>
+          <label>
+            Light hours (per day)
+            <input type="number" id="plant-exposure-hours" min="0" max="24" placeholder="e.g. 18" />
+          </label>
+          <label>
+            Plant photo
+            <input type="file" id="plant-photo" accept="image/*" class="input-file" />
+            <input type="hidden" id="plant-photo-data" />
+            <span class="media-preview" id="plant-photo-preview"></span>
+          </label>
+          <label>
+            Notes
+            <textarea id="plant-notes" rows="3" placeholder="Optional notes..."></textarea>
+          </label>
+        </div>
+        <div class="plant-form-advanced" id="plant-form-advanced" hidden>
         <label>
           Number of plants (batch)
           <input type="number" id="plant-count" min="1" step="1" value="1" placeholder="e.g. 12" />
-        </label>
-        <label>
-          Stage
-          <select id="plant-stage">
-            <option value="klijanje">Germination</option>
-            <option value="sadnica">Seedling</option>
-            <option value="vegetativna">Vegetative</option>
-            <option value="cvjetanje">Flowering</option>
-            <option value="susenje">Drying</option>
-          </select>
         </label>
         <label>
           Sub-phase (pot volume)
@@ -728,24 +824,27 @@
           </select>
         </label>
         <div class="plant-subphase-actions" id="plant-subphase-actions">
+          <p class="field-hint plant-subphase-actions-label">
+            Optional transplant shortcuts — they only change the fields above; tap <strong>Save</strong> to apply.
+          </p>
           <button type="button" class="btn btn-ghost btn-sm" id="plant-btn-next-pot">
-            → Next pot
+            Set next pot size
           </button>
           <button type="button" class="btn btn-ghost btn-sm" id="plant-btn-to-field">
-            → To the field
+            Set outdoor / field
           </button>
           <p class="field-hint plant-subphase-actions-hint">
-            From a pot you can move to a bigger pot or out to the field; then enter the field and planting location.
+            From a pot you can bump to a bigger size or move outdoors, then fill field location if needed.
           </p>
         </div>
         <div class="plant-stage-transition-block">
           <p class="field-hint">
-            For a <strong>new plant</strong> the first journal entry is created. When you <strong>change the stage</strong> and save,
-            a new entry is added with the transition date (below) and the photo from this form if one was uploaded.
+            When you <strong>change the stage</strong> and save, a journal entry is added with the transition date
+            (below) and the photo from this form if one was uploaded.
           </p>
           <label>
             Date of transition to the currently selected stage
-            <input type="date" id="plant-stage-transition-date" />
+            <input type="date" lang="en-GB" id="plant-stage-transition-date" />
           </label>
           <label>
             Short note for this step (optional)
@@ -756,56 +855,12 @@
             />
           </label>
         </div>
-        <label>
-          Start date
-          <input type="date" id="plant-start-date" />
-        </label>
-        <label>
-          Environment (e.g. Grow tent)
-          <input type="text" id="plant-environment-name" placeholder="e.g. Grow tent, Greenhouse" />
-        </label>
-        <label>
-          Grow type
-          <select id="plant-environment-type">
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
-          </select>
-        </label>
-        <div id="plant-outdoor-fields" class="plant-outdoor-fields" hidden>
-          <label id="plant-field-location-wrap" class="plant-field-location-wrap">
-            Field location
-            <input
-              type="text"
-              id="plant-field-location"
-              placeholder="e.g. Field A, plot 3, GPS coordinates…"
-            />
-          </label>
-          <label id="plant-planting-location-wrap" class="plant-planting-location-wrap" hidden>
-            Planting location
-            <input
-              type="text"
-              id="plant-planting-location"
-              placeholder="e.g. row 2, spot 15, along the plot edge…"
-            />
-          </label>
         </div>
-        <label>
-          Light hours (per day)
-          <input type="number" id="plant-exposure-hours" min="0" max="24" placeholder="e.g. 18" />
-        </label>
-        <label>
-          Plant photo
-          <input type="file" id="plant-photo" accept="image/*" class="input-file" />
-          <input type="hidden" id="plant-photo-data" />
-          <span class="media-preview" id="plant-photo-preview"></span>
-        </label>
-        <label>
-          Notes
-          <textarea id="plant-notes" rows="3" placeholder="Optional notes..."></textarea>
-        </label>
-        <div class="modal-actions">
+        <div class="modal-actions plant-form-actions">
           <button type="button" class="btn btn-ghost modal-cancel">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-ghost" id="plant-form-back" hidden>Back</button>
+          <button type="button" class="btn btn-ghost" id="plant-form-next" hidden>Add details</button>
+          <button type="submit" class="btn btn-primary" id="plant-form-submit">Save plant</button>
         </div>
       </form>
     </div>
@@ -825,7 +880,7 @@
         </label>
         <label>
           Date *
-          <input type="date" id="entry-date" required />
+          <input type="date" lang="en-GB" id="entry-date" required />
         </label>
         <label>
           Type
@@ -918,15 +973,16 @@
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260728e"></script>
-  <script src="js/market.js?v=20260729c"></script>
-  <script src="js/metric-ui.js?v=20260727g"></script>
+  <script src="js/market.js?v=20260729g"></script>
+  <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-pixel-art.js?v=20260720b"></script>
   <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
   <script src="js/grower-quests.js?v=20260724h"></script>
-  <script src="js/notifications.js?v=20260729a"></script>
-  <script src="js/signup.js?v=20260729c"></script>
-  <script src="js/plant-token.js?v=20260729c"></script>
-  <script src="js/ai-coach.js?v=20260724h"></script>
-  <script src="js/app.js?v=20260729c"></script>
+  <script src="js/notifications.js?v=20260729g"></script>
+  <script src="js/signup.js?v=20260729g"></script>
+  <script src="js/plant-token.js?v=20260729g"></script>
+  <script src="js/ai-coach.js?v=20260729e"></script>
+  <script src="js/app.js?v=20260729g"></script>
+  <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

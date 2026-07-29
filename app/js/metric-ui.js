@@ -22,9 +22,14 @@
 
   function metricCard(opts) {
     const o = opts || {};
-    return (
-      '<article class="metric-card' +
+    const classes =
+      'metric-card' +
       (o.modifier ? ' metric-card--' + o.modifier : '') +
+      (o.attention ? ' metric-card--prompt' : '') +
+      (o.className ? ' ' + o.className : '');
+    return (
+      '<article class="' +
+      classes +
       '">' +
       '<div class="metric-card-body">' +
       '<span class="metric-card-label">' +

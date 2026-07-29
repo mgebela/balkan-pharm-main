@@ -430,7 +430,7 @@
       const stageIndex = PlantToken.stageIndexFromLabel(listing.stage);
       const token = {
         id: tokenId(),
-        name: String(listing.name || 'Adopted RWA').trim(),
+        name: String(listing.name || 'Adopted plant').trim(),
         strain: String(listing.strain || '').trim(),
         batch: String(listing.batch || '').trim(),
         plantId: listing.plantId || null,
@@ -617,7 +617,7 @@
             throw new Error(seedQuest.message || 'Link a journal plant before minting.');
           }
         } else if (!plantId) {
-          throw new Error('Link a journal plant before minting a seed RWA.');
+          throw new Error('Link a journal plant before minting a seed token.');
         }
 
         const now = Date.now();
@@ -894,7 +894,7 @@
   function devnetNotice() {
     return (
       (window.ChainConfig && window.ChainConfig.devnetNotice) ||
-      'Connect a Solana wallet on devnet. Seed NFT minting and $GROWTOO SPL rewards are still simulated locally until M2 on-chain deploy.'
+      'Connect a Solana wallet on the test network. Plant tokens and $GROWTOO rewards still use local simulation until full on-chain deploy.'
     );
   }
 
@@ -1033,19 +1033,16 @@
     if (!el) return;
     if (!wallet.connected) {
       el.innerHTML =
-        '<div class="metric-panel metric-panel--inline adopt-wallet-panel">' +
+        '<div class="metric-panel metric-panel--inline adopt-wallet-panel adopt-wallet-panel--hint">' +
         '<div class="adopt-wallet-connect">' +
         '<div class="adopt-wallet-copy">' +
-        '<h3>' +
-        (isAdopterUi() ? 'Connect when you stake' : 'Connect to mint') +
-        '</h3>' +
+        '<h3>Wallet optional</h3>' +
         '<p>' +
         (isAdopterUi()
-          ? 'Browse your garden anytime. Connect a Solana wallet on the test network when you invest or claim rewards.'
-          : 'Link a Solana wallet on the test network (Devnet) to mint seed NFTs and earn $GROWTOO. The journal works without a wallet.') +
+          ? 'Browse anytime. When you’re ready to invest, tap <strong>Wallet · Off</strong> in the header to connect a test-network wallet — no pressure until then.'
+          : 'Your journal works without crypto. When you want to mint a plant token, tap <strong>Wallet · Off</strong> in the header to connect on the test network.') +
         '</p>' +
         '</div>' +
-        '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
         '</div></div>';
       return;
     }
@@ -1812,12 +1809,12 @@
     const src = resolveInvestSource(token);
     const status = String(src.status || '');
     if (status === 'failed') return 'Investment failed';
-    if (status === 'sold') return 'Adopted RWA';
+    if (status === 'sold') return 'Adopted';
     if (status === 'sale_pending') {
       if (window.StatusRail && StatusRail.hasConfirmedPayment(src)) return 'Settling…';
       return 'Payment pending…';
     }
-    return 'Adopted RWA';
+    return 'Adopted';
   }
 
   // On-chain (devnet) mint status for a token, from the seedMints queue.
@@ -1927,6 +1924,36 @@
       '</div>';
   }
 
+  var TOKENISE_EXPLAINER_KEY = 'dnevnik-live-tokenise-explainer-seen';
+
+  function renderTokeniseExplainer() {
+    const el = document.getElementById('tokenise-explainer');
+    if (!el) return;
+    if (isAdopterUi()) {
+      el.hidden = true;
+      return;
+    }
+    let seen = false;
+    try {
+      seen = localStorage.getItem(TOKENISE_EXPLAINER_KEY) === '1';
+    } catch {
+      seen = false;
+    }
+    el.hidden = seen;
+    const dismiss = document.getElementById('tokenise-explainer-dismiss');
+    if (dismiss && dismiss.dataset.bound !== '1') {
+      dismiss.dataset.bound = '1';
+      dismiss.addEventListener('click', function () {
+        try {
+          localStorage.setItem(TOKENISE_EXPLAINER_KEY, '1');
+        } catch {
+          // ignore
+        }
+        el.hidden = true;
+      });
+    }
+  }
+
   function applyProfileChrome() {
     const marketCta = document.getElementById('adopt-market-cta');
     if (marketCta) {
@@ -1936,6 +1963,7 @@
     if (guide) {
       guide.hidden = !isAdopterUi();
     }
+    renderTokeniseExplainer();
   }
 
   function renderGarden(wallet) {
@@ -2271,6 +2299,8 @@
       wallet.connected && isWatchOnlyProvider(wallet.provider)
         ? '<span class="wallet-link-badge wallet-link-badge--muted">Watch-only</span>'
         : '';
+    // Link is a post-connect step — never show it as a third "Connect" CTA when disconnected.
+    if (!wallet.connected) return '';
     if (!profile.solanaPubkey) {
       return (
         watchBadge +
@@ -2292,8 +2322,8 @@
     );
   }
 
-  /** Views where signing is expected — only these show the header connect bar when disconnected. */
-  var HEADER_WALLET_VIEWS = { adopt: 1, market: 1, admin: 1 };
+  /** Header is status-only; Market may still offer a direct Connect for invest flows. */
+  var HEADER_WALLET_VIEWS = { market: 1, admin: 1 };
 
   function currentAppViewId() {
     var active = document.querySelector('.view.active');
@@ -2302,15 +2332,15 @@
   }
 
   function headerNeedsWalletPrompt(wallet) {
-    if (wallet && wallet.connected) return false;
-    return !!HEADER_WALLET_VIEWS[currentAppViewId()];
+    // Connect lives on the status chip click — never a second header button.
+    return false;
   }
 
   function walletControlsHtml(variant) {
     syncWalletFromSolana();
     const wallet = readWallet();
     const compact = variant === 'compact';
-    const profileHint = 'Each dnevnik.live account links its own Solana wallet.';
+    const profileHint = 'Each growtoo account links its own Solana wallet.';
     const linkedPubkey =
       window.WalletLink && WalletLink.getProfile
         ? String(WalletLink.getProfile().solanaPubkey || '')
@@ -2323,22 +2353,10 @@
           ' — reconnect to sign.</p>'
         : '';
       if (compact) {
-        if (!headerNeedsWalletPrompt(wallet)) return '';
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
-          '<div class="wallet-controls-info">' +
-          '<span class="wallet-controls-label">Solana</span>' +
-          (linkedPubkey
-            ? '<span class="wallet-controls-addr" title="' +
-              esc(linkedPubkey) +
-              '">' +
-              esc(shortAddr(linkedPubkey)) +
-              '</span>'
-            : '') +
-          walletLinkBadgeHtml() +
-          '</div>' +
-          '<button type="button" class="btn btn-primary btn-sm wallet-connect-btn">' +
-          (linkedPubkey ? 'Reconnect' : 'Connect') +
+          '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="Connect wallet">' +
+          'Wallet · Off' +
           '</button>' +
           '</div>'
         );
@@ -2359,8 +2377,18 @@
       );
     }
 
-    // Connected: no persistent header chrome — status lives on Tokenise / Market / Admin panels.
-    if (compact) return '';
+    if (compact) {
+      return (
+        '<div class="wallet-controls wallet-controls--compact">' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-goto-tokenise" title="' +
+        esc(wallet.address || '') +
+        '">' +
+        'Wallet · ' +
+        esc(shortAddr(wallet.address)) +
+        '</button>' +
+        '</div>'
+      );
+    }
 
     const explorer =
       wallet.address
@@ -2407,6 +2435,18 @@
     document.body.dataset.walletBound = '1';
 
     document.addEventListener('click', async function (e) {
+      const statusConnect = e.target.closest('.wallet-status-connect');
+      if (statusConnect) {
+        e.preventDefault();
+        await handleWalletConnect(statusConnect);
+        return;
+      }
+      const gotoTokenise = e.target.closest('.wallet-goto-tokenise');
+      if (gotoTokenise) {
+        e.preventDefault();
+        if (typeof window.showAppView === 'function') window.showAppView('adopt');
+        return;
+      }
       const connectBtn = e.target.closest('.wallet-connect-btn');
       const disconnectBtn = e.target.closest('.wallet-disconnect-btn');
       const linkBtn = e.target.closest('.wallet-link-btn');

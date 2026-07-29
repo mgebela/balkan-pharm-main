@@ -158,7 +158,10 @@
     if (!list) return;
     if (!items.length) {
       list.innerHTML =
-        '<p class="notif-empty">No notifications yet.</p>' +
+        '<div class="empty-state notif-empty-state">' +
+        '<p class="adopt-empty-lead">Inbox is clear</p>' +
+        '<p class="adopt-empty-body">Care reminders, stake updates, and journal confirmations show up here — so nothing slips mid-cycle.</p>' +
+        '</div>' +
         '<div class="notif-panel-foot">' +
         '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>' +
         '</div>';
@@ -674,6 +677,41 @@
     });
   }
 
+  function localDayKey() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+  }
+
+  /** Push care-due reminders into the inbox so the bell badge earns its place. */
+  function syncCareDueFromCoach() {
+    if (!window.AICoach || typeof AICoach.getReminders !== 'function') return;
+    let reminders = [];
+    try {
+      reminders = AICoach.getReminders() || [];
+    } catch {
+      return;
+    }
+    const day = localDayKey();
+    reminders.forEach(function (r) {
+      if (!r || !r.id) return;
+      const id = String(r.id);
+      if (id.indexOf('watering:') !== 0 && id.indexOf('feeding:') !== 0) return;
+      push({
+        type: 'care_due',
+        title: r.title || 'Care reminder',
+        body: r.message || 'A plant needs attention.',
+        meta: { key: 'care-due:' + id + ':' + day, plantId: r.plantId || null },
+        action: { view: 'dashboard', plantId: r.plantId || null },
+        kind: 'warn',
+        dedupKey: 'care-due:' + id + ':' + day,
+        toast: false,
+      });
+    });
+  }
+
   function notifyJournalEntry(entry, plantName) {
     if (!entry) return;
     const typeLabel = entry.type || 'log';
@@ -1045,6 +1083,7 @@
     bindStatusHooks: bindStatusHooks,
     notifyCareProgress: notifyCareProgress,
     notifyJournalEntry: notifyJournalEntry,
+    syncCareDueFromCoach: syncCareDueFromCoach,
   };
 
   if (document.readyState === 'loading') {

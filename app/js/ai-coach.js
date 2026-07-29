@@ -1406,13 +1406,23 @@
     ask(input ? input.value : '');
   }
 
+  function currentAppViewId() {
+    const active = document.querySelector('.view.active');
+    if (!active || !active.id || active.id.indexOf('view-') !== 0) return '';
+    return active.id.slice(5);
+  }
+
   function applyVisibility() {
     ensureDom();
     const root = document.getElementById('ai-coach-root');
     if (!root) return;
-    const show = isGrower();
+    // Hide on Admin (and similar dense grids) so the FAB doesn't cover toolbox cards.
+    const view = currentAppViewId();
+    const hideOnView = view === 'admin' || view === 'danas';
+    const show = isGrower() && !hideOnView;
     root.hidden = !show;
     root.setAttribute('aria-hidden', show ? 'false' : 'true');
+    document.body.classList.toggle('coach-fab-visible', show);
     if (!show) close();
   }
 

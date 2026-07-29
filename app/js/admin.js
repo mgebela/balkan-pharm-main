@@ -207,9 +207,9 @@ async function loadData() {
       const row = document.createElement("tr");
 
       const actionsCell = readOnly
-        ? `<button type="button" class="view-btn">View</button>`
-        : `<button class="edit-btn">Edit</button>
-          <button class="delete-btn">Delete</button>`;
+        ? `<button type="button" class="btn btn-ghost btn-sm view-btn">View</button>`
+        : `<button type="button" class="btn btn-ghost btn-sm edit-btn">Edit</button>
+          <button type="button" class="btn btn-ghost btn-sm delete-btn">Delete</button>`;
 
       row.innerHTML = `
         <td>${renderRow(data)}</td>
@@ -231,7 +231,19 @@ async function loadData() {
         };
 
         row.querySelector(".delete-btn").onclick = async () => {
-          if (!confirm("Delete?")) return;
+          const label =
+            page === "users"
+              ? String(data.email || "this user")
+              : "this " + page.replace(/s$/, "");
+          if (
+            !confirm(
+              "Delete " +
+                label +
+                "?\n\nThis cannot be undone from the admin tools."
+            )
+          ) {
+            return;
+          }
 
           await deleteDoc(doc(db, page, docSnap.id));
           loadData();
@@ -252,7 +264,10 @@ async function loadData() {
 // =======================
 function renderRow(data) {
   if (page === "users") {
-    return `${esc(data.email)} (${esc(data.role)})`;
+    return (
+      `<span class="admin-users-email">${esc(data.email || "—")}</span>` +
+      `<span class="admin-users-role">${esc(data.role || "user")}</span>`
+    );
   }
 
   if (page === "plants") {
@@ -292,7 +307,14 @@ function openModal(data, readOnly = false) {
 
       ${generateForm(data, "", readOnly)}
 
-      ${readOnly ? `<button type="button" id="closeView">Close</button>` : `<button type="button" id="saveDynamic">Save</button>`}
+      <div class="modal-actions">
+      ${
+        readOnly
+          ? `<button type="button" class="btn btn-primary" id="closeView">Close</button>`
+          : `<button type="button" class="btn btn-ghost" id="cancelDynamic">Cancel</button>
+             <button type="button" class="btn btn-primary" id="saveDynamic">Save</button>`
+      }
+      </div>
     </div>
   `;
 
@@ -300,6 +322,9 @@ function openModal(data, readOnly = false) {
     document.getElementById("closeView").onclick = () => modal.classList.remove("open");
     return;
   }
+
+  const cancelBtn = document.getElementById("cancelDynamic");
+  if (cancelBtn) cancelBtn.onclick = () => modal.classList.remove("open");
 
   document.getElementById("saveDynamic").onclick = async () => {
     const formData = getFormDataDynamic();

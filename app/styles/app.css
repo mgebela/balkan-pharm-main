@@ -781,6 +781,12 @@ body.more-nav-open {
   overflow-x: hidden;
 }
 
+/* Grower Coach FAB sits fixed bottom-right — keep last cards clear of it */
+body.coach-fab-visible .main {
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  padding-right: max(2rem, 8.75rem);
+}
+
 .main-header {
   display: flex;
   align-items: center;
@@ -1606,6 +1612,246 @@ body.notif-open {
   margin-bottom: 1.25rem;
 }
 
+.dashboard-first-run {
+  padding: 1.35rem 1.4rem 1.45rem;
+  border-radius: 16px;
+  border: 1px dashed rgba(212, 90, 56, 0.42);
+  background:
+    linear-gradient(145deg, rgba(212, 90, 56, 0.14) 0%, rgba(8, 22, 14, 0.92) 55%),
+    var(--metric-panel-bg);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.dashboard-first-run-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 190, 160, 0.85);
+}
+
+.dashboard-first-run-title {
+  margin: 0 0 0.45rem;
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: #faf4ea;
+}
+
+.dashboard-first-run-body {
+  margin: 0 0 1.1rem;
+  max-width: 36rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(247, 238, 225, 0.72);
+}
+
+.dashboard-first-run .btn {
+  min-height: 2.6rem;
+}
+
+.getting-started-list {
+  list-style: none;
+  margin: 0 0 0.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.getting-started-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 18, 12, 0.55);
+  min-height: 3rem;
+}
+
+.getting-started-item.is-done {
+  opacity: 0.72;
+  border-color: rgba(125, 255, 156, 0.22);
+}
+
+.getting-started-check {
+  flex: 0 0 1.35rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #7dff9c;
+}
+
+.getting-started-item.is-done .getting-started-check {
+  background: rgba(125, 255, 156, 0.16);
+  border-color: rgba(125, 255, 156, 0.4);
+}
+
+.getting-started-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  color: rgba(247, 238, 225, 0.9);
+}
+
+.getting-started-action {
+  flex: 0 0 auto;
+  min-height: 2.4rem;
+}
+
+.dashboard-quick-section {
+  margin: 0 0 1.15rem;
+}
+
+.dashboard-quick-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(180, 220, 180, 0.05);
+}
+
+.dashboard-quick-label {
+  margin: 0;
+  margin-right: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.btn-tap,
+.btn.btn-tap {
+  min-height: 2.75rem;
+  padding-left: 1.05rem;
+  padding-right: 1.05rem;
+}
+
+.plant-form-optional,
+.plant-form-essentials,
+.plant-form-advanced {
+  padding: 0;
+}
+
+.plant-wizard-progress {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 0 0.85rem;
+}
+
+.plant-wizard-step {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 0.35rem;
+  border-bottom: 2px solid transparent;
+}
+
+.plant-wizard-step.is-active {
+  color: var(--accent-bright);
+  border-bottom-color: var(--accent-bright);
+}
+
+.plant-form-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-alt);
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  z-index: 2;
+}
+
+.wallet-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.15rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(6, 18, 12, 0.85);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wallet-status-chip--on {
+  border-color: rgba(125, 255, 156, 0.35);
+  color: #9dffb0;
+  background: rgba(125, 255, 156, 0.08);
+}
+
+.wallet-status-chip--off {
+  border-color: rgba(212, 90, 56, 0.35);
+  color: rgba(255, 190, 160, 0.92);
+}
+
+.wallet-controls--compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.tokenise-explainer {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin: 0 0 1.15rem;
+  padding: 1rem 1.1rem;
+  border-radius: 14px;
+  border: 1px dashed rgba(232, 196, 106, 0.4);
+  background: rgba(232, 196, 106, 0.08);
+}
+
+.tokenise-explainer-title {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  color: #faf4ea;
+}
+
+.tokenise-explainer-copy p {
+  margin: 0 0 0.55rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.tokenise-explainer-details {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.tokenise-explainer-details summary {
+  cursor: pointer;
+  color: var(--accent-warm);
+  font-weight: 600;
+}
+
+.tokenise-explainer-details ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.growlog-timeline-hint {
+  margin: -0.25rem 0 0.75rem;
+}
+
 .metric-panel {
   /* Always-dark instrument plate regardless of page theme — text tokens are
      re-scoped here so plain content (e.g. the wallet-connect copy rendered
@@ -1682,6 +1928,22 @@ body.notif-open {
 .metric-card:hover {
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+/* Needs attention — stronger than a passive stat tile */
+.metric-card--prompt {
+  border-color: rgba(212, 90, 56, 0.48);
+  background: linear-gradient(160deg, rgba(212, 90, 56, 0.18) 0%, rgba(6, 18, 12, 0.96) 70%);
+  box-shadow: inset 0 0 0 1px rgba(212, 90, 56, 0.12);
+}
+
+.metric-card--prompt .metric-card-label {
+  color: rgba(255, 190, 160, 0.88);
+}
+
+.metric-card--prompt:hover {
+  border-color: rgba(212, 90, 56, 0.65);
+  box-shadow: 0 8px 24px rgba(180, 71, 43, 0.22);
 }
 
 .metric-card-body {
@@ -2661,6 +2923,10 @@ body.notif-open {
   align-items: center;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--bg-alt);
 }
 
 .modal-header h2 {
@@ -2696,7 +2962,83 @@ body.notif-open {
   display: block;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.modal label > input,
+.modal label > select,
+.modal label > textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  font-weight: 400;
+}
+
+.modal input::placeholder,
+.modal textarea::placeholder {
+  color: rgba(190, 220, 190, 0.45);
+  font-weight: 400;
+}
+
+select.is-empty-disabled,
+select:disabled.is-empty-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.toast--undo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(92vw, 24rem);
+}
+
+.toast-undo-msg {
+  flex: 1;
+  min-width: 0;
+}
+
+.toast-undo-btn {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #faf4ea;
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+  min-height: 2.25rem;
+}
+
+.toast-undo-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.journal-entry .entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.journal-entry .btn-delete-entry {
+  margin-left: auto;
+}
+
+.notif-empty-state {
+  margin: 0.75rem;
+}
+
+.notif-empty-state .adopt-empty-lead {
+  margin: 0 0 0.35rem;
+}
+
+.notif-empty-state .adopt-empty-body {
+  margin: 0;
 }
 
 .modal label:last-of-type {
@@ -3615,6 +3957,19 @@ body.admin-readonly .toolbox-form textarea {
   display: none !important;
 }
 
+.plant-form-create-hint {
+  margin: 0.15rem 0 0.35rem;
+}
+
+.plant-subphase-actions-label {
+  flex: 1 1 100%;
+  margin: 0 0 0.15rem;
+}
+
+.plant-modal--create .modal-content {
+  max-width: 28rem;
+}
+
 .plant-subphase-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3968,6 +4323,11 @@ body.admin-readonly .toolbox-form textarea {
 
   body.profile-grower .main {
     padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+  }
+
+  body.coach-fab-visible .main {
+    padding-bottom: calc(10rem + env(safe-area-inset-bottom));
+    padding-right: max(0.9rem, env(safe-area-inset-right), 4.5rem);
   }
 
   /* Header: title row, then actions — usable on phones */

@@ -592,10 +592,10 @@
 
   async function createListing(tokenEntry, priceGrow, opts) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to post an RWA offer.');
-    if (!isGrowerUi()) throw new Error('Only grower accounts can post RWA offers.');
+    if (!user) throw new Error('Sign in to post a plant offer.');
+    if (!isGrowerUi()) throw new Error('Only grower accounts can post plant offers.');
 
-    const SW = await ensureSigningWallet('post an offer (escrow the NFT)');
+    const SW = await ensureSigningWallet('post an offer (hold the plant token)');
     const token = tokenEntry.token;
     const priceRounded = Math.round(priceGrow);
     const stakeMode = opts && opts.settlement === 'adopt_stake';
@@ -690,7 +690,7 @@
   async function investInListing(listing) {
     const user = currentUser();
     if (!user) throw new Error('Sign in to invest.');
-    if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in RWAs.');
+    if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in plant offers.');
 
     const SW = await ensureSigningWallet('invest ($GROWTOO payment)');
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
@@ -878,7 +878,7 @@
   // --- UI --------------------------------------------------------------------
 
   const STATUS_LABELS = {
-    escrow_pending: 'Activating escrow…',
+    escrow_pending: 'Preparing listing…',
     active: 'Open for investment',
     sale_pending: 'Investment settling…',
     cancel_requested: 'Cancelling…',
@@ -898,7 +898,7 @@
   }
 
   function assetBadge(assetType) {
-    const label = assetType === 'flower' ? 'Flower RWA' : 'Seed RWA';
+    const label = assetType === 'flower' ? 'Flower token' : 'Seed token';
     return (
       '<span class="market-asset-badge market-asset-badge--' +
       esc(assetType || 'seed') +
@@ -916,7 +916,7 @@
       );
     }
     return (
-      '<span class="market-asset-badge market-asset-badge--instant" title="Full price to grower; NFT transfers on buy.">' +
+      '<span class="market-asset-badge market-asset-badge--instant" title="Full price to grower; plant token transfers on buy.">' +
       'Instant sale</span>'
     );
   }
@@ -1088,7 +1088,7 @@
         } else if (isGrowerUi()) {
           notice.hidden = false;
           notice.textContent =
-            'Post minted seed / growth plant tokens. Adopters invest with $GROWTOO; the NFT transfers when settlement confirms. Test network only.';
+            'Post a minted plant token when you’re ready. Adopters back it with test $GROWTOO; the token moves to them when the deal confirms. Still a test network — no real money.';
         } else {
           notice.hidden = false;
           const intentMarket =
@@ -1136,17 +1136,28 @@
               );
             })
             .join('');
-        if (current) sel.value = current;
+        if (current && options.some(function (o) { return o.mintAddress === current; })) {
+          sel.value = current;
+        }
+
+        const hasListable = options.length > 0;
+        sel.disabled = !hasListable;
+        sel.setAttribute('aria-disabled', hasListable ? 'false' : 'true');
+        sel.classList.toggle('is-empty-disabled', !hasListable);
+        if (!hasListable) {
+          sel.innerHTML = '<option value="">No plant tokens ready to list</option>';
+        }
 
         const hint = document.getElementById('market-list-hint');
         if (hint) {
           if (!options.length && blocked.length) {
             hint.hidden = false;
             hint.textContent =
-              'Only test-network mints can be posted. Finish mint on Tokenise (Retry mint if failed), then refresh this page.';
+              'Almost there — finish minting on Tokenise (use Retry mint if something failed), then come back here.';
           } else if (!options.length) {
             hint.hidden = false;
-            hint.textContent = 'No listable plants yet. Mint a seed on Tokenise first.';
+            hint.textContent =
+              'Nothing to list yet. Mint a seed on Tokenise first — wallet stays optional until you’re ready.';
           } else {
             hint.hidden = true;
             hint.textContent = '';
@@ -1346,10 +1357,10 @@
                 listing.name +
                 '" on Solana devnet?\n\n' +
                 (listing.settlement === 'program'
-                  ? 'You will receive the RWA NFT in this transaction.'
+                  ? 'You will receive the plant token in this transaction.'
                   : listing.settlement === 'adopt_stake'
-                    ? 'Adopt stake: you pay the full price now. 50% goes to the grower on settle; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the NFT when settlement completes.'
-                    : 'You will receive the RWA NFT when settlement completes.')
+                    ? 'Adopt stake: you pay the full price now. 50% goes to the grower when it settles; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the plant token when settlement completes.'
+                    : 'You will receive the plant token when settlement completes.')
             )
           ) {
             return;
@@ -1363,10 +1374,10 @@
             }
           }
           if (listing.settlement === 'program') {
-            flashOk('Investment complete. The RWA NFT is in your wallet.');
+            flashOk('Investment complete. The plant token is in your wallet.');
           } else {
             flashOk(
-              'Investment submitted. NFT appears in My garden when settlement finishes.'
+              'Investment submitted. The plant appears in My garden when settlement finishes.'
             );
           }
         } else {
@@ -1393,7 +1404,7 @@
         const price = priceEl ? parseInt(priceEl.value, 10) : 0;
         const settlement =
           settleEl && settleEl.value === 'adopt_stake' ? 'adopt_stake' : 'instant';
-        if (!mintAddress) return flash(new Error('Choose an RWA to post.'));
+        if (!mintAddress) return flash(new Error('Choose a plant token to post.'));
         if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROWTOO.'));
         const entry = listableTokens().find(function (o) {
           return o.mintAddress === mintAddress;
@@ -1404,7 +1415,7 @@
         busy = true;
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'Escrowing NFT…';
+          submitBtn.textContent = 'Holding token for listing…';
         }
         try {
           await createListing(entry, price, {
