@@ -1088,7 +1088,7 @@
         } else if (isGrowerUi()) {
           notice.hidden = false;
           notice.textContent =
-            'Post real minted seed / growth RWAs. Adopters invest with $GROWTOO; the NFT transfers when settlement confirms.';
+            'Post minted seed / growth plant tokens. Adopters invest with $GROWTOO; the NFT transfers when settlement confirms. Test network only.';
         } else {
           notice.hidden = false;
           const intentMarket =
@@ -1097,7 +1097,7 @@
               : '';
           notice.textContent =
             intentMarket ||
-            'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet when you tap Invest on an open offer.';
+            'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest on an open offer.';
         }
       }
 
@@ -1108,7 +1108,7 @@
         const blocked = unlistableGardenTokens();
         const current = sel.value;
         sel.innerHTML =
-          '<option value="">— choose a minted RWA —</option>' +
+          '<option value="">— choose a minted plant —</option>' +
           options
             .map(function (o) {
               return (
@@ -1143,10 +1143,10 @@
           if (!options.length && blocked.length) {
             hint.hidden = false;
             hint.textContent =
-              'Only Devnet-minted RWAs can be posted. Finish mint on Tokenise (Retry mint if failed), then refresh this page.';
+              'Only test-network mints can be posted. Finish mint on Tokenise (Retry mint if failed), then refresh this page.';
           } else if (!options.length) {
             hint.hidden = false;
-            hint.textContent = 'No listable RWAs yet. Mint a seed on Tokenise first.';
+            hint.textContent = 'No listable plants yet. Mint a seed on Tokenise first.';
           } else {
             hint.hidden = true;
             hint.textContent = '';
@@ -1180,14 +1180,14 @@
               return listingCardHtml(l, uid);
             }).join('')
           : isGrowerUi()
-            ? '<div class="empty-state">No live offers yet. Mint an RWA in Tokenise, then post it here.</div>'
+            ? '<div class="empty-state">No live offers yet. Mint a plant token in Tokenise, then post it here.</div>'
             : '<div class="empty-state adopt-empty-adopter">' +
               '<p class="adopt-empty-lead">No open offers right now</p>' +
-              '<p class="adopt-empty-body">Growers are still seeding the board on Devnet. When an ask goes live, it shows up here with Invest.</p>' +
+              '<p class="adopt-empty-body">Growers are still seeding the board on the test network. When an ask goes live, it shows up here with Invest.</p>' +
               '<ul class="adopt-empty-steps adopt-empty-steps--bullets">' +
-              '<li>Check back after growers mint and post RWAs</li>' +
-              '<li>Meanwhile, connect your Devnet wallet under My garden</li>' +
-              '<li>Read Risks &amp; FAQ on the marketing site if you are new to Devnet</li>' +
+              '<li>Check back after growers mint and post plants</li>' +
+              '<li>Meanwhile, connect your test-network wallet under My garden</li>' +
+              '<li>Read Risks &amp; FAQ on the marketing site if you are new to the flow</li>' +
               '</ul>' +
               '<button type="button" class="btn btn-ghost" id="market-empty-garden-btn">Back to My garden</button>' +
               '</div>';
@@ -1197,7 +1197,7 @@
           ? mine.map(function (l) {
               return listingCardHtml(l, uid);
             }).join('')
-          : '<div class="empty-state">You have not posted any RWA offers yet.</div>';
+          : '<div class="empty-state">You have not posted any plant offers yet.</div>';
       }
       if (window.AdoptPlant && typeof AdoptPlant.renderTestFaucetPanel === 'function') {
         try {

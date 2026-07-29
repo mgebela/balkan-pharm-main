@@ -526,6 +526,8 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Avoid white flash on mobile scroll compositing. */
+  background-color: var(--bg);
 }
 
 body {
@@ -1512,56 +1514,79 @@ body.notif-open {
   display: block;
 }
 
-/* Buttons */
+/* Buttons — flat terracotta, matches landing CTAs */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1rem;
-  min-height: 44px;
-  min-width: 44px;
+  padding: 0.75rem 1.35rem;
+  min-height: 48px;
+  min-width: 48px;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 12px;
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 650;
   font-size: 0.95rem;
-  border: none;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  box-shadow: none;
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
+  background: #d45a38;
   color: #f7eee1;
-  border: 1px solid rgba(255, 180, 140, 0.28);
-  box-shadow: 0 10px 28px rgba(180, 71, 43, 0.28);
+  border-color: rgba(255, 190, 160, 0.32);
+  box-shadow: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(180deg, #e06848 0%, #a04028 100%);
+  background: #e06a4a;
   color: #f7eee1;
-  transform: translateY(-1px);
-  box-shadow: 0 14px 34px rgba(180, 71, 43, 0.34);
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:active {
+  background: #b4472b;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid #e8c46a;
+  outline-offset: 3px;
 }
 
 .btn-ghost {
-  background: rgba(120, 200, 130, 0.06);
-  color: #b8ffc8;
-  border: 1px solid rgba(120, 220, 140, 0.28);
+  background: transparent;
+  color: var(--text-muted);
+  border-color: rgba(140, 200, 140, 0.28);
 }
 
 .btn-ghost:hover {
-  background: rgba(120, 200, 130, 0.14);
-  color: #e8ffe9;
+  background: rgba(120, 200, 130, 0.1);
+  color: #f4fff4;
+  border-color: rgba(157, 255, 176, 0.4);
+}
+
+.btn-ghost:active {
+  background: rgba(120, 200, 130, 0.16);
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid #9dffb0;
+  outline-offset: 3px;
 }
 
 .btn-sm {
   min-height: 36px;
   min-width: 0;
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.85rem;
   font-size: 0.82rem;
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .toolbar {
@@ -4464,10 +4489,12 @@ body:not(.app-loading) {
   box-shadow: var(--shadow-md);
 }
 
-/* Primary button: desk rust stamp */
+/* Primary button: flat terracotta stamp */
 .btn-primary {
-  border: 1px solid rgba(255, 180, 140, 0.28);
+  border: 1px solid rgba(255, 190, 160, 0.32);
   color: #f7eee1;
+  background: #d45a38;
+  box-shadow: none;
 }
 
 /* Recent notes: left accent strip */
@@ -6278,21 +6305,27 @@ body.profile-adopter .adopt-hero-text h2 {
   gap: 0.45rem;
   margin: 0;
   padding: 0.72rem 1rem;
-  border-radius: 999px;
-  border: 1px solid rgba(180, 71, 43, 0.45);
-  background: linear-gradient(145deg, #9a3d26 0%, #b4472b 55%, #c45a3a 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 190, 160, 0.32);
+  background: #d45a38;
   color: #faf4ea;
   font: inherit;
-  font-weight: 700;
+  font-weight: 650;
   font-size: 0.9rem;
   cursor: pointer;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
-  transition: transform 0.18s ease, filter 0.18s ease;
+  box-shadow: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .ai-coach-fab:hover {
-  filter: brightness(1.06);
-  transform: translateY(-1px);
+  background: #e06a4a;
+  filter: none;
+  transform: none;
+}
+
+.ai-coach-fab:focus-visible {
+  outline: 2px solid #e8c46a;
+  outline-offset: 3px;
 }
 
 .ai-coach-fab[hidden] {
@@ -6372,7 +6405,7 @@ body.profile-adopter .adopt-hero-text h2 {
   align-items: center;
   justify-content: center;
   color: #fff8f2;
-  background: linear-gradient(145deg, #8e3520, #b4472b);
+  background: #d45a38;
   flex-shrink: 0;
 }
 
@@ -6848,18 +6881,25 @@ body.profile-adopter .adopt-hero-text h2 {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 12px;
-  border: none;
-  background: linear-gradient(145deg, #8e3520, #b4472b);
+  border: 1px solid rgba(255, 190, 160, 0.32);
+  background: #d45a38;
   color: #faf4ea;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   padding: 0;
+  box-shadow: none;
 }
 
 .ai-coach-send:hover {
-  filter: brightness(1.06);
+  background: #e06a4a;
+  filter: none;
+}
+
+.ai-coach-send:focus-visible {
+  outline: 2px solid #e8c46a;
+  outline-offset: 3px;
 }
 
 .ai-coach-send:disabled {

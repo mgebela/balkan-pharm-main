@@ -1041,8 +1041,8 @@
         '</h3>' +
         '<p>' +
         (isAdopterUi()
-          ? 'Browse your garden anytime. Connect a Solana wallet on Devnet when you invest or claim rewards.'
-          : 'Link a Solana wallet on Devnet to mint seed NFTs and earn $GROWTOO.') +
+          ? 'Browse your garden anytime. Connect a Solana wallet on the test network when you invest or claim rewards.'
+          : 'Link a Solana wallet on the test network (Devnet) to mint seed NFTs and earn $GROWTOO. The journal works without a wallet.') +
         '</p>' +
         '</div>' +
         '<button type="button" class="btn btn-primary" id="adopt-connect-btn">Connect wallet</button>' +
@@ -2008,7 +2008,7 @@
     let body =
       '<div class="test-faucet-card">' +
       '<div class="test-faucet-copy">' +
-      '<strong>Devnet test faucet</strong>' +
+      '<strong>Test-network faucet</strong>' +
       '<p>Claim <strong>' +
       esc(String(amount)) +
       ' $GROWTOO</strong> once per UTC day to your connected wallet — enough to try Invest / adopt stake.</p>' +

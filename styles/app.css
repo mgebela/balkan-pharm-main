@@ -135,48 +135,68 @@ body {
   display: block;
 }
 
-/* Buttons */
+/* Buttons — flat terracotta, matches landing CTAs */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.55rem 1rem;
-  min-height: 44px;
-  min-width: 44px;
+  padding: 0.75rem 1.35rem;
+  min-height: 48px;
+  min-width: 48px;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 12px;
   font-family: var(--font);
-  font-weight: 600;
+  font-weight: 650;
   font-size: 0.95rem;
-  border: none;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  box-shadow: none;
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {
-  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-bright) 100%);
-  color: #06201a;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 14px 34px rgba(45, 212, 191, 0.18);
+  background: #d45a38;
+  color: #f7eee1;
+  border-color: rgba(255, 190, 160, 0.32);
+  box-shadow: none;
 }
 
 .btn-primary:hover {
-  background: linear-gradient(90deg, var(--accent-hover) 0%, var(--accent) 100%);
-  color: #06201a;
-  transform: translateY(-1px);
-  box-shadow: 0 18px 44px rgba(45, 212, 191, 0.22);
+  background: #e06a4a;
+  color: #f7eee1;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:active {
+  background: #b4472b;
+}
+
+.btn-primary:focus-visible {
+  outline: 2px solid #e8c46a;
+  outline-offset: 3px;
 }
 
 .btn-ghost {
   background: transparent;
   color: var(--text-muted);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(140, 200, 140, 0.28);
 }
 
 .btn-ghost:hover {
-  background: var(--surface);
+  background: rgba(120, 200, 130, 0.1);
   color: var(--text);
+  border-color: rgba(157, 255, 176, 0.4);
+  transform: none;
+}
+
+.btn-ghost:focus-visible {
+  outline: 2px solid #9dffb0;
+  outline-offset: 3px;
 }
 
 .toolbar {

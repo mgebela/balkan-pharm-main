@@ -23,6 +23,9 @@
       --desk-panel: linear-gradient(180deg, rgba(10, 28, 18, 0.94) 0%, rgba(8, 18, 12, 0.98) 100%);
     }
     * { box-sizing: border-box; }
+    html {
+      background-color: var(--bg);
+    }
     body {
       margin: 0;
       min-height: 100vh;
@@ -224,23 +227,50 @@
     .check-row a { color: #b8ffc8; }
     button[type="submit"] {
       width: 100%;
-      border: 1px solid rgba(255, 180, 140, 0.28);
-      border-radius: 6px;
-      padding: 0.75rem 0.9rem;
-      font-weight: 700;
+      border: 1px solid rgba(255, 190, 160, 0.32);
+      border-radius: 12px;
+      padding: 0.75rem 1.35rem;
+      min-height: 48px;
+      font-weight: 650;
+      font-size: 0.95rem;
       color: #f7eee1;
-      background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
+      background: #d45a38;
+      box-shadow: none;
       cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    button[type="submit"]:hover {
+      background: #e06a4a;
+    }
+    button[type="submit"]:active {
+      background: #b4472b;
+    }
+    button[type="submit"]:focus-visible {
+      outline: 2px solid #e8c46a;
+      outline-offset: 3px;
     }
     button[type="submit"].submit--grower {
-      border-color: rgba(120, 220, 140, 0.35);
+      border-color: rgba(120, 220, 140, 0.4);
       color: #06201a;
-      background: linear-gradient(180deg, #9dffb0 0%, #2f8f4e 100%);
+      background: #9dffb0;
+    }
+    button[type="submit"].submit--grower:hover {
+      background: #b8ffc8;
+    }
+    button[type="submit"].submit--grower:active {
+      background: #7dff9c;
+    }
+    button[type="submit"].submit--grower:focus-visible {
+      outline: 2px solid #9dffb0;
+      outline-offset: 3px;
     }
     button[type="submit"].submit--adopter {
-      border-color: rgba(255, 180, 140, 0.35);
+      border-color: rgba(255, 190, 160, 0.32);
       color: #f7eee1;
-      background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
+      background: #d45a38;
+    }
+    button[type="submit"].submit--adopter:hover {
+      background: #e06a4a;
     }
     button[type="submit"]:disabled {
       opacity: 0.65;
@@ -270,17 +300,25 @@
       justify-content: center;
       gap: 0.55rem;
       border: 1px solid rgba(140, 200, 140, 0.28);
-      border-radius: 6px;
-      padding: 0.7rem 0.9rem;
+      border-radius: 12px;
+      padding: 0.75rem 1.35rem;
+      min-height: 48px;
       font: inherit;
       font-weight: 650;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: #f4fff4;
-      background: rgba(255, 255, 255, 0.06);
+      background: transparent;
+      box-shadow: none;
       cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
     }
     .btn-google:hover {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(120, 200, 130, 0.1);
+      border-color: rgba(157, 255, 176, 0.4);
+    }
+    .btn-google:focus-visible {
+      outline: 2px solid #9dffb0;
+      outline-offset: 3px;
     }
     .btn-google:disabled {
       opacity: 0.65;
@@ -332,11 +370,11 @@
     <div class="profile-pick" id="profile-pick" hidden>
       <button type="button" class="profile-option" data-type="grower" id="pick-grower">
         <strong>Grower</strong>
-        <span>Log care, tokenise stages, unlock $GROWTOO.</span>
+        <span>Free journal first. Optional on-chain proof when you want it.</span>
       </button>
       <button type="button" class="profile-option" data-type="adopter" id="pick-adopter">
         <strong>Adopter</strong>
-        <span>Stake $GROWTOO, adopt RWAs, track growth.</span>
+        <span>Follow a real plant’s trail. Crypto is optional until you invest.</span>
       </button>
     </div>
 
@@ -396,21 +434,21 @@
         <div class="choice-grid" id="adopter-intent-choices" role="group" aria-label="Adopter intent">
           <button type="button" class="choice-option is-selected" data-intent="support_growers">
             <strong>Support growers</strong>
-            <span>Back real grows with $GROWTOO stakes</span>
+            <span>Follow a real plant’s care trail</span>
           </button>
           <button type="button" class="choice-option" data-intent="collect_garden">
             <strong>Collect a garden</strong>
-            <span>Adopt RWAs and follow growth stages</span>
+            <span>Adopt plant tokens and watch stages</span>
           </button>
           <button type="button" class="choice-option" data-intent="earn_rewards">
-            <strong>Earn rewards</strong>
-            <span>Track $GROWTOO and harvest unlocks</span>
+            <strong>Learn the flow</strong>
+            <span>Practice stakes on test assets (no real value)</span>
           </button>
         </div>
       </div>
       <label class="check-row signup-only">
         <input type="checkbox" id="accept-devnet" />
-        <span>I understand staking uses Solana Devnet for now.</span>
+        <span>I understand this uses Solana’s public test network (Devnet) — assets have no monetary value.</span>
       </label>
     </div>
 
@@ -435,7 +473,7 @@
     <p id="login-status" aria-live="polite"></p>
     <div class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
-  <script src="../app/js/signup.js?v=20260724d"></script>
+  <script src="../app/js/signup.js?v=20260729c"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
     import {
@@ -548,21 +586,21 @@
       submitBtn.classList.remove('submit--grower', 'submit--adopter');
       if (isSignup && profileType === 'grower') {
         submitBtn.classList.add('submit--grower');
-        submitBtn.textContent = 'Create grower account';
+        submitBtn.textContent = 'Start your journal free';
         googleLabel.textContent = 'Sign up with Google';
-        titleEl.textContent = 'Start your grow journal';
-        leadEl.textContent = 'Log care, tokenise stages, unlock $GROWTOO.';
+        titleEl.textContent = 'Start your journal free';
+        leadEl.textContent = 'Log watering, feeding, and stages. On-chain proof is optional — never required to start.';
       } else if (isSignup && profileType === 'adopter') {
         submitBtn.classList.add('submit--adopter');
-        submitBtn.textContent = 'Create adopter account';
+        submitBtn.textContent = 'Enter as Adopter';
         googleLabel.textContent = 'Sign up with Google';
-        titleEl.textContent = 'Start your garden';
-        leadEl.textContent = 'Stake $GROWTOO, adopt RWAs, track growth.';
+        titleEl.textContent = 'Enter as Adopter';
+        leadEl.textContent = 'Follow a plant’s journal trail. Test-network stakes are optional and have no monetary value.';
       } else if (isSignup) {
         submitBtn.textContent = 'Create account';
         googleLabel.textContent = 'Sign up with Google';
         titleEl.textContent = 'Create your account';
-        leadEl.textContent = 'Pick Grower or Adopter. Each has its own app workspace.';
+        leadEl.textContent = 'Growers start with the journal. Adopters follow a plant. Pick your desk.';
       } else {
         submitBtn.textContent = 'Sign in';
         googleLabel.textContent = 'Continue with Google';

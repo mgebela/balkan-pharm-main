@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260729a" />
+  <link rel="stylesheet" href="styles/app.css?v=20260729c" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
 <body class="app-loading">
@@ -240,12 +240,12 @@
         <section class="adopt-hero">
           <div class="adopt-hero-text">
             <div class="adopt-hero-top">
-              <h2 class="grower-only">Tokenise your grow</h2>
+              <h2 class="grower-only">Optional proof for your journal</h2>
               <h2 class="adopter-only">My adopted garden</h2>
-              <span class="adopt-chain-badge">◎ Devnet</span>
+              <span class="adopt-chain-badge">◎ Test network</span>
             </div>
-            <p class="grower-only">Link journal plants, complete grower quests, and mint stage NFTs for <strong>$GROWTOO</strong>.</p>
-            <p class="adopter-only">Back a real grow with <strong>$GROWTOO</strong>, then track the plant’s verified stages here.</p>
+            <p class="grower-only">Your plants and care logs come first. When you want a checkable trail, mint stage proof on Solana’s test network (Devnet) for <strong>$GROWTOO</strong> — test assets only.</p>
+            <p class="adopter-only">Follow a real plant’s journal trail. Backing with <strong>$GROWTOO</strong> is optional and has no monetary value on the test network.</p>
           </div>
         </section>
 
@@ -256,20 +256,20 @@
               <span class="adopter-guide-num">1</span>
               <div>
                 <strong>Browse the market</strong>
-                <p>Open offers are real grower RWAs with a journal trail behind them.</p>
+                <p>Open offers are grower plant tokens with a journal trail behind them.</p>
               </div>
             </li>
             <li>
               <span class="adopter-guide-num">2</span>
               <div>
-                <strong>Connect a Devnet wallet</strong>
+                <strong>Connect a test-network wallet</strong>
                 <p>Phantom or Solflare on Devnet. Needed only when you tap Invest.</p>
               </div>
             </li>
             <li>
               <span class="adopter-guide-num">3</span>
               <div>
-                <strong>Stake $GROWTOO</strong>
+                <strong>Back with $GROWTOO</strong>
                 <p>Instant sale transfers the NFT now. Adopt stake locks half until harvest care.</p>
               </div>
             </li>
@@ -286,7 +286,7 @@
             <button type="button" class="btn btn-ghost" id="adopter-guide-wallet-btn">Connect wallet</button>
           </div>
           <p class="adopter-guide-note">
-            Devnet only — $GROWTOO has no monetary value. You’re testing the trust flow before mainnet.
+            Test network only — $GROWTOO has no monetary value. You’re learning the trust flow before real stakes exist.
           </p>
         </section>
 
@@ -305,7 +305,7 @@
 
         <div class="adopt-notice grower-only" id="adopt-notice">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Use Phantom or Solflare on <strong>Devnet</strong>. Seed NFTs mint on-chain after you log cultivation data.</p>
+          <p>Use Phantom or Solflare on Solana’s <strong>test network (Devnet)</strong>. Seed NFTs mint after you log cultivation data. Journal works without a wallet.</p>
         </div>
         <div class="adopt-notice adopter-only">
           <span class="adopt-notice-icon" aria-hidden="true">◎</span>
@@ -362,17 +362,17 @@
             <li>After settle, track the plant under <strong>My garden</strong>.</li>
           </ul>
           <p class="adopter-guide-note">
-            Need $GROWTOO on Devnet? Claim the free test faucet below (once per day), then Invest.
-            Tokens here have no real value.
+            Need test $GROWTOO? Claim the free faucet below (once per day), then Invest.
+            Tokens here have no monetary value.
           </p>
-          <div id="test-faucet-panel" class="test-faucet-panel" aria-label="Devnet test faucet"></div>
+          <div id="test-faucet-panel" class="test-faucet-panel" aria-label="Test-network faucet"></div>
         </section>
 
         <section class="plants-journal-section grower-only" id="market-list-section" hidden>
-          <h2 class="section-heading">Post an RWA offer</h2>
+          <h2 class="section-heading">Post a plant offer</h2>
           <p class="market-hint">
-            List a real devnet-minted seed or growth-stage NFT for adopters to invest in with $GROWTOO.
-            Listing escrows the NFT to the marketplace wallet until an adopter invests (or you cancel).
+            List a test-network mint (seed or growth stage) for adopters to back with $GROWTOO.
+            Listing escrows the NFT to the marketplace wallet until someone invests (or you cancel).
           </p>
           <form class="adopt-seed-form" id="market-list-form">
             <label>
@@ -412,7 +412,7 @@
             <span class="grower-only">Open market</span>
           </h2>
           <p class="market-hint" id="market-open-hint">
-            <span class="adopter-only">Live asks from growers. Stake $GROWTOO to adopt an RWA — then follow it in My garden.</span>
+            <span class="adopter-only">Live asks from growers. Back a plant with $GROWTOO when you’re ready — then follow it in My garden.</span>
             <span class="grower-only">Public board: other growers’ open asks (yours appear under My offers).</span>
           </p>
           <div class="market-grid" id="market-grid"></div>
@@ -910,7 +910,7 @@
       }
     })();
   </script>
-  <script src="js/chain-config.js?v=20260723f"></script>
+  <script src="js/chain-config.js?v=20260729c"></script>
   <script src="js/solana-rpc.js?v=20260723c"></script>
   <script src="js/solana-wallet.js?v=20260728a"></script>
   <script src="js/wallet-link.js?v=20260728a"></script>
@@ -918,15 +918,15 @@
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260728e"></script>
-  <script src="js/market.js?v=20260729a"></script>
+  <script src="js/market.js?v=20260729c"></script>
   <script src="js/metric-ui.js?v=20260727g"></script>
   <script src="js/token-pixel-art.js?v=20260720b"></script>
   <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
   <script src="js/grower-quests.js?v=20260724h"></script>
   <script src="js/notifications.js?v=20260729a"></script>
-  <script src="js/signup.js?v=20260724d"></script>
-  <script src="js/plant-token.js?v=20260729a"></script>
+  <script src="js/signup.js?v=20260729c"></script>
+  <script src="js/plant-token.js?v=20260729c"></script>
   <script src="js/ai-coach.js?v=20260724h"></script>
-  <script src="js/app.js?v=20260728d"></script>
+  <script src="js/app.js?v=20260729c"></script>
 </body>
 </html>

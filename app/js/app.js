@@ -1227,22 +1227,22 @@ function adopterIntentCopy() {
   const intent = getAdopterIntent();
   if (intent === 'collect_garden') {
     return {
-      hero: 'Collect adopted RWAs and follow each growth stage in your garden.',
-      empty: 'Browse the market to adopt your first plant NFT and grow your collection.',
-      market: 'Find open RWA offers and stake $GROWTOO to add plants to your garden.',
+      hero: 'Collect adopted plants and follow each growth stage in your garden.',
+      empty: 'Browse the market to adopt your first plant and grow your collection.',
+      market: 'Find open plant offers and back them with $GROWTOO when you’re ready.',
     };
   }
   if (intent === 'earn_rewards') {
     return {
-      hero: 'Track $GROWTOO stakes and harvest unlocks from the grows you support.',
-      empty: 'Stake on an open offer to start earning through growth and harvest care.',
-      market: 'Invest $GROWTOO in grower RWAs — follow monthly unlock progress toward harvest.',
+      hero: 'Practice stakes and harvest unlocks on test assets — no monetary value.',
+      empty: 'Back an open offer to start following growth and harvest care on the test network.',
+      market: 'Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.',
     };
   }
   return {
-    hero: 'Back real growers with $GROWTOO and follow the plants you help fund.',
-    empty: 'Browse the market and stake $GROWTOO when you are ready to support a grow.',
-    market: 'Invest $GROWTOO to adopt a grower’s real RWA. Connect your wallet when you tap Invest.',
+    hero: 'Follow a real plant’s journal trail. Backing with $GROWTOO is optional.',
+    empty: 'Browse the market and back a grow with $GROWTOO when you are ready.',
+    market: 'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.',
   };
 }
 
@@ -2424,7 +2424,7 @@ function initFirebaseSync() {
               label: 'Solana wallet',
               value: walletDisplay,
               meta:
-                M.row('Network', 'devnet', 'metric-dot--teal') +
+                M.row('Network', 'test network', 'metric-dot--teal') +
                 M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
               modifier: 'teal',
             }) +
@@ -2432,7 +2432,7 @@ function initFirebaseSync() {
               label: 'Market',
               value: 'Browse',
               meta:
-                M.row('Action', 'Buy & track RWAs', 'metric-dot--amber') +
+                M.row('Action', 'Follow plant trails', 'metric-dot--amber') +
                 M.row('Profile', 'Adopter', 'metric-dot--violet'),
               modifier: 'violet',
             })

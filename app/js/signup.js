@@ -99,7 +99,7 @@
       var intent = normalizeAdopterIntent(raw.adopterIntent);
       if (!intent) return { ok: false, error: 'Choose why you’re joining as an adopter.' };
       if (!raw.acceptedDevnet) {
-        return { ok: false, error: 'Confirm you understand Devnet staking.' };
+        return { ok: false, error: 'Confirm you understand this uses Solana’s test network (no real value).' };
       }
       payload.adopterIntent = intent;
       payload.acceptedDevnet = true;

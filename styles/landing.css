@@ -19,8 +19,7 @@
   --shadow-md: 0 16px 48px rgba(0, 0, 0, 0.45);
   --overlay: rgba(8, 18, 12, 0.72);
   --font: 'Archivo', sans-serif;
-  --font-serif: 'Lora', serif;
-  --font-brand: 'Fredoka', 'Archivo', sans-serif;
+  --font-brand: 'Archivo', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --desk-panel: linear-gradient(180deg, #163024 0%, #12241c 100%);
   --desk-line: rgba(157, 255, 176, 0.18);
@@ -382,10 +381,10 @@ body:has(.devnet-banner) .header {
 }
 
 .logo-hero {
-  font-family: var(--font-serif);
+  font-family: var(--font);
   font-size: clamp(2.4rem, 6vw, 3.6rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   margin: 0 0 0.85rem;
   line-height: 1.1;
 }
@@ -600,9 +599,10 @@ body:has(.devnet-banner) .header {
 
 .desk-seat-register {
   align-self: flex-start;
-  font-family: var(--font-serif);
+  font-family: var(--font);
   font-size: 0.78rem;
-  font-style: italic;
+  font-style: normal;
+  font-weight: 500;
   letter-spacing: 0.02em;
   color: rgba(232, 210, 170, 0.72);
 }
@@ -1336,31 +1336,54 @@ body:has(.devnet-banner) .header {
   background: rgba(120, 200, 130, 0.06);
 }
 
-.desk-spec-code {
+.desk-spec-code,
+.desk-spec-icon {
   flex: 0 0 auto;
-  min-width: 2.4rem;
-  padding: 0.28rem 0.35rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   font-family: var(--font);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   color: #102016;
-  background: linear-gradient(180deg, #ffe7a8 0%, #e8c46a 100%);
-  border-radius: 3px;
+  background: #e8c46a;
+  border-radius: 10px;
 }
 
-.desk-spec-code--green {
-  background: linear-gradient(180deg, #b8ffc8 0%, #6edf8a 100%);
+.desk-spec-icon svg {
+  display: block;
 }
 
-.desk-spec-code--rust {
-  background: linear-gradient(180deg, #ffc4b0 0%, #d45a38 100%);
+.desk-spec-code--green,
+.desk-spec-icon--green {
+  background: #6edf8a;
+}
+
+.desk-spec-code--rust,
+.desk-spec-icon--rust {
+  background: #d45a38;
   color: #2a1008;
 }
 
-.desk-spec-code--brass {
-  background: linear-gradient(180deg, #fff0c4 0%, #e0b84a 100%);
+.desk-spec-code--brass,
+.desk-spec-icon--brass {
+  background: #e0b84a;
+}
+
+.desk-spec-icon--verify {
+  background: #6edf8a;
+  color: #102016;
+}
+
+.desk-spec-icon--cool {
+  background: #5ec8d8;
+  color: #041416;
 }
 
 .desk-spec h3 {
@@ -1820,8 +1843,9 @@ body:has(.devnet-banner) .header {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: var(--font-serif);
+  font-family: var(--font-brand);
   font-size: 1.15rem;
+  font-weight: 700;
   color: #f4fff4;
   margin-bottom: 0.35rem;
 }
@@ -3630,6 +3654,53 @@ body:has(.devnet-banner) .header {
   text-align: left;
 }
 
+.section-photo {
+  margin: 0 0 1.75rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #06100c;
+}
+
+.section-photo img {
+  display: block;
+  width: 100%;
+  height: clamp(12rem, 32vw, 22rem);
+  object-fit: cover;
+  object-position: center;
+}
+
+.section-photo figcaption {
+  margin: 0;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.section-photo--adopters img {
+  object-position: center 40%;
+}
+
+.trail-photo {
+  margin: 0 0 1.15rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  max-height: 16rem;
+}
+
+.trail-photo img {
+  display: block;
+  width: 100%;
+  height: 16rem;
+  object-fit: cover;
+  object-position: center 35%;
+}
+
 .audience-grid--flip .audience-copy {
   order: 2;
 }
@@ -3909,14 +3980,16 @@ body:has(.devnet-banner) .header {
   border-color: rgba(94, 200, 216, 0.28);
 }
 
-.desk-spec-code--verify {
+.desk-spec-code--verify,
+.desk-spec-icon--verify {
   color: #102016;
-  background: linear-gradient(180deg, #c8ffd4 0%, #6edf8a 100%);
+  background: #6edf8a;
 }
 
-.desk-spec-code--cool {
+.desk-spec-code--cool,
+.desk-spec-icon--cool {
   color: #041416;
-  background: linear-gradient(180deg, #b8f0f8 0%, #5ec8d8 100%);
+  background: #5ec8d8;
 }
 
 .desk-panel-meta--verify {
@@ -4243,11 +4316,22 @@ body:has(.devnet-banner) .header {
 
 .builder-voice {
   margin: 1rem 0 0 !important;
-  font-family: var(--font-serif);
-  font-style: italic;
+  font-family: var(--font);
+  font-style: normal;
+  font-weight: 500;
   font-size: 0.95rem !important;
-  color: rgba(220, 235, 210, 0.82) !important;
-  line-height: 1.45;
+  color: rgba(220, 235, 210, 0.88) !important;
+  line-height: 1.5;
+}
+
+.builder-voice-attr {
+  display: block;
+  margin-top: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
 }
 
 .desk-section--faq {
@@ -4555,8 +4639,8 @@ body:has(.devnet-banner) .header {
 }
 
 .stakes-row-price {
-  font-family: var(--font-serif, 'Lora', serif);
-  font-weight: 600;
+  font-family: var(--font);
+  font-weight: 700;
   color: var(--accent-warm, #e8c46a);
   text-align: right;
   white-space: nowrap;
@@ -4627,9 +4711,9 @@ body:has(.devnet-banner) .header {
 }
 
 .stakes-kpi-value {
-  font-family: var(--font-serif, 'Lora', serif);
+  font-family: var(--font);
   font-size: 1.2rem;
-  font-weight: 600;
+  font-weight: 700;
   color: #f4fff4;
   letter-spacing: -0.02em;
   display: block;
