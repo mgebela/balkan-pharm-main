@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260729c" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260729d" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -26,9 +26,9 @@
       </button>
       <nav class="nav" id="main-nav">
         <a href="#proof" class="nav-link">How it works</a>
-        <a href="#stakes" class="nav-link">Stakes</a>
         <a href="#growers" class="nav-link">Growers</a>
         <a href="#adopters" class="nav-link">Adopters</a>
+        <a href="#stakes" class="nav-link">Stakes</a>
         <a href="#faq" class="nav-link">FAQ</a>
         <a href="rwa-docs/" class="nav-link">Docs</a>
         <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start free</a>
@@ -61,7 +61,7 @@
           <p class="hero-cta-note">
             Prefer to follow someone else’s grow?
             <a href="dnevnik/?mode=signup&type=adopter">Enter as an adopter</a>
-            · <a href="#stakes">See live Devnet stakes</a>
+            · <a href="#stakes">See live test-network stakes</a>
           </p>
         </div>
       </div>
@@ -75,67 +75,6 @@
         <span>Proof optional</span>
       </div>
     </div>
-
-    <section id="stakes" class="section desk-section desk-section--stakes">
-      <div class="container">
-        <div class="desk-header">
-          <span class="desk-tag desk-tag--adopter">Optional · Devnet</span>
-          <h2>Live stakes, when you’re ready</h2>
-          <p class="section-lead">
-            After the journal, adopters can back open grower asks on Devnet.
-            Test assets only — $GROWTOO has no monetary value.
-          </p>
-        </div>
-
-        <div class="stakes-desk" id="stakes-desk" data-state="loading">
-          <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
-            <p class="stakes-panel-label">Available stakes</p>
-            <p class="stakes-panel-meta" id="stakes-open-meta">Loading open offers…</p>
-            <ol class="stakes-list" id="stakes-open-list"></ol>
-            <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
-            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
-          </aside>
-
-          <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
-            <p class="stakes-panel-label">Already staked</p>
-            <div class="stakes-kpis">
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Contracts</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-count">—</strong>
-              </div>
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">$GROWTOO in</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-value">—</strong>
-              </div>
-              <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Open ask</span>
-                <strong class="stakes-kpi-value" id="stakes-kpi-open">—</strong>
-              </div>
-            </div>
-            <div class="stakes-mix" aria-hidden="true">
-              <div class="stakes-mix-track">
-                <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
-                <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
-              </div>
-              <div class="stakes-mix-legend">
-                <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
-                <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
-              </div>
-            </div>
-            <div class="stakes-bars" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
-            <p class="stakes-panel-note" id="stakes-updated">Updating…</p>
-          </aside>
-        </div>
-
-        <aside class="founding-banner founding-banner--inline">
-          <strong>Founding Growers shape what ships next.</strong>
-          <p>
-            Journal (and optionally mint) on Devnet now for a Founding Grower badge carried to mainnet,
-            plus early access before features go public.
-          </p>
-        </aside>
-      </div>
-    </section>
 
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
@@ -200,32 +139,66 @@
           </li>
         </ol>
 
-        <article id="trail" class="example-plant">
+        <div id="trail" class="trail-proof">
           <div class="example-plant-head">
-            <span class="desk-tag desk-tag--verify">One plant story</span>
-            <h3>Follow a real plant. Open the txs yourself.</h3>
+            <span class="desk-tag desk-tag--verify">Checkable plants</span>
+            <h3>Four plants. Open the transactions yourself.</h3>
             <p>
-              Example plant on Solana Devnet (CBD Auto #1). This is the adopter appeal too: not a ticker,
-              a plant you can watch and verify stage by stage.
+              Real mint records on Solana’s public test network (Devnet) — not a ticker demo.
+              Each link opens the explorer so you can verify the trail yourself.
             </p>
           </div>
-          <ol class="example-timeline">
-            <li>
-              <span>Seed minted</span><time>15 Jul</time>
+
+          <ul class="trail-grid" aria-label="Example plant mint trails">
+            <li class="trail-card">
+              <p class="trail-card-name">CBD Auto #1</p>
+              <p class="trail-card-meta">Seed minted · 15 Jul</p>
               <a class="verify-code" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 31H6…5emD</a>
             </li>
-            <li>
-              <span>Transferred</span><time>17 Jul</time>
-              <a class="verify-code" href="https://explorer.solana.com/tx/38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 38eu…wyzn</a>
+            <li class="trail-card">
+              <p class="trail-card-name">Gold Bloom #1</p>
+              <p class="trail-card-meta">Seed minted · 19 Jul</p>
+              <a class="verify-code" href="https://explorer.solana.com/tx/2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 2xds…nozH</a>
             </li>
-            <li>
-              <span>Art updated</span><time>17 Jul</time>
-              <a class="verify-code" href="https://explorer.solana.com/tx/3TWuswDMsrc6KGWWpdGR91GaUPvRqD5wDu4tnf9ooj3nfFEjF9osiadP7usjd84T4vEKh2tCuTmJhdnmi7dbmMWh?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 3TWu…bMWh</a>
+            <li class="trail-card">
+              <p class="trail-card-name">Charlotte’s Web #1</p>
+              <p class="trail-card-meta">Seed minted · 15 Jul</p>
+              <a class="verify-code" href="https://explorer.solana.com/tx/4wPzcmqEZMt4eBTUURAYq59TCwHmmidz9A28YTYwZ8PvcVkrzY7w5T5bZ8PX33meGJcbHSyy2wbgmE1Nf9c3QZDv?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 4wPz…QZDv</a>
             </li>
-            <li><span>Stage advances</span><time>ongoing</time><span class="example-pending">Logged in journal, minted in Tokenise</span></li>
-            <li><span>Harvest</span><time>planned</time><span class="example-pending">M5 redemption path</span></li>
-          </ol>
-        </article>
+            <li class="trail-card">
+              <p class="trail-card-name">Harlequin #1</p>
+              <p class="trail-card-meta">Seed minted · 15 Jul</p>
+              <a class="verify-code" href="https://explorer.solana.com/tx/2ku2UhinDShq7Qdtr8EdQy7J5VZJdjuLRJ4U23S2Fuxcv6RaQrD1Viqaj2W2BeUXj1iu9eRMtW9ekWKTz6TqBRqu?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 2ku2…BRqu</a>
+            </li>
+          </ul>
+
+          <article class="example-plant">
+            <div class="example-plant-head">
+              <span class="desk-tag desk-tag--verify">Full trail · CBD Auto #1</span>
+              <h3>Stage by stage on one plant</h3>
+              <p>
+                Mint, transfer, and art update are separate checkable steps. Harvest redemption
+                (turning a finished plant token into its real-world counterpart) is still on the roadmap.
+              </p>
+            </div>
+            <ol class="example-timeline">
+              <li>
+                <span>Seed minted</span><time>15 Jul</time>
+                <a class="verify-code" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 31H6…5emD</a>
+              </li>
+              <li>
+                <span>Transferred</span><time>17 Jul</time>
+                <a class="verify-code" href="https://explorer.solana.com/tx/38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 38eu…wyzn</a>
+              </li>
+              <li>
+                <span>Art updated</span><time>17 Jul</time>
+                <a class="verify-code" href="https://explorer.solana.com/tx/3TWuswDMsrc6KGWWpdGR91GaUPvRqD5wDu4tnf9ooj3nfFEjF9osiadP7usjd84T4vEKh2tCuTmJhdnmi7dbmMWh?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 3TWu…bMWh</a>
+              </li>
+              <li><span>Stage advances</span><time>ongoing</time><span class="example-pending">Logged in journal, minted in Tokenise</span></li>
+              <li><span>Harvest</span><time>planned</time><span class="example-pending">Redemption path (roadmap)</span></li>
+            </ol>
+          </article>
+        </div>
 
         <div class="proof-fork" id="join">
           <p class="proof-fork-lead">Pick your desk</p>
@@ -301,9 +274,9 @@
             care logs, stage changes, and checkable updates tied to one plant’s life.
           </p>
           <p>
-            If you’re RWA-curious and want something tangible (not another institutional fund wrapper),
-            start by following the evidence trail. Devnet assets have no monetary value — use them to
-            learn the trust flow before real stakes exist.
+            If you’re curious about real-world assets (RWAs: tokens tied to something physical, here a plant)
+            and want something tangible — not another fund wrapper — start with the evidence trail.
+            Test-network assets have no monetary value; use them to learn the trust flow before real stakes exist.
           </p>
           <ul class="audience-bullets audience-bullets--verify">
             <li>“I can watch this plant grow” beats yield promises</li>
@@ -340,7 +313,7 @@
               <span class="desk-spec-code desk-spec-code--cool">03</span>
               <div>
                 <h3>Early access</h3>
-                <p>Retail-scale RWA practice before mainnet stakes.</p>
+                <p>Practice following a plant token before real-money stakes.</p>
               </div>
             </div>
           </div>
@@ -348,22 +321,88 @@
       </div>
     </section>
 
+    <section id="stakes" class="section desk-section desk-section--stakes">
+      <div class="container">
+        <div class="desk-header">
+          <span class="desk-tag desk-tag--adopter">Optional · test network</span>
+          <h2>Live stakes, when you’re ready</h2>
+          <p class="section-lead">
+            After the journal, adopters can back open grower asks on Solana’s public test network (Devnet).
+            Test assets only — $GROWTOO has no monetary value.
+          </p>
+        </div>
+
+        <div class="stakes-desk" id="stakes-desk" data-state="loading" aria-busy="true">
+          <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
+            <p class="stakes-panel-label">Available stakes</p>
+            <p class="stakes-panel-meta" id="stakes-open-meta">Fetching live offers…</p>
+            <div class="stakes-list-skeleton" id="stakes-open-skeleton" aria-hidden="true">
+              <span class="stakes-skel-row"></span>
+              <span class="stakes-skel-row"></span>
+              <span class="stakes-skel-row"></span>
+            </div>
+            <ol class="stakes-list" id="stakes-open-list" hidden></ol>
+            <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
+            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
+          </aside>
+
+          <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
+            <p class="stakes-panel-label">Already staked</p>
+            <div class="stakes-kpis">
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">Contracts</span>
+                <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-count" aria-label="Loading"></strong>
+              </div>
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">$GROWTOO in</span>
+                <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-value" aria-label="Loading"></strong>
+              </div>
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">Open ask</span>
+                <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-open" aria-label="Loading"></strong>
+              </div>
+            </div>
+            <div class="stakes-mix" aria-hidden="true">
+              <div class="stakes-mix-track stakes-mix-track--pending">
+                <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
+                <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
+              </div>
+              <div class="stakes-mix-legend">
+                <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
+                <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
+              </div>
+            </div>
+            <div class="stakes-bars stakes-bars--pending" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
+            <p class="stakes-panel-note" id="stakes-updated">Fetching live board…</p>
+          </aside>
+        </div>
+
+        <aside class="founding-banner founding-banner--inline">
+          <strong>Early growers help shape what ships next.</strong>
+          <p>
+            Journal (and optionally mint) on the test network now. Early growers get a Founding Grower
+            recognition badge we intend to carry to the live network, plus early access before features go public.
+          </p>
+        </aside>
+      </div>
+    </section>
+
     <section id="status" class="section desk-section desk-section--status">
       <div class="container status-block">
         <span class="desk-tag">Where we are right now</span>
-        <h2>Solana Devnet: real system, test assets</h2>
+        <h2>Solana test network: real system, test assets</h2>
         <p>
-          growtoo runs on Solana Devnet while we build toward mainnet. Your plants, journal entries,
-          and grow data are real. The tokens are test assets with no monetary value yet. Every mint,
-          transfer, and trade you see is a real transaction on Devnet, so you can verify exactly how
-          the system works before real value is on the line.
+          growtoo runs on Solana’s public test network (Devnet) while we build toward the live network (mainnet).
+          Your plants, journal entries, and grow data are real. The tokens are test assets with no monetary value yet.
+          Every mint, transfer, and trade you see is a real transaction on that test network, so you can verify
+          exactly how the system works before real value is on the line.
         </p>
         <p class="builder-voice">
           “We started with the journal because documentation is the asset. Tokens only matter if
           the grow behind them is real.” (growtoo team)
         </p>
         <p class="status-links">
-          <a href="rwa-docs/">Read the RWA docs →</a>
+          <a href="rwa-docs/">Read the architecture docs →</a>
           <a href="risks/">Risks &amp; scope →</a>
         </p>
       </div>
@@ -381,7 +420,7 @@
             <summary>Do I need to know anything about crypto to use this?</summary>
             <p>
               No. The journal is free and usable with no wallet at all. A Solana wallet (Phantom or Solflare)
-              is only needed if you want to mint or adopt on Devnet.
+              is only needed if you want to mint or adopt on the test network.
             </p>
           </details>
           <details class="faq-item">
@@ -395,7 +434,7 @@
           <details class="faq-item">
             <summary>Who verifies that a journal entry is real, not fabricated?</summary>
             <p>
-              Today, the platform operator reviews journal progress before minting. The mainnet roadmap
+              Today, the platform operator reviews journal progress before minting. The live-network roadmap
               moves this toward stronger attestations so no single party has to be trusted forever.
               Details live in the <a href="rwa-docs/">trust model docs</a>.
             </p>
@@ -405,37 +444,39 @@
             <p>
               Redemption converts a harvest-stage token into its real-world counterpart, subject to
               applicable regulation in the grower’s jurisdiction. Today redemption is specified but still
-              mocked on Devnet, not a live fulfillment pipeline. Read
+              mocked on the test network, not a live fulfillment pipeline. Read
               <a href="risks/">Risks &amp; scope</a> for the honest limits.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Why build on Devnet instead of going live with real money?</summary>
+            <summary>Why build on a test network instead of going live with real money?</summary>
             <p>
               So the system (journal proof, minting, escrow, redemption) can be battle-tested in the open
               first. Growers and adopters can see exactly how it works before anything real is at stake.
+              “Devnet” is Solana’s public test network — same tools, no real value.
             </p>
           </details>
           <details class="faq-item">
             <summary>Is $GROWTOO worth anything right now?</summary>
             <p>
-              No. It’s a Devnet test token with no monetary value. It exists so the optional
+              No. It’s a test-network token with no monetary value. It exists so the optional
               mint → verify → adopt flow can be tested publicly before real value is on the line.
             </p>
           </details>
           <details class="faq-item">
-            <summary>What happens to my $GROWTOO when mainnet launches?</summary>
+            <summary>What happens to my $GROWTOO when the live network launches?</summary>
             <p>
-              Devnet $GROWTOO is for testing the flow and should not be treated as transferable monetary
-              balance. Founding Grower recognition is intended to carry forward; exact mainnet migration
-              rules will be published before launch.
+              Test-network $GROWTOO is for practicing the flow and should not be treated as transferable monetary
+              balance. Early-grower recognition (the Founding Grower badge) is intended to carry forward;
+              exact migration rules will be published before launch.
             </p>
           </details>
           <details class="faq-item">
-            <summary>When does mainnet launch?</summary>
+            <summary>When does the live network launch?</summary>
             <p>
-              Targeting after the M5 redemption flow ships. See the architecture and roadmap notes in our
-              <a href="rwa-docs/">RWA docs</a>. We publish milestones, not a vague “soon.”
+              Targeting after the harvest redemption flow ships (roadmap milestone M5 in the docs).
+              See the architecture notes in our
+              <a href="rwa-docs/">docs</a>. We publish milestones, not a vague “soon.”
             </p>
           </details>
         </div>
@@ -472,9 +513,10 @@
           <a href="#proof">How it works</a>
           <a href="#growers">Growers</a>
           <a href="#adopters">Adopters</a>
+          <a href="#stakes">Stakes</a>
           <a href="#faq">FAQ</a>
           <a href="risks/">Risks</a>
-          <a href="rwa-docs/">RWA docs</a>
+          <a href="rwa-docs/">Docs</a>
         </div>
       </div>
       <p class="footer-powered">
@@ -518,7 +560,7 @@
       }
     })();
   </script>
-  <script src="js/landing-market.js?v=20260727j"></script>
+  <script src="js/landing-market.js?v=20260729d"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

@@ -319,6 +319,13 @@
       .join('');
   }
 
+  function setKpiReady(el, text) {
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('stakes-kpi-value--pending');
+    el.removeAttribute('aria-label');
+  }
+
   function renderStakesDesk(openListings, allListings, opts) {
     var desk = document.getElementById('stakes-desk');
     if (!desk) return;
@@ -332,14 +339,18 @@
     });
 
     desk.dataset.state = isDemo ? 'demo' : 'live';
+    desk.setAttribute('aria-busy', 'false');
     desk.classList.toggle('stakes-desk--demo', isDemo);
 
     var openList = document.getElementById('stakes-open-list');
     var openEmpty = document.getElementById('stakes-open-empty');
     var openMeta = document.getElementById('stakes-open-meta');
+    var openSkeleton = document.getElementById('stakes-open-skeleton');
     if (openList) {
       openList.innerHTML = open.slice(0, 5).map(stakeRowHtml).join('');
+      openList.hidden = open.length === 0;
     }
+    if (openSkeleton) openSkeleton.hidden = true;
     if (openEmpty) openEmpty.hidden = open.length > 0;
     if (openMeta) {
       openMeta.textContent = isDemo
@@ -359,12 +370,14 @@
     var stakedPct = Math.round((stakedValue / total) * 100);
     var openPct = Math.max(0, 100 - stakedPct);
 
-    var kpiCount = document.getElementById('stakes-kpi-count');
-    var kpiValue = document.getElementById('stakes-kpi-value');
-    var kpiOpen = document.getElementById('stakes-kpi-open');
-    if (kpiCount) kpiCount.textContent = String(staked.length);
-    if (kpiValue) kpiValue.textContent = formatPrice(stakedValue);
-    if (kpiOpen) kpiOpen.textContent = formatPrice(askVolume);
+    setKpiReady(document.getElementById('stakes-kpi-count'), String(staked.length));
+    setKpiReady(document.getElementById('stakes-kpi-value'), formatPrice(stakedValue));
+    setKpiReady(document.getElementById('stakes-kpi-open'), formatPrice(askVolume));
+
+    var mixTrack = document.querySelector('#stakes-desk .stakes-mix-track');
+    if (mixTrack) mixTrack.classList.remove('stakes-mix-track--pending');
+    var bars = document.getElementById('stakes-bars');
+    if (bars) bars.classList.remove('stakes-bars--pending');
 
     var mixStaked = document.getElementById('stakes-mix-staked');
     var mixOpen = document.getElementById('stakes-mix-open');
@@ -377,7 +390,7 @@
     if (updated) {
       updated.textContent = isDemo
         ? 'Preview mix · seed the board from Tokenise + Market'
-        : 'Last print ' + formatClock(new Date()) + ' · Devnet';
+        : 'Last print ' + formatClock(new Date()) + ' · test network';
     }
   }
 
