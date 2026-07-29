@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260727j" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260729c" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
 </head>
 <body>
@@ -42,7 +42,7 @@
       <div class="hero-bg" aria-hidden="true">
         <img src="images/3.jpg?v=20260724k" alt="" />
       </div>
-      <div class="container hero-journal-inner">
+      <div class="container hero-journal-inner hero-journal-inner--solo">
         <div class="hero-journal-copy">
           <p class="hero-brand hero-brand--inline">
             <img src="images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="hero-brand-mark" />
@@ -50,79 +50,19 @@
           </p>
           <p class="hero-eyebrow">Free grow journal for cannabis growers</p>
           <h1 class="hero-headline">Track the grow. Keep a trail you can trust.</h1>
-          <p class="hero-enemy">
-            Notebooks, camera rolls, and memory forget. growtoo is clear, simple tracking for one plant or a few , 
-            built for cannabis growers, not for trading desks.
-          </p>
           <p class="hero-sub">
-            Log watering, feeding, and stages. Get weather planning and an AI coach that tells you what’s next.
-            On-chain proof is optional when you want it. never required to use the journal.
+            Log watering, feeding, and stages for one plant or a few.
+            Weather tips and an AI coach help you stay on track — no wallet required.
+            On-chain proof is optional, never the reason to start.
           </p>
           <div class="hero-cta-row">
             <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start your journal free</a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-ghost btn-lg">Adopt a plant</a>
           </div>
           <p class="hero-cta-note">
-            Opens the <strong>Grower</strong> desk.
-            <a href="#adopters">Want to follow a plant instead?</a>
+            Prefer to follow someone else’s grow?
+            <a href="dnevnik/?mode=signup&type=adopter">Enter as an adopter</a>
+            · <a href="#stakes">See live Devnet stakes</a>
           </p>
-          <aside class="founding-banner founding-banner--hero">
-            <strong>Founding Growers shape what ships next.</strong>
-            <p>
-              Cannabis growers who journal (and optionally mint) on Devnet now get a Founding Grower badge
-              carried forward at mainnet, plus early access before features go public.
-            </p>
-          </aside>
-        </div>
-
-        <div class="hero-preview hero-preview--stakes" id="stakes">
-          <div class="stakes-desk stakes-desk--hero" id="stakes-desk" data-state="loading">
-            <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
-              <p class="stakes-panel-label">
-                <span class="hero-preview-rule" aria-hidden="true"></span>
-                Available stakes · Devnet
-                <span class="hero-preview-rule" aria-hidden="true"></span>
-              </p>
-              <p class="stakes-panel-meta" id="stakes-open-meta">Loading open offers…</p>
-              <ol class="stakes-list" id="stakes-open-list"></ol>
-              <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
-              <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
-            </aside>
-
-            <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
-              <p class="stakes-panel-label">
-                <span class="hero-preview-rule" aria-hidden="true"></span>
-                Already staked
-                <span class="hero-preview-rule" aria-hidden="true"></span>
-              </p>
-              <div class="stakes-kpis">
-                <div class="stakes-kpi">
-                  <span class="stakes-kpi-label">Contracts</span>
-                  <strong class="stakes-kpi-value" id="stakes-kpi-count">—</strong>
-                </div>
-                <div class="stakes-kpi">
-                  <span class="stakes-kpi-label">$GROWTOO in</span>
-                  <strong class="stakes-kpi-value" id="stakes-kpi-value">—</strong>
-                </div>
-                <div class="stakes-kpi">
-                  <span class="stakes-kpi-label">Open ask</span>
-                  <strong class="stakes-kpi-value" id="stakes-kpi-open">—</strong>
-                </div>
-              </div>
-              <div class="stakes-mix" aria-hidden="true">
-                <div class="stakes-mix-track">
-                  <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
-                  <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
-                </div>
-                <div class="stakes-mix-legend">
-                  <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
-                  <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
-                </div>
-              </div>
-              <div class="stakes-bars" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
-              <p class="stakes-panel-note" id="stakes-updated">Updating…</p>
-            </aside>
-          </div>
         </div>
       </div>
     </section>
@@ -136,21 +76,82 @@
       </div>
     </div>
 
+    <section id="stakes" class="section desk-section desk-section--stakes">
+      <div class="container">
+        <div class="desk-header">
+          <span class="desk-tag desk-tag--adopter">Optional · Devnet</span>
+          <h2>Live stakes, when you’re ready</h2>
+          <p class="section-lead">
+            After the journal, adopters can back open grower asks on Devnet.
+            Test assets only — $GROWTOO has no monetary value.
+          </p>
+        </div>
+
+        <div class="stakes-desk" id="stakes-desk" data-state="loading">
+          <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
+            <p class="stakes-panel-label">Available stakes</p>
+            <p class="stakes-panel-meta" id="stakes-open-meta">Loading open offers…</p>
+            <ol class="stakes-list" id="stakes-open-list"></ol>
+            <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
+            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
+          </aside>
+
+          <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
+            <p class="stakes-panel-label">Already staked</p>
+            <div class="stakes-kpis">
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">Contracts</span>
+                <strong class="stakes-kpi-value" id="stakes-kpi-count">—</strong>
+              </div>
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">$GROWTOO in</span>
+                <strong class="stakes-kpi-value" id="stakes-kpi-value">—</strong>
+              </div>
+              <div class="stakes-kpi">
+                <span class="stakes-kpi-label">Open ask</span>
+                <strong class="stakes-kpi-value" id="stakes-kpi-open">—</strong>
+              </div>
+            </div>
+            <div class="stakes-mix" aria-hidden="true">
+              <div class="stakes-mix-track">
+                <span class="stakes-mix-fill stakes-mix-fill--staked" id="stakes-mix-staked"></span>
+                <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
+              </div>
+              <div class="stakes-mix-legend">
+                <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
+                <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
+              </div>
+            </div>
+            <div class="stakes-bars" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
+            <p class="stakes-panel-note" id="stakes-updated">Updating…</p>
+          </aside>
+        </div>
+
+        <aside class="founding-banner founding-banner--inline">
+          <strong>Founding Growers shape what ships next.</strong>
+          <p>
+            Journal (and optionally mint) on Devnet now for a Founding Grower badge carried to mainnet,
+            plus early access before features go public.
+          </p>
+        </aside>
+      </div>
+    </section>
+
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag desk-tag--verify">How proof works</span>
+          <span class="desk-tag desk-tag--verify">How it works</span>
           <h2>Log it. Prove it. Keep going.</h2>
           <p class="section-lead">
-            The product thesis in three beats: document the grow, mint the stage, keep the trail checkable.
+            Start with everyday care notes. Minting a checkable trail is optional — only when you want it.
           </p>
         </div>
 
         <ol class="proof-chain proof-chain--motion">
-          <li class="proof-step">
+          <li class="proof-step proof-step--primary">
             <div class="proof-clip proof-clip--grow" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Journal</span>
+                <span class="clip-ui-label">Care log</span>
                 <button type="button" class="clip-tap" tabindex="-1">Log watering</button>
                 <p class="clip-log"><span class="clip-check">✓</span> Watering · just now</p>
                 <p class="clip-reminder clip-reminder--fade">Reminder cleared</p>
@@ -167,7 +168,7 @@
           <li class="proof-step proof-step--verify">
             <div class="proof-clip proof-clip--verify" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Tokenise</span>
+                <span class="clip-ui-label">Optional proof</span>
                 <p class="clip-quest"><span class="clip-tick">✓</span> Log growth stage in journal</p>
                 <p class="clip-mint">Mint confirmed</p>
                 <p class="clip-tx">tx <code>6TDm7g…saTD</code></p>
@@ -184,7 +185,7 @@
           <li class="proof-step proof-step--trade">
             <div class="proof-clip proof-clip--trade" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Trail</span>
+                <span class="clip-ui-label">Your trail</span>
                 <p class="clip-quest"><span class="clip-tick">✓</span> Seed → flower trail intact</p>
                 <p class="clip-mint">Same evidence forever</p>
               </div>
@@ -193,7 +194,7 @@
             <span class="proof-num" aria-hidden="true">03</span>
             <h3>Keep going.</h3>
             <p>
-              Your care log stays with the plant. Later, others can follow that same trail , 
+              Your care log stays with the plant. Later, others can follow that same trail —
               once there’s real grower supply to back.
             </p>
           </li>
@@ -248,10 +249,10 @@
           </p>
           <p>
             No crypto knowledge required. The journal is free and works without a wallet.
-            Optional stage proof is a bonus when you want a trail others can check. not the reason to sign up.
+            Optional stage proof is a bonus when you want a trail others can check — not the reason to sign up.
           </p>
           <ul class="audience-bullets">
-            <li>Clear, simple logs. not gamification for its own sake</li>
+            <li>Clear, simple logs — not gamification for its own sake</li>
             <li>AI coach and reminders so care doesn’t slip mid-cycle</li>
             <li>Weather planning for outdoor and mixed grows</li>
             <li>Built where few tools target cannabis growers yet</li>
@@ -265,21 +266,21 @@
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
-              <span class="desk-spec-code">HOME</span>
+              <span class="desk-spec-code">01</span>
               <div>
                 <h3>Any scale</h3>
                 <p>One plant or a room. Indoor, outdoor, or mixed.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">CLEAR</span>
+              <span class="desk-spec-code">02</span>
               <div>
                 <h3>Clear structure</h3>
                 <p>Stages and care in plain language, easy to revisit.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">COACH</span>
+              <span class="desk-spec-code">03</span>
               <div>
                 <h3>What’s next</h3>
                 <p>Coach and reminders. Always asks before acting.</p>
@@ -301,13 +302,13 @@
           </p>
           <p>
             If you’re RWA-curious and want something tangible (not another institutional fund wrapper),
-            start by following the evidence trail. Devnet assets have no monetary value. use them to
+            start by following the evidence trail. Devnet assets have no monetary value — use them to
             learn the trust flow before real stakes exist.
           </p>
           <ul class="audience-bullets audience-bullets--verify">
             <li>“I can watch this plant grow” beats yield promises</li>
             <li>Open the journal entry and the transaction yourself</li>
-            <li>Same trail the grower sees. no hidden side channel</li>
+            <li>Same trail the grower sees — no hidden side channel</li>
             <li>FAQ and risks are for the due-diligence reader. Start there if you’re skeptical</li>
           </ul>
           <div class="adopter-cta-row">
@@ -322,21 +323,21 @@
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--brass">STORY</span>
+              <span class="desk-spec-code desk-spec-code--brass">01</span>
               <div>
                 <h3>Plant story</h3>
                 <p>Seed to harvest, with dates you can read.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--verify">PROOF</span>
+              <span class="desk-spec-code desk-spec-code--verify">02</span>
               <div>
                 <h3>Checkable proof</h3>
                 <p>Explorer links when a stage is minted.</p>
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--cool">EARLY</span>
+              <span class="desk-spec-code desk-spec-code--cool">03</span>
               <div>
                 <h3>Early access</h3>
                 <p>Retail-scale RWA practice before mainnet stakes.</p>
@@ -373,28 +374,30 @@
         <div class="desk-header">
           <span class="desk-tag">Questions people actually ask</span>
           <h2>Straight answers before you start</h2>
-          <p class="section-lead">For anyone who has heard “RWA” and “Devnet” and still wants the plain version.</p>
+          <p class="section-lead">Start with the journal questions. Crypto details come later — only if you want them.</p>
         </div>
         <div class="faq-list">
-          <details class="faq-item">
-            <summary>Is $GROWTOO worth anything right now?</summary>
+          <details class="faq-item" open>
+            <summary>Do I need to know anything about crypto to use this?</summary>
             <p>
-              No. It’s a Devnet test token with no monetary value. It exists so the whole
-              mint → verify → trade flow can be tested and shown publicly before real value is on the line.
+              No. The journal is free and usable with no wallet at all. A Solana wallet (Phantom or Solflare)
+              is only needed if you want to mint or adopt on Devnet.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Why build on Devnet instead of going live with real money?</summary>
+            <summary>Is this only for licensed commercial growers?</summary>
             <p>
-              So the system (journal proof, minting, escrow, redemption) can be battle-tested in the open
-              first. Growers and adopters can see exactly how it works before anything real is at stake.
+              No. The journal is aimed at cannabis growers (a plant or a few, or a full room), including places where
+              cultivation rules are opening up. Always follow the law where you grow; growtoo is a
+              documentation tool, not legal advice.
             </p>
           </details>
           <details class="faq-item">
-            <summary>When does mainnet launch?</summary>
+            <summary>Who verifies that a journal entry is real, not fabricated?</summary>
             <p>
-              Targeting after the M5 redemption flow ships. See the architecture and roadmap notes in our
-              <a href="rwa-docs/">RWA docs</a>. We publish milestones, not a vague “soon.”
+              Today, the platform operator reviews journal progress before minting. The mainnet roadmap
+              moves this toward stronger attestations so no single party has to be trusted forever.
+              Details live in the <a href="rwa-docs/">trust model docs</a>.
             </p>
           </details>
           <details class="faq-item">
@@ -407,6 +410,20 @@
             </p>
           </details>
           <details class="faq-item">
+            <summary>Why build on Devnet instead of going live with real money?</summary>
+            <p>
+              So the system (journal proof, minting, escrow, redemption) can be battle-tested in the open
+              first. Growers and adopters can see exactly how it works before anything real is at stake.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Is $GROWTOO worth anything right now?</summary>
+            <p>
+              No. It’s a Devnet test token with no monetary value. It exists so the optional
+              mint → verify → adopt flow can be tested publicly before real value is on the line.
+            </p>
+          </details>
+          <details class="faq-item">
             <summary>What happens to my $GROWTOO when mainnet launches?</summary>
             <p>
               Devnet $GROWTOO is for testing the flow and should not be treated as transferable monetary
@@ -415,26 +432,10 @@
             </p>
           </details>
           <details class="faq-item">
-            <summary>Who verifies that a journal entry is real, not fabricated?</summary>
+            <summary>When does mainnet launch?</summary>
             <p>
-              Today, the platform operator reviews journal progress before minting. The mainnet roadmap
-              moves this toward stronger attestations so no single party has to be trusted forever.
-              Details live in the <a href="rwa-docs/">trust model docs</a>.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>Is this only for licensed commercial growers?</summary>
-            <p>
-              No. The journal is aimed at cannabis growers (a plant or a few, or a full room), including places where
-              cultivation rules are opening up. Always follow the law where you grow; growtoo is a
-              documentation tool, not legal advice.
-            </p>
-          </details>
-          <details class="faq-item">
-            <summary>Do I need to know anything about crypto to use this?</summary>
-            <p>
-              No. The journal is free and usable with no wallet at all. A Solana wallet (Phantom or Solflare)
-              is only needed if you want to mint or trade.
+              Targeting after the M5 redemption flow ships. See the architecture and roadmap notes in our
+              <a href="rwa-docs/">RWA docs</a>. We publish milestones, not a vague “soon.”
             </p>
           </details>
         </div>
