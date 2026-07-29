@@ -319,7 +319,7 @@
       return (async function () {
         const uid = currentAuthUid();
         if (!uid) {
-          throw new Error('Sign in to your dnevnik.live account before connecting a wallet.');
+          throw new Error('Sign in to your growtoo account before connecting a wallet.');
         }
         if (accountUid !== uid) {
           await PlantToken.bindAccount(uid);
@@ -801,13 +801,19 @@
   }
 
   // --- Plant growth SVG (seed → harvest) ----------------------------------
-  // Wallet-ready 48×48 pixel sprites (see plant-pixel-sprites.js).
+  // Botanical line-art cards (see token-botanical-art.js / plant-botanical-sprites.js).
 
   let growthPreviewStage = null;
 
   function buildPlantGrowSvg(stageIndex, options) {
+    if (window.PlantBotanicalSprites && typeof window.PlantBotanicalSprites.renderStageSvg === 'function') {
+      return window.PlantBotanicalSprites.renderStageSvg(stageIndex, options);
+    }
     if (window.PlantPixelSprites && typeof window.PlantPixelSprites.renderStageSvg === 'function') {
       return window.PlantPixelSprites.renderStageSvg(stageIndex, options);
+    }
+    if (window.TokenBotanicalArt && typeof window.TokenBotanicalArt.renderStageSvg === 'function') {
+      return window.TokenBotanicalArt.renderStageSvg(stageIndex, options);
     }
     return '';
   }
@@ -865,7 +871,7 @@
       '<div class="metric-panel metric-panel--adopt">' +
       '<header class="metric-panel-head">' +
       '<h2 class="metric-panel-title">How growth works</h2>' +
-      '<p class="metric-panel-sub">Tap a stage to preview rewards</p>' +
+      '<p class="metric-panel-sub">Seed → Harvest · tap a stage, or swipe / use arrows on small screens</p>' +
       '</header>' +
       '<div class="adopt-growth-guide-inner">' +
       '<div class="adopt-growth-showcase">' +
@@ -880,11 +886,48 @@
       '</span>' +
       '</div>' +
       '</div>' +
-      '<div class="adopt-growth-stepper" role="tablist" aria-label="Growth stages">' +
+      '<div class="adopt-growth-stepper-wrap">' +
+      '<button type="button" class="adopt-growth-scroll adopt-growth-scroll--prev" id="adopt-growth-scroll-prev" aria-label="Previous stages">‹</button>' +
+      '<div class="adopt-growth-stepper" id="adopt-growth-stepper" role="tablist" aria-label="Growth stages">' +
       stepperHtml +
+      '</div>' +
+      '<button type="button" class="adopt-growth-scroll adopt-growth-scroll--next" id="adopt-growth-scroll-next" aria-label="Next stages">›</button>' +
+      '<p class="adopt-growth-scroll-hint" id="adopt-growth-scroll-hint">Swipe for all stages →</p>' +
       '</div>' +
       '</div>' +
       '</div></div>';
+
+    const stepper = document.getElementById('adopt-growth-stepper');
+    const prevBtn = document.getElementById('adopt-growth-scroll-prev');
+    const nextBtn = document.getElementById('adopt-growth-scroll-next');
+    const scrollHint = document.getElementById('adopt-growth-scroll-hint');
+    function updateScrollChrome() {
+      if (!stepper) return;
+      const max = stepper.scrollWidth - stepper.clientWidth;
+      const canScroll = max > 8;
+      if (prevBtn) prevBtn.hidden = !canScroll;
+      if (nextBtn) nextBtn.hidden = !canScroll;
+      if (scrollHint) scrollHint.hidden = !canScroll || stepper.scrollLeft > 12;
+      if (prevBtn) prevBtn.disabled = stepper.scrollLeft <= 4;
+      if (nextBtn) nextBtn.disabled = stepper.scrollLeft >= max - 4;
+    }
+    if (stepper) {
+      stepper.addEventListener('scroll', updateScrollChrome, { passive: true });
+      updateScrollChrome();
+      window.setTimeout(updateScrollChrome, 50);
+    }
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function () {
+        if (!stepper) return;
+        stepper.scrollBy({ left: -140, behavior: 'smooth' });
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        if (!stepper) return;
+        stepper.scrollBy({ left: 140, behavior: 'smooth' });
+      });
+    }
   }
 
   function networkLabel() {
@@ -1228,11 +1271,13 @@
 
     return (
       '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + token.stageIndex + '">' +
-      '<div class="adopt-token-banner">' +
+      '<div class="adopt-token-banner' + (plantPhoto ? '' : ' adopt-token-banner--art') + '">' +
       (plantPhoto
         ? '<img class="adopt-token-banner-photo" src="' + esc(plantPhoto) + '" alt="" />'
-        : buildPlantGrowSvg(token.stageIndex, { compact: true, noBg: true })) +
-      '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>' +
+        : buildPlantGrowSvg(token.stageIndex, { compact: true })) +
+      (plantPhoto
+        ? '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>'
+        : '') +
       '</div>' +
       '<div class="adopt-token-body">' +
       '<div class="adopt-token-head">' +
@@ -1989,7 +2034,7 @@
           '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">Browse market</button>' +
           '</div>';
       } else {
-        grid.innerHTML = '<div class="empty-state">No tokens yet. Mint a seed above to start growing.</div>';
+        grid.innerHTML = '<div class="empty-state">No tokens yet. Add a plant from Plants and turn on “also mint on-chain”, or use the advanced mint form above.</div>';
       }
       return;
     }
@@ -2002,11 +2047,26 @@
     const plants = readPlants();
     const current = sel.value;
     sel.innerHTML =
-      '<option value="">— choose a plant —</option>' +
+      '<option value="">— choose a journal plant —</option>' +
       plants
         .map((p) => '<option value="' + esc(p.id) + '">' + esc(p.name || 'Plant') + '</option>')
         .join('');
     if (current) sel.value = current;
+  }
+
+  function syncSeedNameFromPlant() {
+    const plantSel = document.getElementById('adopt-seed-plant');
+    const nameEl = document.getElementById('adopt-seed-name');
+    if (!plantSel || !nameEl) return;
+    const plant = readPlants().find((p) => p && p.id === plantSel.value);
+    if (!plant) return;
+    const suggested = String(plant.name || '').trim().slice(0, 32);
+    if (!suggested) return;
+    // Prefill when empty or still matching the previous plant name pattern.
+    if (!nameEl.value.trim() || nameEl.dataset.autofilled === '1') {
+      nameEl.value = suggested;
+      nameEl.dataset.autofilled = '1';
+    }
   }
 
   function setBusy(state) {
@@ -2168,7 +2228,7 @@
     if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
       const hint =
         msg +
-        '\n\nIf a wallet is installed, unlock it, allow dnevnik.live, then refresh this page.';
+        '\n\nIf a wallet is installed, unlock it, allow growto.live, then refresh this page.';
       if (confirm(hint + '\n\nBrowse Solana wallets?')) {
         window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
       }
@@ -2789,32 +2849,51 @@
 
     const seedForm = document.getElementById('adopt-seed-form');
     if (seedForm) {
+      const plantSel = document.getElementById('adopt-seed-plant');
+      const nameEl = document.getElementById('adopt-seed-name');
+      if (plantSel && plantSel.dataset.bound !== '1') {
+        plantSel.dataset.bound = '1';
+        plantSel.addEventListener('change', syncSeedNameFromPlant);
+      }
+      if (nameEl && nameEl.dataset.bound !== '1') {
+        nameEl.dataset.bound = '1';
+        nameEl.addEventListener('input', function () {
+          nameEl.dataset.autofilled = '0';
+        });
+      }
       seedForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (busy) return;
-        const nameEl = document.getElementById('adopt-seed-name');
+        const nameInput = document.getElementById('adopt-seed-name');
         const batchEl = document.getElementById('adopt-seed-batch');
-        const plantSel = document.getElementById('adopt-seed-plant');
-        const name = nameEl ? nameEl.value.trim() : '';
-        if (!name) return;
-        const batch = batchEl ? batchEl.value.trim() : '';
-        let plantId = plantSel ? plantSel.value : '';
-        let strain = '';
-        if (plantId) {
-          const plant = readPlants().find((p) => p.id === plantId);
-          if (plant) strain = plant.strain || '';
+        const plantSelect = document.getElementById('adopt-seed-plant');
+        let plantId = plantSelect ? plantSelect.value : '';
+        if (!plantId) {
+          flashError(new Error('Choose a journal plant to link this token to.'));
+          return;
         }
+        const plant = readPlants().find((p) => p.id === plantId);
+        let name = nameInput ? nameInput.value.trim() : '';
+        if (!name && plant) name = String(plant.name || '').trim();
+        if (!name) {
+          flashError(new Error('Enter a token name (or pick a plant with a name).'));
+          return;
+        }
+        const batch = batchEl ? batchEl.value.trim() : '';
+        let strain = '';
+        if (plant) strain = plant.strain || '';
         const submitBtn = seedForm.querySelector('button[type="submit"]');
         setBusy(true);
         if (submitBtn) submitBtn.textContent = 'Minting…';
         try {
           await PlantToken.importSeed({ name, strain, batch, plantId: plantId || null });
           seedForm.reset();
+          if (nameInput) nameInput.dataset.autofilled = '0';
           render();
         } catch (err) {
           flashError(err);
         } finally {
-          if (submitBtn) submitBtn.textContent = '🌰 Mint seed token';
+          if (submitBtn) submitBtn.textContent = 'Mint seed token';
           setBusy(false);
         }
       });
@@ -2918,7 +2997,7 @@
           '</h2></header>' +
           '<div class="dashboard-adopt-panel">' +
           '<div class="dashboard-adopt-visual">' +
-          buildPlantGrowSvg(0, { hero: true, noBg: true }) +
+          buildPlantGrowSvg(0, { hero: true, animate: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
           '<p>' +
@@ -2957,7 +3036,7 @@
             : '') +
           '<div class="dashboard-adopt-panel">' +
           '<div class="dashboard-adopt-visual">' +
-          buildPlantGrowSvg(0, { hero: true, noBg: true }) +
+          buildPlantGrowSvg(0, { hero: true, animate: true }) +
           '</div>' +
           '<div class="dashboard-adopt-copy">' +
           '<p>' +
@@ -2974,17 +3053,15 @@
         const growing = wallet.tokens.filter((t) => t.stageIndex < maxStage).length;
 
         const preview = wallet.tokens.slice(0, 3).map((token) => {
-          const tStage = GROWTH_STAGES[token.stageIndex] || GROWTH_STAGES[0];
           const tPct = Math.round((token.stageIndex / maxStage) * 100);
           return (
             '<div class="dashboard-adopt-token">' +
             '<div class="dashboard-adopt-token-visual">' +
-            buildPlantGrowSvg(token.stageIndex, { compact: true, noBg: true }) +
+            buildPlantGrowSvg(token.stageIndex, { compact: true }) +
             '</div>' +
             '<div class="dashboard-adopt-token-body">' +
             '<div class="dashboard-adopt-token-head">' +
             '<strong>' + esc(token.name) + '</strong>' +
-            '<span class="adopt-stage-badge">' + esc(tStage.label) + '</span>' +
             '</div>' +
             '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + tPct + '%"></div></div>' +
             '</div></div>'
@@ -3025,7 +3102,7 @@
             : '') +
           '<div class="dashboard-adopt-panel dashboard-adopt-panel--active">' +
           '<div class="dashboard-adopt-visual">' +
-          buildPlantGrowSvg(top.stageIndex, { hero: true, noBg: true }) +
+          buildPlantGrowSvg(top.stageIndex, { hero: true, animate: true }) +
           '<div class="dashboard-adopt-feature-meta">' +
           '<strong>' + esc(top.name) + '</strong>' +
           '<span>' + esc(stage.label) + ' · ' + pct + '% grown</span>' +

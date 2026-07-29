@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260729h" />
+  <link rel="stylesheet" href="styles/app.css?v=20260730c" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
-<body class="app-loading">
+<body class="app-loading crypto-simple">
   <div class="app">
     <aside class="sidebar">
       <a href="../index.html" class="sidebar-logo" aria-label="growtoo">
@@ -188,6 +188,7 @@
       </div>
 
       <div id="view-dashboard" class="view active">
+        <p class="dashboard-coach-brief grower-only" id="dashboard-coach-brief" hidden></p>
         <div id="dashboard-metrics" class="dashboard-metrics"></div>
         <section class="dashboard-quick-section" id="dashboard-quick-section" hidden>
           <div class="dashboard-quick-actions" id="dashboard-quick-actions"></div>
@@ -234,8 +235,9 @@
           <h2 class="section-heading">My plants</h2>
           <div class="toolbar">
             <button type="button" class="btn btn-primary" id="btn-add-plant">+ New plant</button>
-            <button type="button" class="btn btn-ghost grower-only" id="btn-open-coach">Ask Coach</button>
+            <button type="button" class="btn btn-ghost grower-only" id="btn-open-coach">Coach</button>
           </div>
+          <p class="coach-plants-strip grower-only" id="coach-plants-strip" hidden></p>
           <div id="plants-list" class="plants-list"></div>
         </section>
         <section class="plants-journal-section plants-journal-diary">
@@ -262,6 +264,10 @@
             </div>
             <p class="grower-only">Your plants and care logs come first. When you want a checkable trail, mint stage proof on Solana’s test network (Devnet) for <strong>$GROWTOO</strong> — test assets only.</p>
             <p class="adopter-only">Follow a real plant’s journal trail. Backing with <strong>$GROWTOO</strong> is optional and has no monetary value on the test network.</p>
+            <div class="crypto-mode-bar" role="group" aria-label="Detail level">
+              <span class="crypto-mode-status">View: <strong data-crypto-mode-label>Simple</strong></span>
+              <button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="false">Show advanced details</button>
+            </div>
           </div>
         </section>
 
@@ -311,13 +317,14 @@
             <h3 class="tokenise-explainer-title">What Tokenise means (plain language)</h3>
             <p>
               Your journal stays free and local-first. Tokenise is optional: it turns a plant’s documented trail into a
-              <strong>plant token</strong> on Solana’s test network so others can back the grow with test $GROWTOO.
+              <span class="plain-tip">plant token<button type="button" class="plain-tip-btn" aria-label="What does plant token mean?" data-plain-tip="plant token">?</button><span class="plain-tip-bubble" role="tooltip" hidden>A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.</span></span>
+              on Solana’s test network so others can back the grow with test $GROWTOO.
             </p>
-            <details class="tokenise-explainer-details">
+            <details class="tokenise-explainer-details crypto-advanced-only">
               <summary>What do the crypto words mean?</summary>
               <ul>
                 <li><strong>Plant token</strong> — a digital certificate linked to this plant’s journal (often called an NFT).</li>
-                <li><strong>Listing / hold</strong> — when you post to Market, the token is held until someone invests or you cancel (sometimes called escrow).</li>
+                <li><strong>Listing / hold</strong> — when you post to Market, the token is held until someone invests or you cancel (sometimes called <span class="plain-tip">escrow<button type="button" class="plain-tip-btn" aria-label="What does escrow mean?" data-plain-tip="escrow">?</button><span class="plain-tip-bubble" role="tooltip" hidden>A temporary hold: your plant token sits safely with the market until someone invests or you cancel — like a middle shelf, not a permanent transfer.</span></span>).</li>
                 <li><strong>Settle</strong> — the deal finishes and the token + $GROWTOO move as agreed.</li>
               </ul>
             </details>
@@ -329,7 +336,7 @@
 
         <div class="adopter-summary adopter-only" id="adopter-summary" hidden></div>
 
-        <section class="plants-journal-section grower-only" id="platform-bonus-section">
+        <section class="plants-journal-section grower-only crypto-advanced-only" id="platform-bonus-section">
           <h2 class="section-heading">Platform monthly bonus</h2>
           <p class="market-hint">
             Extra $GROWTOO from growtoo (not adopter funds) for adding plants, minting tokens, weekly progress, and flower stages.
@@ -347,24 +354,33 @@
           <p>Wallet is optional until you invest. After that, adopted plants and unlock status show in your garden.</p>
         </div>
 
-        <section class="adopt-section plants-journal-section grower-only" id="adopt-seed-section" hidden>
-          <h2 class="section-heading">Plant a seed</h2>
+        <section class="adopt-section plants-journal-section grower-only crypto-advanced-only" id="adopt-seed-section" hidden>
+          <h2 class="section-heading">Mint a plant token</h2>
+          <p class="market-hint" id="adopt-seed-explain">
+            Prefer the simple path? Use <strong>+ New plant</strong> and turn on “also mint on-chain” at the end.
+            This form is for minting a token later for a plant you already journaled.
+          </p>
           <form class="adopt-seed-form" id="adopt-seed-form">
-            <label>
-              Strain / name *
-              <input type="text" id="adopt-seed-name" placeholder="e.g. CBD Auto" autocomplete="off" required maxlength="32" />
-            </label>
-            <label>
-              Batch (optional)
-              <input type="text" id="adopt-seed-batch" placeholder="e.g. B-2026-07" autocomplete="off" maxlength="32" />
-            </label>
             <label class="adopt-seed-form-span">
-              Link to a journal plant *
-              <select id="adopt-seed-plant" required><option value="">Choose a plant</option></select>
+              Journal plant *
+              <select id="adopt-seed-plant" required><option value="">Choose a plant from your journal</option></select>
+            </label>
+            <label>
+              Token name *
+              <input type="text" id="adopt-seed-name" placeholder="Filled from the plant — editable" autocomplete="off" required maxlength="32" />
+            </label>
+            <label>
+              Batch label (optional)
+              <input type="text" id="adopt-seed-batch" placeholder="e.g. B-2026-07" autocomplete="off" maxlength="32" />
             </label>
             <button type="submit" class="btn btn-primary adopt-seed-submit">Mint seed token</button>
           </form>
         </section>
+
+        <p class="market-hint grower-only crypto-simple-only" id="adopt-simple-mint-hint">
+          To prove a plant on-chain, add it from <strong>Plants</strong> and enable “also mint on-chain (optional)”.
+          Switch to advanced view if you need the full mint form or monthly bonus panel.
+        </p>
 
         <section class="adopt-section plants-journal-section" id="adopt-garden-section">
           <h2 class="section-heading grower-only">My plant tokens</h2>
@@ -380,12 +396,17 @@
           <button type="button" class="btn btn-primary" id="adopt-open-market-btn">Open market</button>
         </section>
 
-        <section class="adopt-growth-guide grower-only" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
+        <section class="adopt-growth-guide grower-only crypto-advanced-only" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
       </div>
 
       <div id="view-market" class="view">
         <p class="market-notice" id="market-notice" hidden></p>
         <div class="market-stuck" id="market-stuck" hidden></div>
+
+        <div class="crypto-mode-bar market-mode-bar" role="group" aria-label="Detail level">
+          <span class="crypto-mode-status">View: <strong data-crypto-mode-label>Simple</strong></span>
+          <button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="false">Show advanced details</button>
+        </div>
 
         <section class="adopter-guide adopter-only" id="market-adopter-guide" aria-label="Adopter market guide">
           <h3 class="adopter-guide-title">Adopting on this board</h3>
@@ -399,6 +420,8 @@
           <p class="adopter-guide-note">
             Need test $GROWTOO? Claim the free faucet below (once per day), then Invest.
             Tokens here have no monetary value.
+            <span class="plain-tip">Redemption<button type="button" class="plain-tip-btn" aria-label="What does redemption mean?" data-plain-tip="redemption">?</button><span class="plain-tip-bubble" role="tooltip" hidden>Turning a harvest-stage token into a real harvest share someday. On Devnet this path is still mocked — no physical delivery yet.</span></span>
+            of a physical harvest is specified but still mocked on Devnet.
           </p>
           <div id="test-faucet-panel" class="test-faucet-panel" aria-label="Test-network faucet"></div>
         </section>
@@ -411,7 +434,7 @@
           </p>
           <form class="adopt-seed-form" id="market-list-form">
             <label>
-              Asset *
+              Plant token *
               <select id="market-asset-select"><option value="">Choose a plant token</option></select>
             </label>
             <p class="market-hint" id="market-list-hint" hidden></p>
@@ -419,18 +442,32 @@
               Invest price ($GROWTOO) *
               <input type="number" id="market-price-input" min="1" step="1" placeholder="e.g. 50" required />
             </label>
-            <label>
-              Offer type *
-              <select id="market-settlement-select">
-                <option value="instant">Instant sale (full price to you on buy)</option>
-                <option value="adopt_stake">Adopt stake (50% now · 50% locked until harvest care)</option>
+            <fieldset class="market-offer-compare">
+              <legend>Offer type *</legend>
+              <div class="market-offer-cards" role="radiogroup" aria-label="Offer type">
+                <label class="market-offer-card" data-offer="instant">
+                  <input type="radio" name="market-settlement" id="market-settle-instant" value="instant" checked />
+                  <span class="market-offer-card-title">Instant sale</span>
+                  <span class="market-offer-card-body">Paid in full now. Adopter owns the plant token immediately when the deal confirms.</span>
+                </label>
+                <label class="market-offer-card" data-offer="adopt_stake">
+                  <input type="radio" name="market-settlement" id="market-settle-stake" value="adopt_stake" />
+                  <span class="market-offer-card-title">Adopt stake</span>
+                  <span class="market-offer-card-body">Paid in full now, but half stays locked until you keep logging care monthly through harvest.</span>
+                </label>
+              </div>
+              <select id="market-settlement-select" class="sr-only" tabindex="-1" aria-hidden="true">
+                <option value="instant">Instant sale</option>
+                <option value="adopt_stake">Adopt stake</option>
               </select>
-            </label>
-            <p class="market-hint" id="market-stake-hint">
-              Adopt stake: the adopter pays the full price up front. Half reaches you when the deal settles;
-              half stays locked until every calendar month of care qualifies (all-or-nothing at harvest).
-              Weekly progress stays private to growers; adopters see monthly unlock status.
-            </p>
+            </fieldset>
+            <p class="market-hint crypto-advanced-only" id="market-stake-hint" data-mode="instant" hidden></p>
+            <div class="market-offer-example crypto-advanced-only" id="market-offer-example" aria-live="polite">
+              <strong class="market-offer-example-title">Example</strong>
+              <p class="market-offer-example-body" id="market-offer-example-body">
+                Price 100 $GROWTOO → you get 100 when they buy. Simple transfer — no care lock.
+              </p>
+            </div>
             <button type="submit" class="btn btn-primary">Post to market</button>
           </form>
         </section>
@@ -485,9 +522,10 @@
             <div class="toolbar growlog-toolbar">
               <button type="button" class="btn btn-primary" id="btn-add-entry-growlog">+ New entry for this plant</button>
               <button type="button" class="btn btn-ghost" id="btn-edit-plant-growlog">✎ Edit plant</button>
-              <button type="button" class="btn btn-ghost" id="btn-coach-growlog">Ask Coach</button>
+              <button type="button" class="btn btn-ghost" id="btn-coach-growlog">Coach</button>
             </div>
             <div class="growlog-hero" id="growlog-hero" aria-label="Plant overview"></div>
+            <p class="growlog-reward-goal" id="growlog-reward-goal" hidden></p>
             <section class="growlog-timeline-section">
               <h3 class="growlog-section-title">Seed-to-harvest trail</h3>
               <p class="field-hint growlog-timeline-hint">Journal entries and photos in order — the documentation trail for this plant.</p>
@@ -856,6 +894,16 @@
           </label>
         </div>
         </div>
+        <label class="plant-mint-toggle" id="plant-mint-toggle-wrap" hidden>
+          <input type="checkbox" id="plant-also-mint" />
+          <span>
+            Also mint this on-chain (optional)
+            <span class="field-hint plant-mint-toggle-hint">
+              Creates a test-network plant token linked to this journal plant. Needs a connected Devnet wallet.
+              Stage rewards can total up to <strong>225 $GROWTOO</strong> by harvest.
+            </span>
+          </span>
+        </label>
         <div class="modal-actions plant-form-actions">
           <button type="button" class="btn btn-ghost modal-cancel">Cancel</button>
           <button type="button" class="btn btn-ghost" id="plant-form-back" hidden>Back</button>
@@ -968,21 +1016,23 @@
   <script src="js/chain-config.js?v=20260729c"></script>
   <script src="js/solana-rpc.js?v=20260723c"></script>
   <script src="js/solana-wallet.js?v=20260728a"></script>
-  <script src="js/wallet-link.js?v=20260728a"></script>
+  <script src="js/wallet-link.js?v=20260729i"></script>
   <script src="js/seed-chain.js?v=20260727a"></script>
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260728e"></script>
-  <script src="js/market.js?v=20260729g"></script>
+  <script src="js/plain-lang.js?v=20260729j"></script>
+  <script src="js/market.js?v=20260729j"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
-  <script src="js/token-pixel-art.js?v=20260720b"></script>
-  <script src="js/plant-pixel-sprites.js?v=20260720b"></script>
+  <script src="js/token-botanical-art.js?v=20260729k"></script>
+  <script src="js/plant-botanical-sprites.js?v=20260729k"></script>
   <script src="js/grower-quests.js?v=20260724h"></script>
-  <script src="js/notifications.js?v=20260729g"></script>
+  <script src="js/notifications.js?v=20260730b"></script>
   <script src="js/signup.js?v=20260729g"></script>
-  <script src="js/plant-token.js?v=20260729g"></script>
-  <script src="js/ai-coach.js?v=20260729e"></script>
-  <script src="js/app.js?v=20260729g"></script>
+  <script src="js/plant-token.js?v=20260729k"></script>
+  <script src="js/coach-core.js?v=20260730c"></script>
+  <script src="js/ai-coach.js?v=20260730c"></script>
+  <script src="js/app.js?v=20260730b"></script>
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

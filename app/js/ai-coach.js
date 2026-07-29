@@ -403,7 +403,31 @@
         });
       }
     });
-    return list.slice(0, 8);
+
+    // Weather + watering-pace predictions (no new infra)
+    if (window.CoachCore && typeof CoachCore.buildPredictiveNudges === 'function') {
+      try {
+        const predictive = CoachCore.buildPredictiveNudges(plants, entries) || [];
+        predictive.forEach(function (nudge) {
+          pushReminder(list, nudge);
+        });
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Prefer predictive / urgent first
+    list.sort(function (a, b) {
+      const score = function (r) {
+        if (r.kind === 'predictive') return 0;
+        if (r.severity === 'urgent') return 1;
+        if (r.kind === 'advisory') return 3;
+        return 2;
+      };
+      return score(a) - score(b);
+    });
+
+    return list.slice(0, 10);
   }
 
   function resolveStage(raw) {
@@ -692,6 +716,23 @@
     const type = action && action.type;
     const DJ = window.DnevnikJournal;
     const PT = window.PlantToken;
+    const mode =
+      window.CoachCore && typeof CoachCore.resolveActionMode === 'function'
+        ? CoachCore.resolveActionMode(type)
+        : 'draft';
+
+    if (mode === 'advise') {
+      throw new Error(
+        'That call stays advisory — Coach will not change the journal or chain for plant-health decisions. You decide.'
+      );
+    }
+
+    // High-stakes always require the confirm UI path (runPendingActions only after confirm).
+    if (mode === 'confirm' && (type === 'import_seed' || type === 'mint_growth' || type === 'link_plant')) {
+      // Still allowed after explicit confirm — fall through.
+    }
+
+    let resultMsg = '';
 
     if (type === 'create_plant') {
       if (!DJ || typeof DJ.createPlant !== 'function') throw new Error('Journal API unavailable');
@@ -702,10 +743,9 @@
         environmentType: action.environmentType,
         notes: action.notes,
       });
-      return 'Created plant “' + plant.name + '” (' + (STAGE_LABELS[plant.stage] || plant.stage) + ').';
-    }
-
-    if (type === 'add_entry') {
+      resultMsg =
+        'Created plant “' + plant.name + '” (' + (STAGE_LABELS[plant.stage] || plant.stage) + ').';
+    } else if (type === 'add_entry') {
       if (!DJ || typeof DJ.addEntry !== 'function') throw new Error('Journal API unavailable');
       const plant = resolvePlant(action.plantId);
       if (!plant) throw new Error('Plant not found for entry');
@@ -715,19 +755,16 @@
         note: action.note,
         date: action.date,
       });
-      return 'Logged ' + entry.type + ' for “' + plant.name + '”.';
-    }
-
-    if (type === 'set_stage') {
+      resultMsg = 'Logged ' + entry.type + ' for “' + plant.name + '”.';
+    } else if (type === 'set_stage') {
       if (!DJ || typeof DJ.setPlantStage !== 'function') throw new Error('Journal API unavailable');
       const plant = resolvePlant(action.plantId);
       if (!plant) throw new Error('Plant not found for stage change');
       const stage = resolveStage(action.stage) || action.stage;
       const updated = DJ.setPlantStage(plant.id, stage, action.note);
-      return 'Updated “' + updated.name + '” → ' + (STAGE_LABELS[updated.stage] || updated.stage) + '.';
-    }
-
-    if (type === 'import_seed') {
+      resultMsg =
+        'Updated “' + updated.name + '” → ' + (STAGE_LABELS[updated.stage] || updated.stage) + '.';
+    } else if (type === 'import_seed') {
       if (!PT || typeof PT.importSeed !== 'function') throw new Error('Token API unavailable');
       const plant = resolvePlant(action.plantId);
       if (!plant) throw new Error('Plant required to mint seed');
@@ -738,10 +775,8 @@
         plantId: plant.id,
       });
       if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
-      return 'Seed token minted for “' + (result.token && result.token.name) + '”.';
-    }
-
-    if (type === 'mint_growth') {
+      resultMsg = 'Seed token minted for “' + (result.token && result.token.name) + '”.';
+    } else if (type === 'mint_growth') {
       if (!PT || typeof PT.mintGrowth !== 'function') throw new Error('Token API unavailable');
       let tokenId = action.tokenId;
       if (!tokenId && action.plantId) {
@@ -752,23 +787,32 @@
       if (!tokenId) throw new Error('Token not found for growth mint');
       const result = await PT.mintGrowth(tokenId);
       if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
-      return (
+      resultMsg =
         'Growth minted' +
         (result && result.reward != null ? ' (+' + result.reward + ' $GROWTOO)' : '') +
-        '.'
-      );
-    }
-
-    if (type === 'link_plant') {
+        '.';
+    } else if (type === 'link_plant') {
       if (!PT || typeof PT.linkPlant !== 'function') throw new Error('Token API unavailable');
       const plant = resolvePlant(action.plantId);
       if (!plant || !action.tokenId) throw new Error('tokenId and plant required');
       await PT.linkPlant(action.tokenId, plant.id);
       if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
-      return 'Linked token to “' + plant.name + '”.';
+      resultMsg = 'Linked token to “' + plant.name + '”.';
+    } else {
+      throw new Error('Unsupported action: ' + type);
     }
 
-    throw new Error('Unsupported action: ' + type);
+    if (window.CoachCore && typeof CoachCore.logActivity === 'function') {
+      CoachCore.logActivity({
+        kind: 'action',
+        actionType: type,
+        tier: mode,
+        title: resultMsg.replace(/\.$/, ''),
+        body: resultMsg,
+        status: 'done',
+      });
+    }
+    return resultMsg;
   }
 
   async function runPendingActions() {
@@ -786,8 +830,12 @@
     const results = [];
     for (let i = 0; i < pendingActions.length; i++) {
       try {
-        const msg = await executeAction(pendingActions[i]);
+        const action = pendingActions[i];
+        const msg = await executeAction(action);
         results.push('✓ ' + msg);
+        if (action && action.draftFrom) {
+          dismissReminder(action.draftFrom);
+        }
       } catch (err) {
         results.push('✗ ' + (err && err.message ? err.message : 'Action failed'));
       }
@@ -841,6 +889,31 @@
     }
   }
 
+  function setCoachTab(tabId) {
+    const id = tabId === 'settings' || tabId === 'log' || tabId === 'perms' ? 'settings' : 'chat';
+    const root = document.getElementById('ai-coach-root');
+    if (!root) return;
+    root.querySelectorAll('[data-coach-tab]').forEach(function (btn) {
+      btn.classList.toggle('is-active', btn.getAttribute('data-coach-tab') === id);
+    });
+    root.querySelectorAll('[data-coach-panel]').forEach(function (panel) {
+      const on = panel.getAttribute('data-coach-panel') === id;
+      panel.classList.toggle('is-active', on);
+      panel.hidden = !on;
+    });
+    const composer = root.querySelector('.ai-coach-composer');
+    if (composer) composer.hidden = id !== 'chat';
+    if (id === 'settings') {
+      const settingsPanel = document.getElementById('ai-coach-settings-panel');
+      if (settingsPanel && window.CoachCore) {
+        settingsPanel.innerHTML =
+          typeof CoachCore.settingsScreenHtml === 'function'
+            ? CoachCore.settingsScreenHtml()
+            : CoachCore.permissionsPanelHtml();
+      }
+    }
+  }
+
   function ensureDom() {
     if (document.getElementById('ai-coach-root')) return;
     const root = document.createElement('div');
@@ -864,8 +937,8 @@
       '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
       '</svg></span>' +
       '<div class="ai-coach-brand-copy">' +
-      '<strong id="ai-coach-title">Grower Coach</strong>' +
-      '<span class="ai-coach-status" id="ai-coach-status">Ready to help</span>' +
+      '<strong id="ai-coach-title">Grow coach</strong>' +
+      '<span class="ai-coach-status" id="ai-coach-status">Ready when you are</span>' +
       '</div></div>' +
       '<div class="ai-coach-head-actions">' +
       '<button type="button" class="ai-coach-icon-btn" id="ai-coach-clear" title="Clear conversation" aria-label="Clear conversation">' +
@@ -875,13 +948,22 @@
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
       '</button>' +
       '</div></header>' +
+      '<nav class="ai-coach-tabs" aria-label="Coach sections">' +
+      '<button type="button" class="ai-coach-tab is-active" data-coach-tab="chat">Chat</button>' +
+      '<button type="button" class="ai-coach-tab" data-coach-tab="settings">Settings</button>' +
+      '</nav>' +
+      '<div class="ai-coach-tab-panels">' +
+      '<div class="ai-coach-tab-panel is-active" data-coach-panel="chat">' +
       '<div class="ai-coach-messages" id="ai-coach-messages" role="log" aria-live="polite"></div>' +
+      '</div>' +
+      '<div class="ai-coach-tab-panel" data-coach-panel="settings" id="ai-coach-settings-panel" hidden></div>' +
+      '</div>' +
       '<div class="ai-coach-composer">' +
       '<div class="ai-coach-quick" id="ai-coach-quick" aria-label="Suggestions"></div>' +
       '<form class="ai-coach-form" id="ai-coach-form">' +
       '<label class="ai-coach-field">' +
       '<span class="visually-hidden">Message</span>' +
-      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask about stages, care, or minting…" autocomplete="off"></textarea>' +
+      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask about care, weather, or what to log next…" autocomplete="off"></textarea>' +
       '</label>' +
       '<div class="ai-coach-form-actions">' +
       '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
@@ -893,7 +975,7 @@
       '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
       '</svg></button>' +
       '</div></form>' +
-      '<p class="ai-coach-foot">Coach can suggest actions — it always asks before creating plants, logging care, updating stages, or minting.</p>' +
+      '<p class="ai-coach-foot">Routine nudges can run quietly. Journal drafts need your tap. Minting and plant-health calls stay with you.</p>' +
       '</div></aside>';
     document.body.appendChild(root);
 
@@ -910,6 +992,22 @@
       if (!chip) return;
       const text = chip.getAttribute('data-prompt');
       if (text) ask(text);
+    });
+
+    root.querySelector('.ai-coach-tabs').addEventListener('click', function (e) {
+      const tab = e.target.closest('[data-coach-tab]');
+      if (!tab) return;
+      setCoachTab(tab.getAttribute('data-coach-tab'));
+    });
+    root.addEventListener('change', function (e) {
+      const toggle = e.target && e.target.getAttribute && e.target.getAttribute('data-coach-perm');
+      if (!toggle || !window.CoachCore) return;
+      const patch = {};
+      patch[toggle] = !!e.target.checked;
+      CoachCore.setPermissions(patch);
+      setStatus('Settings saved');
+      // Refresh activity + toggles so state stays honest
+      setCoachTab('settings');
     });
 
     const input = document.getElementById('ai-coach-input');
@@ -932,6 +1030,11 @@
     });
 
     document.getElementById('ai-coach-messages').addEventListener('click', function (e) {
+      const draftBtn = e.target.closest('[data-coach-draft]');
+      if (draftBtn) {
+        proposeDraftFromReminder(draftBtn.getAttribute('data-coach-draft'));
+        return;
+      }
       const promptBtn = e.target.closest('[data-coach-prompt]');
       if (promptBtn) {
         const text = promptBtn.getAttribute('data-coach-prompt');
@@ -1016,6 +1119,91 @@
     }
   }
 
+  function draftActionFromReminder(reminder) {
+    if (!reminder || !reminder.plantId) return null;
+    const id = String(reminder.id || '');
+    const plant = resolvePlant(reminder.plantId);
+    const name = (plant && plant.name) || 'plant';
+    if (id.indexOf('watering:') === 0 || id.indexOf('predict-heat-water:') === 0) {
+      return {
+        type: 'add_entry',
+        plantId: reminder.plantId,
+        entryType: 'zalijevanje',
+        note:
+          reminder.kind === 'predictive'
+            ? 'Watered — coach draft after heat/pace check for ' + name
+            : 'Watered — coach draft for ' + name,
+        draftFrom: id,
+      };
+    }
+    if (id.indexOf('feeding:') === 0) {
+      return {
+        type: 'add_entry',
+        plantId: reminder.plantId,
+        entryType: 'gnojidba',
+        note: 'Fed — coach draft for ' + name,
+        draftFrom: id,
+      };
+    }
+    return null;
+  }
+
+  function proposeDraftFromReminder(reminderOrId) {
+    ensureDom();
+    let reminder = reminderOrId;
+    if (typeof reminderOrId === 'string') {
+      const list = buildReminders(getPlants(), getEntries(), getToolbox());
+      reminder = list.find(function (r) {
+        return r && String(r.id) === String(reminderOrId);
+      });
+    }
+    if (!reminder) return false;
+    const action = draftActionFromReminder(reminder);
+    if (!action) {
+      if (reminder.prompt) ask(reminder.prompt);
+      return false;
+    }
+    const mode =
+      window.CoachCore && typeof CoachCore.resolveActionMode === 'function'
+        ? CoachCore.resolveActionMode(action.type)
+        : 'draft';
+    if (mode === 'advise') {
+      ask(reminder.prompt || 'What should I check before logging care?');
+      return false;
+    }
+    pendingActions = [action];
+    history.push({
+      role: 'assistant',
+      content:
+        'Draft ready for “' +
+        ((resolvePlant(action.plantId) || {}).name || 'plant') +
+        '”.\n\n' +
+        reminder.message +
+        '\n\nNothing is saved until you confirm — one tap applies it to the journal trail.',
+      at: Date.now(),
+      source: 'local',
+      actions: [action],
+    });
+    if (window.CoachCore && typeof CoachCore.logActivity === 'function') {
+      const plantName = ((resolvePlant(action.plantId) || {}).name || 'plant');
+      CoachCore.logActivity({
+        kind: 'draft',
+        actionType: action.type,
+        tier: 'draft',
+        title: 'Drafted entry — ' + plantName,
+        body: 'Waiting on your approval — ' + actionLabel(action),
+        plantId: action.plantId,
+        status: 'pending',
+      });
+    }
+    saveHistory();
+    openPanel();
+    setCoachTab('chat');
+    renderMessages();
+    setStatus('Confirm draft below');
+    return true;
+  }
+
   function reminderCardsHtml(reminders) {
     const list = Array.isArray(reminders) ? reminders : [];
     if (!list.length) return '';
@@ -1023,16 +1211,22 @@
       '<div class="ai-coach-reminders">' +
       '<div class="ai-coach-reminders-head">' +
       '<strong>Smart reminders</strong>' +
-      '<span>Based on your logs</span>' +
+      '<span>Care logs + weather when available</span>' +
       '</div>' +
       '<div class="ai-coach-reminder-list">' +
       list
         .slice(0, 4)
         .map(function (r) {
           const sev = r.severity === 'urgent' ? 'urgent' : 'info';
+          const canDraft = (function () {
+            if (!draftActionFromReminder(r)) return false;
+            if (!window.CoachCore || typeof CoachCore.resolveActionMode !== 'function') return true;
+            return CoachCore.resolveActionMode('add_entry') === 'draft';
+          })();
           return (
             '<article class="ai-coach-reminder ai-coach-reminder--' +
             sev +
+            (r.kind === 'predictive' ? ' ai-coach-reminder--predictive' : '') +
             '">' +
             '<div class="ai-coach-reminder-top">' +
             '<h4>' +
@@ -1045,9 +1239,18 @@
             '<p>' +
             esc(r.message) +
             '</p>' +
-            '<button type="button" class="ai-coach-reminder-action" data-coach-prompt="' +
+            '<div class="ai-coach-reminder-actions">' +
+            (canDraft
+              ? '<button type="button" class="btn btn-primary btn-sm" data-coach-draft="' +
+                esc(r.id) +
+                '">Draft log</button>'
+              : '') +
+            '<button type="button" class="btn btn-ghost btn-sm ai-coach-reminder-action" data-coach-prompt="' +
             esc(r.prompt) +
-            '">Plan this now</button>' +
+            '">' +
+            (canDraft ? 'Ask first' : 'Plan this now') +
+            '</button>' +
+            '</div>' +
             '</article>'
           );
         })
@@ -1063,8 +1266,8 @@
     const trustHtml = trustSeen
       ? ''
       : '<div class="ai-coach-trust" id="ai-coach-trust">' +
-        '<strong>Always asks first</strong>' +
-        'Coach can create plants, log care, update stages, and mint — only after you confirm.' +
+        '<strong>Graduated help</strong>' +
+        'Routine nudges can surface on their own. Drafts wait for your tap. Minting and plant-health calls stay with you.' +
         '</div>';
     if (!trustSeen && typeof localStorage !== 'undefined') {
       try {
@@ -1074,9 +1277,9 @@
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
-      '<p class="ai-coach-empty-kicker">Grower Coach</p>' +
-      '<h3>What should we work on?</h3>' +
-      '<p>Advice on stages, journal logs, and mint prep. Tap a starter or type below.</p>' +
+      '<p class="ai-coach-empty-kicker">Grow coach</p>' +
+      '<h3>What needs attention?</h3>' +
+      '<p>A low-key grow buddy — care pace, weather, and plain-language next steps. Not a feature pitch.</p>' +
       '</div>' +
       trustHtml +
       '<div class="ai-coach-empty-grid" role="list">' +
@@ -1132,9 +1335,32 @@
           esc(m.content).replace(/\n/g, '<br/>') +
           '</p>';
         if (m.actions && m.actions.length) {
+          const tiers = m.actions.map(function (a) {
+            return window.CoachCore && typeof CoachCore.actionClassLabel === 'function'
+              ? CoachCore.actionClassLabel(a.type)
+              : 'Draft & confirm';
+          });
+          const uniqueTier = tiers.filter(function (t, i) {
+            return tiers.indexOf(t) === i;
+          });
+          const highStakes = m.actions.some(function (a) {
+            return (
+              a.type === 'import_seed' ||
+              a.type === 'mint_growth' ||
+              a.type === 'link_plant' ||
+              a.type === 'market_list'
+            );
+          });
           body +=
-            '<div class="ai-coach-confirm">' +
-            '<p class="ai-coach-confirm-title">I can do this for you</p>' +
+            '<div class="ai-coach-confirm' +
+            (highStakes ? ' ai-coach-confirm--high' : '') +
+            '">' +
+            '<p class="ai-coach-confirm-title">' +
+            (highStakes ? 'Confirm required — this touches the trail / chain' : 'Draft ready — confirm to save') +
+            '</p>' +
+            '<p class="ai-coach-confirm-tier">' +
+            esc(uniqueTier.join(' · ')) +
+            '</p>' +
             '<ul class="ai-coach-actions">' +
             m.actions
               .map(function (a) {
@@ -1143,7 +1369,9 @@
               .join('') +
             '</ul>' +
             '<div class="ai-coach-action-bar">' +
-            '<button type="button" class="btn btn-primary btn-sm" data-coach-run>Yes, run it</button>' +
+            '<button type="button" class="btn btn-primary btn-sm" data-coach-run>' +
+            (highStakes ? 'Yes, confirm' : 'Save to journal') +
+            '</button>' +
             '<button type="button" class="btn btn-ghost btn-sm" data-coach-cancel>Not now</button>' +
             '</div></div>';
         }
@@ -1205,6 +1433,7 @@
 
   function openPanel() {
     setOpen(true);
+    setCoachTab('chat');
   }
 
   function getSpeechRecognition() {
@@ -1418,7 +1647,7 @@
     if (!root) return;
     // Hide on Admin (and similar dense grids) so the FAB doesn't cover toolbox cards.
     const view = currentAppViewId();
-    const hideOnView = view === 'admin' || view === 'danas';
+    const hideOnView = view === 'admin';
     const show = isGrower() && !hideOnView;
     root.hidden = !show;
     root.setAttribute('aria-hidden', show ? 'false' : 'true');
@@ -1449,7 +1678,35 @@
     getReminders: function () {
       return (buildContext().reminders || []).slice();
     },
+    proposeDraftFromReminder: proposeDraftFromReminder,
+    draftActionFromReminder: draftActionFromReminder,
     runPendingActions: runPendingActions,
+    narrateAfterEntry: function (entry, plant) {
+      if (window.CoachCore && typeof CoachCore.narrateAfterEntry === 'function') {
+        return CoachCore.narrateAfterEntry(entry, plant);
+      }
+      return null;
+    },
+    dashboardBriefing: function (plants, entries) {
+      if (window.CoachCore && typeof CoachCore.dashboardBriefing === 'function') {
+        return CoachCore.dashboardBriefing(plants, entries);
+      }
+      return '';
+    },
+    getEntryNote: function (entryId) {
+      if (window.CoachCore && typeof CoachCore.getEntryNote === 'function') {
+        return CoachCore.getEntryNote(entryId);
+      }
+      return '';
+    },
+    openLog: function () {
+      openPanel();
+      setCoachTab('settings');
+    },
+    openPermissions: function () {
+      openPanel();
+      setCoachTab('settings');
+    },
     STAGE_PLAYBOOK: STAGE_PLAYBOOK,
     STAGE_ORDER: STAGE_ORDER,
   };

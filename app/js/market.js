@@ -628,6 +628,15 @@
         escrowSignature: result.signature,
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
+        ...(function () {
+          const story = storySnapshotForPlant(token.plantId);
+          if (!story) return {};
+          return {
+            photo: story.photo || null,
+            journalSnippets: story.journalSnippets || [],
+            journalStage: story.journalStage || null,
+          };
+        })(),
       });
     } else {
       const escrow = cfg().escrowAddress;
@@ -652,6 +661,7 @@
         escrowSignature = 'recovered-escrow-' + Date.now();
       }
 
+      const story = storySnapshotForPlant(token.plantId);
       const listing = {
         uid: user.uid,
         sellerPubkey: SW.getPublicKey(),
@@ -671,6 +681,11 @@
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
       };
+      if (story) {
+        listing.photo = story.photo || null;
+        listing.journalSnippets = story.journalSnippets || [];
+        listing.journalStage = story.journalStage || null;
+      }
       if (stakeMode) {
         listing.stakeLockedBps = 5000;
         listing.immediateGrow = immediateGrow;
@@ -921,6 +936,78 @@
     );
   }
 
+  function tip(term, label) {
+    if (window.GrowtooPlain && typeof GrowtooPlain.tipHtml === 'function') {
+      return GrowtooPlain.tipHtml(term, label);
+    }
+    return esc(label || term);
+  }
+
+  function readLocalPlants() {
+    try {
+      const raw = localStorage.getItem('dnevnik-live-plants');
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function readLocalEntries() {
+    try {
+      const raw = localStorage.getItem('dnevnik-live-entries');
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function storySnapshotForPlant(plantId) {
+    if (!plantId) return null;
+    const plant = readLocalPlants().find(function (p) {
+      return p && String(p.id) === String(plantId);
+    });
+    if (!plant) return null;
+    const entries = readLocalEntries()
+      .filter(function (e) {
+        return e && String(e.plantId) === String(plantId) && (e.note || e.photo);
+      })
+      .sort(function (a, b) {
+        return String(b.date || '').localeCompare(String(a.date || ''));
+      })
+      .slice(0, 3)
+      .map(function (e) {
+        return {
+          date: e.date || null,
+          type: e.type || '',
+          note: String(e.note || '').trim().slice(0, 120),
+        };
+      })
+      .filter(function (e) {
+        return e.note;
+      });
+    return {
+      photo: plant.photo || null,
+      journalStage: plant.stage || null,
+      journalSnippets: entries,
+    };
+  }
+
+  function enrichListingStory(listing) {
+    if (!listing) return listing;
+    if (listing.photo || (listing.journalSnippets && listing.journalSnippets.length)) {
+      return listing;
+    }
+    const snap = storySnapshotForPlant(listing.plantId);
+    if (!snap) return listing;
+    return Object.assign({}, listing, {
+      photo: listing.photo || snap.photo,
+      journalSnippets: listing.journalSnippets || snap.journalSnippets,
+      journalStage: listing.journalStage || snap.journalStage,
+    });
+  }
+
   function offerExplainHtml(listing) {
     if (!isAdopterUi() || listing.status !== 'active') return '';
     if (listing.settlement === 'adopt_stake') {
@@ -937,10 +1024,12 @@
         '</strong> now · ' +
         '<strong>' +
         esc(String(immediate)) +
-        '</strong> to grower on settle · ' +
+        '</strong> to grower on ' +
+        tip('settle', 'settle') +
+        ' · ' +
         '<strong>' +
         esc(String(locked)) +
-        '</strong> locked until harvest care. NFT after settlement.' +
+        '</strong> locked until harvest care. Token after settlement.' +
         '</p>'
       );
     }
@@ -948,12 +1037,49 @@
       '<p class="market-card-explain market-card-explain--instant">' +
       'Pay <strong>' +
       esc(String(listing.priceGrow)) +
-      ' $GROWTOO</strong> and receive the plant NFT in this flow.' +
+      ' $GROWTOO</strong> and receive the plant token in this flow.' +
       '</p>'
     );
   }
 
+  function storyBlockHtml(listing) {
+    const photo = listing.photo
+      ? '<div class="market-card-photo"><img src="' +
+        esc(listing.photo) +
+        '" alt="" loading="lazy" /></div>'
+      : '<div class="market-card-photo market-card-photo--empty" aria-hidden="true"></div>';
+    const stage = listing.stage || listing.journalStage || '';
+    const snippets = Array.isArray(listing.journalSnippets) ? listing.journalSnippets : [];
+    const journalHtml = snippets.length
+      ? '<ul class="market-card-journal">' +
+        snippets
+          .slice(0, 2)
+          .map(function (s) {
+            return (
+              '<li><span class="market-card-journal-date">' +
+              esc(s.date || '') +
+              '</span> ' +
+              esc(s.note) +
+              '</li>'
+            );
+          })
+          .join('') +
+        '</ul>'
+      : '<p class="market-card-journal-empty">Journal trail linked — open after adopt to follow care logs.</p>';
+    return (
+      '<div class="market-card-story">' +
+      photo +
+      '<div class="market-card-story-body">' +
+      (stage
+        ? '<span class="market-card-stage-chip">' + esc(stage) + '</span>'
+        : '') +
+      journalHtml +
+      '</div></div>'
+    );
+  }
+
   function listingCardHtml(listing, uid) {
+    listing = enrichListingStory(listing);
     const isMine = listing.uid === uid;
     const isBuyer = listing.buyerUid === uid;
     const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
@@ -967,7 +1093,9 @@
     const showStrain = strainNorm && strainNorm !== nameNorm;
     const careLine =
       listing.settlement === 'adopt_stake' && listing.careStatus
-        ? '<p class="market-card-meta">Care escrow: <strong>' +
+        ? '<p class="market-card-meta">Care ' +
+          tip('escrow', 'escrow') +
+          ': <strong>' +
           esc(listing.careStatus) +
           '</strong>' +
           (listing.lockedGrow != null ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO' : '') +
@@ -1000,9 +1128,11 @@
           : 'Ask price';
     const investLabel =
       listing.settlement === 'adopt_stake' ? 'Adopt · stake' : 'Adopt · buy';
+    const showStory = isAdopterUi() || listing.status === 'active';
     return (
       '<article class="market-card' +
       (isDead ? ' market-card--dead' : '') +
+      (isAdopterUi() ? ' market-card--adopter' : '') +
       '" data-id="' +
       esc(listing.id) +
       '">' +
@@ -1011,6 +1141,7 @@
       settlementBadge(listing) +
       statusBadge(listing.status) +
       '</div>' +
+      (showStory ? storyBlockHtml(listing) : '') +
       '<h4 class="market-card-name">' +
       esc(listing.name) +
       '</h4>' +
@@ -1024,7 +1155,12 @@
       phaseRail +
       offerExplainHtml(listing) +
       careLine +
-      '<p class="market-card-meta">NFT: <a href="' +
+      (listing.settlement === 'adopt_stake' && canInvest
+        ? '<p class="market-card-redeem-note">Physical ' +
+          tip('redemption', 'redemption') +
+          ' is still mocked on Devnet — you are practicing the stake flow only.</p>'
+        : '') +
+      '<p class="market-card-meta crypto-advanced-only">NFT: <a href="' +
       esc(explorerAddress(listing.mintAddress)) +
       '" target="_blank" rel="noopener noreferrer"><code>' +
       esc(shortAddr(listing.mintAddress)) +
@@ -1278,12 +1414,64 @@
 
   let eventsBound = false;
 
+  function syncMarketOfferHint() {
+    const settleEl = document.getElementById('market-settlement-select');
+    const hint = document.getElementById('market-stake-hint');
+    const exampleBody = document.getElementById('market-offer-example-body');
+    const cards = document.querySelectorAll('.market-offer-card');
+    if (!settleEl) return;
+    const stake = settleEl.value === 'adopt_stake';
+    cards.forEach(function (card) {
+      const on = card.getAttribute('data-offer') === (stake ? 'adopt_stake' : 'instant');
+      card.classList.toggle('is-selected', on);
+    });
+    if (hint) {
+      hint.setAttribute('data-mode', stake ? 'adopt_stake' : 'instant');
+      if (stake) {
+        hint.textContent =
+          'Adopt stake: the adopter pays the full price up front. Half reaches you when the deal settles; ' +
+          'half stays locked until every calendar month of care qualifies (all-or-nothing at harvest). ' +
+          'Weekly progress stays private to growers; adopters see monthly unlock status.';
+      } else {
+        hint.textContent =
+          'Instant sale: the adopter pays the full price; you receive it when the deal confirms, and the plant token moves to them in the same flow.';
+      }
+    }
+    if (exampleBody) {
+      if (stake) {
+        exampleBody.textContent =
+          'Price 100 $GROWTOO → ~50 to you on settle, ~50 locked. If every care month qualifies at harvest, the locked half unlocks; otherwise that path fails all-or-nothing.';
+      } else {
+        exampleBody.textContent =
+          'Price 100 $GROWTOO → you get 100 when they buy. Simple transfer — no care lock.';
+      }
+    }
+  }
+
+  function syncSettlementFromRadios() {
+    const settleEl = document.getElementById('market-settlement-select');
+    const checked = document.querySelector('input[name="market-settlement"]:checked');
+    if (settleEl && checked) {
+      settleEl.value = checked.value === 'adopt_stake' ? 'adopt_stake' : 'instant';
+    }
+    syncMarketOfferHint();
+  }
+
   function bindEvents() {
     if (eventsBound) return;
     eventsBound = true;
 
     const view = document.getElementById('view-market');
     if (!view) return;
+
+    const settleEl = document.getElementById('market-settlement-select');
+    if (settleEl) {
+      settleEl.addEventListener('change', syncMarketOfferHint);
+    }
+    document.querySelectorAll('input[name="market-settlement"]').forEach(function (radio) {
+      radio.addEventListener('change', syncSettlementFromRadios);
+    });
+    syncSettlementFromRadios();
 
     view.addEventListener('click', async function (e) {
       const gardenEmptyBtn = e.target.closest('#market-empty-garden-btn');
@@ -1349,20 +1537,24 @@
       btn.disabled = true;
       try {
         if (investBtn) {
-          if (
-            !confirm(
-              'Invest ' +
-                listing.priceGrow +
-                ' $GROWTOO to adopt "' +
-                listing.name +
-                '" on Solana devnet?\n\n' +
-                (listing.settlement === 'program'
-                  ? 'You will receive the plant token in this transaction.'
-                  : listing.settlement === 'adopt_stake'
-                    ? 'Adopt stake: you pay the full price now. 50% goes to the grower when it settles; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the plant token when settlement completes.'
-                    : 'You will receive the plant token when settlement completes.')
-            )
-          ) {
+          var confirmMsg =
+            'Invest ' +
+            listing.priceGrow +
+            ' $GROWTOO to adopt "' +
+            listing.name +
+            '" on Solana Devnet?\n\n';
+          if (listing.settlement === 'program') {
+            confirmMsg += 'You will receive the plant token in this transaction.';
+          } else if (listing.settlement === 'adopt_stake') {
+            confirmMsg +=
+              'Adopt stake: you pay the full price now. 50% goes to the grower when it settles; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the plant token when settlement completes.\n\n' +
+              'Important: physical harvest redemption is still mocked on Devnet — no real delivery. This is a test-network practice flow only.';
+          } else {
+            confirmMsg +=
+              'You will receive the plant token when settlement completes.\n\n' +
+              'Note: physical harvest redemption is still mocked on Devnet.';
+          }
+          if (!confirm(confirmMsg)) {
             return;
           }
           await investInListing(listing);
@@ -1422,6 +1614,7 @@
             settlement: settlement === 'adopt_stake' ? 'adopt_stake' : undefined,
           });
           form.reset();
+          syncSettlementFromRadios();
           flashOk(
             settlement === 'adopt_stake'
               ? 'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'
@@ -1616,6 +1809,7 @@
   window.Market = {
     render() {
       bindEvents();
+      syncMarketOfferHint();
       startWatch();
       syncMyInvestments();
       render();

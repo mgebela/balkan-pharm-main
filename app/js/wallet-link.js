@@ -41,9 +41,9 @@
 
   function buildLinkMessage(uid, pubkey) {
     return [
-      'Link this Solana wallet to your dnevnik.live account.',
+      'Link this Solana wallet to your growtoo account.',
       '',
-      'Domain: dnevnik.live',
+      'Domain: growto.live',
       'UID: ' + uid,
       'Wallet: ' + pubkey,
       'Cluster: devnet',
@@ -170,7 +170,7 @@
       const opts = options || {};
       const user = firebaseUser();
       if (!user) {
-        throw new Error('Sign in to your dnevnik.live account before linking a wallet.');
+        throw new Error('Sign in to your growtoo account before linking a wallet.');
       }
       if (!isValidPubkey(pubkey)) {
         throw new Error('Invalid Solana wallet address.');

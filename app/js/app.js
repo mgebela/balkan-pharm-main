@@ -1801,39 +1801,79 @@ function initFirebaseSync() {
         ? window.AICoach.getReminders()
         : [];
     const state = readTodayState();
+    const briefing =
+      window.AICoach && typeof window.AICoach.dashboardBriefing === 'function'
+        ? window.AICoach.dashboardBriefing(getPlants(), getEntries())
+        : '';
+
+    let head = '';
+    if (briefing) {
+      head =
+        '<div class="danas-coach-brief">' +
+        '<span class="dashboard-coach-brief-label">Coach</span> ' +
+        escapeHtml(briefing) +
+        '</div>';
+    }
 
     if (!reminders.length) {
       container.innerHTML =
-        '<div class="empty-state">No urgent reminders right now. Keep logging care and stage updates to get smart prompts.</div>';
+        head +
+        '<div class="empty-state">Nothing urgent. Keep logging care — Coach uses your pace and the forecast for the next nudge.</div>';
       return;
     }
 
-    container.innerHTML = reminders
-      .slice(0, 8)
-      .map(function (r) {
-        const done = !!state.done[String(r.id || '')];
-        return (
-          '<label class="danas-item">' +
-          '<input type="checkbox" data-today-id="' +
-          escapeHtml(String(r.id || '')) +
-          '"' +
-          (done ? ' checked' : '') +
-          ' />' +
-          '<div class="danas-content">' +
-          '<span class="danas-title">' +
-          escapeHtml(String(r.title || 'Reminder')) +
-          '</span>' +
-          '<span class="danas-desc">' +
-          escapeHtml(String(r.message || '')) +
-          '</span>' +
-          '<button type="button" class="link-btn danas-open-coach" data-coach-prompt="' +
-          escapeHtml(String(r.prompt || '')) +
-          '">Ask Coach</button>' +
-          '</div>' +
-          '</label>'
-        );
-      })
-      .join('');
+    container.innerHTML =
+      head +
+      reminders
+        .slice(0, 8)
+        .map(function (r) {
+          const done = !!state.done[String(r.id || '')];
+          const canDraft = (function () {
+            if (
+              !window.AICoach ||
+              typeof AICoach.draftActionFromReminder !== 'function' ||
+              !AICoach.draftActionFromReminder(r)
+            ) {
+              return false;
+            }
+            if (window.CoachCore && typeof CoachCore.resolveActionMode === 'function') {
+              return CoachCore.resolveActionMode('add_entry') === 'draft';
+            }
+            return true;
+          })();
+          return (
+            '<label class="danas-item' +
+            (r.kind === 'predictive' ? ' danas-item--predictive' : '') +
+            '">' +
+            '<input type="checkbox" data-today-id="' +
+            escapeHtml(String(r.id || '')) +
+            '"' +
+            (done ? ' checked' : '') +
+            ' />' +
+            '<div class="danas-content">' +
+            '<span class="danas-title">' +
+            escapeHtml(String(r.title || 'Reminder')) +
+            '</span>' +
+            '<span class="danas-desc">' +
+            escapeHtml(String(r.message || '')) +
+            '</span>' +
+            '<div class="danas-actions">' +
+            (canDraft
+              ? '<button type="button" class="btn btn-primary btn-sm danas-draft-coach" data-coach-draft="' +
+                escapeHtml(String(r.id || '')) +
+                '">Draft log</button>'
+              : '') +
+            '<button type="button" class="link-btn danas-open-coach" data-coach-prompt="' +
+            escapeHtml(String(r.prompt || '')) +
+            '">' +
+            (canDraft ? 'Ask first' : 'Open Coach') +
+            '</button>' +
+            '</div>' +
+            '</div>' +
+            '</label>'
+          );
+        })
+        .join('');
   }
 
   // --- Navigation ---
@@ -2070,6 +2110,15 @@ function initFirebaseSync() {
       writeTodayState(state);
     });
     viewDanasEl.addEventListener('click', (e) => {
+      const draftBtn = e.target.closest('[data-coach-draft]');
+      if (draftBtn) {
+        e.preventDefault();
+        const draftId = draftBtn.getAttribute('data-coach-draft');
+        if (draftId && window.AICoach && typeof AICoach.proposeDraftFromReminder === 'function') {
+          AICoach.proposeDraftFromReminder(draftId);
+        }
+        return;
+      }
       const btn = e.target.closest('[data-coach-prompt]');
       if (!btn) return;
       e.preventDefault();
@@ -2338,6 +2387,42 @@ function initFirebaseSync() {
       }
     }
 
+    const rewardGoalEl = document.getElementById('growlog-reward-goal');
+    if (rewardGoalEl) {
+      const total =
+        window.GrowtooPlain && typeof GrowtooPlain.totalGrowRewards === 'function'
+          ? GrowtooPlain.totalGrowRewards()
+          : 225;
+      let linkedToken = null;
+      if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
+        const tokens = PlantToken.getWallet().tokens || [];
+        linkedToken = tokens.find(function (t) {
+          return t && String(t.plantId) === String(plantId);
+        });
+      }
+      if (linkedToken) {
+        const remaining =
+          window.GrowtooPlain && typeof GrowtooPlain.remainingGrowRewards === 'function'
+            ? GrowtooPlain.remainingGrowRewards(linkedToken.stageIndex)
+            : total;
+        rewardGoalEl.hidden = false;
+        rewardGoalEl.innerHTML =
+          remaining > 0
+            ? 'On-chain plant token linked — this plant can still earn up to <strong>' +
+              remaining +
+              ' $GROWTOO</strong> in stage rewards by harvest (up to ' +
+              total +
+              ' total across all stages).'
+            : 'On-chain plant token linked — harvest stage complete. Stage rewards for this token are done.';
+      } else {
+        rewardGoalEl.hidden = false;
+        rewardGoalEl.innerHTML =
+          'If you mint an optional plant token, stage rewards can total up to <strong>' +
+          total +
+          ' $GROWTOO</strong> by harvest (test network only).';
+      }
+    }
+
     const timelineItems = [];
     entries.slice(0, 20).forEach((e) => {
       const dayWeek = formatDayWeek(e.date, startDate);
@@ -2365,9 +2450,44 @@ function initFirebaseSync() {
     return addr.slice(0, 4) + '…' + addr.slice(-4);
   }
 
+  function renderCoachBriefingSurfaces() {
+    const plants = getPlants();
+    const entries = getEntries();
+    const brief =
+      window.AICoach && typeof AICoach.dashboardBriefing === 'function'
+        ? AICoach.dashboardBriefing(plants, entries)
+        : '';
+    const dashBrief = document.getElementById('dashboard-coach-brief');
+    if (dashBrief) {
+      const show = !isAdopterProfile() && !!brief && plants.length > 0;
+      dashBrief.hidden = !show;
+      if (show) {
+        dashBrief.innerHTML =
+          '<span class="dashboard-coach-brief-label">Coach</span> ' +
+          escapeHtml(brief) +
+          ' <button type="button" class="link-btn" id="dashboard-coach-open">Open coach</button>';
+        const openBtn = document.getElementById('dashboard-coach-open');
+        if (openBtn) {
+          openBtn.addEventListener('click', function () {
+            if (window.AICoach) AICoach.open();
+          });
+        }
+      } else {
+        dashBrief.innerHTML = '';
+      }
+    }
+    const plantsStrip = document.getElementById('coach-plants-strip');
+    if (plantsStrip) {
+      const show = !isAdopterProfile() && !!brief;
+      plantsStrip.hidden = !show;
+      plantsStrip.textContent = show ? brief : '';
+    }
+  }
+
   function renderDashboard() {
     const plants = getPlants();
     const entries = getEntries();
+    renderCoachBriefingSurfaces();
     const metricsEl = document.getElementById('dashboard-metrics');
     const recentEl = document.getElementById('recent-notes');
     const totalPlantCount = plants.reduce((sum, p) => sum + Math.max(1, Number(p.count || 1)), 0);
@@ -2469,7 +2589,7 @@ function initFirebaseSync() {
           '<ol class="getting-started-list">' +
           checklistItem(!!plants.length, 'Add your first plant', 'add-plant', 'Add plant') +
           checklistItem(hasWaterLog, 'Log a watering', 'log-water', 'Log watering') +
-          checklistItem(coachTried, 'Try Grower Coach', 'open-coach', 'Ask Coach') +
+          checklistItem(coachTried, 'Hear from Coach once', 'open-coach', 'Open Coach') +
           checklistItem(hasMint, 'Mint a stage token (optional)', 'open-tokenise', 'Tokenise') +
           '</ol>' +
           '</div>';
@@ -2877,6 +2997,29 @@ function initFirebaseSync() {
         ' days →</p>';
     }
     weatherDiv.innerHTML = html;
+
+    // Cache for Coach predictive nudges (weather + watering pace)
+    try {
+      if (window.CoachCore && typeof CoachCore.saveWeatherCache === 'function') {
+        CoachCore.saveWeatherCache({
+          city: city,
+          days: days.map(function (day, i) {
+            return {
+              date: day.date,
+              label: formatWeatherDayLabel(day.date),
+              avgtemp: day.day.avgtemp_c,
+              maxtemp: day.day.maxtemp_c,
+              mintemp: day.day.mintemp_c,
+              rainChance: day.day.daily_chance_of_rain,
+              condition: day.day.condition && day.day.condition.text,
+              offsetDays: i,
+            };
+          }),
+        });
+      }
+    } catch (err) {
+      // ignore
+    }
   }
 
   function loadPlantsWeatherFromInput() {
@@ -2964,6 +3107,7 @@ function initFirebaseSync() {
 
   // --- Plants ---
   function renderPlants() {
+    renderCoachBriefingSurfaces();
     const list = document.getElementById('plants-list');
     const plants = getPlants();
     if (plants.length === 0) {
@@ -3198,6 +3342,7 @@ function initFirebaseSync() {
     const nextBtn = document.getElementById('plant-form-next');
     const submitBtn = document.getElementById('plant-form-submit');
     const createHint = document.getElementById('plant-form-create-hint');
+    const mintWrap = document.getElementById('plant-mint-toggle-wrap');
 
     if (!isCreate) {
       if (step1) step1.hidden = false;
@@ -3207,6 +3352,7 @@ function initFirebaseSync() {
       if (backBtn) backBtn.hidden = true;
       if (nextBtn) nextBtn.hidden = true;
       if (createHint) createHint.hidden = true;
+      if (mintWrap) mintWrap.hidden = true;
       if (submitBtn) submitBtn.textContent = 'Save';
       return;
     }
@@ -3220,6 +3366,7 @@ function initFirebaseSync() {
     if (step2) step2.hidden = plantWizardStep !== 2;
     if (advanced) advanced.hidden = true;
     if (createHint) createHint.hidden = plantWizardStep !== 1;
+    if (mintWrap) mintWrap.hidden = false;
     if (backBtn) backBtn.hidden = plantWizardStep !== 2;
     if (nextBtn) nextBtn.hidden = plantWizardStep !== 1;
     if (submitBtn) {
@@ -3315,6 +3462,8 @@ function initFirebaseSync() {
       photoData.value = '';
       photoPreview.innerHTML = '';
     }
+    const alsoMint = document.getElementById('plant-also-mint');
+    if (alsoMint) alsoMint.checked = false;
     setPlantWizardStep(isEdit ? 0 : 1);
     updatePlantOutdoorFieldsVisibility();
     modal.classList.add('open');
@@ -3550,6 +3699,8 @@ function initFirebaseSync() {
     if (journalAdds.length) {
       setEntries(getEntries().concat(journalAdds));
     }
+    const alsoMintEl = document.getElementById('plant-also-mint');
+    const wantMint = !id && alsoMintEl && alsoMintEl.checked;
     closePlantModal();
     if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
       DnevnikNotifications.toast(id ? 'Plant updated' : 'Plant added — ' + payload.name, 'success');
@@ -3565,7 +3716,52 @@ function initFirebaseSync() {
       const headerTitle = document.querySelector('.view-title');
       if (headerTitle) headerTitle.textContent = payload.name;
     }
+    if (wantMint) {
+      maybeMintPlantToken(payload).catch(function (err) {
+        console.warn('Optional mint after plant create failed', err);
+        if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+          DnevnikNotifications.toast(
+            (err && err.message) || 'Plant saved, but on-chain mint did not start. Try Tokenise → advanced.',
+            'warn'
+          );
+        }
+      });
+    }
   });
+
+  async function maybeMintPlantToken(plant) {
+    if (!plant || !plant.id) return;
+    const PT = window.PlantToken;
+    if (!PT || typeof PT.importSeed !== 'function') {
+      throw new Error('Minting is not available yet.');
+    }
+    const wallet = typeof PT.getWallet === 'function' ? PT.getWallet() : null;
+    if (!wallet || !wallet.connected) {
+      if (typeof PT.connect === 'function') {
+        await PT.connect();
+      } else if (window.SolanaWallet && typeof SolanaWallet.connect === 'function') {
+        await SolanaWallet.connect();
+      } else {
+        throw new Error('Connect a Devnet wallet first, then mint from Tokenise.');
+      }
+    }
+    await PT.importSeed({
+      name: String(plant.name || '').trim().slice(0, 32),
+      strain: plant.strain || '',
+      batch: '',
+      plantId: plant.id,
+    });
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+      DnevnikNotifications.toast('Plant token mint started for ' + plant.name, 'success');
+    }
+    if (window.AdoptPlant && typeof AdoptPlant.render === 'function') {
+      try {
+        AdoptPlant.render();
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
 
   document.querySelector('#modal-plant .modal-close').addEventListener('click', closePlantModal);
   document.querySelector('#modal-plant .modal-cancel').addEventListener('click', closePlantModal);
@@ -3733,6 +3929,20 @@ function initFirebaseSync() {
               }
             </div>
             <div class="entry-note">${escapeHtml(e.note || '')}</div>
+            ${
+              (function () {
+                const coachNote =
+                  window.AICoach && typeof AICoach.getEntryNote === 'function'
+                    ? AICoach.getEntryNote(e.id)
+                    : '';
+                if (!coachNote) return '';
+                return (
+                  '<p class="entry-coach-note"><span class="entry-coach-note-label">Coach</span> ' +
+                  escapeHtml(coachNote) +
+                  '</p>'
+                );
+              })()
+            }
             ${metaHtml ? '<div class="entry-meta-blocks">' + metaHtml + '</div>' : ''}
             ${media.length ? '<div class="entry-media-wrap">' + media.join('') + '</div>' : ''}
           </div>
@@ -3966,6 +4176,16 @@ function initFirebaseSync() {
     };
     entries.push(newEntry);
     setEntries(entries);
+    if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
+      try {
+        const plantForNote = getPlants().find(function (p) {
+          return p && p.id === newEntry.plantId;
+        });
+        AICoach.narrateAfterEntry(newEntry, plantForNote || null);
+      } catch (e) {
+        // ignore
+      }
+    }
     if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
       const plantName =
         (getPlants().find(function (p) {
@@ -4592,6 +4812,13 @@ document.addEventListener("click", (e) => {
     };
     setEntries(getEntries().concat([entry]));
     refreshAfterJournalWrite(plantId);
+    if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
+      try {
+        AICoach.narrateAfterEntry(entry, plant);
+      } catch (e) {
+        // ignore
+      }
+    }
     if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
       try {
         DnevnikNotifications.notifyJournalEntry(entry, plant.name);

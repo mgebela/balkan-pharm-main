@@ -133,14 +133,23 @@
     if (!action || !action.view) return;
     if (typeof window.showAppView === 'function') {
       window.showAppView(action.view, action.plantId || null);
-      return;
+    } else {
+      const nav = document.querySelector('.nav-item[data-view="' + action.view + '"]');
+      if (nav) nav.click();
+      if (action.plantId) {
+        window.dispatchEvent(
+          new CustomEvent('dnevnik:open-growlog', { detail: { plantId: action.plantId } })
+        );
+      }
     }
-    const nav = document.querySelector('.nav-item[data-view="' + action.view + '"]');
-    if (nav) nav.click();
-    if (action.plantId) {
-      window.dispatchEvent(
-        new CustomEvent('dnevnik:open-growlog', { detail: { plantId: action.plantId } })
-      );
+    if (
+      action.coachDraft &&
+      window.AICoach &&
+      typeof AICoach.proposeDraftFromReminder === 'function'
+    ) {
+      setTimeout(function () {
+        AICoach.proposeDraftFromReminder(action.coachDraft);
+      }, 140);
     }
   }
 
@@ -698,14 +707,18 @@
     reminders.forEach(function (r) {
       if (!r || !r.id) return;
       const id = String(r.id);
-      if (id.indexOf('watering:') !== 0 && id.indexOf('feeding:') !== 0) return;
+      const isCare =
+        id.indexOf('watering:') === 0 ||
+        id.indexOf('feeding:') === 0 ||
+        id.indexOf('predict-') === 0;
+      if (!isCare) return;
       push({
         type: 'care_due',
         title: r.title || 'Care reminder',
         body: r.message || 'A plant needs attention.',
-        meta: { key: 'care-due:' + id + ':' + day, plantId: r.plantId || null },
-        action: { view: 'dashboard', plantId: r.plantId || null },
-        kind: 'warn',
+        meta: { key: 'care-due:' + id + ':' + day, plantId: r.plantId || null, reminderId: id },
+        action: { view: 'danas', plantId: r.plantId || null, coachDraft: id },
+        kind: r.severity === 'urgent' || r.kind === 'predictive' ? 'warn' : 'info',
         dedupKey: 'care-due:' + id + ':' + day,
         toast: false,
       });

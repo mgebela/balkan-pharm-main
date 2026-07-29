@@ -3,221 +3,285 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>growtoo · RWA documentation</title>
-  <meta name="description" content="Architecture docs for growtoo plant tokens on Solana: standards, growth minting, and redemption flow." />
+  <title>Plant token docs · growtoo</title>
+  <meta name="description" content="Architecture docs for growtoo plant tokens on Solana: standards, growth minting, marketplace, and redemption." />
   <link rel="canonical" href="https://growto.live/rwa-docs/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="growtoo" />
   <meta property="og:url" content="https://growto.live/rwa-docs/" />
-  <meta property="og:title" content="growtoo · RWA documentation" />
-  <meta property="og:description" content="Architecture docs for growtoo plant tokens on Solana: standards, growth minting, and redemption flow." />
+  <meta property="og:title" content="Plant token docs · growtoo" />
+  <meta property="og:description" content="Architecture docs for growtoo plant tokens on Solana: standards, growth minting, marketplace, and redemption." />
   <meta property="og:image" content="https://growto.live/images/3.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/landing.css?v=20260729h" />
+  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
+  <link rel="icon" href="../images/growtoo-logo.png?v=20260722a" type="image/png" />
   <style>
-    :root {
-      --bg: #0d1117;
-      --panel: #161b22;
-      --border: #2d333b;
-      --text: #e6edf3;
-      --muted: #9aa4b2;
-      --accent: #2dd4bf;
-      --amber: #f59e0b;
+    .docs-prose h2 {
+      margin: 2rem 0 0.65rem;
+      font-size: 1.25rem;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.65;
+    .docs-prose h3 {
+      margin: 1.25rem 0 0.4rem;
+      font-size: 1.02rem;
     }
-    .wrap { max-width: 860px; margin: 0 auto; padding: 3rem 1.4rem 5rem; }
-    header.site { margin-bottom: 3rem; }
-    header.site .kicker { color: var(--accent); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.78rem; }
-    h1 { font-size: 2rem; margin: 0.4rem 0 0.6rem; }
-    .sub { color: var(--muted); font-size: 1.02rem; max-width: 640px; }
-    h2 { font-size: 1.4rem; margin: 3rem 0 0.8rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
-    h3 { font-size: 1.05rem; margin: 1.6rem 0 0.5rem; }
-    p, li { color: var(--text); font-size: 0.95rem; }
-    li { margin-bottom: 0.35rem; }
-    code {
-      background: var(--panel);
-      border: 1px solid var(--border);
+    .docs-prose p,
+    .docs-prose li {
+      color: var(--text-muted, rgba(190, 220, 190, 0.78));
+      line-height: 1.55;
+    }
+    .docs-prose code {
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.84em;
+      padding: 0.1rem 0.35rem;
       border-radius: 6px;
-      padding: 0.1rem 0.4rem;
-      font-size: 0.85em;
+      border: 1px solid rgba(140, 200, 140, 0.22);
+      background: rgba(6, 18, 12, 0.7);
     }
-    pre {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
+    .docs-prose pre {
       overflow-x: auto;
-      font-size: 0.82rem;
-      line-height: 1.5;
+      padding: 1rem 1.1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(140, 200, 140, 0.18);
+      background: rgba(6, 18, 12, 0.85);
+      font-size: 0.8rem;
+      line-height: 1.45;
     }
-    pre code { background: none; border: none; padding: 0; }
-    table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.88rem; }
-    th, td { text-align: left; padding: 0.5rem 0.8rem; border: 1px solid var(--border); }
-    th { background: var(--panel); }
-    a { color: var(--accent); }
-    .badge {
-      display: inline-block;
-      font-size: 0.72rem;
-      padding: 0.15rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid var(--amber);
-      color: var(--amber);
-      margin-left: 0.6rem;
-      vertical-align: middle;
+    .docs-prose pre code {
+      border: 0;
+      background: none;
+      padding: 0;
     }
-    .flow { counter-reset: step; list-style: none; padding-left: 0; }
-    .flow li { position: relative; padding-left: 2.4rem; margin-bottom: 0.8rem; }
+    .docs-prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.85rem 0 1.25rem;
+      font-size: 0.88rem;
+    }
+    .docs-prose th,
+    .docs-prose td {
+      text-align: left;
+      padding: 0.5rem 0.7rem;
+      border: 1px solid rgba(140, 200, 140, 0.18);
+    }
+    .docs-prose th {
+      background: rgba(8, 22, 14, 0.9);
+      color: rgba(247, 238, 225, 0.7);
+    }
+    .docs-audience {
+      margin: 0 0 1.25rem;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: 1px dashed rgba(232, 196, 106, 0.4);
+      background: rgba(232, 196, 106, 0.07);
+      color: rgba(247, 238, 225, 0.78);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .flow {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+    }
+    .flow li {
+      position: relative;
+      padding-left: 2.4rem;
+      margin-bottom: 0.75rem;
+    }
     .flow li::before {
       counter-increment: step;
       content: counter(step);
-      position: absolute; left: 0; top: 0.1rem;
-      width: 1.6rem; height: 1.6rem;
-      border-radius: 50%;
-      background: var(--panel);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      font-size: 0.8rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
+      position: absolute;
+      left: 0;
+      top: 0.05rem;
+      width: 1.55rem;
+      height: 1.55rem;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(212, 90, 56, 0.2);
+      color: #ffb4a0;
+      border: 1px solid rgba(212, 90, 56, 0.4);
     }
-    footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.82rem; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="site">
-      <span class="kicker">dnevnik.live · public docs</span>
-      <h1>Seed RWA architecture <span class="badge">Solana devnet</span></h1>
-      <p class="sub">
-        How dnevnik.live tokenizes physical CBD plants as real-world assets (RWAs)
-        on Solana: token standards, growth minting, marketplace and redemption flow.
-      </p>
-    </header>
+  <div class="devnet-banner" role="status">
+    <strong>Solana Devnet</strong>
+    <span>Technical docs for plant tokens &amp; $GROWTOO — <em>no monetary value</em>.</span>
+    <a href="../risks/">Risks</a>
+  </div>
 
-    <h2 id="architecture">1. RWA architecture</h2>
-    <p>
-      Each physical seed adopted on <a href="https://dnevnik.live">dnevnik.live</a> is represented
-      by a <strong>Seed NFT</strong>, a Metaplex NFT in the verified
-      <em>dnevnik.live Seeds</em> collection. The NFT is the on-chain record of the asset;
-      the public grow journal is the off-chain evidence trail. The two are linked in both
-      directions: the NFT metadata references the journal plant ID, and the app shows the
-      on-chain mint address, transactions and metadata for each token.
-    </p>
-    <h3>Components</h3>
-    <ul>
-      <li><strong>App (dnevnik.live/app)</strong>: Firebase-authenticated grow journal. Users connect a Solana wallet (multi-wallet or watch-only) and link it to their account by signing a message.</li>
-      <li><strong>Seed NFTs</strong>: one per physical seed; strain, batch and linked plant ID live in the metadata (Arweave, uploaded via Irys).</li>
-      <li><strong>$GROWTOO SPL token</strong>: fungible reward token (9 decimals). Minted to holders as their plants advance growth stages; used as the marketplace currency.</li>
-      <li><strong>Mint queue</strong>: mint and settlement requests are filed in Firestore; an authority-operated worker executes them on devnet and writes back transaction signatures. This queue is the devnet stand-in for backend services / on-chain programs planned for mainnet.</li>
-    </ul>
-    <h3>Trust model (devnet MVP)</h3>
-    <p>
-      On devnet, the collection authority also acts as metadata update authority, $GROWTOO mint
-      authority and marketplace escrow. Growth-stage updates are only executed by the authority
-      after the corresponding journal progress exists, and rewards are computed server-side.
-      The mainnet path replaces the queue with an on-chain escrow program and oracle-verified
-      growth attestations.
-    </p>
+  <header class="header">
+    <div class="container header-inner">
+      <a href="../index.html" class="logo" aria-label="growtoo">
+        <img src="../images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="logo-mark" />
+        <span class="logo-word">growtoo</span>
+      </a>
+      <nav class="nav" id="main-nav">
+        <a href="../risks/" class="nav-link">Risks</a>
+        <a href="../privacy/" class="nav-link">Privacy</a>
+        <a href="../dnevnik/" class="btn btn-primary">Sign in</a>
+      </nav>
+    </div>
+  </header>
 
-    <h2 id="standards">2. Token standards</h2>
-    <h3>Seed NFT (non-fungible)</h3>
-    <p>
-      Metaplex Token Metadata standard, extended with a machine-readable
-      <code>rwa</code> block. Full JSON Schema:
-      <a href="https://dnevnik.live/token-metadata/seed-rwa.schema.json"><code>seed-rwa.schema.json</code></a>.
-    </p>
+  <main>
+    <section class="section desk-section risks-page">
+      <div class="container risks-wrap">
+        <div class="desk-header">
+          <span class="desk-tag">DOCS</span>
+          <h1 class="risks-title">Plant token architecture</h1>
+          <p class="section-lead">
+            How growtoo links a journal plant to an optional Solana Devnet plant token:
+            standards, growth rewards, marketplace hold/settle, and planned redemption.
+          </p>
+        </div>
+
+        <p class="docs-audience">
+          <strong>Who this is for:</strong> builders and curious adopters who want the plumbing.
+          Regular growers can stay in the journal — you do not need this page to log watering.
+          Prefer the honest product limits? Start with
+          <a href="../risks/">Risks &amp; scope</a>.
+        </p>
+
+        <div class="desk-panel risks-panel docs-prose">
+          <div class="desk-panel-bar">
+            <span>growtoo · public docs</span>
+            <span class="desk-panel-meta">DEVNET</span>
+          </div>
+
+          <h2 id="architecture">1. Architecture</h2>
+          <p>
+            Each physical seed you choose to tokenise is represented by a <strong>plant token</strong>
+            (a Metaplex NFT in the verified growtoo Seeds collection). The NFT is the on-chain record;
+            the public grow journal is the off-chain evidence trail. They link both ways: metadata
+            references the journal plant ID, and the app shows mint address and transactions for each token.
+          </p>
+          <h3>Components</h3>
+          <ul>
+            <li><strong>App (growto.live/app)</strong> — Firebase-authenticated grow journal. Optional Solana wallet (extension or watch-only) linked by a signed message.</li>
+            <li><strong>Plant tokens</strong> — one per minted seed; strain, batch, and linked plant ID live in metadata (often Arweave via Irys).</li>
+            <li><strong>$GROWTOO</strong> — fungible SPL reward token (9 decimals). Minted as plants advance stages; used as marketplace currency on Devnet.</li>
+            <li><strong>Mint queue</strong> — mint/settlement requests in Firestore; an authority worker executes them on Devnet. Stand-in for future on-chain programs.</li>
+          </ul>
+          <h3>Trust model (Devnet MVP)</h3>
+          <p>
+            On Devnet, one collection authority also controls metadata updates, $GROWTOO minting, and marketplace hold/release.
+            Stage updates only run after matching journal progress exists. Mainnet aims to replace the queue with an on-chain escrow program
+            and stronger attestations — see <a href="../risks/">Risks</a>.
+          </p>
+
+          <h2 id="standards">2. Token standards</h2>
+          <h3>Plant token (non-fungible)</h3>
+          <p>
+            Metaplex Token Metadata, extended with a machine-readable <code>rwa</code> block.
+            Schema reference (legacy path may still use the older filename):
+            <code>seed-rwa.schema.json</code>.
+          </p>
 <pre><code>{
   "name": "CBD Auto #1",
   "symbol": "SEED",
-  "image": "…",
   "attributes": [
-    { "trait_type": "Strain",  "value": "CBD Auto" },
-    { "trait_type": "Batch",   "value": "B-2026-07-A" },
-    { "trait_type": "Stage",   "value": "Flowering" },
-    { "trait_type": "Plant ID","value": "plant-abc" }
+    { "trait_type": "Strain", "value": "CBD Auto" },
+    { "trait_type": "Batch", "value": "B-2026-07-A" },
+    { "trait_type": "Stage", "value": "Flowering" },
+    { "trait_type": "Plant ID", "value": "plant-abc" }
   ],
   "rwa": {
-    "standard": "dnevnik.live/seed-rwa",
+    "standard": "growtoo/seed-rwa",
     "version": "1.0.0",
     "assetType": "flower",
     "strain": "CBD Auto",
     "batch": "B-2026-07-A",
     "plantId": "plant-abc",
-    "cluster": "devnet",
-    "importedAt": "2026-07-10T00:00:00Z",
-    "growthHistory": [
-      { "stage": "germination", "reward": 10, "ts": "…", "signature": "…" }
-    ]
+    "cluster": "devnet"
   }
 }</code></pre>
-    <p>
-      The metadata URI is updated at every growth stage; <code>rwa.assetType</code> flips from
-      <code>seed</code> to <code>flower</code> at the flowering stage, which is what makes
-      seed RWAs and flower-stage tokens two distinct tradeable asset types on the marketplace.
-    </p>
-    <h3>$GROWTOO (fungible, SPL)</h3>
-    <table>
-      <tr><th>Property</th><th>Value</th></tr>
-      <tr><td>Standard</td><td>SPL token + Metaplex fungible metadata</td></tr>
-      <tr><td>Symbol / decimals</td><td>GROW / 9</td></tr>
-      <tr><td>Issuance</td><td>Minted per growth stage: Germination 10, Seedling 20, Vegetative 35, Flowering 60, Harvest 100</td></tr>
-      <tr><td>Utility</td><td>Marketplace currency; future redemption &amp; governance</td></tr>
-    </table>
+          <p>
+            Metadata URI updates each growth stage; <code>rwa.assetType</code> flips from
+            <code>seed</code> to <code>flower</code> at flowering so marketplace listings can distinguish them.
+          </p>
+          <h3>$GROWTOO (fungible SPL)</h3>
+          <table>
+            <tr><th>Property</th><th>Value</th></tr>
+            <tr><td>Standard</td><td>SPL token + Metaplex fungible metadata</td></tr>
+            <tr><td>Symbol / decimals</td><td>GROW / 9</td></tr>
+            <tr><td>Issuance</td><td>Per stage: Germination 10, Seedling 20, Vegetative 35, Flowering 60, Harvest 100</td></tr>
+            <tr><td>Utility</td><td>Devnet marketplace currency; future redemption &amp; governance (planned)</td></tr>
+          </table>
 
-    <h2 id="growth">3. Growth minting flow</h2>
-    <ol class="flow">
-      <li>User documents growth in the journal and advances the plant token a stage in the app.</li>
-      <li>The app files a <code>growthMints</code> request referencing the Seed NFT mint address.</li>
-      <li>The worker uploads new stage metadata to Arweave (Stage trait + <code>growthHistory</code>) and updates the NFT metadata URI on-chain.</li>
-      <li>The worker mints the stage's $GROWTOO reward to the holder's wallet.</li>
-      <li>The app displays the real transaction signatures (Solscan links) in the token's history.</li>
-    </ol>
+          <h2 id="growth">3. Growth minting flow</h2>
+          <ol class="flow">
+            <li>Document growth in the journal and advance the plant token a stage in the app.</li>
+            <li>The app files a growth-mint request for that mint address.</li>
+            <li>The worker uploads stage metadata and updates the NFT metadata URI on-chain.</li>
+            <li>The worker mints that stage’s $GROWTOO reward to the holder’s wallet.</li>
+            <li>The app shows real transaction signatures (e.g. Solscan) in token history.</li>
+          </ol>
 
-    <h2 id="marketplace">4. Marketplace (devnet MVP)</h2>
-    <ol class="flow">
-      <li><strong>List:</strong> the seller signs a transfer of the NFT to the marketplace escrow wallet and the listing goes live with a $GROWTOO price.</li>
-      <li><strong>Buy:</strong> the buyer signs a $GROWTOO payment directly to the seller.</li>
-      <li><strong>Settle:</strong> the worker verifies the payment on-chain and releases the NFT from escrow to the buyer. Sellers can cancel live listings; the NFT is returned.</li>
-    </ol>
-    <p>
-      The swap is escrow-mediated rather than atomic, an accepted trade-off for the devnet MVP.
-      Mainnet uses an on-chain escrow program so neither leg depends on the operator.
-    </p>
+          <h2 id="marketplace">4. Marketplace (Devnet MVP)</h2>
+          <ol class="flow">
+            <li><strong>List:</strong> seller moves the NFT into a marketplace hold; listing goes live with a $GROWTOO ask.</li>
+            <li><strong>Invest:</strong> buyer pays $GROWTOO (instant sale or adopt-stake split).</li>
+            <li><strong>Settle:</strong> payment is confirmed; the plant token is released to the buyer. Sellers can cancel live listings.</li>
+          </ol>
+          <p>
+            Instant sale pays the full ask on buy. Adopt stake locks half until monthly care qualifies at harvest (all-or-nothing).
+            Devnet settlement is operator-assisted; mainnet targets a fully on-chain program.
+          </p>
 
-    <h2 id="redemption">5. Redemption flow</h2>
-    <p>
-      Redemption converts the on-chain asset back into its real-world counterpart
-      (harvest share of the plant, subject to applicable regulation).
-    </p>
-    <ol class="flow">
-      <li>A harvest-stage NFT holder requests redemption in the app (planned M5; devnet mock until then).</li>
-      <li>The redemption burns the NFT (or marks it redeemed via a frozen redemption trait), permanently retiring the claim.</li>
-      <li>The operator fulfils the physical delivery / payout recorded against the batch code, and publishes the fulfilment reference in the journal.</li>
-      <li>$GROWTOO earned by the plant remains with the holder. Only the asset NFT is retired.</li>
-    </ol>
+          <h2 id="redemption">5. Redemption (planned)</h2>
+          <p>
+            Redemption would convert the on-chain asset into its real-world counterpart (harvest share),
+            subject to regulation. Still mock / planned — not live fulfillment.
+          </p>
+          <ol class="flow">
+            <li>Harvest-stage holder requests redemption in the app (planned).</li>
+            <li>NFT is burned or marked redeemed.</li>
+            <li>Operator records physical fulfilment against the batch and journal.</li>
+            <li>$GROWTOO already earned stays with the holder; only the asset NFT is retired.</li>
+          </ol>
 
-    <h2 id="addresses">6. Deployed addresses (devnet)</h2>
-    <p>
-      Published after the M1 devnet deploy in
-      <a href="https://github.com/mgebela/balkan-pharm-main">the repository</a>
-      (<code>chain/deployed.devnet.json</code>) and in the app's chain config.
-      All assets are on <strong>devnet</strong>. They carry no monetary value.
-    </p>
+          <h2 id="addresses">6. Deployed addresses (Devnet)</h2>
+          <p>
+            After deploy, addresses live in
+            <a href="https://github.com/mgebela/balkan-pharm-main">the repository</a>
+            (<code>chain/deployed.devnet.json</code> and the app chain config. Devnet only — no monetary value.
+          </p>
+        </div>
 
-    <footer>
-      growtoo · Seed RWA docs · schema version 1.0.0 ·
-      <a href="https://growto.live">growto.live</a> ·
-      <a href="../privacy/">Privacy</a> ·
-      <a href="../terms/">Terms</a> ·
-      <a href="../risks/">Risks</a>
-    </footer>
-  </div>
-  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
+        <p class="risks-footer-note">
+          <a href="../risks/">Risks &amp; scope</a> ·
+          <a href="../privacy/">Privacy</a> ·
+          <a href="../terms/">Terms</a> ·
+          <a href="../index.html">Back to growtoo</a>
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer desk-footer">
+    <div class="container">
+      <p class="footer-disclaimer">
+        Technical reference for the Devnet MVP. Not investment advice. Tokens have no monetary value.
+      </p>
+      <div class="footer-links" style="justify-content:center;margin:0.75rem 0 1rem">
+        <a href="../privacy/">Privacy</a>
+        <a href="../terms/">Terms</a>
+        <a href="../risks/">Risks</a>
+        <a href="../index.html">Home</a>
+      </div>
+      <p class="footer-copy">© growtoo. All rights reserved.</p>
+    </div>
+  </footer>
+
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

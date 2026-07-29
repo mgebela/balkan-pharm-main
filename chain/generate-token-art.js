@@ -1,8 +1,8 @@
 /*
- * Generate NFT token PNGs from shared pixel art (seed → harvest).
+ * Generate NFT token PNGs from botanical line art (seed → harvest).
  *
  * Usage: node generate-token-art.js
- * Writes 512×512 PNGs into token-metadata/images/
+ * Writes portrait PNGs into token-metadata/images/
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,11 +11,11 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const Art = require('../shared/token-pixel-art.js');
+const Art = require('../shared/token-botanical-art.js');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = path.join(__dirname, '../token-metadata/images');
-const SCALE = 16; // 32 → 512
+const SIZE = 512; // width; height follows card aspect
 
 function crc32(buf) {
   let c = ~0;
@@ -42,8 +42,8 @@ function encodePng(width, height, rgba) {
   const ihdr = Buffer.alloc(13);
   ihdr.writeUInt32BE(width, 0);
   ihdr.writeUInt32BE(height, 4);
-  ihdr[8] = 8; // bit depth
-  ihdr[9] = 6; // RGBA
+  ihdr[8] = 8;
+  ihdr[9] = 6;
   ihdr[10] = 0;
   ihdr[11] = 0;
   ihdr[12] = 0;
@@ -52,7 +52,7 @@ function encodePng(width, height, rgba) {
   const raw = Buffer.alloc((stride + 1) * height);
   for (let y = 0; y < height; y += 1) {
     const rowStart = y * (stride + 1);
-    raw[rowStart] = 0; // filter none
+    raw[rowStart] = 0;
     rgba.copy(raw, rowStart + 1, y * stride, y * stride + stride);
   }
   const compressed = zlib.deflateSync(raw, { level: 9 });
@@ -67,18 +67,16 @@ function encodePng(width, height, rgba) {
 
 fs.mkdirSync(OUT_DIR, { recursive: true });
 
-console.log('Generating pixel token art…');
+console.log('Generating botanical token art…');
 for (let i = 0; i < Art.STAGE_KEYS.length; i += 1) {
   const key = Art.STAGE_KEYS[i];
-  const grid = Art.buildStage(i, { withBg: true });
-  const { width, height, rgba } = Art.gridToRgba(grid, SCALE);
-  const png = encodePng(width, height, rgba);
+  const { width, height, rgba } = Art.renderStageRgba(i, SIZE);
+  const png = encodePng(width, height, Buffer.from(rgba));
   const file = path.join(OUT_DIR, `plant-${key}.png`);
   fs.writeFileSync(file, png);
   console.log('✔', file, `(${width}×${height})`);
 }
 
-// Keep legacy filename as alias of seed stage for existing mint scripts.
 const seedSrc = path.join(OUT_DIR, 'plant-seed.png');
 const seedDst = path.join(OUT_DIR, 'seed-rwa.png');
 fs.copyFileSync(seedSrc, seedDst);
