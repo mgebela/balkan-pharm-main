@@ -4,12 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>growtoo: free grow journal for cannabis growers</title>
-  <meta name="description" content="Free grow journal for cannabis growers (CBD, THC, and more). Track watering, feeding, weather, and stages. Optional on-chain proof when you want a trail anyone can check." />
+  <meta name="description" content="Free cannabis grow journal — track watering, feeding, and stages. Optional on-chain proof. No wallet required to start." />
+  <link rel="canonical" href="https://growto.live/" />
+  <meta name="theme-color" content="#08120e" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="growtoo" />
+  <meta property="og:url" content="https://growto.live/" />
+  <meta property="og:title" content="growtoo: free grow journal for cannabis growers" />
+  <meta property="og:description" content="Free cannabis grow journal — track watering, feeding, and stages. Optional on-chain proof. No wallet required to start." />
+  <meta property="og:image" content="https://growto.live/images/3.jpg" />
+  <meta property="og:image:width" content="4500" />
+  <meta property="og:image:height" content="3000" />
+  <meta property="og:image:alt" content="Cannabis plants in a grow — the journal starts with real care logs" />
+  <meta property="og:locale" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="growtoo: free grow journal for cannabis growers" />
+  <meta name="twitter:description" content="Free cannabis grow journal — track watering, feeding, and stages. Optional on-chain proof. No wallet required to start." />
+  <meta name="twitter:image" content="https://growto.live/images/3.jpg" />
+  <meta name="twitter:image:alt" content="Cannabis plants in a grow — the journal starts with real care logs" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles/landing.css?v=20260729h" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "growtoo",
+        "url": "https://growto.live/",
+        "description": "Free cannabis grow journal with optional on-chain proof.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "growtoo",
+          "url": "https://growto.live/",
+          "logo": "https://growto.live/images/growtoo-logo.png"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Do I need to know anything about crypto to use this?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. The journal is free and usable with no wallet at all. A Solana wallet (Phantom or Solflare) is only needed if you want to mint or adopt on the test network."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this only for licensed commercial growers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. The journal is aimed at cannabis growers (a plant or a few, or a full room), including places where cultivation rules are opening up. Always follow the law where you grow; growtoo is a documentation tool, not legal advice."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Who verifies that a journal entry is real, not fabricated?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Today, the platform operator reviews journal progress before minting. The live-network roadmap moves this toward stronger attestations so no single party has to be trusted forever."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this legal? What happens with an actual harvest?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Redemption converts a harvest-stage token into its real-world counterpart, subject to applicable regulation in the grower’s jurisdiction. Today redemption is specified but still mocked on the test network, not a live fulfillment pipeline."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Why build on a test network instead of going live with real money?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "So the system (journal proof, minting, escrow, redemption) can be battle-tested in the open first. Devnet is Solana’s public test network — same tools, no real value."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is $GROWTOO worth anything right now?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. It’s a test-network token with no monetary value. It exists so the optional mint → verify → adopt flow can be tested publicly before real value is on the line."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What happens to my $GROWTOO when the live network launches?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Test-network $GROWTOO is for practicing the flow and should not be treated as transferable monetary balance. Early-grower recognition is intended to carry forward; exact migration rules will be published before launch."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When does the live network launch?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Targeting after the harvest redemption flow ships. We publish milestones in the docs, not a vague soon."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
