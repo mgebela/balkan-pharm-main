@@ -6,7 +6,7 @@
   <title>growtoo: free grow journal for cannabis growers</title>
   <meta name="description" content="Free cannabis grow journal — track watering, feeding, and stages. Optional on-chain proof. No wallet required to start." />
   <link rel="canonical" href="https://growto.live/" />
-  <meta name="theme-color" content="#08120e" />
+  <meta name="theme-color" content="#0f1a12" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="growtoo" />
@@ -27,8 +27,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260729h" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260730f" />
   <link rel="stylesheet" href="styles/trust-gates.css?v=20260729g" />
   <link rel="icon" href="images/growtoo-logo.png?v=20260722a" type="image/png" />
   <script type="application/ld+json">
@@ -122,9 +122,9 @@
 </head>
 <body>
 
-  <header class="header">
+  <header class="header header--catalog">
     <div class="container header-inner">
-      <a href="index.html" class="logo" aria-label="growtoo">
+      <a href="index.html" class="logo logo--brass" aria-label="growtoo">
         <img src="images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="logo-mark" />
         <span class="logo-word">growtoo</span>
       </a>
@@ -133,57 +133,76 @@
         <span class="nav-toggle-bar"></span>
         <span class="nav-toggle-bar"></span>
       </button>
-      <nav class="nav" id="main-nav">
-        <a href="#proof" class="nav-link">How it works</a>
-        <a href="#growers" class="nav-link">Growers</a>
-        <a href="#adopters" class="nav-link">Adopters</a>
-        <a href="#stakes" class="nav-link">Stakes</a>
-        <a href="#faq" class="nav-link">FAQ</a>
-        <a href="rwa-docs/" class="nav-link">Docs</a>
-        <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary nav-cta">Start your journal free</a>
+      <nav class="nav nav--catalog" id="main-nav">
+        <a href="dnevnik/?mode=signup&type=grower" class="nav-link">Journal</a>
+        <a href="app/" class="nav-link">Tokenise</a>
+        <a href="#stakes" class="nav-link">Market</a>
+        <a href="#faq" class="nav-link nav-link--more">FAQ</a>
+        <a href="rwa-docs/" class="nav-link nav-link--more">Docs</a>
       </nav>
     </div>
   </header>
   <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
 
   <main>
-    <section id="top" class="hero hero--journal">
-      <div class="hero-bg" aria-hidden="true">
-        <img src="images/3.jpg?v=20260724k" alt="" width="1800" height="1200" decoding="async" fetchpriority="high" />
+    <section id="top" class="hero hero--catalog">
+      <div class="hero-catalog-etch" aria-hidden="true">
+        <svg class="hero-etch-svg" viewBox="0 0 420 720" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+          <g stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M210 700 V120" />
+            <path d="M210 560 C168 520 132 470 118 410" />
+            <path d="M210 500 C248 465 290 420 312 365" />
+            <path d="M210 420 C160 390 118 330 108 270" />
+            <path d="M210 360 C262 330 318 280 338 220" />
+            <path d="M210 280 C172 250 142 200 136 150" />
+            <path d="M210 220 C248 195 286 155 298 110" />
+            <path d="M118 410 C96 392 78 368 72 340 C92 348 108 368 118 390 Z" />
+            <path d="M312 365 C338 348 358 322 366 294 C346 304 326 324 312 348 Z" />
+            <path d="M108 270 C84 252 66 224 62 194 C84 206 100 228 108 252 Z" />
+            <path d="M338 220 C364 204 386 176 392 146 C370 158 352 180 338 204 Z" />
+            <path d="M136 150 C112 134 96 108 92 80 C112 92 128 112 136 134 Z" />
+            <path d="M298 110 C322 96 342 72 348 44 C328 56 310 76 298 96 Z" />
+            <path d="M210 120 C198 96 188 72 186 48 C204 58 214 78 210 100" />
+            <path d="M210 120 C222 94 234 70 242 46 C226 56 216 78 210 100" />
+            <path d="M72 520 C58 500 52 476 54 452" opacity="0.55" />
+            <path d="M54 452 C42 444 34 428 32 410 C46 418 56 432 58 448 Z" opacity="0.55" />
+            <path d="M360 540 C378 518 390 490 394 462" opacity="0.5" />
+            <path d="M394 462 C410 452 420 434 422 414 C406 424 396 440 392 456 Z" opacity="0.5" />
+          </g>
+        </svg>
       </div>
-      <div class="container hero-journal-inner hero-journal-inner--solo">
-        <div class="hero-journal-copy">
-          <p class="hero-brand hero-brand--inline">
-            <img src="images/growtoo-logo.png?v=20260721m" alt="" width="40" height="40" class="hero-brand-mark" />
-            <span>growtoo</span>
-          </p>
-          <p class="hero-eyebrow">Free grow journal for cannabis growers</p>
-          <h1 class="hero-headline">Track the grow. Keep a trail you can trust.</h1>
+      <div class="container hero-catalog-inner">
+        <div class="hero-catalog-copy">
+          <p class="hero-eyebrow">Est. harvest 2026 · Solana</p>
+          <h1 class="hero-headline">Every plant keeps its own ledger.</h1>
           <p class="hero-sub">
-            Log watering, feeding, and stages for one plant or a few.
-            Weather tips and an AI coach help you stay on track — no wallet required.
-            On-chain proof is optional, never the reason to start.
+            A grow journal for cannabis growers — watering, feeding, stages.
+            Sealed on-chain when you choose, never because you must.
           </p>
           <div class="hero-cta-row">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start your journal free</a>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Begin your journal.</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="hero-cta-link">Follow a plant.</a>
           </div>
-          <p class="hero-cta-note">
-            Prefer to follow someone else’s grow?
-            <a href="dnevnik/?mode=signup&type=adopter">Enter as an adopter</a>
-            · <a href="#stakes">See live test-network stakes</a>
-          </p>
+        </div>
+      </div>
+      <div class="hero-specimen">
+        <div class="container hero-specimen-inner">
+          <div class="hero-specimen-left">
+            <span class="hero-specimen-seal" aria-hidden="true">
+              <svg viewBox="0 0 40 40" width="36" height="36" focusable="false">
+                <circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2.5 2.2" />
+                <path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
+              </svg>
+            </span>
+            <div class="hero-specimen-copy">
+              <p class="hero-specimen-title">Seed <span class="hero-specimen-no">№</span> 0041 — <em>CBD Auto</em></p>
+              <p class="hero-specimen-tx">sealed · tx 6TDm7g…saTD</p>
+            </div>
+          </div>
+          <a href="#proof" class="hero-specimen-verify">Verify →</a>
         </div>
       </div>
     </section>
-
-    <div class="trust-chips" aria-label="Product facts">
-      <div class="container trust-chips-row">
-        <span>Cannabis growers first</span>
-        <span>EU-ready journal</span>
-        <span>Free · no wallet</span>
-        <span>Proof optional</span>
-      </div>
-    </div>
 
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
