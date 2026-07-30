@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate investor PDF for dnevnik.live."""
+"""Generate investor PDF for growto.live."""
 from __future__ import annotations
 
 import os
@@ -40,7 +40,7 @@ class InvestorPDF(FPDF):
             return
         self.set_font("Body", "B", 9)
         self.set_text_color(*self._brand)
-        self.cell(0, 8, "dnevnik.live — investitorski pregled", align="L")
+        self.cell(0, 8, "growto.live — investitorski pregled", align="L")
         self.set_text_color(120, 120, 120)
         self.cell(0, 8, f"Stranica {self.page_no()}", align="R", new_x="LMARGIN", new_y="NEXT")
         self.set_draw_color(220, 220, 220)
@@ -54,7 +54,7 @@ class InvestorPDF(FPDF):
         self.cell(
             0,
             8,
-            "Povjerljivo — predložak ponude · svibanj 2026 · dnevnik.live",
+            "Povjerljivo — predložak ponude · svibanj 2026 · growto.live",
             align="C",
         )
 
@@ -64,7 +64,7 @@ class InvestorPDF(FPDF):
         self.set_y(28)
         self.set_font("Body", "B", 32)
         self.set_text_color(255, 255, 255)
-        self.cell(0, 14, "dnevnik.live", align="C", new_x="LMARGIN", new_y="NEXT")
+        self.cell(0, 14, "growto.live", align="C", new_x="LMARGIN", new_y="NEXT")
         self.set_font("Body", "", 14)
         self.cell(0, 10, "CBD uzgoj — digitalni dnevnik i platforma", align="C", new_x="LMARGIN", new_y="NEXT")
         self.ln(8)
@@ -82,7 +82,7 @@ class InvestorPDF(FPDF):
         self.ln(12)
         self.set_font("Body", "", 10)
         bullets = [
-            "Postojeći MVP na https://dnevnik.live (~40–45 % komercijalnog cilja)",
+            "Postojeći MVP na https://growto.live (~40–45 % komercijalnog cilja)",
             "Firebase Auth + Firestore, admin, IoT senzor, hibridni pristup",
             "Cilj: komercijalni lansman + Web3 pilot (Plant Passport)",
             "IP, programiranje, vođenje, servisi i održavanje uključeni",
@@ -144,7 +144,7 @@ def build() -> None:
     pdf.add_page()
     pdf.section_title("1. Sažetak")
     pdf.body(
-        "dnevnik.live je web platforma za vođenje dnevnika uzgoja CBD biljaka na hrvatskom jeziku. "
+        "growto.live je web platforma za vođenje dnevnika uzgoja CBD biljaka na hrvatskom jeziku. "
         "Projekt polazi od funkcionalnog MVP-a i u 6 mjeseci (18.000 EUR) cilja komercijalno "
         "spreman proizvod s Web3 pilotom (Plant Passport, wallet connect), bez punog RWA marketplacea."
     )
@@ -185,7 +185,7 @@ def build() -> None:
         "Faze uzgoja, podfaze (lonci/polje), lokacije, growlog",
         "Alati: zalijevanje, gnojidba, okoliš, grafovi; CPVO embed",
         "Uloge: user, admin, superadmin; dijeljenje baze; login izvještaj",
-        "Deploy: dnevnik.live, GitHub Pages; Firestore rules pripremljene",
+        "Deploy: growto.live, GitHub Pages; Firestore rules pripremljene",
     ]
     for it in items:
         pdf.set_font("Body", "", 10)
@@ -328,7 +328,7 @@ def build() -> None:
     pdf.multi_cell(
         180,
         8,
-        "Kontakt i demo: https://dnevnik.live - pitch deck u aplikaciji (superadmin).",
+        "Kontakt i demo: https://growto.live - pitch deck u aplikaciji (superadmin).",
         fill=True,
     )
 

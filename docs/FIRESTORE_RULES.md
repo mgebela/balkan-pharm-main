@@ -1,4 +1,4 @@
-# Firestore sigurnosna pravila — dnevnik.live
+# Firestore sigurnosna pravila — growto.live
 
 Firebase Test Mode ističe nakon 30 dana. Bez produkcijskih pravila **cijela aplikacija prestaje raditi** (uključujući učitavanje uloge superadmina).
 

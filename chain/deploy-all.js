@@ -24,7 +24,7 @@ function run(script) {
   });
 }
 
-console.log('=== dnevnik.live devnet deploy ===\n');
+console.log('=== growto.live devnet deploy ===\n');
 await run('deploy-grow-token.js');
 await run('deploy-seed-collection.js');
 await run('mint-test-seeds.js');

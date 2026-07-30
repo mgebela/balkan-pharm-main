@@ -1,4 +1,4 @@
-# dnevnik.live — Ponuda razvoja za tvrtku
+# growto.live — Ponuda razvoja za tvrtku
 **Trajanje:** 6 mjeseci · **Budžet:** 18.000 EUR (bez PDV-a, osim ako nije drugačije dogovoreno)  
 **Model:** fiksni paket · intelektualno vlasništvo · programiranje · vođenje · održavanje
 
@@ -6,7 +6,7 @@
 
 ## 1. Sažetak ponude
 
-Razvoj **dnevnik.live** kao komercijalne B2B/B2C platforme za vođenje uzgoja CBD biljaka, s postojećim MVP-om kao polaznom točkom. U 18.000 EUR uključeno je:
+Razvoj **growto.live** kao komercijalne B2B/B2C platforme za vođenje uzgoja CBD biljaka, s postojećim MVP-om kao polaznom točkom. U 18.000 EUR uključeno je:
 
 | Komponenta | Opis |
 |------------|------|
@@ -22,7 +22,7 @@ Razvoj **dnevnik.live** kao komercijalne B2B/B2C platforme za vođenje uzgoja CB
 
 ## 2. Što je već napravljeno (polazno stanje — ~40–45 % komercijalnog MVP-a)
 
-Ovo je već u repozitoriju i na **dnevnik.live** (procjena na temelju implementiranog koda):
+Ovo je već u repozitoriju i na **growto.live** (procjena na temelju implementiranog koda):
 
 ### Korisnička aplikacija
 - Prijava (Firebase Auth), sync podataka (Firestore `users/{uid}/app/state`)
@@ -42,7 +42,7 @@ Ovo je već u repozitoriju i na **dnevnik.live** (procjena na temelju implementi
 - Admin read-only pregled cijele baze
 
 ### Infrastruktura
-- Deploy GitHub Pages, domena dnevnik.live
+- Deploy GitHub Pages, domena growto.live
 - Firestore **security rules** pripremljene (`firestore.rules`) — potrebno objaviti u produkciji
 - Sync senzora vlažnosti tla (HTTP JSON + cache) — alat u **Alatima**
 
@@ -104,7 +104,7 @@ flowchart LR
 |-----------|------------|
 | Sprint planiranje | 1× tjedno (kratki sync) |
 | Demo / pregled | 1× mjesečno (ili po milestoneu) |
-| Deploy | Kontinuirano na `main` → dnevnik.live |
+| Deploy | Kontinuirano na `main` → growto.live |
 | Dokumentacija | Ažuriranje roadmapa + release notes |
 | Održavanje | Mj. 4–6: bugfix do 8h/mj uključeno u paket |
 
@@ -270,4 +270,4 @@ Po završetku projekta i uplate zadnjeg milestonea:
 ---
 
 *Dokument: predložak ponude — prilagoditi naziv tvrtke, PDV i točne Web3 mreže prije potpisa.*  
-*Verzija: 2026-05-24 · Projekt: dnevnik.live / balkan-pharm*
+*Verzija: 2026-05-24 · Projekt: growto.live / balkan-pharm*

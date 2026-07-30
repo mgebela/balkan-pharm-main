@@ -2,8 +2,8 @@
   "name": "GROWTOO",
   "symbol": "GROWTOO",
   "description": "$GROWTOO is the growth reward token of growtoo — earned as adopted CBD plants advance through real growth stages documented in the grow journal. Devnet deployment.",
-  "image": "https://dnevnik.live/token-metadata/images/growtoo.png",
-  "external_url": "https://dnevnik.live",
+  "image": "https://growto.live/token-metadata/images/growtoo.png",
+  "external_url": "https://growto.live",
   "attributes": [
     { "trait_type": "Network", "value": "Solana devnet" },
     { "trait_type": "Project", "value": "growtoo" }
@@ -12,7 +12,7 @@
     "category": "image",
     "files": [
       {
-        "uri": "https://dnevnik.live/token-metadata/images/growtoo.png",
+        "uri": "https://growto.live/token-metadata/images/growtoo.png",
         "type": "image/png"
       }
     ]

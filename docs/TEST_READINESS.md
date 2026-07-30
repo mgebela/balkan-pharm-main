@@ -1,7 +1,7 @@
 # growtoo / dnevnik — Devnet test readiness
 
 **As of:** 2026-07-23  
-**Overall:** **9 / 10** — ready for grower + adopter desk testing on [dnevnik.live](https://dnevnik.live)
+**Overall:** **9 / 10** — ready for grower + adopter desk testing on [growto.live](https://growto.live)
 
 Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config` / scripts load.
 
@@ -60,7 +60,7 @@ npm run pow:fund:fee    # fee-payer → ~1.5 SOL
 ## Test plan
 
 ### 1. Wallet + auth
-1. Open https://dnevnik.live/app/ (or local app) on **Solana Devnet**.
+1. Open https://growto.live/app/ (or local app) on **Solana Devnet**.
 2. Sign in (Firebase).
 3. Connect wallet → link pubkey to user profile.
 

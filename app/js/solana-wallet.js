@@ -1,5 +1,5 @@
 /*
- * Multi-wallet Solana layer for dnevnik.live (devnet).
+ * Multi-wallet Solana layer for growto.live (devnet).
  * Wallet Standard + legacy extension adapters (Phantom, Solflare, Backpack, …).
  */
 (function () {

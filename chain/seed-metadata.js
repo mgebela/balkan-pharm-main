@@ -1,21 +1,21 @@
 /*
  * Seed RWA metadata (M2).
  *
- * Builds Metaplex-standard NFT metadata JSON for a dnevnik.live seed NFT.
+ * Builds Metaplex-standard NFT metadata JSON for a growtoo seed NFT.
  * Schema reference: token-metadata/seed-rwa.schema.json
  *
  * Each seed NFT is a real-world-asset (RWA) record for one physical seed /
- * plant: strain name, batch code and the linked dnevnik.live plant ID are
+ * plant: strain name, batch code and the linked growtoo plant ID are
  * embedded both as Metaplex attributes (wallet-visible) and in a structured
  * `rwa` block (machine-readable).
  */
 
-export const SEED_RWA_STANDARD = 'dnevnik.live/seed-rwa';
+export const SEED_RWA_STANDARD = 'growtoo/seed-rwa';
 export const SEED_RWA_VERSION = '1.0.0';
 export const SEED_SYMBOL = 'SEED';
-/** Default seed NFT artwork (hosted on dnevnik.live for wallet reliability). */
-export const SEED_IMAGE_URL = 'https://dnevnik.live/token-metadata/images/plant-seed.png';
-export const EXTERNAL_URL = 'https://dnevnik.live';
+/** Default seed NFT artwork (hosted on growto.live for wallet reliability). */
+export const SEED_IMAGE_URL = 'https://growto.live/token-metadata/images/plant-seed.png';
+export const EXTERNAL_URL = 'https://growto.live';
 
 const STAGE_IMAGE_FILES = {
   seed: 'plant-seed.png',
@@ -78,8 +78,8 @@ export function buildSeedMetadata(seed) {
     name,
     symbol: SEED_SYMBOL,
     description:
-      `dnevnik.live seed RWA — strain "${strain}", batch ${batch}. ` +
-      'This NFT records a physical CBD seed adopted on dnevnik.live. ' +
+      `growtoo seed RWA — strain "${strain}", batch ${batch}. ` +
+      'This NFT records a physical CBD seed adopted on growtoo. ' +
       'Its growth from seed to harvest is documented in the public grow journal.',
     image: seed.image || SEED_IMAGE_URL,
     external_url: plantId ? `${EXTERNAL_URL}/?plant=${encodeURIComponent(plantId)}` : EXTERNAL_URL,
@@ -120,7 +120,7 @@ export function buildStageMetadata(seed, stage, history) {
   metadata.properties.files = [{ uri: image, type: 'image/png' }];
 
   metadata.description =
-    `dnevnik.live plant RWA — strain "${metadata.rwa.strain}", batch ${metadata.rwa.batch}, ` +
+    `growtoo plant RWA — strain "${metadata.rwa.strain}", batch ${metadata.rwa.batch}, ` +
     `stage: ${stage.label}. Growth from seed to harvest is documented in the public grow journal.`;
 
   const stageAttr = metadata.attributes.find((a) => a.trait_type === 'Stage');

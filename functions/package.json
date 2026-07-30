@@ -1,6 +1,6 @@
 {
   "name": "dnevnik-live-functions",
-  "description": "Cloud Functions for dnevnik.live (Gemini grow reports, etc.)",
+  "description": "Cloud Functions for growtoo (Gemini grow reports, etc.)",
   "private": true,
   "main": "index.js",
   "engines": {

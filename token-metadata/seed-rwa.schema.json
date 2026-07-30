@@ -1,8 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://dnevnik.live/token-metadata/seed-rwa.schema.json",
-  "title": "dnevnik.live Seed RWA metadata (v1.0.0)",
-  "description": "Metadata schema for dnevnik.live seed NFTs (M2). Extends the Metaplex non-fungible token standard with a structured `rwa` block describing the physical seed. Metadata JSON is uploaded to Arweave (via Irys) and referenced by the on-chain token metadata URI.",
+  "$id": "https://growto.live/token-metadata/seed-rwa.schema.json",
+  "title": "growtoo Seed RWA metadata (v1.0.0)",
+  "description": "Metadata schema for growtoo seed NFTs (M2). Extends the Metaplex non-fungible token standard with a structured `rwa` block describing the physical seed. Metadata JSON is uploaded to Arweave (via Irys) and referenced by the on-chain token metadata URI.",
   "type": "object",
   "required": ["name", "symbol", "description", "image", "attributes", "rwa"],
   "properties": {
@@ -17,7 +17,7 @@
     "external_url": {
       "type": "string",
       "format": "uri",
-      "description": "Link to the dnevnik.live grow journal, with ?plant=<plantId> when linked."
+      "description": "Link to the growtoo grow journal, with ?plant=<plantId> when linked."
     },
     "attributes": {
       "type": "array",
@@ -53,14 +53,14 @@
       "description": "Machine-readable real-world-asset record for the physical seed.",
       "required": ["standard", "version", "assetType", "strain", "batch", "cluster", "importedAt"],
       "properties": {
-        "standard": { "type": "string", "const": "dnevnik.live/seed-rwa" },
+        "standard": { "type": "string", "const": "growtoo/seed-rwa" },
         "version": { "type": "string", "const": "1.0.0" },
         "assetType": { "type": "string", "const": "seed" },
         "strain": { "type": "string", "description": "Cultivar / strain name of the seed." },
         "batch": { "type": "string", "description": "Physical batch code the seed belongs to." },
         "plantId": {
           "type": ["string", "null"],
-          "description": "dnevnik.live plant ID this seed is linked to in the grow journal (null until planted)."
+          "description": "growtoo plant ID this seed is linked to in the grow journal (null until planted)."
         },
         "journalUrl": { "type": "string", "format": "uri" },
         "cluster": { "type": "string", "enum": ["devnet", "mainnet-beta"] },

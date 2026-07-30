@@ -1,7 +1,7 @@
 /*
  * Grower quests — journal proof required before RWA growth mints.
  *
- * Tokenisation is tied to the dnevnik.live grow journal: growers must log
+ * Tokenisation is tied to the growto.live grow journal: growers must log
  * stage changes, watering, and feeding before minting the next growth stage.
  * XP / level is a light gamification layer on top of that checklist.
  */

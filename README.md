@@ -1,4 +1,4 @@
-# dnevnik.live – CBD dnevnik uzgoja
+# growtoo (growto.live) – CBD grow journal
 
 Web stranica i aplikacija za vođenje dnevnika uzgoja CBD biljaka, na hrvatskom jeziku.
 
@@ -38,7 +38,7 @@ Aplikacija se može objaviti besplatno na GitHub Pages.
 3. Nakon pusha na granicu `main`, workflow automatski deploya stranicu.
 
 **Live URL** (nakon prvog deploya):  
-**https://dnevnik.live/**
+**https://growto.live/**
 
 ## Tehnologije
 

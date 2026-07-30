@@ -1,4 +1,4 @@
-# dnevnik.live — Troškovnik razvoja: mjesec 1 + 2
+# growto.live — Troškovnik razvoja: mjesec 1 + 2
 **Ukupno:** 8.000 EUR (fiksno, bez PDV-a ako nije drugačije dogovoreno)  
 **Razdoblje:** mjesec 1 (stabilizacija, produkcija) + mjesec 2 (komercijalni UX, pravni okvir)  
 **Satnica implicitna:** ~55 EUR/h (programiranje i vođenje); infrastruktura = stvarni trošak + setup
@@ -44,7 +44,7 @@
 | # | Stavka | Mj. 1 | Mj. 2 | Ukupno | Napomena |
 |---|--------|-------|-------|--------|----------|
 | B1 | Firebase Blaze plan — rezerva korištenja (Auth, Firestore, Storage) | 110 | 90 | **200** | Procjena ~100 EUR/mj pri malom prometu |
-| B2 | Google Workspace / poslovni mail (1 korisnik × 2 mj.) | 65 | 75 | **140** | npr. `info@dnevnik.live` |
+| B2 | Google Workspace / poslovni mail (1 korisnik × 2 mj.) | 65 | 75 | **140** | npr. `info@growto.live` |
 | B3 | Firebase Auth — e-mail predlošci, verifikacija, domena za mail | 25 | 35 | **60** | Custom domain za Auth mailove |
 | | **Podzbroj B (servisi)** | **200** | **200** | **400** | Pretplate/registracije 2 mj. |
 
@@ -54,7 +54,7 @@
 
 | # | Stavka | Mj. 1 | Mj. 2 | Ukupno | Napomena |
 |---|--------|-------|-------|--------|----------|
-| C1 | Registracija / obnova `dnevnik.live` (godina) | 140 | 10 | **150** | Ovisno o registraru |
+| C1 | Registracija / obnova `growto.live` (godina) | 140 | 10 | **150** | Ovisno o registraru |
 | C2 | DNS: A/CNAME, GitHub Pages, Firebase Hosting (ako se koristi) | 60 | 20 | **80** | SSL automatski |
 | C3 | Subdomena `app.` / redirect `dnevnik/` → app | 15 | 5 | **20** | Već djelomično postoji |
 | | **Podzbroj C** | **215** | **35** | **250** | |
@@ -234,7 +234,7 @@
 - Produkcijski Firebase s aktivnim security rules
 - Dokument „Arhitektura sustava v1” + plan skaliranja
 - Sentry + backup procedura
-- Stabilna aplikacija na dnevnik.live (QA prolaz)
+- Stabilna aplikacija na growto.live (QA prolaz)
 - Obilazak lokacije i usklađen senzor
 
 **Kraj mjeseca 2**

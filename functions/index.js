@@ -44,9 +44,9 @@ function allowReconcileRequest(req) {
   return entry.count <= max;
 }
 
-const COACH_SYSTEM = `You are the dnevnik.live Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant that can PROPOSE app actions.
+const COACH_SYSTEM = `You are the growtoo Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant that can PROPOSE app actions.
 
-Audience: growers using the dnevnik.live journal who can mint Seed RWAs on Solana (devnet).
+Audience: growers using the growtoo journal who can mint Seed RWAs on Solana (devnet).
 
 Journal stages (Croatian keys → English):
 - klijanje = Germination

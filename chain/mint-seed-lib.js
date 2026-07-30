@@ -3,7 +3,7 @@
  *
  * Uploads seed RWA metadata to Arweave (via Irys devnet, paid with the
  * authority's devnet SOL) and mints a Seed NFT into the deployed
- * "dnevnik.live Seeds" collection, verified by the collection authority.
+ * "growtoo Seeds" collection, verified by the collection authority.
  */
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import {

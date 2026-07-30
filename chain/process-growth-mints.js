@@ -120,7 +120,7 @@ async function processDoc(doc) {
     const appState = await loadGrowerAppState(data.uid);
     if (!appState) {
       throw new Error(
-        'Grower journal state missing — sync plants/entries to dnevnik.live before minting.'
+        'Grower journal state missing — sync plants/entries to growto.live before minting.'
       );
     }
     const proof = validateJournalProof(appState, plantId, stage.key);

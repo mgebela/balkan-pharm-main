@@ -20,8 +20,8 @@ import { readDeployed, writeDeployed, solscanAddress } from './common.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const IMAGE_PATH = path.join(__dirname, '../token-metadata/images/growtoo.png');
-const SITE_JSON = 'https://dnevnik.live/token-metadata/grow.json';
-const SITE_IMAGE = 'https://dnevnik.live/token-metadata/images/growtoo.png';
+const SITE_JSON = 'https://growto.live/token-metadata/grow.json';
+const SITE_IMAGE = 'https://growto.live/token-metadata/images/growtoo.png';
 const NAME = 'GROWTOO';
 const SYMBOL = 'GROWTOO';
 
@@ -48,7 +48,7 @@ const metadata = {
   description:
     '$GROWTOO is the growth reward token of growtoo — earned as adopted CBD plants advance through real growth stages documented in the grow journal. Devnet deployment.',
   image: imageUri,
-  external_url: 'https://dnevnik.live',
+  external_url: 'https://growto.live',
   attributes: [
     { trait_type: 'Network', value: 'Solana devnet' },
     { trait_type: 'Project', value: 'growtoo' },

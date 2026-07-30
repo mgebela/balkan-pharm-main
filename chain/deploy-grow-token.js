@@ -14,7 +14,7 @@ import {
 } from '@metaplex-foundation/umi';
 import { RPC_URL, loadAuthoritySecret, readDeployed, writeDeployed, solscanAddress } from './common.js';
 
-const METADATA_URI = 'https://dnevnik.live/token-metadata/grow.json';
+const METADATA_URI = 'https://growto.live/token-metadata/grow.json';
 const DECIMALS = 9;
 
 const existing = readDeployed();

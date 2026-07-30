@@ -1,5 +1,5 @@
 /*
- * Create the dnevnik.live seed NFT collection on Solana devnet (Metaplex).
+ * Create the growtoo seed NFT collection on Solana devnet (Metaplex).
  * Future plant NFTs (M2) will be verified members of this collection.
  */
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
@@ -11,7 +11,7 @@ import {
 } from '@metaplex-foundation/umi';
 import { RPC_URL, loadAuthoritySecret, readDeployed, writeDeployed, solscanAddress } from './common.js';
 
-const METADATA_URI = 'https://dnevnik.live/token-metadata/seed-collection.json';
+const METADATA_URI = 'https://growto.live/token-metadata/seed-collection.json';
 
 const existing = readDeployed();
 if (existing.seedCollection) {
@@ -31,7 +31,7 @@ const collectionMint = generateSigner(umi);
 
 await createNft(umi, {
   mint: collectionMint,
-  name: 'dnevnik.live Seeds',
+  name: 'growtoo Seeds',
   symbol: 'SEED',
   uri: METADATA_URI,
   sellerFeeBasisPoints: percentAmount(0),
