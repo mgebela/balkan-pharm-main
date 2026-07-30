@@ -806,14 +806,12 @@
   let growthPreviewStage = null;
 
   function buildPlantGrowSvg(stageIndex, options) {
-    if (window.PlantBotanicalSprites && typeof window.PlantBotanicalSprites.renderStageSvg === 'function') {
-      return window.PlantBotanicalSprites.renderStageSvg(stageIndex, options);
-    }
-    if (window.PlantPixelSprites && typeof window.PlantPixelSprites.renderStageSvg === 'function') {
-      return window.PlantPixelSprites.renderStageSvg(stageIndex, options);
-    }
+    // Prefer botanical art explicitly — never fall back to legacy pixel modules.
     if (window.TokenBotanicalArt && typeof window.TokenBotanicalArt.renderStageSvg === 'function') {
       return window.TokenBotanicalArt.renderStageSvg(stageIndex, options);
+    }
+    if (window.PlantBotanicalSprites && typeof window.PlantBotanicalSprites.renderStageSvg === 'function') {
+      return window.PlantBotanicalSprites.renderStageSvg(stageIndex, options);
     }
     return '';
   }
