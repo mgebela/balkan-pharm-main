@@ -1398,12 +1398,14 @@
     const panel = document.getElementById('ai-coach-panel');
     const fab = document.getElementById('ai-coach-fab');
     const backdrop = document.getElementById('ai-coach-backdrop');
-    if (!panel || !fab) return;
+    if (!panel) return;
     panel.hidden = !open;
     if (backdrop) backdrop.hidden = !open;
-    fab.setAttribute('aria-expanded', open ? 'true' : 'false');
-    fab.classList.toggle('is-open', open);
-    fab.hidden = open;
+    if (fab) {
+      fab.setAttribute('aria-expanded', open ? 'true' : 'false');
+      fab.classList.toggle('is-open', open);
+      fab.hidden = true;
+    }
     document.body.classList.toggle('ai-coach-open', open);
     syncCoachKeyboardInset();
     if (open) {
@@ -1645,13 +1647,14 @@
     ensureDom();
     const root = document.getElementById('ai-coach-root');
     if (!root) return;
-    // Hide on Admin (and similar dense grids) so the FAB doesn't cover toolbox cards.
-    const view = currentAppViewId();
-    const hideOnView = view === 'admin';
-    const show = isGrower() && !hideOnView;
+    // Panel-only: care Log lives in the tab bar — no overlapping FAB.
+    const show = isGrower();
     root.hidden = !show;
     root.setAttribute('aria-hidden', show ? 'false' : 'true');
-    document.body.classList.toggle('coach-fab-visible', show);
+    root.classList.add('ai-coach-root--panel-only');
+    const fab = document.getElementById('ai-coach-fab');
+    if (fab) fab.hidden = true;
+    document.body.classList.remove('coach-fab-visible');
     if (!show) close();
   }
 
@@ -1688,6 +1691,15 @@
       return null;
     },
     dashboardBriefing: function (plants, entries) {
+      if (window.CoachCore && typeof CoachCore.dashboardBriefing === 'function') {
+        return CoachCore.dashboardBriefing(plants, entries);
+      }
+      return '';
+    },
+    todayHeadline: function (plants, entries) {
+      if (window.CoachCore && typeof CoachCore.todayHeadline === 'function') {
+        return CoachCore.todayHeadline(plants, entries);
+      }
       if (window.CoachCore && typeof CoachCore.dashboardBriefing === 'function') {
         return CoachCore.dashboardBriefing(plants, entries);
       }

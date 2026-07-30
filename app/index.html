@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260730f" />
+  <link rel="stylesheet" href="styles/app.css?v=20260730m" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
   <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
 </head>
@@ -20,70 +20,73 @@
       </a>
       <nav class="sidebar-nav">
         <a href="#" class="nav-item active" data-view="dashboard">
-          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><rect x="5.5" y="11" width="3" height="7" rx="1"/><rect x="10.5" y="6" width="3" height="12" rx="1"/><rect x="15.5" y="13.5" width="3" height="4.5" rx="1"/></svg></span>
-          <span>Dashboard</span>
+          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16"/><path d="M7 19.5V8.5l5-3 5 3v11"/></svg></span>
+          <span>Journal</span>
         </a>
         <a href="#" class="nav-item grower-only" data-view="plants">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg></span>
-          <span>Plants & journal</span>
+          <span>Plants</span>
         </a>
+        <button type="button" class="nav-item nav-item-log grower-only" id="sidebar-log-btn" aria-controls="log-sheet-overlay">
+          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8a2 2 0 012 2v14l-6-3-6 3V6a2 2 0 012-2z"/><path d="M10 9h4M10 13h4"/></svg></span>
+          <span>Log</span>
+        </button>
         <a href="#" class="nav-item" data-view="adopt">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
-          <span data-label-grower="Tokenise" data-label-adopter="My garden">Adopt a plant</span>
+          <span data-label-grower="Tokenise" data-label-adopter="My garden">Tokenise</span>
         </a>
         <a href="#" class="nav-item" data-view="market">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
-          <span data-label-grower="Post to market" data-label-adopter="Market">Market</span>
+          <span data-label-grower="Market" data-label-adopter="Market">Market</span>
         </a>
         <a href="#" class="nav-item grower-only" data-view="toolbox">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
           <span>Tools</span>
         </a>
-         <a href="#" class="nav-item grower-only" data-view="danas">
+        <a href="#" class="nav-item grower-only" data-view="danas">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
           <span>Today</span>
         </a>
-          <a href="#" class="nav-item admin-only" data-view="admin">
+        <a href="#" class="nav-item admin-only" data-view="admin">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
           <span>Admin</span>
-          </a>
-       </nav>
+        </a>
+      </nav>
     </aside>
 
-    <nav class="bottom-nav" aria-label="Glavna navigacija">
+    <nav class="bottom-nav" aria-label="Main navigation">
       <a href="#" class="nav-item active" data-view="dashboard">
-        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h16"/><rect x="5.5" y="11" width="3" height="7" rx="1"/><rect x="10.5" y="6" width="3" height="12" rx="1"/><rect x="15.5" y="13.5" width="3" height="4.5" rx="1"/></svg></span>
-        <span class="bottom-nav-label">Home</span>
+        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5h16"/><path d="M7 19.5V8.5l5-3 5 3v11"/></svg></span>
+        <span class="bottom-nav-label">Journal</span>
       </a>
       <a href="#" class="nav-item grower-only" data-view="plants">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg></span>
         <span class="bottom-nav-label">Plants</span>
       </a>
+      <button
+        type="button"
+        class="nav-item bottom-nav-log grower-only"
+        id="bottom-nav-log"
+        aria-label="Log care"
+        aria-expanded="false"
+        aria-controls="log-sheet-overlay"
+      >
+        <span class="bottom-nav-log-fab" aria-hidden="true">
+          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 4h8a2 2 0 012 2v14l-6-3-6 3V6a2 2 0 012-2z"/>
+            <path d="M10 9h4M10 13h4"/>
+          </svg>
+        </span>
+        <span class="bottom-nav-label">Log</span>
+      </button>
       <a href="#" class="nav-item" data-view="adopt">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
-        <span class="bottom-nav-label" data-label-grower="Tokenise" data-label-adopter="Garden">Adopt</span>
+        <span class="bottom-nav-label" data-label-grower="Tokenise" data-label-adopter="Garden">Tokenise</span>
       </a>
       <a href="#" class="nav-item" data-view="market">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/><path d="M9.5 20v-4.5h5V20"/></svg></span>
         <span class="bottom-nav-label" data-label-grower="Market" data-label-adopter="Market">Market</span>
       </a>
-      <button
-        type="button"
-        class="nav-item bottom-nav-more-btn"
-        id="bottom-nav-more"
-        aria-label="More"
-        aria-expanded="false"
-        aria-controls="more-nav-overlay"
-      >
-        <span class="nav-icon" aria-hidden="true">
-          <svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="5" cy="12" r="1.6"/>
-            <circle cx="12" cy="12" r="1.6"/>
-            <circle cx="19" cy="12" r="1.6"/>
-          </svg>
-        </span>
-        <span class="bottom-nav-label">More</span>
-      </button>
     </nav>
 
     <div class="more-nav-overlay" id="more-nav-overlay" hidden>
@@ -91,7 +94,7 @@
       <div class="more-nav-sheet" role="dialog" aria-modal="true" aria-labelledby="more-nav-title">
         <div class="more-nav-handle" aria-hidden="true"></div>
         <div class="more-nav-head">
-          <strong id="more-nav-title">More</strong>
+          <strong id="more-nav-title">Account</strong>
           <button type="button" class="more-nav-close" id="more-nav-close" aria-label="Close">×</button>
         </div>
         <div class="more-nav-list">
@@ -99,7 +102,7 @@
             <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
             <span class="more-nav-copy">
               <strong>Tools</strong>
-              <span>Calculators & sensors</span>
+              <span>Calculators &amp; sensors</span>
             </span>
           </a>
           <a href="#" class="more-nav-item grower-only" data-view="danas">
@@ -128,20 +131,42 @@
               <span>Rules for using growtoo</span>
             </span>
           </a>
+          <button type="button" class="more-nav-item more-nav-item--logout" id="btn-logout-sheet">
+            <span class="more-nav-copy">
+              <strong>Log out</strong>
+              <span>End this session</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="log-sheet-overlay" id="log-sheet-overlay" hidden>
+      <button type="button" class="log-sheet-backdrop" id="log-sheet-backdrop" aria-label="Close log"></button>
+      <div class="log-sheet" role="dialog" aria-modal="true" aria-labelledby="log-sheet-title">
+        <div class="log-sheet-handle" aria-hidden="true"></div>
+        <div class="log-sheet-head">
+          <strong id="log-sheet-title">Log care</strong>
+          <button type="button" class="log-sheet-close" id="log-sheet-close" aria-label="Close">×</button>
+        </div>
+        <div class="log-sheet-actions">
+          <button type="button" class="btn btn-primary btn-tap" id="log-sheet-water">Log watering</button>
+          <button type="button" class="btn btn-secondary btn-tap" id="log-sheet-feed">Log feeding</button>
+          <button type="button" class="btn btn-ghost btn-tap" id="log-sheet-full">Full journal entry</button>
         </div>
       </div>
     </div>
 
     <main class="main">
       <header class="main-header">
-        <h1 class="view-title">Dashboard</h1>
+        <h1 class="view-title">Journal</h1>
         <div class="main-header-actions">
           <span id="profile-type-badge" class="profile-type-badge" hidden>Grower</span>
           <div id="app-wallet-bar" class="app-wallet-bar" aria-live="polite"></div>
           <div class="notif-wrap" id="notif-wrap">
             <button
               type="button"
-              class="notif-bell-btn"
+              class="header-icon-btn notif-bell-btn"
               id="notif-bell-btn"
               aria-label="Notifications"
               aria-expanded="false"
@@ -149,15 +174,26 @@
               aria-controls="notif-panel"
               title="Inbox"
             >
-              <svg class="notif-bell-svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="notif-bell-svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                 <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
               </svg>
-              <span class="notif-bell-label">Inbox</span>
+              <span class="notif-dot" id="notif-dot" hidden aria-hidden="true"></span>
               <span class="notif-badge" id="notif-badge" hidden>0</span>
             </button>
           </div>
-          <button type="button" class="btn btn-ghost" id="btn-logout">Log out</button>
+          <button
+            type="button"
+            class="header-icon-btn header-avatar-btn"
+            id="btn-account"
+            aria-label="Account menu"
+            aria-expanded="false"
+            aria-controls="more-nav-overlay"
+            title="Account"
+          >
+            <span class="header-avatar-mark" aria-hidden="true">G</span>
+          </button>
+          <button type="button" class="btn btn-ghost" id="btn-logout" hidden>Log out</button>
         </div>
       </header>
 
@@ -188,6 +224,17 @@
       </div>
 
       <div id="view-dashboard" class="view active">
+        <section class="dashboard-today-section grower-only" id="dashboard-today-section" hidden>
+          <article class="shell-card today-card" id="dashboard-today-card">
+            <p class="today-card-eyebrow">Today</p>
+            <p class="today-card-line" id="dashboard-today-line"></p>
+            <div class="today-card-actions" id="dashboard-today-actions"></div>
+          </article>
+        </section>
+        <section class="dashboard-seals-section grower-only" id="dashboard-seals-section" hidden>
+          <h2 class="section-heading">Your plants</h2>
+          <div class="plant-seal-grid" id="dashboard-plant-seals"></div>
+        </section>
         <p class="dashboard-coach-brief grower-only" id="dashboard-coach-brief" hidden></p>
         <div id="dashboard-metrics" class="dashboard-metrics"></div>
         <section class="dashboard-quick-section" id="dashboard-quick-section" hidden>
@@ -255,22 +302,6 @@
       </div>
 
       <div id="view-adopt" class="view">
-        <section class="adopt-hero">
-          <div class="adopt-hero-text">
-            <div class="adopt-hero-top">
-              <h2 class="grower-only">Optional proof for your journal</h2>
-              <h2 class="adopter-only">My adopted garden</h2>
-              <span class="adopt-chain-badge">◎ Test network</span>
-            </div>
-            <p class="grower-only">Your plants and care logs come first. When you want a checkable trail, mint stage proof on Solana’s test network (Devnet) for <strong>$GROWTOO</strong> — test assets only.</p>
-            <p class="adopter-only">Follow a real plant’s journal trail. Backing with <strong>$GROWTOO</strong> is optional and has no monetary value on the test network.</p>
-            <div class="crypto-mode-bar" role="group" aria-label="Detail level">
-              <span class="crypto-mode-status">View: <strong data-crypto-mode-label>Simple</strong></span>
-              <button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="false">Show advanced details</button>
-            </div>
-          </div>
-        </section>
-
         <section class="adopter-guide adopter-only" id="adopter-guide" aria-label="How adoption works">
           <h3 class="adopter-guide-title">How to adopt a plant</h3>
           <ol class="adopter-guide-steps">
@@ -278,21 +309,21 @@
               <span class="adopter-guide-num">1</span>
               <div>
                 <strong>Browse the market</strong>
-                <p>Open offers are grower plant tokens with a journal trail behind them.</p>
+                <p>Open offers are sealed plant tokens with a journal trail behind them.</p>
               </div>
             </li>
             <li>
               <span class="adopter-guide-num">2</span>
               <div>
                 <strong>Connect a test-network wallet</strong>
-                <p>Phantom or Solflare on Devnet — you’ll be prompted when you Invest, or use <strong>Connect wallet</strong> on this page.</p>
+                <p>Phantom or Solflare on Devnet — tap the wallet pill in the header when you are ready to invest.</p>
               </div>
             </li>
             <li>
               <span class="adopter-guide-num">3</span>
               <div>
                 <strong>Back with $GROWTOO</strong>
-                <p>Instant sale moves the plant token to you now. Adopt stake locks half until harvest care checks out.</p>
+                <p>Instant sale moves the plant token to you now. Adopt stake: half now, half unlocks as the grower keeps logging care.</p>
               </div>
             </li>
             <li>
@@ -312,78 +343,40 @@
           </p>
         </section>
 
-        <aside class="tokenise-explainer grower-only" id="tokenise-explainer" hidden>
-          <div class="tokenise-explainer-copy">
-            <h3 class="tokenise-explainer-title">What Tokenise means (plain language)</h3>
-            <p>
-              Your journal stays free and local-first. Tokenise is optional: it turns a plant’s documented trail into a
-              <span class="plain-tip">plant token<button type="button" class="plain-tip-btn" aria-label="What does plant token mean?" data-plain-tip="plant token">?</button><span class="plain-tip-bubble" role="tooltip" hidden>A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.</span></span>
-              on Solana’s test network so others can back the grow with test $GROWTOO.
-            </p>
-            <details class="tokenise-explainer-details crypto-advanced-only">
-              <summary>What do the crypto words mean?</summary>
-              <ul>
-                <li><strong>Plant token</strong> — a digital certificate linked to this plant’s journal (often called an NFT).</li>
-                <li><strong>Listing / hold</strong> — when you post to Market, the token is held until someone invests or you cancel (sometimes called <span class="plain-tip">escrow<button type="button" class="plain-tip-btn" aria-label="What does escrow mean?" data-plain-tip="escrow">?</button><span class="plain-tip-bubble" role="tooltip" hidden>A temporary hold: your plant token sits safely with the market until someone invests or you cancel — like a middle shelf, not a permanent transfer.</span></span>).</li>
-                <li><strong>Settle</strong> — the deal finishes and the token + $GROWTOO move as agreed.</li>
-              </ul>
-            </details>
-          </div>
-          <button type="button" class="btn btn-ghost btn-sm" id="tokenise-explainer-dismiss">Got it</button>
-        </aside>
-
-        <section class="adopt-wallet" id="adopt-wallet"></section>
-
         <div class="adopter-summary adopter-only" id="adopter-summary" hidden></div>
+
+        <section class="shell-card seal-stage-card grower-only" id="adopt-seed-section" hidden>
+          <p class="shell-card-eyebrow">Seal a stage</p>
+          <form class="seal-stage-form" id="adopt-seed-form">
+            <label class="seal-stage-label" for="adopt-seed-plant">Plant from your journal</label>
+            <select id="adopt-seed-plant" class="seal-stage-select" required>
+              <option value="">Choose a plant from your journal</option>
+            </select>
+            <p class="seal-stage-hint">Strain, batch and dates come from the journal — nothing to re-enter.</p>
+            <input type="hidden" id="adopt-seed-name" value="" />
+            <input type="hidden" id="adopt-seed-batch" value="" />
+            <button type="submit" class="btn btn-primary seal-stage-submit" id="seal-stage-submit" disabled>
+              Seal seed stage · +0 $GROWTOO
+            </button>
+            <p class="seal-stage-status" id="seal-stage-status" hidden></p>
+          </form>
+        </section>
+
+        <section class="shell-card trail-ahead-card grower-only" id="adopt-growth-guide" aria-label="The trail ahead"></section>
 
         <section class="plants-journal-section grower-only crypto-advanced-only" id="platform-bonus-section">
           <h2 class="section-heading">Platform monthly bonus</h2>
           <p class="market-hint">
-            Extra $GROWTOO from growtoo (not adopter funds) for adding plants, minting tokens, weekly progress, and flower stages.
+            Extra $GROWTOO from growtoo (not adopter funds) for adding plants, sealing stages, weekly progress, and flower stages.
             Claim once per calendar month, separate from adopt-stake harvest unlock. Growers only.
           </p>
           <div id="platform-bonus-panel" class="platform-bonus-panel"></div>
         </section>
 
-        <div class="adopt-notice grower-only" id="adopt-notice">
-          <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Use Phantom or Solflare on Solana’s <strong>test network (Devnet)</strong>. Plant tokens mint after you log cultivation data. Journal works without a wallet.</p>
-        </div>
-        <div class="adopt-notice adopter-only">
-          <span class="adopt-notice-icon" aria-hidden="true">◎</span>
-          <p>Wallet is optional until you invest. After that, adopted plants and unlock status show in your garden.</p>
-        </div>
-
-        <section class="adopt-section plants-journal-section grower-only crypto-advanced-only" id="adopt-seed-section" hidden>
-          <h2 class="section-heading">Mint a plant token</h2>
-          <p class="market-hint" id="adopt-seed-explain">
-            Prefer the simple path? Use <strong>+ New plant</strong> and turn on “also mint on-chain” at the end.
-            This form is for minting a token later for a plant you already journaled.
-          </p>
-          <form class="adopt-seed-form" id="adopt-seed-form">
-            <label class="adopt-seed-form-span">
-              Journal plant *
-              <select id="adopt-seed-plant" required><option value="">Choose a plant from your journal</option></select>
-            </label>
-            <label>
-              Token name *
-              <input type="text" id="adopt-seed-name" placeholder="Filled from the plant — editable" autocomplete="off" required maxlength="32" />
-            </label>
-            <label>
-              Batch label (optional)
-              <input type="text" id="adopt-seed-batch" placeholder="e.g. B-2026-07" autocomplete="off" maxlength="32" />
-            </label>
-            <button type="submit" class="btn btn-primary adopt-seed-submit">Mint seed token</button>
-          </form>
-        </section>
-
-        <p class="market-hint grower-only crypto-simple-only" id="adopt-simple-mint-hint">
-          To prove a plant on-chain, add it from <strong>Plants</strong> and enable “also mint on-chain (optional)”.
-          Switch to advanced view if you need the full mint form or monthly bonus panel.
-        </p>
+        <section class="adopt-wallet crypto-advanced-only" id="adopt-wallet" hidden></section>
 
         <section class="adopt-section plants-journal-section" id="adopt-garden-section">
-          <h2 class="section-heading grower-only">My plant tokens</h2>
+          <h2 class="section-heading grower-only">Sealed plants</h2>
           <h2 class="section-heading adopter-only">My adopted plants</h2>
           <div class="adopt-token-grid" id="adopt-token-grid"></div>
         </section>
@@ -395,8 +388,6 @@
           </p>
           <button type="button" class="btn btn-secondary" id="adopt-open-market-btn">Open market</button>
         </section>
-
-        <section class="adopt-growth-guide grower-only crypto-advanced-only" id="adopt-growth-guide" aria-label="Token growth lifecycle"></section>
       </div>
 
       <div id="view-market" class="view">
@@ -413,8 +404,8 @@
           <ul class="adopter-guide-bullets">
             <li><strong>Open market</strong> lists live grower asks you can invest in.</li>
             <li>Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.</li>
-            <li><strong>Instant sale</strong>: the plant token comes to you in the same flow.</li>
-            <li><strong>Adopt stake</strong>: you pay full price; half locks until the grower’s monthly care qualifies at harvest.</li>
+            <li><strong>Instant sale</strong>: full price to the grower at purchase. Done.</li>
+            <li><strong>Adopt stake</strong>: half now, half unlocks as the grower keeps logging care.</li>
             <li>After it settles, track the plant under <strong>My garden</strong>.</li>
           </ul>
           <p class="adopter-guide-note">
@@ -426,34 +417,27 @@
           <div id="test-faucet-panel" class="test-faucet-panel" aria-label="Test-network faucet"></div>
         </section>
 
-        <section class="plants-journal-section grower-only" id="market-list-section" hidden>
-          <h2 class="section-heading">Post a plant offer</h2>
-          <p class="market-hint">
-            When you’re ready, list a plant you’ve already minted so adopters can back it with test $GROWTOO.
-            The listing holds your token safely until someone invests — or you cancel. Journal stays free either way.
-          </p>
-          <form class="adopt-seed-form" id="market-list-form">
-            <label>
-              Plant token *
-              <select id="market-asset-select"><option value="">Choose a plant token</option></select>
-            </label>
+        <section class="shell-card market-list-card grower-only" id="market-list-section" hidden>
+          <p class="shell-card-eyebrow">List a sealed plant</p>
+          <form class="market-list-form" id="market-list-form">
+            <label class="seal-stage-label" for="market-asset-select">Asset</label>
+            <select id="market-asset-select" class="seal-stage-select" required>
+              <option value="">Choose a sealed plant</option>
+            </select>
             <p class="market-hint" id="market-list-hint" hidden></p>
-            <label>
-              Invest price ($GROWTOO) *
-              <input type="number" id="market-price-input" min="1" step="1" placeholder="e.g. 50" required />
-            </label>
+
             <fieldset class="market-offer-compare">
-              <legend>Offer type *</legend>
+              <legend class="seal-stage-label">How the adopter pays you</legend>
               <div class="market-offer-cards" role="radiogroup" aria-label="Offer type">
-                <label class="market-offer-card" data-offer="instant">
+                <label class="market-offer-card is-selected" data-offer="instant">
                   <input type="radio" name="market-settlement" id="market-settle-instant" value="instant" checked />
                   <span class="market-offer-card-title">Instant sale</span>
-                  <span class="market-offer-card-body">Paid in full now. Adopter owns the plant token immediately when the deal confirms.</span>
+                  <span class="market-offer-card-body">Full price to you at purchase. Done.</span>
                 </label>
                 <label class="market-offer-card" data-offer="adopt_stake">
                   <input type="radio" name="market-settlement" id="market-settle-stake" value="adopt_stake" />
                   <span class="market-offer-card-title">Adopt stake</span>
-                  <span class="market-offer-card-body">Paid in full now, but half stays locked until you keep logging care monthly through harvest.</span>
+                  <span class="market-offer-card-body">Half now, half unlocks as you keep logging care.</span>
                 </label>
               </div>
               <select id="market-settlement-select" class="sr-only" tabindex="-1" aria-hidden="true">
@@ -461,16 +445,24 @@
                 <option value="adopt_stake">Adopt stake</option>
               </select>
             </fieldset>
-            <p class="market-hint crypto-advanced-only" id="market-stake-hint" data-mode="instant" hidden></p>
-            <div class="market-offer-example crypto-advanced-only" id="market-offer-example" aria-live="polite">
-              <strong class="market-offer-example-title">Example</strong>
-              <p class="market-offer-example-body" id="market-offer-example-body">
-                Price 100 $GROWTOO → you get 100 when they buy. Simple transfer — no care lock.
-              </p>
+            <p class="market-offer-helper" id="market-stake-hint" data-mode="instant" aria-live="polite">
+              You’re paid the full asking price at purchase. Escrow holds the token until then.
+            </p>
+
+            <label class="seal-stage-label" for="market-price-input">Asking price</label>
+            <div class="market-price-field">
+              <input type="number" id="market-price-input" min="1" step="1" placeholder="120" required />
+              <span class="market-price-unit">$GROWTOO</span>
             </div>
+
             <button type="submit" class="btn btn-primary">Post to market</button>
           </form>
         </section>
+
+        <aside class="shell-card market-info-card" id="market-redemption-note" aria-label="Test network note">
+          <span class="market-info-icon" aria-hidden="true">i</span>
+          <p>Test network — $GROWTOO has no monetary value. Harvest redemption is on the roadmap, not live yet.</p>
+        </aside>
 
         <section class="plants-journal-section grower-only">
           <h2 class="section-heading">My offers</h2>
@@ -897,7 +889,7 @@
         <label class="plant-mint-toggle" id="plant-mint-toggle-wrap" hidden>
           <input type="checkbox" id="plant-also-mint" />
           <span>
-            Also mint this on-chain (optional)
+            Also seal this on-chain (optional)
             <span class="field-hint plant-mint-toggle-hint">
               Creates a test-network plant token linked to this journal plant. Needs a connected Devnet wallet.
               Stage rewards can total up to <strong>225 $GROWTOO</strong> by harvest.
@@ -1021,18 +1013,18 @@
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260728e"></script>
-  <script src="js/plain-lang.js?v=20260729j"></script>
-  <script src="js/market.js?v=20260729j"></script>
+  <script src="js/plain-lang.js?v=20260730m"></script>
+  <script src="js/market.js?v=20260730m"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260730d"></script>
   <script src="js/plant-botanical-sprites.js?v=20260730d"></script>
   <script src="js/grower-quests.js?v=20260724h"></script>
-  <script src="js/notifications.js?v=20260730b"></script>
+  <script src="js/notifications.js?v=20260730k"></script>
   <script src="js/signup.js?v=20260729g"></script>
-  <script src="js/plant-token.js?v=20260730d"></script>
-  <script src="js/coach-core.js?v=20260730c"></script>
-  <script src="js/ai-coach.js?v=20260730c"></script>
-  <script src="js/app.js?v=20260730b"></script>
+  <script src="js/plant-token.js?v=20260730m"></script>
+  <script src="js/coach-core.js?v=20260730k"></script>
+  <script src="js/ai-coach.js?v=20260730k"></script>
+  <script src="js/app.js?v=20260730k"></script>
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

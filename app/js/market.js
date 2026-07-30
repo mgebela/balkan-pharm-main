@@ -1222,9 +1222,8 @@
           notice.textContent =
             'Marketplace needs the $GROWTOO mint and seed collection on devnet. Offers below are read-only until then.';
         } else if (isGrowerUi()) {
-          notice.hidden = false;
-          notice.textContent =
-            'Post a minted plant token when you’re ready. Adopters back it with test $GROWTOO; the token moves to them when the deal confirms. Still a test network — no real money.';
+          notice.hidden = true;
+          notice.textContent = '';
         } else {
           notice.hidden = false;
           const intentMarket =
@@ -1233,7 +1232,7 @@
               : '';
           notice.textContent =
             intentMarket ||
-            'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest on an open offer.';
+            'Invest $GROWTOO to adopt a grower’s sealed plant. Connect your wallet when you tap Invest on an open offer.';
         }
       }
 
@@ -1244,19 +1243,20 @@
         const blocked = unlistableGardenTokens();
         const current = sel.value;
         sel.innerHTML =
-          '<option value="">— choose a minted plant —</option>' +
+          '<option value="">Choose a sealed plant</option>' +
           options
-            .map(function (o) {
+            .map(function (o, i) {
+              const no = String(i + 1).padStart(4, '0');
+              const label =
+                'Seed № ' +
+                no +
+                ' — ' +
+                (o.token.name || 'Plant');
               return (
                 '<option value="' +
                 esc(o.mintAddress) +
                 '">' +
-                esc(o.token.name) +
-                ' · ' +
-                esc(stageLabel(o.token.stageIndex)) +
-                ' (' +
-                esc(shortAddr(o.mintAddress)) +
-                ')' +
+                esc(label) +
                 '</option>'
               );
             })
@@ -1289,11 +1289,11 @@
           if (!options.length && blocked.length) {
             hint.hidden = false;
             hint.textContent =
-              'Almost there — finish minting on Tokenise (use Retry mint if something failed), then come back here.';
+              'Almost there — finish sealing on Tokenise (use Retry if something failed), then come back here.';
           } else if (!options.length) {
             hint.hidden = false;
             hint.textContent =
-              'Nothing to list yet. Mint a seed on Tokenise first — wallet stays optional until you’re ready.';
+              'Nothing to list yet. Seal a stage on Tokenise first — wallet stays optional until you’re ready.';
           } else {
             hint.hidden = true;
             hint.textContent = '';
@@ -1417,7 +1417,6 @@
   function syncMarketOfferHint() {
     const settleEl = document.getElementById('market-settlement-select');
     const hint = document.getElementById('market-stake-hint');
-    const exampleBody = document.getElementById('market-offer-example-body');
     const cards = document.querySelectorAll('.market-offer-card');
     if (!settleEl) return;
     const stake = settleEl.value === 'adopt_stake';
@@ -1426,24 +1425,14 @@
       card.classList.toggle('is-selected', on);
     });
     if (hint) {
+      hint.hidden = false;
       hint.setAttribute('data-mode', stake ? 'adopt_stake' : 'instant');
       if (stake) {
         hint.textContent =
-          'Adopt stake: the adopter pays the full price up front. Half reaches you when the deal settles; ' +
-          'half stays locked until every calendar month of care qualifies (all-or-nothing at harvest). ' +
-          'Weekly progress stays private to growers; adopters see monthly unlock status.';
+          'Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.';
       } else {
         hint.textContent =
-          'Instant sale: the adopter pays the full price; you receive it when the deal confirms, and the plant token moves to them in the same flow.';
-      }
-    }
-    if (exampleBody) {
-      if (stake) {
-        exampleBody.textContent =
-          'Price 100 $GROWTOO → ~50 to you on settle, ~50 locked. If every care month qualifies at harvest, the locked half unlocks; otherwise that path fails all-or-nothing.';
-      } else {
-        exampleBody.textContent =
-          'Price 100 $GROWTOO → you get 100 when they buy. Simple transfer — no care lock.';
+          'You’re paid the full asking price at purchase. Escrow holds the token until then.';
       }
     }
   }

@@ -458,6 +458,58 @@
     );
   }
 
+  function specimenNo(index) {
+    var n = String((index || 0) + 1);
+    while (n.length < 4) n = '0' + n;
+    return n;
+  }
+
+  /** Short serif line for the Journal "Today" card. */
+  function todayHeadline(plants, entries) {
+    var list = plants || [];
+    var ents = entries || [];
+    if (!list.length) {
+      return 'Add a plant when you are ready — Coach will keep the care trail tidy.';
+    }
+    var nudges = buildPredictiveNudges(list, ents);
+    if (nudges.length) {
+      var n = nudges[0];
+      var plantIdx = -1;
+      for (var i = 0; i < list.length; i++) {
+        if (list[i] && list[i].id === n.plantId) {
+          plantIdx = i;
+          break;
+        }
+      }
+      var plant = plantIdx >= 0 ? list[plantIdx] : null;
+      var name = (plant && plant.name) || 'Plant';
+      var no = plantIdx >= 0 ? ' №' + specimenNo(plantIdx) : '';
+      if (n.id && String(n.id).indexOf('predict-heat-water') === 0) {
+        var heat = upcomingHeat(readWeatherCache());
+        var heatBit = heat ? ' — heat wave ' + heat.label : '';
+        return name + no + ' is due for watering' + heatBit;
+      }
+      if (n.id && String(n.id).indexOf('stage-pace') === 0) {
+        return name + no + ' may be ready to move stage — take a look when you can.';
+      }
+      return n.message;
+    }
+    var top = list[0];
+    var waterDates = careDatesMs(top.id, ents, ['zalijevanje']);
+    var daysSince = waterDates[0] ? Math.floor((Date.now() - waterDates[0]) / 86400000) : null;
+    var label = (top.name || 'Plant') + ' №' + specimenNo(0);
+    if (daysSince == null) {
+      return label + ' is waiting for a first watering.';
+    }
+    if (daysSince === 0) {
+      return label + ' looks steady — watering logged today.';
+    }
+    if (daysSince >= 2) {
+      return label + ' is due for watering — last care ' + daysSince + ' days ago.';
+    }
+    return label + ' · last watering yesterday.';
+  }
+
   function relativeTime(iso) {
     var t = Date.parse(iso || '');
     if (!Number.isFinite(t)) return '';
@@ -711,6 +763,7 @@
     buildPredictiveNudges: buildPredictiveNudges,
     narrateAfterEntry: narrateAfterEntry,
     dashboardBriefing: dashboardBriefing,
+    todayHeadline: todayHeadline,
     permissionsPanelHtml: permissionsPanelHtml,
     settingsScreenHtml: settingsScreenHtml,
     activityLogHtml: activityLogHtml,

@@ -211,13 +211,18 @@
 
   function renderBell() {
     const badge = document.getElementById('notif-badge');
+    const dot = document.getElementById('notif-dot');
     const btn = document.getElementById('notif-bell-btn');
     const count = unreadCount();
     if (badge) {
-      badge.hidden = count === 0;
+      badge.hidden = true;
       badge.textContent = count > 99 ? '99+' : String(count);
     }
+    if (dot) {
+      dot.hidden = count === 0;
+    }
     if (btn) {
+      btn.classList.toggle('has-unread', count > 0);
       btn.setAttribute('aria-label', count ? 'Inbox, ' + count + ' unread' : 'Inbox');
     }
     if (panelOpen) renderPanelList();

@@ -16,9 +16,9 @@
     'plant token':
       'A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.',
     'adopt stake':
-      'You pay the full price now. Half reaches the grower when the deal settles; half stays locked until monthly care qualifies at harvest (all-or-nothing).',
+      'Half now, half unlocks as the grower keeps logging care through harvest.',
     'instant sale':
-      'Full price to the grower when you buy; the plant token comes to you in the same flow. No care lock.',
+      'Full price to the grower at purchase. Done — no care lock.',
     redemption:
       'Turning a harvest-stage token into a real harvest share someday. On Devnet this path is still mocked — no physical delivery yet.',
     'bonding curve':

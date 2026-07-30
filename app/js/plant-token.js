@@ -820,112 +820,76 @@
 
   function growthStepHint(stageIndex) {
     const stage = GROWTH_STAGES[stageIndex] || GROWTH_STAGES[0];
-    if (stageIndex >= GROWTH_STAGES.length - 1) return 'Fully grown · harvest complete';
+    if (stageIndex >= GROWTH_STAGES.length - 1) return 'Trail complete · harvest sealed';
     const next = GROWTH_STAGES[stageIndex + 1];
-    return 'Next mint → ' + next.label + ' (+' + next.reward + ' $GROWTOO)';
+    return 'Next seal → ' + next.label + ' (+' + next.reward + ' $GROWTOO)';
   }
+
+  const TRAIL_SHORT = ['Seed', 'Germ.', 'Seedl.', 'Veget.', 'Flower', 'Harvest'];
 
   function renderGrowthGuide(activeStageIndex) {
     const el = document.getElementById('adopt-growth-guide');
     if (!el) return;
 
-    const fallback = activeStageIndex >= 0 ? activeStageIndex : 0;
-    const preview =
-      growthPreviewStage == null
-        ? fallback
-        : Math.max(0, Math.min(GROWTH_STAGES.length - 1, growthPreviewStage));
-    const stageMeta = GROWTH_STAGES[preview];
+    const sealedAt = activeStageIndex >= 0 ? activeStageIndex : -1;
+    const focusIdx =
+      sealedAt < 0 ? 0 : Math.min(GROWTH_STAGES.length - 1, sealedAt + 1);
+    // When fully sealed, focus the harvest bar as complete.
+    const focus =
+      sealedAt >= GROWTH_STAGES.length - 1 ? GROWTH_STAGES.length - 1 : focusIdx;
+    const maxReward = GROWTH_STAGES.reduce(function (sum, s) {
+      return sum + (Number(s.reward) || 0);
+    }, 0);
 
-    const stepperHtml = GROWTH_STAGES.map((s, i) => {
-      const isPreview = i === preview;
-      const isPast = activeStageIndex >= 0 && i < activeStageIndex;
+    const bars = GROWTH_STAGES.map(function (s, i) {
+      const height = 28 + Math.round((i / Math.max(1, GROWTH_STAGES.length - 1)) * 72);
+      const done = sealedAt >= 0 && i <= sealedAt && i !== focus;
+      const isCurrent = i === focus;
+      const future = i > focus;
       const cls =
-        'adopt-growth-step' +
-        (isPreview ? ' adopt-growth-step--active' : '') +
-        (isPast ? ' adopt-growth-step--done' : '');
-      const reward = i === 0 ? 'Seed' : '+' + s.reward;
+        'trail-bar' +
+        (done ? ' trail-bar--done' : '') +
+        (isCurrent ? ' trail-bar--current' : '') +
+        (future ? ' trail-bar--future' : '');
+      let caption = '';
+      if (done) {
+        caption = i === 0 ? '✓' : '✓ +' + s.reward;
+      } else if (isCurrent) {
+        caption = i === 0 ? 'Seed' : i === GROWTH_STAGES.length - 1 ? 'Harvest +' + s.reward : '+' + s.reward;
+      } else if (i === GROWTH_STAGES.length - 1) {
+        caption = 'Harvest +' + s.reward;
+      } else {
+        caption = '+' + s.reward;
+      }
       return (
-        '<button type="button" class="' +
+        '<div class="trail-col">' +
+        '<div class="' +
         cls +
-        '" data-stage="' +
-        i +
-        '" aria-pressed="' +
-        (isPreview ? 'true' : 'false') +
-        '">' +
-        '<span class="adopt-growth-step-num">' +
-        (i + 1) +
-        '</span>' +
-        '<span class="adopt-growth-step-name">' +
+        '" style="height:' +
+        height +
+        '%" title="' +
         esc(s.label) +
+        '"></div>' +
+        '<span class="trail-col-label">' +
+        esc(TRAIL_SHORT[i] || s.label) +
         '</span>' +
-        '<span class="adopt-growth-step-reward">' +
-        esc(reward) +
+        '<span class="trail-col-cap' +
+        (isCurrent || i === GROWTH_STAGES.length - 1 ? ' trail-col-cap--accent' : '') +
+        '">' +
+        esc(caption) +
         '</span>' +
-        '</button>'
+        '</div>'
       );
     }).join('');
 
     el.innerHTML =
-      '<div class="metric-panel metric-panel--adopt">' +
-      '<header class="metric-panel-head">' +
-      '<h2 class="metric-panel-title">How growth works</h2>' +
-      '<p class="metric-panel-sub">Seed → Harvest · tap a stage, or swipe / use arrows on small screens</p>' +
-      '</header>' +
-      '<div class="adopt-growth-guide-inner">' +
-      '<div class="adopt-growth-showcase">' +
-      '<div class="adopt-growth-feature">' +
-      buildPlantGrowSvg(preview, { hero: true, animate: true }) +
-      '<div class="adopt-growth-feature-meta">' +
-      '<span class="adopt-growth-feature-stage">' +
-      esc(stageMeta.label) +
-      '</span>' +
-      '<span class="adopt-growth-feature-hint">' +
-      esc(growthStepHint(preview)) +
-      '</span>' +
+      '<p class="shell-card-eyebrow">The trail ahead</p>' +
+      '<div class="trail-chart" role="img" aria-label="Stage rewards from seed to harvest">' +
+      bars +
       '</div>' +
-      '</div>' +
-      '<div class="adopt-growth-stepper-wrap">' +
-      '<button type="button" class="adopt-growth-scroll adopt-growth-scroll--prev" id="adopt-growth-scroll-prev" aria-label="Previous stages">‹</button>' +
-      '<div class="adopt-growth-stepper" id="adopt-growth-stepper" role="tablist" aria-label="Growth stages">' +
-      stepperHtml +
-      '</div>' +
-      '<button type="button" class="adopt-growth-scroll adopt-growth-scroll--next" id="adopt-growth-scroll-next" aria-label="Next stages">›</button>' +
-      '<p class="adopt-growth-scroll-hint" id="adopt-growth-scroll-hint">Swipe for all stages →</p>' +
-      '</div>' +
-      '</div>' +
-      '</div></div>';
-
-    const stepper = document.getElementById('adopt-growth-stepper');
-    const prevBtn = document.getElementById('adopt-growth-scroll-prev');
-    const nextBtn = document.getElementById('adopt-growth-scroll-next');
-    const scrollHint = document.getElementById('adopt-growth-scroll-hint');
-    function updateScrollChrome() {
-      if (!stepper) return;
-      const max = stepper.scrollWidth - stepper.clientWidth;
-      const canScroll = max > 8;
-      if (prevBtn) prevBtn.hidden = !canScroll;
-      if (nextBtn) nextBtn.hidden = !canScroll;
-      if (scrollHint) scrollHint.hidden = !canScroll || stepper.scrollLeft > 12;
-      if (prevBtn) prevBtn.disabled = stepper.scrollLeft <= 4;
-      if (nextBtn) nextBtn.disabled = stepper.scrollLeft >= max - 4;
-    }
-    if (stepper) {
-      stepper.addEventListener('scroll', updateScrollChrome, { passive: true });
-      updateScrollChrome();
-      window.setTimeout(updateScrollChrome, 50);
-    }
-    if (prevBtn) {
-      prevBtn.addEventListener('click', function () {
-        if (!stepper) return;
-        stepper.scrollBy({ left: -140, behavior: 'smooth' });
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener('click', function () {
-        if (!stepper) return;
-        stepper.scrollBy({ left: 140, behavior: 'smooth' });
-      });
-    }
+      '<p class="trail-foot">Each sealed stage earns $GROWTOO — up to ' +
+      maxReward +
+      ' by harvest. Test network; no monetary value.</p>';
   }
 
   function networkLabel() {
@@ -1072,90 +1036,9 @@
   function renderWalletPanel(wallet) {
     const el = document.getElementById('adopt-wallet');
     if (!el) return;
-    if (!wallet.connected) {
-      el.innerHTML =
-        '<div class="metric-panel metric-panel--inline adopt-wallet-panel adopt-wallet-panel--hint">' +
-        '<div class="adopt-wallet-connect">' +
-        '<div class="adopt-wallet-copy">' +
-        '<h3>Wallet optional</h3>' +
-        '<p>' +
-        (isAdopterUi()
-          ? 'Browse anytime. When you’re ready to invest, tap <strong>Wallet · Off</strong> in the header to connect a test-network wallet — no pressure until then.'
-          : 'Your journal works without crypto. When you want to mint a plant token, tap <strong>Wallet · Off</strong> in the header to connect on the test network.') +
-        '</p>' +
-        '</div>' +
-        '</div></div>';
-      return;
-    }
-    const seeds = wallet.tokens.length;
-    const grown = wallet.tokens.filter((t) => t.stageIndex >= GROWTH_STAGES.length - 1).length;
-    const growing = seeds - grown;
-    const growPct = seeds ? Math.round((grown / seeds) * 100) : 0;
-    const M = window.MetricUI;
-
-    const addrLink =
-      wallet.address
-        ? '<a class="adopt-wallet-explorer" href="' +
-          esc(explorerAddressUrl(wallet.address)) +
-          '" target="_blank" rel="noopener noreferrer" title="View on Solscan">Solscan ↗</a>'
-        : '';
-
-    if (M) {
-      el.innerHTML =
-        '<div class="metric-panel metric-panel--inline">' +
-        '<div class="metric-cards metric-cards--wallet">' +
-        M.card({
-          label: 'Wallet address',
-          value: esc(shortAddr(wallet.address)),
-          meta: M.row('Network', esc(networkLabel()), 'metric-dot--teal'),
-          modifier: 'teal',
-        }) +
-        M.card({
-          label: '$GROWTOO balance',
-          value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
-          meta:
-            onchainGrowBalance != null
-              ? M.row('On-chain', onchainGrowBalance.toLocaleString('en-US') + ' $GROWTOO', 'metric-dot--amber')
-              : M.row('Rewards', 'Simulated', 'metric-dot--amber'),
-          modifier: 'amber',
-        }) +
-        M.card({
-          label: 'Plant tokens',
-          value: String(seeds),
-          meta: M.row('Growing', growing, 'metric-dot--teal') + M.row('Harvested', grown, 'metric-dot--blue'),
-          modifier: 'blue',
-        }) +
-        M.card({
-          label: 'Growth progress',
-          value: grown + ' / ' + seeds,
-          meta: M.row('Complete', growPct + '%', 'metric-dot--violet'),
-          modifier: 'violet',
-        }) +
-        '</div>' +
-        '<div class="adopt-wallet-actions">' +
-        linkStatusHtml(wallet) +
-        addrLink +
-        '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
-        '</div>' +
-        growerProfileHtml() +
-        '</div>';
-      return;
-    }
-
-    el.innerHTML =
-      '<div class="adopt-wallet-card">' +
-      '<div class="adopt-wallet-row">' +
-      '<span class="adopt-wallet-dot" aria-hidden="true"></span>' +
-      '<span class="adopt-wallet-addr" title="' + esc(wallet.address) + '">' + esc(shortAddr(wallet.address)) + '</span>' +
-      '<button type="button" class="btn btn-ghost btn-sm" id="adopt-disconnect-btn">Disconnect</button>' +
-      '</div>' +
-      '<div class="adopt-wallet-stats">' +
-      '<div class="adopt-stat"><span class="adopt-stat-value">' + (Number(wallet.growthBalance || 0)) + '</span><span class="adopt-stat-label">$GROWTOO balance</span></div>' +
-      '<div class="adopt-stat"><span class="adopt-stat-value">' + seeds + '</span><span class="adopt-stat-label">Plant tokens</span></div>' +
-      '<div class="adopt-stat"><span class="adopt-stat-value">' + grown + '</span><span class="adopt-stat-label">Fully grown</span></div>' +
-      '</div>' +
-      growerProfileHtml() +
-      '</div>';
+    // Wallet status lives in the header pill — hide the old triple-CTA panel.
+    el.innerHTML = '';
+    el.hidden = true;
   }
 
   // --- On-chain $GROWTOO balance (M3) -----------------------------------------
@@ -1780,7 +1663,7 @@
         esc(token.id) +
         '" disabled' +
         title +
-        '>Complete quests to mint → ' +
+        '>Log care to seal → ' +
         esc(next.label) +
         '</button>'
       );
@@ -1788,7 +1671,7 @@
     return (
       '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn adopt-action-primary" data-id="' +
       esc(token.id) +
-      '">Mint → ' +
+      '">Seal → ' +
       esc(next.label) +
       ' (+' +
       next.reward +
@@ -2032,11 +1915,88 @@
           '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">Browse market</button>' +
           '</div>';
       } else {
-        grid.innerHTML = '<div class="empty-state">No tokens yet. Add a plant from Plants and turn on “also mint on-chain”, or use the advanced mint form above.</div>';
+        grid.innerHTML = '<div class="empty-state">No sealed plants yet. Pick a journal plant above and seal the first stage.</div>';
       }
       return;
     }
     grid.innerHTML = wallet.tokens.map(tokenCardHtml).join('');
+  }
+
+  function journalStageLabel(plant) {
+    const key = plant && plant.stage ? String(plant.stage) : '';
+    const map = {
+      klijanje: 'germination',
+      sadnica: 'seedling',
+      vegetativna: 'vegetative',
+      cvjetanje: 'flowering',
+      susenje: 'harvest',
+    };
+    if (map[key]) return map[key];
+    const tokenKey = PLANT_STAGE_TO_TOKEN[key];
+    if (tokenKey) return tokenKey;
+    return key || 'growing';
+  }
+
+  function plantDayCount(plant) {
+    if (!plant) return null;
+    const raw =
+      (plant.stageDates && plant.stage && plant.stageDates[plant.stage]) ||
+      plant.startDate ||
+      plant.createdAt ||
+      '';
+    const t = Date.parse(raw);
+    if (!Number.isFinite(t)) return null;
+    return Math.max(0, Math.floor((Date.now() - t) / 86400000));
+  }
+
+  function plantSpecimenNo(index) {
+    const n = String((index || 0) + 1);
+    return n.length >= 4 ? n : ('0000' + n).slice(-4);
+  }
+
+  function tokenForPlant(wallet, plantId) {
+    if (!wallet || !plantId) return null;
+    return (wallet.tokens || []).find(function (t) {
+      return t && t.plantId === plantId;
+    }) || null;
+  }
+
+  function sealActionForPlant(plant, wallet) {
+    if (!plant) return null;
+    const token = tokenForPlant(wallet, plant.id);
+    if (!token) {
+      return {
+        kind: 'seed',
+        stage: GROWTH_STAGES[0],
+        label: 'Seal seed stage · +0 $GROWTOO',
+        token: null,
+      };
+    }
+    const nextIdx = Number(token.stageIndex || 0) + 1;
+    if (nextIdx >= GROWTH_STAGES.length) {
+      return {
+        kind: 'done',
+        stage: GROWTH_STAGES[GROWTH_STAGES.length - 1],
+        label: 'Trail complete',
+        token: token,
+      };
+    }
+    const next = GROWTH_STAGES[nextIdx];
+    let ready = true;
+    let lockMsg = '';
+    if (window.GrowerQuests) {
+      const quest = GrowerQuests.evaluateGrowthQuest(token, next.key);
+      ready = !!quest.ready;
+      lockMsg = quest.message || '';
+    }
+    return {
+      kind: 'growth',
+      stage: next,
+      label: 'Seal ' + String(next.label || '').toLowerCase() + ' stage · +' + next.reward + ' $GROWTOO',
+      token: token,
+      ready: ready,
+      lockMsg: lockMsg,
+    };
   }
 
   function fillSeedPlantOptions() {
@@ -2045,26 +2005,87 @@
     const plants = readPlants();
     const current = sel.value;
     sel.innerHTML =
-      '<option value="">— choose a journal plant —</option>' +
+      '<option value="">Choose a plant from your journal</option>' +
       plants
-        .map((p) => '<option value="' + esc(p.id) + '">' + esc(p.name || 'Plant') + '</option>')
+        .map(function (p, i) {
+          const stage = journalStageLabel(p);
+          const day = plantDayCount(p);
+          const dayBit = day == null ? '' : ', day ' + day;
+          const label =
+            (p.name || 'Plant') +
+            ' №' +
+            plantSpecimenNo(i) +
+            ' — ' +
+            stage +
+            dayBit;
+          return '<option value="' + esc(p.id) + '">' + esc(label) + '</option>';
+        })
         .join('');
     if (current) sel.value = current;
+    syncSealStageCta();
+  }
+
+  function syncSealStageCta() {
+    const plantSel = document.getElementById('adopt-seed-plant');
+    const submitBtn = document.getElementById('seal-stage-submit');
+    const statusEl = document.getElementById('seal-stage-status');
+    const nameEl = document.getElementById('adopt-seed-name');
+    const batchEl = document.getElementById('adopt-seed-batch');
+    if (!submitBtn) return;
+    const wallet = readWallet();
+    if (!wallet.connected) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Connect wallet to seal';
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Tap the wallet pill in the header to connect on the test network.';
+      }
+      return;
+    }
+    const plantId = plantSel ? plantSel.value : '';
+    const plant = readPlants().find(function (p) {
+      return p && p.id === plantId;
+    });
+    if (nameEl && plant) nameEl.value = String(plant.name || '').trim().slice(0, 32);
+    if (batchEl && plant) batchEl.value = String(plant.batch || plant.batchLabel || '').trim().slice(0, 32);
+    const action = sealActionForPlant(plant, wallet);
+    if (!action) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Seal a stage';
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Pick a plant from your journal.';
+      }
+      return;
+    }
+    if (action.kind === 'done') {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Trail complete · harvest sealed';
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'This plant’s trail is fully sealed. List it on Market when you are ready.';
+      }
+      return;
+    }
+    if (action.kind === 'growth' && action.ready === false) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = action.label;
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.textContent = action.lockMsg || 'Log more care before sealing the next stage.';
+      }
+      return;
+    }
+    submitBtn.disabled = false;
+    submitBtn.textContent = action.label;
+    if (statusEl) {
+      statusEl.hidden = true;
+      statusEl.textContent = '';
+    }
   }
 
   function syncSeedNameFromPlant() {
-    const plantSel = document.getElementById('adopt-seed-plant');
-    const nameEl = document.getElementById('adopt-seed-name');
-    if (!plantSel || !nameEl) return;
-    const plant = readPlants().find((p) => p && p.id === plantSel.value);
-    if (!plant) return;
-    const suggested = String(plant.name || '').trim().slice(0, 32);
-    if (!suggested) return;
-    // Prefill when empty or still matching the previous plant name pattern.
-    if (!nameEl.value.trim() || nameEl.dataset.autofilled === '1') {
-      nameEl.value = suggested;
-      nameEl.dataset.autofilled = '1';
-    }
+    syncSealStageCta();
   }
 
   function setBusy(state) {
@@ -2194,7 +2215,8 @@
       renderPlatformBonusPanel();
       renderTestFaucetPanel();
       renderAdopterSummary(wallet);
-      if (seedSection) seedSection.hidden = !wallet.connected || isAdopterUi();
+      // Seal card is always available for growers (CTA prompts connect if needed).
+      if (seedSection) seedSection.hidden = isAdopterUi();
       // Adopters always see the garden (empty state guides them). Growers when connected/tokens.
       if (gardenSection) {
         gardenSection.hidden = isAdopterUi()
@@ -2202,8 +2224,10 @@
           : !(wallet.connected || (wallet.tokens && wallet.tokens.length > 0));
       }
       applyProfileChrome();
+      if (!isAdopterUi()) {
+        fillSeedPlantOptions();
+      }
       if (isAdopterUi() || wallet.connected || (wallet.tokens && wallet.tokens.length > 0)) {
-        if (!isAdopterUi() && wallet.connected) fillSeedPlantOptions();
         renderGarden(wallet);
       }
     } finally {
@@ -2414,7 +2438,8 @@
         return (
           '<div class="wallet-controls wallet-controls--compact">' +
           '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="Connect wallet">' +
-          'Wallet · Off' +
+          '<span class="wallet-status-dot wallet-status-dot--off" aria-hidden="true"></span>' +
+          '<span class="wallet-status-addr">Connect</span>' +
           '</button>' +
           '</div>'
         );
@@ -2438,11 +2463,13 @@
     if (compact) {
       return (
         '<div class="wallet-controls wallet-controls--compact">' +
-        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-goto-tokenise" title="' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="Tap to disconnect ' +
         esc(wallet.address || '') +
         '">' +
-        'Wallet · ' +
+        '<span class="wallet-status-dot" aria-hidden="true"></span>' +
+        '<span class="wallet-status-addr">' +
         esc(shortAddr(wallet.address)) +
+        '</span>' +
         '</button>' +
         '</div>'
       );
@@ -2499,6 +2526,19 @@
         await handleWalletConnect(statusConnect);
         return;
       }
+      const statusToggle = e.target.closest('.wallet-status-toggle');
+      if (statusToggle) {
+        e.preventDefault();
+        const wallet = readWallet();
+        if (wallet.connected) {
+          if (window.confirm('Disconnect wallet from this account?')) {
+            await handleWalletDisconnect(statusToggle);
+          }
+        } else {
+          await handleWalletConnect(statusToggle);
+        }
+        return;
+      }
       const gotoTokenise = e.target.closest('.wallet-goto-tokenise');
       if (gotoTokenise) {
         e.preventDefault();
@@ -2542,13 +2582,7 @@
       const stepBtn = e.target.closest('.adopt-growth-step');
 
       if (stepBtn) {
-        growthPreviewStage = Number(stepBtn.dataset.stage);
-        const wallet = readWallet();
-        const highlight =
-          wallet.tokens.length > 0
-            ? Math.max.apply(null, wallet.tokens.map((t) => t.stageIndex))
-            : -1;
-        renderGrowthGuide(highlight);
+        // Trail chart is display-only — sealing happens from the plant picker CTA.
         return;
       }
 
@@ -2848,51 +2882,63 @@
     const seedForm = document.getElementById('adopt-seed-form');
     if (seedForm) {
       const plantSel = document.getElementById('adopt-seed-plant');
-      const nameEl = document.getElementById('adopt-seed-name');
       if (plantSel && plantSel.dataset.bound !== '1') {
         plantSel.dataset.bound = '1';
-        plantSel.addEventListener('change', syncSeedNameFromPlant);
-      }
-      if (nameEl && nameEl.dataset.bound !== '1') {
-        nameEl.dataset.bound = '1';
-        nameEl.addEventListener('input', function () {
-          nameEl.dataset.autofilled = '0';
-        });
+        plantSel.addEventListener('change', syncSealStageCta);
       }
       seedForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         if (busy) return;
-        const nameInput = document.getElementById('adopt-seed-name');
-        const batchEl = document.getElementById('adopt-seed-batch');
         const plantSelect = document.getElementById('adopt-seed-plant');
-        let plantId = plantSelect ? plantSelect.value : '';
+        const plantId = plantSelect ? plantSelect.value : '';
         if (!plantId) {
-          flashError(new Error('Choose a journal plant to link this token to.'));
+          flashError(new Error('Choose a journal plant to seal.'));
           return;
         }
         const plant = readPlants().find((p) => p.id === plantId);
-        let name = nameInput ? nameInput.value.trim() : '';
-        if (!name && plant) name = String(plant.name || '').trim();
-        if (!name) {
-          flashError(new Error('Enter a token name (or pick a plant with a name).'));
+        if (!plant) {
+          flashError(new Error('Plant not found in your journal.'));
           return;
         }
-        const batch = batchEl ? batchEl.value.trim() : '';
-        let strain = '';
-        if (plant) strain = plant.strain || '';
-        const submitBtn = seedForm.querySelector('button[type="submit"]');
+        const wallet = readWallet();
+        if (!wallet.connected) {
+          flashError(new Error('Connect a wallet first (header pill).'));
+          return;
+        }
+        const action = sealActionForPlant(plant, wallet);
+        const submitBtn = document.getElementById('seal-stage-submit') || seedForm.querySelector('button[type="submit"]');
+        const originalLabel = submitBtn ? submitBtn.textContent : '';
         setBusy(true);
-        if (submitBtn) submitBtn.textContent = 'Minting…';
+        if (submitBtn) submitBtn.textContent = 'Sealing…';
         try {
-          await PlantToken.importSeed({ name, strain, batch, plantId: plantId || null });
-          seedForm.reset();
-          if (nameInput) nameInput.dataset.autofilled = '0';
+          if (!action || action.kind === 'done') {
+            throw new Error('This plant’s trail is already fully sealed.');
+          }
+          if (action.kind === 'seed') {
+            const name = String(plant.name || '').trim().slice(0, 32);
+            if (!name) throw new Error('Plant needs a name in the journal before sealing.');
+            await PlantToken.importSeed({
+              name: name,
+              strain: plant.strain || '',
+              batch: plant.batch || plant.batchLabel || '',
+              plantId: plantId,
+            });
+          } else if (action.kind === 'growth' && action.token) {
+            if (action.ready === false) {
+              throw new Error(action.lockMsg || 'Log more care before sealing the next stage.');
+            }
+            await PlantToken.mintGrowth(action.token.id);
+          } else {
+            throw new Error('Nothing to seal for this plant.');
+          }
           render();
+          flashOk('Stage sealed.');
         } catch (err) {
           flashError(err);
         } finally {
-          if (submitBtn) submitBtn.textContent = 'Mint seed token';
+          if (submitBtn) submitBtn.textContent = originalLabel || 'Seal stage';
           setBusy(false);
+          syncSealStageCta();
         }
       });
     }

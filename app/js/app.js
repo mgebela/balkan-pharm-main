@@ -1332,6 +1332,11 @@ function applyProfileTypeUI(profileType) {
       (type === PROFILE_TYPES.adopter ? 'adopter' : 'grower');
   }
 
+  const avatarMark = document.querySelector('#btn-account .header-avatar-mark');
+  if (avatarMark) {
+    avatarMark.textContent = type === PROFILE_TYPES.adopter ? 'A' : 'G';
+  }
+
   const title = document.querySelector('title');
   if (title) {
     title.textContent =
@@ -1368,21 +1373,21 @@ function applySignupProfileCopy(profileType) {
 }
 
 function syncMoreNavVisibility() {
-  const moreBtn = document.getElementById('bottom-nav-more');
-  if (!moreBtn) return;
+  const accountBtn = document.getElementById('btn-account');
+  if (!accountBtn) return;
   const items = document.querySelectorAll('.more-nav-item');
   let visible = 0;
   items.forEach(function (el) {
     const style = window.getComputedStyle(el);
     if (style.display !== 'none' && style.visibility !== 'hidden') visible += 1;
   });
-  moreBtn.hidden = visible === 0;
+  // Account menu always stays available (privacy/terms/logout).
   if (visible === 0) {
     const overlay = document.getElementById('more-nav-overlay');
     if (overlay) overlay.hidden = true;
     document.body.classList.remove('more-nav-open');
-    moreBtn.classList.remove('active');
-    moreBtn.setAttribute('aria-expanded', 'false');
+    accountBtn.classList.remove('active');
+    accountBtn.setAttribute('aria-expanded', 'false');
   }
 }
 
@@ -1883,9 +1888,9 @@ function initFirebaseSync() {
   const logoutBtn = document.getElementById('btn-logout');
   const MORE_NAV_VIEWS = ['toolbox', 'danas', 'admin'];
   const titles = {
-    dashboard: 'Dashboard',
-    plants: 'Plants & journal',
-    adopt: 'Adopt a plant',
+    dashboard: 'Journal',
+    plants: 'Plants',
+    adopt: 'Tokenise',
     market: 'Market',
     growlog: 'Grow log',
     toolbox: 'Tools',
@@ -1895,31 +1900,38 @@ function initFirebaseSync() {
 
   let currentGrowlogPlantId = null;
 
+  async function performLogout() {
+    const uid =
+      window.firebase && firebase.auth && firebase.auth().currentUser
+        ? firebase.auth().currentUser.uid
+        : '';
+    try {
+      if (window.SolanaWallet && typeof SolanaWallet.disconnect === 'function') {
+        await SolanaWallet.disconnect();
+      }
+    } catch {
+      // ignore
+    }
+    if (window.DnevnikNotifications && typeof DnevnikNotifications.clearWalletReconnectPrompt === 'function') {
+      DnevnikNotifications.clearWalletReconnectPrompt(uid);
+    }
+    try {
+      if (window.firebase && firebase.auth) await firebase.auth().signOut();
+    } catch {
+      // ignore
+    }
+    localStorage.removeItem(STORAGE_AUTH);
+    window.location.replace('../dnevnik/');
+  }
+
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      const uid =
-        window.firebase && firebase.auth && firebase.auth().currentUser
-          ? firebase.auth().currentUser.uid
-          : '';
-      // End the browser wallet session only — keep Firestore wallet link.
-      // Phantom/Solflare cannot stay signed for the next Firebase account.
-      try {
-        if (window.SolanaWallet && typeof SolanaWallet.disconnect === 'function') {
-          await SolanaWallet.disconnect();
-        }
-      } catch {
-        // ignore
-      }
-      if (window.DnevnikNotifications && typeof DnevnikNotifications.clearWalletReconnectPrompt === 'function') {
-        DnevnikNotifications.clearWalletReconnectPrompt(uid);
-      }
-      try {
-        if (window.firebase && firebase.auth) await firebase.auth().signOut();
-      } catch {
-        // ignore
-      }
-      localStorage.removeItem(STORAGE_AUTH);
-      window.location.replace('../dnevnik/');
+    logoutBtn.addEventListener('click', performLogout);
+  }
+  const logoutSheetBtn = document.getElementById('btn-logout-sheet');
+  if (logoutSheetBtn) {
+    logoutSheetBtn.addEventListener('click', function () {
+      setMoreNavOpen(false);
+      performLogout();
     });
   }
 
@@ -1940,9 +1952,10 @@ function initFirebaseSync() {
       const plant = getPlants().find((p) => p.id === extra);
       if (viewTitle) viewTitle.textContent = plant ? plant.name : 'Growlog';
       document.querySelectorAll('.nav-item[data-view="plants"]').forEach((n) => n.classList.add('active'));
-      const moreBtnEarly = document.getElementById('bottom-nav-more');
+      const moreBtnEarly = document.getElementById('btn-account');
       if (moreBtnEarly) moreBtnEarly.classList.remove('active');
       setMoreNavOpen(false);
+      setLogSheetOpen(false);
       if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
         window.AdoptPlant.renderGlobalWalletUI();
       }
@@ -1955,11 +1968,12 @@ function initFirebaseSync() {
     currentGrowlogPlantId = null;
     const view = document.getElementById('view-' + id);
     document.querySelectorAll('.nav-item[data-view="' + id + '"], .more-nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
-    const moreBtn = document.getElementById('bottom-nav-more');
-    if (moreBtn) {
-      moreBtn.classList.toggle('active', MORE_NAV_VIEWS.indexOf(id) !== -1);
+    const accountBtn = document.getElementById('btn-account');
+    if (accountBtn) {
+      accountBtn.classList.toggle('active', MORE_NAV_VIEWS.indexOf(id) !== -1);
     }
     setMoreNavOpen(false);
+    setLogSheetOpen(false);
     if (view) view.classList.add('active');
     if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
       window.AdoptPlant.renderGlobalWalletUI();
@@ -2062,14 +2076,40 @@ function initFirebaseSync() {
 
   function setMoreNavOpen(open) {
     const overlay = document.getElementById('more-nav-overlay');
-    const btn = document.getElementById('bottom-nav-more');
+    const btn = document.getElementById('btn-account');
     if (overlay) overlay.hidden = !open;
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('more-nav-open', !!open);
+    if (open) {
+      const logOverlay = document.getElementById('log-sheet-overlay');
+      const logBtn = document.getElementById('bottom-nav-log');
+      const sideBtn = document.getElementById('sidebar-log-btn');
+      if (logOverlay) logOverlay.hidden = true;
+      if (logBtn) logBtn.setAttribute('aria-expanded', 'false');
+      if (sideBtn) sideBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('log-sheet-open');
+    }
+  }
+
+  function setLogSheetOpen(open) {
+    const overlay = document.getElementById('log-sheet-overlay');
+    const btn = document.getElementById('bottom-nav-log');
+    const sideBtn = document.getElementById('sidebar-log-btn');
+    if (overlay) overlay.hidden = !open;
+    if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (sideBtn) sideBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    document.body.classList.toggle('log-sheet-open', !!open);
+    if (open) {
+      const moreOverlay = document.getElementById('more-nav-overlay');
+      const accountBtn = document.getElementById('btn-account');
+      if (moreOverlay) moreOverlay.hidden = true;
+      if (accountBtn) accountBtn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('more-nav-open');
+    }
   }
 
   (function bindMoreNav() {
-    const btn = document.getElementById('bottom-nav-more');
+    const btn = document.getElementById('btn-account');
     const backdrop = document.getElementById('more-nav-backdrop');
     const closeBtn = document.getElementById('more-nav-close');
     if (btn) {
@@ -2081,10 +2121,52 @@ function initFirebaseSync() {
     }
     if (backdrop) backdrop.addEventListener('click', function () { setMoreNavOpen(false); });
     if (closeBtn) closeBtn.addEventListener('click', function () { setMoreNavOpen(false); });
+  })();
+
+  (function bindLogSheet() {
+    function toggleLog() {
+      if (blockAdminWrite()) return;
+      const overlay = document.getElementById('log-sheet-overlay');
+      setLogSheetOpen(!(overlay && !overlay.hidden));
+    }
+    const bottomLog = document.getElementById('bottom-nav-log');
+    const sideLog = document.getElementById('sidebar-log-btn');
+    const backdrop = document.getElementById('log-sheet-backdrop');
+    const closeBtn = document.getElementById('log-sheet-close');
+    const water = document.getElementById('log-sheet-water');
+    const feed = document.getElementById('log-sheet-feed');
+    const full = document.getElementById('log-sheet-full');
+    if (bottomLog) bottomLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
+    if (sideLog) sideLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
+    if (backdrop) backdrop.addEventListener('click', function () { setLogSheetOpen(false); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setLogSheetOpen(false); });
+    if (water) {
+      water.addEventListener('click', function () {
+        setLogSheetOpen(false);
+        quickLogWatering();
+      });
+    }
+    if (feed) {
+      feed.addEventListener('click', function () {
+        setLogSheetOpen(false);
+        quickLogFeeding();
+      });
+    }
+    if (full) {
+      full.addEventListener('click', function () {
+        setLogSheetOpen(false);
+        if (blockAdminWrite()) return;
+        openEntryModal(null);
+      });
+    }
+  })();
+
+  // Escape closes account + log sheets.
+  (function bindShellSheetEscape() {
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && document.body.classList.contains('more-nav-open')) {
-        setMoreNavOpen(false);
-      }
+      if (e.key !== 'Escape') return;
+      setMoreNavOpen(false);
+      setLogSheetOpen(false);
     });
   })();
 
@@ -2450,6 +2532,112 @@ function initFirebaseSync() {
     return addr.slice(0, 4) + '…' + addr.slice(-4);
   }
 
+  function plantSpecimenNo(index) {
+    return String(index + 1).padStart(4, '0');
+  }
+
+  function daysSinceLastCare(plantId, entries, types) {
+    const wanted = types || ['zalijevanje'];
+    let latest = 0;
+    (entries || []).forEach(function (e) {
+      if (!e || e.plantId !== plantId || wanted.indexOf(e.type) === -1 || !e.date) return;
+      const t = new Date(e.date + 'T12:00:00').getTime();
+      if (t > latest) latest = t;
+    });
+    if (!latest) return null;
+    return Math.floor((Date.now() - latest) / 86400000);
+  }
+
+  function renderTodayAndSeals(plants, entries) {
+    const todaySection = document.getElementById('dashboard-today-section');
+    const sealsSection = document.getElementById('dashboard-seals-section');
+    const todayLine = document.getElementById('dashboard-today-line');
+    const todayActions = document.getElementById('dashboard-today-actions');
+    const sealsEl = document.getElementById('dashboard-plant-seals');
+    const hasWaterLog = (entries || []).some((e) => e && e.type === 'zalijevanje');
+    let coachTried = false;
+    try {
+      coachTried =
+        localStorage.getItem('dnevnik-live-coach-trust-seen') === '1' ||
+        localStorage.getItem('dnevnik-live-getting-started-coach') === '1';
+    } catch {
+      coachTried = false;
+    }
+    const stillOnboarding = !plants.length || !hasWaterLog || !coachTried;
+    const showGrowerHome = !isAdopterProfile() && plants.length > 0 && !stillOnboarding;
+
+    if (todaySection) todaySection.hidden = !showGrowerHome;
+    if (sealsSection) sealsSection.hidden = !showGrowerHome;
+    if (!showGrowerHome) {
+      if (todayLine) todayLine.textContent = '';
+      if (todayActions) todayActions.innerHTML = '';
+      if (sealsEl) sealsEl.innerHTML = '';
+      return;
+    }
+
+    const brief =
+      window.AICoach && typeof AICoach.todayHeadline === 'function'
+        ? AICoach.todayHeadline(plants, entries)
+        : window.AICoach && typeof AICoach.dashboardBriefing === 'function'
+          ? AICoach.dashboardBriefing(plants, entries)
+          : '';
+    if (todayLine) todayLine.textContent = brief || 'Your garden is quiet — log a watering to keep the trail warm.';
+    if (todayActions) {
+      todayActions.innerHTML =
+        '<button type="button" class="btn btn-primary btn-tap" id="today-log-water">Log watering</button>' +
+        '<button type="button" class="btn btn-secondary btn-tap" id="today-ask-coach">Ask coach</button>';
+      const waterBtn = document.getElementById('today-log-water');
+      const coachBtn = document.getElementById('today-ask-coach');
+      if (waterBtn) waterBtn.addEventListener('click', function () { quickLogWatering(); });
+      if (coachBtn) {
+        coachBtn.addEventListener('click', function () {
+          if (window.AICoach) AICoach.open();
+        });
+      }
+    }
+
+    if (sealsEl) {
+      sealsEl.innerHTML = plants
+        .map(function (p, i) {
+          const stage = STAGES[p.stage] || p.stage || 'Growing';
+          const env =
+            p.environmentType === 'outdoor' || p.fieldLocation
+              ? 'outdoor'
+              : 'indoor';
+          const since = daysSinceLastCare(p.id, entries, ['zalijevanje']);
+          const waterLine =
+            since == null ? 'no watering yet' : since === 0 ? 'watered today' : since + 'd since water';
+          const no = plantSpecimenNo(i);
+          return (
+            '<button type="button" class="shell-card plant-seal-card" data-plant-id="' +
+            escapeHtml(p.id) +
+            '">' +
+            '<span class="plant-seal-mark" aria-hidden="true"></span>' +
+            '<span class="plant-seal-title">Plant <span class="plant-seal-no">№</span> ' +
+            no +
+            ' — <em>' +
+            escapeHtml(p.name || 'Plant') +
+            '</em></span>' +
+            '<span class="plant-seal-data">' +
+            escapeHtml(stage) +
+            ' · ' +
+            waterLine +
+            ' · ' +
+            env +
+            '</span>' +
+            '</button>'
+          );
+        })
+        .join('');
+      sealsEl.querySelectorAll('[data-plant-id]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const id = btn.getAttribute('data-plant-id');
+          if (id) showView('growlog', id);
+        });
+      });
+    }
+  }
+
   function renderCoachBriefingSurfaces() {
     const plants = getPlants();
     const entries = getEntries();
@@ -2459,22 +2647,9 @@ function initFirebaseSync() {
         : '';
     const dashBrief = document.getElementById('dashboard-coach-brief');
     if (dashBrief) {
-      const show = !isAdopterProfile() && !!brief && plants.length > 0;
-      dashBrief.hidden = !show;
-      if (show) {
-        dashBrief.innerHTML =
-          '<span class="dashboard-coach-brief-label">Coach</span> ' +
-          escapeHtml(brief) +
-          ' <button type="button" class="link-btn" id="dashboard-coach-open">Open coach</button>';
-        const openBtn = document.getElementById('dashboard-coach-open');
-        if (openBtn) {
-          openBtn.addEventListener('click', function () {
-            if (window.AICoach) AICoach.open();
-          });
-        }
-      } else {
-        dashBrief.innerHTML = '';
-      }
+      // Coach speaks from the Today card now — keep legacy strip hidden.
+      dashBrief.hidden = true;
+      dashBrief.innerHTML = '';
     }
     const plantsStrip = document.getElementById('coach-plants-strip');
     if (plantsStrip) {
@@ -2488,6 +2663,7 @@ function initFirebaseSync() {
     const plants = getPlants();
     const entries = getEntries();
     renderCoachBriefingSurfaces();
+    renderTodayAndSeals(plants, entries);
     const metricsEl = document.getElementById('dashboard-metrics');
     const recentEl = document.getElementById('recent-notes');
     const totalPlantCount = plants.reduce((sum, p) => sum + Math.max(1, Number(p.count || 1)), 0);
@@ -2538,7 +2714,6 @@ function initFirebaseSync() {
     const adoptSection = document.getElementById('dashboard-adopt-section');
     const quickSection = document.getElementById('dashboard-quick-section');
     const quickEl = document.getElementById('dashboard-quick-actions');
-    const isEmptyGrower = !isAdopterProfile() && plants.length === 0;
     const isEmptyAdopter = isAdopterProfile() && tokenCount === 0;
 
     const hasWaterLog = entries.some((e) => e && e.type === 'zalijevanje');
@@ -2553,6 +2728,7 @@ function initFirebaseSync() {
     const hasMint = tokenCount > 0;
     const showGettingStarted =
       !isAdopterProfile() && (!plants.length || !hasWaterLog || !coachTried);
+    const showGrowerJournalHome = !isAdopterProfile() && plants.length > 0 && !showGettingStarted;
 
     function checklistItem(done, label, actionId, actionLabel) {
       return (
@@ -2579,13 +2755,14 @@ function initFirebaseSync() {
     if (metricsEl && window.MetricUI) {
       const M = MetricUI;
       if (showGettingStarted) {
+        metricsEl.hidden = false;
         metricsEl.innerHTML =
-          '<div class="dashboard-first-run" role="status">' +
+          '<div class="dashboard-first-run shell-card" role="status">' +
           '<p class="dashboard-first-run-eyebrow">Getting started</p>' +
           '<h2 class="dashboard-first-run-title">' +
           (plants.length ? 'Keep the streak going' : 'Start your grow journal') +
           '</h2>' +
-          '<p class="dashboard-first-run-body">A short checklist — then your stats fill in with real activity.</p>' +
+          '<p class="dashboard-first-run-body">A short checklist — then your journal fills with real activity.</p>' +
           '<ol class="getting-started-list">' +
           checklistItem(!!plants.length, 'Add your first plant', 'add-plant', 'Add plant') +
           checklistItem(hasWaterLog, 'Log a watering', 'log-water', 'Log watering') +
@@ -2615,8 +2792,9 @@ function initFirebaseSync() {
           });
         });
       } else if (isEmptyAdopter) {
+        metricsEl.hidden = false;
         metricsEl.innerHTML =
-          '<div class="dashboard-first-run" role="status">' +
+          '<div class="dashboard-first-run shell-card" role="status">' +
           '<p class="dashboard-first-run-eyebrow">My garden</p>' +
           '<h2 class="dashboard-first-run-title">No adopted plants yet</h2>' +
           '<p class="dashboard-first-run-body">Browse the market for open offers, then invest with test $GROWTOO when you are ready.</p>' +
@@ -2625,6 +2803,7 @@ function initFirebaseSync() {
         const marketBtn = document.getElementById('dashboard-open-market');
         if (marketBtn) marketBtn.addEventListener('click', () => showView('market'));
       } else if (isAdopterProfile()) {
+        metricsEl.hidden = false;
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
@@ -2662,7 +2841,12 @@ function initFirebaseSync() {
               attention: true,
             })
         );
+      } else if (showGrowerJournalHome) {
+        // Journal home: Today + seals replace the zero-stats wall.
+        metricsEl.hidden = true;
+        metricsEl.innerHTML = '';
       } else {
+        metricsEl.hidden = false;
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
@@ -2715,50 +2899,30 @@ function initFirebaseSync() {
     }
 
     if (quickSection && quickEl) {
-      const showQuick = !isAdopterProfile() && plants.length > 0;
-      quickSection.hidden = !showQuick;
-      if (showQuick) {
-        quickEl.innerHTML =
-          '<div class="dashboard-quick-bar">' +
-          '<p class="dashboard-quick-label">Quick log</p>' +
-          '<button type="button" class="btn btn-primary btn-tap" id="dashboard-log-water">Log watering</button>' +
-          '<button type="button" class="btn btn-ghost btn-tap" id="dashboard-log-feed">Log feeding</button>' +
-          '<button type="button" class="btn btn-ghost btn-tap" id="dashboard-add-plant-quick">+ Plant</button>' +
-          '</div>';
-        const waterBtn = document.getElementById('dashboard-log-water');
-        const feedBtn = document.getElementById('dashboard-log-feed');
-        const addQuick = document.getElementById('dashboard-add-plant-quick');
-        if (waterBtn) waterBtn.addEventListener('click', () => quickLogWatering());
-        if (feedBtn) feedBtn.addEventListener('click', () => quickLogFeeding());
-        if (addQuick) {
-          addQuick.addEventListener('click', () => {
-            if (blockAdminWrite()) return;
-            openPlantModal();
-          });
-        }
-      } else {
-        quickEl.innerHTML = '';
-      }
+      // Quick log lives on Today card + center Log tab now.
+      quickSection.hidden = true;
+      quickEl.innerHTML = '';
     }
 
     if (adoptSection) {
-      adoptSection.hidden = showGettingStarted || isEmptyAdopter;
+      adoptSection.hidden = showGettingStarted || isEmptyAdopter || showGrowerJournalHome;
     }
     if (
       !showGettingStarted &&
       !isEmptyAdopter &&
+      !showGrowerJournalHome &&
       window.AdoptPlant &&
       typeof window.AdoptPlant.renderDashboard === 'function'
     ) {
       window.AdoptPlant.renderDashboard(document.getElementById('dashboard-adopt-panel'), () => showView('adopt'));
-    } else if (adoptSection && (showGettingStarted || isEmptyAdopter)) {
+    } else if (adoptSection && (showGettingStarted || isEmptyAdopter || showGrowerJournalHome)) {
       const panel = document.getElementById('dashboard-adopt-panel');
       if (panel) panel.innerHTML = '';
     }
 
     const chartsSection = document.getElementById('dashboard-charts-section');
     const recentSection = document.querySelector('#view-dashboard .recent-section');
-    if (chartsSection) chartsSection.hidden = isAdopterProfile() || showGettingStarted;
+    if (chartsSection) chartsSection.hidden = isAdopterProfile() || showGettingStarted || showGrowerJournalHome;
     if (recentSection) recentSection.hidden = isAdopterProfile() || showGettingStarted;
 
     if (isAdopterProfile() || showGettingStarted) {
@@ -2767,29 +2931,31 @@ function initFirebaseSync() {
     }
 
     const recent = entries.slice(-5).reverse();
-    if (recent.length === 0) {
-      recentEl.innerHTML = '<div class="empty-state">No entries yet. Add a plant and start your journal.</div>';
-    } else {
-      recentEl.innerHTML = recent
-        .map((e) => {
-          const plant = plants.find((p) => p.id === e.plantId);
-          const plantName = escapeHtml(plant ? plant.name : 'Plant');
-          const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-          const thumb = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="recent-note-thumb" />' : '';
-          return `
-            <div class="recent-note">
+    if (recentEl) {
+      if (recent.length === 0) {
+        recentEl.innerHTML = '<div class="empty-state">No entries yet. Add a plant and start your journal.</div>';
+      } else {
+        recentEl.innerHTML = recent
+          .map((e) => {
+            const plant = plants.find((p) => p.id === e.plantId);
+            const plantName = escapeHtml(plant ? plant.name : 'Plant');
+            const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+            const thumb = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="recent-note-thumb" />' : '';
+            return `
+            <div class="recent-note shell-card">
               <div class="meta">${plantName} · ${date} · ${escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General')}</div>
               ${thumb}
               <div class="text">${escapeHtml(e.note || '').slice(0, 120)}${(e.note || '').length > 120 ? '…' : ''}</div>
             </div>
           `;
-        })
-        .join('');
+          })
+          .join('');
+      }
     }
 
     const MIN_CHART_ENTRIES = 2;
     const chartsContainer = document.getElementById('dashboard-charts');
-    if (chartsSection && chartsContainer && typeof getToolboxData === 'function') {
+    if (chartsSection && chartsContainer && typeof getToolboxData === 'function' && !showGrowerJournalHome) {
       const toolbox = getToolboxData();
       const watering = toolbox.watering || [];
       const environment = toolbox.environment || [];
