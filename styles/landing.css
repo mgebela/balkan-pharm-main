@@ -3903,9 +3903,12 @@ body:has(.devnet-banner) .header {
 
 .close-block h2 {
   margin: 0 0 0.75rem;
-  font-size: clamp(1.45rem, 3.2vw, 1.95rem);
-  color: #f4fff4;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 3.6vw, 2.25rem);
+  font-weight: 350;
+  color: #f3efe6;
   letter-spacing: -0.02em;
+  line-height: 1.18;
 }
 
 .close-block > p {
@@ -4058,15 +4061,12 @@ body:has(.devnet-banner) .header {
 }
 
 .desk-spec-code--verify,
-.desk-spec-icon--verify {
+.desk-spec-icon--verify,
+.desk-spec-code--cool,
+.desk-spec-icon--cool,
+.desk-spec-icon--brass {
   color: var(--brass-ink);
   background: var(--brass);
-}
-
-.desk-spec-code--cool,
-.desk-spec-icon--cool {
-  color: var(--brass-ink);
-  background: rgba(196, 163, 90, 0.85);
 }
 
 .desk-panel-meta--verify {
@@ -4112,9 +4112,9 @@ body:has(.devnet-banner) .header {
   margin: 0 0 0.55rem;
   padding: 0.35rem 0.65rem;
   border: 0;
-  border-radius: 6px;
-  background: linear-gradient(180deg, #d45a38 0%, #8e3520 100%);
-  color: #f7eee1;
+  border-radius: 3px;
+  background: var(--brass);
+  color: var(--brass-ink);
   font: inherit;
   font-size: 0.78rem;
   font-weight: 700;
@@ -4144,7 +4144,7 @@ body:has(.devnet-banner) .header {
 
 .clip-check,
 .clip-tick {
-  color: var(--verify);
+  color: var(--brass);
   font-weight: 700;
 }
 
@@ -4208,10 +4208,11 @@ body:has(.devnet-banner) .header {
 
 .clip-caption {
   margin: 0.45rem 0 0;
-  font-size: 0.72rem;
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-  color: rgba(200, 230, 200, 0.65);
+  font-size: 0.78rem;
+  font-family: var(--font);
+  letter-spacing: 0.01em;
+  color: rgba(184, 196, 176, 0.72);
+  line-height: 1.4;
 }
 
 .clip-caption--verify {
@@ -4937,7 +4938,7 @@ body:has(.devnet-banner) .header {
   border-radius: 999px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(140, 200, 140, 0.12);
+  border: 1px solid rgba(196, 163, 90, 0.16);
 }
 
 .stakes-mix-fill {
@@ -4947,11 +4948,11 @@ body:has(.devnet-banner) .header {
 }
 
 .stakes-mix-fill--staked {
-  background: linear-gradient(90deg, rgba(212, 90, 56, 0.85), rgba(232, 196, 106, 0.9));
+  background: rgba(196, 163, 90, 0.88);
 }
 
 .stakes-mix-fill--open {
-  background: linear-gradient(90deg, rgba(157, 255, 176, 0.55), rgba(94, 200, 216, 0.45));
+  background: rgba(196, 163, 90, 0.28);
 }
 
 .stakes-mix-legend {
@@ -4960,7 +4961,7 @@ body:has(.devnet-banner) .header {
   margin-top: 0.4rem;
   font-family: var(--font-mono);
   font-size: 0.68rem;
-  color: rgba(190, 220, 190, 0.6);
+  color: rgba(184, 196, 176, 0.6);
 }
 
 .stakes-dot {
@@ -4973,11 +4974,11 @@ body:has(.devnet-banner) .header {
 }
 
 .stakes-dot--staked {
-  background: #d45a38;
+  background: var(--brass);
 }
 
 .stakes-dot--open {
-  background: #9dffb0;
+  background: rgba(196, 163, 90, 0.35);
 }
 
 .stakes-bars {
@@ -5014,14 +5015,14 @@ body:has(.devnet-banner) .header {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, rgba(180, 71, 43, 0.75), rgba(232, 196, 106, 0.95));
+  background: rgba(196, 163, 90, 0.85);
   transition: width 0.7s ease;
 }
 
 .stakes-bar-val {
   font-family: var(--font-mono);
   font-size: 0.68rem;
-  color: rgba(232, 196, 106, 0.9);
+  color: rgba(196, 163, 90, 0.9);
   text-align: right;
 }
 
