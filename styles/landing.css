@@ -7,17 +7,25 @@
   --surface-active: #2a3c32;
   --green: #b8d4b0;
   --green-light: #cfe0c6;
-  --accent: #c4a35a;
-  --accent-hover: #d4b56e;
-  --accent-bright: #d4b56e;
-  --accent-warm: #c4a35a;
-  --brass: #c4a35a;
-  --brass-hover: #d4b56e;
+  /* Button system — define once so site/app can't drift */
+  --brass: #c9a55e;
+  --brass-hover: #d8b872;
+  --brass-active: #b08f45;
   --brass-ink: #1a1408;
+  --brass-disabled-bg: #2a3530;
+  --brass-disabled-ink: #6a7568;
+  --rust: #a86b4f;
+  --rust-hover-fill: rgba(168, 107, 79, 0.14);
+  --sage-link: rgba(184, 196, 176, 0.78);
+  --sage-link-hover: #cfe0c6;
+  --accent: var(--brass);
+  --accent-hover: var(--brass-hover);
+  --accent-bright: var(--brass-hover);
+  --accent-warm: var(--brass);
   --text: #f3efe6;
   --text-muted: #b8c4b0;
   --text-faint: #8fa090;
-  --border: rgba(196, 163, 90, 0.22);
+  --border: rgba(201, 165, 94, 0.22);
   --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   --shadow-md: 0 16px 48px rgba(0, 0, 0, 0.45);
   --overlay: rgba(15, 26, 18, 0.72);
@@ -26,7 +34,8 @@
   --font-display: 'Fraunces', 'Times New Roman', serif;
   --font-mono: 'JetBrains Mono', monospace;
   --desk-panel: linear-gradient(180deg, #1a2820 0%, #142018 100%);
-  --desk-line: rgba(196, 163, 90, 0.16);
+  --desk-line: rgba(201, 165, 94, 0.16);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--brass);
 }
 
 * {
@@ -290,34 +299,183 @@ body:has(.devnet-banner) .header {
   text-decoration: none;
   border: 1px solid transparent;
   box-shadow: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
+.btn:focus {
+  outline: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* PRIMARY — gold · one per screen */
 .btn-primary {
   background: var(--brass);
   color: var(--brass-ink);
-  border-color: rgba(255, 230, 180, 0.28);
+  border-color: var(--brass);
 }
 
 .btn-primary:hover {
   background: var(--brass-hover);
   color: var(--brass-ink);
+  border-color: var(--brass-hover);
 }
 
 .btn-primary:active {
-  background: #b08f48;
+  background: var(--brass-active);
+  border-color: var(--brass-active);
 }
 
-.btn-primary:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 3px;
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  background: var(--brass-disabled-bg);
+  color: var(--brass-disabled-ink);
+  border-color: transparent;
+  pointer-events: none;
+  cursor: not-allowed;
 }
 
+/* SECONDARY — outline · supporting actions */
+.btn-secondary,
+.btn-adopter,
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border-color: rgba(201, 165, 94, 0.55);
+  box-shadow: none;
+  font-weight: 650;
+}
+
+.btn-secondary:hover,
+.btn-adopter:hover,
+.btn-ghost:hover {
+  background: rgba(201, 165, 94, 0.12);
+  color: #f3efe6;
+  border-color: rgba(201, 165, 94, 0.85);
+}
+
+.btn-secondary:active,
+.btn-adopter:active,
+.btn-ghost:active {
+  background: rgba(201, 165, 94, 0.18);
+  border-color: var(--brass);
+}
+
+.btn-secondary:focus-visible,
+.btn-adopter:focus-visible,
+.btn-ghost:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn-secondary:disabled,
+.btn-adopter:disabled,
+.btn-ghost:disabled,
+.btn-secondary[aria-disabled="true"],
+.btn-adopter[aria-disabled="true"],
+.btn-ghost[aria-disabled="true"] {
+  color: var(--brass-disabled-ink);
+  border-color: rgba(106, 117, 104, 0.45);
+  background: transparent;
+  pointer-events: none;
+}
+
+/* DESTRUCTIVE — reserved · delete & cancel only */
+.btn-destructive {
+  background: transparent;
+  color: var(--rust);
+  border-color: rgba(168, 107, 79, 0.65);
+}
+
+.btn-destructive:hover {
+  background: var(--rust-hover-fill);
+  color: #c4896e;
+  border-color: rgba(168, 107, 79, 0.9);
+}
+
+.btn-destructive:active {
+  background: rgba(168, 107, 79, 0.22);
+}
+
+.btn-destructive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--rust);
+}
+
+/* Sizes */
 .btn-lg {
-  padding: 0.75rem 1.35rem;
-  font-size: 0.95rem;
-  min-height: 48px;
+  padding: 0.9rem 1.55rem;
+  font-size: 1rem;
+  min-height: 52px;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.82rem;
+  min-height: 36px;
+  border-radius: 3px;
+}
+
+/* TERTIARY — gold caps (verify) + sage quiet links */
+.btn-link,
+.trail-card-verify,
+.hero-specimen-verify {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass);
+  text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0.2rem 0;
+  min-height: 0;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.btn-link:hover,
+.trail-card-verify:hover,
+.hero-specimen-verify:hover {
+  color: var(--brass-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+  text-decoration-thickness: 1px;
+}
+
+.btn-link:focus-visible,
+.trail-card-verify:focus-visible,
+.hero-specimen-verify:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 2px;
+}
+
+.btn-link--quiet,
+.hero-cta-link {
+  color: var(--sage-link);
+  font-size: 0.98rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: rgba(201, 165, 94, 0.4);
+}
+
+.btn-link--quiet:hover,
+.hero-cta-link:hover {
+  color: var(--sage-link-hover);
+  text-decoration-color: var(--brass);
 }
 
 /* Hero */
@@ -2267,27 +2425,7 @@ body:has(.devnet-banner) .header {
   justify-content: center;
 }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--brass);
-  border-color: rgba(196, 163, 90, 0.28);
-  border-radius: 3px;
-}
-
-.btn-ghost:hover {
-  background: rgba(196, 163, 90, 0.1);
-  color: var(--brass-hover);
-  border-color: rgba(196, 163, 90, 0.5);
-}
-
-.btn-ghost:active {
-  background: rgba(196, 163, 90, 0.16);
-}
-
-.btn-ghost:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 3px;
-}
+/* (legacy ghost block removed — secondary system owns these) */
 
 /* Platform pillars: 3 across on desktop */
 .features-grid--pillars {
@@ -4026,29 +4164,7 @@ body:has(.devnet-banner) .header {
   box-shadow: none;
 }
 
-.btn-adopter {
-  background: transparent;
-  color: var(--brass);
-  border-color: rgba(196, 163, 90, 0.45);
-  box-shadow: none;
-  font-weight: 650;
-  border-radius: 3px;
-}
-
-.btn-adopter:hover {
-  background: rgba(196, 163, 90, 0.12);
-  color: var(--brass-hover);
-  border-color: rgba(196, 163, 90, 0.7);
-}
-
-.btn-adopter:active {
-  background: rgba(196, 163, 90, 0.18);
-}
-
-.btn-adopter:focus-visible {
-  outline: 2px solid var(--brass);
-  outline-offset: 3px;
-}
+/* adopter uses secondary styles via .btn-secondary.btn-adopter */
 
 .desk-section--adopter {
   background:
@@ -4110,13 +4226,13 @@ body:has(.devnet-banner) .header {
 .clip-tap {
   display: inline-block;
   margin: 0 0 0.55rem;
-  padding: 0.35rem 0.65rem;
-  border: 0;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--brass);
   border-radius: 3px;
   background: var(--brass);
   color: var(--brass-ink);
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 700;
   animation: clip-tap-pulse 5.5s ease-in-out infinite;
 }
