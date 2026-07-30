@@ -2,6 +2,9 @@
 [build]
   publish = "."
   command = "echo 'Static site — no build step'"
+  # Never auto-skip: Netlify had been marking every main push as Skipped.
+  # exit 1 = "do not ignore" (continue the build).
+  ignore = "exit 1"
 
 [[headers]]
   for = "/app/js/*"
