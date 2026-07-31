@@ -1616,13 +1616,38 @@
       typeof Market.findAdoptStakeForMint === 'function'
         ? Market.findAdoptStakeForMint(token.mintAddress)
         : null;
-    if (!listing || listing.careStatus !== 'active') return '';
-    const locked = listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
+    if (!listing) return '';
+    const care = String(listing.careStatus || '');
+    if (care !== 'active' && care !== 'released' && care !== 'refunded') return '';
+
+    const claim =
+      typeof Market.getHarvestClaim === 'function' ? Market.getHarvestClaim(listing.id) : null;
+    const claimRail =
+      window.StatusRail && typeof StatusRail.harvestClaimPipeline === 'function'
+        ? StatusRail.harvestClaimPipeline({ claim: claim, listing: listing })
+        : '';
+
+    if (care === 'released' || care === 'refunded') {
+      return (
+        '<div class="adopt-stake-panel">' +
+        claimRail +
+        '<p class="adopt-care-hint">Locked stake settled · ' +
+        esc(care) +
+        '.</p>' +
+        '</div>'
+      );
+    }
+
+    const locked =
+      listing.lockedGrow != null
+        ? listing.lockedGrow
+        : Math.floor(Number(listing.priceGrow || 0) / 2);
     const isHarvest =
       listing.harvestReady === true ||
       listing.liveStageKey === 'harvest' ||
       token.stageIndex >= GROWTH_STAGES.length - 1 ||
       (GROWTH_STAGES[token.stageIndex] && GROWTH_STAGES[token.stageIndex].key === 'harvest');
+    const claimPending = !!(claim && (claim.status === 'pending' || claim.optimisticPending));
     let pathMsg = '';
     if (token.plantId && window.GrowerQuests && listing.adoptedAt) {
       const path = GrowerQuests.validateHarvestCarePath(token.plantId, listing.adoptedAt);
@@ -1635,20 +1660,23 @@
     const stageHint = listing.liveStage ? ' · stage ' + listing.liveStage : '';
     return (
       '<div class="adopt-stake-panel">' +
+      claimRail +
       '<p class="adopt-care-hint">Adopt stake locked: <strong>' +
       esc(String(locked)) +
       ' $GROWTOO</strong>' +
       (pathMsg ? ' · ' + esc(pathMsg) : '') +
       (stageHint ? esc(stageHint) : '') +
       '</p>' +
-      (isHarvest
-        ? '<button type="button" class="btn btn-primary btn-sm adopt-harvest-claim-btn" data-listing-id="' +
-          esc(listing.id) +
-          '" data-plant-id="' +
-          esc(token.plantId || '') +
-          '">Claim locked stake ($GROWTOO)</button>' +
-          '<p class="adopt-care-hint">Settles locked $GROWTOO only — physical harvest redemption is coming later.</p>'
-        : '<p class="adopt-care-hint">Reach harvest stage to claim the locked $GROWTOO half (all months must qualify).</p>') +
+      (claimPending
+        ? '<p class="adopt-care-hint">Claim queued — waiting for the adopt worker.</p>'
+        : isHarvest
+          ? '<button type="button" class="btn btn-primary btn-sm adopt-harvest-claim-btn" data-listing-id="' +
+            esc(listing.id) +
+            '" data-plant-id="' +
+            esc(token.plantId || '') +
+            '">Claim locked stake ($GROWTOO)</button>' +
+            '<p class="adopt-care-hint">Settles locked $GROWTOO only — physical harvest redemption is coming later.</p>'
+          : '<p class="adopt-care-hint">Reach harvest stage to claim the locked $GROWTOO half (all months must qualify).</p>') +
       '</div>'
     );
   }
@@ -2195,20 +2223,20 @@
             ? window.GrowtooProfile.adopterIntentCopy().empty
             : 'Browse the market and stake $GROWTOO when you are ready to support a grow.';
         grid.innerHTML =
-          '<div class="empty-state adopt-empty-adopter">' +
+          '<div class="empty-state empty-state--next adopt-empty-adopter">' +
           '<p class="adopt-empty-lead">No adopted plants yet</p>' +
           '<p class="adopt-empty-body">' +
           esc(emptyCopy) +
           '</p>' +
-          '<ol class="adopt-empty-steps">' +
-          '<li>Open Market and pick a live offer</li>' +
-          '<li>Tap Invest and confirm with your Devnet wallet</li>' +
-          '<li>The plant appears here after settlement</li>' +
-          '</ol>' +
           '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">Browse market</button>' +
           '</div>';
       } else {
-        grid.innerHTML = '<div class="empty-state">No sealed plants yet. Pick a journal plant above and seal the first stage.</div>';
+        grid.innerHTML =
+          '<div class="empty-state empty-state--next">' +
+          '<p class="adopt-empty-lead">No sealed plants yet</p>' +
+          '<p class="adopt-empty-body">Pick a journal plant and seal the first stage to mint your RWA.</p>' +
+          '<button type="button" class="btn btn-primary" id="adopt-empty-seal-btn">Seal a stage</button>' +
+          '</div>';
       }
       return;
     }
@@ -2541,12 +2569,17 @@
     const msg = formatWalletError(err);
     console.error('Wallet UI error', err);
     if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
-      const hint =
-        msg +
-        '\n\nIf a wallet is installed, unlock it, allow growto.live, then refresh this page.';
-      if (confirm(hint + '\n\nBrowse Solana wallets?')) {
-        window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
-      }
+      askConfirm({
+        title: 'Wallet not found',
+        body:
+          msg +
+          '\n\nIf a wallet is installed, unlock it, allow growto.live, then refresh this page.',
+        confirmLabel: 'Browse wallets',
+      }).then(function (ok) {
+        if (ok) {
+          window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
+        }
+      });
       return;
     }
     if (window.DnevnikNotifications) DnevnikNotifications.toast(msg, 'error');
@@ -2556,6 +2589,17 @@
   function flashOk(msg) {
     if (window.DnevnikNotifications) DnevnikNotifications.toast(msg || 'Done.', 'success');
     else alert(msg || 'Done.');
+  }
+
+  function askConfirm(opts) {
+    if (window.AppConfirm && typeof AppConfirm.ask === 'function') {
+      return AppConfirm.ask(opts);
+    }
+    const fallback =
+      ((opts && opts.title) || 'Confirm') +
+      '\n\n' +
+      ((opts && opts.body) || 'Continue?');
+    return Promise.resolve(window.confirm(fallback));
   }
 
   async function handleWalletLink(btn) {
@@ -2979,13 +3023,13 @@
           flashError(new Error('Harvest claim is not available.'));
           return;
         }
-        if (
-          !confirm(
-            'Claim locked stake ($GROWTOO)?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
-          )
-        ) {
-          return;
-        }
+        const claimOk = await askConfirm({
+          title: 'Claim locked stake ($GROWTOO)?',
+          body:
+            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.',
+          confirmLabel: 'Claim locked stake',
+        });
+        if (!claimOk) return;
         setBusy(true);
         const original = harvestBtn.textContent;
         harvestBtn.textContent = 'Claiming…';
@@ -3160,11 +3204,19 @@
               })
             : null;
         const repair = burnTok ? resolveMintRepair(burnTok) : null;
-        const burnMsg =
-          repair && repair.kind === 'stub'
-            ? 'Remove this stub mint from your garden? (Does not burn the on-chain NFT — hide it in Phantom if it still appears.)'
-            : 'Burn this token? This cannot be undone.';
-        if (!confirm(burnMsg)) return;
+        const burnOk = await askConfirm({
+          title:
+            repair && repair.kind === 'stub'
+              ? 'Remove stub mint from garden?'
+              : 'Burn this token?',
+          body:
+            repair && repair.kind === 'stub'
+              ? 'Removes this card from your garden. Does not burn the on-chain NFT — hide the empty Collectible in Phantom if it still appears.'
+              : 'Removes this plant from your garden. This cannot be undone.',
+          confirmLabel: repair && repair.kind === 'stub' ? 'Remove stub' : 'Burn',
+          danger: true,
+        });
+        if (!burnOk) return;
         setBusy(true);
         try {
           await PlantToken.burnToken(id);
@@ -3173,6 +3225,24 @@
           flashError(err);
         } finally {
           setBusy(false);
+        }
+        return;
+      }
+
+      const sealEmptyBtn = e.target.closest('#adopt-empty-seal-btn');
+      if (sealEmptyBtn) {
+        const seal = document.getElementById('adopt-seed-section');
+        if (seal) {
+          seal.hidden = false;
+          seal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        const plantSel = document.getElementById('adopt-seed-plant');
+        if (plantSel) {
+          try {
+            plantSel.focus();
+          } catch (_) {
+            /* ignore */
+          }
         }
         return;
       }

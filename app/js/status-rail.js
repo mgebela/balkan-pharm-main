@@ -156,7 +156,10 @@
           steps: steps,
           currentIndex: 1,
           tone: 'pending',
-          caption: 'Payment seen — releasing NFT from escrow…',
+          caption:
+            settlement === 'adopt_stake'
+              ? 'Payment seen — settling 50% to grower, locking 50%…'
+              : 'Payment seen — releasing NFT from escrow…',
         });
       }
       return html({
@@ -164,6 +167,65 @@
         currentIndex: 0,
         tone: 'pending',
         caption: 'Complete $GROWTOO payment in your wallet.',
+      });
+    }
+    return '';
+  }
+
+  /**
+   * Harvest locked-stake claim: Claimed → Queue → Released/Refunded.
+   * Accepts { claim, listing } or a flat claim/listing-shaped object.
+   */
+  function harvestClaimPipeline(input) {
+    const src = input || {};
+    const claim = src.claim || (src.status && src.listingId ? src : null);
+    const listing = src.listing || src;
+    const claimStatus = String((claim && claim.status) || src.claimStatus || '').toLowerCase();
+    const careStatus = String(
+      (listing && listing.careStatus) || src.careStatus || ''
+    ).toLowerCase();
+    const err = String(
+      (claim && (claim.error || claim.lastError)) || src.error || ''
+    ).trim();
+
+    const settled =
+      careStatus === 'released' ||
+      careStatus === 'refunded' ||
+      claimStatus === 'released' ||
+      claimStatus === 'refunded';
+    const endLabel =
+      careStatus === 'refunded' || claimStatus === 'refunded' ? 'Refunded' : 'Released';
+    const steps = [
+      { key: 'filed', label: 'Claimed' },
+      { key: 'queue', label: 'Queue' },
+      { key: 'done', label: endLabel },
+    ];
+
+    if (claimStatus === 'failed') {
+      return html({
+        steps: steps,
+        currentIndex: 1,
+        tone: 'fail',
+        caption: err || 'Claim failed — check care months and retry.',
+      });
+    }
+    if (settled) {
+      return html({
+        steps: steps,
+        currentIndex: 3,
+        tone: 'ok',
+        caption:
+          endLabel === 'Refunded'
+            ? 'Locked $GROWTOO returned to the adopter.'
+            : 'Locked $GROWTOO released to the grower.',
+      });
+    }
+    if (claimStatus === 'pending' || src.optimisticPending) {
+      return html({
+        steps: steps,
+        currentIndex: 1,
+        tone: 'pending',
+        caption: 'Queued — adopt worker validates care months next pass (~5 min).',
       });
     }
     return '';
@@ -294,6 +356,7 @@
     html: html,
     investPipeline: investPipeline,
     listingPipeline: listingPipeline,
+    harvestClaimPipeline: harvestClaimPipeline,
     mintPipeline: mintPipeline,
     hasConfirmedPayment: hasConfirmedPayment,
   };

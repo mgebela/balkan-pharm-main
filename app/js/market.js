@@ -12,12 +12,15 @@
   const listeners = new Set();
   let listings = [];
   let platformRewards = [];
+  let harvestClaims = [];
   let unsubscribe = null;
   let platformUnsub = null;
+  let harvestUnsub = null;
   let watchedUid = '';
   let busy = false;
   let reconcileTimer = null;
   let lastReconcileAt = 0;
+  const HCLAIM_OPT_KEY = 'growtoo-hclaim-optimistic';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => {
@@ -92,6 +95,103 @@
       );
   }
 
+  function readOptimisticHarvestClaims() {
+    try {
+      const raw = sessionStorage.getItem(HCLAIM_OPT_KEY);
+      if (!raw) return {};
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function writeOptimisticHarvestClaims(map) {
+    try {
+      sessionStorage.setItem(HCLAIM_OPT_KEY, JSON.stringify(map || {}));
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function markOptimisticHarvestClaim(listingId) {
+    if (!listingId) return;
+    const map = readOptimisticHarvestClaims();
+    map[listingId] = { status: 'pending', requestedAt: new Date().toISOString() };
+    writeOptimisticHarvestClaims(map);
+  }
+
+  function clearOptimisticHarvestClaim(listingId) {
+    if (!listingId) return;
+    const map = readOptimisticHarvestClaims();
+    if (!map[listingId]) return;
+    delete map[listingId];
+    writeOptimisticHarvestClaims(map);
+  }
+
+  function getHarvestClaim(listingId) {
+    if (!listingId) return null;
+    const live = harvestClaims.find(function (c) {
+      return c && (c.id === listingId || c.listingId === listingId);
+    });
+    if (live) {
+      clearOptimisticHarvestClaim(listingId);
+      return live;
+    }
+    const opt = readOptimisticHarvestClaims()[listingId];
+    if (opt) {
+      return {
+        id: listingId,
+        listingId: listingId,
+        status: opt.status || 'pending',
+        requestedAt: opt.requestedAt || null,
+        optimisticPending: true,
+      };
+    }
+    return null;
+  }
+
+  function startHarvestWatch(uid) {
+    if (harvestUnsub) {
+      harvestUnsub();
+      harvestUnsub = null;
+    }
+    harvestClaims = [];
+    if (!uid || !firebaseReady()) return;
+    harvestUnsub = firebase
+      .firestore()
+      .collection('harvestClaims')
+      .where('uid', '==', uid)
+      .limit(24)
+      .onSnapshot(
+        function (snap) {
+          const next = [];
+          snap.forEach(function (doc) {
+            next.push(Object.assign({ id: doc.id }, doc.data()));
+          });
+          next.sort(function (a, b) {
+            return String(b.requestedAt || '').localeCompare(String(a.requestedAt || ''));
+          });
+          harvestClaims = next;
+          next.forEach(function (c) {
+            if (c && c.listingId) clearOptimisticHarvestClaim(c.listingId);
+            if (c && c.id) clearOptimisticHarvestClaim(c.id);
+          });
+          emit();
+          if (window.PlantToken && typeof PlantToken.render === 'function') {
+            try {
+              PlantToken.render();
+            } catch {
+              // ignore
+            }
+          }
+        },
+        function (err) {
+          console.warn('harvestClaims watch failed', err);
+        }
+      );
+  }
+
   function startWatch() {
     const user = currentUser();
     const uid = user ? user.uid : '';
@@ -104,10 +204,12 @@
     listings = [];
     if (!uid || !firebaseReady()) {
       startPlatformWatch('');
+      startHarvestWatch('');
       emit();
       return;
     }
     startPlatformWatch(uid);
+    startHarvestWatch(uid);
     unsubscribe = firebase
       .firestore()
       .collection('marketListings')
@@ -1144,12 +1246,19 @@
     const isBuyer = listing.buyerUid === uid;
     const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
     const canCancel = isGrowerUi() && isMine && listing.status === 'active';
+    const harvestClaimDoc =
+      listing.settlement === 'adopt_stake' ? getHarvestClaim(listing.id) : null;
+    const harvestClaimPending = !!(
+      harvestClaimDoc &&
+      (harvestClaimDoc.status === 'pending' || harvestClaimDoc.optimisticPending)
+    );
     const canHarvestClaim =
       isGrowerUi() &&
       isMine &&
       listing.settlement === 'adopt_stake' &&
       listing.status === 'sold' &&
-      listing.careStatus === 'active';
+      listing.careStatus === 'active' &&
+      !harvestClaimPending;
     const harvestReady = canHarvestClaim && listingHarvestReady(listing);
     const isDead =
       listing.status === 'cancelled' ||
@@ -1202,21 +1311,34 @@
     }
     let phaseRail = '';
     if (window.StatusRail) {
-      if (isBuyer || listing.status === 'sale_pending' || listing.status === 'sold') {
+      const careSettled =
+        listing.careStatus === 'released' || listing.careStatus === 'refunded';
+      if (
+        window.StatusRail.harvestClaimPipeline &&
+        (harvestClaimDoc || careSettled) &&
+        (isMine || isBuyer || careSettled)
+      ) {
+        phaseRail =
+          StatusRail.harvestClaimPipeline({
+            claim: harvestClaimDoc,
+            listing: listing,
+          }) || '';
+      }
+      if (!phaseRail && (isBuyer || listing.status === 'sale_pending' || listing.status === 'sold')) {
         phaseRail = StatusRail.investPipeline(listing) || '';
       }
-      if (!phaseRail && (isMine || listing.status === 'escrow_pending' || listing.status === 'cancel_requested' || listing.status === 'failed' || listing.status === 'active' || listing.status === 'cancelled')) {
-        // Grower-facing listing lifecycle (and open offers get a quiet Live rail).
-        if (
-          isMine ||
-          listing.status === 'escrow_pending' ||
+      // In-flight grower listing states only (skip quiet "Live" on every active card).
+      if (
+        !phaseRail &&
+        isMine &&
+        (listing.status === 'escrow_pending' ||
           listing.status === 'cancel_requested' ||
           listing.status === 'failed' ||
           listing.status === 'cancelled' ||
-          (listing.status === 'active' && isGrowerUi())
-        ) {
-          phaseRail = StatusRail.listingPipeline(listing) || '';
-        }
+          listing.status === 'sale_pending' ||
+          listing.status === 'sold')
+      ) {
+        phaseRail = StatusRail.listingPipeline(listing) || '';
       }
     }
     const priceLabel =
@@ -1302,9 +1424,11 @@
         ? '<p class="market-card-redeem-note market-card-redeem-note--later">Physical harvest redemption — coming later. This claim only settles the locked $GROWTOO.</p>'
         : '') +
       '</div>' +
-      (canHarvestClaim && !harvestReady
-        ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked $GROWTOO half.</p>'
-        : '') +
+      (harvestClaimPending && isMine
+        ? '<p class="market-card-meta">Claim queued — waiting for the adopt worker (~5 min).</p>'
+        : canHarvestClaim && !harvestReady
+          ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked $GROWTOO half.</p>'
+          : '') +
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
         : '') +
@@ -1463,24 +1587,38 @@
               return listingCardHtml(l, uid);
             }).join('')
           : isGrowerUi()
-            ? '<div class="empty-state">No live offers yet. Mint a plant token in Tokenise, then post it here.</div>'
-            : '<div class="empty-state adopt-empty-adopter">' +
-              '<p class="adopt-empty-lead">No open offers right now</p>' +
-              '<p class="adopt-empty-body">Growers are still seeding the board on the test network. When an ask goes live, it shows up here with Invest.</p>' +
-              '<ul class="adopt-empty-steps adopt-empty-steps--bullets">' +
-              '<li>Check back after growers mint and post plants</li>' +
-              '<li>Meanwhile, connect your test-network wallet under My garden</li>' +
-              '<li>Read Risks &amp; FAQ on the marketing site if you are new to the flow</li>' +
-              '</ul>' +
-              '<button type="button" class="btn btn-ghost" id="market-empty-garden-btn">Back to My garden</button>' +
-              '</div>';
+            ? emptyNextStepHtml({
+                lead: 'No live offers on the board',
+                body: 'Seal a plant on Tokenise, then post it here.',
+                ctaId: 'market-empty-tokenise-btn',
+                ctaLabel: 'Seal a stage on Tokenise',
+              })
+            : emptyNextStepHtml({
+                adopter: true,
+                lead: 'No open offers right now',
+                body: 'When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.',
+                ctaId: 'market-empty-garden-btn',
+                ctaLabel: 'Open My garden',
+                ghost: true,
+              });
       }
       if (mineGrid) {
         mineGrid.innerHTML = mine.length
           ? mine.map(function (l) {
               return listingCardHtml(l, uid);
             }).join('')
-          : '<div class="empty-state">You have not posted any plant offers yet.</div>';
+          : emptyNextStepHtml({
+              lead: 'No offers posted yet',
+              body: listableTokens().length
+                ? 'Pick a sealed plant above and post your ask.'
+                : 'Seal a stage on Tokenise first, then list it here.',
+              ctaId: listableTokens().length
+                ? 'market-empty-list-btn'
+                : 'market-empty-tokenise-btn',
+              ctaLabel: listableTokens().length
+                ? 'Post an offer'
+                : 'Seal a stage on Tokenise',
+            });
       }
       if (window.AdoptPlant && typeof AdoptPlant.renderTestFaucetPanel === 'function') {
         try {
@@ -1508,6 +1646,40 @@
       return;
     }
     alert(text);
+  }
+
+  function askConfirm(opts) {
+    if (window.AppConfirm && typeof AppConfirm.ask === 'function') {
+      return AppConfirm.ask(opts);
+    }
+    const fallback =
+      ((opts && opts.title) || 'Confirm') +
+      '\n\n' +
+      ((opts && opts.body) || 'Continue?');
+    return Promise.resolve(window.confirm(fallback));
+  }
+
+  function emptyNextStepHtml(opts) {
+    opts = opts || {};
+    return (
+      '<div class="empty-state empty-state--next' +
+      (opts.adopter ? ' adopt-empty-adopter' : '') +
+      '">' +
+      '<p class="adopt-empty-lead">' +
+      esc(opts.lead || '') +
+      '</p>' +
+      '<p class="adopt-empty-body">' +
+      esc(opts.body || '') +
+      '</p>' +
+      '<button type="button" class="btn ' +
+      (opts.ghost ? 'btn-ghost' : 'btn-primary') +
+      '" id="' +
+      esc(opts.ctaId || '') +
+      '">' +
+      esc(opts.ctaLabel || 'Continue') +
+      '</button>' +
+      '</div>'
+    );
   }
 
   async function notifySellerStake(listing, buyerPubkey) {
@@ -1599,6 +1771,33 @@
     syncSettlementFromRadios();
 
     view.addEventListener('click', async function (e) {
+      const tokeniseEmptyBtn = e.target.closest('#market-empty-tokenise-btn');
+      if (tokeniseEmptyBtn) {
+        if (typeof window.showAppView === 'function') window.showAppView('adopt');
+        else {
+          const nav = document.querySelector('.nav-item[data-view="adopt"]');
+          if (nav) nav.click();
+        }
+        requestAnimationFrame(function () {
+          const seal = document.getElementById('adopt-seed-section');
+          if (seal) seal.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        return;
+      }
+      const listEmptyBtn = e.target.closest('#market-empty-list-btn');
+      if (listEmptyBtn) {
+        const section = document.getElementById('market-list-section');
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const sel = document.getElementById('market-asset-select');
+        if (sel && !sel.disabled) {
+          try {
+            sel.focus();
+          } catch (_) {
+            /* ignore */
+          }
+        }
+        return;
+      }
       const gardenEmptyBtn = e.target.closest('#market-empty-garden-btn');
       if (gardenEmptyBtn) {
         const adoptNav = document.querySelector('.nav-item[data-view="adopt"]');
@@ -1656,6 +1855,47 @@
         return l.id === id;
       });
       if (!listing) return;
+
+      let confirmed = true;
+      if (investBtn) {
+        let body = '';
+        if (listing.settlement === 'program') {
+          body =
+            'You will receive the plant token in this transaction on Solana Devnet.';
+        } else if (listing.settlement === 'adopt_stake') {
+          body =
+            'Adopt stake: full price now. 50% to the grower on settle; 50% locked until monthly care at harvest (all-or-nothing). Token arrives when settlement completes.\n\nPhysical harvest redemption is coming later — no delivery on Devnet.';
+        } else {
+          body =
+            'You will receive the plant token when settlement completes.\n\nPhysical harvest redemption is coming later — not available on this test network.';
+        }
+        confirmed = await askConfirm({
+          title:
+            'Invest ' +
+            Number(listing.priceGrow).toLocaleString('en-US') +
+            ' $GROWTOO in “' +
+            listing.name +
+            '”?',
+          body: body,
+          confirmLabel: 'Invest',
+        });
+      } else if (harvestBtn) {
+        confirmed = await askConfirm({
+          title: 'Claim locked stake ($GROWTOO)?',
+          body:
+            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.',
+          confirmLabel: 'Claim locked stake',
+        });
+      } else if (cancelBtn) {
+        confirmed = await askConfirm({
+          title: 'Cancel this offer?',
+          body: 'The plant token returns to your wallet. Adopters will no longer see this ask.',
+          confirmLabel: 'Cancel offer',
+          danger: true,
+        });
+      }
+      if (!confirmed) return;
+
       busy = true;
       const btn = investBtn || cancelBtn || harvestBtn;
       const prevText = btn.textContent;
@@ -1667,26 +1907,6 @@
       btn.disabled = true;
       try {
         if (investBtn) {
-          var confirmMsg =
-            'Invest ' +
-            listing.priceGrow +
-            ' $GROWTOO to adopt "' +
-            listing.name +
-            '" on Solana Devnet?\n\n';
-          if (listing.settlement === 'program') {
-            confirmMsg += 'You will receive the plant token in this transaction.';
-          } else if (listing.settlement === 'adopt_stake') {
-            confirmMsg +=
-              'Adopt stake: you pay the full price now. 50% goes to the grower when it settles; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the plant token when settlement completes.\n\n' +
-              'Physical harvest redemption is coming later — no delivery on Devnet. You are practicing the stake / care unlock flow only.';
-          } else {
-            confirmMsg +=
-              'You will receive the plant token when settlement completes.\n\n' +
-              'Physical harvest redemption is coming later — not available on this test network.';
-          }
-          if (!confirm(confirmMsg)) {
-            return;
-          }
           await investInListing(listing);
           if (window.AdoptPlant && typeof window.AdoptPlant.render === 'function') {
             try {
@@ -1703,17 +1923,15 @@
             );
           }
         } else if (harvestBtn) {
-          if (
-            !confirm(
-              'Claim locked stake ($GROWTOO)?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
-            )
-          ) {
-            return;
-          }
           await requestHarvestClaim(listing.id, harvestBtn.dataset.plantId || listing.plantId);
           flashOk('Harvest claim queued. Locked stake settles after the next adopt queue pass.');
         } else {
           await cancelListing(listing);
+          flashOk(
+            listing.settlement === 'program'
+              ? 'Offer cancelled. The plant is back in your wallet.'
+              : 'Cancel requested. The plant returns after settlement.'
+          );
         }
       } catch (err) {
         flash(err);
@@ -1872,6 +2090,8 @@
       requestedAt: new Date().toISOString(),
       cluster: 'devnet',
     });
+    markOptimisticHarvestClaim(listingId);
+    emit();
   }
 
   async function claimPlatformBonus() {
@@ -1966,6 +2186,7 @@
       return listings.slice();
     },
     findAdoptStakeForMint: findAdoptStakeForMint,
+    getHarvestClaim: getHarvestClaim,
     requestHarvestClaim: requestHarvestClaim,
     claimPlatformBonus: claimPlatformBonus,
     claimTestFaucet: claimTestFaucet,
