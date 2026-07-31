@@ -1301,8 +1301,8 @@ body.notif-open {
 }
 
 .wallet-link-badge--ok {
-  color: #b4472b;
-  background: rgba(180, 71, 43, 0.12);
+  color: var(--brass);
+  background: rgba(201, 165, 94, 0.12);
 }
 
 .wallet-link-badge--warn {
@@ -2110,7 +2110,7 @@ body.notif-open {
   font-size: clamp(1.25rem, 2vw, 1.75rem);
   font-weight: 600;
   line-height: 1.15;
-  color: #fff;
+  color: var(--text);
   font-family: var(--font-mono);
   letter-spacing: -0.03em;
   white-space: nowrap;
@@ -2156,7 +2156,7 @@ body.notif-open {
 .metric-dot--amber { background: var(--accent-warm); }
 .metric-dot--muted { background: rgba(255, 255, 255, 0.28); }
 
-.metric-card--teal:hover { border-color: rgba(180, 71, 43, 0.22); }
+.metric-card--teal:hover { border-color: rgba(201, 165, 94, 0.28); }
 .metric-card--blue:hover { border-color: rgba(95, 182, 255, 0.22); }
 .metric-card--violet:hover { border-color: rgba(199, 155, 255, 0.22); }
 .metric-card--amber:hover { border-color: rgba(185, 134, 46, 0.28); }
@@ -2178,7 +2178,7 @@ body.notif-open {
 }
 
 .adopt-wallet-link-status--ok {
-  color: #b4472b;
+  color: var(--brass);
 }
 
 .adopt-wallet-link-status--warn {
@@ -2577,9 +2577,9 @@ body.notif-open {
   border-radius: 6px;
   font-size: 0.72rem;
   font-weight: 600;
-  background: rgba(180, 71, 43, 0.12);
-  border: 1px solid rgba(180, 71, 43, 0.35);
-  color: var(--accent-bright);
+  background: rgba(201, 165, 94, 0.1);
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  color: var(--brass);
 }
 
 .plant-card-actions {
@@ -4287,9 +4287,9 @@ body.admin-readonly .toolbox-form textarea {
 }
 
 .growlog-hero-chip--accent {
-  background: linear-gradient(135deg, rgba(180, 71, 43, 0.2), rgba(180, 71, 43, 0.08));
-  border-color: rgba(180, 71, 43, 0.4);
-  color: var(--accent-bright);
+  background: linear-gradient(135deg, rgba(201, 165, 94, 0.18), rgba(201, 165, 94, 0.06));
+  border-color: rgba(201, 165, 94, 0.4);
+  color: var(--brass);
 }
 
 .growlog-hero-chip--muted {
@@ -5059,8 +5059,10 @@ body:not(.app-loading) {
   padding: 1.15rem 1.25rem;
   margin-bottom: 1rem;
   border-radius: 16px;
-  border: 1px solid var(--border);
-  background: linear-gradient(135deg, rgba(142, 53, 32, 0.16), rgba(220, 207, 175, 0.5));
+  border: 1px solid var(--desk-line);
+  background:
+    radial-gradient(ellipse 80% 70% at 12% 0%, rgba(201, 165, 94, 0.12), transparent 55%),
+    linear-gradient(180deg, rgba(18, 28, 20, 0.94) 0%, rgba(12, 20, 14, 0.97) 100%);
   box-shadow: var(--shadow);
 }
 
@@ -7213,16 +7215,16 @@ body.crypto-simple .crypto-simple-only {
   }
 }
 
-/* Grower AI Coach — bright readable chat sheet */
+/* Grower AI Coach — forest desk chat (catalog brass) */
 :root {
   --coach-kbd-inset: 0px;
   --coach-ink: #f2f6f0;
   --coach-muted: rgba(190, 205, 180, 0.78);
   --coach-paper: #0c1a12;
   --coach-wash: #102016;
-  --coach-line: rgba(140, 200, 140, 0.18);
+  --coach-line: rgba(201, 165, 94, 0.18);
   --coach-accent: var(--brass);
-  --coach-accent-soft: rgba(180, 71, 43, 0.18);
+  --coach-accent-soft: rgba(201, 165, 94, 0.14);
 }
 
 .ai-coach-root {
@@ -7338,7 +7340,7 @@ body.crypto-simple .crypto-simple-only {
   height: 0.28rem;
   margin: 0.5rem auto 0.1rem;
   border-radius: 999px;
-  background: #b7cfc0;
+  background: rgba(201, 165, 94, 0.35);
 }
 
 .ai-coach-head {
@@ -7348,7 +7350,7 @@ body.crypto-simple .crypto-simple-only {
   gap: 0.75rem;
   padding: 0.85rem 1rem;
   border-bottom: 1px solid var(--coach-line);
-  background: #ffffff;
+  background: rgba(10, 24, 16, 0.96);
 }
 
 .ai-coach-brand {
@@ -7365,7 +7367,7 @@ body.crypto-simple .crypto-simple-only {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #fff8f2;
+  color: var(--brass-ink);
   background: var(--brass);
   flex-shrink: 0;
 }
@@ -7386,7 +7388,7 @@ body.crypto-simple .crypto-simple-only {
   margin-top: 0.12rem;
   font-size: 0.76rem;
   font-weight: 650;
-  color: #2f8f4e;
+  color: var(--green);
 }
 
 .ai-coach-head-actions {
@@ -7400,7 +7402,7 @@ body.crypto-simple .crypto-simple-only {
   height: 2.15rem;
   border-radius: 10px;
   border: 1px solid var(--coach-line);
-  background: #fff;
+  background: rgba(18, 36, 24, 0.9);
   color: var(--coach-ink);
   display: inline-flex;
   align-items: center;
@@ -7410,9 +7412,9 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-icon-btn:hover {
-  background: var(--coach-wash);
-  border-color: #b7cfc0;
-  color: var(--coach-accent);
+  background: rgba(32, 48, 36, 0.98);
+  border-color: rgba(201, 165, 94, 0.4);
+  color: var(--brass);
 }
 
 .ai-coach-messages {
@@ -7534,7 +7536,7 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-reminder {
-  border: 1px solid rgba(180, 71, 43, 0.22);
+  border: 1px solid rgba(201, 165, 94, 0.22);
   background: var(--coach-accent-soft);
   border-radius: 10px;
   padding: 0.55rem 0.6rem 0.6rem;
@@ -7573,14 +7575,19 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-reminder-action {
-  border: 1px solid rgba(142, 53, 32, 0.3);
-  background: #fff;
-  color: var(--coach-accent);
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  background: rgba(24, 38, 28, 0.92);
+  color: var(--green-light);
   border-radius: 8px;
   padding: 0.3rem 0.55rem;
   font-size: 0.72rem;
   font-weight: 650;
   cursor: pointer;
+}
+.ai-coach-reminder-action:hover {
+  border-color: rgba(201, 165, 94, 0.45);
+  background: rgba(32, 48, 36, 0.98);
+  color: var(--text);
 }
 
 .ai-coach-row {
@@ -7612,26 +7619,26 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-bubble--assistant {
-  background: #ffffff;
-  border: 1px solid var(--coach-line);
+  background: rgba(18, 36, 24, 0.95);
+  border: 1px solid rgba(140, 180, 140, 0.22);
   border-bottom-left-radius: 5px;
   color: var(--coach-ink);
-  box-shadow: 0 2px 10px rgba(20, 36, 26, 0.06);
+  box-shadow: none;
 }
 
 .ai-coach-bubble--user {
-  background: var(--coach-accent);
-  border: 1px solid #9a3d26;
+  background: var(--brass);
+  border: 1px solid var(--brass-active);
   border-bottom-right-radius: 5px;
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(142, 53, 32, 0.22);
+  color: var(--brass-ink);
+  box-shadow: none;
 }
 
 .ai-coach-bubble--user,
 .ai-coach-bubble--user p,
 .ai-coach-bubble--user strong,
 .ai-coach-bubble--user span {
-  color: #ffffff !important;
+  color: var(--brass-ink) !important;
 }
 
 .ai-coach-bubble--typing {
@@ -7680,7 +7687,7 @@ body.crypto-simple .crypto-simple-only {
 .ai-coach-meta {
   font-size: 0.74rem;
   font-weight: 650;
-  color: #2f8f4e;
+  color: var(--green);
   padding: 0 0.2rem;
 }
 
@@ -7688,15 +7695,15 @@ body.crypto-simple .crypto-simple-only {
   margin-top: 0.65rem;
   padding: 0.7rem 0.75rem;
   border-radius: 10px;
-  background: #e8f6ec;
-  border: 1px solid #b7dcc3;
+  background: rgba(30, 90, 48, 0.22);
+  border: 1px solid rgba(157, 255, 176, 0.28);
 }
 
 .ai-coach-confirm-title {
   margin: 0 0 0.35rem !important;
   font-size: 0.8rem;
   font-weight: 700;
-  color: #1a5c32;
+  color: var(--green-light);
 }
 
 .ai-coach-actions {
@@ -7719,7 +7726,7 @@ body.crypto-simple .crypto-simple-only {
 
 .ai-coach-composer {
   border-top: 1px solid var(--coach-line);
-  background: #ffffff;
+  background: rgba(10, 24, 16, 0.96);
   padding: 0.65rem 0.8rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
 }
 
@@ -7770,9 +7777,9 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-chip:hover {
-  border-color: rgba(180, 71, 43, 0.45);
+  border-color: rgba(201, 165, 94, 0.45);
   background: var(--coach-accent-soft);
-  color: var(--coach-accent);
+  color: var(--brass);
 }
 
 .ai-coach-form {
@@ -7795,8 +7802,8 @@ body.crypto-simple .crypto-simple-only {
   resize: none;
   padding: 0.75rem 0.85rem;
   border-radius: 14px;
-  border: 1px solid #b7cfc0;
-  background: #ffffff;
+  border: 1px solid rgba(140, 180, 140, 0.28);
+  background: rgba(6, 16, 10, 0.75);
   color: var(--coach-ink);
   font: inherit;
   font-size: 0.94rem;
@@ -7806,12 +7813,12 @@ body.crypto-simple .crypto-simple-only {
 
 .ai-coach-form textarea:focus {
   outline: none;
-  border-color: rgba(180, 71, 43, 0.55);
-  box-shadow: 0 0 0 3px rgba(180, 71, 43, 0.16);
+  border-color: rgba(201, 165, 94, 0.55);
+  box-shadow: 0 0 0 3px rgba(201, 165, 94, 0.16);
 }
 
 .ai-coach-form textarea::placeholder {
-  color: #7a9084;
+  color: rgba(190, 205, 180, 0.55);
 }
 
 .ai-coach-form-actions {
@@ -7828,15 +7835,15 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-composer .ai-coach-icon-btn:hover {
-  background: #fff;
-  color: var(--coach-accent);
+  background: rgba(32, 48, 36, 0.98);
+  color: var(--brass);
 }
 
 .ai-coach-mic.is-listening {
-  color: var(--coach-accent) !important;
+  color: var(--brass) !important;
   background: var(--coach-accent-soft) !important;
-  border-color: rgba(180, 71, 43, 0.45) !important;
-  box-shadow: 0 0 0 3px rgba(180, 71, 43, 0.15);
+  border-color: rgba(201, 165, 94, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(201, 165, 94, 0.15);
 }
 
 .ai-coach-send {
@@ -8102,13 +8109,23 @@ table td {
 
 .ai-coach-panel .ai-coach-starter:hover {
   background: rgba(28, 48, 34, 0.98) !important;
-  border-color: rgba(212, 90, 56, 0.5) !important;
+  border-color: rgba(201, 165, 94, 0.5) !important;
+}
+
+.ai-coach-panel .ai-coach-bubble--assistant {
+  background: rgba(18, 36, 24, 0.95) !important;
+  border-color: rgba(140, 180, 140, 0.22) !important;
+}
+
+.ai-coach-panel .ai-coach-bubble--user {
+  background: var(--brass) !important;
+  border-color: var(--brass-active) !important;
 }
 
 .ai-coach-panel .ai-coach-bubble--user,
 .ai-coach-panel .ai-coach-bubble--user p,
 .ai-coach-panel .ai-coach-bubble--user * {
-  color: #ffffff !important;
+  color: var(--brass-ink) !important;
 }
 
 .ai-coach-panel .ai-coach-form textarea {
@@ -8118,9 +8135,9 @@ table td {
 }
 
 .ai-coach-panel .ai-coach-form textarea:focus {
-  border-color: rgba(212, 90, 56, 0.65) !important;
+  border-color: rgba(201, 165, 94, 0.65) !important;
   outline: none;
-  box-shadow: 0 0 0 2px rgba(212, 90, 56, 0.18);
+  box-shadow: 0 0 0 2px rgba(201, 165, 94, 0.18);
 }
 
 .ai-coach-panel .ai-coach-form textarea::placeholder {
@@ -8135,8 +8152,14 @@ table td {
 
 .ai-coach-panel .ai-coach-chip:hover {
   background: rgba(28, 48, 34, 0.98) !important;
-  border-color: rgba(212, 90, 56, 0.45) !important;
-  color: #f8ebe4 !important;
+  border-color: rgba(201, 165, 94, 0.45) !important;
+  color: var(--brass) !important;
+}
+
+.ai-coach-panel .ai-coach-reminder-action {
+  background: rgba(24, 38, 28, 0.92) !important;
+  border-color: rgba(201, 165, 94, 0.28) !important;
+  color: var(--green-light) !important;
 }
 
 .ai-coach-panel .ai-coach-messages {
@@ -8170,8 +8193,8 @@ table td {
 }
 
 .ai-coach-reminder--urgent {
-  border-color: rgba(212, 90, 56, 0.45) !important;
-  background: rgba(180, 71, 43, 0.14) !important;
+  border-color: rgba(168, 107, 79, 0.45) !important;
+  background: rgba(168, 107, 79, 0.14) !important;
 }
 
 .ai-coach-reminder--info {

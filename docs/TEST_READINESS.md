@@ -35,7 +35,26 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | `growMint` / `seedCollection` / `escrowProgramId` / `marketplacePda` | On-chain LIVE; app `chain-config` synced |
 | App JS syntax (`app.js`, `plant-token`, `market`, escrow, …) | OK |
 
-**Not automated (needs human wallets):** sign-in + link, seed mint in Phantom, list/buy/cancel, adopt-stake, harvest claim, notifications UX.
+**Not automated (needs human wallets):** sign-in + link, seed mint in Phantom, list/buy/cancel, **new** adopt-stake list+invest, harvest claim click, notifications UX.
+
+### Adopt-stake desk (2026-07-31 evening)
+
+Ops audit of the two live sold stakes + queue (no new Phantom list/invest this pass).
+
+| Check | Result |
+|-------|--------|
+| Live `adopt_stake` listings | **2** · both `sold` / `careStatus: active` |
+| Locked `$GROWTOO` in care escrow | **15** (= 5 Gold Bloom + 10 The BUD) |
+| NFT with adopter wallet | **yes** (both mints) |
+| Care progress sync (GH `adopt:queue`) | **OK** — writes `careMonthKeys`, `currentMonthDaysHit`, `careProgressUpdatedAt` |
+| Local `npm run adopt:queue` | **OK** — both stakes “up to date” |
+| Monthly proof (live data) | Gold Bloom **0/12** days (external plant missing in journal) · The BUD **1/12** |
+| Harvest claim docs | **0** pending (none filed yet) |
+| Unpaid `pending-*` reservations | **none** (TTL dry-run: 5m keep / 20m reopen) |
+| Grower inbox for these listings | **2 notify docs each** (`stake_received` path) |
+| growto.live scripts | `market.js?v=20260731c` (Market harvest claim) · `plant-token.js?v=20260731e` · forest care pills CSS |
+
+**Still needs human wallets:** post a fresh Adopt stake offer → invest → watch settle; abandon a pay to confirm 15m reopen; advance journal to harvest + 12 care days → Claim harvest stake on Market.
 
 ---
 
@@ -137,6 +156,11 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [x] Authority / fee-payer funded for queue + legacy settle (~1.73 / ~1.46 SOL)
 - [x] Mint / grow / market queues idle and GH Actions succeeding
 - [x] Botanical + brass token images served from growto.live
+- [x] **Adopt-stake settle (existing):** 2 sold stakes · NFTs with buyer · 15 `$GROWTOO` locked in escrow
+- [x] **Care progress sync:** GH + local adopt queue writing month / day counters
+- [x] **Monthly unlock rule (proof):** rejects &lt;12 care days; BUD 1/12 · Gold Bloom 0/12 (no journal plant)
+- [x] **Stake notify (store):** grower notification docs present for both listing IDs
+- [x] **Reservation TTL logic:** dry-run reopen after 15m (no live unpaid reservation to expire)
 
 ### Manual (human wallets)
 - [ ] Wallet connect + Firebase link works on Devnet  
@@ -145,15 +169,13 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [ ] Buy completes atomically (NFT + `$GROWTOO`, status `sold`)  
 - [ ] Cancel returns NFT  
 - [ ] Browser confirmations do not flake on public RPC (proxy preferred)  
-- [ ] **Adopt stake:** post offer as “Adopt stake”, adopter pays full price to care escrow; settle releases 50% to grower, locks 50%  
-- [ ] **Adopt reservation TTL:** unpaid `pending-*` adopt payments reopen after ~15m (same as instant market)  
-- [ ] **Monthly care:** ≥12 distinct care days / calendar month on linked plant (unlock rule)  
-- [ ] **Care progress sync:** after adopt queue pass, sold stake shows months + current-month days on Market / adopter garden  
+- [ ] **Adopt stake (fresh):** post “Adopt stake” → adopter pays full price → settle 50/50 (existing stakes already prove settle path)  
+- [ ] **Adopt reservation TTL (live):** abandon unpaid `pending-*` and confirm reopen ~15m  
+- [ ] **Monthly care (UI):** log ≥12 distinct care days; Market / adopter garden show live counters  
 - [ ] **Weekly progress:** grower-only on Tokenise; adopters see monthly unlock status only  
 - [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
-- [ ] **Harvest claim:** grower claims from Market (sold adopt stake) or Tokenise if token still held; all months qualify → locked half to grower; fail → refund to adopter  
+- [ ] **Harvest claim:** journal at harvest + months qualify → Claim on Market; fail path refunds adopter  
 - [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
-- [ ] **Stake notify:** adopter invest → grower gets `stake_received` in inbox  
 - [ ] **Mark all read** clears badge; click item navigates to related view  
 
 ---
