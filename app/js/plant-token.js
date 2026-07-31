@@ -1387,7 +1387,7 @@
           esc(token.id.slice(-6)) +
           '</code></p>',
         {
-          forceClosed: isAdopterUi() || !!token.adopted,
+          // Simple: hidden via CSS. Advanced: open so mint / explorer are visible.
           summary: 'Chain details',
         }
       ) +

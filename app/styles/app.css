@@ -869,6 +869,12 @@ body.profile-adopter .account-profile-avatar {
   color: #f4fff4;
   font-variant-numeric: tabular-nums;
 }
+.account-profile-mode-hint {
+  margin: 0.55rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
 .account-profile-actions {
   margin: 0.8rem 0 0;
   display: flex;
@@ -6997,7 +7003,12 @@ body.crypto-advanced .crypto-simple-only {
   display: none !important;
 }
 
-/* Collapsible mint / PDA chrome (adopter cards stay quiet by default) */
+/* Simple view: hide mint / PDA / explorer chrome entirely */
+body.crypto-simple .chain-details {
+  display: none !important;
+}
+
+/* Collapsible mint / PDA chrome (visible in Advanced) */
 .chain-details {
   margin: 0.45rem 0 0.55rem;
   border-radius: 10px;

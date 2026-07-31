@@ -1430,6 +1430,11 @@ function renderAccountProfile() {
     '<div class="account-profile-meta">' +
     metaRows +
     '</div>' +
+    '<p class="account-profile-mode-hint">' +
+    (cryptoMode === 'advanced'
+      ? 'Advanced shows mint addresses, explorer links, and listing PDAs on cards.'
+      : 'Simple hides mint addresses and chain IDs — plant · stage · ask only.') +
+    '</p>' +
     statsHtml +
     '<div class="account-profile-actions">' +
     '<button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="' +
@@ -1453,6 +1458,8 @@ function renderAccountProfile() {
     });
   }
 }
+
+window.renderAccountProfile = renderAccountProfile;
 
 window.GrowtooProfile = {
   getPreferredGrowEnvironment: getPreferredGrowEnvironment,

@@ -121,7 +121,7 @@
       btn.setAttribute('aria-pressed', mode === 'advanced' ? 'true' : 'false');
       btn.textContent = mode === 'simple' ? 'Show advanced details' : 'Use simple view';
     });
-    // Refresh cards so Chain details open/closed matches mode.
+    // Refresh cards so Chain details match mode (hidden in Simple, open in Advanced).
     try {
       if (window.Market && typeof Market.render === 'function') Market.render();
     } catch (e) {
@@ -130,6 +130,17 @@
     try {
       if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
     } catch (e2) {
+      /* ignore */
+    }
+    try {
+      if (typeof window.renderAccountProfile === 'function') window.renderAccountProfile();
+      else {
+        var overlay = document.getElementById('more-nav-overlay');
+        if (overlay && !overlay.hidden && window.DnevnikProfile) {
+          /* profile re-renders on next open */
+        }
+      }
+    } catch (e3) {
       /* ignore */
     }
   }

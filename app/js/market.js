@@ -1432,7 +1432,7 @@
               esc(shortAddr(listing.listingPda)) +
               '</code></p>'
             : ''),
-        { forceClosed: isAdopterUi() && !isMine }
+        { summary: 'Chain details' }
       ) +
       '<div class="market-card-foot">' +
       '<span class="market-price"><span class="market-price-label">' +
