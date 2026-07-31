@@ -121,6 +121,17 @@
       btn.setAttribute('aria-pressed', mode === 'advanced' ? 'true' : 'false');
       btn.textContent = mode === 'simple' ? 'Show advanced details' : 'Use simple view';
     });
+    // Refresh cards so Chain details open/closed matches mode.
+    try {
+      if (window.Market && typeof Market.render === 'function') Market.render();
+    } catch (e) {
+      /* ignore */
+    }
+    try {
+      if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
+    } catch (e2) {
+      /* ignore */
+    }
   }
 
   function bindModeToggle() {

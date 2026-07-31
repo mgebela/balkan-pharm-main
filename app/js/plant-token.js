@@ -959,6 +959,29 @@
     );
   }
 
+  /** Collapsible mint / explorer chrome for garden cards. */
+  function chainDetailsHtml(innerHtml, opts) {
+    if (!innerHtml) return '';
+    const o = opts || {};
+    const advanced =
+      window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function'
+        ? GrowtooPlain.getMode() === 'advanced'
+        : false;
+    const open = o.forceOpen === true || (advanced && o.forceClosed !== true);
+    return (
+      '<details class="chain-details"' +
+      (open ? ' open' : '') +
+      '>' +
+      '<summary class="chain-details-summary">' +
+      esc(o.summary || 'Chain details') +
+      '</summary>' +
+      '<div class="chain-details-body">' +
+      innerHtml +
+      '</div>' +
+      '</details>'
+    );
+  }
+
   function explorerAddressUrl(address) {
     if (window.ChainConfig && typeof window.ChainConfig.explorerAddress === 'function') {
       return window.ChainConfig.explorerAddress(address);
@@ -1324,15 +1347,7 @@
         : token.plantId
           ? '<p class="adopt-token-link">Linked journal plant</p>'
           : linkPlantControlHtml(token)) +
-      chainMintHtml(token) +
-      (token.mintAddress
-        ? '<p class="adopt-token-chain adopt-token-chain--ok">⛓ NFT <a href="' +
-          esc(explorerAddressUrl(token.mintAddress)) +
-          '" target="_blank" rel="noopener noreferrer"><code>' +
-          esc(shortAddr(token.mintAddress)) +
-          '</code></a></p>'
-        : '') +
-      replacedMintHtml(token) +
+      (isAdopterUi() || token.adopted ? '' : chainMintHtml(token)) +
       growerQuestHtml(token, next) +
       careWeekHtml(token) +
       careMonthHtml(token) +
@@ -1348,8 +1363,34 @@
       ': <strong>' +
       (token.adopted ? Number(token.investedGrow || 0) : earned) +
       ' $GROWTOO</strong></span>' +
-      '<span class="adopt-token-id" title="' + esc(token.id) + '">#' + esc(token.id.slice(-6)) + '</span>' +
+      (isAdopterUi() || token.adopted
+        ? ''
+        : '<span class="adopt-token-id" title="' +
+          esc(token.id) +
+          '">#' +
+          esc(token.id.slice(-6)) +
+          '</span>') +
       '</div>' +
+      chainDetailsHtml(
+        (isAdopterUi() || token.adopted ? chainMintHtml(token) : '') +
+          (token.mintAddress
+            ? '<p class="adopt-token-chain adopt-token-chain--ok">NFT <a href="' +
+              esc(explorerAddressUrl(token.mintAddress)) +
+              '" target="_blank" rel="noopener noreferrer"><code>' +
+              esc(shortAddr(token.mintAddress)) +
+              '</code></a></p>'
+            : '') +
+          replacedMintHtml(token) +
+          '<p class="adopt-token-chain">Card id <code title="' +
+          esc(token.id) +
+          '">#' +
+          esc(token.id.slice(-6)) +
+          '</code></p>',
+        {
+          forceClosed: isAdopterUi() || !!token.adopted,
+          summary: 'Chain details',
+        }
+      ) +
       '<div class="adopt-token-actions">' +
       (token.adopted
         ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
@@ -1415,6 +1456,114 @@
       pct +
       '%"></span>' +
       '</div>'
+    );
+  }
+
+  /** YYYY-MM → Jul / Jul ’26 */
+  function formatMonthKeyLabel(key) {
+    const m = String(key || '').match(/^(\d{4})-(\d{2})$/);
+    if (!m) return String(key || '');
+    const names = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    const month = names[parseInt(m[2], 10) - 1] || m[2];
+    const year = parseInt(m[1], 10);
+    const nowY = new Date().getUTCFullYear();
+    return year === nowY ? month : month + ' ’' + String(year).slice(-2);
+  }
+
+  /**
+   * Month path story for adopters: Jul qualify · Aug 4/12 · Sep —
+   */
+  function careUnlockTimelineHtml(listing) {
+    if (!listing) return '';
+    let keys = Array.isArray(listing.careMonthKeys) ? listing.careMonthKeys.slice() : [];
+    if (
+      !keys.length &&
+      listing.harvestProofSummary &&
+      Array.isArray(listing.harvestProofSummary.monthKeys)
+    ) {
+      keys = listing.harvestProofSummary.monthKeys.slice();
+    }
+    if (!keys.length && window.GrowerQuests && typeof GrowerQuests.enumerateMonthKeys === 'function') {
+      const adoptedAt = listing.adoptedAt || listing.soldAt || listing.investedAt;
+      const fromMs = adoptedAt ? Date.parse(adoptedAt) : NaN;
+      if (Number.isFinite(fromMs)) {
+        keys = GrowerQuests.enumerateMonthKeys(fromMs, Date.now());
+      }
+    }
+    if (!keys.length) return '';
+
+    const qualify = Object.create(null);
+    (Array.isArray(listing.qualifyingMonthKeys) ? listing.qualifyingMonthKeys : []).forEach(
+      function (k) {
+        if (k) qualify[String(k)] = true;
+      }
+    );
+    const cur = listing.currentMonthKey != null ? String(listing.currentMonthKey) : '';
+    const hasSync =
+      listing.currentMonthKey != null && listing.currentMonthDaysHit != null;
+    const daysHit = hasSync ? Number(listing.currentMonthDaysHit) || 0 : 0;
+    const minDays =
+      listing.currentMonthMinDays != null
+        ? Number(listing.currentMonthMinDays)
+        : (window.GrowerQuests && GrowerQuests.MONTHLY_CARE_MIN_DAYS) || 12;
+
+    const items = keys
+      .map(function (rawKey) {
+        const key = String(rawKey);
+        const label = formatMonthKeyLabel(key);
+        let state = 'todo';
+        let detail = '—';
+        if (qualify[key]) {
+          state = 'ok';
+          detail = 'qualify';
+        } else if (cur && key === cur) {
+          if (!hasSync) {
+            state = 'lag';
+            detail = 'sync…';
+          } else if (daysHit >= minDays) {
+            state = 'ok';
+            detail = daysHit + '/' + minDays;
+          } else {
+            state = 'current';
+            detail = daysHit + '/' + minDays;
+          }
+        } else if (cur && key < cur) {
+          state = 'short';
+          detail = 'short';
+        }
+        return (
+          '<li class="adopt-unlock-tl-item adopt-unlock-tl-item--' +
+          state +
+          '"' +
+          (key === cur ? ' aria-current="step"' : '') +
+          '>' +
+          '<span class="adopt-unlock-tl-dot" aria-hidden="true"></span>' +
+          '<span class="adopt-unlock-tl-label">' +
+          esc(label) +
+          '</span>' +
+          '<span class="adopt-unlock-tl-detail">' +
+          esc(detail) +
+          '</span>' +
+          '</li>'
+        );
+      })
+      .join('');
+
+    return (
+      '<ol class="adopt-unlock-timeline" aria-label="Care month path">' + items + '</ol>'
     );
   }
 
@@ -1501,6 +1650,7 @@
         esc(statusCopy) +
         '</span>' +
         '</div>' +
+        careUnlockTimelineHtml(listing) +
         '<div class="adopt-unlock-grid">' +
         (stageLabel
           ? '<div class="adopt-unlock-row">' +
@@ -1512,26 +1662,13 @@
             '</div>'
           : '') +
         '<div class="adopt-unlock-row">' +
-        '<span class="adopt-unlock-label">Months</span>' +
+        '<span class="adopt-unlock-label">Path</span>' +
         '<strong class="adopt-unlock-value">' +
         esc(String(months)) +
         '/' +
         esc(String(neededLabel)) +
-        ' qualify</strong>' +
+        ' months qualify</strong>' +
         monthMeter +
-        '</div>' +
-        '<div class="adopt-unlock-row">' +
-        '<span class="adopt-unlock-label">This month</span>' +
-        '<strong class="adopt-unlock-value">' +
-        (hasMonthSync
-          ? esc(String(daysHit)) +
-            '/' +
-            esc(String(minDays)) +
-            ' days · ' +
-            esc(String(listing.currentMonthKey))
-          : '— sync pending') +
-        '</strong>' +
-        dayMeter +
         '</div>' +
         (locked
           ? '<div class="adopt-unlock-row">' +
@@ -1542,6 +1679,22 @@
             '</div>'
           : '') +
         '</div>' +
+        (hasMonthSync || syncLag
+          ? '<div class="adopt-unlock-current">' +
+            '<p>' +
+            (hasMonthSync
+              ? 'This month <strong>' +
+                esc(formatMonthKeyLabel(listing.currentMonthKey)) +
+                '</strong>: ' +
+                esc(String(daysHit)) +
+                '/' +
+                esc(String(minDays)) +
+                ' care days'
+              : 'This month: waiting for care sync') +
+            '</p>' +
+            (hasMonthSync ? dayMeter : '') +
+            '</div>'
+          : '') +
         '<p class="adopt-unlock-foot">' +
         (status === 'active'
           ? syncLag

@@ -1021,7 +1021,14 @@
   }
 
   function assetBadge(assetType) {
-    const label = assetType === 'flower' ? 'Flower token' : 'Seed token';
+    const flower = assetType === 'flower';
+    const label = isAdopterUi()
+      ? flower
+        ? 'Flower'
+        : 'Seed'
+      : flower
+        ? 'Flower token'
+        : 'Seed token';
     return (
       '<span class="market-asset-badge market-asset-badge--' +
       esc(assetType || 'seed') +
@@ -1049,6 +1056,29 @@
       return GrowtooPlain.tipHtml(term, label);
     }
     return esc(label || term);
+  }
+
+  /** Collapsible mint / pubkey chrome — open by default only in advanced mode. */
+  function chainDetailsHtml(innerHtml, opts) {
+    if (!innerHtml) return '';
+    const o = opts || {};
+    const advanced =
+      window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function'
+        ? GrowtooPlain.getMode() === 'advanced'
+        : false;
+    const open = o.forceOpen === true || (advanced && o.forceClosed !== true);
+    return (
+      '<details class="chain-details"' +
+      (open ? ' open' : '') +
+      '>' +
+      '<summary class="chain-details-summary">' +
+      esc(o.summary || 'Chain details') +
+      '</summary>' +
+      '<div class="chain-details-body">' +
+      innerHtml +
+      '</div>' +
+      '</details>'
+    );
   }
 
   function readLocalPlants() {
@@ -1368,11 +1398,9 @@
       '</h4>' +
       '<p class="market-card-meta">' +
       (showStrain ? esc(listing.strain) : '') +
-      (showStrain && listing.batch ? ' · ' : '') +
-      (listing.batch ? 'batch ' + esc(listing.batch) : '') +
       (function () {
         const live = listingDisplayStage(listing);
-        const prefix = showStrain || listing.batch ? ' · ' : '';
+        const prefix = showStrain ? ' · ' : '';
         return live ? prefix + esc(live) : '';
       })() +
       '</p>' +
@@ -1384,17 +1412,28 @@
           tip('redemption', 'redemption') +
           ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
         : '') +
-      '<p class="market-card-meta crypto-advanced-only">NFT: <a href="' +
-      esc(explorerAddress(listing.mintAddress)) +
-      '" target="_blank" rel="noopener noreferrer"><code>' +
-      esc(shortAddr(listing.mintAddress)) +
-      '</code></a>' +
-      ' · grower <code>' +
-      esc(shortAddr(listing.sellerPubkey)) +
-      '</code>' +
-      (isMine ? ' (you)' : '') +
-      (isBuyer ? ' · your investment' : '') +
-      '</p>' +
+      chainDetailsHtml(
+        (listing.batch
+          ? '<p class="market-card-meta">Batch <code>' + esc(listing.batch) + '</code></p>'
+          : '') +
+          '<p class="market-card-meta">NFT <a href="' +
+          esc(explorerAddress(listing.mintAddress)) +
+          '" target="_blank" rel="noopener noreferrer"><code>' +
+          esc(shortAddr(listing.mintAddress)) +
+          '</code></a>' +
+          ' · grower <code>' +
+          esc(shortAddr(listing.sellerPubkey)) +
+          '</code>' +
+          (isMine ? ' (you)' : '') +
+          (isBuyer ? ' · your investment' : '') +
+          '</p>' +
+          (listing.listingPda
+            ? '<p class="market-card-meta">Listing PDA <code>' +
+              esc(shortAddr(listing.listingPda)) +
+              '</code></p>'
+            : ''),
+        { forceClosed: isAdopterUi() && !isMine }
+      ) +
       '<div class="market-card-foot">' +
       '<span class="market-price"><span class="market-price-label">' +
       esc(priceLabel) +

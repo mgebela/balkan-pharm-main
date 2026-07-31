@@ -6217,6 +6217,113 @@ body.profile-adopter .adopt-hero-text h2 {
   line-height: 1.4;
   color: var(--text-muted);
 }
+.adopt-unlock-current {
+  margin: 0.55rem 0 0;
+  display: grid;
+  gap: 0.3rem;
+}
+.adopt-unlock-current p {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.adopt-unlock-current .adopt-unlock-meter {
+  grid-column: 1;
+}
+
+/* Care unlock month path: Jul qualify · Aug 4/12 · … */
+.adopt-unlock-timeline {
+  list-style: none;
+  margin: 0.55rem 0 0.65rem;
+  padding: 0.15rem 0 0.25rem;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.adopt-unlock-tl-item {
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 3.6rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0 0.45rem;
+  text-align: center;
+}
+.adopt-unlock-tl-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 0.42rem;
+  left: calc(50% + 0.45rem);
+  width: calc(100% - 0.9rem);
+  height: 1px;
+  background: rgba(201, 165, 94, 0.22);
+}
+.adopt-unlock-tl-item--ok:not(:last-child)::after {
+  background: rgba(52, 211, 153, 0.45);
+}
+.adopt-unlock-tl-item--current:not(:last-child)::after,
+.adopt-unlock-tl-item--lag:not(:last-child)::after {
+  background: rgba(201, 165, 94, 0.45);
+}
+.adopt-unlock-tl-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201, 165, 94, 0.4);
+  background: rgba(10, 18, 14, 0.8);
+  z-index: 1;
+}
+.adopt-unlock-tl-item--ok .adopt-unlock-tl-dot {
+  border-color: #34d399;
+  background: #34d399;
+  box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
+}
+.adopt-unlock-tl-item--current .adopt-unlock-tl-dot {
+  border-color: var(--brass);
+  background: var(--brass);
+  animation: status-rail-pulse 1.6s ease-in-out infinite;
+}
+.adopt-unlock-tl-item--lag .adopt-unlock-tl-dot {
+  border-color: #f59e0b;
+  background: #f59e0b;
+  animation: status-rail-pulse 1.6s ease-in-out infinite;
+}
+.adopt-unlock-tl-item--short .adopt-unlock-tl-dot {
+  border-color: #f87171;
+  background: rgba(248, 113, 113, 0.35);
+}
+.adopt-unlock-tl-item--todo .adopt-unlock-tl-dot {
+  opacity: 0.55;
+}
+.adopt-unlock-tl-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.adopt-unlock-tl-detail {
+  font-size: 0.64rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.adopt-unlock-tl-item--ok .adopt-unlock-tl-detail {
+  color: #34d399;
+}
+.adopt-unlock-tl-item--current .adopt-unlock-tl-detail {
+  color: var(--brass);
+}
+.adopt-unlock-tl-item--lag .adopt-unlock-tl-detail {
+  color: #f59e0b;
+}
+.adopt-unlock-tl-item--short .adopt-unlock-tl-detail {
+  color: #f87171;
+}
 
 .grower-quest--care {
   margin-top: 0.5rem;
@@ -6747,6 +6854,54 @@ body.crypto-simple .crypto-advanced-only {
 
 body.crypto-advanced .crypto-simple-only {
   display: none !important;
+}
+
+/* Collapsible mint / PDA chrome (adopter cards stay quiet by default) */
+.chain-details {
+  margin: 0.45rem 0 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 165, 94, 0.16);
+  background: rgba(8, 14, 10, 0.35);
+  overflow: hidden;
+}
+.chain-details-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  user-select: none;
+}
+.chain-details-summary::-webkit-details-marker {
+  display: none;
+}
+.chain-details-summary::after {
+  content: '+';
+  float: right;
+  color: var(--brass);
+  font-weight: 700;
+}
+.chain-details[open] .chain-details-summary::after {
+  content: '−';
+}
+.chain-details-body {
+  padding: 0 0.7rem 0.55rem;
+  display: grid;
+  gap: 0.25rem;
+}
+.chain-details-body .market-card-meta,
+.chain-details-body .adopt-token-chain {
+  margin: 0;
+  font-size: 0.74rem;
+}
+.chain-details-body .adopt-mint-repair {
+  margin: 0.25rem 0 0;
+}
+.market-card--adopter .chain-details-summary {
+  letter-spacing: 0.03em;
 }
 
 body.crypto-simple .crypto-simple-only {
