@@ -1,10 +1,10 @@
 /*
  * Marketplace (devnet): growers post real RWA NFTs; adopters invest with $GROWTOO.
  *
- * Listings live in Firestore (`marketListings`); on-chain legs:
- *   - grower escrows the NFT to the authority wallet (signed in-app),
- *   - adopter pays the grower in $GROWTOO (signed in-app),
- *   - chain/process-market.js verifies both and releases the NFT to the adopter.
+ * Default Instant sale → on-chain Anchor escrow (`settlement: program`):
+ *   list/buy/cancel are atomic wallet txs (PDA vault). No CF settle queue.
+ * Adopt stake → hot-wallet NFT escrow + care vault (process-adopt-stakes).
+ * Legacy hot-wallet path remains for open listings / explicit settlementMode legacy.
  */
 (function () {
   'use strict';
@@ -599,7 +599,12 @@
     const token = tokenEntry.token;
     const priceRounded = Math.round(priceGrow);
     const stakeMode = opts && opts.settlement === 'adopt_stake';
-    const useProgram = !stakeMode && cfg().settlementMode === 'program' && cfg().escrowProgramId;
+    // Instant lists prefer program PDA escrow whenever the program id is set.
+    // Legacy hot-wallet only when adopt_stake, explicit opts.settlement:'legacy',
+    // or ChainConfig.settlementMode === 'legacy'.
+    const forceLegacy =
+      (opts && opts.settlement === 'legacy') || cfg().settlementMode === 'legacy';
+    const useProgram = !stakeMode && !forceLegacy && !!cfg().escrowProgramId;
     const lockedGrow = stakeMode ? Math.floor(priceRounded / 2) : 0;
     const immediateGrow = stakeMode ? priceRounded - lockedGrow : priceRounded;
     const careEscrow = cfg().careEscrowAddress || cfg().escrowAddress;
@@ -700,6 +705,7 @@
     if (window.PlantToken && typeof PlantToken.markTokenListed === 'function') {
       PlantToken.markTokenListed(tokenEntry.mintAddress, tokenEntry.mintRequestId);
     }
+    return useProgram ? 'program' : stakeMode ? 'adopt_stake' : 'legacy';
   }
 
   async function investInListing(listing) {
@@ -1559,7 +1565,7 @@
           'Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.';
       } else {
         hint.textContent =
-          'You’re paid the full asking price at purchase. Escrow holds the token until then.';
+          'You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.';
       }
     }
   }
@@ -1741,15 +1747,17 @@
           submitBtn.textContent = 'Holding token for listing…';
         }
         try {
-          await createListing(entry, price, {
+          const used = await createListing(entry, price, {
             settlement: settlement === 'adopt_stake' ? 'adopt_stake' : undefined,
           });
           form.reset();
           syncSettlementFromRadios();
           flashOk(
-            settlement === 'adopt_stake'
+            used === 'adopt_stake'
               ? 'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'
-              : 'Offer posted. Adopters can invest once escrow confirms.'
+              : used === 'program'
+                ? 'Offer is live. The plant is locked in the program vault — adopters can invest now.'
+                : 'Offer posted. Adopters can invest once escrow confirms.'
           );
         } catch (err) {
           flash(err);

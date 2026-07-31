@@ -6082,6 +6082,104 @@ body.profile-adopter .adopt-hero-text h2 {
   border-radius: 10px;
   background: rgba(232, 196, 106, 0.05);
 }
+
+/* Adopter garden — monthly care unlock (months / this-month days / stage) */
+.adopt-unlock-panel {
+  margin: 0.55rem 0 0.75rem;
+  padding: 0.7rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--desk-line);
+  background: rgba(10, 18, 14, 0.55);
+}
+.adopt-unlock-panel--active {
+  border-color: rgba(201, 165, 94, 0.28);
+}
+.adopt-unlock-panel--lag {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.06);
+}
+.adopt-unlock-panel--released {
+  border-color: rgba(52, 211, 153, 0.35);
+  background: rgba(52, 211, 153, 0.07);
+}
+.adopt-unlock-panel--refunded {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.06);
+}
+.adopt-unlock-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+}
+.adopt-unlock-head strong {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--text);
+}
+.adopt-unlock-status {
+  color: var(--brass);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.adopt-unlock-panel--lag .adopt-unlock-status {
+  color: #f59e0b;
+}
+.adopt-unlock-panel--released .adopt-unlock-status {
+  color: #34d399;
+}
+.adopt-unlock-panel--refunded .adopt-unlock-status {
+  color: #f87171;
+}
+.adopt-unlock-grid {
+  display: grid;
+  gap: 0.45rem;
+}
+.adopt-unlock-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 0.2rem 0.55rem;
+  align-items: center;
+}
+.adopt-unlock-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.adopt-unlock-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+.adopt-unlock-meter {
+  grid-column: 2;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+.adopt-unlock-meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brass-active), var(--brass));
+  transition: width 0.35s ease;
+}
+.adopt-unlock-panel--lag .adopt-unlock-meter-fill {
+  background: linear-gradient(90deg, #b45309, #f59e0b);
+}
+.adopt-unlock-foot {
+  margin: 0.55rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
 .grower-quest--care {
   margin-top: 0.5rem;
 }

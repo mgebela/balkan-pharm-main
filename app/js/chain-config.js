@@ -38,7 +38,8 @@
     // Dedicated care vault (separate from NFT escrow). Legacy sold stakes may still
     // point listing.careEscrowAddress at the NFT escrow until harvest settles.
     careEscrowAddress: 'C69K4V4921m1jYxjBoBoMYJR2fxYQpnx1w45gNGsL4ZU',
-    // On-chain Anchor escrow (parallel path). 'program' = PDA vault; 'legacy' = hot-wallet queue.
+    // Instant sale default: on-chain Anchor PDA vault when escrowProgramId is set.
+    // settlementMode 'legacy' forces hot-wallet queue (ops/regression only).
     escrowProgramId: 'GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb',
     settlementMode: 'program',
     // Activates escrow_pending → active when NFT is already in escrow.

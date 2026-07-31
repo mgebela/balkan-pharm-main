@@ -1089,10 +1089,28 @@
     const earned = (token.history || [])
       .filter((h) => h.type === 'growth')
       .reduce((sum, h) => sum + Number(h.amount || 0), 0);
-    const pct = progressPercent(token.stageIndex);
     const nameNorm = String(token.name || '').trim().toLowerCase();
     const strainNorm = String(token.strain || '').trim().toLowerCase();
     const showStrain = strainNorm && strainNorm !== nameNorm;
+    const stakeListing =
+      token.mintAddress && window.Market && typeof Market.findAdoptStakeForMint === 'function'
+        ? Market.findAdoptStakeForMint(token.mintAddress)
+        : null;
+    const liveStageLabel =
+      (token.adopted || isAdopterUi()) && stakeListing
+        ? stakeListing.liveStage || stakeListing.stage || ''
+        : '';
+    const stageBadgeLabel = liveStageLabel || stage.label;
+    let displayStageIndex = token.stageIndex;
+    if (liveStageLabel && typeof PlantToken.stageIndexFromLabel === 'function') {
+      const liveIdx = PlantToken.stageIndexFromLabel(
+        stakeListing.liveStageKey || liveStageLabel
+      );
+      if (liveIdx > 0 || /seed|germination|harvest|flower|veget/i.test(liveStageLabel)) {
+        displayStageIndex = liveIdx;
+      }
+    }
+    const pct = progressPercent(displayStageIndex);
     const linkedPlant = (function () {
       if (!token.plantId) return null;
       let plants = [];
@@ -1114,7 +1132,7 @@
     const plantPhoto = linkedPlant && linkedPlant.photo ? linkedPlant.photo : '';
 
     const dots = GROWTH_STAGES.map((s, i) => {
-      const cls = i < token.stageIndex ? 'done' : i === token.stageIndex ? 'current' : 'todo';
+      const cls = i < displayStageIndex ? 'done' : i === displayStageIndex ? 'current' : 'todo';
       return '<span class="adopt-stage-dot adopt-stage-dot--' + cls + '" title="' + esc(s.label) + '"></span>';
     }).join('');
 
@@ -1151,13 +1169,13 @@
       .join('');
 
     return (
-      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + token.stageIndex + '">' +
+      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + displayStageIndex + '">' +
       '<div class="adopt-token-banner adopt-token-banner--art">' +
-      buildPlantGrowSvg(token.stageIndex, { compact: true }) +
+      buildPlantGrowSvg(displayStageIndex, { compact: true }) +
       (plantPhoto
         ? '<img class="adopt-token-banner-chip" src="' + esc(plantPhoto) + '" alt="" />'
         : '') +
-      '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>' +
+      '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stageBadgeLabel) + '</span>' +
       '</div>' +
       '<div class="adopt-token-body">' +
       '<div class="adopt-token-head">' +
@@ -1249,6 +1267,23 @@
     );
   }
 
+  function adoptUnlockMeter(done, total) {
+    const t = Math.max(1, Number(total) || 1);
+    const d = Math.max(0, Math.min(t, Number(done) || 0));
+    const pct = Math.round((d / t) * 100);
+    return (
+      '<div class="adopt-unlock-meter" role="progressbar" aria-valuemin="0" aria-valuemax="' +
+      t +
+      '" aria-valuenow="' +
+      d +
+      '">' +
+      '<span class="adopt-unlock-meter-fill" style="width:' +
+      pct +
+      '%"></span>' +
+      '</div>'
+    );
+  }
+
   function careMonthHtml(token) {
     if (!window.GrowerQuests) return '';
     const listing =
@@ -1259,6 +1294,7 @@
     // Adopters: monthly unlock view only (no weekly).
     if (isAdopterUi() || token.adopted) {
       if (!listing || listing.settlement !== 'adopt_stake') return '';
+      const status = String(listing.careStatus || 'active');
       const months = Array.isArray(listing.qualifyingMonthKeys)
         ? listing.qualifyingMonthKeys.length
         : 0;
@@ -1279,38 +1315,107 @@
           }
         }
       }
-      if (needed == null) needed = listing.adoptedAt ? '…' : '1+';
-      const status = listing.careStatus || 'active';
-      let liveBit = '';
-      if (listing.currentMonthKey != null && listing.currentMonthDaysHit != null) {
-        const minDays =
-          listing.currentMonthMinDays != null
-            ? listing.currentMonthMinDays
-            : GrowerQuests.MONTHLY_CARE_MIN_DAYS || 12;
-        liveBit =
-          ' This month (' +
-          esc(String(listing.currentMonthKey)) +
-          '): ' +
-          esc(String(listing.currentMonthDaysHit)) +
-          '/' +
-          esc(String(minDays)) +
-          ' care days.';
+      const neededNum = Number(needed);
+      const neededLabel = Number.isFinite(neededNum) && neededNum > 0 ? neededNum : '…';
+      const minDays =
+        listing.currentMonthMinDays != null
+          ? Number(listing.currentMonthMinDays)
+          : GrowerQuests.MONTHLY_CARE_MIN_DAYS || 12;
+      const hasMonthSync =
+        listing.currentMonthKey != null && listing.currentMonthDaysHit != null;
+      const daysHit = hasMonthSync ? Number(listing.currentMonthDaysHit) || 0 : null;
+      const stageLabel = listing.liveStage || listing.stage || '';
+      const locked =
+        listing.lockedGrow != null
+          ? Number(listing.lockedGrow)
+          : Math.floor(Number(listing.priceGrow || 0) / 2);
+      const syncedAt = listing.careProgressUpdatedAt
+        ? Date.parse(listing.careProgressUpdatedAt)
+        : NaN;
+      const syncLag =
+        status === 'active' &&
+        (!hasMonthSync ||
+          !Number.isFinite(syncedAt) ||
+          Date.now() - syncedAt > 2 * 60 * 60 * 1000);
+
+      let statusTone = 'active';
+      let statusCopy = 'Care stake active';
+      if (status === 'released') {
+        statusTone = 'released';
+        statusCopy = 'Unlocked — locked half paid to grower';
+      } else if (status === 'refunded') {
+        statusTone = 'refunded';
+        statusCopy = 'Refunded — locked half returned to you';
+      } else if (syncLag) {
+        statusTone = 'lag';
+        statusCopy = 'Waiting for care sync';
       }
+
+      const monthMeter =
+        Number.isFinite(neededNum) && neededNum > 0
+          ? adoptUnlockMeter(months, neededNum)
+          : '';
+      const dayMeter = hasMonthSync ? adoptUnlockMeter(daysHit, minDays) : '';
+
       return (
-        '<div class="grower-quest grower-quest--care grower-quest--monthly">' +
-        '<div class="grower-quest-head">' +
-        '<strong>Monthly care unlock</strong>' +
-        '<span>' +
-        esc(String(status)) +
+        '<div class="adopt-unlock-panel adopt-unlock-panel--' +
+        esc(statusTone) +
+        '" aria-label="Monthly care unlock">' +
+        '<div class="adopt-unlock-head">' +
+        '<strong>Care unlock</strong>' +
+        '<span class="adopt-unlock-status">' +
+        esc(statusCopy) +
         '</span>' +
         '</div>' +
-        '<p class="grower-quest-msg">Grower must qualify each calendar month (≥12 care days). ' +
-        'Progress: ' +
+        '<div class="adopt-unlock-grid">' +
+        (stageLabel
+          ? '<div class="adopt-unlock-row">' +
+            '<span class="adopt-unlock-label">Stage</span>' +
+            '<strong class="adopt-unlock-value">' +
+            esc(String(stageLabel)) +
+            (listing.harvestReady ? ' · harvest ready' : '') +
+            '</strong>' +
+            '</div>'
+          : '') +
+        '<div class="adopt-unlock-row">' +
+        '<span class="adopt-unlock-label">Months</span>' +
+        '<strong class="adopt-unlock-value">' +
         esc(String(months)) +
         '/' +
-        esc(String(needed)) +
-        ' months. Locked stake releases only if all months pass at harvest.' +
-        liveBit +
+        esc(String(neededLabel)) +
+        ' qualify</strong>' +
+        monthMeter +
+        '</div>' +
+        '<div class="adopt-unlock-row">' +
+        '<span class="adopt-unlock-label">This month</span>' +
+        '<strong class="adopt-unlock-value">' +
+        (hasMonthSync
+          ? esc(String(daysHit)) +
+            '/' +
+            esc(String(minDays)) +
+            ' days · ' +
+            esc(String(listing.currentMonthKey))
+          : '— sync pending') +
+        '</strong>' +
+        dayMeter +
+        '</div>' +
+        (locked
+          ? '<div class="adopt-unlock-row">' +
+            '<span class="adopt-unlock-label">Locked</span>' +
+            '<strong class="adopt-unlock-value">' +
+            esc(String(locked)) +
+            ' $GROWTOO</strong>' +
+            '</div>'
+          : '') +
+        '</div>' +
+        '<p class="adopt-unlock-foot">' +
+        (status === 'active'
+          ? syncLag
+            ? 'Progress updates after the adopt queue runs (about every 5 minutes).'
+            : 'All months need ≥12 care days. Locked half releases to the grower only if every month qualifies at harvest — otherwise it refunds to you.'
+          : status === 'released'
+            ? 'Harvest claim settled in the grower’s favor.'
+            : 'Harvest claim settled — your locked stake was returned.') +
         '</p>' +
         '</div>'
       );

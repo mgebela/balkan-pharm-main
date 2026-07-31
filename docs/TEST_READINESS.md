@@ -111,9 +111,10 @@ npm run pow:fund:fee    # fee-payer → ~1.5 SOL
 2. Optionally advance growth stages and confirm `$GROWTOO` rewards mint.
 3. Confirm NFT appears in **My garden** / wallet (botanical thumbnail from `growto.live/token-metadata/images/`).
 
-### 3. Market — program path (default for new listings)
-1. **List** an owned Seed/Flower RWA at a `$GROWTOO` price.
+### 3. Market — program path (default for Instant sale)
+1. **List** an owned Seed/Flower RWA at a `$GROWTOO` price (Instant sale radio).
    - Expect Firestore `status: active`, `settlement: program` immediately (no `escrow_pending`).
+   - Gate: program whenever `escrowProgramId` is set, unless `settlementMode: 'legacy'` or Adopt stake.
 2. **Invest** from a second (adopter) wallet with enough `$GROWTOO`.
    - Expect NFT + payment in **one** tx; listing `sold` (no `sale_pending`).
 3. **Cancel** an open program listing as seller.
@@ -177,7 +178,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [ ] **Adopt stake (fresh):** post “Adopt stake” → adopter pays full price → settle 50/50 (existing stakes already prove settle path)  
 - [ ] **Adopt reservation TTL (live):** abandon unpaid `pending-*` and confirm reopen ~15m  
 - [ ] **Monthly care (UI):** log ≥12 distinct care days; Market / adopter garden show live counters  
-- [ ] **Weekly progress:** grower-only on Tokenise; adopters see monthly unlock status only  
+- [ ] **Weekly progress:** grower-only on Tokenise; adopters see **Care unlock** panel (stage · months qualify · this-month days · locked · sync-lag empty state)  
 - [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
 - [ ] **Harvest claim:** journal at harvest + months qualify → Claim on Market; fail path refunds adopter  
 - [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
