@@ -1259,18 +1259,43 @@
     // Adopters: monthly unlock view only (no weekly).
     if (isAdopterUi() || token.adopted) {
       if (!listing || listing.settlement !== 'adopt_stake') return '';
-      const months =
-        (listing.qualifyingMonthKeys && listing.qualifyingMonthKeys.length) ||
-        (listing.harvestProofSummary &&
-          listing.harvestProofSummary.monthKeys &&
-          listing.qualifyingMonthKeys &&
-          listing.qualifyingMonthKeys.length) ||
-        0;
-      const needed =
-        (listing.harvestProofSummary && listing.harvestProofSummary.monthKeys
-          ? listing.harvestProofSummary.monthKeys.length
-          : null) || (listing.adoptedAt ? '…' : '1+');
+      const months = Array.isArray(listing.qualifyingMonthKeys)
+        ? listing.qualifyingMonthKeys.length
+        : 0;
+      let needed = null;
+      if (Array.isArray(listing.careMonthKeys) && listing.careMonthKeys.length) {
+        needed = listing.careMonthKeys.length;
+      } else if (
+        listing.harvestProofSummary &&
+        Array.isArray(listing.harvestProofSummary.monthKeys)
+      ) {
+        needed = listing.harvestProofSummary.monthKeys.length;
+      } else {
+        const adoptedAt = listing.adoptedAt || listing.soldAt || listing.investedAt;
+        if (adoptedAt && typeof GrowerQuests.enumerateMonthKeys === 'function') {
+          const fromMs = Date.parse(adoptedAt);
+          if (Number.isFinite(fromMs)) {
+            needed = GrowerQuests.enumerateMonthKeys(fromMs, Date.now()).length || 1;
+          }
+        }
+      }
+      if (needed == null) needed = listing.adoptedAt ? '…' : '1+';
       const status = listing.careStatus || 'active';
+      let liveBit = '';
+      if (listing.currentMonthKey != null && listing.currentMonthDaysHit != null) {
+        const minDays =
+          listing.currentMonthMinDays != null
+            ? listing.currentMonthMinDays
+            : GrowerQuests.MONTHLY_CARE_MIN_DAYS || 12;
+        liveBit =
+          ' This month (' +
+          esc(String(listing.currentMonthKey)) +
+          '): ' +
+          esc(String(listing.currentMonthDaysHit)) +
+          '/' +
+          esc(String(minDays)) +
+          ' care days.';
+      }
       return (
         '<div class="grower-quest grower-quest--care grower-quest--monthly">' +
         '<div class="grower-quest-head">' +
@@ -1284,7 +1309,9 @@
         esc(String(months)) +
         '/' +
         esc(String(needed)) +
-        ' months. Locked stake releases only if all months pass at harvest.</p>' +
+        ' months. Locked stake releases only if all months pass at harvest.' +
+        liveBit +
+        '</p>' +
         '</div>'
       );
     }

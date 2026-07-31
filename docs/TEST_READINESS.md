@@ -1,6 +1,6 @@
 # growtoo / dnevnik — Devnet test readiness
 
-**As of:** 2026-07-23  
+**As of:** 2026-07-31  
 **Overall:** **9 / 10** — ready for grower + adopter desk testing on [growto.live](https://growto.live)
 
 Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config` / scripts load.
@@ -12,10 +12,30 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | Area | Score | Notes |
 |------|------:|-------|
 | **Overall readiness** | **9** | End-to-end Devnet path is usable |
-| **Stability** | **9** | Escrow program live; CF health + settle OK |
+| **Stability** | **9** | Escrow program live; CF health + settle OK; GH queues green |
 | **Market buy/settle** | **9.5** | New listings: atomic on-chain; legacy: CF queue |
 | **Browser RPC** | **9** | `solanaRpc` proxy → QuickNode (secret server-side) |
 | **Scalability** | **8** | No hot-wallet settle bottleneck; proxy rate-limited |
+
+---
+
+## Automated smoke (2026-07-31)
+
+| Check | Result |
+|-------|--------|
+| `healthCheck` CF | OK |
+| `solanaRpc` `getHealth` | OK |
+| `settleMarketQueue` / `reconcileMarketEscrow` | OK (idle queues) |
+| `chain health-check.js` | 0 critical / 0 warnings; no pending mints or stuck market |
+| GH Actions (`chain-queues`, `chain-health`, reconcile) | Recent runs **success** |
+| Landing / app / dnevnik / docs / 404 / emails | HTTP 200 |
+| Botanical PNGs + brass `$GROWTOO` icon on growto.live | HTTP 200 (post `aecffb7`) |
+| Mint authority SOL | **~1.73** |
+| Fee payer SOL | **~1.46** |
+| `growMint` / `seedCollection` / `escrowProgramId` / `marketplacePda` | On-chain LIVE; app `chain-config` synced |
+| App JS syntax (`app.js`, `plant-token`, `market`, escrow, …) | OK |
+
+**Not automated (needs human wallets):** sign-in + link, seed mint in Phantom, list/buy/cancel, adopt-stake, harvest claim, notifications UX.
 
 ---
 
@@ -29,7 +49,7 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | Escrow program | `GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb` |
 | Marketplace PDA | `2a887xGdhztkvfHn1BdR5xSkXjunzTG1StdTdtrRddAm` |
 | Settlement mode | `program` (instant) · `adopt_stake` (50/50 care escrow) |
-| Hot-wallet escrow (legacy / adopt_stake NFT + locked $GROWTOO) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
+| Hot-wallet escrow (legacy / adopt_stake NFT + locked `$GROWTOO`) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
 | Care escrow | same as hot-wallet escrow (Devnet MVP) |
 | Mint authority | `F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3` |
 | Fee payer | `Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975` |
@@ -39,13 +59,13 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | Adopt-stake queue | `npm run adopt:queue` (GH Actions every 5m) |
 | Platform bonus queue | `npm run platform:queue` |
 
-### Ops wallet balances (snapshot 2026-07-23)
+### Ops wallet balances (snapshot 2026-07-31)
 
 | Role | Balance | Purpose |
 |------|--------:|---------|
-| Mint authority | ~1.95 SOL | Seed / growth mint queue |
-| Fee payer | ~1.47 SOL | Legacy market settle fees |
-| Escrow vault | 0 SOL | OK — holds NFTs only |
+| Mint authority | ~1.73 SOL | Seed / growth mint queue |
+| Fee payer | ~1.46 SOL | Legacy market settle fees |
+| Escrow vault | holds NFTs | OK — not a SOL hotspot |
 
 Top up when low:
 
@@ -67,7 +87,7 @@ npm run pow:fund:fee    # fee-payer → ~1.5 SOL
 ### 2. Mint path
 1. Grower: import / mint a **Seed RWA** (cloud queue).
 2. Optionally advance growth stages and confirm `$GROWTOO` rewards mint.
-3. Confirm NFT appears in **My garden** / wallet.
+3. Confirm NFT appears in **My garden** / wallet (botanical thumbnail from `growto.live/token-metadata/images/`).
 
 ### 3. Market — program path (default for new listings)
 1. **List** an owned Seed/Flower RWA at a `$GROWTOO` price.
@@ -105,24 +125,33 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Mainnet, marketplace fees > 0, royalties, offers/bidding
 - Migrating old hot-wallet listings into PDAs (cancel + relist instead)
 - Removing CF settle entirely (still required for legacy)
+- Some early test seed NFTs have empty on-chain metadata accounts (cannot refresh art) — remint if needed
 - If a wallet call fails with `RPC method not allowed`, check Cloud Function logs (`solanaRpc denied method …`) and extend the proxy allow/deny rules in `functions/solana-rpc-proxy.js`
 
 ---
 
 ## Pass criteria (desk session)
 
+### Automated / ops (2026-07-31)
+- [x] Browser RPC proxy healthy (`getHealth` ok)
+- [x] Authority / fee-payer funded for queue + legacy settle (~1.73 / ~1.46 SOL)
+- [x] Mint / grow / market queues idle and GH Actions succeeding
+- [x] Botanical + brass token images served from growto.live
+
+### Manual (human wallets)
 - [ ] Wallet connect + Firebase link works on Devnet  
 - [ ] Seed mint lands in wallet via queue  
 - [ ] New listing goes `active` with `settlement: program`  
 - [ ] Buy completes atomically (NFT + `$GROWTOO`, status `sold`)  
 - [ ] Cancel returns NFT  
 - [ ] Browser confirmations do not flake on public RPC (proxy preferred)  
-- [ ] Authority / fee-payer stay funded for queue + legacy settle  
 - [ ] **Adopt stake:** post offer as “Adopt stake”, adopter pays full price to care escrow; settle releases 50% to grower, locks 50%  
+- [ ] **Adopt reservation TTL:** unpaid `pending-*` adopt payments reopen after ~15m (same as instant market)  
 - [ ] **Monthly care:** ≥12 distinct care days / calendar month on linked plant (unlock rule)  
+- [ ] **Care progress sync:** after adopt queue pass, sold stake shows months + current-month days on Market / adopter garden  
 - [ ] **Weekly progress:** grower-only on Tokenise; adopters see monthly unlock status only  
 - [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
-- [ ] **Harvest claim:** all months qualify → locked half to grower; fail → refund to adopter  
+- [ ] **Harvest claim:** grower claims from Market (sold adopt stake) or Tokenise if token still held; all months qualify → locked half to grower; fail → refund to adopter  
 - [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
 - [ ] **Stake notify:** adopter invest → grower gets `stake_received` in inbox  
 - [ ] **Mark all read** clears badge; click item navigates to related view  

@@ -1106,12 +1106,28 @@
     );
   }
 
+  function listingHarvestReady(listing) {
+    if (!listing) return false;
+    const snap = listing.plantId ? storySnapshotForPlant(listing.plantId) : null;
+    const stage = String(
+      (snap && snap.journalStage) || listing.journalStage || listing.stage || ''
+    ).toLowerCase();
+    return stage.indexOf('harvest') >= 0;
+  }
+
   function listingCardHtml(listing, uid) {
     listing = enrichListingStory(listing);
     const isMine = listing.uid === uid;
     const isBuyer = listing.buyerUid === uid;
     const canInvest = isAdopterUi() && !isMine && listing.status === 'active';
     const canCancel = isGrowerUi() && isMine && listing.status === 'active';
+    const canHarvestClaim =
+      isGrowerUi() &&
+      isMine &&
+      listing.settlement === 'adopt_stake' &&
+      listing.status === 'sold' &&
+      listing.careStatus === 'active';
+    const harvestReady = canHarvestClaim && listingHarvestReady(listing);
     const isDead =
       listing.status === 'cancelled' ||
       listing.status === 'failed' ||
@@ -1119,16 +1135,48 @@
     const nameNorm = String(listing.name || '').trim().toLowerCase();
     const strainNorm = String(listing.strain || '').trim().toLowerCase();
     const showStrain = strainNorm && strainNorm !== nameNorm;
-    const careLine =
-      listing.settlement === 'adopt_stake' && listing.careStatus
-        ? '<p class="market-card-meta">Care ' +
-          tip('escrow', 'escrow') +
-          ': <strong>' +
-          esc(listing.careStatus) +
-          '</strong>' +
-          (listing.lockedGrow != null ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO' : '') +
-          '</p>'
-        : '';
+    let careLine = '';
+    if (listing.settlement === 'adopt_stake' && listing.careStatus) {
+      const locked =
+        listing.lockedGrow != null
+          ? ' · locked ' + esc(String(listing.lockedGrow)) + ' $GROWTOO'
+          : '';
+      let progress = '';
+      if (listing.careStatus === 'active') {
+        const q = Array.isArray(listing.qualifyingMonthKeys)
+          ? listing.qualifyingMonthKeys.length
+          : 0;
+        const needed = Array.isArray(listing.careMonthKeys)
+          ? listing.careMonthKeys.length
+          : listing.adoptedAt
+            ? '…'
+            : null;
+        if (needed != null) {
+          progress += ' · months ' + esc(String(q)) + '/' + esc(String(needed));
+        }
+        if (listing.currentMonthKey != null && listing.currentMonthDaysHit != null) {
+          const minDays =
+            listing.currentMonthMinDays != null ? listing.currentMonthMinDays : 12;
+          progress +=
+            ' · ' +
+            esc(String(listing.currentMonthKey)) +
+            ' ' +
+            esc(String(listing.currentMonthDaysHit)) +
+            '/' +
+            esc(String(minDays)) +
+            ' days';
+        }
+      }
+      careLine =
+        '<p class="market-card-meta">Care ' +
+        tip('escrow', 'escrow') +
+        ': <strong>' +
+        esc(listing.careStatus) +
+        '</strong>' +
+        locked +
+        progress +
+        '</p>';
+    }
     let phaseRail = '';
     if (window.StatusRail) {
       if (isBuyer || listing.status === 'sale_pending' || listing.status === 'sold') {
@@ -1217,7 +1265,17 @@
           esc(listing.id) +
           '">Cancel</button>'
         : '') +
+      (canHarvestClaim && harvestReady
+        ? '<button type="button" class="btn btn-primary btn-sm market-harvest-claim-btn" data-id="' +
+          esc(listing.id) +
+          '" data-plant-id="' +
+          esc(listing.plantId || '') +
+          '">Claim harvest stake</button>'
+        : '') +
       '</div>' +
+      (canHarvestClaim && !harvestReady
+        ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked half.</p>'
+        : '') +
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
         : '') +
@@ -1561,17 +1619,22 @@
 
       const investBtn = e.target.closest('.market-invest-btn');
       const cancelBtn = e.target.closest('.market-cancel-btn');
-      if (!investBtn && !cancelBtn) return;
+      const harvestBtn = e.target.closest('.market-harvest-claim-btn');
+      if (!investBtn && !cancelBtn && !harvestBtn) return;
       if (busy) return;
-      const id = (investBtn || cancelBtn).dataset.id;
+      const id = (investBtn || cancelBtn || harvestBtn).dataset.id;
       const listing = listings.find(function (l) {
         return l.id === id;
       });
       if (!listing) return;
       busy = true;
-      const btn = investBtn || cancelBtn;
+      const btn = investBtn || cancelBtn || harvestBtn;
       const prevText = btn.textContent;
-      btn.textContent = investBtn ? 'Investing…' : 'Cancelling…';
+      btn.textContent = investBtn
+        ? 'Investing…'
+        : harvestBtn
+          ? 'Claiming…'
+          : 'Cancelling…';
       btn.disabled = true;
       try {
         if (investBtn) {
@@ -1610,6 +1673,16 @@
               'Investment submitted. The plant appears in My garden when settlement finishes.'
             );
           }
+        } else if (harvestBtn) {
+          if (
+            !confirm(
+              'Claim harvest stake?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% $GROWTOO releases to you. Otherwise it refunds to the adopter (all-or-nothing).'
+            )
+          ) {
+            return;
+          }
+          await requestHarvestClaim(listing.id, harvestBtn.dataset.plantId || listing.plantId);
+          flashOk('Harvest claim queued. Locked stake settles after the next adopt queue pass.');
         } else {
           await cancelListing(listing);
         }

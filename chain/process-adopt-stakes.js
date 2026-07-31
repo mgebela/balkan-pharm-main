@@ -30,11 +30,18 @@ import { createMarketClient, createMintClient, uploadSeedMetadata } from './mint
 import { RPC_URL, readDeployed, LEGACY_ESCROW_ADDRESS } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
-import { validateHarvestCarePath, monthKey } from './weekly-care.js';
+import {
+  validateHarvestCarePath,
+  validateMonthlyCareProof,
+  monthKey,
+  MONTHLY_CARE_MIN_DAYS,
+} from './weekly-care.js';
 import { applyCareHistory, toPublicMetadataUri } from './seed-metadata.js';
 import { notifyUser } from './notify-user.js';
 
 const db = initFirestore();
+/** Unpaid invest reservations older than this are released back to active. */
+const RESERVATION_TTL_MS = 15 * 60 * 1000;
 const {
   umi: marketUmi,
   escrowSigner,
@@ -202,6 +209,23 @@ function isPendingPaymentReservation(data) {
   return String(data.paymentSignature || '').startsWith('pending-');
 }
 
+function statusEnteredAt(data, status) {
+  if (status === 'sale_pending') return data.investedAt || data.createdAt;
+  return data.activatedAt || data.createdAt;
+}
+
+function ageMinutes(raw) {
+  if (!raw) return null;
+  let ms = null;
+  if (typeof raw.toDate === 'function') ms = raw.toDate().getTime();
+  else {
+    const t = Date.parse(raw);
+    if (Number.isFinite(t)) ms = t;
+  }
+  if (ms == null) return null;
+  return Math.round((Date.now() - ms) / 60000);
+}
+
 async function processAdoptSale(doc) {
   const data = doc.data();
   const label = `adopt-stake ${data.name || doc.id}`;
@@ -215,8 +239,23 @@ async function processAdoptSale(doc) {
     if (!data.buyerPubkey || !data.paymentSignature) {
       throw new Error('Missing buyerPubkey or paymentSignature.');
     }
+    // Pre-pay reservation: wait for the buyer to attach a real signature, or release.
     if (isPendingPaymentReservation(data)) {
-      console.log(`… ${label}: waiting for payment signature`);
+      const ageMin = ageMinutes(statusEnteredAt(data, 'sale_pending'));
+      if (ageMin != null && ageMin * 60000 >= RESERVATION_TTL_MS) {
+        await doc.ref.update({
+          status: 'active',
+          buyerUid: FieldValue.delete(),
+          buyerPubkey: FieldValue.delete(),
+          paymentSignature: FieldValue.delete(),
+          investedAt: FieldValue.delete(),
+          reservationExpiredAt: new Date().toISOString(),
+          lastError: FieldValue.delete(),
+        });
+        console.warn(`… ${label}: unpaid reservation expired, listing reopened`);
+      } else {
+        console.log(`… ${label}: waiting for payment signature`);
+      }
       return;
     }
 
@@ -324,6 +363,81 @@ async function processAdoptSale(doc) {
     }
   } catch (err) {
     await fail(doc, label, err);
+  } finally {
+    await clearLease(doc.ref);
+  }
+}
+
+/**
+ * Sync live monthly care progress onto sold adopt-stake listings so adopters
+ * (and Market cards) see qualifying months without waiting for harvest claim.
+ */
+async function syncCareProgress(doc) {
+  const data = doc.data() || {};
+  const label = `care-progress ${data.name || doc.id}`;
+  if (data.settlement !== 'adopt_stake') return;
+  if (data.status !== 'sold') return;
+  if (data.careStatus !== 'active') return;
+  if (!(await tryClaimLease(doc.ref))) {
+    console.log(`… ${label}: leased, skipping`);
+    return;
+  }
+  try {
+    const plantId = data.plantId;
+    const adoptedAt = data.adoptedAt || data.soldAt || data.investedAt;
+    if (!plantId || !adoptedAt) {
+      console.log(`… ${label}: missing plantId/adoptedAt`);
+      return;
+    }
+    const appState = await loadGrowerAppState(data.uid);
+    if (!appState) {
+      console.log(`… ${label}: grower journal missing`);
+      return;
+    }
+
+    const proof = validateHarvestCarePath(appState, plantId, adoptedAt, Date.now());
+    const curKey = monthKey(Date.now());
+    const cur = validateMonthlyCareProof(appState, plantId, curKey, MONTHLY_CARE_MIN_DAYS);
+    const payload = {
+      qualifyingMonthKeys: proof.qualifyingMonthKeys || [],
+      qualifyingWeekKeys: proof.qualifyingMonthKeys || [],
+      careMonthKeys: proof.monthKeys || [],
+      currentMonthKey: curKey,
+      currentMonthDaysHit: cur.daysHit,
+      currentMonthMinDays: MONTHLY_CARE_MIN_DAYS,
+      careProgressUpdatedAt: new Date().toISOString(),
+    };
+
+    const prevKeys = JSON.stringify(data.qualifyingMonthKeys || []);
+    const nextKeys = JSON.stringify(payload.qualifyingMonthKeys);
+    const unchanged =
+      prevKeys === nextKeys &&
+      Number(data.currentMonthDaysHit) === Number(payload.currentMonthDaysHit) &&
+      String(data.currentMonthKey || '') === String(payload.currentMonthKey);
+
+    if (unchanged) {
+      console.log(`… ${label}: up to date`);
+      return;
+    }
+
+    await doc.ref.update(payload);
+    await db.collection('adoptStakes').doc(doc.id).set(
+      {
+        qualifyingMonthKeys: payload.qualifyingMonthKeys,
+        careMonthKeys: payload.careMonthKeys,
+        currentMonthKey: payload.currentMonthKey,
+        currentMonthDaysHit: payload.currentMonthDaysHit,
+        currentMonthMinDays: payload.currentMonthMinDays,
+        careProgressUpdatedAt: payload.careProgressUpdatedAt,
+        updatedAt: payload.careProgressUpdatedAt,
+      },
+      { merge: true }
+    );
+    console.log(
+      `✔ ${label}: ${payload.qualifyingMonthKeys.length}/${payload.careMonthKeys.length} months · this month ${payload.currentMonthDaysHit}/${MONTHLY_CARE_MIN_DAYS}`
+    );
+  } catch (err) {
+    console.warn(`… ${label}: ${err.message || err}`);
   } finally {
     await clearLease(doc.ref);
   }
@@ -513,6 +627,13 @@ async function processPending() {
   if (sales.size) console.log(`… adopt sale_pending: ${sales.size}`);
   for (const doc of sales.docs) {
     await processAdoptSale(doc);
+  }
+
+  const active = await db.collection('marketListings').where('careStatus', '==', 'active').get();
+  const activeDocs = active.docs.filter((d) => (d.data() || {}).settlement === 'adopt_stake');
+  if (activeDocs.length) console.log(`… adopt care active: ${activeDocs.length}`);
+  for (const doc of activeDocs) {
+    await syncCareProgress(doc);
   }
 
   const claims = await db.collection('harvestClaims').where('status', '==', 'pending').get();
