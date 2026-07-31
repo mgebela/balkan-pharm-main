@@ -32,10 +32,17 @@
     return '';
   }
 
-  function readLastSeen(uid) {
+  function lastSeenKey(uid, adopter) {
+    return LAST_SEEN_PREFIX + uid + ':' + (adopter ? 'adopter' : 'grower');
+  }
+
+  function readLastSeen(uid, adopter) {
     if (!uid) return null;
     try {
-      const raw = localStorage.getItem(LAST_SEEN_PREFIX + uid);
+      const raw =
+        localStorage.getItem(lastSeenKey(uid, adopter)) ||
+        // Legacy unscoped key (grower-era installs)
+        (!adopter ? localStorage.getItem(LAST_SEEN_PREFIX + uid) : null);
       if (!raw) return null;
       const ms = Date.parse(raw);
       return Number.isFinite(ms) ? ms : null;
@@ -44,11 +51,11 @@
     }
   }
 
-  function writeLastSeen(uid, when) {
+  function writeLastSeen(uid, when, adopter) {
     if (!uid) return;
     try {
       localStorage.setItem(
-        LAST_SEEN_PREFIX + uid,
+        lastSeenKey(uid, adopter),
         new Date(when || Date.now()).toISOString()
       );
     } catch (_) {
@@ -68,11 +75,15 @@
     }
   }
 
-  function resolveSinceMs(uid) {
-    const lastSeen = readLastSeen(uid);
+  function resolveSinceMs(uid, adopter) {
+    const lastSeen = readLastSeen(uid, adopter);
     if (lastSeen) return lastSeen;
-    const prev = readPrevLoginMs(uid);
-    if (prev) return prev;
+    // Previous login is shared across roles — skip for brand-new adopter sessions
+    // so switching grower → adopter still gets a welcome / while-away sheet.
+    if (!adopter) {
+      const prev = readPrevLoginMs(uid);
+      if (prev) return prev;
+    }
     return null;
   }
 
@@ -265,7 +276,43 @@
     }
   }
 
+  function readGardenTokens() {
+    try {
+      if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
+        const w = PlantToken.getWallet();
+        if (w && Array.isArray(w.tokens)) return w.tokens;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+    return [];
+  }
+
   function collectAdopterGains(uid, sinceMs, gains) {
+    const tokens = readGardenTokens();
+    const listingIdsInGarden = Object.create(null);
+    if (tokens.length) {
+      let stageMoved = 0;
+      tokens.forEach(function (t) {
+        if (!t) return;
+        if (t.listingId) listingIdsInGarden[t.listingId] = true;
+        if (!t.adopted) return;
+        if (afterSince(t.updatedAt, sinceMs) || afterSince(t.stageUpdatedAt, sinceMs)) {
+          stageMoved += 1;
+        }
+      });
+      if (stageMoved) {
+        gains.push({
+          icon: '❧',
+          text:
+            stageMoved === 1
+              ? '1 adopted plant moved a stage'
+              : stageMoved + ' adopted plants updated',
+          view: 'adopt',
+        });
+      }
+    }
+
     if (window.Market && typeof Market.getListings === 'function') {
       const listings = Market.getListings() || [];
       let myStakes = 0;
@@ -275,7 +322,8 @@
       let newSettles = 0;
       listings.forEach(function (l) {
         if (!l) return;
-        if (l.buyerUid === uid && l.settlement === 'adopt_stake') {
+        const isBuyer = l.buyerUid === uid || (!!l.id && !!listingIdsInGarden[l.id]);
+        if (isBuyer && (l.settlement === 'adopt_stake' || l.status === 'sold' || l.status === 'settled')) {
           myStakes += 1;
           if (afterSince(l.careProgressUpdatedAt, sinceMs)) careTicks += 1;
           if (l.harvestReady === true) harvestReady += 1;
@@ -476,11 +524,11 @@
     document.body.classList.add('daily-status-open');
   }
 
-  function hidePopup(uid) {
+  function hidePopup(uid, adopter) {
     const overlay = document.getElementById('daily-status-overlay');
     if (overlay) overlay.hidden = true;
     document.body.classList.remove('daily-status-open');
-    if (uid) writeLastSeen(uid, Date.now());
+    if (uid) writeLastSeen(uid, Date.now(), !!adopter || isAdopter());
   }
 
   function bindPopupOnce() {
@@ -489,7 +537,7 @@
     overlay.dataset.bound = '1';
 
     function dismiss() {
-      hidePopup(currentUid());
+      hidePopup(currentUid(), isAdopter());
     }
 
     const backdrop = document.getElementById('daily-status-backdrop');
@@ -519,20 +567,59 @@
     });
   }
 
-  function alreadyShownThisSession(uid) {
+  function sessionKey(uid, adopter) {
+    return SESSION_SHOWN + uid + ':' + (adopter ? 'adopter' : 'grower');
+  }
+
+  function alreadyShownThisSession(uid, adopter) {
     try {
-      return sessionStorage.getItem(SESSION_SHOWN + uid) === '1';
+      if (sessionStorage.getItem(sessionKey(uid, adopter)) === '1') return true;
+      // Legacy key (pre role-scoped) — only blocks same-role grower sessions.
+      if (!adopter && sessionStorage.getItem(SESSION_SHOWN + uid) === '1') return true;
+      return false;
     } catch (_) {
       return false;
     }
   }
 
-  function markShownThisSession(uid) {
+  function markShownThisSession(uid, adopter) {
     try {
-      sessionStorage.setItem(SESSION_SHOWN + uid, '1');
+      sessionStorage.setItem(sessionKey(uid, adopter), '1');
     } catch (_) {
       /* ignore */
     }
+  }
+
+  /** Wait briefly so Market snapshot / garden wallet can fill before gains. */
+  function whenDataReady(adopter, done) {
+    let finished = false;
+    const finish = function () {
+      if (finished) return;
+      finished = true;
+      done();
+    };
+
+    if (!adopter || !window.Market || typeof Market.onChange !== 'function') {
+      setTimeout(finish, SETTLE_MS);
+      return;
+    }
+
+    const listings = typeof Market.getListings === 'function' ? Market.getListings() : [];
+    if (listings && listings.length) {
+      setTimeout(finish, 120);
+      return;
+    }
+
+    let unsub = null;
+    const timer = setTimeout(function () {
+      if (typeof unsub === 'function') unsub();
+      finish();
+    }, 1800);
+    unsub = Market.onChange(function () {
+      clearTimeout(timer);
+      if (typeof unsub === 'function') unsub();
+      setTimeout(finish, 80);
+    });
   }
 
   function maybeShowAfterLogin(opts) {
@@ -546,21 +633,20 @@
     bindPopupOnce();
     renderStrip(adopter);
 
-    if (alreadyShownThisSession(uid)) return;
+    if (alreadyShownThisSession(uid, adopter)) return;
 
-    const run = function () {
-      const sinceMs = resolveSinceMs(uid);
+    whenDataReady(adopter, function () {
+      const sinceMs = resolveSinceMs(uid, adopter);
       const now = Date.now();
       const firstVisit = sinceMs == null;
       const awayMs = firstVisit ? 0 : Math.max(0, now - sinceMs);
       const gains = collectGains(uid, sinceMs, adopter);
 
-      // Always update strip; popup only when away long enough or first visit / gains.
-      const showPopupNow =
-        firstVisit ||
-        (awayMs >= MIN_AWAY_MS && (gains.length > 0 || awayMs >= 6 * 60 * 60 * 1000));
+      // First visit (incl. first time as this role), or away ≥30m.
+      // Empty gains still show the quiet “pick a next step” state.
+      const showPopupNow = firstVisit || awayMs >= MIN_AWAY_MS;
 
-      markShownThisSession(uid);
+      markShownThisSession(uid, adopter);
       if (showPopupNow) {
         showPopup({
           adopter: adopter,
@@ -569,12 +655,9 @@
           firstVisit: firstVisit,
         });
       } else {
-        // Still advance last-seen so short revisits don't pile up.
-        writeLastSeen(uid, now);
+        writeLastSeen(uid, now, adopter);
       }
-    };
-
-    setTimeout(run, SETTLE_MS);
+    });
   }
 
   window.DailyStatus = {
@@ -584,7 +667,7 @@
       renderStrip(isAdopter());
     },
     hide: function () {
-      hidePopup(currentUid());
+      hidePopup(currentUid(), isAdopter());
     },
   };
 })();
