@@ -148,6 +148,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Migrating old hot-wallet listings into PDAs (cancel + relist instead)
 - Removing CF settle entirely (still required for legacy)
 - Early broken metadata reminted (2026-07-31): CBD Auto #1–#3 + Charlotte's Web #1 → new mints with healthy metadata + growto.live botanical images. Old mints kept as `replacedMint` in `mints.devnet.json`. Re-run: `cd chain && npm run repair:seed-metadata -- --execute`
+- All `mints.devnet.json` seeds now use growto.live botanical images (Irys image hosts cleared). Gold Bloom #1 → `plant-flowering.png`. Refresh: `npm run update:seed-art`
 - If a wallet call fails with `RPC method not allowed`, check Cloud Function logs (`solanaRpc denied method …`) and extend the proxy allow/deny rules in `functions/solana-rpc-proxy.js`
 
 ---

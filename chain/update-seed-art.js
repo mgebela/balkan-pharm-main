@@ -33,6 +33,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MINTS_PATH = path.join(__dirname, 'mints.devnet.json');
 const USER = '9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi';
 const onlyMine = process.argv.includes('--only-mine');
+const mintArgIdx = process.argv.indexOf('--mint');
+const onlyMint = mintArgIdx >= 0 ? String(process.argv[mintArgIdx + 1] || '').trim() : '';
 
 const STAGE_LABEL_TO_KEY = {
   Seed: 'seed',
@@ -43,7 +45,19 @@ const STAGE_LABEL_TO_KEY = {
   Harvest: 'harvest',
 };
 
-function stageKeyFromMetadata(json) {
+function stageKeyFromRow(row) {
+  if (!row?.stage) return null;
+  if (STAGE_LABEL_TO_KEY[row.stage]) return STAGE_LABEL_TO_KEY[row.stage];
+  const lower = String(row.stage).toLowerCase();
+  if (Object.values(STAGE_LABEL_TO_KEY).includes(lower)) return lower;
+  return null;
+}
+
+function stageKeyFromMetadata(json, row) {
+  // Explicit row.stage wins (ops can force Flowering etc. in mints.devnet.json).
+  const fromRow = stageKeyFromRow(row);
+  if (fromRow) return fromRow;
+
   const attrs = Array.isArray(json?.attributes) ? json.attributes : [];
   const stageAttr = attrs.find((a) => a && a.trait_type === 'Stage');
   const label = stageAttr ? String(stageAttr.value || '') : '';
@@ -52,6 +66,12 @@ function stageKeyFromMetadata(json) {
   if (STAGE_LABEL_TO_KEY[fromRwa] || Object.values(STAGE_LABEL_TO_KEY).includes(fromRwa)) {
     return STAGE_LABEL_TO_KEY[fromRwa] || fromRwa;
   }
+  // Name hints for early desk mints that never wrote Stage attrs.
+  const name = String(row?.name || json?.name || '');
+  if (/harvest|dry/i.test(name)) return 'harvest';
+  if (/bloom|flower/i.test(name)) return 'flowering';
+  if (/veg/i.test(name)) return 'vegetative';
+  if (/seedling|sprout/i.test(name)) return 'seedling';
   return 'seed';
 }
 
@@ -67,14 +87,17 @@ const umi = createMintClient();
 const connection = new Connection(RPC_URL, 'confirmed');
 const list = JSON.parse(fs.readFileSync(MINTS_PATH, 'utf8'));
 
-const targets = onlyMine
-  ? list.filter(
-      (m) =>
-        m.owner === USER ||
-        m.mint === '5YXmrcsBjQh7naKgD6j6vjLTiYWmCWjBsg9k6TnNbKd4' ||
-        m.mint === '4XbCLB2oJz7cmSAjKicRiCoyPTjvBi1XnY2ryFKt5bao'
-    )
-  : list;
+let targets = list;
+if (onlyMint) {
+  targets = list.filter((m) => m.mint === onlyMint);
+} else if (onlyMine) {
+  targets = list.filter(
+    (m) =>
+      m.owner === USER ||
+      m.mint === '5YXmrcsBjQh7naKgD6j6vjLTiYWmCWjBsg9k6TnNbKd4' ||
+      m.mint === '4XbCLB2oJz7cmSAjKicRiCoyPTjvBi1XnY2ryFKt5bao'
+  );
+}
 
 console.log('Updating', targets.length, 'seed NFT(s) → growto.live botanical images…\n');
 
@@ -115,7 +138,7 @@ for (const row of targets) {
       importedAt: row.mintedAt || existingJson?.rwa?.importedAt,
     };
 
-    const stageKey = stageKeyFromMetadata(existingJson || {});
+    const stageKey = stageKeyFromMetadata(existingJson || {}, row);
     const imageUri = stageImageUrl(stageKey);
     seed.image = imageUri;
 

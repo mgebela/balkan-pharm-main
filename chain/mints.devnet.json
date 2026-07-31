@@ -5,18 +5,19 @@
     "batch": "B-2026-07-A",
     "plantId": null,
     "mint": "6x5fcn5znp2BoDdjSKJ1JB2NFrYKaD6ozeK5MncGTLxW",
-    "metadataUri": "https://gateway.irys.xyz/7RSsjLxxUA3ybpzFi1Lk33bLXWd7jtftdrZYd9LvVeSn",
+    "metadataUri": "https://gateway.irys.xyz/EMBxGezsnmWeREHqzUkmaAktv5ZT9t1BgwKbiSzcwQK8",
     "signature": "4naenqbjSw6CLAp4VGHFXz44dqNd9Uwf2YMarSN4Ua9fr7SyCTW9AKDkeUFRTVnXz61PzJULk3H7SPoYAPBpqHhB",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
     "mintedAt": "2026-07-31T20:47:51.461Z",
     "transferredAt": "2026-07-17T17:09:47.290Z",
     "transferSignature": "38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn",
     "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
-    "artUpdatedAt": "2026-07-31T20:47:51.461Z",
+    "artUpdatedAt": "2026-07-31T20:57:53.077Z",
     "replacedMint": "5YXmrcsBjQh7naKgD6j6vjLTiYWmCWjBsg9k6TnNbKd4",
     "replacedAt": "2026-07-31T20:47:51.461Z",
     "artSource": "growto.live-botanical",
-    "repairNote": "Reminted — previous metadata PDA was empty/corrupt"
+    "repairNote": "Reminted — previous metadata PDA was empty/corrupt",
+    "artUpdateSignature": "XL7KzfKbenRQCVfhKzcQt7XAboL8Q3MBXNgQt1Z2B7szXtAJgrSgEkVJi2uo6PWWtEX7xXguYgvKwpPAAuVpGW4"
   },
   {
     "name": "CBD Auto #2",
@@ -24,18 +25,19 @@
     "batch": "B-2026-07-A",
     "plantId": null,
     "mint": "4mZF55uLFB2qVTo9tpFrezp4hruaPmU6JQC8nhJh787d",
-    "metadataUri": "https://gateway.irys.xyz/CtgocbcZiiZLsoHipkFVnd9iNFqFwwwqG6L21a72LnaE",
+    "metadataUri": "https://gateway.irys.xyz/EAdcAcowtjtKyFsA2zMytTwFrwi1jaD898K8U4fA85aq",
     "signature": "2YKP6VwRmBod4xdYWCD1N4UKfPYGTxVerQ9hi9tY2ik3KmRHcCyCzqn331FEsbTVcx3sqAqBS4V8hxwVYdN4tiVZ",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
     "mintedAt": "2026-07-31T20:48:07.574Z",
     "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
-    "artUpdatedAt": "2026-07-31T20:48:07.574Z",
+    "artUpdatedAt": "2026-07-31T20:57:56.320Z",
     "transferredAt": "2026-07-17T17:33:17.822Z",
     "transferSignature": "27xe2V9Vh7ycRQyXE6LsewsWjhjEjFF68bfoRvbBfPm2oekJ45ZJWPc9kipDPibXy6t6qLEb2GLWRSDhWs739Uh9",
     "replacedMint": "76MGoms6RRjJgCbkM9NSCNVK67z76vGfWp33eZbY4YLz",
     "replacedAt": "2026-07-31T20:48:07.574Z",
     "artSource": "growto.live-botanical",
-    "repairNote": "Reminted — previous metadata PDA was empty/corrupt"
+    "repairNote": "Reminted — previous metadata PDA was empty/corrupt",
+    "artUpdateSignature": "54ZTDEE8tB4vLHgM7tePaSVL32GTNTteSMZfQMcsRyPwP3Br1w2yVYQSEsezCdNUDQxWrdQoUwci7iV4arW2ABFX"
   },
   {
     "name": "CBD Auto #3",
@@ -43,18 +45,19 @@
     "batch": "B-2026-07-A",
     "plantId": null,
     "mint": "5LsCudbhC1ZYfjtPLpSyLVVzSYvDm8m1ss1KHXsMuYpB",
-    "metadataUri": "https://gateway.irys.xyz/B7Dsa6wUZHFNMn1ke5apXGQ52bKSvRzdWPkwGaYvSrpE",
+    "metadataUri": "https://gateway.irys.xyz/E2K1v432n1XV8gQyQqToTXg6HWQhtaqCK5k3qh7ae7Rb",
     "signature": "5FXDPKa1NKWJXc4X45LpA8Jvci3A4CphyQooRErYYmQvBa5B3gUsyhXkh8D23DUsUXbbyWmRBGZs1zwbnVRV5iV8",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
     "mintedAt": "2026-07-31T20:48:23.274Z",
     "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
-    "artUpdatedAt": "2026-07-31T20:48:23.274Z",
+    "artUpdatedAt": "2026-07-31T20:58:09.248Z",
     "transferredAt": "2026-07-17T17:33:30.100Z",
     "transferSignature": "DT5ih8RC8xpk1RDnAVAS371gcovypRmdK2jN54yrHMF1dLTCd4NKE4vapsTK98x7JoLPAPhh6WcHEo5BmTW5vyq",
     "replacedMint": "6GxDhLgVWb8rL1ZURE2EfVLdEtMLD69wHVWqFDc1nezG",
     "replacedAt": "2026-07-31T20:48:23.274Z",
     "artSource": "growto.live-botanical",
-    "repairNote": "Reminted — previous metadata PDA was empty/corrupt"
+    "repairNote": "Reminted — previous metadata PDA was empty/corrupt",
+    "artUpdateSignature": "2sAooczcW51BaR8G8JasZ5DbLnCfQX7rD4XGnKzChbCnArWVESccVb9xBwYsUfSC7AnLBj6p3jbAAar4mcTjvJMy"
   },
   {
     "name": "Charlotte's Web #1",
@@ -62,18 +65,19 @@
     "batch": "B-2026-07-B",
     "plantId": null,
     "mint": "DkDpWmdpENgx16sEx2dmxZu3STgkdo9JwKgiKv1bKfro",
-    "metadataUri": "https://gateway.irys.xyz/4YMeHLjyGnjbjoQBJgMCdvNiH77NGCVG5PhXRYBHaHbp",
+    "metadataUri": "https://gateway.irys.xyz/BpTM3VwfP23w5rLBBsPhtrL5d1iT4Rzet88YrGy6gCyM",
     "signature": "5abDsGyAzZVL8YLMU85NN5nY8KCmD5FLVWoM7V7AJWFsAs52BcYXKtfTon5LTkFWTPUq35RR4Kf9Dj6ErdBLCXvZ",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
     "mintedAt": "2026-07-31T20:48:38.746Z",
     "transferredAt": "2026-07-17T17:09:59.702Z",
     "transferSignature": "3Sj2KUNu2HArQTk8xAVVaXtff4ZCMZQYXFrGphuGyfgSbseK9Dk6fvGhnUmGPe9jrYin3HiPtaDvhVyFyTcSWQFf",
     "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
-    "artUpdatedAt": "2026-07-31T20:48:38.746Z",
+    "artUpdatedAt": "2026-07-31T20:58:11.420Z",
     "replacedMint": "4XbCLB2oJz7cmSAjKicRiCoyPTjvBi1XnY2ryFKt5bao",
     "replacedAt": "2026-07-31T20:48:38.746Z",
     "artSource": "growto.live-botanical",
-    "repairNote": "Reminted — previous metadata PDA was empty/corrupt"
+    "repairNote": "Reminted — previous metadata PDA was empty/corrupt",
+    "artUpdateSignature": "2jAx19a9SNefrPjqWddxmbanjdfLWm9wc1rqviVZFDa3GHXwomVY9ht6Y2e9d92qPEqjkkfRvE3LynoNx4ZDUjbq"
   },
   {
     "name": "Harlequin #1",
@@ -81,13 +85,14 @@
     "batch": "B-2026-07-B",
     "plantId": null,
     "mint": "9D15rEKrL5eZrbMPmJhARWobRYW3HZL2wxtV4RMAdCrV",
-    "metadataUri": "https://gateway.irys.xyz/EhCaHcJkHbG4ahCZZfafCTRThc3aJKqGiSWUdVrK4ASg",
+    "metadataUri": "https://gateway.irys.xyz/56evzrHjKkae1kDxZnxauCBxHTp345ft1k4gDZF3bc5R",
     "signature": "2ku2UhinDShq7Qdtr8EdQy7J5VZJdjuLRJ4U23S2Fuxcv6RaQrD1Viqaj2W2BeUXj1iu9eRMtW9ekWKTz6TqBRqu",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:21:43.078Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:15.752Z",
-    "artUpdateSignature": "d35BH4FnFtUTz83ADu4h1s6SZ9AVvdgGxreDZizofDxQ7u4xQKeDMuPaNu1kccSHE3jKRjzRV7KmzZJ6U9wBhKk"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:13.172Z",
+    "artUpdateSignature": "2nvGT2kpH2At6E9Ted8NmuDtKaK19HF5Gfk5spzrxZWQ4TJipt9dTcsw4t4GUnGZFZHyWJKsMuVSpKYa1LHPNEX3",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Harlequin #2",
@@ -95,13 +100,14 @@
     "batch": "B-2026-07-B",
     "plantId": null,
     "mint": "C6nrkXCWptoP46dAh7eQSEnaJb3aRWLQgfPQfZsStkzq",
-    "metadataUri": "https://gateway.irys.xyz/9VU2LKmHdChCFEZn4sAE4ZyKVecNBrkpNDQtDaZZNwPn",
+    "metadataUri": "https://gateway.irys.xyz/HLDcTPeUoTUhzfXJHhuwR2P1cRE3uWpUsJiHdGRDaQb5",
     "signature": "2SDc577g7xdk3tNUNJPjstSqDsbg8rDsvekUHGyC2Mh2HSdoVTqorT9UYEciNFbmTkXUAaPgqGEAof7DnHh8FRRN",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:22:07.730Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:28.439Z",
-    "artUpdateSignature": "uqHqr7R6XFyRUSkZfzkM8xCfuRXt1ShzrPqgWvdWksF6u7FAEKuSziA5Y4q1Xf9uPpTgggR7xqffbbncFPfW2UV"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:14.950Z",
+    "artUpdateSignature": "25U2yzTdv626KJUVMDPZ3QJsczJ3ncJ1iv2xZ4SL2VvWce9wvUAZCfofkY2xvpZgiz12YREZoLVuVLiquD2SfTZ3",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "ACDC #1",
@@ -109,13 +115,14 @@
     "batch": "B-2026-07-C",
     "plantId": null,
     "mint": "12FJCshXmDfnDXXaopiNViLjrRGBLX29K5DVcBrzCq2o",
-    "metadataUri": "https://gateway.irys.xyz/33xQmUDgA3t7THRG1xjBD7NXGe5xTw42E8yToRy9DMin",
+    "metadataUri": "https://gateway.irys.xyz/AvEBLsLywzGT5FYeb5CGZp4LhA5Jsb6QHLzMqLZaEDwd",
     "signature": "5Ukrv67qgfR5CtNSM1HGQKWwHTH9gSvhJgXdKHM9e7zEcwd4cxqUF7p1RQwJeto3vH1uWiyWA1yTAWcsHajqwBxv",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:22:32.626Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:41.175Z",
-    "artUpdateSignature": "2wAhcRqd7h92MAasrGyaeGaZg9FK6ZAoVEidE8yuZ4r3Uv7VxX3oeaT3iZM3xmcWgRZWiR6k1UYPs1dDAVGexCxx"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:28.221Z",
+    "artUpdateSignature": "62B8ooBXzoMbjtthCCGpPQspspLtsgUGc6bzQxYRkc8a74k6oNqQTVw4QF1g9NP3MBCZPFK7q4xTN2oxvb54PSLW",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "ACDC #2",
@@ -123,13 +130,14 @@
     "batch": "B-2026-07-C",
     "plantId": null,
     "mint": "Dn2SfK4yfcXfD6oFuNRWMyUmA3NZzNty7XBRzvtpTTyW",
-    "metadataUri": "https://gateway.irys.xyz/3HsYcPNnmFZ3MG8LYDcwGNdieGNXR6RsSKjtWbsWC3aK",
+    "metadataUri": "https://gateway.irys.xyz/ELT2zhtXU3pp11SoN7TckCiaoJo7R1CgsXsgZyzjdyYq",
     "signature": "YnpBw3pPqHyY59T8gi8VkX7tnqTbC7LYNA9ZDZxN5ztCRuMcXwe97bfn6C979YgkCCKXAhfK846bLN5QTJQAeLG",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:22:57.281Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:53.941Z",
-    "artUpdateSignature": "3HwhBmyME9Z7kJAaetxfXEoq1weii5P9cwFHafUP8dLa9ceuR8fsd59VKHcNBgQJ3uT3EtVcPgYFyQV7DwUzrt26"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:30.205Z",
+    "artUpdateSignature": "5npiZ28JJJUaLJfwaXzNEE3X1mHBfjUsVXhTyUC2LB3923e8YZjJeMbXHexhyGPonrEVc5YZvsgWFA8kG2ByyPCw",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Ringo's Gift #1",
@@ -137,13 +145,14 @@
     "batch": "B-2026-07-C",
     "plantId": null,
     "mint": "6AaFoJTnDD5XHBZJqGSZfTo7xAAhb2zrsaxQyXaHiM5n",
-    "metadataUri": "https://gateway.irys.xyz/BEnFHm6FsvQR3t6WaWH86Po2hdbyx5pG95q5o5scwAL9",
+    "metadataUri": "https://gateway.irys.xyz/AJtJhtHv3ZAWAnfrvHQwha6CC97ahMoxk7M9dCTZjsu1",
     "signature": "5cYd2eGV1oHewwqbzuEQng1jVTbSvRpWtyoJEGt3LLQk4d7WAeYAzRwrTLiKPuuu7n3KW5RMT8nKSiqhGWvcmWcP",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:23:22.259Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:55.082Z",
-    "artUpdateSignature": "4ue3yp52Ygezmnp4LC4tpaAu4dys8XHEFKcDkxpNUQu4RkQRfGzqY89TmFYhLPA5q1JkSGLrizLUJeMTX7cwGxhe"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:32.070Z",
+    "artUpdateSignature": "AWxxoNmLwy5ZaRjDEWGUDwBCkxp666kwJWquSBH9WaeTohiy6q9pCJx7RaBt5z2mXfgwF9YVaTqYn3C1S5Adffk",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Ringo's Gift #2",
@@ -151,13 +160,14 @@
     "batch": "B-2026-07-C",
     "plantId": null,
     "mint": "FEEH8qoT4nJoqEatBKLCdcUFUGPK3ND58uJVzahagysr",
-    "metadataUri": "https://gateway.irys.xyz/HLXvcKh2P1gPKmGUMyde9WqxXRUdVD3a3v2ZUUU3SFA2",
+    "metadataUri": "https://gateway.irys.xyz/8ADjTw8ZLMDGNs8J9xaVfvGywhSTnThxbaGTPRCp5h8p",
     "signature": "4Lsz7W9mz4D3kGCuSHLgxT3e1XYCg7mmvQMWGfodNURs7kDbGPvPhX9WLQ87hHtgoKiroVCKntFxV8eqTw1KREX7",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:23:47.243Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:19:56.211Z",
-    "artUpdateSignature": "4FtWr9T8AeXrymKoSotXPbDJKgrrUqEgeEgr7K4uovYJ8PCGFtjAbT5pZFFaKG8nKBxEiPS47eFohaz4rAJPi3Rc"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:44.858Z",
+    "artUpdateSignature": "5jANLm2nCVNRAZnT6bNC5AqEvpxi3ngCVK2j3K8Wat8f1CiozMCtYa5g4hj68oupbP48JufkpKnsN51btuN7vPfE",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Sour Tsunami #1",
@@ -165,13 +175,14 @@
     "batch": "B-2026-07-D",
     "plantId": null,
     "mint": "DjeHmdvhx3bSXWernbT3ja1wwgJXSBX4BQ66J81GB39E",
-    "metadataUri": "https://gateway.irys.xyz/GEb3jd2aw4tsyHUpTvyDJD5DCsQ6dQcbbRScffU5aMVX",
+    "metadataUri": "https://gateway.irys.xyz/8YJaLJrTJw1WRV76zuQr3qRWU1v4CZUtGj4T6Z4cf3Td",
     "signature": "4bVhnnBoCojNPupwS5yyXUHnMDYXf5tfgG5esNHfKeYe7qH7RYTVNpsidfrewGk33PcvjUfxFWaDATQSGAYeSAsK",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
     "mintedAt": "2026-07-15T16:24:11.997Z",
-    "imageUri": "https://gateway.irys.xyz/GSo4ogxdnUGrLD4YBi6ShLnNiNK7vLvp6dsCDoXaiLnz",
-    "artUpdatedAt": "2026-07-17T17:20:08.963Z",
-    "artUpdateSignature": "3JCLcb58RgiNkKghJ1KMM47uVg6RZbW2JJSKKe3hx4dnFitvHQm3prVSwcUk4K7529E8ADa9DQmMGDfx98rmZHCq"
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:58:58.381Z",
+    "artUpdateSignature": "66zLRaTmjrZaQ1cMv39Z7WaaV3snfdgehVCSHmz9nyKSsBkuvyrBafUSk4d17E3zZiEy1zeAE8w7zEgxDo2AAtb9",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Charlotte's Web #2",
@@ -179,10 +190,14 @@
     "batch": "B-2026-07-B",
     "plantId": null,
     "mint": "4ZJyDn7LPtVipw6Aa3dZpg2i733YnRLFx8wBN9A7asss",
-    "metadataUri": "https://gateway.irys.xyz/UD54ER4fmiqRCyA17L8x1LHibfsJhk8yhbAXqML7fz7",
+    "metadataUri": "https://gateway.irys.xyz/5hA3eP2DMQgsUYAw8CjYGVtbFgrmEtkgwS7kA62oBGHk",
     "signature": "46C4r2fydWDDGxGydLrzXjXYXFRix17ZpcnQQfAAcDSsM1328HHWuGCcivj4J2srzBHh9GozMUuertHbeVdf8bfq",
     "owner": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
-    "mintedAt": "2026-07-19T18:38:32.960Z"
+    "mintedAt": "2026-07-19T18:38:32.960Z",
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "artUpdatedAt": "2026-07-31T20:59:00.894Z",
+    "artUpdateSignature": "5W4vWdJrmqUQsZE4ceYMkpw4xdV2MVrqvQxdLeao2Jiv536kFrbqkmBKMCeKsCU5tfnuHy97ud2xwbKq6YqcnXLJ",
+    "artSource": "growto.live-botanical"
   },
   {
     "name": "Gold Bloom #1",
@@ -190,12 +205,13 @@
     "batch": "B-2026-07-GOLD",
     "mint": "ChQymAm7zNmMjWKGE2ax99qjRLsCwB9dmdGGt8U2msGG",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
-    "metadataUri": "https://gateway.irys.xyz/C2aFyvqyu9K3KTNAETHPJHQtB4KFHRHToF6eGg11PTcp",
-    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
+    "metadataUri": "https://gateway.irys.xyz/Ca9yxHWZy4BFTRcC8n3SKx82M5e1YZjZ9FwwhR3but6Q",
+    "imageUri": "https://growto.live/token-metadata/images/plant-flowering.png",
     "signature": "2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH",
     "mintedAt": "2026-07-19T22:05:07.803Z",
-    "artUpdatedAt": "2026-07-31T19:00:34.681Z",
-    "artUpdateSignature": "5wFuyYYNvMWtNNHrL9r4KKtA7NNQBx36chLeHhxKrDJU4psh7G12rMz4fq7w9Ac6Rz3GWshkwuqaKgubALwLBjns",
-    "artSource": "growto.live-botanical"
+    "artUpdatedAt": "2026-07-31T20:59:13.961Z",
+    "artUpdateSignature": "5siZX9iZHWUmQSZXqyXsTu1E8HPFfQZ2yN5Y3JRScesDXXnvxFVQHja7QPPPLVJNAMWL5dEraHiiWJBwpRpnpy1",
+    "artSource": "growto.live-botanical",
+    "stage": "Flowering"
   }
 ]
