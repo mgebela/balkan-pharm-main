@@ -1,6 +1,8 @@
 name: Chain queues (mint · grow · market)
 
 # Cloud-hosted settlement so listings/mints don't depend on a local laptop.
+# Also kicked near-instantly by Cloud Function `kickChainQueues` (Firestore onWrite
+# + app ping + 2-minute schedule) via workflow_dispatch.
 # Required repo secrets:
 #   FIREBASE_SERVICE_ACCOUNT_JSON  — contents of chain/keys/firebase-service-account.json
 #   SOLANA_AUTHORITY_KEY_JSON      — mint authority (keys/devnet-authority.json)
@@ -13,6 +15,8 @@ on:
   schedule:
     - cron: '*/5 * * * *'
   workflow_dispatch:
+  repository_dispatch:
+    types: [chain-queues]
 
 concurrency:
   group: chain-queues

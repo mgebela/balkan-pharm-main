@@ -15,6 +15,7 @@ const {
   verifyMintDoc,
   persistHealth,
 } = require('./tx-health');
+const {kickChainQueues, becamePending} = require('./kick-chain-queues');
 const {getFirestore} = require('firebase-admin/firestore');
 
 initializeApp();
@@ -203,6 +204,63 @@ exports.settleMarketQueueSchedule = onSchedule(
     async () => {
       const result = await settleMarketPending();
       console.log('scheduled market settle', result);
+    },
+);
+
+/**
+ * Kick GitHub Actions chain-queues (mint · grow · market · adopt · platform).
+ * Used when a mint is queued so Devnet pickup is ~1–2 min instead of GH cron drift.
+ *
+ * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues
+ */
+exports.kickChainQueues = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 30,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (req, res) => {
+      if (!allowReconcileRequest(req)) {
+        res.status(429).json({ok: false, error: 'Too many kick requests'});
+        return;
+      }
+      try {
+        const body = req.method === 'GET' ? req.query : req.body || {};
+        const result = await kickChainQueues({
+          source: String(body.source || 'http'),
+          force: body.force === true || body.force === '1',
+        });
+        res.status(result.ok ? 200 : 500).json(result);
+      } catch (err) {
+        console.error('kickChainQueues', err);
+        res.status(500).json({ok: false, error: (err && err.message) || 'kick failed'});
+      }
+    },
+);
+
+/** Backup: re-dispatch queues every 2 minutes if anything is pending (debounced). */
+exports.kickChainQueuesSchedule = onSchedule(
+    {
+      schedule: 'every 2 minutes',
+      region: REGION,
+      timeoutSeconds: 30,
+      memory: '256MiB',
+    },
+    async () => {
+      const db = getFirestore();
+      const [seeds, growth] = await Promise.all([
+        db.collection('seedMints').where('status', '==', 'pending').limit(1).get(),
+        db.collection('growthMints').where('status', '==', 'pending').limit(1).get(),
+      ]);
+      if (seeds.empty && growth.empty) {
+        console.log('kickChainQueuesSchedule idle');
+        return;
+      }
+      const result = await kickChainQueues({source: 'schedule'});
+      console.log('kickChainQueuesSchedule', result);
     },
 );
 
@@ -460,7 +518,7 @@ exports.onMarketListingHealth = onDocumentWritten(
     },
 );
 
-/** After seed mint status → minted/failed. */
+/** After seed mint status → minted/failed (+ kick queue when newly pending). */
 exports.onSeedMintHealth = onDocumentWritten(
     {
       document: 'seedMints/{requestId}',
@@ -478,6 +536,10 @@ exports.onSeedMintHealth = onDocumentWritten(
         : null;
       if (!after) return;
       try {
+        if (becamePending(before, after)) {
+          const kick = await kickChainQueues({source: 'seedMints-onWrite'});
+          console.log('onSeedMintHealth kick', event.params.requestId, kick);
+        }
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         await onMintDocChange(before, after, event.data.after.ref, 'seedMints');
       } catch (err) {
@@ -486,7 +548,7 @@ exports.onSeedMintHealth = onDocumentWritten(
     },
 );
 
-/** After growth mint status → minted/failed. */
+/** After growth mint status → minted/failed (+ kick queue when newly pending). */
 exports.onGrowthMintHealth = onDocumentWritten(
     {
       document: 'growthMints/{requestId}',
@@ -504,6 +566,10 @@ exports.onGrowthMintHealth = onDocumentWritten(
         : null;
       if (!after) return;
       try {
+        if (becamePending(before, after)) {
+          const kick = await kickChainQueues({source: 'growthMints-onWrite'});
+          console.log('onGrowthMintHealth kick', event.params.requestId, kick);
+        }
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         await onMintDocChange(before, after, event.data.after.ref, 'growthMints');
       } catch (err) {

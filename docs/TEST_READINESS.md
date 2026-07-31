@@ -28,6 +28,7 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest `chain-config`
 | `settleMarketQueue` / `reconcileMarketEscrow` | OK (idle queues) |
 | `chain health-check.js` | 0 critical / 0 warnings; no pending mints or stuck market |
 | GH Actions (`chain-queues`, `chain-health`, reconcile) | Recent runs **success** |
+| Mint queue kick CF (`kickChainQueues` + 2m schedule + onWrite) | Dispatches `chain-queues` when seed/growth pending |
 | Landing / app / dnevnik / docs / 404 / emails | HTTP 200 |
 | Botanical PNGs + brass `$GROWTOO` icon on growto.live | HTTP 200 (post `aecffb7`) |
 | Mint authority SOL | **~1.73** |

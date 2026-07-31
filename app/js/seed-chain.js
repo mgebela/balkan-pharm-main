@@ -43,6 +43,24 @@
     return 'B-' + d.getFullYear() + '-' + month;
   }
 
+  /** Ask Cloud Functions to dispatch GitHub Actions chain-queues (near-instant). */
+  function pingMintQueueKick(source) {
+    const url =
+      (window.ChainConfig && window.ChainConfig.mintQueueKickUrl) ||
+      'https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues';
+    try {
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source: source || 'seed-chain' }),
+      }).catch(function () {
+        /* ignore — Firestore onWrite + schedule are backups */
+      });
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function startWatch(uid) {
     if (unsubscribeSnapshot) {
       unsubscribeSnapshot();
@@ -148,6 +166,7 @@
       }
 
       const ref = await firebase.firestore().collection('seedMints').add(request);
+      pingMintQueueKick('seedMints');
       return ref.id;
     },
 
@@ -217,6 +236,7 @@
       }
 
       const ref = await firebase.firestore().collection('growthMints').add(request);
+      pingMintQueueKick('growthMints');
       return ref.id;
     },
 
