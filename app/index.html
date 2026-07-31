@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260731k" />
+  <link rel="stylesheet" href="styles/app.css?v=20260731m" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -217,6 +217,16 @@
           <button type="button" class="btn btn-ghost" id="btn-logout" hidden>Log out</button>
         </div>
       </header>
+
+      <section class="daily-start-strip" id="daily-start-strip" hidden aria-label="Start here">
+        <div class="daily-start-strip-inner">
+          <div class="daily-start-copy">
+            <p class="daily-start-kicker" id="daily-start-kicker">Start here</p>
+            <p class="daily-start-lead" id="daily-start-lead"></p>
+          </div>
+          <div class="daily-start-actions" id="daily-start-actions"></div>
+        </div>
+      </section>
 
       <div class="notif-overlay" id="notif-overlay" hidden>
         <button type="button" class="notif-backdrop" id="notif-backdrop" aria-label="Close inbox"></button>
@@ -1019,6 +1029,31 @@
     </div>
   </div>
 
+  <div id="daily-status-overlay" class="daily-status-overlay" hidden>
+    <button type="button" class="daily-status-backdrop" id="daily-status-backdrop" aria-label="Dismiss"></button>
+    <div
+      class="daily-status-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="daily-status-title"
+    >
+      <div class="daily-status-handle" aria-hidden="true"></div>
+      <button type="button" class="daily-status-x" id="daily-status-close" aria-label="Close">×</button>
+      <p class="daily-status-eyebrow">Daily status</p>
+      <h2 id="daily-status-title" class="daily-status-title">While you were away</h2>
+      <p class="daily-status-away" id="daily-status-away"></p>
+      <ul class="daily-status-gains" id="daily-status-gains"></ul>
+      <div class="daily-status-next">
+        <p class="daily-status-next-label">Next step</p>
+        <p class="daily-status-next-lead" id="daily-status-next-lead"></p>
+        <button type="button" class="btn btn-primary" id="daily-status-next-btn">Continue</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm daily-status-continue" id="daily-status-continue">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
   <div id="app-confirm-overlay" class="app-confirm-overlay" hidden>
     <button type="button" class="app-confirm-backdrop" id="app-confirm-backdrop" aria-label="Dismiss"></button>
     <div
@@ -1074,9 +1109,10 @@
   <script src="js/notifications.js?v=20260730k"></script>
   <script src="js/signup.js?v=20260729g"></script>
   <script src="js/plant-token.js?v=20260731k"></script>
+  <script src="js/daily-status.js?v=20260731m"></script>
   <script src="js/coach-core.js?v=20260730k"></script>
   <script src="js/ai-coach.js?v=20260730k"></script>
-  <script src="js/app.js?v=20260731d"></script>
+  <script src="js/app.js?v=20260731m"></script>
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

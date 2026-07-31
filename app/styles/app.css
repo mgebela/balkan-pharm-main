@@ -9815,3 +9815,222 @@ body.app-confirm-open {
 .empty-state--next .btn {
   width: auto;
 }
+
+/* Role-first start strip + idle daily status popup */
+.daily-start-strip {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  background:
+    radial-gradient(420px 120px at 100% 0%, rgba(201, 165, 94, 0.1), transparent 60%),
+    linear-gradient(180deg, rgba(24, 38, 28, 0.95), rgba(14, 22, 16, 0.98));
+}
+.daily-start-strip-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+.daily-start-kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.daily-start-lead {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--text);
+  max-width: 42ch;
+}
+.daily-start-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.daily-status-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 330;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  pointer-events: none;
+}
+.daily-status-overlay:not([hidden]) {
+  pointer-events: auto;
+}
+.daily-status-backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: rgba(4, 10, 8, 0.66);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.daily-status-overlay:not([hidden]) .daily-status-backdrop {
+  opacity: 1;
+}
+.daily-status-sheet {
+  position: relative;
+  z-index: 1;
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: min(84vh, 36rem);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem 1.15rem 1.15rem;
+  border: 1px solid rgba(201, 165, 94, 0.32);
+  border-radius: 18px 18px 12px 12px;
+  background:
+    radial-gradient(280px 140px at 10% 0%, rgba(201, 165, 94, 0.14), transparent 55%),
+    linear-gradient(180deg, #1a2a1f 0%, #121c16 100%);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+  transform: translateY(16px);
+  opacity: 0;
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+.daily-status-overlay:not([hidden]) .daily-status-sheet {
+  transform: translateY(0);
+  opacity: 1;
+}
+.daily-status-handle {
+  width: 2.5rem;
+  height: 0.28rem;
+  margin: 0 auto 0.1rem;
+  border-radius: 999px;
+  background: rgba(201, 165, 94, 0.35);
+}
+.daily-status-x {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
+}
+.daily-status-eyebrow {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.daily-status-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 350;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+  padding-right: 1.5rem;
+}
+.daily-status-away {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+.daily-status-gains {
+  list-style: none;
+  margin: 0.35rem 0 0.15rem;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.daily-status-gain {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 165, 94, 0.16);
+  background: rgba(8, 14, 10, 0.45);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text);
+  animation: daily-gain-rise 0.45s ease both;
+}
+.daily-status-gain:nth-child(2) { animation-delay: 0.05s; }
+.daily-status-gain:nth-child(3) { animation-delay: 0.1s; }
+.daily-status-gain:nth-child(4) { animation-delay: 0.15s; }
+.daily-status-gain:nth-child(5) { animation-delay: 0.2s; }
+.daily-status-gain--quiet {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+.daily-status-gain-icon {
+  flex: 0 0 auto;
+  color: var(--brass);
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+@keyframes daily-gain-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.daily-status-next {
+  margin-top: 0.35rem;
+  padding: 0.75rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 165, 94, 0.22);
+  background: rgba(201, 165, 94, 0.06);
+  display: grid;
+  gap: 0.35rem;
+}
+.daily-status-next-label {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.daily-status-next-lead {
+  margin: 0 0 0.25rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+.daily-status-continue {
+  align-self: center;
+  margin-top: 0.15rem;
+}
+body.daily-status-open {
+  overflow: hidden;
+}
+@media (min-width: 720px) {
+  .daily-status-overlay {
+    align-items: center;
+  }
+  .daily-status-sheet {
+    border-radius: 16px;
+  }
+  .daily-status-handle {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-status-gain,
+  .daily-status-sheet,
+  .daily-status-backdrop {
+    animation: none !important;
+    transition: none !important;
+  }
+}

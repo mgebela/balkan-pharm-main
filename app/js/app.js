@@ -1082,6 +1082,15 @@ async function ensureUserExists(user) {
     console.log("User created", currentProfileType);
   } else {
     const data = docSnap.data() || {};
+    // Capture previous login before overwrite — DailyStatus uses this for "while away".
+    try {
+      sessionStorage.setItem(
+        'dnevnik-live-prev-login-at:' + user.uid,
+        data.lastLoginAt ? String(data.lastLoginAt) : ''
+      );
+    } catch (_) {
+      /* ignore */
+    }
     const patch = { lastLoginAt: new Date().toISOString() };
     if (hybridUser && data.role === 'viewer') {
       patch.role = 'user';
@@ -1230,6 +1239,7 @@ function adopterIntentCopy() {
       hero: 'Collect adopted plants and follow each growth stage in your garden.',
       empty: 'Browse the market to adopt your first plant and grow your collection.',
       market: 'Find open plant offers and back them with $GROWTOO when you’re ready.',
+      strip: 'Claim test $GROWTOO, browse the market, and collect your first plant.',
     };
   }
   if (intent === 'earn_rewards') {
@@ -1237,12 +1247,14 @@ function adopterIntentCopy() {
       hero: 'Practice stakes and harvest unlocks on test assets — no monetary value.',
       empty: 'Back an open offer to start following growth and harvest care on the test network.',
       market: 'Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.',
+      strip: 'Claim test $GROWTOO, stake on a live offer, then watch monthly unlock in My garden.',
     };
   }
   return {
     hero: 'Follow a real plant’s journal trail. Backing with $GROWTOO is optional.',
     empty: 'Browse the market and back a grow with $GROWTOO when you are ready.',
     market: 'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.',
+    strip: 'Claim test $GROWTOO, then invest in a live plant offer.',
   };
 }
 
@@ -1658,6 +1670,16 @@ function initFirebaseSync() {
     } finally {
       authBootstrapInFlight = false;
       finishAppLoading();
+      if (window.DailyStatus && typeof DailyStatus.maybeShowAfterLogin === 'function') {
+        try {
+          DailyStatus.maybeShowAfterLogin({
+            uid: user.uid,
+            profileType: isAdopterProfile() ? 'adopter' : 'grower',
+          });
+        } catch (statusErr) {
+          console.warn('DailyStatus', statusErr);
+        }
+      }
     }
   });
 }
