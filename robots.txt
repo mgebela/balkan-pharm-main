@@ -4,6 +4,7 @@
 
 User-agent: *
 Allow: /
+Disallow: /emails/
 
 User-agent: GPTBot
 Disallow: /

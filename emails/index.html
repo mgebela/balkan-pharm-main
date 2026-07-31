@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email templates · growtoo</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0f1a12" />
+  <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,350;9..144,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1a12;
+      --card: #132016;
+      --brass: #c9a55e;
+      --brass-ink: #1a1408;
+      --text: #f3efe6;
+      --muted: rgba(184, 196, 176, 0.78);
+      --border: rgba(201, 165, 94, 0.22);
+      --font: 'Archivo', sans-serif;
+      --display: 'Fraunces', serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(800px 420px at 85% -5%, rgba(201, 165, 94, 0.08), transparent 55%),
+        linear-gradient(180deg, #0c1610, var(--bg) 40%, #101c14);
+      min-height: 100vh;
+    }
+    .wrap { max-width: 920px; margin: 0 auto; padding: 1.5rem 1.15rem 3rem; }
+    header { margin-bottom: 1.5rem; }
+    .tag {
+      margin: 0 0 0.4rem;
+      font-size: 0.72rem;
+      font-weight: 650;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+    h1 {
+      margin: 0 0 0.45rem;
+      font-family: var(--display);
+      font-weight: 350;
+      font-size: clamp(1.6rem, 4vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+    .lead { margin: 0; color: var(--muted); line-height: 1.45; max-width: 40rem; }
+    .lead a { color: var(--brass); }
+    .howto {
+      margin: 1.25rem 0 1.75rem;
+      padding: 0.95rem 1.1rem;
+      border: 1px dashed rgba(201, 165, 94, 0.4);
+      border-radius: 12px;
+      background: rgba(201, 165, 94, 0.06);
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .howto strong { color: var(--brass); }
+    .howto ol { margin: 0.55rem 0 0; padding-left: 1.2rem; }
+    .howto li + li { margin-top: 0.35rem; }
+    .grid {
+      display: grid;
+      gap: 1.25rem;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      overflow: hidden;
+    }
+    .card-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .card-bar span { color: var(--muted); }
+    .card-bar a {
+      color: var(--brass);
+      font-weight: 650;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    .card-bar a:hover { color: #d8b872; }
+    iframe {
+      display: block;
+      width: 100%;
+      height: 640px;
+      border: 0;
+      background: #0c1610;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--brass); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="tag">Brand system</p>
+      <h1>Email templates</h1>
+      <p class="lead">
+        Catalog forest + brass for Firebase Auth and future transactional mail.
+        Open a file, copy the HTML into Firebase Console, keep the
+        <code>%LINK%</code> / <code>%EMAIL%</code> placeholders.
+      </p>
+    </header>
+
+    <div class="howto">
+      <strong>Firebase Auth setup</strong>
+      <ol>
+        <li>Firebase Console → Authentication → Templates</li>
+        <li>Edit Email address verification, Password reset, and Email address change</li>
+        <li>Set subject from the HTML comment in each file; paste the full HTML (or body)</li>
+        <li>Sender name: <em>growtoo</em> · reply-to as needed</li>
+      </ol>
+      Transactional previews (<em>welcome</em>, <em>stage sealed</em>, <em>market settled</em>) use
+      <code>{{placeholders}}</code> for a future mailer — not wired yet.
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-bar">
+          <span>Auth · Verify email</span>
+          <a href="verify-email.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="verify-email.html" title="Verify email preview" loading="lazy"></iframe>
+      </article>
+
+      <article class="card">
+        <div class="card-bar">
+          <span>Auth · Reset password</span>
+          <a href="reset-password.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="reset-password.html" title="Reset password preview" loading="lazy"></iframe>
+      </article>
+
+      <article class="card">
+        <div class="card-bar">
+          <span>Auth · Change email</span>
+          <a href="change-email.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="change-email.html" title="Change email preview" loading="lazy"></iframe>
+      </article>
+
+      <article class="card">
+        <div class="card-bar">
+          <span>Transactional · Welcome</span>
+          <a href="welcome.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="welcome.html" title="Welcome preview" loading="lazy"></iframe>
+      </article>
+
+      <article class="card">
+        <div class="card-bar">
+          <span>Transactional · Stage sealed</span>
+          <a href="stage-sealed.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="stage-sealed.html" title="Stage sealed preview" loading="lazy"></iframe>
+      </article>
+
+      <article class="card">
+        <div class="card-bar">
+          <span>Transactional · Market settled</span>
+          <a href="market-settled.html" target="_blank" rel="noopener">Open file</a>
+        </div>
+        <iframe src="market-settled.html" title="Market settled preview" loading="lazy"></iframe>
+      </article>
+    </div>
+
+    <footer>
+      <a href="../">Back to growtoo</a>
+      · Preview only — paste Auth templates into Firebase to go live
+    </footer>
+  </div>
+
+  <script>
+    // Demo-fill placeholders so iframes look real in preview
+    document.querySelectorAll('iframe').forEach(function (frame) {
+      frame.addEventListener('load', function () {
+        try {
+          var doc = frame.contentDocument;
+          if (!doc || !doc.body) return;
+          var html = doc.documentElement.innerHTML
+            .replace(/%LINK%/g, 'https://growto.live/app/')
+            .replace(/%EMAIL%/g, 'grower@example.com')
+            .replace(/\{\{name\}\}/g, 'Grower')
+            .replace(/\{\{app_url\}\}/g, 'https://growto.live/app/')
+            .replace(/\{\{plant_name\}\}/g, "Charlotte's Web #1")
+            .replace(/\{\{stage\}\}/g, 'Seedling')
+            .replace(/\{\{reward\}\}/g, '20')
+            .replace(/\{\{amount\}\}/g, '120')
+            .replace(/\{\{role\}\}/g, 'acquired')
+            .replace(/\{\{solscan_url\}\}/g, 'https://solscan.io/?cluster=devnet');
+          doc.open();
+          doc.write(html);
+          doc.close();
+        } catch (e) {
+          /* file:// may block; open file directly instead */
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1497,6 +1497,11 @@ function getInitialViewFromUrl() {
 
 function finishAppLoading() {
   document.body.classList.remove('app-loading');
+  const boot = document.getElementById('app-boot');
+  if (boot) {
+    boot.setAttribute('aria-busy', 'false');
+    boot.hidden = true;
+  }
 }
 
 function initFirebaseSync() {

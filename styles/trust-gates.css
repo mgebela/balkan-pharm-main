@@ -1,4 +1,4 @@
-/* Age gate + cookie consent — shared across marketing site and auth */
+/* Age gate + cookie consent — catalog forest + brass */
 .trust-gate {
   position: fixed;
   inset: 0;
@@ -17,27 +17,28 @@
 .trust-gate-card {
   width: min(100%, 26rem);
   padding: 1.5rem 1.45rem 1.35rem;
-  border-radius: 16px;
-  border: 1px solid rgba(140, 200, 140, 0.22);
-  background: linear-gradient(165deg, rgba(14, 36, 24, 0.98) 0%, rgba(8, 18, 12, 0.99) 100%);
-  color: rgba(232, 255, 233, 0.92);
+  border-radius: 12px;
+  border: 1px solid rgba(201, 165, 94, 0.22);
+  background: linear-gradient(165deg, rgba(18, 28, 20, 0.98) 0%, rgba(12, 20, 14, 0.99) 100%);
+  color: #f3efe6;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
   font-family: 'Archivo', system-ui, sans-serif;
 }
 
 .trust-gate-card h2 {
   margin: 0 0 0.55rem;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-family: 'Fraunces', 'Archivo', serif;
+  font-size: 1.35rem;
+  font-weight: 350;
   letter-spacing: -0.02em;
-  color: #f4fff4;
+  color: #f3efe6;
 }
 
 .trust-gate-card p {
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: rgba(190, 220, 190, 0.78);
+  color: rgba(184, 196, 176, 0.78);
 }
 
 .trust-gate-actions .btn,
@@ -48,27 +49,38 @@
   gap: 0.35rem;
   min-height: 2.75rem;
   padding: 0.55rem 1rem;
-  border-radius: 10px;
-  border: 1px solid rgba(140, 200, 140, 0.28);
+  border-radius: 4px;
+  border: 1px solid rgba(201, 165, 94, 0.4);
   font: inherit;
   font-weight: 650;
   font-size: 0.92rem;
   cursor: pointer;
   text-decoration: none;
-  color: rgba(232, 255, 233, 0.92);
-  background: rgba(180, 220, 180, 0.08);
+  color: #f3efe6;
+  background: transparent;
 }
 
 .trust-gate-actions .btn-primary,
 .cookie-banner-actions .btn-primary {
-  background: #d45a38;
-  border-color: rgba(255, 190, 160, 0.35);
-  color: #faf4ea;
+  background: #c9a55e;
+  border-color: #c9a55e;
+  color: #1a1408;
+}
+
+.trust-gate-actions .btn-primary:hover,
+.cookie-banner-actions .btn-primary:hover {
+  background: #d8b872;
+  border-color: #d8b872;
 }
 
 .trust-gate-actions .btn-ghost,
 .cookie-banner-actions .btn-ghost {
   background: transparent;
+}
+
+.trust-gate-actions .btn-ghost:hover,
+.cookie-banner-actions .btn-ghost:hover {
+  background: rgba(201, 165, 94, 0.1);
 }
 
 .trust-gate-actions .btn {
@@ -79,43 +91,41 @@
   margin-bottom: 1rem;
 }
 
+.trust-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
 .cookie-banner {
   position: fixed;
   left: 1rem;
   right: 1rem;
-  bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 9990;
-  max-width: 36rem;
-  margin: 0 auto;
-  padding: 1rem 1.1rem;
-  border-radius: 14px;
-  border: 1px solid rgba(140, 200, 140, 0.28);
-  background: rgba(10, 22, 16, 0.96);
-  color: rgba(232, 255, 233, 0.92);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.95rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 165, 94, 0.22);
+  background: rgba(15, 26, 18, 0.96);
+  color: rgba(184, 196, 176, 0.9);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
   font-family: 'Archivo', system-ui, sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
 
 .cookie-banner[hidden] {
   display: none !important;
 }
 
-.cookie-banner h2 {
-  margin: 0 0 0.35rem;
-  font-size: 1rem;
-  font-weight: 650;
-  color: #f4fff4;
-}
-
-.cookie-banner p {
-  margin: 0 0 0.85rem;
-  font-size: 0.88rem;
-  line-height: 1.45;
-  color: rgba(190, 220, 190, 0.75);
-}
-
 .cookie-banner a {
-  color: #e8c46a;
+  color: #c9a55e;
+  text-underline-offset: 0.18em;
 }
 
 .cookie-banner-actions {
@@ -124,24 +134,11 @@
   gap: 0.45rem;
 }
 
-.cookie-banner-actions .btn {
-  min-height: 2.5rem;
-}
-
-body.trust-gate-locked {
-  overflow: hidden;
-}
-
-body.trust-gate-locked > *:not(.trust-gate):not(.cookie-banner) {
-  /* Keep overlay readable; do not pointer-lock siblings beyond age gate */
-}
-
-@media (min-width: 720px) {
+@media (min-width: 640px) {
   .cookie-banner {
     left: auto;
     right: 1.25rem;
     bottom: 1.25rem;
-    width: min(100%, 26rem);
-    margin: 0;
+    max-width: 28rem;
   }
 }

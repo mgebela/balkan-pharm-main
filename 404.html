@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page not found · growtoo</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#0f1a12" />
+  <meta property="og:title" content="Page not found · growtoo" />
+  <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
+  <link rel="icon" href="/images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,350;9..144,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0f1a12;
+      --brass: #c9a55e;
+      --brass-ink: #1a1408;
+      --text: #f3efe6;
+      --text-muted: rgba(184, 196, 176, 0.78);
+      --border: rgba(201, 165, 94, 0.2);
+      --font: 'Archivo', sans-serif;
+      --font-display: 'Fraunces', serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 1.5rem;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(900px 480px at 85% -5%, rgba(201, 165, 94, 0.08) 0%, transparent 55%),
+        radial-gradient(700px 420px at 8% 45%, rgba(40, 80, 50, 0.18) 0%, transparent 50%),
+        linear-gradient(180deg, #0c1610 0%, var(--bg) 40%, #101c14 100%);
+    }
+    .miss {
+      width: min(100%, 26rem);
+      text-align: center;
+      padding: 1.75rem 1.35rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #132016;
+    }
+    .miss-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.4);
+    }
+    .miss-eyebrow {
+      margin: 0.85rem 0 0.45rem;
+      font-size: 0.68rem;
+      font-weight: 650;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brass);
+    }
+    h1 {
+      margin: 0 0 0.55rem;
+      font-family: var(--font-display);
+      font-weight: 350;
+      font-size: clamp(1.55rem, 4vw, 1.9rem);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0 0 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+    .miss-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      justify-content: center;
+    }
+    a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0.65rem 1.15rem;
+      border-radius: 4px;
+      font-weight: 650;
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--brass);
+      color: var(--brass-ink);
+      border: 1px solid var(--brass);
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid rgba(201, 165, 94, 0.55);
+    }
+  </style>
+</head>
+<body>
+  <main class="miss">
+    <img class="miss-mark" src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="56" height="56" />
+    <p class="miss-eyebrow">404</p>
+    <h1>This page isn’t in the journal</h1>
+    <p>The link may be old, or the page moved. Head home — or open your private journal if you’re signed in.</p>
+    <div class="miss-actions">
+      <a class="btn-primary" href="/">Back to home</a>
+      <a class="btn-secondary" href="/app/">Open journal</a>
+    </div>
+  </main>
+</body>
+</html>
