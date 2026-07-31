@@ -605,12 +605,6 @@ body::before {
   display: block;
   flex: 0 0 auto;
   box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.4);
-  filter:
-    brightness(1.08)
-    sepia(0.7)
-    hue-rotate(-8deg)
-    saturate(2.4)
-    contrast(1.05);
 }
 
 .sidebar-nav {
@@ -6614,12 +6608,19 @@ body.crypto-simple .crypto-simple-only {
   margin: 0.35rem 0 0.55rem;
 }
 
+.market-card-photo-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+}
+
 .market-card-photo {
   width: 72px;
   height: 72px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(80, 100, 70, 0.25);
+  background: #132016;
+  border: 1px solid rgba(201, 165, 94, 0.22);
 }
 
 .market-card-photo img {
@@ -6629,9 +6630,37 @@ body.crypto-simple .crypto-simple-only {
   display: block;
 }
 
+.market-card-photo--art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(70, 100, 65, 0.2), transparent),
+    #132016;
+}
+
+.market-card-photo--art .plant-grow-svg {
+  width: 100%;
+  height: 100%;
+  max-width: 68px;
+}
+
 .market-card-photo--empty {
   background:
     linear-gradient(145deg, rgba(90, 130, 80, 0.35), rgba(40, 55, 35, 0.5));
+}
+
+.market-card-photo-chip {
+  position: absolute;
+  right: -0.2rem;
+  bottom: -0.2rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0f1a12;
+  box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.4);
 }
 
 .market-card-stage-chip {
@@ -6878,11 +6907,23 @@ body.crypto-simple .crypto-simple-only {
   filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.45));
 }
 
+.adopt-token-banner-chip {
+  position: absolute;
+  left: 0.65rem;
+  bottom: 0.65rem;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0f1a12;
+  box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.45);
+}
+
 .adopt-token-banner--art {
   min-height: 188px;
   padding: 1rem 0.75rem 1.1rem;
-  background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(70, 100, 65, 0.18), transparent),
-    #121810;
+  background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(201, 165, 94, 0.08), transparent),
+    #132016;
 }
 
 .plant-grow-svg .grow-label {
@@ -8840,9 +8881,72 @@ table td {
   padding: 0.25rem 0.4rem;
 }
 
-.log-sheet-actions {
+.log-sheet-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.log-sheet-plants {
   display: grid;
+  gap: 0.4rem;
+  margin-bottom: 0.95rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.log-sheet-plant {
+  display: flex;
+  align-items: baseline;
   gap: 0.55rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(6, 14, 10, 0.55);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.log-sheet-plant.is-selected {
+  border-color: rgba(201, 165, 94, 0.65);
+  background: rgba(201, 165, 94, 0.12);
+}
+
+.log-sheet-plant-no {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--brass);
+  flex: 0 0 auto;
+}
+
+.log-sheet-plant-name {
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-size: 1rem;
+}
+
+.log-sheet-empty {
+  margin: 0 0 0.85rem;
+  display: grid;
+  gap: 0.65rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.market-empty-cta {
+  margin: 0.35rem 0 0.85rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.market-empty-cta[hidden] {
+  display: none !important;
 }
 
 .ai-coach-root--panel-only .ai-coach-fab {

@@ -1042,12 +1042,37 @@
     );
   }
 
+  function storyArtHtml(listing) {
+    let stageIndex = 0;
+    if (window.PlantToken && typeof PlantToken.stageIndexFromLabel === 'function') {
+      stageIndex = PlantToken.stageIndexFromLabel(
+        listing.stage || listing.journalStage || listing.assetType || ''
+      );
+    }
+    let svg = '';
+    if (window.PlantToken && typeof PlantToken.renderPlantSvg === 'function') {
+      svg = PlantToken.renderPlantSvg(stageIndex, { compact: true });
+    } else if (window.TokenBotanicalArt && typeof TokenBotanicalArt.renderStageSvg === 'function') {
+      svg = TokenBotanicalArt.renderStageSvg(stageIndex, { compact: true });
+    }
+    if (svg) {
+      return (
+        '<div class="market-card-photo market-card-photo--art" aria-hidden="true">' +
+        svg +
+        '</div>'
+      );
+    }
+    return '<div class="market-card-photo market-card-photo--empty" aria-hidden="true"></div>';
+  }
+
   function storyBlockHtml(listing) {
-    const photo = listing.photo
-      ? '<div class="market-card-photo"><img src="' +
+    // Botanical etching is the card face; journal photo (if any) sits as a small seal.
+    const art = storyArtHtml(listing);
+    const photoChip = listing.photo
+      ? '<img class="market-card-photo-chip" src="' +
         esc(listing.photo) +
-        '" alt="" loading="lazy" /></div>'
-      : '<div class="market-card-photo market-card-photo--empty" aria-hidden="true"></div>';
+        '" alt="" loading="lazy" />'
+      : '';
     const stage = listing.stage || listing.journalStage || '';
     const snippets = Array.isArray(listing.journalSnippets) ? listing.journalSnippets : [];
     const journalHtml = snippets.length
@@ -1068,7 +1093,10 @@
       : '<p class="market-card-journal-empty">Journal trail linked — open after adopt to follow care logs.</p>';
     return (
       '<div class="market-card-story">' +
-      photo +
+      '<div class="market-card-photo-wrap">' +
+      art +
+      photoChip +
+      '</div>' +
       '<div class="market-card-story-body">' +
       (stage
         ? '<span class="market-card-stage-chip">' + esc(stage) + '</span>'
@@ -1285,6 +1313,11 @@
         }
 
         const hint = document.getElementById('market-list-hint');
+        const emptyCta = document.getElementById('market-empty-cta');
+        const goTokenise = document.getElementById('market-go-tokenise');
+        const formExtras = document.querySelectorAll(
+          '#market-list-form .market-offer-compare, #market-list-form .market-offer-helper, #market-list-form .seal-stage-label[for="market-price-input"], #market-list-form .market-price-field, #market-list-form button[type="submit"]'
+        );
         if (hint) {
           if (!options.length && blocked.length) {
             hint.hidden = false;
@@ -1293,12 +1326,28 @@
           } else if (!options.length) {
             hint.hidden = false;
             hint.textContent =
-              'Nothing to list yet. Seal a stage on Tokenise first — wallet stays optional until you’re ready.';
+              'Nothing sealed to list yet. Seal a stage on Tokenise first — then post it here.';
           } else {
             hint.hidden = true;
             hint.textContent = '';
           }
         }
+        if (emptyCta) emptyCta.hidden = !!options.length;
+        if (goTokenise) {
+          goTokenise.hidden = !!options.length;
+          if (!goTokenise.dataset.bound) {
+            goTokenise.dataset.bound = '1';
+            goTokenise.addEventListener('click', function () {
+              if (typeof window.showAppView === 'function') window.showAppView('adopt');
+            });
+          }
+        }
+        formExtras.forEach(function (el) {
+          if (el) el.hidden = !options.length;
+        });
+        const assetLabel = document.querySelector('label[for="market-asset-select"]');
+        if (assetLabel) assetLabel.hidden = !options.length;
+        sel.hidden = !options.length;
       }
 
       if (listSection) {

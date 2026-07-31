@@ -18,9 +18,9 @@
   var STAGE_LABELS = ['Seed', 'Germination', 'Seedling', 'Vegetative', 'Flowering', 'Harvest'];
 
   var C = {
-    bg: '#1a2218',
+    bg: '#132016',
     bracket: '#8fa88a',
-    label: '#f2f4ef',
+    label: '#f3efe6',
     soil: '#5a3a24',
     soilEdge: '#3d2718',
     root: '#a67c52',
@@ -32,8 +32,8 @@
     bud: '#d4a84a',
     budDeep: '#b8862e',
     budHi: '#f5e6b8',
-    sealRing: '#4a6b48',
-    sealDot: '#7aab72',
+    sealRing: '#c9a55e',
+    sealDot: '#d8b872',
   };
 
   var VW = 200;

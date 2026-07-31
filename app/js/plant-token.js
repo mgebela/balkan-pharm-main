@@ -1127,8 +1127,8 @@
           h.type === 'invest'
             ? 'Invested / adopted'
             : h.type === 'mint'
-              ? 'Seed minted'
-              : 'Grew to ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
+              ? 'Seed sealed'
+              : 'Sealed ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
         const amt =
           h.type === 'invest'
             ? h.amount
@@ -1152,13 +1152,12 @@
 
     return (
       '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + token.stageIndex + '">' +
-      '<div class="adopt-token-banner' + (plantPhoto ? '' : ' adopt-token-banner--art') + '">' +
+      '<div class="adopt-token-banner adopt-token-banner--art">' +
+      buildPlantGrowSvg(token.stageIndex, { compact: true }) +
       (plantPhoto
-        ? '<img class="adopt-token-banner-photo" src="' + esc(plantPhoto) + '" alt="" />'
-        : buildPlantGrowSvg(token.stageIndex, { compact: true })) +
-      (plantPhoto
-        ? '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>'
+        ? '<img class="adopt-token-banner-chip" src="' + esc(plantPhoto) + '" alt="" />'
         : '') +
+      '<span class="adopt-stage-badge adopt-token-banner-badge">' + esc(stage.label) + '</span>' +
       '</div>' +
       '<div class="adopt-token-body">' +
       '<div class="adopt-token-head">' +
@@ -2434,16 +2433,16 @@
           esc(shortAddr(linkedPubkey)) +
           ' — reconnect to sign.</p>'
         : '';
-      if (compact) {
-        return (
-          '<div class="wallet-controls wallet-controls--compact">' +
-          '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="Connect wallet">' +
-          '<span class="wallet-status-dot wallet-status-dot--off" aria-hidden="true"></span>' +
-          '<span class="wallet-status-addr">Connect</span>' +
-          '</button>' +
-          '</div>'
-        );
-      }
+    if (compact) {
+      return (
+        '<div class="wallet-controls wallet-controls--compact">' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="Connect Devnet wallet" aria-label="Connect wallet">' +
+        '<span class="wallet-status-dot wallet-status-dot--off" aria-hidden="true"></span>' +
+        '<span class="wallet-status-addr">Connect</span>' +
+        '</button>' +
+        '</div>'
+      );
+    }
       return (
         '<div class="wallet-controls wallet-controls--panel">' +
         '<div class="wallet-controls-copy">' +
@@ -2463,9 +2462,7 @@
     if (compact) {
       return (
         '<div class="wallet-controls wallet-controls--compact">' +
-        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="Tap to disconnect ' +
-        esc(wallet.address || '') +
-        '">' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="Connected — tap to disconnect" aria-label="Wallet connected, tap to disconnect">' +
         '<span class="wallet-status-dot" aria-hidden="true"></span>' +
         '<span class="wallet-status-addr">' +
         esc(shortAddr(wallet.address)) +
@@ -2531,7 +2528,13 @@
         e.preventDefault();
         const wallet = readWallet();
         if (wallet.connected) {
-          if (window.confirm('Disconnect wallet from this account?')) {
+          if (
+            window.confirm(
+              'Disconnect ' +
+                shortAddr(wallet.address) +
+                ' from this account?\n\nYou can reconnect anytime from this pill.'
+            )
+          ) {
             await handleWalletDisconnect(statusToggle);
           }
         } else {

@@ -222,15 +222,10 @@ body:has(.devnet-banner) .header {
   box-shadow: 0 0 0 1px rgba(196, 163, 90, 0.4);
 }
 
-/* Gold the existing mark via CSS only — artwork pixels unchanged. */
+/* Brass mark is baked into growtoo-mark-brass.png — no CSS recolor needed. */
 .logo--brass .logo-mark,
 .logo .logo-mark {
-  filter:
-    brightness(1.08)
-    sepia(0.7)
-    hue-rotate(-8deg)
-    saturate(2.4)
-    contrast(1.05);
+  filter: none;
 }
 
 .logo-word {

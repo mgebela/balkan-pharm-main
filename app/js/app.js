@@ -2105,6 +2105,84 @@ function initFirebaseSync() {
       if (moreOverlay) moreOverlay.hidden = true;
       if (accountBtn) accountBtn.setAttribute('aria-expanded', 'false');
       document.body.classList.remove('more-nav-open');
+      renderLogSheet();
+    } else {
+      logSheetPendingAction = null;
+    }
+  }
+
+  let logSheetSelectedPlantId = '';
+  let logSheetPendingAction = null; // 'water' | 'feed' | null
+
+  function loggablePlants() {
+    return getPlants().filter((p) => p && p.id && !isSharedPlantId(p.id));
+  }
+
+  function renderLogSheet() {
+    const listEl = document.getElementById('log-sheet-plants');
+    const emptyEl = document.getElementById('log-sheet-empty');
+    const actionsEl = document.getElementById('log-sheet-actions');
+    const plants = loggablePlants();
+    if (!listEl) return;
+
+    if (!plants.length) {
+      logSheetSelectedPlantId = '';
+      listEl.innerHTML = '';
+      listEl.hidden = true;
+      if (emptyEl) emptyEl.hidden = false;
+      if (actionsEl) actionsEl.hidden = true;
+      return;
+    }
+
+    if (emptyEl) emptyEl.hidden = true;
+    listEl.hidden = false;
+    if (actionsEl) actionsEl.hidden = false;
+
+    if (!logSheetSelectedPlantId || !plants.some((p) => p.id === logSheetSelectedPlantId)) {
+      logSheetSelectedPlantId = plants[0].id;
+    }
+
+    listEl.innerHTML = plants
+      .map(function (p, i) {
+        const selected = p.id === logSheetSelectedPlantId;
+        return (
+          '<button type="button" class="log-sheet-plant' +
+          (selected ? ' is-selected' : '') +
+          '" role="option" aria-selected="' +
+          (selected ? 'true' : 'false') +
+          '" data-plant-id="' +
+          escapeHtml(p.id) +
+          '">' +
+          '<span class="log-sheet-plant-no">№ ' +
+          plantSpecimenNo(i) +
+          '</span>' +
+          '<span class="log-sheet-plant-name">' +
+          escapeHtml(p.name || 'Plant') +
+          '</span>' +
+          '</button>'
+        );
+      })
+      .join('');
+
+    listEl.querySelectorAll('[data-plant-id]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        logSheetSelectedPlantId = btn.getAttribute('data-plant-id') || '';
+        renderLogSheet();
+      });
+    });
+  }
+
+  function openLogSheet(pendingAction) {
+    if (blockAdminWrite()) return;
+    logSheetPendingAction = pendingAction || null;
+    setLogSheetOpen(true);
+    if (pendingAction && loggablePlants().length === 1) {
+      // Single plant: run immediately after sheet paints.
+      window.setTimeout(function () {
+        if (pendingAction === 'water') quickLogWatering();
+        else if (pendingAction === 'feed') quickLogFeeding();
+        setLogSheetOpen(false);
+      }, 0);
     }
   }
 
@@ -2127,7 +2205,9 @@ function initFirebaseSync() {
     function toggleLog() {
       if (blockAdminWrite()) return;
       const overlay = document.getElementById('log-sheet-overlay');
-      setLogSheetOpen(!(overlay && !overlay.hidden));
+      const opening = !(overlay && !overlay.hidden);
+      if (opening) openLogSheet(null);
+      else setLogSheetOpen(false);
     }
     const bottomLog = document.getElementById('bottom-nav-log');
     const sideLog = document.getElementById('sidebar-log-btn');
@@ -2136,27 +2216,36 @@ function initFirebaseSync() {
     const water = document.getElementById('log-sheet-water');
     const feed = document.getElementById('log-sheet-feed');
     const full = document.getElementById('log-sheet-full');
+    const addPlant = document.getElementById('log-sheet-add-plant');
     if (bottomLog) bottomLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
     if (sideLog) sideLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
     if (backdrop) backdrop.addEventListener('click', function () { setLogSheetOpen(false); });
     if (closeBtn) closeBtn.addEventListener('click', function () { setLogSheetOpen(false); });
+    if (addPlant) {
+      addPlant.addEventListener('click', function () {
+        setLogSheetOpen(false);
+        if (blockAdminWrite()) return;
+        openPlantModal();
+      });
+    }
     if (water) {
       water.addEventListener('click', function () {
-        setLogSheetOpen(false);
         quickLogWatering();
+        setLogSheetOpen(false);
       });
     }
     if (feed) {
       feed.addEventListener('click', function () {
-        setLogSheetOpen(false);
         quickLogFeeding();
+        setLogSheetOpen(false);
       });
     }
     if (full) {
       full.addEventListener('click', function () {
+        const plantId = logSheetSelectedPlantId;
         setLogSheetOpen(false);
         if (blockAdminWrite()) return;
-        openEntryModal(null);
+        openEntryModal(plantId || null);
       });
     }
   })();
@@ -2554,17 +2643,7 @@ function initFirebaseSync() {
     const todayLine = document.getElementById('dashboard-today-line');
     const todayActions = document.getElementById('dashboard-today-actions');
     const sealsEl = document.getElementById('dashboard-plant-seals');
-    const hasWaterLog = (entries || []).some((e) => e && e.type === 'zalijevanje');
-    let coachTried = false;
-    try {
-      coachTried =
-        localStorage.getItem('dnevnik-live-coach-trust-seen') === '1' ||
-        localStorage.getItem('dnevnik-live-getting-started-coach') === '1';
-    } catch {
-      coachTried = false;
-    }
-    const stillOnboarding = !plants.length || !hasWaterLog || !coachTried;
-    const showGrowerHome = !isAdopterProfile() && plants.length > 0 && !stillOnboarding;
+    const showGrowerHome = !isAdopterProfile() && plants.length > 0;
 
     if (todaySection) todaySection.hidden = !showGrowerHome;
     if (sealsSection) sealsSection.hidden = !showGrowerHome;
@@ -2588,7 +2667,13 @@ function initFirebaseSync() {
         '<button type="button" class="btn btn-secondary btn-tap" id="today-ask-coach">Ask coach</button>';
       const waterBtn = document.getElementById('today-log-water');
       const coachBtn = document.getElementById('today-ask-coach');
-      if (waterBtn) waterBtn.addEventListener('click', function () { quickLogWatering(); });
+      if (waterBtn) {
+        waterBtn.addEventListener('click', function () {
+          const plants = loggablePlants();
+          if (plants.length > 1) openLogSheet('water');
+          else quickLogWatering();
+        });
+      }
       if (coachBtn) {
         coachBtn.addEventListener('click', function () {
           if (window.AICoach) AICoach.open();
@@ -2715,82 +2800,36 @@ function initFirebaseSync() {
     const quickSection = document.getElementById('dashboard-quick-section');
     const quickEl = document.getElementById('dashboard-quick-actions');
     const isEmptyAdopter = isAdopterProfile() && tokenCount === 0;
-
-    const hasWaterLog = entries.some((e) => e && e.type === 'zalijevanje');
-    let coachTried = false;
-    try {
-      coachTried =
-        localStorage.getItem('dnevnik-live-coach-trust-seen') === '1' ||
-        localStorage.getItem('dnevnik-live-getting-started-coach') === '1';
-    } catch {
-      coachTried = false;
-    }
-    const hasMint = tokenCount > 0;
-    const showGettingStarted =
-      !isAdopterProfile() && (!plants.length || !hasWaterLog || !coachTried);
-    const showGrowerJournalHome = !isAdopterProfile() && plants.length > 0 && !showGettingStarted;
-
-    function checklistItem(done, label, actionId, actionLabel) {
-      return (
-        '<li class="getting-started-item' +
-        (done ? ' is-done' : '') +
-        '">' +
-        '<span class="getting-started-check" aria-hidden="true">' +
-        (done ? '✓' : '') +
-        '</span>' +
-        '<span class="getting-started-label">' +
-        label +
-        '</span>' +
-        (done || !actionId
-          ? ''
-          : '<button type="button" class="btn btn-ghost btn-sm getting-started-action" data-gs-action="' +
-            actionId +
-            '">' +
-            actionLabel +
-            '</button>') +
-        '</li>'
-      );
-    }
+    // Empty journal only — once plants exist, Today leads.
+    const showGettingStarted = !isAdopterProfile() && !plants.length;
+    const showGrowerJournalHome = !isAdopterProfile() && plants.length > 0;
 
     if (metricsEl && window.MetricUI) {
       const M = MetricUI;
       if (showGettingStarted) {
         metricsEl.hidden = false;
         metricsEl.innerHTML =
-          '<div class="dashboard-first-run shell-card" role="status">' +
-          '<p class="dashboard-first-run-eyebrow">Getting started</p>' +
-          '<h2 class="dashboard-first-run-title">' +
-          (plants.length ? 'Keep the streak going' : 'Start your grow journal') +
-          '</h2>' +
-          '<p class="dashboard-first-run-body">A short checklist — then your journal fills with real activity.</p>' +
-          '<ol class="getting-started-list">' +
-          checklistItem(!!plants.length, 'Add your first plant', 'add-plant', 'Add plant') +
-          checklistItem(hasWaterLog, 'Log a watering', 'log-water', 'Log watering') +
-          checklistItem(coachTried, 'Hear from Coach once', 'open-coach', 'Open Coach') +
-          checklistItem(hasMint, 'Mint a stage token (optional)', 'open-tokenise', 'Tokenise') +
-          '</ol>' +
-          '</div>';
-        metricsEl.querySelectorAll('[data-gs-action]').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const action = btn.getAttribute('data-gs-action');
-            if (action === 'add-plant') {
-              if (blockAdminWrite()) return;
-              openPlantModal();
-            } else if (action === 'log-water') {
-              quickLogWatering();
-            } else if (action === 'open-coach') {
-              try {
-                localStorage.setItem('dnevnik-live-getting-started-coach', '1');
-              } catch {
-                // ignore
-              }
-              if (window.AICoach) AICoach.open();
-              renderDashboard();
-            } else if (action === 'open-tokenise') {
-              showView('adopt');
-            }
+          '<article class="shell-card today-card dashboard-first-run" role="status">' +
+          '<p class="today-card-eyebrow">Today</p>' +
+          '<p class="today-card-line">Add your first plant — Coach will keep the care trail tidy from there.</p>' +
+          '<div class="today-card-actions">' +
+          '<button type="button" class="btn btn-primary btn-tap" id="dashboard-add-first-plant">Add a plant</button>' +
+          '<button type="button" class="btn btn-secondary btn-tap" id="dashboard-open-coach-empty">Ask coach</button>' +
+          '</div>' +
+          '</article>';
+        const addBtn = document.getElementById('dashboard-add-first-plant');
+        const coachBtn = document.getElementById('dashboard-open-coach-empty');
+        if (addBtn) {
+          addBtn.addEventListener('click', function () {
+            if (blockAdminWrite()) return;
+            openPlantModal();
           });
-        });
+        }
+        if (coachBtn) {
+          coachBtn.addEventListener('click', function () {
+            if (window.AICoach) AICoach.open();
+          });
+        }
       } else if (isEmptyAdopter) {
         metricsEl.hidden = false;
         metricsEl.innerHTML =
@@ -2975,27 +3014,27 @@ function initFirebaseSync() {
   }
 
   function pickPlantForQuickLog() {
-    const plants = getPlants().filter((p) => p && p.id && !isSharedPlantId(p.id));
+    const plants = loggablePlants();
     if (!plants.length) return null;
+    if (logSheetSelectedPlantId) {
+      const selected = plants.find((p) => p.id === logSheetSelectedPlantId);
+      if (selected) return selected;
+    }
     if (plants.length === 1) return plants[0];
-    const names = plants.map((p, i) => i + 1 + '. ' + p.name).join('\n');
-    const raw = window.prompt('Which plant?\n' + names + '\n\nEnter number or name:', '1');
-    if (raw == null) return null;
-    const trimmed = String(raw).trim();
-    const asNum = parseInt(trimmed, 10);
-    if (Number.isFinite(asNum) && asNum >= 1 && asNum <= plants.length) return plants[asNum - 1];
-    const lower = trimmed.toLowerCase();
-    return plants.find((p) => String(p.name || '').toLowerCase() === lower) || null;
+    return null;
   }
 
   function quickLogCare(type, note) {
     if (blockAdminWrite()) return;
-    const plant = pickPlantForQuickLog();
+    const plants = loggablePlants();
+    if (!plants.length) {
+      openPlantModal();
+      return;
+    }
+    let plant = pickPlantForQuickLog();
     if (!plant) {
-      if (!getPlants().length) {
-        openPlantModal();
-        return;
-      }
+      // Multiple plants and none selected yet — open the Log sheet.
+      openLogSheet(type === 'zalijevanje' ? 'water' : type === 'gnojidba' ? 'feed' : null);
       return;
     }
     try {

@@ -4,18 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>growtoo · Grow journal</title>
+  <meta name="theme-color" content="#0f1a12" />
+  <meta property="og:title" content="growtoo · Grow journal" />
+  <meta property="og:description" content="Your private grow journal — seal stages, follow the trail." />
+  <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260730m" />
+  <link rel="stylesheet" href="styles/app.css?v=20260731b" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260729g" />
-  <link rel="icon" href="../images/growtoo-logo.png?v=20260722b" type="image/png" />
+  <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
+  <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
 </head>
 <body class="app-loading crypto-simple">
   <div class="app">
     <aside class="sidebar">
       <a href="../index.html" class="sidebar-logo" aria-label="growtoo">
-        <img src="../images/growtoo-logo.png?v=20260722b" alt="" width="32" height="32" class="sidebar-logo-mark" />
+        <img src="../images/growtoo-mark-brass.png?v=20260731a" alt="" width="32" height="32" class="sidebar-logo-mark" />
         <span>growtoo</span>
       </a>
       <nav class="sidebar-nav">
@@ -149,7 +156,15 @@
           <strong id="log-sheet-title">Log care</strong>
           <button type="button" class="log-sheet-close" id="log-sheet-close" aria-label="Close">×</button>
         </div>
-        <div class="log-sheet-actions">
+        <div class="log-sheet-plant-block" id="log-sheet-plant-block">
+          <p class="log-sheet-label" id="log-sheet-plant-label">Plant</p>
+          <div class="log-sheet-plants" id="log-sheet-plants" role="listbox" aria-labelledby="log-sheet-plant-label"></div>
+          <p class="log-sheet-empty" id="log-sheet-empty" hidden>
+            No plants yet.
+            <button type="button" class="btn btn-primary btn-tap" id="log-sheet-add-plant">Add a plant</button>
+          </p>
+        </div>
+        <div class="log-sheet-actions" id="log-sheet-actions">
           <button type="button" class="btn btn-primary btn-tap" id="log-sheet-water">Log watering</button>
           <button type="button" class="btn btn-secondary btn-tap" id="log-sheet-feed">Log feeding</button>
           <button type="button" class="btn btn-ghost btn-tap" id="log-sheet-full">Full journal entry</button>
@@ -424,7 +439,12 @@
             <select id="market-asset-select" class="seal-stage-select" required>
               <option value="">Choose a sealed plant</option>
             </select>
-            <p class="market-hint" id="market-list-hint" hidden></p>
+            <div class="market-empty-cta grower-only" id="market-empty-cta" hidden>
+              <p class="market-hint" id="market-list-hint" hidden></p>
+              <button type="button" class="btn btn-secondary btn-tap" id="market-go-tokenise" hidden>
+                Seal a stage on Tokenise
+              </button>
+            </div>
 
             <fieldset class="market-offer-compare">
               <legend class="seal-stage-label">How the adopter pays you</legend>
@@ -1014,17 +1034,17 @@
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260728e"></script>
   <script src="js/plain-lang.js?v=20260730m"></script>
-  <script src="js/market.js?v=20260730m"></script>
+  <script src="js/market.js?v=20260731b"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
-  <script src="js/token-botanical-art.js?v=20260730d"></script>
+  <script src="js/token-botanical-art.js?v=20260731a"></script>
   <script src="js/plant-botanical-sprites.js?v=20260730d"></script>
   <script src="js/grower-quests.js?v=20260724h"></script>
   <script src="js/notifications.js?v=20260730k"></script>
   <script src="js/signup.js?v=20260729g"></script>
-  <script src="js/plant-token.js?v=20260730m"></script>
+  <script src="js/plant-token.js?v=20260731b"></script>
   <script src="js/coach-core.js?v=20260730k"></script>
   <script src="js/ai-coach.js?v=20260730k"></script>
-  <script src="js/app.js?v=20260730k"></script>
+  <script src="js/app.js?v=20260731b"></script>
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>
