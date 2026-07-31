@@ -1240,6 +1240,7 @@ function adopterIntentCopy() {
       empty: 'Browse the market to adopt your first plant and grow your collection.',
       market: 'Find open plant offers and back them with $GROWTOO when you’re ready.',
       strip: 'Claim test $GROWTOO, browse the market, and collect your first plant.',
+      label: 'Collect a garden',
     };
   }
   if (intent === 'earn_rewards') {
@@ -1248,6 +1249,7 @@ function adopterIntentCopy() {
       empty: 'Back an open offer to start following growth and harvest care on the test network.',
       market: 'Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.',
       strip: 'Claim test $GROWTOO, stake on a live offer, then watch monthly unlock in My garden.',
+      label: 'Practice stakes',
     };
   }
   return {
@@ -1255,7 +1257,201 @@ function adopterIntentCopy() {
     empty: 'Browse the market and back a grow with $GROWTOO when you are ready.',
     market: 'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.',
     strip: 'Claim test $GROWTOO, then invest in a live plant offer.',
+    label: 'Support growers',
   };
+}
+
+function shortWalletAddr(addr) {
+  const s = String(addr || '');
+  if (s.length < 10) return s || '—';
+  return s.slice(0, 6) + '…' + s.slice(-4);
+}
+
+function readDisplayName() {
+  try {
+    return String(localStorage.getItem('dnevnik-live-display-name') || '').trim();
+  } catch {
+    return '';
+  }
+}
+
+function renderAccountProfile() {
+  const el = document.getElementById('account-profile');
+  if (!el) return;
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  const adopter = isAdopterProfile();
+  const auth = (typeof getStoredAuth === 'function' ? getStoredAuth() : null) || {};
+  let email = auth.email || '';
+  try {
+    if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+      email = firebase.auth().currentUser.email || email;
+    }
+  } catch {
+    /* ignore */
+  }
+  const name = readDisplayName() || (email ? email.split('@')[0] : '') || 'growtoo member';
+  const mark = adopter ? 'A' : 'G';
+  const roleLabel = adopter ? 'Adopter' : 'Grower';
+
+  let wallet = '';
+  try {
+    if (window.WalletLink && typeof WalletLink.getProfile === 'function') {
+      wallet = String((WalletLink.getProfile() || {}).solanaPubkey || '');
+    }
+  } catch {
+    /* ignore */
+  }
+
+  let cryptoMode = 'simple';
+  try {
+    if (window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function') {
+      cryptoMode = GrowtooPlain.getMode() === 'advanced' ? 'advanced' : 'simple';
+    }
+  } catch {
+    /* ignore */
+  }
+
+  let metaRows = '';
+  let statsHtml = '';
+
+  if (adopter) {
+    const intentCopy = adopterIntentCopy();
+    let adopted = 0;
+    let growBal = '—';
+    try {
+      if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
+        const w = PlantToken.getWallet() || {};
+        adopted = Array.isArray(w.tokens) ? w.tokens.length : 0;
+        if (w.growthBalance != null) growBal = Number(w.growthBalance).toLocaleString('en-US');
+      }
+    } catch {
+      /* ignore */
+    }
+    metaRows =
+      '<div class="account-profile-row"><span>Focus</span><strong>' +
+      esc(intentCopy.label || 'Support growers') +
+      '</strong></div>' +
+      '<div class="account-profile-row"><span>Wallet</span><strong>' +
+      esc(wallet ? shortWalletAddr(wallet) : 'Not linked') +
+      '</strong></div>' +
+      '<div class="account-profile-row"><span>View</span><strong>' +
+      esc(cryptoMode === 'advanced' ? 'Advanced' : 'Simple') +
+      '</strong></div>';
+    statsHtml =
+      '<div class="account-profile-stats">' +
+      '<div class="account-profile-stat"><span>Adopted</span><strong>' +
+      esc(String(adopted)) +
+      '</strong></div>' +
+      '<div class="account-profile-stat"><span>$GROWTOO</span><strong>' +
+      esc(String(growBal)) +
+      '</strong></div>' +
+      '</div>';
+  } else {
+    const setup = getPreferredGrowEnvironment() === 'outdoor' ? 'Outdoor' : 'Indoor';
+    let city = '';
+    try {
+      city = String(localStorage.getItem('dnevnik-live-weather-city') || '').trim();
+    } catch {
+      city = '';
+    }
+    let plantCount = 0;
+    try {
+      const raw = localStorage.getItem('dnevnik-live-plants');
+      const plants = raw ? JSON.parse(raw) : [];
+      plantCount = Array.isArray(plants) ? plants.length : 0;
+    } catch {
+      plantCount = 0;
+    }
+    let rankLabel = '—';
+    let xp = '—';
+    try {
+      if (window.GrowerQuests) {
+        if (typeof GrowerQuests.growerRankFromLocal === 'function') {
+          const rank = GrowerQuests.growerRankFromLocal();
+          if (rank && rank.label) rankLabel = rank.label;
+        }
+        if (typeof GrowerQuests.getGrowerProfile === 'function') {
+          const profile = GrowerQuests.getGrowerProfile() || {};
+          if (profile.xp != null) xp = String(profile.xp);
+          else if (profile.totalXp != null) xp = String(profile.totalXp);
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    metaRows =
+      '<div class="account-profile-row"><span>Setup</span><strong>' +
+      esc(setup + (city ? ' · ' + city : '')) +
+      '</strong></div>' +
+      '<div class="account-profile-row"><span>Wallet</span><strong>' +
+      esc(wallet ? shortWalletAddr(wallet) : 'Not linked') +
+      '</strong></div>' +
+      '<div class="account-profile-row"><span>View</span><strong>' +
+      esc(cryptoMode === 'advanced' ? 'Advanced' : 'Simple') +
+      '</strong></div>';
+    statsHtml =
+      '<div class="account-profile-stats">' +
+      '<div class="account-profile-stat"><span>Plants</span><strong>' +
+      esc(String(plantCount)) +
+      '</strong></div>' +
+      '<div class="account-profile-stat"><span>Rank · XP</span><strong>' +
+      esc(rankLabel + (xp !== '—' ? ' · ' + xp : '')) +
+      '</strong></div>' +
+      '</div>';
+  }
+
+  el.hidden = false;
+  el.innerHTML =
+    '<div class="account-profile-top">' +
+    '<div class="account-profile-avatar" aria-hidden="true">' +
+    esc(mark) +
+    '</div>' +
+    '<div class="account-profile-id">' +
+    '<p class="account-profile-name">' +
+    esc(name) +
+    '</p>' +
+    (email ? '<p class="account-profile-email">' + esc(email) + '</p>' : '') +
+    '<span class="account-profile-role account-profile-role--' +
+    (adopter ? 'adopter' : 'grower') +
+    '">' +
+    esc(roleLabel) +
+    '</span>' +
+    '</div>' +
+    '</div>' +
+    '<div class="account-profile-meta">' +
+    metaRows +
+    '</div>' +
+    statsHtml +
+    '<div class="account-profile-actions">' +
+    '<button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="' +
+    (cryptoMode === 'advanced' ? 'true' : 'false') +
+    '">' +
+    (cryptoMode === 'simple' ? 'Show advanced details' : 'Use simple view') +
+    '</button>' +
+    '<button type="button" class="btn btn-primary btn-sm" id="account-profile-primary">' +
+    esc(adopter ? 'Open market' : 'Open journal') +
+    '</button>' +
+    '</div>';
+
+  const primary = document.getElementById('account-profile-primary');
+  if (primary) {
+    primary.addEventListener('click', function () {
+      if (typeof setMoreNavOpen === 'function') setMoreNavOpen(false);
+      if (typeof showView === 'function') showView(adopter ? 'market' : 'plants');
+      else if (typeof window.showAppView === 'function') {
+        window.showAppView(adopter ? 'market' : 'plants');
+      }
+    });
+  }
 }
 
 window.GrowtooProfile = {
@@ -1444,6 +1640,12 @@ function applyRoleUI(role) {
   }
 
   applyProfileTypeUI(currentProfileType || PROFILE_TYPES.grower);
+  try {
+    const overlay = document.getElementById('more-nav-overlay');
+    if (overlay && !overlay.hidden) renderAccountProfile();
+  } catch {
+    /* ignore */
+  }
 }
 
 
@@ -2108,6 +2310,11 @@ function initFirebaseSync() {
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('more-nav-open', !!open);
     if (open) {
+      try {
+        renderAccountProfile();
+      } catch (err) {
+        console.warn('account profile', err);
+      }
       const logOverlay = document.getElementById('log-sheet-overlay');
       const logBtn = document.getElementById('bottom-nav-log');
       const sideBtn = document.getElementById('sidebar-log-btn');
