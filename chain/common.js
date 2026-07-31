@@ -5,6 +5,7 @@
  * Roles:
  *   mint / authority — $GROWTOO + seed collection authority (process mint/grow)
  *   escrow           — holds listed NFTs (app sends here; market releases from here)
+ *   careEscrow       — holds locked adopt-stake $GROWTOO until harvest
  *   feePayer         — pays SOL fees for market settlement txs
  */
 import fs from 'node:fs';
@@ -19,6 +20,7 @@ export const KEYS_DIR = path.join(__dirname, 'keys');
 export const AUTHORITY_KEY_PATH = path.join(KEYS_DIR, 'devnet-authority.json');
 export const MINT_KEY_PATH = AUTHORITY_KEY_PATH;
 export const ESCROW_KEY_PATH = path.join(KEYS_DIR, 'devnet-escrow.json');
+export const CARE_ESCROW_KEY_PATH = path.join(KEYS_DIR, 'devnet-care-escrow.json');
 export const FEE_PAYER_KEY_PATH = path.join(KEYS_DIR, 'devnet-fee-payer.json');
 export const DEPLOYED_PATH = path.join(__dirname, 'deployed.devnet.json');
 
@@ -79,6 +81,21 @@ export function loadFeePayerSecret() {
   return loadAuthoritySecret();
 }
 
+/**
+ * Adopt-stake care escrow secret (locked $GROWTOO).
+ * Falls back to NFT escrow if the dedicated care key is missing so legacy
+ * shared-vault installs keep settling.
+ */
+export function loadCareEscrowSecret() {
+  if (fs.existsSync(CARE_ESCROW_KEY_PATH)) {
+    return readSecretFile(CARE_ESCROW_KEY_PATH, 'Care escrow');
+  }
+  console.warn(
+    'devnet-care-escrow.json missing — using NFT escrow as care vault (run npm run create-role-keypairs).'
+  );
+  return loadEscrowSecret();
+}
+
 export function readDeployed() {
   if (!fs.existsSync(DEPLOYED_PATH)) return {};
   return JSON.parse(fs.readFileSync(DEPLOYED_PATH, 'utf8'));
@@ -101,10 +118,12 @@ export function resolveRoleAddresses() {
   const { Keypair } = requireKeypair();
   const mint = Keypair.fromSecretKey(loadMintSecret()).publicKey.toBase58();
   const escrow = Keypair.fromSecretKey(loadEscrowSecret()).publicKey.toBase58();
+  const careEscrow = Keypair.fromSecretKey(loadCareEscrowSecret()).publicKey.toBase58();
   const feePayer = Keypair.fromSecretKey(loadFeePayerSecret()).publicKey.toBase58();
   return {
     mintAuthority: deployed.mintAuthority || deployed.authority || mint,
     escrowAddress: deployed.escrowAddress || escrow,
+    careEscrowAddress: deployed.careEscrowAddress || careEscrow,
     feePayerAddress: deployed.feePayerAddress || feePayer,
     legacyEscrowAddress: deployed.legacyEscrowAddress || LEGACY_ESCROW_ADDRESS,
   };

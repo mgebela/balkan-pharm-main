@@ -18,6 +18,7 @@
     "mint:seed": "node mint-seed.js",
     "mint:test-seeds": "node mint-test-seeds.js",
     "update:seed-art": "node update-seed-art.js",
+    "repair:seed-metadata": "node repair-broken-seed-metadata.js",
     "mint:queue": "node process-seed-mints.js",
     "mint:queue:watch": "node process-seed-mints.js --watch",
     "grow:queue": "node process-growth-mints.js",

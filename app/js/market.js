@@ -1046,7 +1046,12 @@
     let stageIndex = 0;
     if (window.PlantToken && typeof PlantToken.stageIndexFromLabel === 'function') {
       stageIndex = PlantToken.stageIndexFromLabel(
-        listing.stage || listing.journalStage || listing.assetType || ''
+        listing.liveStage ||
+          listing.liveStageKey ||
+          listing.stage ||
+          listing.journalStage ||
+          listing.assetType ||
+          ''
       );
     }
     let svg = '';
@@ -1073,7 +1078,7 @@
         esc(listing.photo) +
         '" alt="" loading="lazy" />'
       : '';
-    const stage = listing.stage || listing.journalStage || '';
+    const stage = listingDisplayStage(listing);
     const snippets = Array.isArray(listing.journalSnippets) ? listing.journalSnippets : [];
     const journalHtml = snippets.length
       ? '<ul class="market-card-journal">' +
@@ -1106,13 +1111,25 @@
     );
   }
 
+  function listingDisplayStage(listing) {
+    if (!listing) return '';
+    if (listing.liveStage) return String(listing.liveStage);
+    const snap = listing.plantId ? storySnapshotForPlant(listing.plantId) : null;
+    return String(
+      (snap && snap.journalStage) || listing.journalStage || listing.stage || ''
+    );
+  }
+
   function listingHarvestReady(listing) {
     if (!listing) return false;
-    const snap = listing.plantId ? storySnapshotForPlant(listing.plantId) : null;
-    const stage = String(
-      (snap && snap.journalStage) || listing.journalStage || listing.stage || ''
-    ).toLowerCase();
-    return stage.indexOf('harvest') >= 0;
+    if (listing.harvestReady === true || listing.liveStageKey === 'harvest') return true;
+    const stage = listingDisplayStage(listing).toLowerCase();
+    return (
+      stage.indexOf('harvest') >= 0 ||
+      stage.indexOf('susenje') >= 0 ||
+      stage.indexOf('drying') >= 0 ||
+      stage === 'dry'
+    );
   }
 
   function listingCardHtml(listing, uid) {
@@ -1225,8 +1242,11 @@
       (showStrain ? esc(listing.strain) : '') +
       (showStrain && listing.batch ? ' · ' : '') +
       (listing.batch ? 'batch ' + esc(listing.batch) : '') +
-      ((showStrain || listing.batch) && listing.stage ? ' · ' : '') +
-      (listing.stage ? esc(listing.stage) : '') +
+      (function () {
+        const live = listingDisplayStage(listing);
+        const prefix = showStrain || listing.batch ? ' · ' : '';
+        return live ? prefix + esc(live) : '';
+      })() +
       '</p>' +
       phaseRail +
       offerExplainHtml(listing) +

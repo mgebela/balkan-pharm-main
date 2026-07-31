@@ -1,7 +1,8 @@
 /*
  * Create role-split Devnet keypairs:
  *   - mint authority  → already at keys/devnet-authority.json (not overwritten)
- *   - escrow vault    → keys/devnet-escrow.json
+ *   - escrow vault    → keys/devnet-escrow.json (listed NFTs)
+ *   - care escrow     → keys/devnet-care-escrow.json (locked adopt-stake $GROWTOO)
  *   - fee payer       → keys/devnet-fee-payer.json
  *
  * Then syncs public addresses into deployed.devnet.json + app/js/chain-config.js.
@@ -12,6 +13,7 @@ import {
   KEYS_DIR,
   AUTHORITY_KEY_PATH,
   ESCROW_KEY_PATH,
+  CARE_ESCROW_KEY_PATH,
   FEE_PAYER_KEY_PATH,
   LEGACY_ESCROW_ADDRESS,
   loadAuthoritySecret,
@@ -47,16 +49,19 @@ if (!fs.existsSync(AUTHORITY_KEY_PATH)) {
 
 const mint = Keypair.fromSecretKey(loadAuthoritySecret());
 const escrow = ensureKey(ESCROW_KEY_PATH, 'escrow vault');
+const careEscrow = ensureKey(CARE_ESCROW_KEY_PATH, 'care escrow');
 const feePayer = ensureKey(FEE_PAYER_KEY_PATH, 'fee payer');
 
 const mintAuthority = mint.publicKey.toBase58();
 const escrowAddress = escrow.publicKey.toBase58();
+const careEscrowAddress = careEscrow.publicKey.toBase58();
 const feePayerAddress = feePayer.publicKey.toBase58();
 
 const deployed = writeDeployed({
   mintAuthority,
   authority: mintAuthority,
   escrowAddress,
+  careEscrowAddress,
   feePayerAddress,
   legacyEscrowAddress: LEGACY_ESCROW_ADDRESS,
 });
@@ -64,37 +69,24 @@ const deployed = writeDeployed({
 console.log('\nRole split');
 console.log('  mint authority:', mintAuthority, solscanAddress(mintAuthority));
 console.log('  escrow vault:  ', escrowAddress, solscanAddress(escrowAddress));
+console.log('  care escrow:   ', careEscrowAddress, solscanAddress(careEscrowAddress));
 console.log('  fee payer:     ', feePayerAddress, solscanAddress(feePayerAddress));
-if (escrowAddress === mintAuthority) {
-  console.log('  (escrow still same as mint — unexpected)');
-}
-if (feePayerAddress === mintAuthority) {
-  console.log('  (fee payer still same as mint — unexpected)');
-}
 
 // Sync app chain-config.js
 const configPath = path.join(__dirname, '../app/js/chain-config.js');
 let src = fs.readFileSync(configPath, 'utf8');
-if (!/mintAuthority:/.test(src)) {
-  src = src.replace(
-    /escrowAddress: '[^']*'/,
-    `mintAuthority: '${mintAuthority}',\n    escrowAddress: '${escrowAddress}',\n    feePayerAddress: '${feePayerAddress}',\n    legacyEscrowAddress: '${LEGACY_ESCROW_ADDRESS}'`
-  );
-} else {
-  src = src.replace(/mintAuthority: '[^']*'/, `mintAuthority: '${mintAuthority}'`);
-  src = src.replace(/escrowAddress: '[^']*'/, `escrowAddress: '${escrowAddress}'`);
-  src = src.replace(/feePayerAddress: '[^']*'/, `feePayerAddress: '${feePayerAddress}'`);
-  src = src.replace(
-    /legacyEscrowAddress: '[^']*'/,
-    `legacyEscrowAddress: '${LEGACY_ESCROW_ADDRESS}'`
-  );
-}
+src = src.replace(/mintAuthority: '[^']*'/, `mintAuthority: '${mintAuthority}'`);
+src = src.replace(/escrowAddress: '[^']*'/, `escrowAddress: '${escrowAddress}'`);
+src = src.replace(/careEscrowAddress: '[^']*'/, `careEscrowAddress: '${careEscrowAddress}'`);
+src = src.replace(/feePayerAddress: '[^']*'/, `feePayerAddress: '${feePayerAddress}'`);
+src = src.replace(
+  /legacyEscrowAddress: '[^']*'/,
+  `legacyEscrowAddress: '${LEGACY_ESCROW_ADDRESS}'`
+);
 fs.writeFileSync(configPath, src);
 console.log('\nUpdated app/js/chain-config.js');
 console.log('Updated deployed.devnet.json at', deployed.updatedAt);
 console.log('\nNext:');
-console.log('  1. Fund fee payer (and optionally escrow) with Devnet SOL:');
-console.log('       SOLANA_AIRDROP_TO=feePayer npm run airdrop');
-console.log('  2. Add GitHub secrets SOLANA_ESCROW_KEY_JSON + SOLANA_FEE_PAYER_KEY_JSON');
-console.log('  3. Redeploy functions so reconcile checks the new escrow address');
-console.log('  4. Open listings still in the legacy escrow settle via the mint key');
+console.log('  1. Add GitHub secret SOLANA_CARE_ESCROW_KEY_JSON from keys/devnet-care-escrow.json');
+console.log('  2. Existing sold stakes keep listing.careEscrowAddress (shared vault) until harvest');
+console.log('  3. New adopt_stake listings pay the dedicated care escrow');

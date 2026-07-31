@@ -6,6 +6,7 @@ name: Chain queues (mint · grow · market)
 #   SOLANA_AUTHORITY_KEY_JSON      — mint authority (keys/devnet-authority.json)
 # Optional (role split — fall back to authority if unset):
 #   SOLANA_ESCROW_KEY_JSON         — NFT escrow vault (keys/devnet-escrow.json)
+#   SOLANA_CARE_ESCROW_KEY_JSON    — adopt-stake locked $GROWTOO (keys/devnet-care-escrow.json)
 #   SOLANA_FEE_PAYER_KEY_JSON      — market fee payer (keys/devnet-fee-payer.json)
 #   SOLANA_RPC_URL                 — dedicated Devnet RPC (Helius/QuickNode)
 on:
@@ -42,6 +43,7 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
           SOLANA_AUTHORITY_KEY_JSON: ${{ secrets.SOLANA_AUTHORITY_KEY_JSON }}
           SOLANA_ESCROW_KEY_JSON: ${{ secrets.SOLANA_ESCROW_KEY_JSON }}
+          SOLANA_CARE_ESCROW_KEY_JSON: ${{ secrets.SOLANA_CARE_ESCROW_KEY_JSON }}
           SOLANA_FEE_PAYER_KEY_JSON: ${{ secrets.SOLANA_FEE_PAYER_KEY_JSON }}
           SOLANA_RPC_URL: ${{ secrets.SOLANA_RPC_URL }}
         run: |
@@ -60,6 +62,12 @@ jobs:
             cp keys/devnet-authority.json keys/devnet-escrow.json
             echo "::warning::SOLANA_ESCROW_KEY_JSON unset — using mint authority as escrow."
           fi
+          if [ -n "${SOLANA_CARE_ESCROW_KEY_JSON:-}" ]; then
+            printf '%s' "$SOLANA_CARE_ESCROW_KEY_JSON" > keys/devnet-care-escrow.json
+          else
+            cp keys/devnet-escrow.json keys/devnet-care-escrow.json
+            echo "::warning::SOLANA_CARE_ESCROW_KEY_JSON unset — using NFT escrow as care vault."
+          fi
           if [ -n "${SOLANA_FEE_PAYER_KEY_JSON:-}" ]; then
             printf '%s' "$SOLANA_FEE_PAYER_KEY_JSON" > keys/devnet-fee-payer.json
           else
@@ -72,6 +80,7 @@ jobs:
               'keys/firebase-service-account.json',
               'keys/devnet-authority.json',
               'keys/devnet-escrow.json',
+              'keys/devnet-care-escrow.json',
               'keys/devnet-fee-payer.json',
           ):
               json.load(open(path))
@@ -119,4 +128,4 @@ jobs:
       - name: Scrub keys
         if: always()
         working-directory: chain
-        run: rm -f keys/firebase-service-account.json keys/devnet-authority.json keys/devnet-escrow.json keys/devnet-fee-payer.json
+        run: rm -f keys/firebase-service-account.json keys/devnet-authority.json keys/devnet-escrow.json keys/devnet-care-escrow.json keys/devnet-fee-payer.json

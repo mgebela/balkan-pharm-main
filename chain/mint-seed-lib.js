@@ -24,6 +24,7 @@ import {
   RPC_URL,
   loadMintSecret,
   loadEscrowSecret,
+  loadCareEscrowSecret,
   loadFeePayerSecret,
   LEGACY_ESCROW_ADDRESS,
   readDeployed,
@@ -50,12 +51,15 @@ export function createMarketClient() {
   const umi = createUmi(RPC_URL).use(mplTokenMetadata());
   const feeKp = umi.eddsa.createKeypairFromSecretKey(loadFeePayerSecret());
   const escrowKp = umi.eddsa.createKeypairFromSecretKey(loadEscrowSecret());
+  const careEscrowKp = umi.eddsa.createKeypairFromSecretKey(loadCareEscrowSecret());
   umi.use(keypairIdentity(feeKp));
   const deployed = readDeployed();
   return {
     umi,
     escrowSigner: escrowKp,
     escrowAddress: String(escrowKp.publicKey),
+    careEscrowSigner: careEscrowKp,
+    careEscrowAddress: deployed.careEscrowAddress || String(careEscrowKp.publicKey),
     feePayerAddress: String(feeKp.publicKey),
     legacyEscrowAddress: deployed.legacyEscrowAddress || LEGACY_ESCROW_ADDRESS,
     mintAuthoritySecret: loadMintSecret(),

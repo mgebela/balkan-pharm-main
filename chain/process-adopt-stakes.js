@@ -46,6 +46,8 @@ const {
   umi: marketUmi,
   escrowSigner,
   escrowAddress: ESCROW,
+  careEscrowSigner,
+  careEscrowAddress: configuredCareEscrow,
   legacyEscrowAddress,
   mintAuthoritySecret,
 } = createMarketClient();
@@ -56,6 +58,7 @@ const watch = process.argv.includes('--watch');
 const legacyEscrowSigner = marketUmi.eddsa.createKeypairFromSecretKey(mintAuthoritySecret);
 const LEGACY_ESCROW = legacyEscrowAddress || LEGACY_ESCROW_ADDRESS;
 const escrowAuthority = createSignerFromKeypair(marketUmi, escrowSigner);
+const careEscrowAuthority = createSignerFromKeypair(marketUmi, careEscrowSigner);
 
 const deployed = readDeployed();
 if (!deployed.growMint) {
@@ -65,10 +68,22 @@ if (!deployed.growMint) {
 const GROW_MINT = deployed.growMint;
 const GROW_MINT_PK = publicKey(GROW_MINT);
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
-const CARE_ESCROW = deployed.careEscrowAddress || ESCROW;
+const CARE_ESCROW = configuredCareEscrow || deployed.careEscrowAddress || ESCROW;
+const NFT_ESCROW = ESCROW;
 
-console.log('Care / NFT escrow:', CARE_ESCROW);
+console.log('NFT escrow: ', NFT_ESCROW);
+console.log('Care escrow:', CARE_ESCROW);
 console.log('Worker:', workerId());
+
+function growAuthorityForEscrow(sourceAddress) {
+  const addr = String(sourceAddress || CARE_ESCROW);
+  if (addr === String(careEscrowSigner.publicKey)) return careEscrowAuthority;
+  if (addr === String(escrowSigner.publicKey) || addr === NFT_ESCROW) return escrowAuthority;
+  if (addr === LEGACY_ESCROW) {
+    return createSignerFromKeypair(marketUmi, legacyEscrowSigner);
+  }
+  throw new Error('No signer configured for care escrow ' + addr);
+}
 
 function stakeAmounts(priceGrow) {
   const total = Math.max(0, Math.round(Number(priceGrow) || 0));
@@ -160,11 +175,13 @@ async function transferNftFromEscrow(mintAddress, destinationPubkey) {
   return base58.deserialize(result.signature)[0];
 }
 
-async function transferGrowFromEscrow(destinationPubkey, wholeTokens) {
+async function transferGrowFromEscrow(destinationPubkey, wholeTokens, sourceEscrowAddress) {
   const amount = BigInt(wholeTokens) * 10n ** BigInt(GROW_DECIMALS);
   if (amount <= 0n) return 'zero';
+  const sourceAddr = String(sourceEscrowAddress || CARE_ESCROW);
+  const authority = growAuthorityForEscrow(sourceAddr);
   const destOwner = publicKey(destinationPubkey);
-  const sourceOwner = publicKey(CARE_ESCROW);
+  const sourceOwner = publicKey(sourceAddr);
   const source = findAssociatedTokenPda(marketUmi, { mint: GROW_MINT_PK, owner: sourceOwner });
   const destination = findAssociatedTokenPda(marketUmi, { mint: GROW_MINT_PK, owner: destOwner });
   const result = await transactionBuilder()
@@ -174,7 +191,7 @@ async function transferGrowFromEscrow(destinationPubkey, wholeTokens) {
         source,
         destination,
         amount,
-        authority: escrowAuthority,
+        authority,
       })
     )
     .sendAndConfirm(marketUmi);
@@ -271,7 +288,11 @@ async function processAdoptSale(doc) {
     const transferSignature = await transferNftFromEscrow(data.mintAddress, data.buyerPubkey);
     let immediateSig = 'zero';
     if (amounts.immediate > 0) {
-      immediateSig = await transferGrowFromEscrow(data.sellerPubkey, amounts.immediate);
+      immediateSig = await transferGrowFromEscrow(
+        data.sellerPubkey,
+        amounts.immediate,
+        careEscrow
+      );
     }
 
     const adoptedAt = data.investedAt || new Date().toISOString();
@@ -368,9 +389,63 @@ async function processAdoptSale(doc) {
   }
 }
 
+/** Journal (HR) + English stage labels → token stage key. */
+const JOURNAL_STAGE_TO_TOKEN = {
+  klijanje: { key: 'germination', label: 'Germination' },
+  sadnica: { key: 'seedling', label: 'Seedling' },
+  vegetativna: { key: 'vegetative', label: 'Vegetative' },
+  cvjetanje: { key: 'flowering', label: 'Flowering' },
+  susenje: { key: 'harvest', label: 'Harvest' },
+  seed: { key: 'seed', label: 'Seed' },
+  germination: { key: 'germination', label: 'Germination' },
+  seedling: { key: 'seedling', label: 'Seedling' },
+  vegetative: { key: 'vegetative', label: 'Vegetative' },
+  flowering: { key: 'flowering', label: 'Flowering' },
+  harvest: { key: 'harvest', label: 'Harvest' },
+};
+
+function resolveLiveStage(appState, plantId) {
+  const plants = Array.isArray(appState?.plants) ? appState.plants : [];
+  const plant = plants.find((p) => p && String(p.id) === String(plantId));
+  if (!plant) return null;
+  const raw = String(plant.stage || '').trim();
+  if (!raw) {
+    return {
+      journalStage: null,
+      liveStageKey: null,
+      liveStage: null,
+      harvestReady: false,
+    };
+  }
+  const lower = raw.toLowerCase();
+  const mapped = JOURNAL_STAGE_TO_TOKEN[lower];
+  if (mapped) {
+    return {
+      journalStage: raw,
+      liveStageKey: mapped.key,
+      liveStage: mapped.label,
+      harvestReady: mapped.key === 'harvest',
+    };
+  }
+  if (/harvest|susenje|dry|drying/i.test(raw)) {
+    return {
+      journalStage: raw,
+      liveStageKey: 'harvest',
+      liveStage: 'Harvest',
+      harvestReady: true,
+    };
+  }
+  return {
+    journalStage: raw,
+    liveStageKey: null,
+    liveStage: raw,
+    harvestReady: false,
+  };
+}
+
 /**
- * Sync live monthly care progress onto sold adopt-stake listings so adopters
- * (and Market cards) see qualifying months without waiting for harvest claim.
+ * Sync live monthly care progress + journal stage onto sold adopt-stake
+ * listings so Market / adopters see current unlock state without harvest claim.
  */
 async function syncCareProgress(doc) {
   const data = doc.data() || {};
@@ -398,6 +473,12 @@ async function syncCareProgress(doc) {
     const proof = validateHarvestCarePath(appState, plantId, adoptedAt, Date.now());
     const curKey = monthKey(Date.now());
     const cur = validateMonthlyCareProof(appState, plantId, curKey, MONTHLY_CARE_MIN_DAYS);
+    const live = resolveLiveStage(appState, plantId) || {
+      journalStage: null,
+      liveStageKey: null,
+      liveStage: null,
+      harvestReady: false,
+    };
     const payload = {
       qualifyingMonthKeys: proof.qualifyingMonthKeys || [],
       qualifyingWeekKeys: proof.qualifyingMonthKeys || [],
@@ -405,6 +486,10 @@ async function syncCareProgress(doc) {
       currentMonthKey: curKey,
       currentMonthDaysHit: cur.daysHit,
       currentMonthMinDays: MONTHLY_CARE_MIN_DAYS,
+      journalStage: live.journalStage,
+      liveStage: live.liveStage,
+      liveStageKey: live.liveStageKey,
+      harvestReady: !!live.harvestReady,
       careProgressUpdatedAt: new Date().toISOString(),
     };
 
@@ -413,7 +498,10 @@ async function syncCareProgress(doc) {
     const unchanged =
       prevKeys === nextKeys &&
       Number(data.currentMonthDaysHit) === Number(payload.currentMonthDaysHit) &&
-      String(data.currentMonthKey || '') === String(payload.currentMonthKey);
+      String(data.currentMonthKey || '') === String(payload.currentMonthKey) &&
+      String(data.liveStageKey || '') === String(payload.liveStageKey || '') &&
+      Boolean(data.harvestReady) === Boolean(payload.harvestReady) &&
+      String(data.journalStage || '') === String(payload.journalStage || '');
 
     if (unchanged) {
       console.log(`… ${label}: up to date`);
@@ -428,13 +516,18 @@ async function syncCareProgress(doc) {
         currentMonthKey: payload.currentMonthKey,
         currentMonthDaysHit: payload.currentMonthDaysHit,
         currentMonthMinDays: payload.currentMonthMinDays,
+        journalStage: payload.journalStage,
+        liveStage: payload.liveStage,
+        liveStageKey: payload.liveStageKey,
+        harvestReady: payload.harvestReady,
         careProgressUpdatedAt: payload.careProgressUpdatedAt,
         updatedAt: payload.careProgressUpdatedAt,
       },
       { merge: true }
     );
     console.log(
-      `✔ ${label}: ${payload.qualifyingMonthKeys.length}/${payload.careMonthKeys.length} months · this month ${payload.currentMonthDaysHit}/${MONTHLY_CARE_MIN_DAYS}`
+      `✔ ${label}: ${payload.qualifyingMonthKeys.length}/${payload.careMonthKeys.length} months · this month ${payload.currentMonthDaysHit}/${MONTHLY_CARE_MIN_DAYS}` +
+        (payload.liveStage ? ` · stage ${payload.liveStage}` : '')
     );
   } catch (err) {
     console.warn(`… ${label}: ${err.message || err}`);
@@ -513,11 +606,11 @@ async function processHarvestClaim(doc) {
     let outcomeSig = '';
     let careStatus = 'refunded';
     if (proof.ok) {
-      outcomeSig = await transferGrowFromEscrow(listing.sellerPubkey, locked);
+      outcomeSig = await transferGrowFromEscrow(listing.sellerPubkey, locked, careEscrow);
       careStatus = 'released';
     } else {
       if (!listing.buyerPubkey) throw new Error('Missing buyerPubkey for refund.');
-      outcomeSig = await transferGrowFromEscrow(listing.buyerPubkey, locked);
+      outcomeSig = await transferGrowFromEscrow(listing.buyerPubkey, locked, careEscrow);
       careStatus = 'refunded';
     }
 

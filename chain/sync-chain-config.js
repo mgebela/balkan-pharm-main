@@ -17,6 +17,7 @@ if (!deployed.growMint || !deployed.seedCollection) {
 
 const mintAuthority = deployed.mintAuthority || deployed.authority || '';
 const escrowAddress = deployed.escrowAddress || mintAuthority;
+const careEscrowAddress = deployed.careEscrowAddress || escrowAddress;
 const feePayerAddress = deployed.feePayerAddress || mintAuthority;
 const legacyEscrow = deployed.legacyEscrowAddress || LEGACY_ESCROW_ADDRESS;
 
@@ -28,12 +29,13 @@ src = src.replace(/seedCollection: '[^']*'/, `seedCollection: '${deployed.seedCo
 if (/mintAuthority:/.test(src)) {
   src = src.replace(/mintAuthority: '[^']*'/, `mintAuthority: '${mintAuthority}'`);
   src = src.replace(/escrowAddress: '[^']*'/, `escrowAddress: '${escrowAddress}'`);
+  src = src.replace(/careEscrowAddress: '[^']*'/, `careEscrowAddress: '${careEscrowAddress}'`);
   src = src.replace(/feePayerAddress: '[^']*'/, `feePayerAddress: '${feePayerAddress}'`);
   src = src.replace(/legacyEscrowAddress: '[^']*'/, `legacyEscrowAddress: '${legacyEscrow}'`);
 } else if (mintAuthority) {
   src = src.replace(
     /escrowAddress: '[^']*'/,
-    `mintAuthority: '${mintAuthority}',\n    escrowAddress: '${escrowAddress}',\n    feePayerAddress: '${feePayerAddress}',\n    legacyEscrowAddress: '${legacyEscrow}'`
+    `mintAuthority: '${mintAuthority}',\n    escrowAddress: '${escrowAddress}',\n    careEscrowAddress: '${careEscrowAddress}',\n    feePayerAddress: '${feePayerAddress}',\n    legacyEscrowAddress: '${legacyEscrow}'`
   );
 }
 
@@ -67,6 +69,7 @@ console.log('  growMint:', deployed.growMint);
 console.log('  seedCollection:', deployed.seedCollection);
 console.log('  mintAuthority:', mintAuthority);
 console.log('  escrowAddress:', escrowAddress);
+console.log('  careEscrowAddress:', careEscrowAddress);
 console.log('  feePayerAddress:', feePayerAddress);
 if (deployed.escrowProgramId) {
   console.log('  escrowProgramId:', deployed.escrowProgramId);

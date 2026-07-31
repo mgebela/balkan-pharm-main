@@ -44,9 +44,11 @@ Ops audit of the two live sold stakes + queue (no new Phantom list/invest this p
 | Check | Result |
 |-------|--------|
 | Live `adopt_stake` listings | **2** · both `sold` / `careStatus: active` |
-| Locked `$GROWTOO` in care escrow | **15** (= 5 Gold Bloom + 10 The BUD) |
+| Locked `$GROWTOO` (legacy shared vault) | **15** on NFT escrow `EmQ4…` (= 5 Gold Bloom + 10 The BUD) until those stakes harvest |
+| Dedicated care escrow (new listings) | `C69K4V4921m1jYxjBoBoMYJR2fxYQpnx1w45gNGsL4ZU` · GH secret `SOLANA_CARE_ESCROW_KEY_JSON` set |
 | NFT with adopter wallet | **yes** (both mints) |
 | Care progress sync (GH `adopt:queue`) | **OK** — writes `careMonthKeys`, `currentMonthDaysHit`, `careProgressUpdatedAt` |
+| Live stage sync on sold stakes | **OK** — writes `liveStage` / `liveStageKey` / `harvestReady` / `journalStage` from grower journal |
 | Local `npm run adopt:queue` | **OK** — both stakes “up to date” |
 | Monthly proof (live data) | Gold Bloom **0/12** days (external plant missing in journal) · The BUD **1/12** |
 | Harvest claim docs | **0** pending (none filed yet) |
@@ -68,8 +70,9 @@ Ops audit of the two live sold stakes + queue (no new Phantom list/invest this p
 | Escrow program | `GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb` |
 | Marketplace PDA | `2a887xGdhztkvfHn1BdR5xSkXjunzTG1StdTdtrRddAm` |
 | Settlement mode | `program` (instant) · `adopt_stake` (50/50 care escrow) |
-| Hot-wallet escrow (legacy / adopt_stake NFT + locked `$GROWTOO`) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
-| Care escrow | same as hot-wallet escrow (Devnet MVP) |
+| Hot-wallet escrow (listed NFTs) | `EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD` |
+| Care escrow (adopt-stake locked `$GROWTOO`) | `C69K4V4921m1jYxjBoBoMYJR2fxYQpnx1w45gNGsL4ZU` |
+| Legacy locked stakes (pre-split) | still on NFT escrow until harvest; per-listing `careEscrowAddress` |
 | Mint authority | `F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3` |
 | Fee payer | `Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975` |
 | Browser RPC | `https://europe-west1-balpha-9dab9.cloudfunctions.net/solanaRpc` |
@@ -144,7 +147,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Mainnet, marketplace fees > 0, royalties, offers/bidding
 - Migrating old hot-wallet listings into PDAs (cancel + relist instead)
 - Removing CF settle entirely (still required for legacy)
-- Some early test seed NFTs have empty on-chain metadata accounts (cannot refresh art) — remint if needed
+- Early broken metadata reminted (2026-07-31): CBD Auto #1–#3 + Charlotte's Web #1 → new mints with healthy metadata + growto.live botanical images. Old mints kept as `replacedMint` in `mints.devnet.json`. Re-run: `cd chain && npm run repair:seed-metadata -- --execute`
 - If a wallet call fails with `RPC method not allowed`, check Cloud Function logs (`solanaRpc denied method …`) and extend the proxy allow/deny rules in `functions/solana-rpc-proxy.js`
 
 ---

@@ -1380,6 +1380,8 @@
     if (!listing || listing.careStatus !== 'active') return '';
     const locked = listing.lockedGrow != null ? listing.lockedGrow : Math.floor(Number(listing.priceGrow || 0) / 2);
     const isHarvest =
+      listing.harvestReady === true ||
+      listing.liveStageKey === 'harvest' ||
       token.stageIndex >= GROWTH_STAGES.length - 1 ||
       (GROWTH_STAGES[token.stageIndex] && GROWTH_STAGES[token.stageIndex].key === 'harvest');
     let pathMsg = '';
@@ -1391,12 +1393,14 @@
         (path.monthKeys || []).length +
         ' months qualify';
     }
+    const stageHint = listing.liveStage ? ' · stage ' + listing.liveStage : '';
     return (
       '<div class="adopt-stake-panel">' +
       '<p class="adopt-care-hint">Adopt stake locked: <strong>' +
       esc(String(locked)) +
       ' $GROWTOO</strong>' +
       (pathMsg ? ' · ' + esc(pathMsg) : '') +
+      (stageHint ? esc(stageHint) : '') +
       '</p>' +
       (isHarvest
         ? '<button type="button" class="btn btn-primary btn-sm adopt-harvest-claim-btn" data-listing-id="' +

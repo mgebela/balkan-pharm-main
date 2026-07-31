@@ -11,8 +11,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { publicKey } from '@metaplex-foundation/umi';
-import { updateV1, fetchMetadataFromSeeds } from '@metaplex-foundation/mpl-token-metadata';
+import {
+  updateV1,
+  fetchMetadataFromSeeds,
+  findMetadataPda,
+} from '@metaplex-foundation/mpl-token-metadata';
 import { base58 } from '@metaplex-foundation/umi/serializers';
 import { createMintClient, uploadSeedMetadata } from './mint-seed-lib.js';
 import {
@@ -22,6 +27,7 @@ import {
   stageImageUrl,
   SEED_IMAGE_URL,
 } from './seed-metadata.js';
+import { RPC_URL } from './common.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MINTS_PATH = path.join(__dirname, 'mints.devnet.json');
@@ -58,6 +64,7 @@ async function fetchJson(uri) {
 }
 
 const umi = createMintClient();
+const connection = new Connection(RPC_URL, 'confirmed');
 const list = JSON.parse(fs.readFileSync(MINTS_PATH, 'utf8'));
 
 const targets = onlyMine
@@ -71,8 +78,23 @@ const targets = onlyMine
 
 console.log('Updating', targets.length, 'seed NFT(s) → growto.live botanical images…\n');
 
+async function metadataIsBroken(mintAddress) {
+  const pda = findMetadataPda(umi, { mint: publicKey(mintAddress) });
+  const info = await connection.getAccountInfo(new PublicKey(String(pda[0])));
+  return !info || info.data.length < 100;
+}
+
 for (const row of targets) {
   try {
+    if (await metadataIsBroken(row.mint)) {
+      console.error(
+        '✖',
+        row.name || row.mint,
+        'empty/corrupt metadata PDA — remint with: npm run repair:seed-metadata -- --execute --mint',
+        row.mint
+      );
+      continue;
+    }
     const mint = publicKey(row.mint);
     const current = await fetchMetadataFromSeeds(umi, { mint });
     const existingJson = await fetchJson(current.uri || row.metadataUri);
