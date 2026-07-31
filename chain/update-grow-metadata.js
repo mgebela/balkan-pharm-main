@@ -1,13 +1,12 @@
 /*
  * Update on-chain $GROWTOO Metaplex name, symbol, image, and metadata URI.
- * Uploads the growtoo logo + JSON via Irys (devnet), then updateV1 on the mint.
+ * Image points at growto.live brass mark (reliable); JSON uploads via Irys.
  *
  * Usage: node update-grow-metadata.js
+ * Prerequisite: deploy token-metadata/images/growtoo.png to growto.live
  */
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createGenericFile } from '@metaplex-foundation/umi';
 import {
   updateV1,
   fetchMetadataFromSeeds,
@@ -19,7 +18,8 @@ import { toPublicMetadataUri } from './seed-metadata.js';
 import { readDeployed, writeDeployed, solscanAddress } from './common.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const IMAGE_PATH = path.join(__dirname, '../token-metadata/images/growtoo.png');
+void __dirname;
+
 const SITE_JSON = 'https://growto.live/token-metadata/grow.json';
 const SITE_IMAGE = 'https://growto.live/token-metadata/images/growtoo.png';
 const NAME = 'GROWTOO';
@@ -35,30 +35,22 @@ const umi = createMintClient();
 const mint = publicKey(deployed.growMint);
 
 console.log('Mint:', String(mint));
-console.log('Uploading growtoo logo…');
-const png = fs.readFileSync(IMAGE_PATH);
-const imageFile = createGenericFile(png, 'growtoo.png', { contentType: 'image/png' });
-const [rawImageUri] = await umi.uploader.upload([imageFile]);
-const imageUri = toPublicMetadataUri(rawImageUri);
-console.log('Image URI:', imageUri);
+console.log('Using hosted brass mark:', SITE_IMAGE);
 
 const metadata = {
   name: NAME,
   symbol: SYMBOL,
   description:
     '$GROWTOO is the growth reward token of growtoo — earned as adopted CBD plants advance through real growth stages documented in the grow journal. Devnet deployment.',
-  image: imageUri,
+  image: SITE_IMAGE,
   external_url: 'https://growto.live',
   attributes: [
-    { trait_type: 'Network', value: 'Solana devnet' },
+    { trait_type: 'Network', value: 'Solana Devnet' },
     { trait_type: 'Project', value: 'growtoo' },
   ],
   properties: {
     category: 'image',
-    files: [
-      { uri: imageUri, type: 'image/png' },
-      { uri: SITE_IMAGE, type: 'image/png' },
-    ],
+    files: [{ uri: SITE_IMAGE, type: 'image/png' }],
   },
 };
 
@@ -80,17 +72,15 @@ const result = await updateV1(umi, {
 }).sendAndConfirm(umi);
 
 const sig = base58.deserialize(result.signature)[0];
-writeDeployed({
-  growMetadataUri: metadataUri,
-  growImageUri: imageUri,
-  growSiteMetadataUri: SITE_JSON,
-  growName: NAME,
-  growSymbol: SYMBOL,
-  growMetadataUpdatedAt: new Date().toISOString(),
-  growMetadataUpdateSignature: sig,
-});
+deployed.growMetadataUri = metadataUri;
+deployed.growImageUri = SITE_IMAGE;
+deployed.growUpdatedAt = new Date().toISOString();
+deployed.growUpdateSignature = sig;
+writeDeployed(deployed);
 
-console.log('\n$GROWTOO metadata updated.');
-console.log('Name/symbol:', NAME);
-console.log('Tx:', sig);
-console.log('Solscan:', solscanAddress(deployed.growMint));
+console.log('✔ Updated');
+console.log('  metadata:', metadataUri);
+console.log('  site JSON:', SITE_JSON);
+console.log('  image:', SITE_IMAGE);
+console.log('  tx:', sig);
+console.log('  mint:', solscanAddress(String(mint)));

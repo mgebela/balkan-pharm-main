@@ -178,9 +178,12 @@
     "batch": "B-2026-07-GOLD",
     "mint": "ChQymAm7zNmMjWKGE2ax99qjRLsCwB9dmdGGt8U2msGG",
     "owner": "9k1QwNaqTmj6JvhzZiszKzCNGGe4Rw3Ezu7CQ3CqHfhi",
-    "metadataUri": "https://gateway.irys.xyz/8hCWmWCW1Y1Y7AFXiPU35ELQTgWRtVKMxq4piKy6GK8",
-    "imageUri": "https://gateway.irys.xyz/GRe4rhRQYKzbG3xbkWjtnMK1RxcRsyuC629pLBERi1Rq",
+    "metadataUri": "https://gateway.irys.xyz/C2aFyvqyu9K3KTNAETHPJHQtB4KFHRHToF6eGg11PTcp",
+    "imageUri": "https://growto.live/token-metadata/images/plant-seed.png",
     "signature": "2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH",
-    "mintedAt": "2026-07-19T22:05:07.803Z"
+    "mintedAt": "2026-07-19T22:05:07.803Z",
+    "artUpdatedAt": "2026-07-31T19:00:34.681Z",
+    "artUpdateSignature": "5wFuyYYNvMWtNNHrL9r4KKtA7NNQBx36chLeHhxKrDJU4psh7G12rMz4fq7w9Ac6Rz3GWshkwuqaKgubALwLBjns",
+    "artSource": "growto.live-botanical"
   }
 ]

@@ -31,6 +31,17 @@ export function stageImageUrl(stageKey) {
   return `${EXTERNAL_URL}/token-metadata/images/${file}`;
 }
 
+/** Prefer growto.live botanical PNGs; ignore broken Irys/arweave image hosts. */
+export function resolvePlantImageUrl(stageKey, preferred) {
+  const hosted = stageImageUrl(stageKey || 'seed');
+  if (!preferred || typeof preferred !== 'string') return hosted;
+  const u = preferred.trim();
+  if (u.startsWith(`${EXTERNAL_URL}/token-metadata/images/`)) return u;
+  // Legacy Irys/arweave image links frequently 404 in wallets — do not reuse.
+  if (/irys\.xyz|arweave\.(net|dev)/i.test(u)) return hosted;
+  return u;
+}
+
 /** Irys-devnet uploads are NOT on arweave.net — rewrite so wallets can fetch JSON/images. */
 export function toPublicMetadataUri(uri) {
   if (!uri || typeof uri !== 'string') return uri;
@@ -74,6 +85,8 @@ export function buildSeedMetadata(seed) {
     attributes.push({ trait_type: 'Plant ID', value: plantId });
   }
 
+  const image = resolvePlantImageUrl('seed', seed.image);
+
   return {
     name,
     symbol: SEED_SYMBOL,
@@ -81,12 +94,12 @@ export function buildSeedMetadata(seed) {
       `growtoo seed RWA — strain "${strain}", batch ${batch}. ` +
       'This NFT records a physical CBD seed adopted on growtoo. ' +
       'Its growth from seed to harvest is documented in the public grow journal.',
-    image: seed.image || SEED_IMAGE_URL,
+    image,
     external_url: plantId ? `${EXTERNAL_URL}/?plant=${encodeURIComponent(plantId)}` : EXTERNAL_URL,
     attributes,
     properties: {
       category: 'image',
-      files: [{ uri: seed.image || SEED_IMAGE_URL, type: 'image/png' }],
+      files: [{ uri: image, type: 'image/png' }],
     },
     rwa: {
       standard: SEED_RWA_STANDARD,
@@ -114,7 +127,7 @@ export function buildSeedMetadata(seed) {
 export function buildStageMetadata(seed, stage, history) {
   const metadata = buildSeedMetadata(seed);
   const assetType = stage.key === 'flowering' || stage.key === 'harvest' ? 'flower' : 'seed';
-  const image = seed.image || stageImageUrl(stage.key);
+  const image = resolvePlantImageUrl(stage.key, seed.image);
 
   metadata.image = image;
   metadata.properties.files = [{ uri: image, type: 'image/png' }];

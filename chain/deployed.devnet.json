@@ -3,11 +3,11 @@
   "authority": "F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3",
   "growMint": "3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp",
   "growDecimals": 9,
-  "growMetadataUri": "https://gateway.irys.xyz/HRU2JpjusGu7WnMhwzmHQnjph4ddhi5iLKoghsampoPc",
-  "updatedAt": "2026-07-23T11:05:43.701Z",
+  "growMetadataUri": "https://gateway.irys.xyz/621NZ21ZiamoEQpN7Dtw362xx4wsGLigL1tfMmfgWMUR",
+  "updatedAt": "2026-07-31T19:00:52.060Z",
   "seedCollection": "79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa",
   "seedCollectionMetadataUri": "https://growto.live/token-metadata/seed-collection.json",
-  "growImageUri": "https://gateway.irys.xyz/79zdjjjzGJ3YaeLUaP3QUi6kE7QwV4VRsAAKdvZL9Pm4",
+  "growImageUri": "https://growto.live/token-metadata/images/growtoo.png",
   "growSiteMetadataUri": "https://growto.live/token-metadata/grow.json",
   "growName": "GROWTOO",
   "growSymbol": "GROWTOO",
@@ -21,5 +21,7 @@
   "escrowProgramId": "GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb",
   "settlementMode": "program",
   "marketplacePda": "2a887xGdhztkvfHn1BdR5xSkXjunzTG1StdTdtrRddAm",
-  "escrowProgramDeployedAt": "2026-07-23T11:05:43.699Z"
+  "escrowProgramDeployedAt": "2026-07-23T11:05:43.699Z",
+  "growUpdatedAt": "2026-07-31T19:00:52.058Z",
+  "growUpdateSignature": "3qysyNHSqbUCYk37dgtWPd2kzkXCQowhmYDdg7eAMz3yKyCX9r1mqL5bXWmYToMuBRGHdn1nMpfCG94vNS5uvRT3"
 }
