@@ -54,6 +54,35 @@
     susenje: 'harvest',
   };
 
+  /**
+   * Early desk seeds reminted after empty metadata PDAs (see repair-broken-seed-metadata.js).
+   * Stub mint → healthy replacement. Kept so Tokenise can hint even before seedMints sync.
+   */
+  const KNOWN_MINT_REPAIRS = [
+    {
+      stub: '5YXmrcsBjQh7naKgD6j6vjLTiYWmCWjBsg9k6TnNbKd4',
+      mint: '6x5fcn5znp2BoDdjSKJ1JB2NFrYKaD6ozeK5MncGTLxW',
+    },
+    {
+      stub: '76MGoms6RRjJgCbkM9NSCNVK67z76vGfWp33eZbY4YLz',
+      mint: '4mZF55uLFB2qVTo9tpFrezp4hruaPmU6JQC8nhJh787d',
+    },
+    {
+      stub: '6GxDhLgVWb8rL1ZURE2EfVLdEtMLD69wHVWqFDc1nezG',
+      mint: '5LsCudbhC1ZYfjtPLpSyLVVzSYvDm8m1ss1KHXsMuYpB',
+    },
+    {
+      stub: '4XbCLB2oJz7cmSAjKicRiCoyPTjvBi1XnY2ryFKt5bao',
+      mint: 'DkDpWmdpENgx16sEx2dmxZu3STgkdo9JwKgiKv1bKfro',
+    },
+  ];
+  const KNOWN_STUB_TO_MINT = Object.create(null);
+  const KNOWN_MINT_TO_STUB = Object.create(null);
+  KNOWN_MINT_REPAIRS.forEach(function (row) {
+    KNOWN_STUB_TO_MINT[row.stub] = row.mint;
+    KNOWN_MINT_TO_STUB[row.mint] = row.stub;
+  });
+
   const listeners = new Set();
 
   function emptyWallet() {
@@ -555,12 +584,34 @@
         }
 
         if (existing) {
-          if (existing.mintAddress !== m.mintAddress) {
+          // Remint repair: garden still on stub mint → point at healthy replacement.
+          if (
+            m.replacedMint &&
+            existing.mintAddress &&
+            existing.mintAddress === m.replacedMint &&
+            m.mintAddress !== existing.mintAddress
+          ) {
+            existing.mintAddress = m.mintAddress;
+            existing.replacedMint = m.replacedMint;
+            changed = true;
+          } else if (
+            existing.mintAddress &&
+            KNOWN_STUB_TO_MINT[existing.mintAddress] &&
+            KNOWN_STUB_TO_MINT[existing.mintAddress] === m.mintAddress
+          ) {
+            existing.replacedMint = existing.mintAddress;
+            existing.mintAddress = m.mintAddress;
+            changed = true;
+          } else if (existing.mintAddress !== m.mintAddress) {
             existing.mintAddress = m.mintAddress;
             changed = true;
           }
           if (existing.mintRequestId !== requestId) {
             existing.mintRequestId = requestId;
+            changed = true;
+          }
+          if (m.replacedMint && existing.replacedMint !== m.replacedMint) {
+            existing.replacedMint = m.replacedMint;
             changed = true;
           }
           return;
@@ -572,7 +623,7 @@
         else if (/bloom|flower|harvest/i.test(String(m.name || ''))) stageIndex = 4;
 
         const now = Date.now();
-        wallet.tokens.unshift({
+        const row = {
           id: tokenId(),
           name: String(m.name || 'Seed RWA').trim(),
           strain: String(m.strain || '').trim(),
@@ -592,7 +643,12 @@
               tx: m.signature || mockTxHash(),
             },
           ],
-        });
+        };
+        if (m.replacedMint) row.replacedMint = m.replacedMint;
+        else if (KNOWN_MINT_TO_STUB[m.mintAddress]) {
+          row.replacedMint = KNOWN_MINT_TO_STUB[m.mintAddress];
+        }
+        wallet.tokens.unshift(row);
         changed = true;
       });
 
@@ -1082,6 +1138,82 @@
     return Math.round((stageIndex / (GROWTH_STAGES.length - 1)) * 100);
   }
 
+  /**
+   * Detect reminted stub vs healthy replacement for Tokenise desk hints.
+   * Returns { kind: 'stub'|'replacement', stubMint, mint } or null.
+   */
+  function resolveMintRepair(token) {
+    if (!token || !token.mintAddress) return null;
+    const mint = String(token.mintAddress);
+
+    // Card still points at the empty-metadata stub.
+    let replacement = KNOWN_STUB_TO_MINT[mint] || '';
+    if (!replacement && window.SeedChain && typeof SeedChain.getMints === 'function') {
+      const all = SeedChain.getMints() || {};
+      Object.keys(all).some(function (id) {
+        const rec = all[id];
+        if (rec && String(rec.replacedMint || '') === mint && rec.mintAddress) {
+          replacement = String(rec.mintAddress);
+          return true;
+        }
+        return false;
+      });
+    }
+    if (replacement) {
+      return { kind: 'stub', stubMint: mint, mint: replacement };
+    }
+
+    // Healthy remint — show which stub it replaced.
+    let stub = token.replacedMint ? String(token.replacedMint) : '';
+    if (!stub && token.mintRequestId && window.SeedChain) {
+      const rec = SeedChain.getMint(token.mintRequestId);
+      if (rec && rec.replacedMint) stub = String(rec.replacedMint);
+    }
+    if (!stub && window.SeedChain && typeof SeedChain.getMints === 'function') {
+      const all = SeedChain.getMints() || {};
+      Object.keys(all).some(function (id) {
+        const rec = all[id];
+        if (rec && rec.mintAddress === mint && rec.replacedMint) {
+          stub = String(rec.replacedMint);
+          return true;
+        }
+        return false;
+      });
+    }
+    if (!stub && KNOWN_MINT_TO_STUB[mint]) stub = KNOWN_MINT_TO_STUB[mint];
+    if (stub && stub !== mint) {
+      return { kind: 'replacement', stubMint: stub, mint: mint };
+    }
+    return null;
+  }
+
+  function replacedMintHtml(token) {
+    const repair = resolveMintRepair(token);
+    if (!repair) return '';
+    if (repair.kind === 'stub') {
+      return (
+        '<div class="adopt-mint-repair adopt-mint-repair--stub" role="status">' +
+        '<strong>Broken metadata stub</strong>' +
+        '<p>This mint was reminted as <a href="' +
+        esc(explorerAddressUrl(repair.mint)) +
+        '" target="_blank" rel="noopener noreferrer"><code>' +
+        esc(shortAddr(repair.mint)) +
+        '</code></a>. Use <em>Burn</em> to remove this card — hide the empty Collectible in Phantom if it still shows.</p>' +
+        '</div>'
+      );
+    }
+    return (
+      '<div class="adopt-mint-repair adopt-mint-repair--ok" role="status">' +
+      '<strong>Replaces stub mint</strong>' +
+      '<p>Earlier empty-metadata NFT <a href="' +
+      esc(explorerAddressUrl(repair.stubMint)) +
+      '" target="_blank" rel="noopener noreferrer"><code>' +
+      esc(shortAddr(repair.stubMint)) +
+      '</code></a> may still sit in your wallet Collectibles — safe to hide; this card is the live one.</p>' +
+      '</div>'
+    );
+  }
+
   function tokenCardHtml(token) {
     const stage = GROWTH_STAGES[token.stageIndex] || GROWTH_STAGES[0];
     const isMax = token.stageIndex >= GROWTH_STAGES.length - 1;
@@ -1200,12 +1332,14 @@
           esc(shortAddr(token.mintAddress)) +
           '</code></a></p>'
         : '') +
+      replacedMintHtml(token) +
       growerQuestHtml(token, next) +
       careWeekHtml(token) +
       careMonthHtml(token) +
       rankBadgeHtml(token) +
       careToolsHtml(token, next) +
       adoptStakeActionsHtml(token) +
+      redeemComingLaterHtml(token) +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
@@ -1512,8 +1646,32 @@
           esc(listing.id) +
           '" data-plant-id="' +
           esc(token.plantId || '') +
-          '">Claim harvest stake</button>'
-        : '<p class="adopt-care-hint">Reach harvest stage to claim the locked half (all months must qualify).</p>') +
+          '">Claim locked stake ($GROWTOO)</button>' +
+          '<p class="adopt-care-hint">Settles locked $GROWTOO only — physical harvest redemption is coming later.</p>'
+        : '<p class="adopt-care-hint">Reach harvest stage to claim the locked $GROWTOO half (all months must qualify).</p>') +
+      '</div>'
+    );
+  }
+
+  function redeemComingLaterHtml(token) {
+    const atHarvest =
+      token.stageIndex >= GROWTH_STAGES.length - 1 ||
+      (GROWTH_STAGES[token.stageIndex] && GROWTH_STAGES[token.stageIndex].key === 'harvest');
+    const listing =
+      token.mintAddress && window.Market && typeof Market.findAdoptStakeForMint === 'function'
+        ? Market.findAdoptStakeForMint(token.mintAddress)
+        : null;
+    const liveHarvest =
+      listing &&
+      (listing.harvestReady === true ||
+        listing.liveStageKey === 'harvest' ||
+        /harvest|susenje|drying/i.test(String(listing.liveStage || '')));
+    if (!atHarvest && !liveHarvest) return '';
+    return (
+      '<div class="adopt-redeem-later" role="status">' +
+      '<strong>Redeem physical harvest</strong>' +
+      '<span>Coming later</span>' +
+      '<p>Not available on Devnet. Care unlock and locked-stake claim are the practice path today.</p>' +
       '</div>'
     );
   }
@@ -2823,7 +2981,7 @@
         }
         if (
           !confirm(
-            'Claim harvest stake?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% $GROWTOO releases to you. Otherwise it refunds to the adopter (all-or-nothing).'
+            'Claim locked stake ($GROWTOO)?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
           )
         ) {
           return;
@@ -2994,7 +3152,19 @@
       if (burnBtn) {
         if (busy) return;
         const id = burnBtn.dataset.id;
-        if (!confirm('Burn this token? This cannot be undone.')) return;
+        const wallet = PlantToken.getWallet ? PlantToken.getWallet() : null;
+        const burnTok =
+          wallet && Array.isArray(wallet.tokens)
+            ? wallet.tokens.find(function (t) {
+                return t && t.id === id;
+              })
+            : null;
+        const repair = burnTok ? resolveMintRepair(burnTok) : null;
+        const burnMsg =
+          repair && repair.kind === 'stub'
+            ? 'Remove this stub mint from your garden? (Does not burn the on-chain NFT — hide it in Phantom if it still appears.)'
+            : 'Burn this token? This cannot be undone.';
+        if (!confirm(burnMsg)) return;
         setBusy(true);
         try {
           await PlantToken.burnToken(id);

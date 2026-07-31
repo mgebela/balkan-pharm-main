@@ -5380,6 +5380,44 @@ body:not(.app-loading) {
 .adopt-token-link--warn {
   color: #f59e0b;
 }
+.adopt-mint-repair {
+  margin: 0 0 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--desk-line);
+  background: rgba(10, 18, 14, 0.55);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+.adopt-mint-repair strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+.adopt-mint-repair p {
+  margin: 0;
+  color: var(--text-muted);
+}
+.adopt-mint-repair a {
+  color: var(--brass);
+}
+.adopt-mint-repair code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+.adopt-mint-repair--ok {
+  border-color: rgba(201, 165, 94, 0.28);
+}
+.adopt-mint-repair--stub {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.06);
+}
+.adopt-mint-repair--stub strong {
+  color: #f59e0b;
+}
 .adopt-mint-btn--locked {
   opacity: 0.65;
   cursor: not-allowed;
@@ -6902,6 +6940,41 @@ body.crypto-simple .crypto-simple-only {
   border: 1px solid rgba(220, 140, 60, 0.28);
   font-size: 0.78rem;
   line-height: 1.35;
+  color: var(--text-muted);
+}
+.market-card-redeem-note--later {
+  background: rgba(201, 165, 94, 0.08);
+  border-color: rgba(201, 165, 94, 0.28);
+}
+.adopt-redeem-later {
+  margin: 0.55rem 0 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed rgba(201, 165, 94, 0.35);
+  background: rgba(10, 18, 14, 0.45);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.75rem;
+  align-items: baseline;
+}
+.adopt-redeem-later strong {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: var(--text);
+}
+.adopt-redeem-later span {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.adopt-redeem-later p {
+  grid-column: 1 / -1;
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
   color: var(--text-muted);
 }
 
@@ -9484,6 +9557,26 @@ table td {
   font-size: 0.84rem;
   line-height: 1.45;
   color: var(--text-muted);
+}
+.market-info-card--later {
+  border-color: rgba(201, 165, 94, 0.28);
+  background: rgba(201, 165, 94, 0.05);
+}
+.market-info-body {
+  min-width: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+.market-info-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+.market-info-card--later .market-info-title {
+  color: var(--brass);
 }
 
 .market-offer-card-body {

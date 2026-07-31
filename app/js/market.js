@@ -1258,9 +1258,9 @@
       offerExplainHtml(listing) +
       careLine +
       (listing.settlement === 'adopt_stake' && canInvest
-        ? '<p class="market-card-redeem-note">Physical ' +
+        ? '<p class="market-card-redeem-note">Practice stake only — physical ' +
           tip('redemption', 'redemption') +
-          ' is still mocked on Devnet — you are practicing the stake flow only.</p>'
+          ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
         : '') +
       '<p class="market-card-meta crypto-advanced-only">NFT: <a href="' +
       esc(explorerAddress(listing.mintAddress)) +
@@ -1296,11 +1296,14 @@
           esc(listing.id) +
           '" data-plant-id="' +
           esc(listing.plantId || '') +
-          '">Claim harvest stake</button>'
+          '">Claim locked stake ($GROWTOO)</button>'
+        : '') +
+      (canHarvestClaim && harvestReady
+        ? '<p class="market-card-redeem-note market-card-redeem-note--later">Physical harvest redemption — coming later. This claim only settles the locked $GROWTOO.</p>'
         : '') +
       '</div>' +
       (canHarvestClaim && !harvestReady
-        ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked half.</p>'
+        ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked $GROWTOO half.</p>'
         : '') +
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
@@ -1675,11 +1678,11 @@
           } else if (listing.settlement === 'adopt_stake') {
             confirmMsg +=
               'Adopt stake: you pay the full price now. 50% goes to the grower when it settles; 50% stays locked until monthly care criteria at harvest (all-or-nothing). You receive the plant token when settlement completes.\n\n' +
-              'Important: physical harvest redemption is still mocked on Devnet — no real delivery. This is a test-network practice flow only.';
+              'Physical harvest redemption is coming later — no delivery on Devnet. You are practicing the stake / care unlock flow only.';
           } else {
             confirmMsg +=
               'You will receive the plant token when settlement completes.\n\n' +
-              'Note: physical harvest redemption is still mocked on Devnet.';
+              'Physical harvest redemption is coming later — not available on this test network.';
           }
           if (!confirm(confirmMsg)) {
             return;
@@ -1702,7 +1705,7 @@
         } else if (harvestBtn) {
           if (
             !confirm(
-              'Claim harvest stake?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% $GROWTOO releases to you. Otherwise it refunds to the adopter (all-or-nothing).'
+              'Claim locked stake ($GROWTOO)?\n\nIf every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
             )
           ) {
             return;

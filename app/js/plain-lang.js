@@ -20,7 +20,7 @@
     'instant sale':
       'Full price to the grower at purchase. Done — no care lock.',
     redemption:
-      'Turning a harvest-stage token into a real harvest share someday. On Devnet this path is still mocked — no physical delivery yet.',
+      'Turning a harvest-stage token into a real harvest share. Coming later — not available on Devnet. Claim locked stake only unlocks escrowed $GROWTOO.',
     'bonding curve':
       'An automatic price formula some crypto projects use. growtoo does not use one — growers set their own ask price.',
     'collection authority':
