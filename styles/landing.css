@@ -5643,6 +5643,15 @@ body:has(.devnet-banner) .header {
   transform: translate3d(0, 16px, 0);
 }
 
+/* Legal / risks pages have no landing reveal script — keep content visible. */
+.desk-section.risks-page .desk-header,
+.desk-section.risks-page .desk-panel,
+.desk-section.risks-page .proof-steps,
+.desk-section.risks-page .close-cta {
+  opacity: 1;
+  transform: none;
+}
+
 .desk-section.is-revealed .desk-header,
 .desk-section.is-revealed .desk-panel,
 .desk-section.is-revealed .proof-steps,
