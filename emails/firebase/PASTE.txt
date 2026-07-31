@@ -1,0 +1,55 @@
+Firebase Auth email paste — project balpha-9dab9
+================================================
+
+Console:
+https://console.firebase.google.com/project/balpha-9dab9/authentication/emails
+
+Sender display name is already set via API to: growtoo
+(From address stays noreply@… unless you add custom SMTP.)
+
+Subjects + HTML bodies must be pasted in the Console
+(API returns EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED for subject;
+body PATCH is ignored for this project — Console only).
+
+------------------------------------------------------------
+1) Email address verification
+------------------------------------------------------------
+Subject:
+Verify your email · growtoo
+
+Body file (copy all):
+emails/firebase/verify-email.body.html
+
+Keep %LINK% and %EMAIL% unchanged. Save.
+
+------------------------------------------------------------
+2) Password reset
+------------------------------------------------------------
+Subject:
+Reset your password · growtoo
+
+Body file (copy all):
+emails/firebase/reset-password.body.html
+
+Keep %LINK% and %EMAIL% unchanged. Save.
+
+------------------------------------------------------------
+3) Email address change
+------------------------------------------------------------
+Subject:
+Confirm your new email · growtoo
+
+Body file (copy all):
+emails/firebase/change-email.body.html
+
+Keep %LINK% and %NEW_EMAIL% unchanged. Save.
+
+------------------------------------------------------------
+Smoke check
+------------------------------------------------------------
+1. Sign up a fresh address on https://growto.live/dnevnik/
+2. Open the verification email — expect forest card, brass CTA, growtoo seal mark
+3. Optional: trigger password reset from Console Users → … or your reset UI
+4. Confirm the action link still works (%LINK% was not edited out)
+
+Do not paste transactional stubs (welcome / stage-sealed / market-settled).

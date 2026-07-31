@@ -122,12 +122,30 @@
 
     <div class="howto">
       <strong>Firebase Auth setup</strong>
+      <p style="margin:0.45rem 0 0;">
+        Console:
+        <a href="https://console.firebase.google.com/project/balpha-9dab9/authentication/emails" target="_blank" rel="noopener">balpha-9dab9 → Authentication → Templates</a>
+        · step sheet: <a href="firebase/PASTE.txt" target="_blank" rel="noopener">firebase/PASTE.txt</a>
+      </p>
+      <p style="margin:0.65rem 0 0;"><strong>Subjects</strong> (Console paste — API cannot change these)</p>
+      <ul style="margin:0.35rem 0 0;padding-left:1.2rem;">
+        <li>Verify → <code>Verify your email · growtoo</code></li>
+        <li>Reset → <code>Reset your password · growtoo</code></li>
+        <li>Change → <code>Confirm your new email · growtoo</code></li>
+      </ul>
       <ol>
-        <li>Firebase Console → Authentication → Templates</li>
-        <li>Edit Email address verification, Password reset, and Email address change</li>
-        <li>Set subject from the HTML comment in each file; paste the full HTML (or body)</li>
-        <li>Sender name: <em>growtoo</em> · reply-to as needed</li>
+        <li>Open each template (Email address verification, Password reset, Email address change)</li>
+        <li>Set the subject from the map above</li>
+        <li>Paste the matching body from <code>emails/firebase/*.body.html</code> — keep placeholders</li>
+        <li>Sender name is already <em>growtoo</em> via API · leave default From unless custom SMTP is configured</li>
+        <li>Save · smoke-test with a new signup on <code>/dnevnik/</code></li>
       </ol>
+      <p style="margin:0.75rem 0 0;"><strong>Paste files</strong></p>
+      <ul style="margin:0.35rem 0 0;padding-left:1.2rem;">
+        <li><a href="firebase/verify-email.body.html">firebase/verify-email.body.html</a> — keep <code>%LINK%</code> / <code>%EMAIL%</code></li>
+        <li><a href="firebase/reset-password.body.html">firebase/reset-password.body.html</a> — keep <code>%LINK%</code> / <code>%EMAIL%</code></li>
+        <li><a href="firebase/change-email.body.html">firebase/change-email.body.html</a> — keep <code>%LINK%</code> / <code>%NEW_EMAIL%</code></li>
+      </ul>
       Transactional previews (<em>welcome</em>, <em>stage sealed</em>, <em>market settled</em>) use
       <code>{{placeholders}}</code> for a future mailer — not wired yet.
     </div>
@@ -136,7 +154,11 @@
       <article class="card">
         <div class="card-bar">
           <span>Auth · Verify email</span>
-          <a href="verify-email.html" target="_blank" rel="noopener">Open file</a>
+          <span>
+            <a href="firebase/verify-email.body.html" target="_blank" rel="noopener">Paste body</a>
+            ·
+            <a href="verify-email.html" target="_blank" rel="noopener">Full preview</a>
+          </span>
         </div>
         <iframe src="verify-email.html" title="Verify email preview" loading="lazy"></iframe>
       </article>
@@ -144,7 +166,11 @@
       <article class="card">
         <div class="card-bar">
           <span>Auth · Reset password</span>
-          <a href="reset-password.html" target="_blank" rel="noopener">Open file</a>
+          <span>
+            <a href="firebase/reset-password.body.html" target="_blank" rel="noopener">Paste body</a>
+            ·
+            <a href="reset-password.html" target="_blank" rel="noopener">Full preview</a>
+          </span>
         </div>
         <iframe src="reset-password.html" title="Reset password preview" loading="lazy"></iframe>
       </article>
@@ -152,7 +178,11 @@
       <article class="card">
         <div class="card-bar">
           <span>Auth · Change email</span>
-          <a href="change-email.html" target="_blank" rel="noopener">Open file</a>
+          <span>
+            <a href="firebase/change-email.body.html" target="_blank" rel="noopener">Paste body</a>
+            ·
+            <a href="change-email.html" target="_blank" rel="noopener">Full preview</a>
+          </span>
         </div>
         <iframe src="change-email.html" title="Change email preview" loading="lazy"></iframe>
       </article>

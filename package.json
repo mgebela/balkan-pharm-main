@@ -7,7 +7,8 @@
     "deploy:functions": "firebase deploy --only functions --project balpha-9dab9",
     "functions:install": "npm install --prefix functions",
     "pdf:investor": "python3 docs/generate_investor_pdf.py",
-    "generate:token-art": "node chain/generate-token-art.js && cp shared/token-botanical-art.js app/js/token-botanical-art.js"
+    "generate:token-art": "node chain/generate-token-art.js && cp shared/token-botanical-art.js app/js/token-botanical-art.js",
+    "emails:push-sender": "NODE_PATH=chain/node_modules node emails/firebase/push-templates.mjs"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.4"
