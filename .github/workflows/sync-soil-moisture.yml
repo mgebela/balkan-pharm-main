@@ -2,7 +2,7 @@ name: Sync soil moisture JSON
 
 on:
   schedule:
-    - cron: '*/3 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -16,11 +16,29 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Fetch sensor JSON
+        id: fetch
         run: |
+          set -euo pipefail
           mkdir -p app/tools/soil-moisture
-          curl -sf "http://164.92.208.95/latest.json" -o app/tools/soil-moisture/latest.json
+          TMP="$(mktemp)"
+          if curl -sfL \
+            --connect-timeout 8 \
+            --max-time 25 \
+            --retry 2 \
+            --retry-delay 3 \
+            "http://164.92.208.95/latest.json" \
+            -o "$TMP"; then
+            mv "$TMP" app/tools/soil-moisture/latest.json
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+            echo "Fetched soil moisture JSON ($(wc -c < app/tools/soil-moisture/latest.json) bytes)"
+          else
+            rm -f "$TMP"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Soil moisture sensor unreachable (http://164.92.208.95/latest.json). Keeping previous latest.json."
+          fi
 
       - name: Commit if changed
+        if: steps.fetch.outputs.ok == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

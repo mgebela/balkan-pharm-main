@@ -150,6 +150,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Early broken metadata reminted (2026-07-31): CBD Auto #1–#3 + Charlotte's Web #1 → new mints with healthy metadata + growto.live botanical images. Old mints kept as `replacedMint` in `mints.devnet.json`. Re-run: `cd chain && npm run repair:seed-metadata -- --execute`
 - All `mints.devnet.json` seeds now use growto.live botanical images (Irys image hosts cleared). Gold Bloom #1 → `plant-flowering.png`. Refresh: `npm run update:seed-art`
 - If a wallet call fails with `RPC method not allowed`, check Cloud Function logs (`solanaRpc denied method …`) and extend the proxy allow/deny rules in `functions/solana-rpc-proxy.js`
+- Soil moisture sync: sensor `http://164.92.208.95/latest.json` often times out; workflow soft-warns and keeps the previous `latest.json` (schedule every 15m)
 
 ---
 
@@ -162,7 +163,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - [x] Botanical + brass token images served from growto.live
 - [x] **Adopt-stake settle (existing):** 2 sold stakes · NFTs with buyer · 15 `$GROWTOO` locked in escrow
 - [x] **Care progress sync:** GH + local adopt queue writing month / day counters
-- [x] **Monthly unlock rule (proof):** rejects &lt;12 care days; BUD 1/12 · Gold Bloom 0/12 (no journal plant)
+- [x] **Monthly unlock rule (proof):** rejects &lt;12 care days; BUD 1/12 · Gold Bloom 1/12 (journal plant linked 2026-07-31)
 - [x] **Stake notify (store):** grower notification docs present for both listing IDs
 - [x] **Reservation TTL logic:** dry-run reopen after 15m (no live unpaid reservation to expire)
 
