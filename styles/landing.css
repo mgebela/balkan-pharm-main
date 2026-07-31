@@ -5625,8 +5625,57 @@ body:has(.devnet-banner) .header {
   .hero--catalog .hero-headline,
   .hero--catalog .hero-sub,
   .hero--catalog .hero-cta-row,
-  .hero-specimen {
+  .hero-specimen,
+  .desk-section.is-revealed .desk-header,
+  .desk-section.is-revealed .desk-panel,
+  .desk-section.is-revealed .proof-steps,
+  .desk-section.is-revealed .close-cta {
     animation: none;
+  }
+}
+
+/* Signature motion — desk sections settle on scroll */
+.desk-section .desk-header,
+.desk-section .desk-panel,
+.desk-section .proof-steps,
+.desk-section .close-cta {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.desk-section.is-revealed .desk-header,
+.desk-section.is-revealed .desk-panel,
+.desk-section.is-revealed .proof-steps,
+.desk-section.is-revealed .close-cta {
+  animation: catalog-section-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.desk-section.is-revealed .desk-panel {
+  animation-delay: 0.08s;
+}
+
+.desk-section.is-revealed .proof-steps {
+  animation-delay: 0.1s;
+}
+
+@keyframes catalog-section-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desk-section .desk-header,
+  .desk-section .desk-panel,
+  .desk-section .proof-steps,
+  .desk-section .close-cta {
+    opacity: 1;
+    transform: none;
   }
 }
 

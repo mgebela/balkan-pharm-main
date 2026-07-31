@@ -2822,12 +2822,25 @@
         const id = mintBtn.dataset.id;
         setBusy(true);
         const original = mintBtn.textContent;
-        mintBtn.textContent = 'Minting…';
+        mintBtn.classList.add('is-sealing');
+        mintBtn.textContent = 'Sealing…';
         try {
           await PlantToken.mintGrowth(id);
+          mintBtn.classList.remove('is-sealing');
+          mintBtn.classList.add('is-sealed');
           render();
+          requestAnimationFrame(function () {
+            const bar = document.querySelector('.trail-bar--current');
+            if (bar) {
+              bar.classList.add('is-just-sealed');
+              window.setTimeout(function () {
+                bar.classList.remove('is-just-sealed');
+              }, 1200);
+            }
+          });
         } catch (err) {
           flashError(err);
+          mintBtn.classList.remove('is-sealing');
           mintBtn.textContent = original;
         } finally {
           setBusy(false);
@@ -2912,7 +2925,10 @@
         const submitBtn = document.getElementById('seal-stage-submit') || seedForm.querySelector('button[type="submit"]');
         const originalLabel = submitBtn ? submitBtn.textContent : '';
         setBusy(true);
-        if (submitBtn) submitBtn.textContent = 'Sealing…';
+        if (submitBtn) {
+          submitBtn.classList.add('is-sealing');
+          submitBtn.textContent = 'Sealing…';
+        }
         try {
           if (!action || action.kind === 'done') {
             throw new Error('This plant’s trail is already fully sealed.');
@@ -2934,10 +2950,24 @@
           } else {
             throw new Error('Nothing to seal for this plant.');
           }
+          if (submitBtn) {
+            submitBtn.classList.remove('is-sealing');
+            submitBtn.classList.add('is-sealed');
+          }
           render();
           flashOk('Stage sealed.');
+          requestAnimationFrame(function () {
+            const bar = document.querySelector('.trail-bar--current');
+            if (bar) {
+              bar.classList.add('is-just-sealed');
+              window.setTimeout(function () {
+                bar.classList.remove('is-just-sealed');
+              }, 1200);
+            }
+          });
         } catch (err) {
           flashError(err);
+          if (submitBtn) submitBtn.classList.remove('is-sealing');
         } finally {
           if (submitBtn) submitBtn.textContent = originalLabel || 'Seal stage';
           setBusy(false);

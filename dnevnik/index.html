@@ -87,6 +87,7 @@
       border-radius: 4px;
       padding: 1.5rem 1.35rem 1.35rem;
       box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4);
+      animation: login-card-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .login-brand {
       display: flex;
@@ -100,6 +101,7 @@
       height: 56px;
       border-radius: 50%;
       box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.4);
+      animation: login-seal-settle 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .login-brand-word {
       font-family: var(--font);
@@ -107,6 +109,22 @@
       font-size: 1.05rem;
       letter-spacing: 0.04em;
       color: var(--brass);
+      animation: login-seal-settle 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s both;
+    }
+    @keyframes login-seal-settle {
+      from { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.94); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes login-card-rise {
+      from { opacity: 0; transform: translate3d(0, 14px, 0); }
+      to { opacity: 1; transform: translate3d(0, 0, 0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .login-brand img,
+      .login-brand-word,
+      .login-card {
+        animation: none;
+      }
     }
     .login-eyebrow {
       margin: 0 0 0.45rem;
