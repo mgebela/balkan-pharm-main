@@ -153,6 +153,7 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Market / Tokenise use an in-app confirm sheet (invest, claim, cancel, burn) instead of `window.confirm`; empty boards point to one next-step CTA
 - In-flight txs show a persistent status rail (Queued → confirmed): invest settle, listing escrow/cancel, mint queue, harvest claim queue
 - After sign-in: role **Start here** strip + idle-game **Daily status** popup for grower **and** adopter (gains since last visit / previous login; adopters wait for Market sync)
+- Adopter **spotlight tour** (faucet → market → garden) after daily status / first role visit; **Replay tour** in Profile
 - Adopter Market / garden cards keep mint · PDA · batch behind **Chain details** (collapsed unless Advanced view)
 - Early broken metadata reminted (2026-07-31): CBD Auto #1–#3 + Charlotte's Web #1 → new mints with healthy metadata + growto.live botanical images. Old mints kept as `replacedMint` in `mints.devnet.json`. Re-run: `cd chain && npm run repair:seed-metadata -- --execute`
 - Tokenise shows a **Replaces stub mint** / **Broken metadata stub** hint on reminted cards so desk wallets don’t confuse Phantom’s leftover empty Collectibles

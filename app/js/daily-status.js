@@ -531,13 +531,30 @@
     if (uid) writeLastSeen(uid, Date.now(), !!adopter || isAdopter());
   }
 
+  function maybeKickTour(adopter, uid) {
+    if (!adopter) return;
+    try {
+      if (window.ProductTour && typeof ProductTour.maybeStartAfterDailyStatus === 'function') {
+        ProductTour.maybeStartAfterDailyStatus({
+          profileType: 'adopter',
+          uid: uid || currentUid(),
+        });
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function bindPopupOnce() {
     const overlay = document.getElementById('daily-status-overlay');
     if (!overlay || overlay.dataset.bound === '1') return;
     overlay.dataset.bound = '1';
 
     function dismiss() {
-      hidePopup(currentUid(), isAdopter());
+      const uid = currentUid();
+      const adopter = isAdopter();
+      hidePopup(uid, adopter);
+      maybeKickTour(adopter, uid);
     }
 
     const backdrop = document.getElementById('daily-status-backdrop');
@@ -633,7 +650,11 @@
     bindPopupOnce();
     renderStrip(adopter);
 
-    if (alreadyShownThisSession(uid, adopter)) return;
+    if (alreadyShownThisSession(uid, adopter)) {
+      // Daily status already handled this session — still offer the tour once.
+      maybeKickTour(adopter, uid);
+      return;
+    }
 
     whenDataReady(adopter, function () {
       const sinceMs = resolveSinceMs(uid, adopter);
@@ -656,6 +677,7 @@
         });
       } else {
         writeLastSeen(uid, now, adopter);
+        maybeKickTour(adopter, uid);
       }
     });
   }
