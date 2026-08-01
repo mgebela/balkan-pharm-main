@@ -1,6 +1,6 @@
 /*
  * Spotlight product tour — game-style coach (dim rest, highlight one target).
- * Adopter script first; grower script can reuse the same engine later.
+ * Scripts: adopter-full · grower-full · plants · adopt · market (role-aware tabs).
  */
 (function () {
   'use strict';
@@ -9,12 +9,6 @@
   var ROOT_ID = 'product-tour-root';
   var active = null;
   var resizeTimer = null;
-
-  function esc(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-    });
-  }
 
   function currentUid() {
     try {
@@ -37,13 +31,17 @@
     return document.body.classList.contains('profile-adopter');
   }
 
-  function storageKey(role, uid) {
-    return STORAGE_PREFIX + (uid || 'anon') + ':' + (role || 'adopter');
+  function isGrower() {
+    return !isAdopter();
   }
 
-  function readState(role, uid) {
+  function storageKey(scriptId, uid) {
+    return STORAGE_PREFIX + (uid || 'anon') + ':' + (scriptId || 'full');
+  }
+
+  function readState(scriptId, uid) {
     try {
-      var raw = localStorage.getItem(storageKey(role, uid));
+      var raw = localStorage.getItem(storageKey(scriptId, uid));
       if (!raw) return null;
       var parsed = JSON.parse(raw);
       return parsed && typeof parsed === 'object' ? parsed : null;
@@ -52,13 +50,13 @@
     }
   }
 
-  function writeState(role, uid, patch) {
-    var prev = readState(role, uid) || {};
+  function writeState(scriptId, uid, patch) {
+    var prev = readState(scriptId, uid) || {};
     var next = Object.assign({}, prev, patch || {}, {
       updatedAt: new Date().toISOString(),
     });
     try {
-      localStorage.setItem(storageKey(role, uid), JSON.stringify(next));
+      localStorage.setItem(storageKey(scriptId, uid), JSON.stringify(next));
     } catch (_) {
       /* ignore */
     }
@@ -90,7 +88,9 @@
     return null;
   }
 
-  function adopterSteps() {
+  /* ── Step libraries ───────────────────────────────────────────── */
+
+  function adopterFullSteps() {
     return [
       {
         id: 'start-strip',
@@ -111,7 +111,7 @@
         view: 'market',
         selectors: ['#market-grid', '#market-adopter-guide', '#view-market'],
         title: 'Browse live asks',
-        body: 'Open offers from growers show plant · stage · ask. Tap Invest when you’re ready (wallet may prompt).',
+        body: 'Open offers show plant · stage · ask. Tap Invest when you’re ready (wallet may prompt).',
       },
       {
         id: 'garden-nav',
@@ -128,10 +128,253 @@
         view: 'adopt',
         selectors: ['#adopter-summary', '#adopt-token-grid', '#adopt-market-cta'],
         title: 'Track what you backed',
-        body: 'Adopted plants and balances show up in My garden. You’re done with the tour — explore at your pace.',
+        body: 'Adopted plants and balances show up in My garden. Explore at your pace — tap ? on a tab anytime for a shorter tour.',
       },
     ];
   }
+
+  function growerFullSteps() {
+    return [
+      {
+        id: 'start-strip',
+        view: null,
+        selectors: ['#daily-start-strip', '#btn-account'],
+        title: 'Start here',
+        body: 'Your grower path: log care in the journal, seal a stage on Tokenise, then list it on Market.',
+      },
+      {
+        id: 'plants-nav',
+        view: null,
+        selectors: [
+          '.bottom-nav .nav-item[data-view="plants"]',
+          '.sidebar-nav .nav-item[data-view="plants"]',
+        ],
+        title: 'Journal',
+        body: 'Plants and care logs live here. Tap Journal in the nav to open it.',
+      },
+      {
+        id: 'plants-list',
+        view: 'plants',
+        selectors: ['#btn-add-plant', '#plants-list', '#view-plants'],
+        title: 'Add a plant',
+        body: 'Create a plant, then log watering, feeding, and stage changes — that trail unlocks Tokenise later.',
+      },
+      {
+        id: 'journal-log',
+        view: 'plants',
+        selectors: ['#btn-add-entry', '#journal-entries', '.plants-journal-diary'],
+        title: 'Log care',
+        body: 'New entries prove real work. Quests on Tokenise look for stage, water, and feed logs.',
+      },
+      {
+        id: 'tokenise-nav',
+        view: null,
+        selectors: [
+          '.bottom-nav .nav-item[data-view="adopt"]',
+          '.sidebar-nav .nav-item[data-view="adopt"]',
+        ],
+        title: 'Tokenise',
+        body: 'When the journal is ready, seal a stage into a plant token on Devnet.',
+      },
+      {
+        id: 'seal-stage',
+        view: 'adopt',
+        selectors: ['#adopt-seed-section', '#adopt-growth-guide', '#adopt-token-grid'],
+        title: 'Seal a stage',
+        body: 'Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.',
+      },
+      {
+        id: 'market-nav',
+        view: null,
+        selectors: [
+          '.bottom-nav .nav-item[data-view="market"]',
+          '.sidebar-nav .nav-item[data-view="market"]',
+        ],
+        title: 'Market',
+        body: 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.',
+      },
+      {
+        id: 'market-list',
+        view: 'market',
+        selectors: ['#market-list-section', '#market-mine-grid', '#market-grid'],
+        title: 'List an offer',
+        body: 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.',
+      },
+    ];
+  }
+
+  function plantsTabSteps() {
+    return [
+      {
+        id: 'plants-heading',
+        view: 'plants',
+        selectors: ['#plants-list', '#btn-add-plant', '#view-plants .plants-journal-section'],
+        title: 'Your plants',
+        body: 'Each plant is a living record. Start with + New plant if the list is empty.',
+      },
+      {
+        id: 'add-plant',
+        view: 'plants',
+        selectors: ['#btn-add-plant'],
+        title: 'New plant',
+        body: 'Name, strain, and stage kick off the journal. You can change stage as the grow advances.',
+      },
+      {
+        id: 'journal',
+        view: 'plants',
+        selectors: ['#btn-add-entry', '#journal-entries', '.plants-journal-diary'],
+        title: 'Care journal',
+        body: 'Log watering, feeding, and stage notes. Tokenise quests read this trail before sealing.',
+      },
+      {
+        id: 'weather',
+        view: 'plants',
+        selectors: ['#plants-weather-widget'],
+        title: 'Weather (optional)',
+        body: 'Set a city for a 7-day forecast — handy for outdoor planning. Skip if you grow indoors.',
+      },
+    ];
+  }
+
+  function adoptTabStepsGrower() {
+    return [
+      {
+        id: 'seal',
+        view: 'adopt',
+        selectors: ['#adopt-seed-section', '#adopt-growth-guide'],
+        title: 'Seal a stage',
+        body: 'Link a journal plant and seal the current stage. Completing grower quests unlocks the mint button.',
+      },
+      {
+        id: 'trail',
+        view: 'adopt',
+        selectors: ['#adopt-growth-guide', '#adopt-seed-section'],
+        title: 'The trail ahead',
+        body: 'Stages from seed → harvest each mint a reward on Devnet when you seal them.',
+      },
+      {
+        id: 'sealed',
+        view: 'adopt',
+        selectors: ['#adopt-token-grid', '#adopt-garden-section'],
+        title: 'Sealed plants',
+        body: 'Your tokens land here. When one is ready, list it on Market.',
+      },
+    ];
+  }
+
+  function adoptTabStepsAdopter() {
+    return [
+      {
+        id: 'guide',
+        view: 'adopt',
+        selectors: ['#adopter-guide', '#adopter-summary', '#adopt-garden-section'],
+        title: 'My garden',
+        body: 'Adopted plants and stake progress live here after Market invest settles.',
+      },
+      {
+        id: 'summary',
+        view: 'adopt',
+        selectors: ['#adopter-summary', '#adopt-token-grid'],
+        title: 'Balances',
+        body: 'See how many plants you’ve adopted and your test $GROWTOO balance.',
+      },
+      {
+        id: 'cards',
+        view: 'adopt',
+        selectors: ['#adopt-token-grid', '#adopt-market-cta'],
+        title: 'Plant cards',
+        body: 'Open a card for stage, care unlock, and history. Browse Market if the garden is empty.',
+      },
+    ];
+  }
+
+  function marketTabStepsGrower() {
+    return [
+      {
+        id: 'list-form',
+        view: 'market',
+        selectors: ['#market-list-section', '#market-list-form'],
+        title: 'Post an ask',
+        body: 'Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.',
+      },
+      {
+        id: 'offer-type',
+        view: 'market',
+        selectors: ['.market-offer-compare', '#market-list-section'],
+        title: 'Offer types',
+        body: 'Instant sale pays you in full at purchase. Adopt stake: half now, half after care months qualify.',
+      },
+      {
+        id: 'my-offers',
+        view: 'market',
+        selectors: ['#market-mine-grid'],
+        title: 'My offers',
+        body: 'Track active, adopted, and cancelled listings here — including harvest claim when ready.',
+      },
+      {
+        id: 'open-board',
+        view: 'market',
+        selectors: ['#market-grid'],
+        title: 'Open market',
+        body: 'Other growers’ live asks. Useful to see how the board looks to adopters.',
+      },
+    ];
+  }
+
+  function marketTabStepsAdopter() {
+    return [
+      {
+        id: 'faucet',
+        view: 'market',
+        selectors: ['#test-faucet-panel', '#market-adopter-guide'],
+        title: 'Test faucet',
+        body: 'Claim free Devnet $GROWTOO once a day before you invest.',
+      },
+      {
+        id: 'guide',
+        view: 'market',
+        selectors: ['#market-adopter-guide'],
+        title: 'How adopting works',
+        body: 'Instant sale vs Adopt stake, then follow the plant in My garden after settle.',
+      },
+      {
+        id: 'board',
+        view: 'market',
+        selectors: ['#market-grid'],
+        title: 'Live asks',
+        body: 'Tap Invest on a card. Connect a Devnet wallet when prompted.',
+      },
+    ];
+  }
+
+  function resolveScript(scriptId) {
+    var id = String(scriptId || '').trim();
+    if (id === 'adopter-full' || (id === 'full' && isAdopter())) {
+      return { id: 'adopter-full', steps: adopterFullSteps(), role: 'adopter' };
+    }
+    if (id === 'grower-full' || (id === 'full' && isGrower())) {
+      return { id: 'grower-full', steps: growerFullSteps(), role: 'grower' };
+    }
+    if (id === 'plants') {
+      return { id: 'plants', steps: plantsTabSteps(), role: 'grower' };
+    }
+    if (id === 'adopt') {
+      return isAdopter()
+        ? { id: 'adopt-adopter', steps: adoptTabStepsAdopter(), role: 'adopter' }
+        : { id: 'adopt-grower', steps: adoptTabStepsGrower(), role: 'grower' };
+    }
+    if (id === 'market') {
+      return isAdopter()
+        ? { id: 'market-adopter', steps: marketTabStepsAdopter(), role: 'adopter' }
+        : { id: 'market-grower', steps: marketTabStepsGrower(), role: 'grower' };
+    }
+    // Default full tour for current role
+    return isAdopter()
+      ? { id: 'adopter-full', steps: adopterFullSteps(), role: 'adopter' }
+      : { id: 'grower-full', steps: growerFullSteps(), role: 'grower' };
+  }
+
+  /* ── Engine UI ────────────────────────────────────────────────── */
 
   function ensureRoot() {
     var root = document.getElementById(ROOT_ID);
@@ -175,9 +418,7 @@
       function () {
         if (!active) return;
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-          positionUi();
-        }, 80);
+        resizeTimer = setTimeout(positionUi, 80);
       },
       { passive: true }
     );
@@ -261,21 +502,20 @@
     back.hidden = active.index === 0;
     next.textContent = active.index >= total - 1 ? 'Finish' : 'Next';
 
-    writeState(active.role, active.uid, {
+    writeState(active.scriptId, active.uid, {
       step: active.index,
-      role: active.role,
+      scriptId: active.scriptId,
       inProgress: true,
     });
 
     var run = function () {
       positionUi();
-      // Second pass after scroll/layout.
       setTimeout(positionUi, 280);
     };
 
     if (step.view) {
       goView(step.view);
-      setTimeout(run, 120);
+      setTimeout(run, 140);
     } else {
       run();
     }
@@ -290,13 +530,13 @@
   function finish(opts) {
     opts = opts || {};
     if (!active) return;
-    var role = active.role;
+    var scriptId = active.scriptId;
     var uid = active.uid;
     clearHighlight();
     var root = document.getElementById(ROOT_ID);
     if (root) root.hidden = true;
     document.body.classList.remove('product-tour-open');
-    writeState(role, uid, {
+    writeState(scriptId, uid, {
       done: !!opts.done,
       skipped: !!opts.skipped,
       inProgress: false,
@@ -305,16 +545,7 @@
     active = null;
   }
 
-  function start(opts) {
-    opts = opts || {};
-    var role = opts.role || (isAdopter() ? 'adopter' : 'grower');
-    if (role !== 'adopter') {
-      console.info('ProductTour: grower script not shipped yet');
-      return false;
-    }
-    if (active) finish({ skipped: true });
-
-    // Close competing sheets.
+  function closeChrome() {
     try {
       if (window.DailyStatus && typeof DailyStatus.hide === 'function') DailyStatus.hide();
     } catch (_) {
@@ -327,13 +558,25 @@
     } catch (_) {
       /* ignore */
     }
+  }
+
+  function start(opts) {
+    opts = opts || {};
+    var resolved = resolveScript(opts.script || opts.role || 'full');
+    if (!resolved.steps.length) return false;
+
+    // Role guard for grower-only plants tab
+    if (resolved.id === 'plants' && isAdopter()) return false;
+
+    if (active) finish({ skipped: true });
+    closeChrome();
 
     var uid = opts.uid || currentUid();
-    var steps = adopterSteps();
     active = {
-      role: role,
+      scriptId: resolved.id,
+      role: resolved.role,
       uid: uid,
-      steps: steps,
+      steps: resolved.steps,
       index: Math.max(0, Number(opts.startIndex) || 0),
     };
     ensureRoot();
@@ -341,42 +584,78 @@
     return true;
   }
 
-  function hasCompleted(role, uid) {
-    var state = readState(role, uid || currentUid());
+  function hasCompleted(scriptId, uid) {
+    var state = readState(scriptId, uid || currentUid());
     return !!(state && (state.done || state.skipped));
   }
 
-  /** After daily-status (or if it didn’t show): start adopter tour once. */
+  function fullScriptId() {
+    return isAdopter() ? 'adopter-full' : 'grower-full';
+  }
+
+  /** After daily-status: start the role’s full tour once. */
   function maybeStartAfterDailyStatus(opts) {
     opts = opts || {};
-    var role =
-      opts.profileType === 'adopter' || opts.role === 'adopter' || isAdopter()
-        ? 'adopter'
-        : 'grower';
-    if (role !== 'adopter') return;
-    if (!isAdopter()) return;
     var uid = opts.uid || currentUid();
-    if (hasCompleted('adopter', uid)) return;
-    // Small delay so daily-status close animation finishes.
+    var scriptId =
+      opts.profileType === 'adopter' || opts.role === 'adopter' || isAdopter()
+        ? 'adopter-full'
+        : 'grower-full';
+    if (scriptId === 'adopter-full' && !isAdopter()) return;
+    if (scriptId === 'grower-full' && isAdopter()) return;
+    if (hasCompleted(scriptId, uid)) return;
     setTimeout(function () {
-      if (hasCompleted('adopter', uid)) return;
+      if (hasCompleted(scriptId, uid)) return;
       if (document.body.classList.contains('daily-status-open')) return;
-      start({ role: 'adopter', uid: uid });
+      start({ script: scriptId, uid: uid });
     }, 450);
   }
 
-  function replayAdopter() {
+  function replayFull() {
     var uid = currentUid();
-    writeState('adopter', uid, { done: false, skipped: false, inProgress: false, step: 0 });
-    return start({ role: 'adopter', uid: uid, startIndex: 0 });
+    var scriptId = fullScriptId();
+    writeState(scriptId, uid, { done: false, skipped: false, inProgress: false, step: 0 });
+    return start({ script: scriptId, uid: uid, startIndex: 0 });
+  }
+
+  function startTab(tab) {
+    return start({ script: tab });
+  }
+
+  function bindHelpButtons() {
+    if (document.body.dataset.tourHelpBound === '1') return;
+    document.body.dataset.tourHelpBound = '1';
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-tour-script]');
+      if (!btn) return;
+      e.preventDefault();
+      var script = btn.getAttribute('data-tour-script') || '';
+      start({ script: script });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindHelpButtons);
+  } else {
+    bindHelpButtons();
   }
 
   window.ProductTour = {
     start: start,
+    startTab: startTab,
     stop: function () {
       finish({ skipped: true });
     },
-    replayAdopter: replayAdopter,
+    replayFull: replayFull,
+    replayAdopter: function () {
+      // Back-compat
+      if (!isAdopter()) return false;
+      return replayFull();
+    },
+    replayGrower: function () {
+      if (isAdopter()) return false;
+      return replayFull();
+    },
     maybeStartAfterDailyStatus: maybeStartAfterDailyStatus,
     hasCompleted: hasCompleted,
     isActive: function () {

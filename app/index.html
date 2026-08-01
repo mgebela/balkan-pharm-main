@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260801e" />
+  <link rel="stylesheet" href="styles/app.css?v=20260801f" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -304,6 +304,17 @@
       </div>
 
       <div id="view-plants" class="view">
+        <div class="view-tour-bar grower-only">
+          <button
+            type="button"
+            class="view-tour-help"
+            data-tour-script="plants"
+            aria-label="Journal tutorial"
+            title="Journal tutorial"
+          >
+            ?
+          </button>
+        </div>
         <section class="plants-weather-widget" id="plants-weather-widget" aria-label="Prognoza vremena">
           <div class="plants-weather-widget-inner">
             <div class="plants-weather-widget-head">
@@ -352,6 +363,17 @@
       </div>
 
       <div id="view-adopt" class="view">
+        <div class="view-tour-bar">
+          <button
+            type="button"
+            class="view-tour-help"
+            data-tour-script="adopt"
+            aria-label="Tokenise / garden tutorial"
+            title="Tutorial"
+          >
+            ?
+          </button>
+        </div>
         <section class="adopter-guide adopter-only" id="adopter-guide" aria-label="How adoption works">
           <h3 class="adopter-guide-title">How to adopt a plant</h3>
           <ol class="adopter-guide-steps">
@@ -441,6 +463,17 @@
       </div>
 
       <div id="view-market" class="view">
+        <div class="view-tour-bar">
+          <button
+            type="button"
+            class="view-tour-help"
+            data-tour-script="market"
+            aria-label="Market tutorial"
+            title="Market tutorial"
+          >
+            ?
+          </button>
+        </div>
         <p class="market-notice" id="market-notice" hidden></p>
         <div class="market-stuck" id="market-stuck" hidden></div>
 
@@ -1128,11 +1161,11 @@
   <script src="js/notifications.js?v=20260730k"></script>
   <script src="js/signup.js?v=20260729g"></script>
   <script src="js/plant-token.js?v=20260801c"></script>
-  <script src="js/daily-status.js?v=20260801e"></script>
-  <script src="js/product-tour.js?v=20260801e"></script>
+  <script src="js/daily-status.js?v=20260801f"></script>
+  <script src="js/product-tour.js?v=20260801f"></script>
   <script src="js/coach-core.js?v=20260730k"></script>
   <script src="js/ai-coach.js?v=20260730k"></script>
-  <script src="js/app.js?v=20260801e"></script>
+  <script src="js/app.js?v=20260801f"></script>
   <script src="../js/site-trust.js?v=20260729g"></script>
 </body>
 </html>

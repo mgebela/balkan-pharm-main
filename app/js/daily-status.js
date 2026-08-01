@@ -532,11 +532,10 @@
   }
 
   function maybeKickTour(adopter, uid) {
-    if (!adopter) return;
     try {
       if (window.ProductTour && typeof ProductTour.maybeStartAfterDailyStatus === 'function') {
         ProductTour.maybeStartAfterDailyStatus({
-          profileType: 'adopter',
+          profileType: adopter ? 'adopter' : 'grower',
           uid: uid || currentUid(),
         });
       }

@@ -10342,6 +10342,47 @@ body.daily-status-open {
   }
 }
 
+/* View tab tutorial trigger (?) */
+.view-tour-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 0 0 0.55rem;
+  min-height: 1.75rem;
+}
+.view-tour-help {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 165, 94, 0.4);
+  background: rgba(15, 26, 18, 0.55);
+  color: var(--brass, #c9a55e);
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.view-tour-help:hover,
+.view-tour-help:focus-visible {
+  border-color: rgba(201, 165, 94, 0.75);
+  background: rgba(201, 165, 94, 0.12);
+  color: #f0d9a0;
+  outline: none;
+}
+body.profile-adopter .view-tour-help {
+  border-color: rgba(255, 160, 120, 0.4);
+  color: #ffd9c8;
+}
+body.profile-adopter .view-tour-help:hover,
+body.profile-adopter .view-tour-help:focus-visible {
+  border-color: rgba(255, 160, 120, 0.7);
+  background: rgba(180, 71, 43, 0.14);
+  color: #ffe8dc;
+}
+
 /* Product tour — spotlight coach */
 .product-tour-root {
   position: fixed;

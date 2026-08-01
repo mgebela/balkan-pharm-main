@@ -1442,9 +1442,7 @@ function renderAccountProfile() {
     '">' +
     (cryptoMode === 'simple' ? 'Show advanced details' : 'Use simple view') +
     '</button>' +
-    (adopter
-      ? '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-tour">Replay tour</button>'
-      : '') +
+    '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-tour">Replay tour</button>' +
     '<button type="button" class="btn btn-primary btn-sm" id="account-profile-primary">' +
     esc(adopter ? 'Open market' : 'Open journal') +
     '</button>' +
@@ -1464,8 +1462,13 @@ function renderAccountProfile() {
   if (tourBtn) {
     tourBtn.addEventListener('click', function () {
       if (typeof setMoreNavOpen === 'function') setMoreNavOpen(false);
-      if (window.ProductTour && typeof ProductTour.replayAdopter === 'function') {
-        ProductTour.replayAdopter();
+      if (window.ProductTour) {
+        if (typeof ProductTour.replayFull === 'function') ProductTour.replayFull();
+        else if (adopter && typeof ProductTour.replayAdopter === 'function') {
+          ProductTour.replayAdopter();
+        } else if (!adopter && typeof ProductTour.replayGrower === 'function') {
+          ProductTour.replayGrower();
+        }
       }
     });
   }
