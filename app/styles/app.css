@@ -7467,6 +7467,43 @@ body.profile-adopter .adopt-hero-text h2 {
   border-bottom-color: var(--brass-hover);
 }
 
+/* Forecast + Coach columns. Stacked by default, side by side once there is
+   room — the day cards are narrow and leave the right half of the widget empty. */
+.plants-weather-split {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  align-items: stretch;
+}
+
+.plants-weather-forecast-col {
+  min-width: 0;
+}
+
+@media (min-width: 860px) {
+  .plants-weather-split {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 1.1rem;
+  }
+
+  /* Sized to its cards, so the Coach column takes the rest. */
+  .plants-weather-forecast-col {
+    flex: 0 0 auto;
+    max-width: 60%;
+  }
+
+  .plants-weather-split .weather-coach {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    padding-left: 1.1rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
 /* Coach's read on the forecast, inside the weather widget. */
 .weather-coach {
   margin-top: 0.9rem;

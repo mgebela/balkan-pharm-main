@@ -3938,7 +3938,12 @@ function initFirebaseSync() {
       ' · next ' +
       dayCount +
       (dayCount === 1 ? ' day' : ' days') +
-      '</p><div class="weather-container plants-weather-days">';
+      '</p>' +
+      // Forecast and Coach sit side by side on wide screens — the day cards are
+      // narrow and left a lot of dead space to their right.
+      '<div class="plants-weather-split">' +
+      '<div class="plants-weather-forecast-col">' +
+      '<div class="weather-container plants-weather-days">';
 
     days.forEach((day, i) => {
       const label = formatWeatherDayLabel(day.date);
@@ -3981,7 +3986,7 @@ function initFirebaseSync() {
         dayCount +
         ' days →</p>';
     }
-    html += weatherCoachAdviceHtml(days, city);
+    html += '</div>' + weatherCoachAdviceHtml(days, city) + '</div>';
     weatherDiv.innerHTML = html;
 
     // Cache for Coach predictive nudges (weather + watering pace)
