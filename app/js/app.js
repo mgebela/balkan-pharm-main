@@ -1691,6 +1691,29 @@ function unlockChainPath(nextView) {
   }
 }
 
+/**
+ * Offer Tokenise/Market unlock, then navigate. Used by the profile CTA and by
+ * any deep link (START HERE, tour, etc.) that would otherwise fail silently
+ * while chain-locked.
+ */
+async function promptUnlockChain(nextView) {
+  const ok =
+    window.AppConfirm && typeof AppConfirm.ask === 'function'
+      ? await AppConfirm.ask({
+          title: 'Unlock Tokenise & Market?',
+          body:
+            'This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.',
+          confirmLabel: 'Unlock',
+          cancelLabel: 'Not now',
+        })
+      : window.confirm(
+          'Unlock Tokenise & Market?\n\nOptional on-chain tools. Your journal stays free without a wallet.'
+        );
+  if (!ok) return false;
+  unlockChainPath(nextView || 'adopt');
+  return true;
+}
+
 function applyProfileTypeUI(profileType) {
   const type = normalizeProfileType(profileType) || PROFILE_TYPES.grower;
   currentProfileType = type;
@@ -2472,21 +2495,8 @@ function initFirebaseSync() {
   const unlockChainBtn = document.getElementById('btn-unlock-chain');
   if (unlockChainBtn) {
     unlockChainBtn.addEventListener('click', async function () {
-      const ok =
-        window.AppConfirm && typeof AppConfirm.ask === 'function'
-          ? await AppConfirm.ask({
-              title: 'Unlock Tokenise & Market?',
-              body:
-                'This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.',
-              confirmLabel: 'Unlock',
-              cancelLabel: 'Not now',
-            })
-          : window.confirm(
-              'Unlock Tokenise & Market?\n\nOptional on-chain tools. Your journal stays free without a wallet.'
-            );
-      if (!ok) return;
       setMoreNavOpen(false);
-      unlockChainPath('adopt');
+      await promptUnlockChain('adopt');
     });
   }
   if (window.WalletLink && typeof WalletLink.onChange === 'function') {
@@ -2501,6 +2511,16 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
+    // Chain-locked growers: Tokenise/Market CTAs (START HERE, tour, etc.)
+    // must open the unlock dialog — never silently fall back to Plants.
+    if (
+      (id === 'adopt' || id === 'market') &&
+      isGrowerProfile() &&
+      !isChainOptIn()
+    ) {
+      promptUnlockChain(id);
+      return;
+    }
     if (id !== 'growlog' && !isViewAllowedForProfile(id)) {
       id = defaultViewForProfile();
     }
