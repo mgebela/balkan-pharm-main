@@ -3773,6 +3773,10 @@ function initFirebaseSync() {
   }
 
   const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
+  // The plan behind the current key returns 3 days, so we ask for 3 and say 3.
+  // Every label below is still derived from what actually came back, so raising
+  // this (and the plan) lifts the UI with no further code change.
+  const WEATHER_DAYS = 3;
   const WEATHER_CITY_KEY = 'dnevnik-live-weather-city';
   const PLANTS_WEATHER_EL = 'plants-weather';
   let plantsWeatherFormBound = false;
@@ -3806,7 +3810,9 @@ function initFirebaseSync() {
     const cityName = String(city || '').trim();
     if (!cityName) {
       weatherDiv.innerHTML =
-        '<p class="plants-weather-empty">Add a city above for a 7-day forecast. Optional — skip if you grow indoors.</p>';
+        '<p class="plants-weather-empty">Add a city above for a ' +
+        WEATHER_DAYS +
+        '-day forecast. Optional — skip if you grow indoors.</p>';
       return;
     }
     weatherDiv.innerHTML = '<p class="plants-weather-loading">Loading forecast…</p>';
@@ -3816,7 +3822,8 @@ function initFirebaseSync() {
       encodeURIComponent(WEATHER_API_KEY) +
       '&q=' +
       encodeURIComponent(cityName) +
-      '&days=7';
+      '&days=' +
+      WEATHER_DAYS;
 
     try {
       const response = await fetch(url);
@@ -3855,6 +3862,62 @@ function initFirebaseSync() {
     }
   }
 
+  /**
+   * Coach's read on the forecast — up to three bullets, or nothing at all when
+   * the weather holds no advice worth giving.
+   */
+  function weatherCoachAdviceHtml(days, city) {
+    if (!window.CoachCore || typeof CoachCore.weatherAdvice !== 'function') return '';
+    let notes = [];
+    try {
+      notes = CoachCore.weatherAdvice({
+        city: city,
+        days: days.map(function (day, i) {
+          return {
+            date: day.date,
+            label: formatWeatherDayLabel(day.date),
+            avgtemp: day.day.avgtemp_c,
+            maxtemp: day.day.maxtemp_c,
+            mintemp: day.day.mintemp_c,
+            rainChance: day.day.daily_chance_of_rain,
+            condition: day.day.condition && day.day.condition.text,
+            offsetDays: i,
+          };
+        }),
+      });
+    } catch (err) {
+      return '';
+    }
+    if (!notes.length) return '';
+
+    return (
+      '<div class="weather-coach" aria-label="Coach advice on the forecast">' +
+      '<p class="weather-coach-head">' +
+      '<span class="weather-coach-mark" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/>' +
+      '<path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
+      '</svg></span>' +
+      'Coach · what this means for your grow' +
+      '</p>' +
+      '<ul class="weather-coach-list">' +
+      notes
+        .map(function (n) {
+          return (
+            '<li class="weather-coach-item weather-coach-item--' +
+            (n.tone === 'warn' ? 'warn' : 'info') +
+            '">' +
+            escapeHtml(n.text) +
+            '</li>'
+          );
+        })
+        .join('') +
+      '</ul>' +
+      '<button type="button" class="btn btn-ghost btn-sm weather-coach-ask" id="weather-coach-ask">Ask Coach about the weather</button>' +
+      '</div>'
+    );
+  }
+
   function displayWeather(data, containerId) {
     const elId = containerId || PLANTS_WEATHER_EL;
     const weatherDiv = document.getElementById(elId);
@@ -3864,10 +3927,18 @@ function initFirebaseSync() {
     const region = data.location.region ? ', ' + data.location.region : '';
     const days = data.forecast.forecastday;
 
+    // Say what we actually got back, not what we asked for.
+    const dayCount = days.length;
+    const sub = document.getElementById('plants-weather-widget-sub');
+    if (sub) sub.textContent = dayCount + (dayCount === 1 ? ' day' : ' days') + ' · for grow planning';
+
     let html =
       '<p class="plants-weather-location">' +
       escapeHtml(city + region) +
-      ' · next 7 days</p><div class="weather-container plants-weather-days">';
+      ' · next ' +
+      dayCount +
+      (dayCount === 1 ? ' day' : ' days') +
+      '</p><div class="weather-container plants-weather-days">';
 
     days.forEach((day, i) => {
       const label = formatWeatherDayLabel(day.date);
@@ -3904,12 +3975,13 @@ function initFirebaseSync() {
     });
 
     html += '</div>';
-    if (days.length > 3) {
+    if (dayCount > 3) {
       html +=
         '<p class="plants-weather-scroll-hint">Swipe for all ' +
-        days.length +
+        dayCount +
         ' days →</p>';
     }
+    html += weatherCoachAdviceHtml(days, city);
     weatherDiv.innerHTML = html;
 
     // Cache for Coach predictive nudges (weather + watering pace)
@@ -5265,6 +5337,25 @@ function initFirebaseSync() {
       if (window.AICoach) AICoach.open();
     });
   }
+
+  // The weather advice block is re-rendered on every refresh, so delegate.
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#weather-coach-ask')) return;
+    e.preventDefault();
+    if (!window.AICoach) return;
+    AICoach.open();
+    if (typeof AICoach.ask === 'function') {
+      const city =
+        window.CoachCore && typeof CoachCore.getWeatherCity === 'function'
+          ? CoachCore.getWeatherCity()
+          : '';
+      AICoach.ask(
+        'Based on the forecast' +
+          (city ? ' for ' + city : '') +
+          ', what should I change about watering and feeding over the next few days?'
+      );
+    }
+  });
   const btnCoachGrowlog = document.getElementById('btn-coach-growlog');
   if (btnCoachGrowlog) {
     btnCoachGrowlog.addEventListener('click', () => {

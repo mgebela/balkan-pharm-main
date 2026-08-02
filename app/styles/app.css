@@ -7467,6 +7467,85 @@ body.profile-adopter .adopt-hero-text h2 {
   border-bottom-color: var(--brass-hover);
 }
 
+/* Coach's read on the forecast, inside the weather widget. */
+.weather-coach {
+  margin-top: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.weather-coach-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: var(--brass);
+}
+
+.weather-coach-mark {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(201, 165, 94, 0.16);
+}
+
+.weather-coach-mark svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  stroke: var(--brass);
+  fill: none;
+}
+
+.weather-coach-list {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.weather-coach-item {
+  position: relative;
+  padding: 0.5rem 0.7rem 0.5rem 1.9rem;
+  border-radius: var(--radius-row);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+.weather-coach-item::before {
+  content: '•';
+  position: absolute;
+  left: 0.75rem;
+  top: 0.45rem;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--brass);
+}
+
+/* Warnings carry the same rust the app uses for destructive/at-risk states. */
+.weather-coach-item--warn {
+  border-color: rgba(168, 107, 79, 0.45);
+  background: rgba(168, 107, 79, 0.12);
+}
+
+.weather-coach-item--warn::before {
+  content: '!';
+  font-weight: 800;
+  font-size: 0.85rem;
+  top: 0.5rem;
+  color: var(--rust);
+}
+
 /* Long-press quick actions — frosted popover anchored at the press point. */
 .longpress-menu {
   position: fixed;

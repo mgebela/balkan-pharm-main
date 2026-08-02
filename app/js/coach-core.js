@@ -244,6 +244,105 @@
     return best && best.temp >= 28 ? best : null;
   }
 
+  /**
+   * Up to three grow-relevant notes about the forecast, most urgent first.
+   *
+   * Reads only the days actually returned by the forecast, so it never implies
+   * knowledge of a day it doesn't have. Returns [] when nothing is worth saying
+   * — silence is better than filler advice.
+   */
+  function weatherAdvice(cache) {
+    var days = (cache && cache.days) || [];
+    if (!days.length) return [];
+
+    var out = [];
+    var num = function (v) {
+      var n = Number(v);
+      return Number.isFinite(n) ? n : null;
+    };
+
+    var hottest = null;
+    var coldest = null;
+    var wettest = null;
+    var dryRun = true;
+
+    days.forEach(function (d) {
+      if (!d) return;
+      var max = num(d.maxtemp != null ? d.maxtemp : d.avgtemp);
+      var min = num(d.mintemp != null ? d.mintemp : d.avgtemp);
+      var rain = num(d.rainChance);
+      if (max != null && (!hottest || max > hottest.t)) hottest = { t: max, label: d.label || d.date };
+      if (min != null && (!coldest || min < coldest.t)) coldest = { t: min, label: d.label || d.date };
+      if (rain != null && (!wettest || rain > wettest.r)) wettest = { r: rain, label: d.label || d.date };
+      if (rain == null || rain >= 40) dryRun = false;
+    });
+
+    if (hottest && hottest.t >= 30) {
+      out.push({
+        tone: 'warn',
+        text:
+          'Heat warning — ' +
+          Math.round(hottest.t) +
+          '° on ' +
+          hottest.label +
+          '. Water early morning or after sunset, never in full midday sun.',
+      });
+    } else if (hottest && hottest.t >= 26) {
+      out.push({
+        tone: 'info',
+        text:
+          'Warm spell up to ' +
+          Math.round(hottest.t) +
+          '° (' +
+          hottest.label +
+          '). Check soil moisture a finger deep before watering.',
+      });
+    }
+
+    if (wettest && wettest.r >= 60) {
+      out.push({
+        tone: 'info',
+        text:
+          'Rain likely ' +
+          wettest.label +
+          ' (' +
+          Math.round(wettest.r) +
+          '%). Hold off watering and feeding — nutrients wash straight through.',
+      });
+    } else if (dryRun && days.length > 1) {
+      out.push({
+        tone: 'info',
+        text: 'No real rain in the forecast. Outdoor pots dry out fastest — check them daily.',
+      });
+    }
+
+    if (coldest && coldest.t <= 8) {
+      out.push({
+        tone: 'warn',
+        text:
+          'Cold night — down to ' +
+          Math.round(coldest.t) +
+          '° on ' +
+          coldest.label +
+          '. Move sensitive pots under cover or indoors.',
+      });
+    }
+
+    if (hottest && coldest && hottest.t - coldest.t >= 18) {
+      out.push({
+        tone: 'info',
+        text:
+          'Wide day/night swing (' +
+          Math.round(coldest.t) +
+          '–' +
+          Math.round(hottest.t) +
+          '°). Expect slower growth; avoid heavy feeding until it settles.',
+      });
+    }
+
+    return out.slice(0, 3);
+  }
+
   function buildPredictiveNudges(plants, entries) {
     var list = [];
     var weather = readWeatherCache();
@@ -768,6 +867,7 @@
     activityLogHtml: activityLogHtml,
     readWeatherCache: readWeatherCache,
     saveWeatherCache: saveWeatherCache,
+    weatherAdvice: weatherAdvice,
     getWeatherCity: getWeatherCity,
     typicalWateringIntervalDays: typicalWateringIntervalDays,
   };
