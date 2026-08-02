@@ -588,7 +588,13 @@
             typeof DnevnikNotifications.entryTypeLabel === 'function' &&
             DnevnikNotifications.entryTypeLabel(et)) ||
           et;
-        return 'Log ' + etLabel + ' for ' + (action.plantId || 'plant');
+        var plantRef = resolvePlant(action.plantId);
+        var plantLabel = plantRef
+          ? '“' + plantRef.name + '”'
+          : action.plantId
+            ? 'plant ' + String(action.plantId).slice(0, 12)
+            : 'plant';
+        return 'Log ' + etLabel + ' for ' + plantLabel;
       }
       case 'set_stage':
         return 'Set stage → ' + (STAGE_LABELS[action.stage] || action.stage || '?');
@@ -1421,9 +1427,27 @@
     document.body.classList.toggle('ai-coach-open', open);
     syncCoachKeyboardInset();
     if (open) {
+      // Reload from storage so a closed panel still shows the last chat.
+      if (!busy) loadHistory();
+      // Drop draft actions that point at plants no longer in this account.
+      pendingActions = (pendingActions || []).filter(function (a) {
+        if (!a || a.type !== 'add_entry' && a.type !== 'set_stage' && a.type !== 'link_plant') {
+          return true;
+        }
+        if (!a.plantId) return true;
+        return !!resolvePlant(a.plantId);
+      });
       renderMessages();
       renderQuickPrompts();
-      setStatus(busy ? 'Thinking…' : listening ? 'Listening…' : 'Ready to help');
+      setStatus(
+        busy
+          ? 'Thinking…'
+          : listening
+            ? 'Listening…'
+            : pendingActions.length
+              ? 'Confirm actions below'
+              : 'Ready to help'
+      );
       const input = document.getElementById('ai-coach-input');
       if (input) {
         autoResizeInput();

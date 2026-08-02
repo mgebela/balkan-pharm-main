@@ -198,10 +198,28 @@
     remoteSyncPending = {};
     remoteSyncInFlight = true;
     try {
+      // Always push the latest local snapshot for requested keys — never a stale
+      // array captured before a second write landed during an in-flight sync.
+      if (Object.prototype.hasOwnProperty.call(payload, 'entries')) {
+        payload.entries = entriesForRemoteSync(getEntries());
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'plants')) {
+        payload.plants = plantsForRemoteSync(getPlants());
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'toolbox')) {
+        try {
+          payload.toolbox = JSON.parse(localStorage.getItem(STORAGE_TOOLBOX) || '{}') || {};
+        } catch (_) {
+          /* keep pending toolbox */
+        }
+      }
       payload.updatedAt = Date.now();
       await ref.set(payload, { merge: true });
-    } catch {
-      // keep local data as source of truth if network fails
+    } catch (err) {
+      console.warn('Remote journal sync failed — keeping local copy', err);
+      // Re-queue so the next edit / retry can push again.
+      remoteSyncPending = Object.assign({}, payload, remoteSyncPending);
+      delete remoteSyncPending.updatedAt;
     } finally {
       remoteSyncInFlight = false;
       if (Object.keys(remoteSyncPending).length) flushRemoteSync();
@@ -230,6 +248,35 @@
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants || []));
     localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries || []));
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox || {}));
+  }
+
+  /** Merge cloud + device so a slow sync / auth reload cannot erase a just-saved entry. */
+  function mergeLocalWithRemoteState(remote) {
+    const remoteSafe = remote || { plants: [], entries: [], toolbox: {} };
+    let localPlants = [];
+    let localEntries = [];
+    let localToolbox = {};
+    try {
+      localPlants = JSON.parse(localStorage.getItem(STORAGE_PLANTS) || '[]') || [];
+    } catch (_) {
+      localPlants = [];
+    }
+    try {
+      localEntries = JSON.parse(localStorage.getItem(STORAGE_ENTRIES) || '[]') || [];
+    } catch (_) {
+      localEntries = [];
+    }
+    try {
+      localToolbox = JSON.parse(localStorage.getItem(STORAGE_TOOLBOX) || '{}') || {};
+    } catch (_) {
+      localToolbox = {};
+    }
+    // Local wins on id collision (device is source of truth for in-session writes).
+    return {
+      plants: mergeRecordsById(remoteSafe.plants || [], localPlants),
+      entries: mergeRecordsById(remoteSafe.entries || [], localEntries),
+      toolbox: Object.assign({}, remoteSafe.toolbox || {}, localToolbox),
+    };
   }
 
   function mergeRecordsById(existing, incoming) {
@@ -816,16 +863,22 @@
     }
 
     registerSharedReadOnlyIds(sharedPlants, sharedEntries);
-    const plants = mergeRecordsById(sharedPlants, ownState.plants || []);
-    const entries = mergeRecordsById(sharedEntries, ownState.entries || []);
+    // Merge device-local own writes so a reload cannot drop a just-saved entry.
+    const localMerged = mergeLocalWithRemoteState({
+      plants: ownState.plants || [],
+      entries: ownState.entries || [],
+      toolbox: ownState.toolbox || {},
+    });
+    const plants = mergeRecordsById(sharedPlants, localMerged.plants || []);
+    const entries = mergeRecordsById(sharedEntries, localMerged.entries || []);
     applyRemoteStateToLocal({
       plants,
       entries,
-      toolbox: ownState.toolbox || {},
+      toolbox: localMerged.toolbox || {},
     });
     console.log(
       'Hybrid user loaded:',
-      ownState.plants.length,
+      (localMerged.plants || []).length,
       'own +',
       sharedPlants.length,
       'shared plants'
@@ -1872,10 +1925,18 @@ function initFirebaseSync() {
           );
         } else {
           document.body.classList.remove('shared-library-mode');
-          const state = await loadRemoteStateIntoLocal(user.uid);
-          applyRemoteStateToLocal(state || { plants: [], entries: [], toolbox: {} });
+          const remote = await loadRemoteStateIntoLocal(user.uid);
+          const merged = mergeLocalWithRemoteState(remote);
+          applyRemoteStateToLocal(merged);
+          remoteSyncReady = true;
+          // Push merged state so cloud catches up with any offline/local writes.
+          scheduleRemoteSync({
+            plants: plantsForRemoteSync(merged.plants),
+            entries: entriesForRemoteSync(merged.entries),
+            toolbox: merged.toolbox || {},
+          });
         }
-        remoteSyncReady = true;
+        if (!remoteSyncReady) remoteSyncReady = true;
       }
 
       refreshAllViewsAfterRemoteLoad();
@@ -2009,9 +2070,23 @@ function initFirebaseSync() {
   }
 
   function setEntries(entries) {
-    if (blockAdminWrite()) return;
-    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
+    if (blockAdminWrite()) return false;
+    try {
+      localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
+    } catch (err) {
+      console.error('Failed to save journal entries locally', err);
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast(
+          'Could not save journal entry (storage full or blocked). Try a shorter note or remove old photos.',
+          'error'
+        );
+      } else {
+        alert('Could not save journal entry. Local storage may be full.');
+      }
+      return false;
+    }
     scheduleRemoteSync({ entries: entriesForRemoteSync(entries) });
+    return true;
   }
 
   function uuid() {
@@ -4247,8 +4322,12 @@ function initFirebaseSync() {
   function fillJournalPlantFilter() {
     const sel = document.getElementById('journal-plant-filter');
     if (!sel) return;
+    const prev = sel.value;
     const plants = getPlants();
-    sel.innerHTML = '<option value="">All plants</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    sel.innerHTML =
+      '<option value="">All plants</option>' +
+      plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    if (prev && plants.some((p) => p && p.id === prev)) sel.value = prev;
   }
 
   function syncEntryFazaLocationsFromPlant() {
@@ -4599,6 +4678,14 @@ function initFirebaseSync() {
   document.getElementById('form-entry').addEventListener('submit', (e) => {
     e.preventDefault();
     const plantIdForEntry = document.getElementById('entry-plant').value || null;
+    if (!plantIdForEntry) {
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast('Choose a plant before saving the entry.', 'warn');
+      } else {
+        alert('Choose a plant before saving the entry.');
+      }
+      return;
+    }
     if (blockWrite({ plantId: plantIdForEntry })) return;
     const type = document.getElementById('entry-type').value;
     let meta = null;
@@ -4627,23 +4714,34 @@ function initFirebaseSync() {
     const entries = getEntries();
     const newEntry = {
       id: uuid(),
-      plantId: document.getElementById('entry-plant').value || null,
+      plantId: plantIdForEntry,
       date: document.getElementById('entry-date').value,
       type: type,
       note: document.getElementById('entry-note').value.trim(),
       photo: document.getElementById('entry-photo-data').value.trim() || null,
       video: document.getElementById('entry-video-data').value.trim() || null,
       meta: meta || undefined,
+      createdAt: new Date().toISOString(),
     };
     entries.push(newEntry);
-    setEntries(entries);
+    if (!setEntries(entries)) return;
+    // Confirm the write landed before success UI (guards against storage quirks).
+    const saved = getEntries().some(function (en) {
+      return en && en.id === newEntry.id;
+    });
+    if (!saved) {
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast('Entry did not save. Please try again.', 'error');
+      }
+      return;
+    }
     if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
       try {
         const plantForNote = getPlants().find(function (p) {
           return p && p.id === newEntry.plantId;
         });
         AICoach.narrateAfterEntry(newEntry, plantForNote || null);
-      } catch (e) {
+      } catch (err) {
         // ignore
       }
     }
@@ -4671,16 +4769,13 @@ function initFirebaseSync() {
         if (meta.plantingLocation) patch.plantingLocation = meta.plantingLocation;
         plants[idx] = patch;
         setPlants(plants);
-        renderPlants();
-        if (currentGrowlogPlantId === plantIdForEntry) renderGrowlog(plantIdForEntry);
       }
     }
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');
-    // Toast comes from notifyJournalEntry (English type labels) — avoid a second toast.
-    renderJournal();
-    renderDashboard();
+    // Full refresh — including open growlog trail (was missing for General notes).
+    refreshAfterJournalWrite(plantIdForEntry);
   });
 
   modalEntry.querySelector('.modal-close').addEventListener('click', () => {
