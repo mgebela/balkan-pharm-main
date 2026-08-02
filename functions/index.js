@@ -4,7 +4,8 @@ const {onDocumentWritten} = require('firebase-functions/v2/firestore');
 const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {getAuth} = require('firebase-admin/auth');
-const {GoogleGenAI} = require('@google/genai');
+const {GoogleGenAI, Type} = require('@google/genai');
+const {getRelevantKnowledge} = require('./coach-knowledge');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
 const {handleSolanaRpc} = require('./solana-rpc-proxy');
@@ -84,7 +85,56 @@ Rules:
 - Max 5 actions per response.
 - Destructive deletes are NOT allowed.
 - Be concise. Reply language: match the user (default English; Croatian if they write Croatian).
-- If the request is unclear, ask one clarifying question with actions:[].`;
+- If the request is unclear, ask one clarifying question with actions:[].
+- If a "Relevant cultivation reference" block is provided below, ground your advice in it —
+  apply it to the grower's specific plant/situation rather than repeating it verbatim.`;
+
+// Structured-output schema for coachChat. Using Gemini's native JSON mode instead of
+// regex-extracting a JSON blob from free text — the old approach could silently break if the
+// model ever wrapped the JSON in prose or a markdown fence despite being told not to.
+// Action fields are a superset across all 6 action types (see COACH_SYSTEM for which fields
+// apply to which type); the schema only guarantees shape, not per-type field combinations.
+const COACH_RESPONSE_SCHEMA = {
+  type: Type.OBJECT,
+  properties: {
+    reply: {
+      type: Type.STRING,
+      description: 'Short human message explaining what you will do or advising.',
+    },
+    actions: {
+      type: Type.ARRAY,
+      description: 'Proposed app actions. Empty when advice-only.',
+      items: {
+        type: Type.OBJECT,
+        properties: {
+          type: {
+            type: Type.STRING,
+            enum: [
+              'create_plant',
+              'add_entry',
+              'set_stage',
+              'import_seed',
+              'mint_growth',
+              'link_plant',
+            ],
+          },
+          name: {type: Type.STRING},
+          strain: {type: Type.STRING},
+          stage: {type: Type.STRING},
+          environmentType: {type: Type.STRING},
+          plantId: {type: Type.STRING},
+          entryType: {type: Type.STRING},
+          note: {type: Type.STRING},
+          date: {type: Type.STRING},
+          tokenId: {type: Type.STRING},
+          batch: {type: Type.STRING},
+        },
+        required: ['type'],
+      },
+    },
+  },
+  required: ['reply', 'actions'],
+};
 
 
 /**
@@ -443,20 +493,20 @@ exports.coachChat = onRequest(
         const context = body.context && typeof body.context === 'object' ? body.context : {};
         const locale = body.locale === 'hr' ? 'hr' : 'en';
 
+        const stageKey = context.focusPlant && context.focusPlant.stage;
+        const knowledgeBlock = getRelevantKnowledge(message, stageKey);
+
         const contextBlock = [
           'Grower journal snapshot (JSON):',
           JSON.stringify(context).slice(0, 6000),
           locale === 'hr' ? 'Prefer Croatian replies.' : 'Prefer English replies.',
-        ].join('\n');
+          knowledgeBlock,
+        ]
+            .filter(Boolean)
+            .join('\n\n');
 
         const contents = [
           {role: 'user', parts: [{text: COACH_SYSTEM + '\n\n' + contextBlock}]},
-          {
-            role: 'model',
-            parts: [{
-              text: '{"reply":"Ready. I will guide growth steps and propose journal/token actions as JSON when you ask me to do something.","actions":[]}',
-            }],
-          },
         ];
 
         history.forEach((turn) => {
@@ -473,6 +523,10 @@ exports.coachChat = onRequest(
         const result = await genAI.models.generateContent({
           model: 'gemini-2.0-flash',
           contents,
+          config: {
+            responseMimeType: 'application/json',
+            responseSchema: COACH_RESPONSE_SCHEMA,
+          },
         });
         const text = String(result.text || '').trim();
         if (!text) {
@@ -480,20 +534,23 @@ exports.coachChat = onRequest(
           return;
         }
 
-        let reply = text;
-        let actions = [];
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          try {
-            const parsed = JSON.parse(jsonMatch[0]);
-            if (parsed && typeof parsed.reply === 'string') reply = parsed.reply;
-            if (parsed && Array.isArray(parsed.actions)) {
-              actions = parsed.actions.slice(0, 5).filter((a) => a && typeof a === 'object' && a.type);
-            }
-          } catch (parseErr) {
-            // keep plain text reply
-          }
+        // With responseSchema this should always be valid JSON matching the shape above —
+        // unlike the old regex-extraction approach, a parse failure here is a real anomaly
+        // (e.g. truncation), not an expected edge case, so surface it as an error instead of
+        // silently degrading to a raw-text reply.
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (parseErr) {
+          console.error('coachChat: model returned non-JSON despite schema', text.slice(0, 500));
+          res.status(502).json({error: 'Coach response was malformed. Try again.'});
+          return;
         }
+
+        const reply = typeof parsed.reply === 'string' ? parsed.reply : '';
+        const actions = Array.isArray(parsed.actions)
+          ? parsed.actions.slice(0, 5).filter((a) => a && typeof a === 'object' && a.type)
+          : [];
 
         res.json({
           reply,
