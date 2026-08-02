@@ -163,6 +163,37 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 
 ---
 
+## Post-reliability desk script (2026-08-02)
+
+Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loads. Confirm Advanced/Simple is one global (`localStorage` key `growtoo-crypto-mode`) — toggling on Market, Tokenise, or Profile updates all three.
+
+### A. Chain unlock (no silent CTA)
+1. Grower account **without** `chainOptIn` (clear `dnevnik-live-chain-opt-in` or use a fresh grower).
+2. From **START HERE**, tap **Tokenise** (and once **Market**).
+3. Expect the **Unlock Tokenise & Market?** dialog — not a dead click / silent stay on Plants.
+4. Confirm **Unlock** → lands on Tokenise; **Not now** → stays put.
+
+### B. Seal / mint (honest outcome)
+1. Unlock → connect Phantom or Solflare on **Devnet** → link wallet.
+2. Plant with care logs that unlock the next seal → **Seal stage**.
+3. Expect toast that matches reality:
+   - **queued** → “Mint queued on Devnet…”
+   - **failed** → warn that garden saved but mint did not queue + use **Retry mint**
+   - never an unqualified success when the queue rejected
+4. Card reaches **Minted on devnet** (or Retry succeeds).
+
+### C. Market Instant sale (two wallets)
+1. Grower: Market → Instant sale → list sealed NFT.
+2. Adopter: enough test `$GROWTOO` → **Invest** → listing `sold`.
+3. NFT + payment settle (program path).
+
+### D. Journal photo round-trip
+1. Journal / plant → **New entry** → attach a **JPG** (not HEIC).
+2. Preview appears → save → entry shows in **Recent notes** / Journal list / plant timeline.
+3. Unsupported video MIME shows a visible **media-error** (no silent clear).
+
+---
+
 ## Pass criteria (desk session)
 
 ### Automated / ops (2026-07-31)

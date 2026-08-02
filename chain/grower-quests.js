@@ -13,6 +13,19 @@ export const TOKEN_TO_PLANT_STAGE = {
 
 const PLANT_STAGE_ORDER = ['klijanje', 'sadnica', 'vegetativna', 'cvjetanje', 'susenje'];
 
+const PLANT_STAGE_LABELS = {
+  klijanje: 'Germination',
+  sadnica: 'Seedling',
+  vegetativna: 'Vegetative',
+  cvjetanje: 'Flowering',
+  susenje: 'Drying / harvest',
+};
+
+function plantStageLabel(stageKey) {
+  if (!stageKey) return '';
+  return PLANT_STAGE_LABELS[stageKey] || String(stageKey);
+}
+
 function plantStageIndex(stage) {
   const i = PLANT_STAGE_ORDER.indexOf(stage);
   return i < 0 ? -1 : i;
@@ -94,7 +107,10 @@ export function validateJournalProof(state, plantId, targetStage) {
       );
     if (!stageOk) {
       errors.push(
-        `Plant stage must reach "${requiredPlantStage}" (or log a faza entry) before minting ${targetStage}`
+        'Plant stage must reach "' +
+          plantStageLabel(requiredPlantStage) +
+          '" (or log a Stage transition entry) before minting ' +
+          targetStage
       );
     }
   }
@@ -112,7 +128,9 @@ export function validateJournalProof(state, plantId, targetStage) {
     if (matches && toolboxDateMs(row) >= sinceMs) wateringIds.push(row.id || 'watering');
   });
   if (!wateringIds.length) {
-    errors.push('Missing watering log (zalijevanje entry or Tools watering) for this stage window');
+    errors.push(
+      'Missing watering log (Watering entry or Tools watering) for this stage window'
+    );
   }
 
   const feedingRequired = targetStage !== 'germination';
@@ -127,7 +145,9 @@ export function validateJournalProof(state, plantId, targetStage) {
     }
   });
   if (feedingRequired && !feedingIds.length) {
-    errors.push('Missing feeding/nutrient log (gnojidba or Tools feeding) for this stage window');
+    errors.push(
+      'Missing feeding/nutrient log (Feeding entry or Tools feeding) for this stage window'
+    );
   }
 
   return {

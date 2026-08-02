@@ -704,27 +704,36 @@
         return { token, tx };
       }, 700).then(async (result) => {
         const SC = window.SeedChain;
-        if (SC && SC.isEnabled()) {
-          try {
-            const requestId = await SC.requestSeedMint({
-              name: result.token.name,
-              strain: result.token.strain || result.token.name,
-              batch: result.token.batch,
-              plantId: result.token.plantId,
-            });
-            if (requestId) {
-              const wallet = readWallet();
-              const stored = wallet.tokens.find((t) => t.id === result.token.id);
-              if (stored) {
-                stored.mintRequestId = requestId;
-                writeWallet(wallet);
-              }
-              result.mintRequestId = requestId;
+        if (!SC || !SC.isEnabled()) {
+          result.onchainStatus = 'skipped';
+          return result;
+        }
+        try {
+          const requestId = await SC.requestSeedMint({
+            name: result.token.name,
+            strain: result.token.strain || result.token.name,
+            batch: result.token.batch,
+            plantId: result.token.plantId,
+          });
+          if (requestId) {
+            const wallet = readWallet();
+            const stored = wallet.tokens.find((t) => t.id === result.token.id);
+            if (stored) {
+              stored.mintRequestId = requestId;
+              writeWallet(wallet);
             }
-          } catch (err) {
-            // The local token still exists; on-chain mint can be retried later.
-            console.warn('Devnet seed mint request failed', err);
+            result.mintRequestId = requestId;
+            result.onchainStatus = 'queued';
+          } else {
+            result.onchainStatus = 'failed';
+            result.onchainError = 'Mint queue did not accept the request.';
           }
+        } catch (err) {
+          // Local token still exists; on-chain mint can be retried later.
+          console.warn('Devnet seed mint request failed', err);
+          result.onchainStatus = 'failed';
+          result.onchainError =
+            (err && err.message) || 'Devnet mint request failed.';
         }
         return result;
       });
@@ -768,36 +777,53 @@
       }, 800).then(async (result) => {
         const SC = window.SeedChain;
         const token = result.token;
-        const seedMint = SC && token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
-        if (SC && SC.isEnabled() && seedMint && seedMint.mintAddress) {
-          try {
-            const stage = GROWTH_STAGES[token.stageIndex];
-            const journalProof =
-              window.GrowerQuests && typeof GrowerQuests.buildProof === 'function'
-                ? GrowerQuests.buildProof(token, stage.key)
-                : null;
-            const requestId = await SC.requestGrowthMint({
-              mintAddress: seedMint.mintAddress,
-              seedMintRequestId: token.mintRequestId,
-              stage: stage.key,
-              name: token.name,
-              strain: token.strain || token.name,
-              batch: token.batch,
-              plantId: token.plantId,
-              journalProof: journalProof,
-            });
-            if (requestId) {
-              const wallet = readWallet();
-              const stored = wallet.tokens.find((t) => t.id === token.id);
-              if (stored) {
-                if (!stored.growthRequests) stored.growthRequests = {};
-                stored.growthRequests[stage.key] = requestId;
-                writeWallet(wallet);
-              }
+        if (!SC || !SC.isEnabled()) {
+          result.onchainStatus = 'skipped';
+          return result;
+        }
+        const seedMint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
+        if (!seedMint || !seedMint.mintAddress) {
+          // Local stage advanced; on-chain update waits until seed NFT exists.
+          result.onchainStatus = 'pending_seed';
+          result.onchainError =
+            'Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.';
+          return result;
+        }
+        try {
+          const stage = GROWTH_STAGES[token.stageIndex];
+          const journalProof =
+            window.GrowerQuests && typeof GrowerQuests.buildProof === 'function'
+              ? GrowerQuests.buildProof(token, stage.key)
+              : null;
+          const requestId = await SC.requestGrowthMint({
+            mintAddress: seedMint.mintAddress,
+            seedMintRequestId: token.mintRequestId,
+            stage: stage.key,
+            name: token.name,
+            strain: token.strain || token.name,
+            batch: token.batch,
+            plantId: token.plantId,
+            journalProof: journalProof,
+          });
+          if (requestId) {
+            const wallet = readWallet();
+            const stored = wallet.tokens.find((t) => t.id === token.id);
+            if (stored) {
+              if (!stored.growthRequests) stored.growthRequests = {};
+              stored.growthRequests[stage.key] = requestId;
+              writeWallet(wallet);
             }
-          } catch (err) {
-            console.warn('Devnet growth mint request failed', err);
+            result.growthRequestId = requestId;
+            result.onchainStatus = 'queued';
+          } else {
+            result.onchainStatus = 'failed';
+            result.onchainError = 'Growth mint queue did not accept the request.';
           }
+        } catch (err) {
+          console.warn('Devnet growth mint request failed', err);
+          result.onchainStatus = 'failed';
+          result.onchainError =
+            (err && err.message) || 'Devnet growth mint request failed.';
         }
         return result;
       });
@@ -2767,6 +2793,34 @@
     else alert(msg || 'Done.');
   }
 
+  function flashWarn(msg) {
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg || 'Check status.', 'warn');
+    else alert(msg || 'Check status.');
+  }
+
+  function sealOutcomeFlash(result) {
+    const status = result && result.onchainStatus;
+    if (status === 'queued' || status === 'skipped' || !status) {
+      flashOk(
+        status === 'queued'
+          ? 'Stage sealed. Mint queued on Devnet — watch the card until it shows Minted.'
+          : 'Stage sealed.'
+      );
+      return;
+    }
+    if (status === 'pending_seed') {
+      flashWarn(
+        (result && result.onchainError) ||
+          'Stage saved locally. On-chain mint waits for the seed NFT — use Retry if needed.'
+      );
+      return;
+    }
+    flashWarn(
+      'Saved in your garden, but the Devnet mint did not queue. Use Retry mint on the card. ' +
+        ((result && result.onchainError) || '')
+    );
+  }
+
   function askConfirm(opts) {
     if (window.AppConfirm && typeof AppConfirm.ask === 'function') {
       return AppConfirm.ask(opts);
@@ -3509,10 +3563,11 @@
           if (!action || action.kind === 'done') {
             throw new Error('This plant’s trail is already fully sealed.');
           }
+          let sealResult = null;
           if (action.kind === 'seed') {
             const name = String(plant.name || '').trim().slice(0, 32);
             if (!name) throw new Error('Plant needs a name in the journal before sealing.');
-            await PlantToken.importSeed({
+            sealResult = await PlantToken.importSeed({
               name: name,
               strain: plant.strain || '',
               batch: plant.batch || plant.batchLabel || '',
@@ -3522,7 +3577,7 @@
             if (action.ready === false) {
               throw new Error(action.lockMsg || 'Log more care before sealing the next stage.');
             }
-            await PlantToken.mintGrowth(action.token.id);
+            sealResult = await PlantToken.mintGrowth(action.token.id);
           } else {
             throw new Error('Nothing to seal for this plant.');
           }
@@ -3531,7 +3586,7 @@
             submitBtn.classList.add('is-sealed');
           }
           render();
-          flashOk('Stage sealed.');
+          sealOutcomeFlash(sealResult);
           requestAnimationFrame(function () {
             const bar = document.querySelector('.trail-bar--current');
             if (bar) {

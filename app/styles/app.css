@@ -2201,7 +2201,7 @@ body.notif-open {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .metric-panel-sub {
@@ -2271,7 +2271,7 @@ body.notif-open {
   display: block;
   font-size: 0.72rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(255, 255, 255, 0.62);
   letter-spacing: 0.01em;
 }
 
@@ -3410,7 +3410,7 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 
 .modal input::placeholder,
 .modal textarea::placeholder {
-  color: rgba(190, 220, 190, 0.45);
+  color: rgba(190, 220, 190, 0.72);
   font-weight: 400;
 }
 
@@ -3719,11 +3719,13 @@ select:disabled.is-empty-disabled {
 }
 
 .tree-subphases .tree-subphase-item {
-  opacity: 0.55;
+  opacity: 0.78;
+  color: var(--text-muted);
 }
 
 .tree-subphases .tree-subphase-item.current {
   opacity: 1;
+  color: var(--text);
 }
 
 .tree-subphases .tree-stage-icon {
@@ -6043,7 +6045,7 @@ body.profile-adopter .adopt-hero-text h2 {
   padding-top: 0.75rem;
   border-top: 1px solid rgba(140, 200, 140, 0.12);
   font-size: 0.78rem;
-  color: rgba(190, 220, 190, 0.55);
+  color: rgba(190, 220, 190, 0.72);
   line-height: 1.45;
 }
 
@@ -6135,7 +6137,7 @@ body.profile-adopter .adopt-hero-text h2 {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(190, 220, 190, 0.5);
+  color: rgba(190, 220, 190, 0.72);
   font-weight: 600;
 }
 
@@ -8435,7 +8437,7 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-form textarea::placeholder {
-  color: rgba(190, 205, 180, 0.55);
+  color: rgba(190, 205, 180, 0.72);
 }
 
 .ai-coach-form-actions {
@@ -8659,7 +8661,7 @@ textarea,
 
 input::placeholder,
 textarea::placeholder {
-  color: rgba(190, 220, 190, 0.4);
+  color: rgba(190, 220, 190, 0.72);
 }
 
 .modal,
@@ -8691,7 +8693,7 @@ table th {
   font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(190, 220, 190, 0.55);
+  color: rgba(190, 220, 190, 0.72);
   border-bottom-color: var(--desk-line);
 }
 
@@ -8784,7 +8786,7 @@ table td {
 }
 
 .ai-coach-panel .ai-coach-form textarea::placeholder {
-  color: rgba(190, 205, 180, 0.55) !important;
+  color: rgba(190, 205, 180, 0.72) !important;
 }
 
 .ai-coach-panel .ai-coach-chip {
@@ -8885,10 +8887,9 @@ table td {
   font-size: 0.68rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(190, 220, 190, 0.5);
+  color: rgba(190, 220, 190, 0.72);
   font-weight: 600;
   margin-bottom: 0.2rem;
-}
 }
 
 .plants-weather-scroll-hint {

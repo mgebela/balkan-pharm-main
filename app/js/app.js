@@ -5126,9 +5126,16 @@ function initFirebaseSync() {
     const file = e.target.files[0];
     const dataEl = document.getElementById('entry-video-data');
     const previewEl = document.getElementById('entry-video-preview');
-    if (!file || !file.type.startsWith('video/')) {
+    if (!file) {
       dataEl.value = '';
       previewEl.innerHTML = '';
+      return;
+    }
+    if (!file.type || !file.type.startsWith('video/')) {
+      dataEl.value = '';
+      previewEl.innerHTML =
+        '<span class="media-error">Use an MP4 or WebM video (this file type isn’t supported here).</span>';
+      e.target.value = '';
       return;
     }
     const maxBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024;

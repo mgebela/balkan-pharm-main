@@ -25,6 +25,19 @@
 
   const PLANT_STAGE_ORDER = ['klijanje', 'sadnica', 'vegetativna', 'cvjetanje', 'susenje'];
 
+  const PLANT_STAGE_LABELS = {
+    klijanje: 'Germination',
+    sadnica: 'Seedling',
+    vegetativna: 'Vegetative',
+    cvjetanje: 'Flowering',
+    susenje: 'Drying / harvest',
+  };
+
+  function plantStageLabel(stageKey) {
+    if (!stageKey) return '';
+    return PLANT_STAGE_LABELS[stageKey] || String(stageKey);
+  }
+
   const QUEST_XP = {
     linkPlant: 25,
     stageLogged: 40,
@@ -197,10 +210,13 @@
       ? hasStageLog(plant, entries, targetStageKey)
       : { ok: false, ids: [] };
     const requiredPlantStage = TOKEN_TO_PLANT_STAGE[targetStageKey];
+    const requiredStageLabel = plantStageLabel(requiredPlantStage);
     items.push({
       id: 'stageLogged',
-      label: 'Log growth stage in journal' + (requiredPlantStage ? ' (' + requiredPlantStage + ')' : ''),
-      hint: 'Update plant stage or add a “faza” journal entry',
+      label:
+        'Log growth stage in journal' +
+        (requiredStageLabel ? ' (' + requiredStageLabel + ')' : ''),
+      hint: 'Update plant stage or add a Stage (transition) journal entry',
       ok: !!stageCheck.ok,
       xp: QUEST_XP.stageLogged,
       action: plantId ? 'growlog:' + plantId : 'plants',
@@ -213,7 +229,7 @@
     items.push({
       id: 'watering',
       label: 'Log watering for this stage',
-      hint: 'Add a watering entry or Tools → Watering for this plant',
+      hint: 'Add a Watering entry or Tools → Watering for this plant',
       ok: !!water.ok,
       xp: QUEST_XP.watering,
       action: plantId ? 'growlog:' + plantId : 'toolbox',
@@ -228,7 +244,7 @@
     items.push({
       id: 'feeding',
       label: feedingRequired ? 'Log feeding / nutrients' : 'Log feeding (optional for germination)',
-      hint: 'Add a gnojidba entry or Tools → Feeding for this plant',
+      hint: 'Add a Feeding entry or Tools → Feeding for this plant',
       ok: feedingRequired ? !!feed.ok : true,
       optional: !feedingRequired,
       xp: QUEST_XP.feeding,

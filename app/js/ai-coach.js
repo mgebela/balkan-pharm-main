@@ -55,8 +55,8 @@
       title: 'Germination',
       steps: [
         'Keep seeds warm and lightly moist — avoid soaking the medium.',
-        'Log the stage change to klijanje in the plant profile.',
-        'Add a zalijevanje entry when you first water.',
+        'Log the stage change to Germination in the plant profile.',
+        'Add a Watering entry when you first water.',
         'For tokenisation: link the plant, then mint germination (feeding optional at this stage).',
       ],
     },
@@ -64,8 +64,8 @@
       title: 'Seedling',
       steps: [
         'Gentle light, steady moisture, avoid overfeeding.',
-        'Log watering and start a light nutrient schedule (gnojidba).',
-        'Update stage to sadnica so growth mint proof can pass.',
+        'Log watering and start a light nutrient schedule (Feeding entry).',
+        'Update stage to Seedling so growth mint proof can pass.',
         'Token tip: seedling mint needs stage + watering + feeding logs.',
       ],
     },
@@ -83,7 +83,7 @@
       steps: [
         'Shift nutrients toward bloom; keep an eye on pests and bud rot risk.',
         'Log every watering/feeding and photo notes for provenance.',
-        'Update stage to cvjetanje before requesting the flowering mint.',
+        'Update stage to Flowering before requesting the flowering mint.',
         'Token tip: flowering stage also upgrades the on-chain asset type.',
       ],
     },
@@ -92,7 +92,7 @@
       steps: [
         'Slow dry in controlled humidity; log harvest and drying notes.',
         'Complete final watering/feeding history for the cycle.',
-        'Set stage to susenje to unlock the harvest mint.',
+        'Set stage to Drying / harvest to unlock the harvest mint.',
         'Token tip: harvest stage is the last $GROWTOO milestone on the growth path.',
       ],
     },
