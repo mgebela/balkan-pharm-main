@@ -2966,6 +2966,33 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   font-size: 0.75rem;
 }
 
+.entry-source {
+  display: inline-block;
+  margin-right: 0.45rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  vertical-align: baseline;
+}
+
+.entry-source--tools {
+  color: rgba(243, 239, 230, 0.92);
+  background: rgba(201, 165, 94, 0.18);
+  border: 1px solid rgba(201, 165, 94, 0.32);
+}
+
+.journal-entry--from-tools {
+  border-color: rgba(201, 165, 94, 0.22);
+}
+
+.recent-note .entry-source,
+.timeline-entry-body .entry-source {
+  margin-right: 0;
+  font-size: 0.68rem;
+}
+
 .journal-entry .entry-note {
   font-size: 0.95rem;
   font-family: var(--font-serif);

@@ -2155,6 +2155,47 @@ function initFirebaseSync() {
     podfaza: 'Sub-phase (pot / field)',
   };
 
+  function isToolboxMirroredEntry(entry) {
+    const m = entry && entry.meta;
+    if (!m || typeof m !== 'object') return false;
+    return m.source === 'toolbox' || !!m.toolboxTool;
+  }
+
+  /** Strip the mirror suffix from notes when we show a via-Tools badge. */
+  function displayEntryNote(note) {
+    return String(note || '')
+      .replace(/\s*\(via Tools\)\s*$/i, '')
+      .trim();
+  }
+
+  function entrySourceBadgeHtml(entry) {
+    if (!isToolboxMirroredEntry(entry)) return '';
+    return (
+      '<span class="entry-source entry-source--tools" title="Also kept in Tools charts">' +
+      'via Tools</span>'
+    );
+  }
+
+  function toolboxMeasurementMetaHtml(entry) {
+    if (!isToolboxMirroredEntry(entry) || !entry.meta) return '';
+    const m = entry.meta;
+    const parts = [];
+    if (m.amountMl != null && String(m.amountMl).trim() !== '') {
+      parts.push(escapeHtml(String(m.amountMl).trim()) + ' mL');
+    }
+    if (m.product) parts.push(escapeHtml(String(m.product)));
+    if (m.detail) parts.push(escapeHtml(String(m.detail)));
+    if (m.temperatureC) parts.push(escapeHtml(String(m.temperatureC)) + '°C');
+    if (m.humidityPct) parts.push(escapeHtml(String(m.humidityPct)) + '% RH');
+    if (m.ph) parts.push('pH ' + escapeHtml(String(m.ph)));
+    if (!parts.length) return '';
+    return (
+      '<div class="entry-meta-block"><strong>Measurement</strong><p>' +
+      parts.join(' · ') +
+      '</p></div>'
+    );
+  }
+
   function getPlants() {
     try {
       const data = localStorage.getItem(STORAGE_PLANTS);
@@ -2772,9 +2813,11 @@ function initFirebaseSync() {
     if (full) {
       full.addEventListener('click', function () {
         const plantId = logSheetSelectedPlantId;
+        const pending = logSheetPendingAction;
+        const typeHint =
+          pending === 'water' ? 'zalijevanje' : pending === 'feed' ? 'gnojidba' : null;
         setLogSheetOpen(false);
-        if (blockAdminWrite()) return;
-        openEntryModal(plantId || null);
+        startJournalEntry({ plantId: plantId || null, type: typeHint });
       });
     }
   })();
@@ -3149,10 +3192,22 @@ function initFirebaseSync() {
       const dayWeek = formatDayWeek(e.date, startDate);
       const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
       const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
-      const note = (e.note || '').slice(0, 80) + ((e.note || '').length > 80 ? '…' : '');
+      const noteRaw = displayEntryNote(e.note);
+      const note = noteRaw.slice(0, 80) + (noteRaw.length > 80 ? '…' : '');
+      const viaTools = entrySourceBadgeHtml(e);
       const media = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="timeline-thumb" />' : '';
       timelineItems.push(
-        '<div class="timeline-entry"><div class="timeline-entry-header"><span class="timeline-date">📅 ' + dateStr + '</span><span class="timeline-day">' + dayWeek + '</span></div><div class="timeline-entry-body">' + typeLabel + ': ' + escapeHtml(note) + '</div>' + (media ? '<div class="timeline-entry-media">' + media + '</div>' : '') + '</div>'
+        '<div class="timeline-entry"><div class="timeline-entry-header"><span class="timeline-date">📅 ' +
+          dateStr +
+          '</span><span class="timeline-day">' +
+          dayWeek +
+          '</span></div><div class="timeline-entry-body">' +
+          escapeHtml(typeLabel) +
+          (viaTools ? ' ' + viaTools : '') +
+          (note ? ': ' + escapeHtml(note) : '') +
+          '</div>' +
+          (media ? '<div class="timeline-entry-media">' + media + '</div>' : '') +
+          '</div>'
       );
     });
     document.getElementById('growlog-timeline').innerHTML = timelineItems.length ? timelineItems.join('') : '<p class="growlog-empty">No entries in the timeline. Add notes in the Journal.</p>';
@@ -3529,12 +3584,15 @@ function initFirebaseSync() {
             const plant = plants.find((p) => p.id === e.plantId);
             const plantName = escapeHtml(plant ? plant.name : 'Plant');
             const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+            const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
+            const viaTools = entrySourceBadgeHtml(e);
+            const noteRaw = displayEntryNote(e.note);
             const thumb = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="recent-note-thumb" />' : '';
             return `
             <div class="recent-note shell-card">
-              <div class="meta">${plantName} · ${date} · ${escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General')}</div>
+              <div class="meta">${plantName} · ${date} · ${typeLabel}${viaTools ? ' · ' + viaTools : ''}</div>
               ${thumb}
-              <div class="text">${escapeHtml(e.note || '').slice(0, 120)}${(e.note || '').length > 120 ? '…' : ''}</div>
+              <div class="text">${escapeHtml(noteRaw.slice(0, 120))}${noteRaw.length > 120 ? '…' : ''}</div>
             </div>
           `;
           })
@@ -4745,10 +4803,12 @@ function initFirebaseSync() {
         const plantName = escapeHtml(plant ? plant.name : 'Plant');
         const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
         const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
+        const viaTools = entrySourceBadgeHtml(e);
+        const noteText = displayEntryNote(e.note);
         const media = [];
         if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + escapeHtml(e.photo) + '" alt="Photo" /></div>');
         if (e.video) media.push('<div class="entry-media entry-video"><video src="' + escapeHtml(e.video) + '" controls></video></div>');
-        let metaHtml = '';
+        let metaHtml = toolboxMeasurementMetaHtml(e);
         if (e.meta) {
           if (e.meta.faza) {
             const m = e.meta.faza;
@@ -4809,9 +4869,10 @@ function initFirebaseSync() {
           }
         }
         return `
-          <div class="journal-entry" data-entry-id="${escapeHtml(e.id)}">
+          <div class="journal-entry${isToolboxMirroredEntry(e) ? ' journal-entry--from-tools' : ''}" data-entry-id="${escapeHtml(e.id)}">
             <div class="entry-meta">
               <span class="entry-type">${typeLabel}</span>
+              ${viaTools}
               ${plantName} · ${date}
               ${
                 isSharedPlantId(e.plantId)
@@ -4819,7 +4880,7 @@ function initFirebaseSync() {
                   : '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
               }
             </div>
-            <div class="entry-note">${escapeHtml(e.note || '')}</div>
+            <div class="entry-note">${escapeHtml(noteText)}</div>
             ${
               (function () {
                 const coachNote =
@@ -4903,7 +4964,23 @@ function initFirebaseSync() {
     });
   }
 
-  function openEntryModal(plantId) {
+  /**
+   * Shared opener for every “New entry” CTA (Journal, plant detail, Log sheet).
+   * @param {{ plantId?: string|null, type?: string|null }} [opts]
+   */
+  function startJournalEntry(opts) {
+    const o = opts || {};
+    const plantId = o.plantId || null;
+    if (plantId) {
+      if (blockWrite({ plantId: plantId })) return;
+    } else if (blockAdminWrite()) {
+      return;
+    }
+    openEntryModal(plantId, o);
+  }
+
+  function openEntryModal(plantId, opts) {
+    const o = opts || {};
     if (plantId && blockWrite({ plantId })) return;
     if (!modalEntry) return;
     fillEntryPlantSelect();
@@ -4923,6 +5000,14 @@ function initFirebaseSync() {
         plantSelect.disabled = false;
       }
     }
+    const typeSel = document.getElementById('entry-type');
+    if (typeSel && o.type) {
+      const wanted = String(o.type);
+      const hasOption = Array.from(typeSel.options || []).some(function (opt) {
+        return opt && opt.value === wanted;
+      });
+      if (hasOption) typeSel.value = wanted;
+    }
     updateEntryExtraVisibility();
     modalEntry.classList.add('open');
   }
@@ -4930,8 +5015,7 @@ function initFirebaseSync() {
   const btnAddEntry = document.getElementById('btn-add-entry');
   if (btnAddEntry) {
     btnAddEntry.addEventListener('click', () => {
-      if (blockAdminWrite()) return;
-      openEntryModal(null);
+      startJournalEntry({ plantId: null });
     });
   }
 
@@ -4939,7 +5023,7 @@ function initFirebaseSync() {
   if (btnAddEntryGrowlog) {
     btnAddEntryGrowlog.addEventListener('click', () => {
       if (!currentGrowlogPlantId) return;
-      openEntryModal(currentGrowlogPlantId);
+      startJournalEntry({ plantId: currentGrowlogPlantId });
     });
   }
 
@@ -5900,6 +5984,7 @@ document.addEventListener("click", (e) => {
     setPlantStage: setPlantStageProgrammatic,
     addEntry: addJournalEntryProgrammatic,
     saveEntry: saveJournalEntry,
+    openEntry: startJournalEntry,
     findPlant: findPlantByNameOrId,
     refresh: refreshAfterJournalWrite,
   };
