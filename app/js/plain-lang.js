@@ -87,6 +87,7 @@
     });
   }
 
+  /** Single Advanced/Simple setting for Market, Tokenise, and Profile — do not fork. */
   var MODE_KEY = 'growtoo-crypto-mode';
 
   function getMode() {

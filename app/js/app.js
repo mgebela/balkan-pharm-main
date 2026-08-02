@@ -2171,18 +2171,50 @@ function initFirebaseSync() {
   }
 
   function getEntries() {
+    const list = readEntriesFromStorage();
+    return Array.isArray(list) ? list : [];
+  }
+
+  /** Fresh parse from disk — null if missing/corrupt (not an empty journal). */
+  function readEntriesFromStorage() {
     try {
-      const data = localStorage.getItem(STORAGE_ENTRIES);
-      return data ? JSON.parse(data) : [];
+      const raw = localStorage.getItem(STORAGE_ENTRIES);
+      if (raw == null || raw === '') return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
     } catch {
-      return [];
+      return null;
     }
   }
 
+  function entriesIdsMatch(expected, actual) {
+    const want = new Set(
+      (expected || []).map(function (e) {
+        return e && e.id ? String(e.id) : '';
+      }).filter(Boolean)
+    );
+    const got = new Set(
+      (actual || []).map(function (e) {
+        return e && e.id ? String(e.id) : '';
+      }).filter(Boolean)
+    );
+    if (want.size !== got.size) return false;
+    var ok = true;
+    want.forEach(function (id) {
+      if (!got.has(id)) ok = false;
+    });
+    return ok;
+  }
+
+  /**
+   * Persist journal entries, then re-read from localStorage before success.
+   * Same defensive idea as wallet-link: never trust a write until a round-trip confirms it.
+   */
   function setEntries(entries) {
     if (blockAdminWrite()) return false;
+    const list = Array.isArray(entries) ? entries : [];
     try {
-      localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
+      localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(list));
     } catch (err) {
       console.error('Failed to save journal entries locally', err);
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
@@ -2195,8 +2227,34 @@ function initFirebaseSync() {
       }
       return false;
     }
-    scheduleRemoteSync({ entries: entriesForRemoteSync(entries) });
+
+    const reread = readEntriesFromStorage();
+    if (!Array.isArray(reread) || !entriesIdsMatch(list, reread)) {
+      console.error('Journal write verification failed — re-read mismatch after setItem');
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast('Entry did not save. Please try again.', 'error');
+      } else {
+        alert('Entry did not save. Please try again.');
+      }
+      return false;
+    }
+
+    scheduleRemoteSync({ entries: entriesForRemoteSync(reread) });
     return true;
+  }
+
+  /** Field-level confirm that a specific entry landed (id + plant + type). */
+  function verifyEntryLanded(entry) {
+    if (!entry || !entry.id) return null;
+    const reread = readEntriesFromStorage();
+    if (!Array.isArray(reread)) return null;
+    const found = reread.find(function (en) {
+      return en && String(en.id) === String(entry.id);
+    });
+    if (!found) return null;
+    if (String(found.plantId || '') !== String(entry.plantId || '')) return null;
+    if (String(found.type || '') !== String(entry.type || '')) return null;
+    return found;
   }
 
   function uuid() {
@@ -4520,6 +4578,7 @@ function initFirebaseSync() {
           meta: add.meta,
           source: 'plant-modal',
           requireNoteDefault: false,
+          silent: true,
         });
       } catch (err) {
         console.warn('Plant journal entry failed', err);
@@ -5611,7 +5670,8 @@ document.addEventListener("click", (e) => {
   }
 
   /**
-   * Single write path for every journal entry (modal, Log sheet, quick-log, coach).
+   * Canonical journal create path — modal, Log sheet, quick-log, coach, plant wizard.
+   * Success UI runs only after a write→re-read confirm (see setEntries / verifyEntryLanded).
    * @param {{
    *   plantId: string,
    *   type?: string,
@@ -5622,7 +5682,8 @@ document.addEventListener("click", (e) => {
    *   video?: string|null,
    *   meta?: object,
    *   source?: string,
-   *   requireNoteDefault?: boolean
+   *   requireNoteDefault?: boolean,
+   *   silent?: boolean
    * }} opts
    */
   function saveJournalEntry(opts) {
@@ -5656,13 +5717,15 @@ document.addEventListener("click", (e) => {
       createdAt: new Date().toISOString(),
     };
 
-    if (!setEntries(getEntries().concat([entry]))) {
+    const next = getEntries().concat([entry]);
+    if (!setEntries(next)) {
       throw new Error('Could not save journal entry.');
     }
-    const saved = getEntries().some(function (en) {
-      return en && en.id === entry.id;
-    });
-    if (!saved) throw new Error('Entry did not save. Please try again.');
+    // Second confirm: field-level match after an independent storage re-read.
+    const landed = verifyEntryLanded(entry);
+    if (!landed) {
+      throw new Error('Entry did not save. Please try again.');
+    }
 
     // Stage-location fields on a faza entry also update the plant profile.
     if (
@@ -5683,23 +5746,28 @@ document.addEventListener("click", (e) => {
       }
     }
 
+    // Success side-effects only after verified land.
     if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
       try {
-        AICoach.narrateAfterEntry(entry, plant);
+        AICoach.narrateAfterEntry(landed, plant);
       } catch (e) {
         // ignore
       }
     }
-    if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
+    if (
+      !o.silent &&
+      window.DnevnikNotifications &&
+      typeof DnevnikNotifications.notifyJournalEntry === 'function'
+    ) {
       try {
-        DnevnikNotifications.notifyJournalEntry(entry, plant.name);
+        DnevnikNotifications.notifyJournalEntry(landed, plant.name);
       } catch {
         // ignore
       }
     }
     maybeNotifyCareProgress();
     refreshAfterJournalWrite(plantId);
-    return entry;
+    return landed;
   }
 
   /** @deprecated alias — all callers should prefer saveJournalEntry */
