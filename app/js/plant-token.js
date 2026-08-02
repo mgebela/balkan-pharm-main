@@ -2881,7 +2881,9 @@
       );
     }
     const linkedUnverified =
-      isWatchOnlyProvider(profile.walletProvider) || profile.walletProvider === 'watch-only';
+      profile.walletVerified !== true ||
+      isWatchOnlyProvider(profile.walletProvider) ||
+      profile.walletProvider === 'watch-only';
     const linkedLabel = linkedUnverified ? 'Linked · unverified' : 'Account linked';
     if (wallet.connected && wallet.address === profile.solanaPubkey) {
       return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">' + linkedLabel + '</span>';

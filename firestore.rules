@@ -1,8 +1,9 @@
 rules_version = '2';
 
-// Dnevnik.live — Firestore security rules
-// Deploy: Firebase Console → Firestore → Rules → paste & Publish
-//   or: firebase deploy --only firestore:rules (requires Firebase CLI)
+// growtoo — Firestore security rules
+// Deploy: npm run deploy:firestore-rules
+//   or CI workflow .github/workflows/deploy-firestore-rules.yml on main
+// Manual fallback: Firebase Console → Firestore → Rules → Publish
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -69,29 +70,26 @@ service cloud.firestore {
       return t in ['grower', 'adopter'];
     }
 
-    function walletLinkPatchAllowed() {
-      return request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
-        && isValidSolanaPubkey(request.resource.data.solanaPubkey)
-        && request.resource.data.walletProvider is string
-        && request.resource.data.walletProvider.size() > 0
-        && request.resource.data.walletProvider.size() <= 64
-        && request.resource.data.walletLinkedAt is string
-        && request.resource.data.walletLinkedAt.size() > 0
-        // Keep identity fields stable when present
-        && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
-        && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email)
-        && (!('profileType' in request.resource.data)
-          || request.resource.data.profileType == resource.data.profileType);
-    }
+    // solanaPubkey / walletVerified are written only by Cloud Function linkWallet
+    // (Admin SDK) after ed25519 verification — clients must not set them.
 
     // Allow clearing this account's linked wallet (disconnect).
     function walletUnlinkAllowed() {
       return request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['solanaPubkey', 'walletProvider', 'walletLinkedAt'])
+          .hasOnly([
+            'solanaPubkey',
+            'walletProvider',
+            'walletLinkedAt',
+            'walletVerified',
+            'walletLinkSignature',
+            'walletLinkMessage',
+          ])
         && !('solanaPubkey' in request.resource.data)
         && !('walletProvider' in request.resource.data)
         && !('walletLinkedAt' in request.resource.data)
+        && !('walletVerified' in request.resource.data)
+        && !('walletLinkSignature' in request.resource.data)
+        && !('walletLinkMessage' in request.resource.data)
         && (!('role' in request.resource.data) || request.resource.data.role == resource.data.role)
         && (!('email' in request.resource.data) || request.resource.data.email == resource.data.email)
         && (!('profileType' in request.resource.data)
@@ -131,7 +129,6 @@ service cloud.firestore {
         && (!('profileType' in request.resource.data)
           || request.resource.data.profileType == resource.data.profileType
           || (!('profileType' in resource.data) && isValidProfileType(request.resource.data.profileType))))
-      || (request.auth.uid == userId && walletLinkPatchAllowed())
       || (request.auth.uid == userId && walletUnlinkAllowed())
       || (request.auth.uid == userId && profileTypeUpdateAllowed())
       || isSuperadmin()

@@ -51,6 +51,8 @@
     // Kicks GitHub Actions chain-queues when a seed/growth mint is filed.
     mintQueueKickUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues',
+    linkWalletUrl:
+      'https://europe-west1-balpha-9dab9.cloudfunctions.net/linkWallet',
     devnetNotice:
       'Connect a Solana wallet on the test network (Devnet). Seed NFTs mint via the cloud queue; $GROWTOO rewards settle on-chain. Test assets only.',
     explorerAddress: function (address) {

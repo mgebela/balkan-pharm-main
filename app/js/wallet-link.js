@@ -1,15 +1,29 @@
 /*
- * Link Firebase Auth user ↔ Solana pubkey (M1).
- * User signs a short message in their wallet; pubkey is stored on users/{uid}.
+ * Link Firebase Auth user ↔ Solana pubkey.
+ * Ownership is proven by signing a challenge; Cloud Function `linkWallet`
+ * verifies the ed25519 signature and writes users/{uid} via Admin SDK.
+ * Clients cannot set solanaPubkey directly (Firestore rules).
  */
 (function () {
   'use strict';
+
+  function linkWalletUrl() {
+    try {
+      if (window.ChainConfig && ChainConfig.linkWalletUrl) {
+        return String(ChainConfig.linkWalletUrl);
+      }
+    } catch (_) {
+      /* ignore */
+    }
+    return 'https://europe-west1-balpha-9dab9.cloudfunctions.net/linkWallet';
+  }
 
   const cache = {
     uid: '',
     solanaPubkey: '',
     walletProvider: '',
     walletLinkedAt: '',
+    walletVerified: false,
     loaded: false,
   };
 
@@ -65,6 +79,26 @@
 
   const FIRESTORE_TIMEOUT_MS = 12000;
 
+  function encodeSignature(result) {
+    var sig = result && result.signature != null ? result.signature : result;
+    if (!sig) throw new Error('Wallet returned an empty signature.');
+    if (typeof sig === 'string') return sig;
+    var bytes =
+      sig instanceof Uint8Array
+        ? sig
+        : Array.isArray(sig)
+          ? Uint8Array.from(sig)
+          : sig.data
+            ? Uint8Array.from(sig.data)
+            : null;
+    if (!bytes || !bytes.length) {
+      throw new Error('Wallet signature format not recognized.');
+    }
+    var bin = '';
+    for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+  }
+
   async function signLinkMessage(message) {
     const SW = window.SolanaWallet;
     if (!SW) throw new Error('Solana wallet module not loaded.');
@@ -74,8 +108,40 @@
       45000,
       'Wallet did not respond to the sign request. Unlock the extension and try again.'
     );
-    if (result && result.signature) return result.signature;
-    return result;
+    return encodeSignature(result);
+  }
+
+  async function getIdToken() {
+    const user = firebaseUser();
+    if (!user) return null;
+    return user.getIdToken();
+  }
+
+  async function callLinkWallet(body) {
+    const token = await getIdToken();
+    if (!token) throw new Error('Sign in to your growtoo account before linking a wallet.');
+    const res = await withTimeout(
+      fetch(linkWalletUrl(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        body: JSON.stringify(body),
+      }),
+      30000,
+      'Wallet link service timed out. Try again.'
+    );
+    const data = await res.json().catch(function () {
+      return {};
+    });
+    if (!res.ok || !data.ok) {
+      const err = new Error(data.error || 'Wallet link failed (' + res.status + ')');
+      err.code = res.status === 401 ? 'auth' : data.code;
+      err.status = res.status;
+      throw err;
+    }
+    return data;
   }
 
   function normalizeWalletError(err) {
@@ -92,7 +158,7 @@
     }
     if (err.message) return err.message;
     if (err.code === 'permission-denied') {
-      return 'Could not save wallet link. Deploy the latest Firestore rules: firebase deploy --only firestore:rules';
+      return 'Could not save wallet link. Refresh and try again, or contact support.';
     }
     if (err.code === 'WALLET_NOT_FOUND') {
       return 'No Solana wallet found. Install Phantom, Solflare, or another wallet, then refresh.';
@@ -107,11 +173,6 @@
     return 'Something went wrong. Open the browser console (F12) for details.';
   }
 
-  async function assertPubkeyAvailable() {
-    // Cross-user pubkey lookup is blocked by Firestore rules for normal users.
-    // Uniqueness will be enforced server-side in a later milestone.
-  }
-
   const WalletLink = {
     isValidPubkey: isValidPubkey,
 
@@ -121,6 +182,10 @@
 
     isLinked() {
       return !!cache.solanaPubkey;
+    },
+
+    isVerified() {
+      return !!cache.solanaPubkey && !!cache.walletVerified;
     },
 
     onChange(fn) {
@@ -137,6 +202,7 @@
         cache.solanaPubkey = '';
         cache.walletProvider = '';
         cache.walletLinkedAt = '';
+        cache.walletVerified = false;
         cache.loaded = true;
         emit();
         return cache;
@@ -159,6 +225,7 @@
       cache.solanaPubkey = String(data.solanaPubkey || '');
       cache.walletProvider = String(data.walletProvider || '');
       cache.walletLinkedAt = String(data.walletLinkedAt || '');
+      cache.walletVerified = data.walletVerified === true;
       cache.loaded = true;
       emit();
       return cache;
@@ -178,7 +245,7 @@
 
       await WalletLink.loadProfile();
 
-      if (cache.solanaPubkey === pubkey && !opts.force) {
+      if (cache.solanaPubkey === pubkey && cache.walletVerified && !opts.force) {
         return cache;
       }
 
@@ -187,8 +254,6 @@
           'A different wallet is already linked to this account. Disconnect and contact support to change it.'
         );
       }
-
-      await assertPubkeyAvailable();
 
       const SW = window.SolanaWallet;
       let provider = SW && SW.getProviderName ? SW.getProviderName() : 'solana';
@@ -204,64 +269,50 @@
         provider = 'watch-only';
       }
 
-      const message = buildLinkMessage(user.uid, pubkey);
-
-      if (!opts.skipSign && !isWatchOnly) {
+      let saved;
+      if (isWatchOnly || opts.skipSign) {
+        saved = await callLinkWallet({
+          pubkey: pubkey,
+          mode: 'watch-only',
+          walletProvider: 'watch-only',
+          force: !!opts.force,
+        });
+      } else {
+        const message = buildLinkMessage(user.uid, pubkey);
+        let signature;
         try {
-          await signLinkMessage(message);
+          signature = await signLinkMessage(message);
         } catch (err) {
           const msg = normalizeWalletError(err);
-          // If the session is watch-only / cannot sign, fall back to unverified link.
           if (/watch-only|cannot sign|does not support signMessage/i.test(msg)) {
-            provider = 'watch-only';
+            saved = await callLinkWallet({
+              pubkey: pubkey,
+              mode: 'watch-only',
+              walletProvider: 'watch-only',
+              force: !!opts.force,
+            });
           } else {
             const wrapped = new Error(msg);
             wrapped.code = err && err.code;
             throw wrapped;
           }
         }
-      }
-
-      const firestore = db();
-      if (!firestore) throw new Error('Firestore is not available.');
-
-      const now = new Date().toISOString();
-      const patch = {
-        solanaPubkey: pubkey,
-        walletProvider: provider || (isWatchOnly ? 'watch-only' : 'solana'),
-        walletLinkedAt: now,
-      };
-
-      const userRef = firestore.collection('users').doc(user.uid);
-      try {
-        await withTimeout(
-          userRef.set(patch, { merge: true }),
-          FIRESTORE_TIMEOUT_MS,
-          'Firestore timed out saving the wallet link. Check your connection and try again.'
-        );
-      } catch (err) {
-        const wrapped = new Error(normalizeWalletError(err));
-        wrapped.code = err && err.code;
-        throw wrapped;
-      }
-
-      // Re-read to confirm the write landed (rules / offline can look successful otherwise).
-      const confirm = await withTimeout(
-        userRef.get(),
-        FIRESTORE_TIMEOUT_MS,
-        'Firestore timed out confirming the wallet link.'
-      );
-      const saved = confirm.exists ? confirm.data() || {} : {};
-      if (String(saved.solanaPubkey || '') !== pubkey) {
-        throw new Error(
-          'Wallet link did not save. Check Firestore rules for users/{uid} wallet fields, then try again.'
-        );
+        if (!saved) {
+          saved = await callLinkWallet({
+            pubkey: pubkey,
+            message: message,
+            signature: signature,
+            walletProvider: provider || 'solana',
+            force: !!opts.force,
+          });
+        }
       }
 
       cache.uid = user.uid;
-      cache.solanaPubkey = pubkey;
-      cache.walletProvider = String(saved.walletProvider || patch.walletProvider);
-      cache.walletLinkedAt = String(saved.walletLinkedAt || now);
+      cache.solanaPubkey = String(saved.solanaPubkey || pubkey);
+      cache.walletProvider = String(saved.walletProvider || provider || 'solana');
+      cache.walletLinkedAt = String(saved.walletLinkedAt || '');
+      cache.walletVerified = saved.walletVerified === true;
       cache.loaded = true;
       emit();
       return cache;
@@ -278,11 +329,15 @@
         solanaPubkey: firebase.firestore.FieldValue.delete(),
         walletProvider: firebase.firestore.FieldValue.delete(),
         walletLinkedAt: firebase.firestore.FieldValue.delete(),
+        walletVerified: firebase.firestore.FieldValue.delete(),
+        walletLinkSignature: firebase.firestore.FieldValue.delete(),
+        walletLinkMessage: firebase.firestore.FieldValue.delete(),
       });
 
       cache.solanaPubkey = '';
       cache.walletProvider = '';
       cache.walletLinkedAt = '';
+      cache.walletVerified = false;
       emit();
       return cache;
     },

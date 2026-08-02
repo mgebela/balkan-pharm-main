@@ -8,6 +8,7 @@ const {GoogleGenAI} = require('@google/genai');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
 const {handleSolanaRpc} = require('./solana-rpc-proxy');
+const {handleLinkWallet} = require('./link-wallet');
 const {
   onMarketListingChange,
   onMintDocChange,
@@ -108,6 +109,26 @@ exports.solanaRpc = onRequest(
       maxInstances: 10,
     },
     handleSolanaRpc,
+);
+
+/**
+ * Verify Solana wallet ownership (ed25519 message signature) and write
+ * users/{uid}.solanaPubkey via Admin SDK. Clients cannot set that field directly.
+ *
+ * POST https://europe-west1-balpha-9dab9.cloudfunctions.net/linkWallet
+ * Authorization: Bearer <Firebase ID token>
+ * Body: { pubkey, message, signature, walletProvider } | { pubkey, mode:'watch-only' }
+ */
+exports.linkWallet = onRequest(
+    {
+      region: REGION,
+      cors: true,
+      invoker: 'public',
+      timeoutSeconds: 30,
+      memory: '256MiB',
+      maxInstances: 10,
+    },
+    handleLinkWallet,
 );
 
 /**
