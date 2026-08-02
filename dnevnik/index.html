@@ -335,6 +335,32 @@
       cursor: wait;
       opacity: 1;
     }
+    .password-field {
+      display: flex;
+      align-items: stretch;
+      gap: 0.4rem;
+    }
+    .password-field input {
+      flex: 1;
+      min-width: 0;
+    }
+    .password-toggle {
+      flex: 0 0 auto;
+      min-width: 4.25rem;
+      border: 1px solid rgba(201, 165, 94, 0.35);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--brass);
+      font-size: 0.78rem;
+      font-weight: 650;
+      cursor: pointer;
+      padding: 0 0.65rem;
+    }
+    .password-toggle:hover,
+    .password-toggle[aria-pressed="true"] {
+      border-color: rgba(201, 165, 94, 0.7);
+      background: rgba(201, 165, 94, 0.1);
+    }
     .auth-divider {
       display: flex;
       align-items: center;
@@ -464,12 +490,13 @@
     </div>
     <div class="field-block">
       <label for="password">Password</label>
-      <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="8" />
+      <div class="password-field">
+        <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="8" />
+        <button type="button" class="password-toggle" id="password-toggle" aria-pressed="false" aria-label="Show password">
+          Show
+        </button>
+      </div>
       <p class="field-hint signup-only" id="password-hint" hidden>At least 8 characters. Use a unique password you don’t reuse elsewhere.</p>
-    </div>
-    <div class="field-block signup-only" id="field-password-confirm" hidden>
-      <label for="password-confirm">Confirm password</label>
-      <input id="password-confirm" type="password" placeholder="••••••••" autocomplete="new-password" minlength="8" />
     </div>
 
     <div class="role-fields" id="signup-grower-fields" hidden>
@@ -493,9 +520,9 @@
         </div>
       </div>
       <div class="field-block">
-        <label for="home-city">Home city</label>
-        <p class="field-hint">Used for the Plants weather forecast.</p>
-        <input id="home-city" type="text" maxlength="80" placeholder="e.g. Osijek" autocomplete="address-level2" />
+        <label for="home-city">Home city <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <p class="field-hint">Only used for the Plants weather forecast — skip if you grow indoors.</p>
+        <input id="home-city" type="text" maxlength="80" placeholder="e.g. Denver" autocomplete="address-level2" />
       </div>
       <div class="field-block">
         <label for="grow-style-note">Grow style <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
@@ -528,17 +555,12 @@
       </label>
     </div>
 
-    <label class="check-row signup-only" id="field-accept-age" hidden>
-      <input type="checkbox" id="accept-age" />
-      <span>I confirm I am <strong>18 years of age or older</strong>.</span>
-    </label>
-
-    <label class="check-row signup-only" id="field-accept-terms" hidden>
-      <input type="checkbox" id="accept-terms" />
+    <label class="check-row signup-only" id="field-accept-consent" hidden>
+      <input type="checkbox" id="accept-consent" />
       <span>
-        I agree to the
-        <a href="../terms/" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-        and
+        I’m <strong>18+</strong> and agree to the
+        <a href="../terms/" target="_blank" rel="noopener noreferrer">Terms</a>
+        &amp;
         <a href="../privacy/" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.
       </span>
     </label>
@@ -559,8 +581,8 @@
     <p id="login-status" aria-live="polite"></p>
     <div class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
-  <script src="../app/js/signup.js?v=20260729g"></script>
-  <script src="../js/site-trust.js?v=20260729g"></script>
+  <script src="../app/js/signup.js?v=20260802f"></script>
+  <script src="../js/site-trust.js?v=20260802a"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
     import {
@@ -659,21 +681,17 @@
       growerFields.hidden = !(isSignup && profileType === 'grower');
       adopterFields.hidden = !(isSignup && profileType === 'adopter');
 
-      const confirm = document.getElementById('password-confirm');
-      const terms = document.getElementById('accept-terms');
-      const age = document.getElementById('accept-age');
+      const consent = document.getElementById('accept-consent');
       const pwHint = document.getElementById('password-hint');
       const devnet = document.getElementById('accept-devnet');
       const displayName = document.getElementById('display-name');
       const homeCity = document.getElementById('home-city');
       const password = document.getElementById('password');
 
-      if (confirm) confirm.required = isSignup;
-      if (terms) terms.required = isSignup;
-      if (age) age.required = isSignup;
+      if (consent) consent.required = isSignup;
       if (pwHint) pwHint.hidden = !isSignup;
       if (displayName) displayName.required = isSignup;
-      if (homeCity) homeCity.required = isSignup && profileType === 'grower';
+      if (homeCity) homeCity.required = false;
       if (devnet) devnet.required = isSignup && profileType === 'adopter';
       if (password) password.minLength = isSignup ? 8 : 6;
 
@@ -722,11 +740,13 @@
     }
 
     function collectSignupInput(authProvider) {
+      const consented = !!document.getElementById('accept-consent').checked;
       return {
         profileType: profileType,
         displayName: document.getElementById('display-name').value.trim(),
-        acceptedTerms: !!document.getElementById('accept-terms').checked,
-        acceptedAge: !!document.getElementById('accept-age').checked,
+        acceptedConsent: consented,
+        acceptedTerms: consented,
+        acceptedAge: consented,
         growSetup: growSetup,
         homeCity: document.getElementById('home-city').value.trim(),
         growStyleNote: document.getElementById('grow-style-note').value.trim(),
@@ -780,6 +800,19 @@
     }
 
     tabSignin.addEventListener('click', () => setMode('signin'));
+    const passwordToggle = document.getElementById('password-toggle');
+    if (passwordToggle) {
+      passwordToggle.addEventListener('click', () => {
+        const pw = document.getElementById('password');
+        if (!pw) return;
+        const show = pw.type === 'password';
+        pw.type = show ? 'text' : 'password';
+        passwordToggle.setAttribute('aria-pressed', show ? 'true' : 'false');
+        passwordToggle.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+        passwordToggle.textContent = show ? 'Hide' : 'Show';
+      });
+    }
+
     tabSignup.addEventListener('click', () => setMode('signup'));
     document.querySelectorAll('.profile-option').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -842,11 +875,6 @@
         }
         if (password.length < 8) {
           setStatus('Password must be at least 8 characters.', true);
-          return;
-        }
-        const confirm = document.getElementById('password-confirm').value;
-        if (password !== confirm) {
-          setStatus('Passwords do not match.', true);
           return;
         }
         Signup.savePending(checked.payload);

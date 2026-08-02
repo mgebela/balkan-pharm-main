@@ -334,6 +334,13 @@
     } catch {
       // ignore
     }
+    try {
+      window.dispatchEvent(
+        new CustomEvent('growtoo:xp', { detail: { total: state.total, reason: reason, amount: amt } })
+      );
+    } catch {
+      // ignore
+    }
     return state;
   }
 

@@ -190,6 +190,24 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
   display: flex !important;
 }
 
+/* Pure grower: hide Tokenise/Market until they opt into the on-chain path */
+body.profile-grower.chain-locked .sidebar-nav > .nav-item[data-view="adopt"],
+body.profile-grower.chain-locked .sidebar-nav > .nav-item[data-view="market"],
+body.profile-grower.chain-locked .bottom-nav > .nav-item[data-view="adopt"],
+body.profile-grower.chain-locked .bottom-nav > .nav-item[data-view="market"] {
+  display: none !important;
+}
+body.profile-grower .more-nav-list > .more-nav-item.chain-unlock-only,
+body.profile-grower .more-nav-list > .more-nav-item.chain-enabled-only {
+  display: none !important;
+}
+body.profile-grower.chain-locked .more-nav-list > .more-nav-item.chain-unlock-only {
+  display: flex !important;
+}
+body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-enabled-only {
+  display: flex !important;
+}
+
 .admin-visible {
   display: flex !important;
 }
@@ -395,6 +413,7 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 }
 
 #view-plants .plants-weather-loading,
+#view-plants .plants-weather-empty,
 #view-plants .plants-weather-error {
   margin: 0;
   font-size: 0.86rem;
@@ -943,6 +962,10 @@ body.profile-adopter .account-profile-avatar {
   background: rgba(255, 255, 255, 0.03);
   color: rgba(247, 238, 225, 0.88);
   text-decoration: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
 }
 
 /* Always visible in the account sheet (not role-gated). */
@@ -2648,6 +2671,64 @@ body.notif-open {
   margin: 0 0 1rem 0;
 }
 
+.plants-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem 0.85rem;
+  margin: 0 0 1rem;
+}
+
+.plants-section-head .section-heading {
+  margin: 0;
+}
+
+.grower-rank-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.28rem 0.65rem;
+  border: 1px solid rgba(201, 165, 94, 0.35);
+  border-radius: 999px;
+  background: rgba(201, 165, 94, 0.08);
+  color: rgba(243, 239, 230, 0.88);
+  font-family: var(--font);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.grower-rank-chip:hover,
+.grower-rank-chip:focus-visible {
+  border-color: rgba(201, 165, 94, 0.65);
+  background: rgba(201, 165, 94, 0.14);
+  outline: none;
+}
+
+body.profile-grower .grower-rank-chip.grower-only {
+  display: inline-flex !important;
+}
+
+body.profile-grower .grower-rank-chip.grower-only[hidden],
+.grower-rank-chip[hidden] {
+  display: none !important;
+}
+
+.grower-rank-chip-tier {
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+}
+
+.grower-rank-chip-xp {
+  color: rgba(243, 239, 230, 0.55);
+  font-weight: 500;
+}
+
 .plants-journal-diary .journal-filters {
   margin-bottom: 0.75rem;
 }
@@ -3402,6 +3483,16 @@ select:disabled.is-empty-disabled {
 .media-error {
   font-size: 0.85rem;
   color: var(--accent-warm);
+}
+
+.media-loading {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.field-optional {
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .modal input,
@@ -8330,6 +8421,7 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-send {
+  position: relative;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 4px;
@@ -8357,6 +8449,31 @@ body.crypto-simple .crypto-simple-only {
 .ai-coach-send:disabled {
   opacity: 0.55;
   cursor: wait;
+}
+
+.ai-coach-send.is-pending {
+  pointer-events: none;
+}
+
+.ai-coach-send.is-pending > svg {
+  opacity: 0;
+}
+
+.ai-coach-send.is-pending::after {
+  content: '';
+  position: absolute;
+  width: 1.05rem;
+  height: 1.05rem;
+  border: 2px solid rgba(26, 20, 8, 0.35);
+  border-top-color: var(--brass-ink);
+  border-radius: 50%;
+  animation: ai-coach-spin 0.7s linear infinite;
+}
+
+@keyframes ai-coach-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .ai-coach-foot {

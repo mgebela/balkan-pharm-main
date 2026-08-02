@@ -217,10 +217,9 @@
 
   function getWeatherCity() {
     try {
-      var saved = localStorage.getItem(WEATHER_CITY);
-      return (saved && saved.trim()) || 'Visnjevac';
+      return String(localStorage.getItem(WEATHER_CITY) || '').trim();
     } catch (e) {
-      return 'Visnjevac';
+      return '';
     }
   }
 

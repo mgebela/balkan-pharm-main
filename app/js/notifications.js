@@ -670,25 +670,21 @@
 
   function notifyCareProgress(kind, plantId, plantName, periodKey, daysHit, minDays) {
     if (!plantId || !periodKey) return;
-    const type = kind === 'week' ? 'care_week' : 'care_month';
+    // Self-progress after your own logs — toast only. Inbox stays for attention items.
+    const dedup = (kind === 'week' ? 'care_week' : 'care_month') + ':' + plantId + ':' + periodKey;
+    if (shouldSkipDedup(kind === 'week' ? 'care_week' : 'care_month', dedup)) return;
     const label = kind === 'week' ? 'Weekly' : 'Monthly';
-    push({
-      type: type,
-      title: label + ' care qualified',
-      body:
-        (plantName || 'Plant') +
-        ' hit ' +
+    toast(
+      (plantName || 'Plant') +
+        ' · ' +
+        label.toLowerCase() +
+        ' care ' +
         daysHit +
         '/' +
         minDays +
-        ' care days · ' +
-        periodKey +
-        (kind === 'month' ? ' (harvest unlock path).' : ' (grower progress).'),
-      meta: { key: type + ':' + plantId + ':' + periodKey, plantId: plantId, periodKey: periodKey },
-      action: { view: 'adopt', plantId: plantId },
-      kind: 'success',
-      dedupKey: type + ':' + plantId + ':' + periodKey,
-    });
+        ' days',
+      'success'
+    );
   }
 
   function localDayKey() {
@@ -749,24 +745,19 @@
     return ENTRY_TYPE_LABELS[key] || key;
   }
 
-  function notifyJournalEntry(entry, plantName) {
+  /**
+   * Confirm the user's own journal write as a toast only.
+   * Never badge the inbox for "you logged watering" — that trains people to ignore the bell.
+   * @param {object} entry
+   * @param {string} [plantName]
+   * @param {{ toast?: boolean }} [opts]
+   */
+  function notifyJournalEntry(entry, plantName, opts) {
     if (!entry) return;
+    const o = opts || {};
+    if (o.toast === false) return;
     const typeLabel = entryTypeLabel(entry.type);
-    push({
-      type: 'journal_entry',
-      title: 'Journal log saved',
-      body: (plantName || 'Plant') + ' · ' + typeLabel + (entry.note ? ' — ' + String(entry.note).slice(0, 80) : ''),
-      meta: {
-        key: 'journal:' + entry.id,
-        plantId: entry.plantId,
-        entryId: entry.id,
-        entryType: entry.type,
-      },
-      action: { view: 'plants', plantId: entry.plantId },
-      kind: 'info',
-      dedupKey: 'journal:' + entry.id,
-      toastMsg: 'Logged ' + typeLabel + (plantName ? ' for ' + plantName : ''),
-    });
+    toast('Logged ' + typeLabel + (plantName ? ' for ' + plantName : ''), 'success');
   }
 
   function bindUi() {

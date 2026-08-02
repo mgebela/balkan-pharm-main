@@ -1262,6 +1262,9 @@ function hydrateProfileLocalDefaults(data) {
       const intent = normalizeAdopterIntent(data.adopterIntent);
       if (intent) localStorage.setItem('dnevnik-live-adopter-intent', intent);
     }
+    if (data.chainOptIn) {
+      writeChainOptInLocal(true);
+    }
   } catch {
     // ignore
   }
@@ -1594,6 +1597,100 @@ function isGrowerProfile() {
   return getProfileType() === PROFILE_TYPES.grower;
 }
 
+var STORAGE_CHAIN_OPT_IN = 'dnevnik-live-chain-opt-in';
+
+function readChainOptInLocal() {
+  try {
+    return localStorage.getItem(STORAGE_CHAIN_OPT_IN) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function writeChainOptInLocal(enabled) {
+  try {
+    if (enabled) localStorage.setItem(STORAGE_CHAIN_OPT_IN, '1');
+    else localStorage.removeItem(STORAGE_CHAIN_OPT_IN);
+  } catch {
+    // ignore
+  }
+}
+
+function growerHasPriorChainActivity() {
+  try {
+    if (window.WalletLink && typeof WalletLink.getProfile === 'function') {
+      const profile = WalletLink.getProfile() || {};
+      if (profile.solanaPubkey) return true;
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
+      const wallet = PlantToken.getWallet() || {};
+      if (Array.isArray(wallet.tokens) && wallet.tokens.length) return true;
+    }
+  } catch {
+    // ignore
+  }
+  return false;
+}
+
+function isChainOptIn() {
+  if (!isGrowerProfile()) return true;
+  if (readChainOptInLocal()) return true;
+  if (growerHasPriorChainActivity()) {
+    writeChainOptInLocal(true);
+    return true;
+  }
+  return false;
+}
+
+function persistChainOptInRemote(enabled) {
+  try {
+    if (!window.firebase || !firebase.auth || !firebase.firestore) return;
+    const user = firebase.auth().currentUser;
+    if (!user) return;
+    firebase
+      .firestore()
+      .collection('users')
+      .doc(user.uid)
+      .set(
+        {
+          chainOptIn: !!enabled,
+          chainOptInAt: new Date().toISOString(),
+        },
+        { merge: true }
+      )
+      .catch(function () {
+        /* ignore */
+      });
+  } catch {
+    // ignore
+  }
+}
+
+function applyChainNavUI() {
+  const locked = isGrowerProfile() && !isChainOptIn();
+  document.body.classList.toggle('chain-locked', locked);
+  syncMoreNavVisibility();
+}
+
+function setChainOptIn(enabled) {
+  writeChainOptInLocal(!!enabled);
+  if (enabled) persistChainOptInRemote(true);
+  applyChainNavUI();
+}
+
+function unlockChainPath(nextView) {
+  setChainOptIn(true);
+  if (nextView && typeof showView === 'function') {
+    showView(nextView);
+  } else if (nextView && typeof window.showAppView === 'function') {
+    window.showAppView(nextView);
+  }
+}
+
 function applyProfileTypeUI(profileType) {
   const type = normalizeProfileType(profileType) || PROFILE_TYPES.grower;
   currentProfileType = type;
@@ -1634,8 +1731,13 @@ function applyProfileTypeUI(profileType) {
   if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
     window.AICoach.applyVisibility();
   }
-  syncMoreNavVisibility();
+  applyChainNavUI();
   applySignupProfileCopy(type);
+  try {
+    if (typeof renderGrowerRankChip === 'function') renderGrowerRankChip();
+  } catch {
+    /* ignore */
+  }
 }
 
 function applySignupProfileCopy(profileType) {
@@ -1684,8 +1786,16 @@ function isViewAllowedForProfile(viewId) {
   if (viewId === 'growlog') return isGrowerProfile();
   if (['plants', 'toolbox', 'danas'].includes(viewId)) return isGrowerProfile();
   // Growers post RWA offers; adopters browse & invest.
-  if (viewId === 'market') return true;
-  if (['dashboard', 'adopt'].includes(viewId)) return true;
+  // Pure growers stay on the journal path until they unlock Tokenise/Market.
+  if (viewId === 'market') {
+    if (isGrowerProfile() && !isChainOptIn()) return false;
+    return true;
+  }
+  if (viewId === 'adopt') {
+    if (isGrowerProfile() && !isChainOptIn()) return false;
+    return true;
+  }
+  if (viewId === 'dashboard') return true;
   return false;
 }
 
@@ -2260,6 +2370,36 @@ function initFirebaseSync() {
       performLogout();
     });
   }
+  const unlockChainBtn = document.getElementById('btn-unlock-chain');
+  if (unlockChainBtn) {
+    unlockChainBtn.addEventListener('click', async function () {
+      const ok =
+        window.AppConfirm && typeof AppConfirm.ask === 'function'
+          ? await AppConfirm.ask({
+              title: 'Unlock Tokenise & Market?',
+              body:
+                'This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.',
+              confirmLabel: 'Unlock',
+              cancelLabel: 'Not now',
+            })
+          : window.confirm(
+              'Unlock Tokenise & Market?\n\nOptional on-chain tools. Your journal stays free without a wallet.'
+            );
+      if (!ok) return;
+      setMoreNavOpen(false);
+      unlockChainPath('adopt');
+    });
+  }
+  if (window.WalletLink && typeof WalletLink.onChange === 'function') {
+    WalletLink.onChange(function () {
+      applyChainNavUI();
+    });
+  }
+  if (window.PlantToken && typeof PlantToken.onChange === 'function') {
+    PlantToken.onChange(function () {
+      applyChainNavUI();
+    });
+  }
 
   function showView(id, extra) {
     if (id !== 'growlog' && !isViewAllowedForProfile(id)) {
@@ -2707,9 +2847,30 @@ function initFirebaseSync() {
     const durationWeeks = weeksBetween(startDate, updatedAt.slice(0, 10));
     const envType = plant.environmentType === 'outdoor' ? 'Outdoor' : 'Indoor';
     const exposure = plant.exposureHours ? plant.exposureHours + ' h' : '—';
+    let plantIsPublic = false;
+    try {
+      if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
+        const tokens = (PlantToken.getWallet() || {}).tokens || [];
+        plantIsPublic = tokens.some(function (t) {
+          return t && (t.plantId === plantId || t.id === plantId) && (t.mintAddress || t.listed);
+        });
+      }
+    } catch {
+      plantIsPublic = false;
+    }
 
     document.getElementById('growlog-updated').textContent = 'Updated ' + timeAgo(updatedAt);
-    document.getElementById('growlog-views').textContent = views + ' views';
+    const viewsEl = document.getElementById('growlog-views');
+    if (viewsEl) {
+      // Private un-minted journals shouldn't imply an audience with "0 views".
+      if (!plantIsPublic || !views) {
+        viewsEl.hidden = true;
+        viewsEl.textContent = '';
+      } else {
+        viewsEl.hidden = false;
+        viewsEl.textContent = views + (views === 1 ? ' public view' : ' public views');
+      }
+    }
 
     document.getElementById('growlog-metrics').innerHTML = `
       <div class="growlog-metric"><span class="growlog-metric-icon">📅</span> ${durationWeeks} weeks</div>
@@ -3369,18 +3530,21 @@ function initFirebaseSync() {
       return;
     }
     try {
-      addJournalEntryProgrammatic({
+      saveJournalEntry({
         plantId: plant.id,
         type: type,
         note: note,
-        meta: { source: 'dashboard-quick-log' },
+        source: 'quick-log',
+        requireNoteDefault: false,
       });
-      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-        DnevnikNotifications.toast('Logged for ' + plant.name, 'success');
-      }
-      renderDashboard();
+      // Toast comes from notifyJournalEntry inside saveJournalEntry (inbox stays clear).
     } catch (err) {
-      alert((err && err.message) || 'Could not log entry.');
+      const msg = (err && err.message) || 'Could not log entry.';
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast(msg, 'error');
+      } else {
+        alert(msg);
+      }
     }
   }
 
@@ -3400,16 +3564,15 @@ function initFirebaseSync() {
 
   const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
   const WEATHER_CITY_KEY = 'dnevnik-live-weather-city';
-  const DEFAULT_WEATHER_CITY = 'Visnjevac';
   const PLANTS_WEATHER_EL = 'plants-weather';
   let plantsWeatherFormBound = false;
 
+  /** Per-user city from signup or the Plants weather field — no locale hardcoded default. */
   function getWeatherCity() {
     try {
-      const saved = localStorage.getItem(WEATHER_CITY_KEY);
-      return (saved && saved.trim()) || DEFAULT_WEATHER_CITY;
+      return String(localStorage.getItem(WEATHER_CITY_KEY) || '').trim();
     } catch {
-      return DEFAULT_WEATHER_CITY;
+      return '';
     }
   }
 
@@ -3430,7 +3593,12 @@ function initFirebaseSync() {
     const weatherDiv = document.getElementById(elId);
     if (!weatherDiv) return;
 
-    const cityName = (city || DEFAULT_WEATHER_CITY).trim() || DEFAULT_WEATHER_CITY;
+    const cityName = String(city || '').trim();
+    if (!cityName) {
+      weatherDiv.innerHTML =
+        '<p class="plants-weather-empty">Add a city above for a 7-day forecast. Optional — skip if you grow indoors.</p>';
+      return;
+    }
     weatherDiv.innerHTML = '<p class="plants-weather-loading">Loading forecast…</p>';
 
     const url =
@@ -3561,9 +3729,10 @@ function initFirebaseSync() {
   function loadPlantsWeatherFromInput() {
     const input = document.getElementById('plants-weather-city');
     const city = (input && input.value.trim()) || getWeatherCity();
-    if (input && !input.value.trim()) input.value = city;
+    if (input && !input.value.trim() && city) input.value = city;
     try {
-      localStorage.setItem(WEATHER_CITY_KEY, city);
+      if (city) localStorage.setItem(WEATHER_CITY_KEY, city);
+      else localStorage.removeItem(WEATHER_CITY_KEY);
     } catch {
       // ignore
     }
@@ -3576,7 +3745,8 @@ function initFirebaseSync() {
     const refreshBtn = document.getElementById('plants-weather-refresh');
     if (!form || !input) return;
 
-    if (!input.value.trim()) input.value = getWeatherCity();
+    const saved = getWeatherCity();
+    if (!input.value.trim() && saved) input.value = saved;
 
     if (!plantsWeatherFormBound) {
       plantsWeatherFormBound = true;
@@ -3602,6 +3772,8 @@ function initFirebaseSync() {
   }
 
   const MAX_IMAGE_SIZE = 800;
+  /** Soft cap after resize — localStorage + Firestore payload stay usable. */
+  const MAX_ENTRY_PHOTO_CHARS = 900000;
   const MAX_VIDEO_SIZE_MB = 2;
 
   function readFileAsDataUrl(file) {
@@ -3613,37 +3785,121 @@ function initFirebaseSync() {
     });
   }
 
-  function resizeImageDataUrl(dataUrl, maxWidth) {
-    return new Promise((resolve) => {
+  /**
+   * Always re-encode to JPEG (even when already under max edge).
+   * Skipping that left phone photos as multi‑MB PNGs and silent localStorage failures.
+   */
+  function resizeImageDataUrl(dataUrl, maxEdge) {
+    const edge = Math.max(64, Number(maxEdge) || MAX_IMAGE_SIZE);
+    return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
-        let w = img.width;
-        let h = img.height;
-        if (w <= maxWidth) {
-          resolve(dataUrl);
+        let w = img.width || 0;
+        let h = img.height || 0;
+        if (!w || !h) {
+          reject(new Error('Could not read image dimensions.'));
           return;
         }
-        h = Math.round((h * maxWidth) / w);
-        w = maxWidth;
+        const long = Math.max(w, h);
+        if (long > edge) {
+          const scale = edge / long;
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+        }
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, w, h);
-        try {
-          resolve(canvas.toDataURL('image/jpeg', 0.78));
-        } catch {
-          resolve(dataUrl);
+        if (!ctx) {
+          reject(new Error('Could not process image.'));
+          return;
         }
+        ctx.fillStyle = '#0f1a12';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        let quality = 0.82;
+        let out = '';
+        try {
+          out = canvas.toDataURL('image/jpeg', quality);
+          while (out.length > MAX_ENTRY_PHOTO_CHARS && quality > 0.45) {
+            quality -= 0.1;
+            out = canvas.toDataURL('image/jpeg', quality);
+          }
+        } catch (err) {
+          reject(err || new Error('Could not encode image.'));
+          return;
+        }
+        if (!out || out.length > MAX_ENTRY_PHOTO_CHARS) {
+          reject(new Error('Photo is still too large after compression. Try a smaller image.'));
+          return;
+        }
+        resolve(out);
       };
-      img.onerror = () => resolve(dataUrl);
+      img.onerror = () => reject(new Error('Could not load that image. Try JPG or PNG.'));
       img.src = dataUrl;
     });
   }
 
+  function renderGrowerRankChip() {
+    const chip = document.getElementById('grower-rank-chip');
+    if (!chip) return;
+    if (!isGrowerProfile() || !window.GrowerQuests) {
+      chip.hidden = true;
+      chip.textContent = '';
+      return;
+    }
+    let rank = null;
+    let xp = 0;
+    try {
+      if (typeof GrowerQuests.growerRankFromLocal === 'function') {
+        rank = GrowerQuests.growerRankFromLocal();
+      }
+      if (typeof GrowerQuests.getGrowerProfile === 'function') {
+        const profile = GrowerQuests.getGrowerProfile() || {};
+        xp = Number(profile.xp != null ? profile.xp : profile.totalXp) || 0;
+      }
+    } catch {
+      rank = null;
+    }
+    if (!rank || !rank.title) {
+      chip.hidden = true;
+      chip.textContent = '';
+      return;
+    }
+    chip.hidden = false;
+    chip.innerHTML =
+      '<span class="grower-rank-chip-tier">Rank ' +
+      escapeHtml(String(rank.tier || 1)) +
+      '</span>' +
+      '<span>' +
+      escapeHtml(rank.title) +
+      '</span>' +
+      '<span class="grower-rank-chip-xp">' +
+      escapeHtml(String(xp)) +
+      ' XP</span>';
+    chip.setAttribute(
+      'aria-label',
+      'Grower rank ' + (rank.tier || 1) + ', ' + rank.title + ', ' + xp + ' XP. Open profile.'
+    );
+  }
+
+  (function bindGrowerRankChip() {
+    const chip = document.getElementById('grower-rank-chip');
+    if (chip && !chip.dataset.bound) {
+      chip.dataset.bound = '1';
+      chip.addEventListener('click', function () {
+        setMoreNavOpen(true);
+      });
+    }
+    window.addEventListener('growtoo:xp', function () {
+      renderGrowerRankChip();
+    });
+  })();
+
   // --- Plants ---
   function renderPlants() {
     renderCoachBriefingSurfaces();
+    renderGrowerRankChip();
     const list = document.getElementById('plants-list');
     const plants = getPlants();
     if (plants.length === 0) {
@@ -3825,19 +4081,27 @@ function initFirebaseSync() {
     }, ms || 8000);
   }
 
-  function deletePlant(id) {
+  async function deletePlant(id) {
     if (blockWrite({ plantId: id })) return;
     const plant = getPlants().find((p) => p.id === id);
     if (!plant) return;
-    if (
-      !confirm(
-        'Delete "' +
-          plant.name +
-          '" and its journal trail?\n\nYou can undo for a few seconds after.'
-      )
-    ) {
-      return;
-    }
+    const ok =
+      window.AppConfirm && typeof AppConfirm.ask === 'function'
+        ? await AppConfirm.ask({
+            title: 'Delete this plant?',
+            body:
+              'Delete "' +
+              plant.name +
+              '" and its journal trail?\n\nYour grow history is evidence — you can undo for a few seconds after.',
+            confirmLabel: 'Delete plant',
+            danger: true,
+          })
+        : window.confirm(
+            'Delete "' +
+              plant.name +
+              '" and its journal trail?\n\nYou can undo for a few seconds after.'
+          );
+    if (!ok) return;
     const removedPlant = JSON.parse(JSON.stringify(plant));
     const removedEntries = getEntries()
       .filter((e) => e.plantId === id)
@@ -3849,9 +4113,6 @@ function initFirebaseSync() {
     fillEntryPlantSelect();
     fillJournalPlantFilter();
     if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
-    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-      // Brief notice; undo toast carries the recovery action.
-    }
     showUndoToast('Plant deleted — undo available', () => {
       setPlants(getPlants().concat([removedPlant]));
       setEntries(getEntries().concat(removedEntries));
@@ -4045,23 +4306,39 @@ function initFirebaseSync() {
     const file = e.target.files[0];
     const photoData = document.getElementById('plant-photo-data');
     const photoPreview = document.getElementById('plant-photo-preview');
-    if (!file || !file.type.startsWith('image/')) {
+    if (!file) {
       photoData.value = '';
       photoPreview.innerHTML = '';
       return;
     }
+    if (!file.type || !file.type.startsWith('image/')) {
+      photoData.value = '';
+      photoPreview.innerHTML =
+        '<span class="media-error">Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).</span>';
+      e.target.value = '';
+      return;
+    }
+    photoPreview.innerHTML = '<span class="media-loading">Preparing photo…</span>';
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
       photoData.value = dataUrl;
-      photoPreview.innerHTML = '<img src="' + dataUrl + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+      photoPreview.innerHTML =
+        '<img src="' +
+        dataUrl +
+        '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
       photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
         photoData.value = '';
         photoPreview.innerHTML = '';
         document.getElementById('plant-photo').value = '';
       });
     } catch (err) {
-      photoPreview.innerHTML = '<span class="media-error">Error while loading.</span>';
+      photoData.value = '';
+      photoPreview.innerHTML =
+        '<span class="media-error">' +
+        escapeHtml((err && err.message) || 'Could not load photo.') +
+        '</span>';
+      e.target.value = '';
     }
   });
 
@@ -4232,21 +4509,36 @@ function initFirebaseSync() {
       next = [...plants, payload];
     }
     setPlants(next);
-    if (journalAdds.length) {
-      setEntries(getEntries().concat(journalAdds));
-    }
+    journalAdds.forEach(function (add) {
+      try {
+        saveJournalEntry({
+          plantId: add.plantId || newId,
+          type: add.type,
+          note: add.note,
+          date: add.date,
+          photo: add.photo || null,
+          meta: add.meta,
+          source: 'plant-modal',
+          requireNoteDefault: false,
+        });
+      } catch (err) {
+        console.warn('Plant journal entry failed', err);
+      }
+    });
     const alsoMintEl = document.getElementById('plant-also-mint');
     const wantMint = !id && alsoMintEl && alsoMintEl.checked;
     closePlantModal();
     if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
       DnevnikNotifications.toast(id ? 'Plant updated' : 'Plant added — ' + payload.name, 'success');
     }
-    renderPlants();
-    renderDashboard();
-    renderJournal();
-    fillEntryPlantSelect();
-    fillJournalPlantFilter();
-    if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
+    if (!journalAdds.length) {
+      renderPlants();
+      renderDashboard();
+      renderJournal();
+      fillEntryPlantSelect();
+      fillJournalPlantFilter();
+      if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
+    }
     if (currentGrowlogPlantId === newId) {
       renderGrowlog(newId);
       const headerTitle = document.querySelector('.view-title');
@@ -4498,17 +4790,23 @@ function initFirebaseSync() {
     });
   }
 
-  function deleteJournalEntry(entryId) {
+  async function deleteJournalEntry(entryId) {
     const entry = getEntries().find((e) => e && e.id === entryId);
     if (!entry) return;
     if (blockWrite({ plantId: entry.plantId })) return;
-    if (
-      !confirm(
-        'Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.'
-      )
-    ) {
-      return;
-    }
+    const ok =
+      window.AppConfirm && typeof AppConfirm.ask === 'function'
+        ? await AppConfirm.ask({
+            title: 'Delete journal entry?',
+            body:
+              'Remove this entry from your grow trail?\n\nYou can undo for a few seconds after.',
+            confirmLabel: 'Delete entry',
+            danger: true,
+          })
+        : window.confirm(
+            'Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.'
+          );
+    if (!ok) return;
     const removed = JSON.parse(JSON.stringify(entry));
     setEntries(getEntries().filter((e) => e.id !== entryId));
     renderJournal();
@@ -4625,23 +4923,39 @@ function initFirebaseSync() {
     const file = e.target.files[0];
     const dataEl = document.getElementById('entry-photo-data');
     const previewEl = document.getElementById('entry-photo-preview');
-    if (!file || !file.type.startsWith('image/')) {
+    if (!file) {
       dataEl.value = '';
       previewEl.innerHTML = '';
       return;
     }
+    if (!file.type || !file.type.startsWith('image/')) {
+      dataEl.value = '';
+      previewEl.innerHTML =
+        '<span class="media-error">Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).</span>';
+      e.target.value = '';
+      return;
+    }
+    previewEl.innerHTML = '<span class="media-loading">Preparing photo…</span>';
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
       dataEl.value = dataUrl;
-      previewEl.innerHTML = '<img src="' + dataUrl + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+      previewEl.innerHTML =
+        '<img src="' +
+        dataUrl +
+        '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
         previewEl.innerHTML = '';
         document.getElementById('entry-photo').value = '';
       });
     } catch (err) {
-      previewEl.innerHTML = '<span class="media-error">Error while loading.</span>';
+      dataEl.value = '';
+      previewEl.innerHTML =
+        '<span class="media-error">' +
+        escapeHtml((err && err.message) || 'Could not load photo.') +
+        '</span>';
+      e.target.value = '';
     }
   });
 
@@ -4678,104 +4992,67 @@ function initFirebaseSync() {
   document.getElementById('form-entry').addEventListener('submit', (e) => {
     e.preventDefault();
     const plantIdForEntry = document.getElementById('entry-plant').value || null;
-    if (!plantIdForEntry) {
-      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-        DnevnikNotifications.toast('Choose a plant before saving the entry.', 'warn');
-      } else {
-        alert('Choose a plant before saving the entry.');
-      }
-      return;
-    }
-    if (blockWrite({ plantId: plantIdForEntry })) return;
     const type = document.getElementById('entry-type').value;
-    let meta = null;
+    let meta = {};
     if (type === 'presadjivanje') {
       const soil = document.getElementById('entry-transplant-soil').value.trim();
       const age = document.getElementById('entry-transplant-age').value.trim();
       const condition = document.getElementById('entry-transplant-condition').value.trim();
-      if (soil || age || condition) meta = { presadjivanje: { soilQuality: soil || null, plantAge: age || null, plantCondition: condition || null } };
+      if (soil || age || condition) {
+        meta.presadjivanje = {
+          soilQuality: soil || null,
+          plantAge: age || null,
+          plantCondition: condition || null,
+        };
+      }
     } else if (type === 'stresori') {
       const temp = document.getElementById('entry-stressor-temp').value.trim();
       const humidity = document.getElementById('entry-stressor-humidity').value.trim();
       const vpd = document.getElementById('entry-stressor-vpd').value.trim();
       const pests = document.getElementById('entry-stressor-pests').value.trim();
-      if (temp || humidity || vpd || pests) meta = { stresori: { temperature: temp || null, humidity: humidity || null, vpd: vpd || null, pests: pests || null } };
+      if (temp || humidity || vpd || pests) {
+        meta.stresori = {
+          temperature: temp || null,
+          humidity: humidity || null,
+          vpd: vpd || null,
+          pests: pests || null,
+        };
+      }
     } else if (type === 'faza') {
       const fieldLocInput = document.getElementById('entry-faza-field-location');
       const plantingInput = document.getElementById('entry-faza-planting-location');
       const fieldLoc = fieldLocInput ? fieldLocInput.value.trim() : '';
       const plantingLoc = plantingInput ? plantingInput.value.trim() : '';
       if (fieldLoc || plantingLoc) {
-        meta = { faza: {} };
+        meta.faza = {};
         if (fieldLoc) meta.fieldLocation = fieldLoc;
         if (plantingLoc) meta.plantingLocation = plantingLoc;
       }
     }
-    const entries = getEntries();
-    const newEntry = {
-      id: uuid(),
-      plantId: plantIdForEntry,
-      date: document.getElementById('entry-date').value,
-      type: type,
-      note: document.getElementById('entry-note').value.trim(),
-      photo: document.getElementById('entry-photo-data').value.trim() || null,
-      video: document.getElementById('entry-video-data').value.trim() || null,
-      meta: meta || undefined,
-      createdAt: new Date().toISOString(),
-    };
-    entries.push(newEntry);
-    if (!setEntries(entries)) return;
-    // Confirm the write landed before success UI (guards against storage quirks).
-    const saved = getEntries().some(function (en) {
-      return en && en.id === newEntry.id;
-    });
-    if (!saved) {
+    try {
+      saveJournalEntry({
+        plantId: plantIdForEntry,
+        type: type,
+        note: document.getElementById('entry-note').value,
+        date: document.getElementById('entry-date').value || localDateYYYYMMDD(),
+        photo: document.getElementById('entry-photo-data').value.trim() || null,
+        video: document.getElementById('entry-video-data').value.trim() || null,
+        meta: Object.keys(meta).length ? meta : undefined,
+        source: 'entry-modal',
+        requireNoteDefault: false,
+      });
+    } catch (err) {
+      const msg = (err && err.message) || 'Could not save journal entry.';
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-        DnevnikNotifications.toast('Entry did not save. Please try again.', 'error');
+        DnevnikNotifications.toast(msg, msg.indexOf('Choose a plant') === 0 ? 'warn' : 'error');
+      } else {
+        alert(msg);
       }
       return;
-    }
-    if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
-      try {
-        const plantForNote = getPlants().find(function (p) {
-          return p && p.id === newEntry.plantId;
-        });
-        AICoach.narrateAfterEntry(newEntry, plantForNote || null);
-      } catch (err) {
-        // ignore
-      }
-    }
-    if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyJournalEntry === 'function') {
-      const plantName =
-        (getPlants().find(function (p) {
-          return p && p.id === newEntry.plantId;
-        }) || {}).name || null;
-      try {
-        DnevnikNotifications.notifyJournalEntry(newEntry, plantName);
-        maybeNotifyCareProgress();
-      } catch {
-        // ignore
-      }
-    }
-    if (type === 'faza' && plantIdForEntry && meta && (meta.fieldLocation || meta.plantingLocation)) {
-      const plants = getPlants();
-      const idx = plants.findIndex((p) => p.id === plantIdForEntry);
-      if (idx >= 0) {
-        const patch = { ...plants[idx], updatedAt: new Date().toISOString() };
-        if (meta.fieldLocation) {
-          patch.fieldLocation = meta.fieldLocation;
-          patch.environmentType = 'outdoor';
-        }
-        if (meta.plantingLocation) patch.plantingLocation = meta.plantingLocation;
-        plants[idx] = patch;
-        setPlants(plants);
-      }
     }
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');
-    // Full refresh — including open growlog trail (was missing for General notes).
-    refreshAfterJournalWrite(plantIdForEntry);
   });
 
   modalEntry.querySelector('.modal-close').addEventListener('click', () => {
@@ -5281,20 +5558,15 @@ document.addEventListener("click", (e) => {
       subphaseHistory: [],
     };
     setPlants(getPlants().concat([plant]));
-    setEntries(
-      getEntries().concat([
-        {
-          id: uuid(),
-          plantId: newId,
-          date: day0,
-          type: 'faza',
-          note: 'Grow started — stage: ' + (STAGES[stage] || stage) + ' (via Grower Coach)',
-          photo: null,
-          meta: { faza: { from: null, to: stage }, source: 'ai-coach' },
-        },
-      ])
-    );
-    refreshAfterJournalWrite(newId);
+    saveJournalEntry({
+      plantId: newId,
+      type: 'faza',
+      note: 'Grow started — stage: ' + (STAGES[stage] || stage) + ' (via Grower Coach)',
+      date: day0,
+      meta: { faza: { from: null, to: stage } },
+      source: 'ai-coach',
+      requireNoteDefault: false,
+    });
     return plant;
   }
 
@@ -5326,45 +5598,91 @@ document.addEventListener("click", (e) => {
       (STAGES[oldStage] || oldStage) +
       ' → ' +
       (STAGES[newStage] || newStage);
-    setEntries(
-      getEntries().concat([
-        {
-          id: uuid(),
-          plantId: String(plantId),
-          date: td,
-          type: 'faza',
-          note: (note ? base + '. ' + String(note) : base) + ' (via Grower Coach)',
-          photo: null,
-          meta: { faza: { from: oldStage, to: newStage }, source: 'ai-coach' },
-        },
-      ])
-    );
-    refreshAfterJournalWrite(plantId);
+    saveJournalEntry({
+      plantId: String(plantId),
+      type: 'faza',
+      note: (note ? base + '. ' + String(note) : base) + ' (via Grower Coach)',
+      date: td,
+      meta: { faza: { from: oldStage, to: newStage } },
+      source: 'ai-coach',
+      requireNoteDefault: false,
+    });
     return updated;
   }
 
-  function addJournalEntryProgrammatic(opts) {
+  /**
+   * Single write path for every journal entry (modal, Log sheet, quick-log, coach).
+   * @param {{
+   *   plantId: string,
+   *   type?: string,
+   *   entryType?: string,
+   *   note?: string,
+   *   date?: string,
+   *   photo?: string|null,
+   *   video?: string|null,
+   *   meta?: object,
+   *   source?: string,
+   *   requireNoteDefault?: boolean
+   * }} opts
+   */
+  function saveJournalEntry(opts) {
     const o = opts || {};
     const plantId = o.plantId || null;
     if (blockWrite({ plantId: plantId })) throw new Error('Cannot add entry for this plant.');
-    if (!plantId) throw new Error('plantId is required.');
+    if (!plantId) throw new Error('Choose a plant before saving the entry.');
     const plant = getPlants().find((p) => p && String(p.id) === String(plantId));
     if (!plant) throw new Error('Plant not found.');
+
     const type = String(o.type || o.entryType || 'opcenito').trim() || 'opcenito';
-    const note = String(o.note || '').trim() || 'Logged via Grower Coach';
+    // Modal may save an empty General note; coach/quick-log omit note → default copy.
+    let note = '';
+    if (o.note === undefined || o.note === null) {
+      note = o.requireNoteDefault === false ? '' : 'Logged via Grower Coach';
+    } else {
+      note = String(o.note).trim();
+    }
     const date = o.date || localDateYYYYMMDD();
+    const source = o.source || (o.meta && o.meta.source) || 'journal';
+    const meta = Object.assign({}, o.meta || {}, { source: source });
     const entry = {
       id: uuid(),
       plantId: String(plantId),
       date: date,
       type: type,
       note: note,
-      photo: null,
-      video: null,
-      meta: Object.assign({ source: 'ai-coach' }, o.meta || {}),
+      photo: o.photo || null,
+      video: o.video || null,
+      meta: meta,
+      createdAt: new Date().toISOString(),
     };
-    setEntries(getEntries().concat([entry]));
-    refreshAfterJournalWrite(plantId);
+
+    if (!setEntries(getEntries().concat([entry]))) {
+      throw new Error('Could not save journal entry.');
+    }
+    const saved = getEntries().some(function (en) {
+      return en && en.id === entry.id;
+    });
+    if (!saved) throw new Error('Entry did not save. Please try again.');
+
+    // Stage-location fields on a faza entry also update the plant profile.
+    if (
+      type === 'faza' &&
+      (meta.fieldLocation || meta.plantingLocation)
+    ) {
+      const plants = getPlants();
+      const idx = plants.findIndex((p) => p && String(p.id) === String(plantId));
+      if (idx >= 0) {
+        const patch = Object.assign({}, plants[idx], { updatedAt: new Date().toISOString() });
+        if (meta.fieldLocation) {
+          patch.fieldLocation = meta.fieldLocation;
+          patch.environmentType = 'outdoor';
+        }
+        if (meta.plantingLocation) patch.plantingLocation = meta.plantingLocation;
+        plants[idx] = patch;
+        setPlants(plants);
+      }
+    }
+
     if (window.AICoach && typeof AICoach.narrateAfterEntry === 'function') {
       try {
         AICoach.narrateAfterEntry(entry, plant);
@@ -5380,7 +5698,18 @@ document.addEventListener("click", (e) => {
       }
     }
     maybeNotifyCareProgress();
+    refreshAfterJournalWrite(plantId);
     return entry;
+  }
+
+  /** @deprecated alias — all callers should prefer saveJournalEntry */
+  function addJournalEntryProgrammatic(opts) {
+    const o = opts || {};
+    return saveJournalEntry(
+      Object.assign({}, o, {
+        source: (o.meta && o.meta.source) || o.source || 'ai-coach',
+      })
+    );
   }
 
   function findPlantByNameOrId(query) {
@@ -5405,6 +5734,7 @@ document.addEventListener("click", (e) => {
     createPlant: createPlantProgrammatic,
     setPlantStage: setPlantStageProgrammatic,
     addEntry: addJournalEntryProgrammatic,
+    saveEntry: saveJournalEntry,
     findPlant: findPlantByNameOrId,
     refresh: refreshAfterJournalWrite,
   };

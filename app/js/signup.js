@@ -74,12 +74,11 @@
       return { ok: false, error: 'Enter a display name.' };
     }
 
-    if (!raw.acceptedAge) {
-      return { ok: false, error: 'Confirm you are 18 or older to continue.' };
-    }
-
-    if (!raw.acceptedTerms) {
-      return { ok: false, error: 'Please accept the Terms and Privacy Policy to continue.' };
+    if (!raw.acceptedConsent && !(raw.acceptedAge && raw.acceptedTerms)) {
+      return {
+        ok: false,
+        error: 'Confirm you are 18+ and agree to the Terms & Privacy Policy.',
+      };
     }
 
     /** @type {SignupPayload} */
@@ -95,9 +94,8 @@
       var setup = normalizeGrowSetup(raw.growSetup);
       if (!setup) return { ok: false, error: 'Choose a grow setup (indoor, outdoor, or mixed).' };
       var city = trimStr(raw.homeCity, 80);
-      if (!city) return { ok: false, error: 'Enter your home city for weather.' };
       payload.growSetup = setup;
-      payload.homeCity = city;
+      if (city) payload.homeCity = city;
       var note = trimStr(raw.growStyleNote, 240);
       if (note) payload.growStyleNote = note;
     } else {

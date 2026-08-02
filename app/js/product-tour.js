@@ -35,6 +35,11 @@
     return !isAdopter();
   }
 
+  function isChainUnlocked() {
+    // Pure growers hide Tokenise/Market until they opt in (body.chain-locked).
+    return !document.body.classList.contains('chain-locked');
+  }
+
   function storageKey(scriptId, uid) {
     return STORAGE_PREFIX + (uid || 'anon') + ':' + (scriptId || 'full');
   }
@@ -72,18 +77,70 @@
     if (nav) nav.click();
   }
 
+  function isEffectivelyVisible(el) {
+    if (!el || !el.getBoundingClientRect) return false;
+    var node = el;
+    while (node && node.nodeType === 1) {
+      var style = window.getComputedStyle(node);
+      if (
+        style.display === 'none' ||
+        style.visibility === 'hidden' ||
+        Number(style.opacity) === 0
+      ) {
+        return false;
+      }
+      node = node.parentElement;
+    }
+    var rect = el.getBoundingClientRect();
+    return rect.width >= 2 && rect.height >= 2;
+  }
+
   function pickTarget(selectors) {
     var list = Array.isArray(selectors) ? selectors : [selectors];
     for (var i = 0; i < list.length; i++) {
       var sel = list[i];
       if (!sel) continue;
-      var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
-      if (!el) continue;
-      var style = window.getComputedStyle(el);
-      if (style.display === 'none' || style.visibility === 'hidden') continue;
-      var rect = el.getBoundingClientRect();
-      if (rect.width < 2 && rect.height < 2) continue;
+      var el = null;
+      if (typeof sel === 'function') {
+        try {
+          el = sel();
+        } catch (_) {
+          el = null;
+        }
+      } else if (typeof sel === 'string') {
+        el = document.querySelector(sel);
+      } else {
+        el = sel;
+      }
+      if (!el || !isEffectivelyVisible(el)) continue;
       return el;
+    }
+    return null;
+  }
+
+  /** Prefer the on-screen nav control whose visible label matches (Journal ≠ Plants). */
+  function pickNavByLabel(labels) {
+    var wanted = (Array.isArray(labels) ? labels : [labels])
+      .map(function (l) {
+        return String(l || '')
+          .trim()
+          .toLowerCase();
+      })
+      .filter(Boolean);
+    if (!wanted.length) return null;
+    var nodes = document.querySelectorAll(
+      '.bottom-nav .nav-item[data-view], .sidebar-nav .nav-item[data-view]'
+    );
+    for (var i = 0; i < nodes.length; i++) {
+      var el = nodes[i];
+      if (!isEffectivelyVisible(el)) continue;
+      var text = String(el.textContent || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+      for (var j = 0; j < wanted.length; j++) {
+        if (text === wanted[j] || text.indexOf(wanted[j]) !== -1) return el;
+      }
     }
     return null;
   }
@@ -134,23 +191,40 @@
   }
 
   function growerFullSteps() {
-    return [
+    var steps = [
       {
         id: 'start-strip',
         view: null,
         selectors: ['#daily-start-strip', '#btn-account'],
         title: 'Start here',
-        body: 'Your grower path: log care in the journal, seal a stage on Tokenise, then list it on Market.',
+        body: 'Your grower path: log care in the journal first. Tokenise and Market are optional when you want them.',
+      },
+      {
+        id: 'journal-nav',
+        view: 'dashboard',
+        // Journal tab = data-view="dashboard" (Plants is a separate tab).
+        selectors: [
+          function () {
+            return pickNavByLabel(['Journal']);
+          },
+          '.bottom-nav .nav-item[data-view="dashboard"]',
+          '.sidebar-nav .nav-item[data-view="dashboard"]',
+        ],
+        title: 'Journal',
+        body: 'This is the Journal tab — your home desk with Today and progress. Next we’ll open Plants for the care diary.',
       },
       {
         id: 'plants-nav',
         view: null,
         selectors: [
+          function () {
+            return pickNavByLabel(['Plants']);
+          },
           '.bottom-nav .nav-item[data-view="plants"]',
           '.sidebar-nav .nav-item[data-view="plants"]',
         ],
-        title: 'Journal',
-        body: 'Plants and care logs live here. Tap Journal in the nav to open it.',
+        title: 'Plants',
+        body: 'Your plant list and care diary live here. Tap Plants to add a plant and log watering.',
       },
       {
         id: 'plants-list',
@@ -166,41 +240,56 @@
         title: 'Log care',
         body: 'New entries prove real work. Quests on Tokenise look for stage, water, and feed logs.',
       },
-      {
-        id: 'tokenise-nav',
-        view: null,
-        selectors: [
-          '.bottom-nav .nav-item[data-view="adopt"]',
-          '.sidebar-nav .nav-item[data-view="adopt"]',
-        ],
-        title: 'Tokenise',
-        body: 'When the journal is ready, seal a stage into a plant token on Devnet.',
-      },
-      {
-        id: 'seal-stage',
-        view: 'adopt',
-        selectors: ['#adopt-seed-section', '#adopt-growth-guide', '#adopt-token-grid'],
-        title: 'Seal a stage',
-        body: 'Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.',
-      },
-      {
-        id: 'market-nav',
-        view: null,
-        selectors: [
-          '.bottom-nav .nav-item[data-view="market"]',
-          '.sidebar-nav .nav-item[data-view="market"]',
-        ],
-        title: 'Market',
-        body: 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.',
-      },
-      {
-        id: 'market-list',
-        view: 'market',
-        selectors: ['#market-list-section', '#market-mine-grid', '#market-grid'],
-        title: 'List an offer',
-        body: 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.',
-      },
     ];
+
+    if (isChainUnlocked()) {
+      steps.push(
+        {
+          id: 'tokenise-nav',
+          view: null,
+          selectors: [
+            '.bottom-nav .nav-item[data-view="adopt"]',
+            '.sidebar-nav .nav-item[data-view="adopt"]',
+          ],
+          title: 'Tokenise',
+          body: 'When the journal is ready, seal a stage into a plant token on Devnet.',
+        },
+        {
+          id: 'seal-stage',
+          view: 'adopt',
+          selectors: ['#adopt-seed-section', '#adopt-growth-guide', '#adopt-token-grid'],
+          title: 'Seal a stage',
+          body: 'Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.',
+        },
+        {
+          id: 'market-nav',
+          view: null,
+          selectors: [
+            '.bottom-nav .nav-item[data-view="market"]',
+            '.sidebar-nav .nav-item[data-view="market"]',
+          ],
+          title: 'Market',
+          body: 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.',
+        },
+        {
+          id: 'market-list',
+          view: 'market',
+          selectors: ['#market-list-section', '#market-mine-grid', '#market-grid'],
+          title: 'List an offer',
+          body: 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.',
+        }
+      );
+    } else {
+      steps.push({
+        id: 'chain-optional',
+        view: null,
+        selectors: ['#btn-account'],
+        title: 'Tokenise stays optional',
+        body: 'Seal-on-chain and Market stay out of the nav until you unlock them from Profile. The free journal works without a wallet.',
+      });
+    }
+
+    return steps;
   }
 
   function plantsTabSteps() {

@@ -9,7 +9,9 @@
   const STORAGE_ENTRIES = 'dnevnik-live-entries';
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
   const STORAGE_CHAT = 'dnevnik-live-coach-chat';
+  const STORAGE_DRAFT = 'dnevnik-live-coach-draft';
   const STORAGE_REMINDER_DISMISS = 'dnevnik-live-coach-reminder-dismiss';
+  const PLANT_ID_RE = /\bid-\d{10,}-[a-z0-9]+\b/gi;
 
   const COACH_URL = 'https://coachchat-zwul5y4amq-ew.a.run.app';
 
@@ -150,6 +152,26 @@
     } catch {
       return fallback;
     }
+  }
+
+  function currentAuthUid() {
+    try {
+      if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+        return String(firebase.auth().currentUser.uid || '');
+      }
+    } catch {
+      // ignore
+    }
+    return '';
+  }
+
+  function scopedKey(base) {
+    const uid = currentAuthUid();
+    return uid ? base + ':' + uid : base;
+  }
+
+  function looksLikePlantId(value) {
+    return /^id-\d{10,}-[a-z0-9]+$/i.test(String(value == null ? '' : value).trim());
   }
 
   function isGrower() {
@@ -459,6 +481,60 @@
     );
   }
 
+  /** User-facing plant name — never a raw internal id. */
+  function plantLabel(ref, action) {
+    const plant = resolvePlant(ref);
+    if (plant && plant.name) return String(plant.name);
+    if (action && action.plantName && !looksLikePlantId(action.plantName)) {
+      return String(action.plantName);
+    }
+    if (action && action.name && !looksLikePlantId(action.name)) {
+      return String(action.name);
+    }
+    if (ref && !looksLikePlantId(ref)) return String(ref);
+    return 'your plant';
+  }
+
+  function enrichAction(action) {
+    if (!action || typeof action !== 'object') return action;
+    const next = Object.assign({}, action);
+    if (next.plantId) {
+      const plant = resolvePlant(next.plantId);
+      if (plant && plant.name) next.plantName = plant.name;
+      else if (!next.plantName || looksLikePlantId(next.plantName)) {
+        // Keep a prior human name if we already stored one; never persist raw ids as names.
+        if (looksLikePlantId(next.plantName)) delete next.plantName;
+      }
+    }
+    return next;
+  }
+
+  function humanizeCoachText(text) {
+    return String(text == null ? '' : text).replace(PLANT_ID_RE, function (id) {
+      return plantLabel(id);
+    });
+  }
+
+  function actionRequiresLivingPlant(action) {
+    if (!action || !action.type) return false;
+    return (
+      action.type === 'add_entry' ||
+      action.type === 'set_stage' ||
+      action.type === 'link_plant' ||
+      action.type === 'import_seed' ||
+      action.type === 'mint_growth'
+    );
+  }
+
+  function actionPlantAvailable(action) {
+    if (!actionRequiresLivingPlant(action)) return true;
+    if (!action.plantId) return action.type === 'mint_growth' ? !!action.tokenId : true;
+    if (resolvePlant(action.plantId)) return true;
+    // Don't wipe drafts while journal state is still empty/hydrating.
+    if (!getPlants().length) return true;
+    return false;
+  }
+
   function findTokenForPlant(plantId) {
     if (!window.PlantToken || typeof PlantToken.getWallet !== 'function') return null;
     const wallet = PlantToken.getWallet();
@@ -578,9 +654,10 @@
 
   function actionLabel(action) {
     if (!action || !action.type) return 'Unknown action';
+    const name = plantLabel(action.plantId, action);
     switch (action.type) {
       case 'create_plant':
-        return 'Create plant “' + (action.name || 'Untitled') + '”';
+        return 'Create plant “' + (action.name && !looksLikePlantId(action.name) ? action.name : 'Untitled') + '”';
       case 'add_entry': {
         var et = action.entryType || 'entry';
         var etLabel =
@@ -588,22 +665,21 @@
             typeof DnevnikNotifications.entryTypeLabel === 'function' &&
             DnevnikNotifications.entryTypeLabel(et)) ||
           et;
-        var plantRef = resolvePlant(action.plantId);
-        var plantLabel = plantRef
-          ? '“' + plantRef.name + '”'
-          : action.plantId
-            ? 'plant ' + String(action.plantId).slice(0, 12)
-            : 'plant';
-        return 'Log ' + etLabel + ' for ' + plantLabel;
+        return 'Log ' + etLabel + ' for “' + name + '”';
       }
       case 'set_stage':
-        return 'Set stage → ' + (STAGE_LABELS[action.stage] || action.stage || '?');
+        return (
+          'Set “' +
+          name +
+          '” → ' +
+          (STAGE_LABELS[action.stage] || action.stage || '?')
+        );
       case 'import_seed':
-        return 'Mint seed token for ' + (action.plantId || action.name || 'plant');
+        return 'Mint seed token for “' + name + '”';
       case 'mint_growth':
-        return 'Mint next growth stage';
+        return 'Mint next growth stage' + (name !== 'your plant' ? ' for “' + name + '”' : '');
       case 'link_plant':
-        return 'Link token to plant ' + (action.plantId || '');
+        return 'Link token to “' + name + '”';
       default:
         return String(action.type);
     }
@@ -644,6 +720,7 @@
         actions.push({
           type: 'add_entry',
           plantId: plant.id,
+          plantName: plant.name,
           entryType: feedMatch && !waterMatch ? 'gnojidba' : waterMatch ? 'zalijevanje' : 'gnojidba',
           note: feedMatch && !waterMatch ? 'Feeding logged via Grower Coach' : 'Watering logged via Grower Coach',
         });
@@ -666,7 +743,13 @@
       const plant = resolvePlant(stageMatch2[1]);
       const stage = resolveStage(stageMatch2[2]);
       if (plant && stage) {
-        actions.push({ type: 'set_stage', plantId: plant.id, stage: stage, note: 'Updated via Grower Coach' });
+        actions.push({
+          type: 'set_stage',
+          plantId: plant.id,
+          plantName: plant.name,
+          stage: stage,
+          note: 'Updated via Grower Coach',
+        });
         reply = (reply ? reply + '\n' : '') + 'I can move “' + plant.name + '” to ' + (STAGE_LABELS[stage] || stage) + '.';
       }
     }
@@ -674,7 +757,13 @@
     if (/(?:mint\s+(?:a\s+)?seed|tokenise|tokenize)/i.test(lower)) {
       const plant = resolvePlant(context.focusPlant && context.focusPlant.id);
       if (plant) {
-        actions.push({ type: 'import_seed', plantId: plant.id, name: plant.name, strain: plant.strain || plant.name });
+        actions.push({
+          type: 'import_seed',
+          plantId: plant.id,
+          plantName: plant.name,
+          name: plant.name,
+          strain: plant.strain || plant.name,
+        });
         reply = (reply ? reply + '\n' : '') + 'I can mint a Seed NFT for “' + plant.name + '” (wallet must be connected).';
       }
     }
@@ -683,7 +772,12 @@
       const plant = resolvePlant(context.focusPlant && context.focusPlant.id);
       const token = plant ? findTokenForPlant(plant.id) : null;
       if (token) {
-        actions.push({ type: 'mint_growth', tokenId: token.id, plantId: plant.id });
+        actions.push({
+          type: 'mint_growth',
+          tokenId: token.id,
+          plantId: plant.id,
+          plantName: plant.name,
+        });
         reply = (reply ? reply + '\n' : '') + 'I can try minting the next growth stage for “' + token.name + '”.';
       } else {
         reply = (reply ? reply + '\n' : '') + 'No linked token found — mint a seed first or name the plant.';
@@ -895,16 +989,114 @@
   }
 
   function loadHistory() {
-    const saved = readJson(STORAGE_CHAT, []);
+    const key = scopedKey(STORAGE_CHAT);
+    let saved = readJson(key, null);
+    // Migrate legacy unscoped chat into the signed-in account once.
+    if (!Array.isArray(saved)) {
+      const legacy = readJson(STORAGE_CHAT, []);
+      if (Array.isArray(legacy) && legacy.length && currentAuthUid()) {
+        saved = legacy;
+        try {
+          localStorage.setItem(key, JSON.stringify(legacy.slice(-20)));
+          localStorage.removeItem(STORAGE_CHAT);
+        } catch {
+          // ignore
+        }
+      } else {
+        saved = Array.isArray(legacy) ? legacy : [];
+      }
+    }
     history = Array.isArray(saved) ? saved.slice(-20) : [];
+    sanitizeChatState();
   }
 
   function saveHistory() {
     try {
-      localStorage.setItem(STORAGE_CHAT, JSON.stringify(history.slice(-20)));
+      localStorage.setItem(scopedKey(STORAGE_CHAT), JSON.stringify(history.slice(-20)));
     } catch {
       // ignore
     }
+  }
+
+  function saveComposerDraft() {
+    const input = document.getElementById('ai-coach-input');
+    if (!input) return;
+    try {
+      const value = String(input.value || '');
+      if (value.trim()) localStorage.setItem(scopedKey(STORAGE_DRAFT), value);
+      else localStorage.removeItem(scopedKey(STORAGE_DRAFT));
+    } catch {
+      // ignore
+    }
+  }
+
+  function restoreComposerDraft() {
+    const input = document.getElementById('ai-coach-input');
+    if (!input || busy) return;
+    try {
+      const value = localStorage.getItem(scopedKey(STORAGE_DRAFT)) || '';
+      if (!value) return;
+      // Don't clobber text the user is already editing this session.
+      if (String(input.value || '').trim()) return;
+      input.value = value;
+      autoResizeInput();
+    } catch {
+      // ignore
+    }
+  }
+
+  function clearComposerDraft() {
+    try {
+      localStorage.removeItem(scopedKey(STORAGE_DRAFT));
+      localStorage.removeItem(STORAGE_DRAFT);
+    } catch {
+      // ignore
+    }
+  }
+
+  function sanitizeChatState() {
+    let changed = false;
+    history = (history || []).map(function (m) {
+      if (!m || typeof m !== 'object') return m;
+      const next = Object.assign({}, m);
+      const humanized = humanizeCoachText(next.content);
+      if (humanized !== next.content) {
+        next.content = humanized;
+        changed = true;
+      }
+      if (!Array.isArray(next.actions) || !next.actions.length) {
+        if (next.actions) {
+          delete next.actions;
+          changed = true;
+        }
+        return next;
+      }
+      const before = JSON.stringify(next.actions);
+      const kept = next.actions.map(enrichAction).filter(actionPlantAvailable);
+      if (!kept.length) {
+        delete next.actions;
+        if (!/\bno longer in this journal\b/i.test(String(next.content || ''))) {
+          next.content =
+            String(next.content || '').replace(/\s+$/, '') +
+            '\n\n(That draft referred to a plant that’s no longer in this journal — it was cleared.)';
+        }
+        changed = true;
+      } else {
+        next.actions = kept;
+        if (JSON.stringify(kept) !== before) changed = true;
+      }
+      return next;
+    });
+
+    // Rehydrate confirmable actions after reload/reopen (pendingActions is memory-only).
+    pendingActions = [];
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i] && Array.isArray(history[i].actions) && history[i].actions.length) {
+        pendingActions = history[i].actions.slice();
+        break;
+      }
+    }
+    if (changed) saveHistory();
   }
 
   function setCoachTab(tabId) {
@@ -1030,7 +1222,10 @@
 
     const input = document.getElementById('ai-coach-input');
     if (input) {
-      input.addEventListener('input', autoResizeInput);
+      input.addEventListener('input', function () {
+        autoResizeInput();
+        saveComposerDraft();
+      });
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
@@ -1126,6 +1321,7 @@
     pendingActions = [];
     typing = false;
     saveHistory();
+    clearComposerDraft();
     renderMessages();
     renderQuickPrompts();
     setStatus('Fresh chat');
@@ -1141,11 +1337,13 @@
     if (!reminder || !reminder.plantId) return null;
     const id = String(reminder.id || '');
     const plant = resolvePlant(reminder.plantId);
-    const name = (plant && plant.name) || 'plant';
+    if (!plant || !plant.name) return null;
+    const name = plant.name;
     if (id.indexOf('watering:') === 0 || id.indexOf('predict-heat-water:') === 0) {
       return {
         type: 'add_entry',
         plantId: reminder.plantId,
+        plantName: name,
         entryType: 'zalijevanje',
         note:
           reminder.kind === 'predictive'
@@ -1158,6 +1356,7 @@
       return {
         type: 'add_entry',
         plantId: reminder.plantId,
+        plantName: name,
         entryType: 'gnojidba',
         note: 'Fed — coach draft for ' + name,
         draftFrom: id,
@@ -1189,28 +1388,29 @@
       ask(reminder.prompt || 'What should I check before logging care?');
       return false;
     }
-    pendingActions = [action];
+    const readyAction = enrichAction(action);
+    pendingActions = [readyAction];
+    const plantName = plantLabel(readyAction.plantId, readyAction);
     history.push({
       role: 'assistant',
       content:
         'Draft ready for “' +
-        ((resolvePlant(action.plantId) || {}).name || 'plant') +
+        plantName +
         '”.\n\n' +
-        reminder.message +
+        humanizeCoachText(reminder.message) +
         '\n\nNothing is saved until you confirm — one tap applies it to the journal trail.',
       at: Date.now(),
       source: 'local',
-      actions: [action],
+      actions: [readyAction],
     });
     if (window.CoachCore && typeof CoachCore.logActivity === 'function') {
-      const plantName = ((resolvePlant(action.plantId) || {}).name || 'plant');
       CoachCore.logActivity({
         kind: 'draft',
-        actionType: action.type,
+        actionType: readyAction.type,
         tier: 'draft',
         title: 'Drafted entry — ' + plantName,
-        body: 'Waiting on your approval — ' + actionLabel(action),
-        plantId: action.plantId,
+        body: 'Waiting on your approval — ' + actionLabel(readyAction),
+        plantId: readyAction.plantId,
         status: 'pending',
       });
     }
@@ -1350,7 +1550,7 @@
           (m.role === 'user' ? 'user' : 'assistant') +
           '">' +
           '<p>' +
-          esc(m.content).replace(/\n/g, '<br/>') +
+          esc(humanizeCoachText(m.content)).replace(/\n/g, '<br/>') +
           '</p>';
         if (m.actions && m.actions.length) {
           const tiers = m.actions.map(function (a) {
@@ -1429,21 +1629,10 @@
     if (open) {
       // Reload from storage so a closed panel still shows the last chat.
       if (!busy) loadHistory();
-      // Drop draft actions that point at plants no longer in this account.
-      pendingActions = (pendingActions || []).filter(function (a) {
-        if (!a) return false;
-        if (
-          a.type !== 'add_entry' &&
-          a.type !== 'set_stage' &&
-          a.type !== 'link_plant'
-        ) {
-          return true;
-        }
-        if (!a.plantId) return true;
-        return !!resolvePlant(a.plantId);
-      });
+      else sanitizeChatState();
       renderMessages();
       renderQuickPrompts();
+      restoreComposerDraft();
       setStatus(
         busy
           ? 'Thinking…'
@@ -1461,6 +1650,7 @@
         }, 40);
       }
     } else {
+      saveComposerDraft();
       stopVoice();
       document.documentElement.style.setProperty('--coach-kbd-inset', '0px');
     }
@@ -1611,8 +1801,9 @@
       input.value = '';
       autoResizeInput();
     }
+    clearComposerDraft();
 
-    history.push({ role: 'user', content: text, at: Date.now() });
+    history.push({ role: 'user', content: humanizeCoachText(text), at: Date.now() });
     typing = true;
     busy = true;
     setStatus('Thinking…');
@@ -1620,7 +1811,11 @@
     saveHistory();
 
     const sendBtn = document.getElementById('ai-coach-send');
-    if (sendBtn) sendBtn.disabled = true;
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.classList.add('is-pending');
+      sendBtn.setAttribute('aria-busy', 'true');
+    }
     if (input) input.disabled = true;
 
     const context = buildContext();
@@ -1653,10 +1848,12 @@
     }
 
     typing = false;
+    actions = (actions || []).map(enrichAction).filter(actionPlantAvailable);
+    reply = humanizeCoachText(reply || 'Ready when you are — try a suggestion below.');
     pendingActions = actions.slice();
     history.push({
       role: 'assistant',
-      content: reply || 'Ready when you are — try a suggestion below.',
+      content: reply,
       at: Date.now(),
       source: source,
       actions: actions.length ? actions : undefined,
@@ -1665,7 +1862,11 @@
     renderMessages();
     busy = false;
     setStatus(actions.length ? 'Confirm actions below' : 'Ready to help');
-    if (sendBtn) sendBtn.disabled = false;
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      sendBtn.classList.remove('is-pending');
+      sendBtn.removeAttribute('aria-busy');
+    }
     if (input) {
       input.disabled = false;
       input.focus();
@@ -1684,6 +1885,20 @@
     return active.id.slice(5);
   }
 
+  let boundChatUid = null;
+
+  function syncAccountChatScope() {
+    const uid = currentAuthUid();
+    if (boundChatUid === uid) return;
+    boundChatUid = uid;
+    if (!busy) loadHistory();
+    else sanitizeChatState();
+    if (open) {
+      renderMessages();
+      restoreComposerDraft();
+    }
+  }
+
   function applyVisibility() {
     ensureDom();
     const root = document.getElementById('ai-coach-root');
@@ -1697,13 +1912,24 @@
     if (fab) fab.hidden = true;
     document.body.classList.remove('coach-fab-visible');
     if (!show) close();
+    else syncAccountChatScope();
   }
 
   function init() {
-    loadHistory();
     ensureDom();
+    loadHistory();
+    boundChatUid = currentAuthUid();
     applyVisibility();
     renderMessages();
+    try {
+      if (window.firebase && firebase.auth) {
+        firebase.auth().onAuthStateChanged(function () {
+          syncAccountChatScope();
+        });
+      }
+    } catch {
+      // ignore
+    }
   }
 
   if (document.readyState === 'loading') {
