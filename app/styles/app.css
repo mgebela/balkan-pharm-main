@@ -3053,6 +3053,22 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 }
 
 /* Toolbox */
+.toolbox-journal-bridge {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  border-radius: 10px;
+  background: rgba(201, 165, 94, 0.07);
+  color: rgba(243, 239, 230, 0.78);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.toolbox-journal-bridge strong {
+  color: #f3efe6;
+  font-weight: 650;
+}
+
 .toolbox-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -5153,6 +5153,117 @@ function initFirebaseSync() {
     scheduleRemoteSync({ toolbox: data || {} });
   }
 
+  /**
+   * Tools keeps quantitative rows for charts; the plant story lives in the Journal.
+   * Mirror each Tools log into a journal entry so the care trail stays one asset.
+   */
+  function mirrorToolboxItemToJournal(tool, item) {
+    if (!item) return null;
+    const plantId =
+      tool === 'watering'
+        ? item.value2 || item.plantId || null
+        : item.plantId || null;
+    if (!plantId) return null;
+
+    let type = 'opcenito';
+    let note = '';
+    let metaExtra = {};
+
+    if (tool === 'watering') {
+      type = 'zalijevanje';
+      const ml = item.value1 != null && String(item.value1).trim() !== '' ? String(item.value1).trim() + ' mL' : '';
+      note = ml ? ml + ' (via Tools)' : 'Watering logged via Tools';
+      metaExtra = { amountMl: item.value1 || null };
+    } else if (tool === 'feeding') {
+      type = 'gnojidba';
+      const parts = [item.value1, item.value2].filter(Boolean).map(String);
+      note = (parts.length ? parts.join(' — ') : 'Feeding') + ' (via Tools)';
+      metaExtra = { product: item.value1 || null, detail: item.value2 || null };
+    } else if (tool === 'environment') {
+      type = 'okolis';
+      const bits = [];
+      if (item.value1) bits.push(String(item.value1) + '°C');
+      if (item.value2) bits.push(String(item.value2) + '% RH');
+      if (item.value3) bits.push('pH ' + String(item.value3));
+      note = (bits.length ? bits.join(' · ') : 'Environment reading') + ' (via Tools)';
+      metaExtra = {
+        temperatureC: item.value1 || null,
+        humidityPct: item.value2 || null,
+        ph: item.value3 || null,
+      };
+    } else if (tool === 'transplant') {
+      type = 'presadjivanje';
+      const bits = [];
+      if (item.soilQuality) bits.push('Soil: ' + item.soilQuality);
+      if (item.plantAge) bits.push('Age: ' + item.plantAge);
+      if (item.plantCondition) bits.push('Condition: ' + item.plantCondition);
+      note = (bits.length ? bits.join(' · ') : 'Transplant') + ' (via Tools)';
+      metaExtra = {
+        presadjivanje: {
+          soilQuality: item.soilQuality || null,
+          plantAge: item.plantAge || null,
+          plantCondition: item.plantCondition || null,
+        },
+      };
+    } else if (tool === 'stressors') {
+      type = 'stresori';
+      const bits = [];
+      if (item.temperature) bits.push('Temp: ' + item.temperature);
+      if (item.humidity) bits.push('Humidity: ' + item.humidity);
+      if (item.vpd) bits.push('VPD: ' + item.vpd);
+      if (item.pests) bits.push('Pests: ' + item.pests);
+      note = (bits.length ? bits.join(' · ') : 'Stressor note') + ' (via Tools)';
+      metaExtra = {
+        stresori: {
+          temperature: item.temperature || null,
+          humidity: item.humidity || null,
+          vpd: item.vpd || null,
+          pests: item.pests || null,
+        },
+      };
+    } else {
+      return null;
+    }
+
+    try {
+      return saveJournalEntry({
+        plantId: plantId,
+        type: type,
+        note: note,
+        date: item.date || localDateYYYYMMDD(),
+        meta: Object.assign(
+          {
+            toolboxTool: tool,
+            toolboxId: item.id || null,
+          },
+          metaExtra
+        ),
+        source: 'toolbox',
+        requireNoteDefault: false,
+      });
+    } catch (err) {
+      console.warn('Tools → Journal mirror failed', err);
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+        DnevnikNotifications.toast(
+          (err && err.message) || 'Saved in Tools, but journal trail did not update.',
+          'warn'
+        );
+      }
+      return null;
+    }
+  }
+
+  function addToolboxRecord(tool, record) {
+    if (blockAdminWrite()) return null;
+    const data = getToolboxData();
+    if (!data[tool]) data[tool] = [];
+    const item = Object.assign({ id: uuid() }, record || {});
+    data[tool].push(item);
+    setToolboxData(data);
+    mirrorToolboxItemToJournal(tool, item);
+    return item;
+  }
+
   function openToolboxPanel(tool) {
     document.querySelectorAll('.toolbox-panel').forEach((p) => {
       const open = p.dataset.tool === tool;
@@ -5422,14 +5533,12 @@ function initFirebaseSync() {
 
   document.getElementById('toolbox-form-watering').addEventListener('submit', (e) => {
     e.preventDefault();
-    const data = getToolboxData();
-    data.watering.push({
-      id: uuid(),
+    addToolboxRecord('watering', {
       date: document.getElementById('tool-watering-date').value,
       value1: document.getElementById('tool-watering-value1').value.trim(),
       value2: document.getElementById('tool-watering-value2').value.trim() || null,
+      plantId: document.getElementById('tool-watering-value2').value.trim() || null,
     });
-    setToolboxData(data);
     document.getElementById('toolbox-form-watering').reset();
     renderToolboxList('watering');
     renderToolboxChart('watering', document.getElementById('toolbox-chart-watering'));
@@ -5437,15 +5546,12 @@ function initFirebaseSync() {
 
   document.getElementById('toolbox-form-feeding').addEventListener('submit', (e) => {
     e.preventDefault();
-    const data = getToolboxData();
-    data.feeding.push({
-      id: uuid(),
+    addToolboxRecord('feeding', {
       date: document.getElementById('tool-feeding-date').value,
       value1: document.getElementById('tool-feeding-value1').value.trim(),
       value2: document.getElementById('tool-feeding-value2').value.trim() || null,
       plantId: document.getElementById('tool-feeding-plant').value.trim() || null,
     });
-    setToolboxData(data);
     document.getElementById('toolbox-form-feeding').reset();
     renderToolboxList('feeding');
     renderToolboxChart('feeding', document.getElementById('toolbox-chart-feeding'));
@@ -5453,16 +5559,13 @@ function initFirebaseSync() {
 
   document.getElementById('toolbox-form-environment').addEventListener('submit', (e) => {
     e.preventDefault();
-    const data = getToolboxData();
-    data.environment.push({
-      id: uuid(),
+    addToolboxRecord('environment', {
       date: document.getElementById('tool-environment-date').value,
       value1: document.getElementById('tool-environment-value1').value.trim(),
       value2: document.getElementById('tool-environment-value2').value.trim() || null,
       value3: document.getElementById('tool-environment-value3').value.trim() || null,
       plantId: document.getElementById('tool-environment-plant').value.trim() || null,
     });
-    setToolboxData(data);
     document.getElementById('toolbox-form-environment').reset();
     renderToolboxList('environment');
     renderToolboxChart('environment', document.getElementById('toolbox-chart-environment'));
@@ -5472,16 +5575,13 @@ function initFirebaseSync() {
   if (transplantForm) {
     transplantForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const data = getToolboxData();
-      data.transplant.push({
-        id: uuid(),
+      addToolboxRecord('transplant', {
         date: document.getElementById('tool-transplant-date').value,
         soilQuality: document.getElementById('tool-transplant-soil').value.trim() || null,
         plantAge: document.getElementById('tool-transplant-age').value.trim() || null,
         plantCondition: document.getElementById('tool-transplant-condition').value.trim() || null,
         plantId: document.getElementById('tool-transplant-plant').value.trim() || null,
       });
-      setToolboxData(data);
       document.getElementById('toolbox-form-transplant').reset();
       renderToolboxList('transplant');
     });
@@ -5491,9 +5591,7 @@ function initFirebaseSync() {
   if (stressorsForm) {
     stressorsForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const data = getToolboxData();
-      data.stressors.push({
-        id: uuid(),
+      addToolboxRecord('stressors', {
         date: document.getElementById('tool-stressors-date').value,
         temperature: document.getElementById('tool-stressors-temp').value.trim() || null,
         humidity: document.getElementById('tool-stressors-humidity').value.trim() || null,
@@ -5501,7 +5599,6 @@ function initFirebaseSync() {
         pests: document.getElementById('tool-stressors-pests').value.trim() || null,
         plantId: document.getElementById('tool-stressors-plant').value.trim() || null,
       });
-      setToolboxData(data);
       document.getElementById('toolbox-form-stressors').reset();
       renderToolboxList('stressors');
     });

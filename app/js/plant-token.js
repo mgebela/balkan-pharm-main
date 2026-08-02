@@ -2619,6 +2619,17 @@
     el.innerHTML = body;
   }
 
+  function signingWalletReady() {
+    const SW = window.SolanaWallet;
+    if (!SW || typeof SW.isConnected !== 'function' || !SW.isConnected()) return false;
+    if (typeof SW.getPublicKey !== 'function' || !SW.getPublicKey()) return false;
+    const provider =
+      typeof SW.getProviderName === 'function' ? SW.getProviderName() : '';
+    if (provider === 'watch-only' || provider === 'manual') return false;
+    if (typeof SW.isWatchOnly === 'function' && SW.isWatchOnly()) return false;
+    return true;
+  }
+
   function renderPlatformBonusPanel() {
     const el = document.getElementById('platform-bonus-panel');
     if (!el) return;
@@ -2634,8 +2645,9 @@
       window.Market && typeof Market.platformBonusStatus === 'function'
         ? Market.platformBonusStatus()
         : null;
+    const canSign = signingWalletReady();
     let body =
-      '<p class="market-hint">Monthly activity bonus — earn up to <strong>50 $GROWTOO</strong> based on plants, seed mints, care weeks, and flowering progress. Platform-funded (Devnet).</p>' +
+      '<p class="market-hint">Monthly activity bonus — earn up to <strong>50 $GROWTOO</strong> based on plants, seed mints, care weeks, and flowering progress. Platform-funded (Devnet). Paid to your connected wallet.</p>' +
       '<details class="platform-bonus-disclosure">' +
       '<summary>How is this calculated?</summary>' +
       '<p>Base 5, plus points for new plants, seed mints, qualifying care weeks, and reaching flower — capped at 50 for ' +
@@ -2656,8 +2668,19 @@
       body +=
         '<p class="market-card-error">' +
         esc(status.error || 'Claim failed') +
-        '</p>' +
-        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Retry claim</button>';
+        '</p>';
+      if (canSign) {
+        body +=
+          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Retry claim</button>';
+      } else {
+        body +=
+          '<p class="market-hint">Reconnect Phantom or Solflare, then retry.</p>' +
+          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">Connect wallet to retry</button>';
+      }
+    } else if (!canSign) {
+      body +=
+        '<p class="market-hint">Bonus is ready to claim — connect a Devnet wallet first so we know where to send the $GROWTOO. Your journal stays free without one.</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">Connect wallet to claim</button>';
     } else {
       body +=
         '<p class="market-hint">You have an unclaimed monthly bonus available.</p>' +
@@ -3213,11 +3236,33 @@
         return;
       }
 
+      const platformConnectBtn = e.target.closest('#platform-bonus-connect-btn');
+      if (platformConnectBtn) {
+        if (busy || platformConnectBtn.disabled) return;
+        const ok = await askConfirm({
+          title: 'Connect wallet to claim?',
+          body:
+            'Your monthly bonus is paid in test $GROWTOO on Solana Devnet. Next you’ll pick Phantom or Solflare so we can send it to that address.\n\nYour journal stays free without a wallet — this step is only for the bonus.',
+          confirmLabel: 'Connect wallet',
+        });
+        if (!ok) return;
+        await handleWalletConnect(platformConnectBtn);
+        renderPlatformBonusPanel();
+        return;
+      }
+
       const platformBtn = e.target.closest('#platform-bonus-claim-btn');
       if (platformBtn) {
         if (busy || platformBtn.disabled) return;
         if (!window.Market || typeof Market.claimPlatformBonus !== 'function') {
           flashError(new Error('Platform bonus is not available.'));
+          return;
+        }
+        if (!signingWalletReady()) {
+          flashError(
+            new Error('Connect Phantom or Solflare first, then claim the bonus.')
+          );
+          renderPlatformBonusPanel();
           return;
         }
         setBusy(true);

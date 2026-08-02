@@ -658,8 +658,9 @@
   // --- actions ----------------------------------------------------------------
 
   /** Ensure a live extension session that can sign (not just a linked profile). */
-  async function ensureSigningWallet(purpose) {
+  async function ensureSigningWallet(purpose, opts) {
     const why = purpose || 'sign';
+    const options = opts || {};
     const SW = window.SolanaWallet;
     if (!SW) throw new Error('Solana wallet module failed to load. Refresh and try again.');
 
@@ -680,6 +681,14 @@
 
     if (SW.isConnected() && SW.getPublicKey()) {
       return assertSigningSession();
+    }
+
+    // Callers that already warned the user (e.g. monthly bonus) must not ambush
+    // with the wallet picker — surface a clear next step instead.
+    if (options.autoConnect === false) {
+      throw new Error(
+        'Connect Phantom or Solflare first to ' + why + '.'
+      );
     }
 
     // Open the normal connect flow so the user can approve in the extension.
@@ -2133,7 +2142,10 @@
     const user = currentUser();
     if (!user) throw new Error('Sign in to claim the platform bonus.');
     if (!isGrowerUi()) throw new Error('Only growers can claim the platform bonus.');
-    const SW = await ensureSigningWallet('claim platform monthly bonus');
+    // UI already prompts connect; never open the wallet picker from Claim.
+    const SW = await ensureSigningWallet('claim platform monthly bonus', {
+      autoConnect: false,
+    });
     const monthKey = currentMonthKey();
     const docId = user.uid + '_' + monthKey;
     const ref = firebase.firestore().collection('platformRewards').doc(docId);
