@@ -581,8 +581,15 @@
     switch (action.type) {
       case 'create_plant':
         return 'Create plant “' + (action.name || 'Untitled') + '”';
-      case 'add_entry':
-        return 'Log ' + (action.entryType || action.type || 'entry') + ' for ' + (action.plantId || 'plant');
+      case 'add_entry': {
+        var et = action.entryType || 'entry';
+        var etLabel =
+          (window.DnevnikNotifications &&
+            typeof DnevnikNotifications.entryTypeLabel === 'function' &&
+            DnevnikNotifications.entryTypeLabel(et)) ||
+          et;
+        return 'Log ' + etLabel + ' for ' + (action.plantId || 'plant');
+      }
       case 'set_stage':
         return 'Set stage → ' + (STAGE_LABELS[action.stage] || action.stage || '?');
       case 'import_seed':
@@ -755,7 +762,12 @@
         note: action.note,
         date: action.date,
       });
-      resultMsg = 'Logged ' + entry.type + ' for “' + plant.name + '”.';
+      var typeLabel =
+        (window.DnevnikNotifications &&
+          typeof DnevnikNotifications.entryTypeLabel === 'function' &&
+          DnevnikNotifications.entryTypeLabel(entry.type)) ||
+        entry.type;
+      resultMsg = 'Logged ' + typeLabel + ' for “' + plant.name + '”.';
     } else if (type === 'set_stage') {
       if (!DJ || typeof DJ.setPlantStage !== 'function') throw new Error('Journal API unavailable');
       const plant = resolvePlant(action.plantId);

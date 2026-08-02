@@ -730,9 +730,28 @@
     });
   }
 
+  /** Journal types are stored as Croatian keys; UI copy stays English. */
+  var ENTRY_TYPE_LABELS = {
+    opcenito: 'General',
+    zalijevanje: 'Watering',
+    gnojidba: 'Feeding',
+    okolis: 'Environment',
+    presadjivanje: 'Transplanting',
+    stresori: 'Stressors',
+    ostalo: 'Other',
+    faza: 'Stage',
+    podfaza: 'Sub-phase',
+  };
+
+  function entryTypeLabel(type) {
+    var key = String(type || '').trim();
+    if (!key) return 'Entry';
+    return ENTRY_TYPE_LABELS[key] || key;
+  }
+
   function notifyJournalEntry(entry, plantName) {
     if (!entry) return;
-    const typeLabel = entry.type || 'log';
+    const typeLabel = entryTypeLabel(entry.type);
     push({
       type: 'journal_entry',
       title: 'Journal log saved',
@@ -832,7 +851,7 @@
       {
         type: 'journal_entry',
         title: 'Journal log saved',
-        body: 'Northern Lights · zalijevanje — Morning feed complete.',
+        body: 'Northern Lights · Watering — Morning feed complete.',
         createdAt: iso(5),
         meta: { key: 'demo:journal', plantId: null, demo: true },
         action: { view: 'plants' },
@@ -1101,6 +1120,7 @@
     bindStatusHooks: bindStatusHooks,
     notifyCareProgress: notifyCareProgress,
     notifyJournalEntry: notifyJournalEntry,
+    entryTypeLabel: entryTypeLabel,
     syncCareDueFromCoach: syncCareDueFromCoach,
   };
 

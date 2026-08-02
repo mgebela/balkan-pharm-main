@@ -4678,10 +4678,7 @@ function initFirebaseSync() {
     const plantSelect = document.getElementById('entry-plant');
     if (plantSelect) plantSelect.disabled = false;
     modalEntry.classList.remove('open');
-    if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-      const typeLabel = ENTRY_TYPE_LABELS[type] || type || 'Entry';
-      DnevnikNotifications.toast(typeLabel + ' logged', 'success');
-    }
+    // Toast comes from notifyJournalEntry (English type labels) — avoid a second toast.
     renderJournal();
     renderDashboard();
   });

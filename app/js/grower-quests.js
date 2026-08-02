@@ -213,7 +213,7 @@
     items.push({
       id: 'watering',
       label: 'Log watering for this stage',
-      hint: 'Add a zalijevanje entry or Tools → Watering for this plant',
+      hint: 'Add a watering entry or Tools → Watering for this plant',
       ok: !!water.ok,
       xp: QUEST_XP.watering,
       action: plantId ? 'growlog:' + plantId : 'toolbox',
