@@ -1800,7 +1800,10 @@ function syncMoreNavVisibility() {
 }
 
 function defaultViewForProfile() {
-  return isAdopterProfile() ? 'adopt' : 'plants';
+  // Growers land on the Journal dashboard, not Plants — that's where the
+  // TODAY card (Log watering / Ask coach) lives, and those are the two
+  // actions a grower actually reaches for daily.
+  return isAdopterProfile() ? 'adopt' : 'dashboard';
 }
 
 function isViewAllowedForProfile(viewId) {
@@ -2822,6 +2825,7 @@ function initFirebaseSync() {
     }
     const bottomLog = document.getElementById('bottom-nav-log');
     const sideLog = document.getElementById('sidebar-log-btn');
+    const plantsQuickLog = document.getElementById('plants-quick-log');
     const backdrop = document.getElementById('log-sheet-backdrop');
     const closeBtn = document.getElementById('log-sheet-close');
     const water = document.getElementById('log-sheet-water');
@@ -2830,6 +2834,9 @@ function initFirebaseSync() {
     const addPlant = document.getElementById('log-sheet-add-plant');
     if (bottomLog) bottomLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
     if (sideLog) sideLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
+    // Plants is the grower's default landing view — mirror the Journal TODAY
+    // card's quick actions here too, since that's most often the first screen.
+    if (plantsQuickLog) plantsQuickLog.addEventListener('click', function (e) { e.preventDefault(); toggleLog(); });
     if (backdrop) backdrop.addEventListener('click', function () { setLogSheetOpen(false); });
     if (closeBtn) closeBtn.addEventListener('click', function () { setLogSheetOpen(false); });
     if (addPlant) {
