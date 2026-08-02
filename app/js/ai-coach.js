@@ -1431,7 +1431,12 @@
       if (!busy) loadHistory();
       // Drop draft actions that point at plants no longer in this account.
       pendingActions = (pendingActions || []).filter(function (a) {
-        if (!a || a.type !== 'add_entry' && a.type !== 'set_stage' && a.type !== 'link_plant') {
+        if (!a) return false;
+        if (
+          a.type !== 'add_entry' &&
+          a.type !== 'set_stage' &&
+          a.type !== 'link_plant'
+        ) {
           return true;
         }
         if (!a.plantId) return true;
