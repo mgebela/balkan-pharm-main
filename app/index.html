@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260802y" />
+  <link rel="stylesheet" href="styles/app.css?v=20260802z" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -44,9 +44,9 @@
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8a2 2 0 012 2v14l-6-3-6 3V6a2 2 0 012-2z"/><path d="M10 9h4M10 13h4"/></svg></span>
           <span>Log</span>
         </button>
-        <button type="button" class="nav-item nav-item-coach grower-only" id="sidebar-coach-btn" aria-controls="ai-coach-panel" aria-expanded="false">
-          <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
-          <span>Coach</span>
+        <button type="button" class="nav-item nav-item-coach grower-only" id="sidebar-coach-btn" aria-controls="ai-coach-panel" aria-expanded="false" aria-label="Open Grow coach">
+          <span class="nav-icon nav-coach-mark" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
+          <span class="nav-coach-label">Coach</span>
         </button>
         <a href="#" class="nav-item" data-view="adopt">
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
@@ -104,8 +104,8 @@
         aria-expanded="false"
         aria-controls="ai-coach-panel"
       >
-        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
-        <span class="bottom-nav-label">Coach</span>
+        <span class="nav-icon nav-coach-mark" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
+        <span class="bottom-nav-label nav-coach-label">Coach</span>
       </button>
       <a href="#" class="nav-item" data-view="adopt">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg></span>
@@ -145,7 +145,8 @@
               <span>Plants &amp; care logs</span>
             </span>
           </a>
-          <button type="button" class="more-nav-item grower-only" id="more-nav-coach">
+          <button type="button" class="more-nav-item more-nav-item--coach grower-only" id="more-nav-coach">
+            <span class="nav-icon nav-coach-mark" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
             <span class="more-nav-copy">
               <strong>Coach</strong>
               <span>Ask what to log or care for next</span>
