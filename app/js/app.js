@@ -2791,6 +2791,27 @@ function initFirebaseSync() {
     if (closeBtn) closeBtn.addEventListener('click', function () { setMoreNavOpen(false); });
   })();
 
+  function openGrowCoachFromNav() {
+    if (blockAdminWrite()) return;
+    setMoreNavOpen(false);
+    setLogSheetOpen(false);
+    if (window.AICoach && typeof AICoach.open === 'function') {
+      AICoach.open();
+    }
+  }
+
+  (function bindCoachNav() {
+    ['bottom-nav-coach', 'sidebar-coach-btn', 'more-nav-coach'].forEach(function (id) {
+      const btn = document.getElementById(id);
+      if (!btn || btn.dataset.coachBound === '1') return;
+      btn.dataset.coachBound = '1';
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        openGrowCoachFromNav();
+      });
+    });
+  })();
+
   (function bindLogSheet() {
     function toggleLog() {
       if (blockAdminWrite()) return;

@@ -1611,6 +1611,13 @@
     renderQuickPrompts();
   }
 
+  function syncCoachNavState(isOpen) {
+    document.querySelectorAll('.nav-item-coach, #more-nav-coach').forEach(function (btn) {
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      btn.classList.toggle('active', !!isOpen);
+    });
+  }
+
   function setOpen(next) {
     open = !!next;
     const panel = document.getElementById('ai-coach-panel');
@@ -1625,6 +1632,7 @@
       fab.hidden = true;
     }
     document.body.classList.toggle('ai-coach-open', open);
+    syncCoachNavState(open);
     syncCoachKeyboardInset();
     if (open) {
       // Reload from storage so a closed panel still shows the last chat.

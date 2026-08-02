@@ -9712,11 +9712,27 @@ table td {
   display: none !important;
 }
 
-.sidebar-nav .nav-item-log {
+.sidebar-nav .nav-item-log,
+.sidebar-nav .nav-item-coach {
   width: 100%;
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+body.ai-coach-open .nav-item-coach,
+body.ai-coach-open #more-nav-coach {
+  color: var(--brass);
+}
+
+.more-nav-list > .more-nav-item#more-nav-coach {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  border: 0;
+  background: transparent;
 }
 
 @media (max-width: 768px) {
