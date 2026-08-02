@@ -1,5 +1,8 @@
 # Deploy firestore.rules whenever it changes on main.
-# Requires repo secret FIREBASE_SERVICE_ACCOUNT_JSON (same as chain-queues).
+# Uses the Firebase Rules API (not `firebase deploy`) so the CI service
+# account does not need Service Usage Viewer.
+#
+# Required secret: FIREBASE_SERVICE_ACCOUNT_JSON
 name: Deploy Firestore rules
 
 on:
@@ -7,7 +10,7 @@ on:
     branches: [main]
     paths:
       - 'firestore.rules'
-      - 'firestore.indexes.json'
+      - 'scripts/deploy-firestore-rules.mjs'
       - '.github/workflows/deploy-firestore-rules.yml'
   workflow_dispatch:
 
@@ -29,25 +32,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
 
-      - name: Install Firebase CLI
-        run: npm ci
-
-      - name: Authenticate to Firebase
+      - name: Deploy rules via Rules API
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_PROJECT: balpha-9dab9
         run: |
           if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ]; then
             echo "::error::Missing FIREBASE_SERVICE_ACCOUNT_JSON secret."
             exit 1
           fi
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT_JSON" > "$RUNNER_TEMP/firebase-sa.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/firebase-sa.json" >> "$GITHUB_ENV"
+          node scripts/deploy-firestore-rules.mjs
 
-      - name: Deploy rules
-        run: npx firebase deploy --only firestore:rules --project balpha-9dab9 --non-interactive
-
-      - name: Cleanup credentials
-        if: always()
-        run: rm -f "$RUNNER_TEMP/firebase-sa.json"
+      - name: Verify marketListings is not publicly readable
+        run: |
+          code=$(curl -sS -o /tmp/ml.json -w "%{http_code}" \
+            "https://firestore.googleapis.com/v1/projects/balpha-9dab9/databases/(default)/documents/marketListings?pageSize=1")
+          echo "marketListings HTTP $code"
+          if [ "$code" != "403" ]; then
+            echo "::error::Expected 403 for unauthenticated marketListings read, got $code"
+            cat /tmp/ml.json
+            exit 1
+          fi
