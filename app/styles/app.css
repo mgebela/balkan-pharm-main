@@ -9732,10 +9732,40 @@ table td {
   color: var(--text-muted);
 }
 
+/* Log = key journal feature, same standing as Coach: persistent brass badge, not hover-only. */
+.nav-log-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  background: var(--brass);
+  color: var(--brass-ink);
+  border: 1px solid var(--brass-hover);
+}
+
+.nav-log-mark .nav-svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--brass-ink);
+}
+
+.nav-log-label {
+  color: var(--brass);
+  font-weight: 700;
+}
+
+.sidebar-nav .nav-item-log {
+  background: rgba(201, 165, 94, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(201, 165, 94, 0.28);
+  color: var(--brass);
+}
+
 .sidebar-nav .nav-item-log:hover,
 .sidebar-nav .nav-item-log:focus-visible {
-  background: rgba(201, 165, 94, 0.08);
-  color: var(--text);
+  background: rgba(201, 165, 94, 0.16);
+  color: var(--brass-hover);
 }
 
 /* Coach = key journal feature: brass mark + soft pulse so it stands out in the tab row. */

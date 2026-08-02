@@ -616,6 +616,38 @@
 
     const reminders = buildReminders(plants, entries, toolbox);
 
+    // Real recent readings (not just counts) so the coach can reason about actual
+    // conditions — "humidity's high for flowering" instead of only "3 logs exist".
+    // Scoped to the focus plant when one is open; otherwise most-recent across all.
+    function recentToolboxOf(kind, mapFn) {
+      const rows = Array.isArray(toolbox[kind]) ? toolbox[kind] : [];
+      const scoped = focus
+        ? rows.filter((r) => String(r.plantId || r.value2 || '') === String(focus.id))
+        : rows;
+      return scoped
+          .slice()
+          .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+          .slice(0, 3)
+          .map(mapFn);
+    }
+
+    const toolboxRecent = {
+      watering: recentToolboxOf('watering', (r) => ({
+        date: r.date || null,
+        amountMl: r.value1 || null,
+      })),
+      feeding: recentToolboxOf('feeding', (r) => ({
+        date: r.date || null,
+        product: r.value1 || null,
+        detail: r.value2 || null,
+      })),
+      environment: recentToolboxOf('environment', (r) => ({
+        date: r.date || null,
+        temperatureC: r.value1 || null,
+        humidityPct: r.value2 || null,
+      })),
+    };
+
     let growSetup = null;
     let growStyleNote = null;
     try {
@@ -643,6 +675,7 @@
         feeding: Array.isArray(toolbox.feeding) ? toolbox.feeding.length : 0,
         environment: Array.isArray(toolbox.environment) ? toolbox.environment.length : 0,
       },
+      toolboxRecent: toolboxRecent,
       reminders: reminders,
       mintQuest: questHint,
       growSetup: growSetup,
