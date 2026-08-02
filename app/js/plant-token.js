@@ -1989,15 +1989,9 @@
             : 'Fully grown',
         }
       ) +
-      careToolBtn(token.id, 'environment', 'Environment', false, {
-        title: 'Log an environment check',
-      }) +
-      careToolBtn(token.id, 'transplant', 'Transplant', false, {
-        title: 'Log a transplant note',
-      }) +
-      careToolBtn(token.id, 'stress', 'Stress note', false, {
-        title: 'Log pests / stress observation',
-      }) +
+      // Environment/Transplant/Stress note are occasional, not daily — reach
+      // them via "All tools" (Toolbox has a dedicated section for each)
+      // instead of every card carrying all 8 buttons inline.
       careToolBtn(token.id, 'tools', 'All tools', false, {
         title: 'Open the full Tools dashboard',
       }) +
