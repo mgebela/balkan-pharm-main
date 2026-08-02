@@ -24,6 +24,7 @@ import {
   fetchMetadataFromSeeds,
 } from '@metaplex-foundation/mpl-token-metadata';
 import { base58 } from '@metaplex-foundation/umi/serializers';
+import { createRequire } from 'node:module';
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMarketClient, createMintClient, uploadSeedMetadata } from './mint-seed-lib.js';
@@ -38,6 +39,9 @@ import {
 } from './weekly-care.js';
 import { applyCareHistory, toPublicMetadataUri } from './seed-metadata.js';
 import { notifyUser } from './notify-user.js';
+
+const require = createRequire(import.meta.url);
+const { claimPaymentSignature } = require('../functions/used-payment-signatures.js');
 
 const db = initFirestore();
 /** Unpaid invest reservations older than this are released back to active. */
@@ -284,6 +288,11 @@ async function processAdoptSale(doc) {
       amounts.total,
       data.buyerPubkey
     );
+    await claimPaymentSignature(db, data.paymentSignature, doc.id, {
+      buyerUid: data.buyerUid || null,
+      buyerPubkey: data.buyerPubkey || null,
+      source: workerId(),
+    });
 
     const transferSignature = await transferNftFromEscrow(data.mintAddress, data.buyerPubkey);
     let immediateSig = 'zero';

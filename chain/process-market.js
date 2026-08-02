@@ -26,6 +26,7 @@ import {
   findAssociatedTokenPda,
 } from '@metaplex-foundation/mpl-toolbox';
 import { base58 } from '@metaplex-foundation/umi/serializers';
+import { createRequire } from 'node:module';
 import { FieldValue } from 'firebase-admin/firestore';
 import { initFirestore } from './firebase.js';
 import { createMarketClient } from './mint-seed-lib.js';
@@ -33,6 +34,9 @@ import { RPC_URL, readDeployed, LEGACY_ESCROW_ADDRESS } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
 import { notifyUser } from './notify-user.js';
+
+const require = createRequire(import.meta.url);
+const { claimPaymentSignature } = require('../functions/used-payment-signatures.js');
 
 const db = initFirestore();
 /** Unpaid invest reservations older than this are released back to active. */
@@ -327,6 +331,11 @@ async function processSalePending(doc) {
       data.priceGrow,
       data.buyerPubkey
     );
+    await claimPaymentSignature(db, data.paymentSignature, doc.id, {
+      buyerUid: data.buyerUid || null,
+      buyerPubkey: data.buyerPubkey || null,
+      source: workerId(),
+    });
     const transferSignature = await transferNftFromEscrow(data.mintAddress, data.buyerPubkey);
     await doc.ref.update({
       status: 'sold',

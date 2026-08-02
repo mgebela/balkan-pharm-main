@@ -16,8 +16,9 @@ const {
   persistHealth,
 } = require('./tx-health');
 const {kickChainQueues, becamePending} = require('./kick-chain-queues');
-const {getFirestore} = require('firebase-admin/firestore');
+const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {syncMarketPublicTape} = require('./market-public-tape');
+const {reservePaymentSignatureOnListingWrite} = require('./used-payment-signatures');
 const {clientIp} = require('./solana-rpc-proxy');
 
 initializeApp();
@@ -507,13 +508,31 @@ exports.onMarketListingHealth = onDocumentWritten(
       const after = event.data && event.data.after && event.data.after.exists
         ? event.data.after.data()
         : null;
+      const ref = event.data && event.data.after && event.data.after.ref
+        ? event.data.after.ref
+        : event.data && event.data.before && event.data.before.ref
+          ? event.data.before.ref
+          : null;
       try {
         await syncMarketPublicTape(listingId, after);
       } catch (err) {
         console.error('syncMarketPublicTape', listingId, err);
       }
-      if (!after) return;
-      const ref = event.data.after.ref;
+      if (after && ref) {
+        try {
+          await reservePaymentSignatureOnListingWrite(
+              getFirestore(),
+              listingId,
+              before,
+              after,
+              ref,
+              FieldValue,
+          );
+        } catch (err) {
+          console.error('reservePaymentSignature', listingId, err);
+        }
+      }
+      if (!after || !ref) return;
       try {
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         await onMarketListingChange(before, after, ref);

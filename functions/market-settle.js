@@ -12,6 +12,7 @@
  *   GROW_MINT / GROW_DECIMALS (optional; defaults to deployed growtoo mint)
  */
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+const {claimPaymentSignature} = require('./used-payment-signatures');
 const {
   Connection,
   Keypair,
@@ -76,7 +77,11 @@ function loadKeys() {
 
 function isRetryable(err) {
   const msg = String((err && err.message) || err);
-  if (/Payment transaction failed on-chain|Payment too low|Payment does not debit|missing buyer/i.test(msg)) {
+  if (
+    /Payment transaction failed on-chain|Payment too low|Payment does not debit|missing buyer|Payment signature already used/i.test(
+        msg,
+    )
+  ) {
     return false;
   }
   return /block height|expired|429|Too Many|not found on|fetch failed|ECONNRESET|ETIMEDOUT|timeout|503|502|504|rate limit/i.test(
@@ -292,6 +297,11 @@ async function processSale(doc, connection, keys) {
         data.priceGrow,
         data.buyerPubkey,
     );
+    await claimPaymentSignature(doc.ref.firestore, data.paymentSignature, doc.id, {
+      buyerUid: data.buyerUid || null,
+      buyerPubkey: data.buyerPubkey || null,
+      source: WORKER,
+    });
     const holder = await findHolder(connection, data.mintAddress, keys);
     if (!holder) {
       if (await walletHoldsNft(connection, data.buyerPubkey, data.mintAddress)) {

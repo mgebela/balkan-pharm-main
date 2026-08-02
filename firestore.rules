@@ -270,6 +270,23 @@ service cloud.firestore {
     allow update, delete: if false;
   }
 
+  // Consumed $GROWTOO payment tx signatures (one sig → one listing). Admin SDK only.
+  match /usedPaymentSignatures/{signature} {
+    allow read, create, update, delete: if false;
+  }
+
+  function isPendingPaymentSig(sig) {
+    return sig is string
+      && sig.size() >= 8
+      && sig[0:8] == 'pending-';
+  }
+
+  // Real payment sigs must not already be reserved/consumed by another listing.
+  function paymentSigAvailable(sig) {
+    return isPendingPaymentSig(sig)
+      || !exists(/databases/$(database)/documents/usedPaymentSignatures/$(sig));
+  }
+
   // ── Marketplace listings (M4, devnet MVP) ────────────────
   // Legacy: seller escrows NFT to hot wallet; CF/queue settles.
   // Program: seller locks NFT into growtoo_escrow PDA; buy/cancel are atomic.
@@ -342,6 +359,7 @@ service cloud.firestore {
         && isValidSolanaPubkey(request.resource.data.buyerPubkey)
         && request.resource.data.paymentSignature is string
         && request.resource.data.paymentSignature.size() > 0
+        && paymentSigAvailable(request.resource.data.paymentSignature)
         && (
           !('investedAt' in request.resource.data)
           || request.resource.data.investedAt is string
@@ -360,6 +378,7 @@ service cloud.firestore {
         && request.resource.data.paymentSignature is string
         && request.resource.data.paymentSignature.size() > 0
         && request.resource.data.paymentSignature[0:8] != 'pending-'
+        && paymentSigAvailable(request.resource.data.paymentSignature)
         && (
           !('investedAt' in request.resource.data)
           || request.resource.data.investedAt is string
@@ -389,6 +408,7 @@ service cloud.firestore {
         && isValidSolanaPubkey(request.resource.data.buyerPubkey)
         && request.resource.data.paymentSignature is string
         && request.resource.data.paymentSignature.size() > 0
+        && paymentSigAvailable(request.resource.data.paymentSignature)
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly([
             'status',

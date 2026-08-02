@@ -205,32 +205,39 @@ async function loadData() {
       const data = docSnap.data();
 
       const row = document.createElement("tr");
+      const labelCell = document.createElement("td");
+      // Never pipe user-controlled Firestore strings through innerHTML.
+      renderRowInto(labelCell, data);
+      row.appendChild(labelCell);
 
-      const actionsCell = readOnly
-        ? `<button type="button" class="btn btn-ghost btn-sm view-btn">View</button>`
-        : `<button type="button" class="btn btn-ghost btn-sm edit-btn">Edit</button>
-          <button type="button" class="btn btn-ghost btn-sm delete-btn">Delete</button>`;
-
-      row.innerHTML = `
-        <td>${renderRow(data)}</td>
-        <td>${actionsCell}</td>
-      `;
-
+      const actionsCell = document.createElement("td");
       if (readOnly) {
-        row.querySelector(".view-btn").onclick = () => {
+        const viewBtn = document.createElement("button");
+        viewBtn.type = "button";
+        viewBtn.className = "btn btn-ghost btn-sm view-btn";
+        viewBtn.textContent = "View";
+        viewBtn.onclick = () => {
           const page = document.body.dataset.page;
           const merged = deepMerge(structuredClone(schemas[page]), data);
           openModal(merged, true);
         };
+        actionsCell.appendChild(viewBtn);
       } else {
-        row.querySelector(".edit-btn").onclick = () => {
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "btn btn-ghost btn-sm edit-btn";
+        editBtn.textContent = "Edit";
+        editBtn.onclick = () => {
           editId = docSnap.id;
           const page = document.body.dataset.page;
           const merged = deepMerge(structuredClone(schemas[page]), data);
           openModal(merged, false);
         };
-
-        row.querySelector(".delete-btn").onclick = async () => {
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "btn btn-ghost btn-sm delete-btn";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = async () => {
           const label =
             page === "users"
               ? String(data.email || "this user")
@@ -248,7 +255,10 @@ async function loadData() {
           await deleteDoc(doc(db, page, docSnap.id));
           loadData();
         };
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
       }
+      row.appendChild(actionsCell);
 
       table.appendChild(row);
     });
@@ -260,29 +270,39 @@ async function loadData() {
   }
 }
 
-// DISPLAY FORMAT
+// DISPLAY FORMAT — DOM nodes / textContent only (no user HTML).
 // =======================
-function renderRow(data) {
+function renderRowInto(cell, data) {
+  cell.textContent = "";
   if (page === "users") {
-    return (
-      `<span class="admin-users-email">${esc(data.email || "—")}</span>` +
-      `<span class="admin-users-role">${esc(data.role || "user")}</span>`
-    );
+    const email = document.createElement("span");
+    email.className = "admin-users-email";
+    email.textContent = data.email || "—";
+    const role = document.createElement("span");
+    role.className = "admin-users-role";
+    role.textContent = data.role || "user";
+    cell.appendChild(email);
+    cell.appendChild(role);
+    return;
   }
 
   if (page === "plants") {
-    return `${esc(data.metadata?.naziv || "-")} (${esc(data.metadata?.sorta || "-")})`;
+    cell.textContent =
+      (data.metadata?.naziv || "-") + " (" + (data.metadata?.sorta || "-") + ")";
+    return;
   }
 
   if (page === "entries") {
-    return `${esc(data.type || "-")} - ${esc(data.note || "-")}`;
+    cell.textContent = (data.type || "-") + " - " + (data.note || "-");
+    return;
   }
 
   if (page === "tenants") {
-    return `${esc(data.naziv || "-")} (${esc(data.status || "-")})`;
+    cell.textContent = (data.naziv || "-") + " (" + (data.status || "-") + ")";
+    return;
   }
 
-  return esc(JSON.stringify(data));
+  cell.textContent = JSON.stringify(data);
 }
 
 
@@ -301,9 +321,10 @@ if (addBtn && canAdminPanelEdit()) {
 function openModal(data, readOnly = false) {
   modal.classList.add("open");
 
+  const safePage = esc(page);
   modal.innerHTML = `
     <div class="modal-content">
-      <h3>${readOnly ? "View" : editId ? "Edit" : "Add"} ${page}</h3>
+      <h3>${readOnly ? "View" : editId ? "Edit" : "Add"} ${safePage}</h3>
 
       ${generateForm(data, "", readOnly)}
 
