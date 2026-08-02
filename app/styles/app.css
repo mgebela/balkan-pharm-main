@@ -2740,16 +2740,37 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 }
 
 .plant-card {
+  --tint: var(--brass);
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* Same stage-tint scale as the Tokenise token cards — one system, lighter
+   touch here: just a scan-at-a-glance accent, no card restructure. This
+   view stays plain-journal by design (no wallet, no quest framing). */
+.plant-card[data-stage-key="germination"] { --tint: #9ab97f; }
+.plant-card[data-stage-key="seedling"] { --tint: #86ad72; }
+.plant-card[data-stage-key="vegetative"] { --tint: #6f9457; }
+.plant-card[data-stage-key="flowering"] { --tint: #c98a4f; }
+.plant-card[data-stage-key="harvest"] { --tint: #b08f45; }
+
+.plant-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--tint), transparent);
+  opacity: 0.8;
 }
 
 .plant-card:hover {
-  border-color: rgba(180, 71, 43, 0.5);
+  border-color: color-mix(in srgb, var(--tint) 50%, var(--border));
   box-shadow: var(--shadow-md);
 }
 
@@ -6285,6 +6306,8 @@ body.profile-adopter .adopt-hero-text h2 {
   gap: 1.1rem;
 }
 .market-card {
+  --tint: var(--brass);
+  position: relative;
   background:
     linear-gradient(165deg, rgba(16, 32, 22, 0.95) 0%, rgba(8, 18, 12, 0.98) 100%);
   border: 1px solid rgba(140, 200, 140, 0.14);
@@ -6295,9 +6318,25 @@ body.profile-adopter .adopt-hero-text h2 {
   gap: 0.4rem;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+}
+/* Status tint — semantic (available / in-progress / settled / dead), not the
+   plant-stage tint used on token cards: what matters here is "can I still
+   act on this listing", not the grow stage. */
+.market-card[data-status-tint="active"] { --tint: #7fae72; }
+.market-card[data-status-tint="pending"] { --tint: #c9a55e; }
+.market-card[data-status-tint="sold"] { --tint: #b08f45; }
+.market-card[data-status-tint="dead"] { --tint: #8a7266; }
+.market-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--tint), transparent);
+  opacity: 0.85;
 }
 .market-card:hover {
-  border-color: rgba(232, 196, 106, 0.22);
+  border-color: color-mix(in srgb, var(--tint) 45%, rgba(232, 196, 106, 0.22));
   box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
   transform: translateY(-1px);
 }
@@ -6820,6 +6859,41 @@ body.profile-adopter .adopt-hero-text h2 {
   margin: 0.3rem 0 0;
   font-size: 0.75rem;
   color: #f87171;
+}
+
+/* Same disclosure language as .adopt-token-trail — identity, status, price
+   and actions lead; how-it-works copy and chain specifics are a tap away. */
+.market-card-trail {
+  margin: 0.5rem 0 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(8, 14, 10, 0.35);
+  overflow: hidden;
+}
+.market-card-trail-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--tint);
+  user-select: none;
+}
+.market-card-trail-summary::-webkit-details-marker {
+  display: none;
+}
+.market-card-trail-summary::after {
+  content: '▾';
+  float: right;
+}
+.market-card-trail[open] .market-card-trail-summary::after {
+  content: '▴';
+}
+.market-card-trail-body {
+  padding: 0.7rem 0.75rem 0.8rem;
+  display: grid;
+  gap: 0.55rem;
+  border-top: 1px solid var(--border);
 }
 .adopt-progress {
   height: 8px;

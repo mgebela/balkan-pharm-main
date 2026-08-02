@@ -4090,8 +4090,18 @@ function initFirebaseSync() {
         const photoOverlay = p.photo
           ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
           : '';
+        // Same restrained stage-tint language as the token cards on Tokenise —
+        // one visual system, not a separate look per surface.
+        const stageTintKey =
+          {
+            klijanje: 'germination',
+            sadnica: 'seedling',
+            vegetativna: 'vegetative',
+            cvjetanje: 'flowering',
+            susenje: 'harvest',
+          }[p.stage] || 'germination';
         return `
-      <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}">
+      <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}" data-stage-key="${stageTintKey}">
         ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" />${photoOverlay}</div>` : ''}
         <div class="plant-card-header">
           <h3>${escapeHtml(p.name)}</h3>

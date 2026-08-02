@@ -1385,12 +1385,22 @@
     const investLabel =
       listing.settlement === 'adopt_stake' ? 'Adopt · stake' : 'Adopt · buy';
     const showStory = isAdopterUi() || listing.status === 'active';
+    const statusTint =
+      listing.status === 'active'
+        ? 'active'
+        : listing.status === 'sold'
+          ? 'sold'
+          : listing.status === 'cancelled' || listing.status === 'failed'
+            ? 'dead'
+            : 'pending';
     return (
       '<article class="market-card' +
       (isDead ? ' market-card--dead' : '') +
       (isAdopterUi() ? ' market-card--adopter' : '') +
       '" data-id="' +
       esc(listing.id) +
+      '" data-status-tint="' +
+      statusTint +
       '">' +
       '<div class="market-card-head">' +
       assetBadge(listing.assetType) +
@@ -1410,35 +1420,6 @@
       })() +
       '</p>' +
       phaseRail +
-      offerExplainHtml(listing) +
-      careLine +
-      (listing.settlement === 'adopt_stake' && canInvest
-        ? '<p class="market-card-redeem-note">Practice stake only — physical ' +
-          tip('redemption', 'redemption') +
-          ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
-        : '') +
-      chainDetailsHtml(
-        (listing.batch
-          ? '<p class="market-card-meta">Batch <code>' + esc(listing.batch) + '</code></p>'
-          : '') +
-          '<p class="market-card-meta">NFT <a href="' +
-          esc(explorerAddress(listing.mintAddress)) +
-          '" target="_blank" rel="noopener noreferrer"><code>' +
-          esc(shortAddr(listing.mintAddress)) +
-          '</code></a>' +
-          ' · grower <code>' +
-          esc(shortAddr(listing.sellerPubkey)) +
-          '</code>' +
-          (isMine ? ' (you)' : '') +
-          (isBuyer ? ' · your investment' : '') +
-          '</p>' +
-          (listing.listingPda
-            ? '<p class="market-card-meta">Listing PDA <code>' +
-              esc(shortAddr(listing.listingPda)) +
-              '</code></p>'
-            : ''),
-        { summary: 'Chain details' }
-      ) +
       '<div class="market-card-foot">' +
       '<span class="market-price"><span class="market-price-label">' +
       esc(priceLabel) +
@@ -1476,6 +1457,43 @@
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
         : '') +
+      // Reference material — how stake vs instant works, care-escrow numbers,
+      // and chain specifics. Identity, live status, price and the action
+      // buttons above are never hidden; this is background reading.
+      '<details class="market-card-trail">' +
+      '<summary class="market-card-trail-summary">Show listing details</summary>' +
+      '<div class="market-card-trail-body">' +
+      offerExplainHtml(listing) +
+      careLine +
+      (listing.settlement === 'adopt_stake' && canInvest
+        ? '<p class="market-card-redeem-note">Practice stake only — physical ' +
+          tip('redemption', 'redemption') +
+          ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
+        : '') +
+      chainDetailsHtml(
+        (listing.batch
+          ? '<p class="market-card-meta">Batch <code>' + esc(listing.batch) + '</code></p>'
+          : '') +
+          '<p class="market-card-meta">NFT <a href="' +
+          esc(explorerAddress(listing.mintAddress)) +
+          '" target="_blank" rel="noopener noreferrer"><code>' +
+          esc(shortAddr(listing.mintAddress)) +
+          '</code></a>' +
+          ' · grower <code>' +
+          esc(shortAddr(listing.sellerPubkey)) +
+          '</code>' +
+          (isMine ? ' (you)' : '') +
+          (isBuyer ? ' · your investment' : '') +
+          '</p>' +
+          (listing.listingPda
+            ? '<p class="market-card-meta">Listing PDA <code>' +
+              esc(shortAddr(listing.listingPda)) +
+              '</code></p>'
+            : ''),
+        { summary: 'Chain details' }
+      ) +
+      '</div>' +
+      '</details>' +
       '</article>'
     );
   }
