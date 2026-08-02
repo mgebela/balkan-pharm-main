@@ -1375,12 +1375,31 @@
           : linkPlantControlHtml(token)) +
       (isAdopterUi() || token.adopted ? '' : chainMintHtml(token)) +
       growerQuestHtml(token, next) +
-      careWeekHtml(token) +
-      careMonthHtml(token) +
       rankBadgeHtml(token) +
       careToolsHtml(token, next) +
-      adoptStakeActionsHtml(token) +
-      redeemComingLaterHtml(token) +
+      (function () {
+        // Weekly/monthly progress and stake status are reference info, not
+        // daily actions — collapse by default so the card leads with quests
+        // and tools. Force open when there's a real claim button inside, so
+        // an actionable "Claim locked stake" is never hidden behind a tap.
+        // Deliberately NOT chainDetailsHtml/.chain-details — that class is
+        // fully display:none in crypto-simple mode, which would hide a real
+        // claim action, not just collapse it.
+        const stakeHtml = adoptStakeActionsHtml(token);
+        const body = careWeekHtml(token) + careMonthHtml(token) + stakeHtml + redeemComingLaterHtml(token);
+        if (!body) return '';
+        const hasClaimAction = stakeHtml.indexOf('adopt-harvest-claim-btn') !== -1;
+        return (
+          '<details class="progress-details"' +
+          (hasClaimAction ? ' open' : '') +
+          '>' +
+          '<summary class="progress-details-summary">Progress &amp; stake details</summary>' +
+          '<div class="progress-details-body">' +
+          body +
+          '</div>' +
+          '</details>'
+        );
+      })() +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +

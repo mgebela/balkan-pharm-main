@@ -7188,6 +7188,45 @@ body.crypto-simple .chain-details {
 .chain-details-body .adopt-mint-repair {
   margin: 0.25rem 0 0;
 }
+
+/* Weekly/monthly progress + stake status — collapsible like chain-details,
+   but NEVER hidden in crypto-simple mode (unlike .chain-details): this can
+   hold a real "Claim locked stake" action. */
+.progress-details {
+  margin: 0.45rem 0 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(201, 165, 94, 0.16);
+  background: rgba(8, 14, 10, 0.35);
+  overflow: hidden;
+}
+.progress-details-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  user-select: none;
+}
+.progress-details-summary::-webkit-details-marker {
+  display: none;
+}
+.progress-details-summary::after {
+  content: '+';
+  float: right;
+  color: var(--brass);
+  font-weight: 700;
+}
+.progress-details[open] .progress-details-summary::after {
+  content: '−';
+}
+.progress-details-body {
+  padding: 0.35rem 0.7rem 0.6rem;
+  display: grid;
+  gap: 0.5rem;
+}
 .market-card--adopter .chain-details-summary {
   letter-spacing: 0.03em;
 }
