@@ -9722,7 +9722,15 @@ table td {
 
 body.ai-coach-open .nav-item-coach,
 body.ai-coach-open #more-nav-coach {
-  color: var(--brass);
+  color: var(--brass) !important;
+}
+
+.sidebar-nav .nav-item-coach:hover,
+.sidebar-nav .nav-item-coach:focus-visible,
+.sidebar-nav .nav-item-log:hover,
+.sidebar-nav .nav-item-log:focus-visible {
+  color: var(--brass-hover);
+  background: rgba(201, 165, 94, 0.12);
 }
 
 .more-nav-list > .more-nav-item#more-nav-coach {
@@ -9742,19 +9750,57 @@ body.ai-coach-open #more-nav-coach {
   }
 
   .bottom-nav .nav-item {
-    color: rgba(184, 196, 176, 0.55);
+    color: rgba(243, 239, 230, 0.78);
+  }
+
+  .bottom-nav .nav-item:hover,
+  .bottom-nav .nav-item:focus-visible {
+    background: rgba(201, 165, 94, 0.16);
+    color: var(--brass-hover);
+  }
+
+  .bottom-nav .nav-item:active {
+    background: rgba(201, 165, 94, 0.22);
+    color: var(--brass);
   }
 
   .bottom-nav .nav-item.active {
-    background: transparent;
+    background: rgba(201, 165, 94, 0.14);
     color: var(--brass);
+  }
+
+  /* Log + Coach: readable brass on the dark bar (never brass-ink / washed white). */
+  .bottom-nav-log,
+  .bottom-nav .nav-item-coach {
+    color: var(--brass);
+  }
+
+  .bottom-nav-log .bottom-nav-label,
+  .bottom-nav .nav-item-coach .bottom-nav-label,
+  .bottom-nav .nav-item-coach .nav-icon {
+    color: var(--brass);
+    opacity: 1;
+  }
+
+  .bottom-nav-log:hover,
+  .bottom-nav-log:focus-visible,
+  .bottom-nav .nav-item-coach:hover,
+  .bottom-nav .nav-item-coach:focus-visible {
+    color: var(--brass-hover);
+    background: rgba(201, 165, 94, 0.18);
+  }
+
+  .bottom-nav-log:active,
+  .bottom-nav .nav-item-coach:active,
+  body.ai-coach-open .bottom-nav .nav-item-coach {
+    color: var(--brass);
+    background: rgba(201, 165, 94, 0.22);
   }
 
   .bottom-nav-log {
     position: relative;
     top: -0.85rem;
     flex: 1 1 0;
-    color: var(--brass-ink) !important;
   }
 
   .bottom-nav-log .bottom-nav-log-fab {
@@ -9770,18 +9816,25 @@ body.ai-coach-open #more-nav-coach {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
   }
 
+  .bottom-nav-log .bottom-nav-log-fab .nav-svg {
+    color: var(--brass-ink);
+  }
+
   .bottom-nav-log .nav-svg {
     width: 1.35rem;
     height: 1.35rem;
   }
 
   .bottom-nav-log .bottom-nav-label {
-    color: var(--brass);
     font-weight: 700;
   }
 
   .bottom-nav-log[aria-expanded='true'] .bottom-nav-log-fab {
     background: var(--brass-hover);
+  }
+
+  .bottom-nav-log[aria-expanded='true'] .bottom-nav-label {
+    color: var(--brass-hover);
   }
 
   .main {
