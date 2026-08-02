@@ -735,14 +735,12 @@
         escrowSignature: result.signature,
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
-        ...(function () {
+        // Do not embed journal notes or base64 photos on the listing doc —
+        // those leak to every signed-in market reader. Card UI uses botanical art
+        // + stage label; seller-local enrichListingStory can still fill from device.
+        journalStage: (function () {
           const story = storySnapshotForPlant(token.plantId);
-          if (!story) return {};
-          return {
-            photo: story.photo || null,
-            journalSnippets: story.journalSnippets || [],
-            journalStage: story.journalStage || null,
-          };
+          return (story && story.journalStage) || null;
         })(),
       });
     } else {
@@ -788,10 +786,8 @@
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
       };
-      if (story) {
-        listing.photo = story.photo || null;
-        listing.journalSnippets = story.journalSnippets || [];
-        listing.journalStage = story.journalStage || null;
+      if (story && story.journalStage) {
+        listing.journalStage = story.journalStage;
       }
       if (stakeMode) {
         listing.stakeLockedBps = 5000;

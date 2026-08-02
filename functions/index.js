@@ -17,6 +17,8 @@ const {
 } = require('./tx-health');
 const {kickChainQueues, becamePending} = require('./kick-chain-queues');
 const {getFirestore} = require('firebase-admin/firestore');
+const {syncMarketPublicTape} = require('./market-public-tape');
+const {clientIp} = require('./solana-rpc-proxy');
 
 initializeApp();
 
@@ -28,11 +30,8 @@ const REGION = 'europe-west1';
 /** Simple in-memory rate limit for the public reconcile HTTP endpoint. */
 const reconcileHits = new Map();
 function allowReconcileRequest(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  const ip =
-    (forwarded && String(forwarded).split(',')[0].trim()) ||
-    req.ip ||
-    'unknown';
+  // Use platform-appended IP (see clientIp) — not client-controlled leftmost XFF.
+  const ip = clientIp(req);
   const now = Date.now();
   const windowMs = 60 * 1000;
   const max = 12;
@@ -490,7 +489,7 @@ exports.coachChat = onRequest(
 
 /**
  * After each market listing status change (list / invest / cancel / sold),
- * verify NFT custody on Devnet and write `txHealth` on the doc.
+ * verify NFT custody on Devnet, write `txHealth`, and sync scrubbed public tape.
  */
 exports.onMarketListingHealth = onDocumentWritten(
     {
@@ -501,19 +500,25 @@ exports.onMarketListingHealth = onDocumentWritten(
       maxInstances: 4,
     },
     async (event) => {
+      const listingId = event.params.listingId;
       const before = event.data && event.data.before && event.data.before.exists
         ? event.data.before.data()
         : null;
       const after = event.data && event.data.after && event.data.after.exists
         ? event.data.after.data()
         : null;
+      try {
+        await syncMarketPublicTape(listingId, after);
+      } catch (err) {
+        console.error('syncMarketPublicTape', listingId, err);
+      }
       if (!after) return;
       const ref = event.data.after.ref;
       try {
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         await onMarketListingChange(before, after, ref);
       } catch (err) {
-        console.error('onMarketListingHealth', event.params.listingId, err);
+        console.error('onMarketListingHealth', listingId, err);
       }
     },
 );

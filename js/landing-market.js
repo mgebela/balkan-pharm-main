@@ -1,6 +1,7 @@
 /*
  * Public commodity-style market board for the landing page (no auth).
- * Fetches marketListings from Firestore: open tape + adopter stake totals.
+ * Fetches scrubbed marketPublicTape from Firestore (no auth): open tape +
+ * adopter stake totals. Never reads full marketListings (uids/wallets/journal).
  * When the live tape is empty, shows a clearly labeled sample depth so the
  * board never reads as a dead market on first visit.
  */
@@ -533,7 +534,7 @@
 
     firebase
       .firestore()
-      .collection('marketListings')
+      .collection('marketPublicTape')
       .orderBy('createdAt', 'desc')
       .limit(100)
       .get()

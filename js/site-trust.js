@@ -1,6 +1,9 @@
 /**
  * growtoo age gate + cookie consent (GDPR-oriented).
  * Essential storage (auth, prefs) always allowed; analytics loads only after opt-in.
+ *
+ * Age gate is a UX / legal-notice gesture only (localStorage). It is NOT server-side
+ * access control — do not treat it as authentication or age verification.
  */
 (function () {
   'use strict';

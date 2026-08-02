@@ -62,16 +62,32 @@ function isMethodAllowed(method) {
 
 const hits = new Map();
 
+/**
+ * Client IP for rate limiting.
+ * Clients can prepend spoofed values to X-Forwarded-For; Cloud Run / GCF
+ * append the connecting address, so the *rightmost* hop is the trusted one.
+ * Never prefer the leftmost XFF value.
+ */
 function clientIp(req) {
   const forwarded = req.headers['x-forwarded-for'];
+  if (forwarded) {
+    const parts = String(forwarded)
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  // Express may set req.ip from XFF when trust proxy is on — still better than
+  // leftmost spoof. Socket address is the platform edge if nothing else.
   return (
-    (forwarded && String(forwarded).split(',')[0].trim()) ||
     req.ip ||
+    (req.socket && req.socket.remoteAddress) ||
+    (req.raw && req.raw.socket && req.raw.socket.remoteAddress) ||
     'unknown'
   );
 }
 
-/** ~180 req/min/IP — wallets poll confirmations aggressively. */
+/** ~180 req/min/IP — wallets poll confirmations aggressively. Per-instance Map. */
 function allowRequest(req) {
   const ip = clientIp(req);
   const now = Date.now();
@@ -83,6 +99,12 @@ function allowRequest(req) {
   }
   entry.count += 1;
   hits.set(ip, entry);
+  // Bound map size after cold-start storms
+  if (hits.size > 5000) {
+    for (const [key, val] of hits) {
+      if (now - val.start > windowMs) hits.delete(key);
+    }
+  }
   return entry.count <= max;
 }
 
@@ -197,4 +219,10 @@ async function handleSolanaRpc(req, res) {
   }
 }
 
-module.exports = {handleSolanaRpc, isMethodAllowed, DENIED, ALLOWED_EXTRA};
+module.exports = {
+  handleSolanaRpc,
+  isMethodAllowed,
+  clientIp,
+  DENIED,
+  ALLOWED_EXTRA,
+};
