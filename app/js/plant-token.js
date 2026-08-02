@@ -1349,8 +1349,22 @@
       })
       .join('');
 
+    const stageKey = GROWTH_STAGES[displayStageIndex] ? GROWTH_STAGES[displayStageIndex].key : 'seed';
+    const questCounts = (function () {
+      if (isAdopterUi() || !next || !window.GrowerQuests) return null;
+      const q = GrowerQuests.evaluateGrowthQuest(token, next.key);
+      const items = q && q.items ? q.items : [];
+      return { done: items.filter((i) => i.ok).length, total: items.length };
+    })();
+    const dayCount = (function () {
+      const since = (linkedPlant && linkedPlant.startDate) || token.createdAt;
+      if (!since) return null;
+      const ms = Date.now() - new Date(since).getTime();
+      return ms >= 0 ? Math.floor(ms / 86400000) : null;
+    })();
+
     return (
-      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + displayStageIndex + '">' +
+      '<article class="adopt-token-card' + (isMax ? ' adopt-token-card--grown' : '') + '" data-id="' + esc(token.id) + '" data-stage="' + displayStageIndex + '" data-stage-key="' + esc(stageKey) + '">' +
       '<div class="adopt-token-banner adopt-token-banner--art">' +
       buildPlantGrowSvg(displayStageIndex, { compact: true }) +
       (plantPhoto
@@ -1374,14 +1388,44 @@
           ? '<p class="adopt-token-link">Linked journal plant</p>'
           : linkPlantControlHtml(token)) +
       (isAdopterUi() || token.adopted ? '' : chainMintHtml(token)) +
-      growerQuestHtml(token, next) +
+      // Card-level summary — glanceable, matches what used to require opening
+      // the full checklist below just to see "how close am I".
+      '<div class="adopt-token-statrow">' +
+      (dayCount != null ? '<span>Day ' + dayCount + '</span><span class="sep">·</span>' : '') +
+      (questCounts ? '<span>' + questCounts.done + '/' + questCounts.total + ' quests</span>' : '') +
       rankBadgeHtml(token) +
+      '</div>' +
       careToolsHtml(token, next) +
+      '<div class="adopt-token-actions">' +
+      (token.adopted
+        ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
+          esc(investActionLabel(token)) +
+          '</button>'
+        : isMax
+          ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
+          : mintButtonHtml(token, next)) +
+      '</div>' +
+      '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
+      '<div class="adopt-stage-track">' + dots + '</div>' +
+      '<div class="adopt-token-stats">' +
+      '<span>' +
+      (token.adopted ? 'Invested' : 'Earned') +
+      ': <strong>' +
+      (token.adopted ? Number(token.investedGrow || 0) : earned) +
+      ' $GROWTOO</strong></span>' +
+      '</div>' +
+      // Everything below is reference/secondary — the full quest checklist,
+      // weekly/monthly/stake status, chain/mint specifics, and History/
+      // Journal/Burn. Grouped behind one "grow trail" toggle so the card
+      // leads with identity + today's actions, same idea as the Progress &
+      // stake details dropdown, just extended to the whole card.
+      '<details class="adopt-token-trail">' +
+      '<summary class="adopt-token-trail-summary">Show grow trail</summary>' +
+      '<div class="adopt-token-trail-body">' +
+      growerQuestHtml(token, next) +
       (function () {
-        // Weekly/monthly progress and stake status are reference info, not
-        // daily actions — collapse by default so the card leads with quests
-        // and tools. Force open when there's a real claim button inside, so
-        // an actionable "Claim locked stake" is never hidden behind a tap.
+        // Force open when there's a real claim button inside, so an
+        // actionable "Claim locked stake" is never left an extra tap deep.
         // Deliberately NOT chainDetailsHtml/.chain-details — that class is
         // fully display:none in crypto-simple mode, which would hide a real
         // claim action, not just collapse it.
@@ -1400,22 +1444,6 @@
           '</details>'
         );
       })() +
-      '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
-      '<div class="adopt-stage-track">' + dots + '</div>' +
-      '<div class="adopt-token-stats">' +
-      '<span>' +
-      (token.adopted ? 'Invested' : 'Earned') +
-      ': <strong>' +
-      (token.adopted ? Number(token.investedGrow || 0) : earned) +
-      ' $GROWTOO</strong></span>' +
-      (isAdopterUi() || token.adopted
-        ? ''
-        : '<span class="adopt-token-id" title="' +
-          esc(token.id) +
-          '">#' +
-          esc(token.id.slice(-6)) +
-          '</span>') +
-      '</div>' +
       chainDetailsHtml(
         (isAdopterUi() || token.adopted ? chainMintHtml(token) : '') +
           (token.mintAddress
@@ -1436,14 +1464,6 @@
           summary: 'Chain details',
         }
       ) +
-      '<div class="adopt-token-actions">' +
-      (token.adopted
-        ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
-          esc(investActionLabel(token)) +
-          '</button>'
-        : isMax
-          ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
-          : mintButtonHtml(token, next)) +
       '<div class="adopt-token-actions-secondary">' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
       (token.plantId && !isAdopterUi()
@@ -1452,9 +1472,10 @@
           '">Journal</button>'
         : '') +
       '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' + esc(token.id) + '">Burn</button>' +
-      '</div>' +
-      '</div>' +
-      '</div>' +
+      '</div>' + // .adopt-token-actions-secondary
+      '</div>' + // .adopt-token-trail-body
+      '</details>' + // .adopt-token-trail
+      '</div>' + // .adopt-token-body
       '<ul class="adopt-token-history" id="adopt-hist-' + esc(token.id) + '" hidden>' + history + '</ul>' +
       '</article>'
     );

@@ -5572,6 +5572,7 @@ body:not(.app-loading) {
 }
 
 .adopt-token-card {
+  --tint: var(--brass);
   padding: 0;
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -5580,8 +5581,18 @@ body:not(.app-loading) {
   overflow: hidden;
 }
 
+/* Stage tint — analogous shifts within the site's existing brass/green/rust
+   family, not a new rainbow rarity scale. Read by the banner accent line,
+   hover border, and the trail-summary chevron. */
+.adopt-token-card[data-stage-key="seed"] { --tint: #c9a55e; }
+.adopt-token-card[data-stage-key="germination"] { --tint: #9ab97f; }
+.adopt-token-card[data-stage-key="seedling"] { --tint: #86ad72; }
+.adopt-token-card[data-stage-key="vegetative"] { --tint: #6f9457; }
+.adopt-token-card[data-stage-key="flowering"] { --tint: #c98a4f; }
+.adopt-token-card[data-stage-key="harvest"] { --tint: #b08f45; }
+
 .adopt-token-card:hover {
-  border-color: rgba(180, 71, 43, 0.45);
+  border-color: color-mix(in srgb, var(--tint) 55%, var(--border));
   transform: translateY(-2px);
 }
 
@@ -6856,6 +6867,63 @@ body.profile-adopter .adopt-hero-text h2 {
   font-size: 0.72rem;
   opacity: 0.7;
 }
+
+/* Glanceable card-level summary: day count / quest progress / care level,
+   the "how close am I" answer without opening the full trail. */
+.adopt-token-statrow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}
+.adopt-token-statrow .sep {
+  opacity: 0.5;
+}
+.adopt-token-statrow .adopt-rank-badge {
+  /* Keep the badge's own tier color (rank progression) — only reposition it. */
+  margin: 0 0 0 auto;
+}
+
+/* Whole-card disclosure: quest checklist, weekly/monthly/stake status,
+   chain details, History/Journal/Burn. Same collapsible language as
+   .progress-details, one level up, so the card leads with identity and
+   today's actions and the reference material is one tap away. */
+.adopt-token-trail {
+  margin: 0.6rem 0 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(8, 14, 10, 0.35);
+  overflow: hidden;
+}
+.adopt-token-trail-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--tint);
+  user-select: none;
+}
+.adopt-token-trail-summary::-webkit-details-marker {
+  display: none;
+}
+.adopt-token-trail-summary::after {
+  content: '▾';
+  float: right;
+}
+.adopt-token-trail[open] .adopt-token-trail-summary::after {
+  content: '▴';
+}
+.adopt-token-trail-body {
+  padding: 0 0.75rem 0.8rem;
+  display: grid;
+  gap: 0.6rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+}
 .adopt-token-actions {
   display: flex;
   flex-direction: column;
@@ -7674,8 +7742,17 @@ body.crypto-simple .crypto-simple-only {
 .adopt-token-banner--art {
   min-height: 188px;
   padding: 1rem 0.75rem 1.1rem;
-  background: radial-gradient(ellipse 70% 55% at 50% 42%, rgba(201, 165, 94, 0.08), transparent),
+  background: radial-gradient(ellipse 70% 55% at 50% 42%, color-mix(in srgb, var(--tint) 16%, transparent), transparent),
     #132016;
+}
+
+.adopt-token-banner--art::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--tint), transparent);
+  opacity: 0.9;
 }
 
 .plant-grow-svg .grow-label {
