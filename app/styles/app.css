@@ -9712,25 +9712,34 @@ table td {
   display: none !important;
 }
 
+/* Log/Coach are <button>s — reset UA white chrome so they match <a class="nav-item">. */
 .sidebar-nav .nav-item-log,
-.sidebar-nav .nav-item-coach {
+.sidebar-nav .nav-item-coach,
+.bottom-nav .nav-item-log,
+.bottom-nav .nav-item-coach {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   width: 100%;
   font: inherit;
   text-align: left;
   cursor: pointer;
+  color: var(--text-muted);
+}
+
+.sidebar-nav .nav-item-log:hover,
+.sidebar-nav .nav-item-coach:hover,
+.sidebar-nav .nav-item-log:focus-visible,
+.sidebar-nav .nav-item-coach:focus-visible {
+  background: rgba(201, 165, 94, 0.08);
+  color: var(--text);
 }
 
 body.ai-coach-open .nav-item-coach,
 body.ai-coach-open #more-nav-coach {
   color: var(--brass) !important;
-}
-
-.sidebar-nav .nav-item-coach:hover,
-.sidebar-nav .nav-item-coach:focus-visible,
-.sidebar-nav .nav-item-log:hover,
-.sidebar-nav .nav-item-log:focus-visible {
-  color: var(--brass-hover);
-  background: rgba(201, 165, 94, 0.12);
 }
 
 .more-nav-list > .more-nav-item#more-nav-coach {
