@@ -1227,6 +1227,14 @@
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
     document.getElementById('ai-coach-close').addEventListener('click', close);
     document.getElementById('ai-coach-clear').addEventListener('click', clearChat);
+
+    // The grabber is only shown when the panel is a bottom sheet (mobile);
+    // SheetDrag itself no-ops on the desktop popover layout.
+    const coachHandle = root.querySelector('.ai-coach-sheet-handle');
+    const coachPanel = document.getElementById('ai-coach-panel');
+    if (coachHandle && coachPanel && window.SheetDrag) {
+      SheetDrag.attach(coachHandle, coachPanel, { onDismiss: close });
+    }
     document.getElementById('ai-coach-backdrop').addEventListener('click', function (e) {
       // Only the dimmed overlay closes — never a bubbled composer/panel tap.
       if (e.target === e.currentTarget) close();

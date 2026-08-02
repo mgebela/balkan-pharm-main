@@ -1492,12 +1492,21 @@ function renderAccountProfile() {
       : 'Simple hides mint addresses and chain IDs — plant · stage · ask only.') +
     '</p>' +
     statsHtml +
-    '<div class="account-profile-actions">' +
-    '<button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="' +
-    (cryptoMode === 'advanced' ? 'true' : 'false') +
+    '<div class="account-profile-mode-row">' +
+    '<span class="crypto-mode-status">Detail level</span>' +
+    '<div class="segmented-control" data-crypto-mode-segmented data-active="' +
+    cryptoMode +
     '">' +
-    (cryptoMode === 'simple' ? 'Show advanced details' : 'Use simple view') +
-    '</button>' +
+    '<span class="segmented-thumb" aria-hidden="true"></span>' +
+    '<button type="button" class="segmented-option" data-crypto-mode-btn="simple" role="radio" aria-checked="' +
+    (cryptoMode === 'simple' ? 'true' : 'false') +
+    '">Simple</button>' +
+    '<button type="button" class="segmented-option" data-crypto-mode-btn="advanced" role="radio" aria-checked="' +
+    (cryptoMode === 'advanced' ? 'true' : 'false') +
+    '">Advanced</button>' +
+    '</div>' +
+    '</div>' +
+    '<div class="account-profile-actions">' +
     '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-tour">Replay tour</button>' +
     '<button type="button" class="btn btn-primary btn-sm" id="account-profile-primary">' +
     esc(adopter ? 'Open market' : 'Open journal') +
@@ -2384,7 +2393,11 @@ function initFirebaseSync() {
     if (!reminders.length) {
       container.innerHTML =
         head +
-        '<div class="empty-state">Nothing urgent. Keep logging care — Coach uses your pace and the forecast for the next nudge.</div>';
+        emptyStateHtml({
+          icon: 'coach',
+          lead: 'Nothing urgent',
+          body: 'Keep logging care — Coach uses your pace and the forecast for the next nudge.',
+        });
       return;
     }
 
@@ -2662,10 +2675,29 @@ function initFirebaseSync() {
   });
 });
 
+  /**
+   * Grabber bars on the Log / More sheets are rendered up front but only become
+   * draggable once a sheet is opened. SheetDrag.attach is idempotent.
+   */
+  function bindSheetDrag() {
+    if (!window.SheetDrag) return;
+    const logSheet = document.querySelector('#log-sheet-overlay .log-sheet');
+    const logHandle = document.querySelector('#log-sheet-overlay .log-sheet-handle');
+    if (logSheet && logHandle) {
+      SheetDrag.attach(logHandle, logSheet, { onDismiss: () => setLogSheetOpen(false) });
+    }
+    const moreSheet = document.querySelector('#more-nav-overlay .more-nav-sheet');
+    const moreHandle = document.querySelector('#more-nav-overlay .more-nav-handle');
+    if (moreSheet && moreHandle) {
+      SheetDrag.attach(moreHandle, moreSheet, { onDismiss: () => setMoreNavOpen(false) });
+    }
+  }
+
   function setMoreNavOpen(open) {
     const overlay = document.getElementById('more-nav-overlay');
     const btn = document.getElementById('btn-account');
     if (overlay) overlay.hidden = !open;
+    if (open) bindSheetDrag();
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('more-nav-open', !!open);
     if (open) {
@@ -2689,6 +2721,7 @@ function initFirebaseSync() {
     const btn = document.getElementById('bottom-nav-log');
     const sideBtn = document.getElementById('sidebar-log-btn');
     if (overlay) overlay.hidden = !open;
+    if (open) bindSheetDrag();
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     if (sideBtn) sideBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('log-sheet-open', !!open);
@@ -3625,7 +3658,11 @@ function initFirebaseSync() {
     const recent = entries.slice(-5).reverse();
     if (recentEl) {
       if (recent.length === 0) {
-        recentEl.innerHTML = '<div class="empty-state">No entries yet. Add a plant and start your journal.</div>';
+        recentEl.innerHTML = emptyStateHtml({
+          icon: 'journal',
+          lead: 'No entries yet',
+          body: 'Add a plant and start your journal.',
+        });
       } else {
         recentEl.innerHTML = recent
           .map((e) => {
@@ -3724,6 +3761,15 @@ function initFirebaseSync() {
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  /** Shared first-run empty state (icon + headline + body + one CTA). */
+  function emptyStateHtml(opts) {
+    const o = opts || {};
+    if (window.GrowtooPlain && typeof GrowtooPlain.emptyStateHtml === 'function') {
+      return GrowtooPlain.emptyStateHtml(o);
+    }
+    return '<div class="empty-state">' + escapeHtml(o.lead || '') + '</div>';
   }
 
   const WEATHER_API_KEY = '4fcd0d4855e24280a52121246261504';
@@ -4067,7 +4113,13 @@ function initFirebaseSync() {
     const list = document.getElementById('plants-list');
     const plants = getPlants();
     if (plants.length === 0) {
-      list.innerHTML = '<div class="empty-state">You have no plants. Click "New plant" to add your first one.</div>';
+      list.innerHTML = emptyStateHtml({
+        icon: 'plant',
+        lead: 'No plants yet',
+        body: 'Add your first plant to start a grow journal.',
+        ctaId: 'empty-add-plant',
+        ctaLabel: '+ New plant',
+      });
       return;
     }
     list.innerHTML = plants
@@ -4447,6 +4499,24 @@ function initFirebaseSync() {
   document.getElementById('btn-add-plant').addEventListener('click', () => {
     if (blockAdminWrite()) return;
     openPlantModal();
+  });
+
+  // Empty-state CTAs reuse the real "New plant" / "New entry" flows rather than
+  // duplicating them — one delegated listener, since the states re-render often.
+  document.addEventListener('click', (e) => {
+    const addPlant = e.target.closest('#empty-add-plant');
+    if (addPlant) {
+      e.preventDefault();
+      const real = document.getElementById('btn-add-plant');
+      if (real) real.click();
+      return;
+    }
+    const addEntry = e.target.closest('#empty-add-entry');
+    if (addEntry) {
+      e.preventDefault();
+      const real = document.getElementById('btn-add-entry');
+      if (real) real.click();
+    }
   });
 
   const plantFormNext = document.getElementById('plant-form-next');
@@ -4852,7 +4922,13 @@ function initFirebaseSync() {
     const container = document.getElementById('journal-entries');
     const plants = getPlants();
     if (entries.length === 0) {
-      container.innerHTML = '<div class="empty-state">No entries yet. Click "New entry".</div>';
+      container.innerHTML = emptyStateHtml({
+        icon: 'journal',
+        lead: 'No entries yet',
+        body: 'Log watering, feeding, or a note to start the trail.',
+        ctaId: 'empty-add-entry',
+        ctaLabel: '+ New entry',
+      });
       return;
     }
     container.innerHTML = entries
@@ -4926,16 +5002,17 @@ function initFirebaseSync() {
             if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stressors</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
           }
         }
-        return `
+        const deletable = !isSharedPlantId(e.plantId);
+        const entryHtml = `
           <div class="journal-entry${isToolboxMirroredEntry(e) ? ' journal-entry--from-tools' : ''}" data-entry-id="${escapeHtml(e.id)}">
             <div class="entry-meta">
               <span class="entry-type">${typeLabel}</span>
               ${viaTools}
               ${plantName} · ${date}
               ${
-                isSharedPlantId(e.plantId)
-                  ? ''
-                  : '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
+                deletable
+                  ? '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
+                  : ''
               }
             </div>
             <div class="entry-note">${escapeHtml(noteText)}</div>
@@ -4957,15 +5034,104 @@ function initFirebaseSync() {
             ${media.length ? '<div class="entry-media-wrap">' + media.join('') + '</div>' : ''}
           </div>
         `;
+        // Swipe-to-delete is an extra affordance, not a replacement: the inline
+        // Delete button above stays so the action is never gesture-only.
+        return deletable
+          ? `<div class="journal-swipe">
+               <div class="journal-swipe-actions">
+                 <button type="button" class="journal-swipe-delete" tabindex="-1" aria-hidden="true">Delete</button>
+               </div>
+               ${entryHtml}
+             </div>`
+          : entryHtml;
       })
       .join('');
-    container.querySelectorAll('.btn-delete-entry').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const wrap = btn.closest('.journal-entry');
-        const entryId = wrap && wrap.getAttribute('data-entry-id');
-        if (entryId) deleteJournalEntry(entryId);
-      });
+    bindJournalRowActions(container);
+  }
+
+  /**
+   * One delegated listener for the whole list (replaces a per-button rebind on
+   * every render), plus horizontal swipe-to-reveal on touch.
+   */
+  function bindJournalRowActions(container) {
+    if (!container || container.dataset.rowActionsBound === '1') return;
+    container.dataset.rowActionsBound = '1';
+
+    container.addEventListener('click', (e) => {
+      const del = e.target.closest('.btn-delete-entry, .journal-swipe-delete');
+      if (!del) return;
+      const wrap = del.closest('.journal-swipe') || del.closest('.journal-entry');
+      const entry = wrap ? wrap.querySelector('.journal-entry') || wrap : null;
+      const entryId = entry && entry.getAttribute('data-entry-id');
+      if (entryId) deleteJournalEntry(entryId);
     });
+
+    const REVEAL = 84;
+    let sliding = null;
+    let startX = 0;
+    let startY = 0;
+    let dx = 0;
+    let decided = false;
+    let openRow = null;
+
+    function closeRow(row) {
+      if (!row) return;
+      row.style.transition = 'transform 0.25s var(--ease-spring)';
+      row.style.transform = 'translateX(0px)';
+    }
+
+    container.addEventListener('pointerdown', (e) => {
+      if (!window.matchMedia('(max-width: 768px)').matches) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      const row = e.target.closest('.journal-swipe .journal-entry');
+      if (!row) return;
+      // Let real controls inside the row win the press.
+      if (e.target.closest('button, a, input, textarea, select')) return;
+      if (openRow && openRow !== row) closeRow(openRow);
+      sliding = row;
+      startX = e.clientX;
+      startY = e.clientY;
+      dx = 0;
+      decided = false;
+      row.style.transition = 'none';
+    });
+
+    container.addEventListener('pointermove', (e) => {
+      if (!sliding) return;
+      const moveX = e.clientX - startX;
+      const moveY = e.clientY - startY;
+      if (!decided) {
+        // Vertical intent wins — never hijack page scrolling.
+        if (Math.abs(moveY) > Math.abs(moveX)) {
+          sliding.style.transition = '';
+          sliding.style.transform = '';
+          sliding = null;
+          return;
+        }
+        if (Math.abs(moveX) < 6) return;
+        decided = true;
+      }
+      dx = Math.max(-REVEAL, Math.min(0, moveX));
+      sliding.style.transform = `translateX(${dx}px)`;
+    });
+
+    function endSwipe() {
+      if (!sliding) return;
+      const row = sliding;
+      sliding = null;
+      row.style.transition = 'transform 0.25s var(--ease-spring)';
+      if (dx < -REVEAL / 2) {
+        row.style.transform = `translateX(${-REVEAL}px)`;
+        openRow = row;
+      } else {
+        row.style.transform = 'translateX(0px)';
+        if (openRow === row) openRow = null;
+      }
+      dx = 0;
+    }
+
+    container.addEventListener('pointerup', endSwipe);
+    container.addEventListener('pointercancel', endSwipe);
   }
 
   async function deleteJournalEntry(entryId) {

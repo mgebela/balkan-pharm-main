@@ -12,9 +12,9 @@
   <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Lora:ital,wght@0,400;0,500;0,600;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260802z4" />
-  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/app.css?v=20260802z9" />
+  <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
 </head>
@@ -424,9 +424,12 @@
             ?
           </button>
         </div>
-        <div class="crypto-mode-bar" role="group" aria-label="Detail level">
-          <span class="crypto-mode-status">View: <strong data-crypto-mode-label>Simple</strong></span>
-          <button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="false">Show advanced details</button>
+        <div class="crypto-mode-bar" role="radiogroup" aria-label="Detail level">
+          <div class="segmented-control" data-crypto-mode-segmented data-active="simple">
+            <span class="segmented-thumb" aria-hidden="true"></span>
+            <button type="button" class="segmented-option" data-crypto-mode-btn="simple" role="radio" aria-checked="true">Simple</button>
+            <button type="button" class="segmented-option" data-crypto-mode-btn="advanced" role="radio" aria-checked="false">Advanced</button>
+          </div>
         </div>
         <section class="adopter-guide adopter-only" id="adopter-guide" aria-label="How adoption works">
           <h3 class="adopter-guide-title">How to adopt a plant</h3>
@@ -531,9 +534,12 @@
         <p class="market-notice" id="market-notice" hidden></p>
         <div class="market-stuck" id="market-stuck" hidden></div>
 
-        <div class="crypto-mode-bar market-mode-bar" role="group" aria-label="Detail level">
-          <span class="crypto-mode-status">View: <strong data-crypto-mode-label>Simple</strong></span>
-          <button type="button" class="btn btn-ghost btn-sm" data-crypto-mode-btn aria-pressed="false">Show advanced details</button>
+        <div class="crypto-mode-bar market-mode-bar" role="radiogroup" aria-label="Detail level">
+          <div class="segmented-control" data-crypto-mode-segmented data-active="simple">
+            <span class="segmented-thumb" aria-hidden="true"></span>
+            <button type="button" class="segmented-option" data-crypto-mode-btn="simple" role="radio" aria-checked="true">Simple</button>
+            <button type="button" class="segmented-option" data-crypto-mode-btn="advanced" role="radio" aria-checked="false">Advanced</button>
+          </div>
         </div>
 
         <section class="adopter-guide adopter-only" id="market-adopter-guide" aria-label="Adopter market guide">
@@ -1208,21 +1214,22 @@
   <script src="js/spl-transfer.js?v=20260722d"></script>
   <script src="js/escrow-program.js?v=20260729a"></script>
   <script src="js/status-rail.js?v=20260731j"></script>
-  <script src="js/plain-lang.js?v=20260802p"></script>
-  <script src="js/app-confirm.js?v=20260731j"></script>
-  <script src="js/market.js?v=20260802s"></script>
+  <script src="js/plain-lang.js?v=20260802q"></script>
+  <script src="js/sheet-drag.js?v=20260802a"></script>
+  <script src="js/app-confirm.js?v=20260802k"></script>
+  <script src="js/market.js?v=20260802t"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260731a"></script>
   <script src="js/plant-botanical-sprites.js?v=20260730d"></script>
   <script src="js/grower-quests.js?v=20260802u"></script>
   <script src="js/notifications.js?v=20260802k"></script>
   <script src="js/signup.js?v=20260729g"></script>
-  <script src="js/plant-token.js?v=20260802x"></script>
+  <script src="js/plant-token.js?v=20260802z"></script>
   <script src="js/daily-status.js?v=20260801f"></script>
   <script src="js/product-tour.js?v=20260802o"></script>
   <script src="js/coach-core.js?v=20260802i"></script>
-  <script src="js/ai-coach.js?v=20260802z"></script>
-  <script src="js/app.js?v=20260802x"></script>
+  <script src="js/ai-coach.js?v=20260803a"></script>
+  <script src="js/app.js?v=20260802z"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
 </body>
 </html>

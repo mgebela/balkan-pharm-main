@@ -52,6 +52,15 @@
     ui.cancel.addEventListener('click', function () {
       finish(false);
     });
+    // Dragging the sheet away reads as Cancel, same as backdrop/Escape.
+    var handle = document.querySelector('#app-confirm-overlay .app-confirm-handle');
+    if (handle && ui.sheet && window.SheetDrag) {
+      SheetDrag.attach(handle, ui.sheet, {
+        onDismiss: function () {
+          finish(false);
+        },
+      });
+    }
     if (ui.backdrop) {
       ui.backdrop.addEventListener('click', function () {
         finish(false);

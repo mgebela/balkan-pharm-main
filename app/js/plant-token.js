@@ -985,6 +985,33 @@
     );
   }
 
+  /** Thin-stroke glyphs matching the nav/icon language. */
+  const GROUPED_ICONS = {
+    nft: '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"/><path d="M12 3v18M5 7l7 4 7-4"/></svg>',
+    card: '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2.4"/><path d="M3.5 10h17"/></svg>',
+  };
+
+  /**
+   * One grouped-list row: tinted icon, label, value.
+   * A chevron is only rendered when the row genuinely drills out (a link).
+   */
+  function groupedRowHtml(icon, label, valueHtml, isLink) {
+    return (
+      '<div class="grouped-list-row">' +
+      '<span class="grouped-list-icon" aria-hidden="true">' +
+      (GROUPED_ICONS[icon] || '') +
+      '</span>' +
+      '<span class="grouped-list-label">' +
+      esc(label) +
+      '</span>' +
+      '<span class="grouped-list-value">' +
+      valueHtml +
+      (isLink ? '<span class="grouped-list-chevron" aria-hidden="true">&rsaquo;</span>' : '') +
+      '</span>' +
+      '</div>'
+    );
+  }
+
   /** Collapsible mint / explorer chrome for garden cards. */
   function chainDetailsHtml(innerHtml, opts) {
     if (!innerHtml) return '';
@@ -1446,19 +1473,27 @@
       })() +
       chainDetailsHtml(
         (isAdopterUi() || token.adopted ? chainMintHtml(token) : '') +
-          (token.mintAddress
-            ? '<p class="adopt-token-chain adopt-token-chain--ok">NFT <a href="' +
-              esc(explorerAddressUrl(token.mintAddress)) +
-              '" target="_blank" rel="noopener noreferrer"><code>' +
-              esc(shortAddr(token.mintAddress)) +
-              '</code></a></p>'
-            : '') +
           replacedMintHtml(token) +
-          '<p class="adopt-token-chain">Card id <code title="' +
-          esc(token.id) +
-          '">#' +
-          esc(token.id.slice(-6)) +
-          '</code></p>',
+          '<div class="grouped-list">' +
+          (token.mintAddress
+            ? groupedRowHtml(
+                'nft',
+                'NFT',
+                '<a href="' +
+                  esc(explorerAddressUrl(token.mintAddress)) +
+                  '" target="_blank" rel="noopener noreferrer"><code>' +
+                  esc(shortAddr(token.mintAddress)) +
+                  '</code></a>',
+                true
+              )
+            : '') +
+          groupedRowHtml(
+            'card',
+            'Card id',
+            '<code title="' + esc(token.id) + '">#' + esc(token.id.slice(-6)) + '</code>',
+            false
+          ) +
+          '</div>',
         {
           // Simple: hidden via CSS. Advanced: open so mint / explorer are visible.
           summary: 'Chain details',
@@ -3174,10 +3209,125 @@
     });
   }
 
+  /**
+   * Long-press a card for its most common actions without opening it.
+   *
+   * The menu mirrors the card's own Water / Feed / Ask Coach buttons rather than
+   * defining its own list, so it can never offer an action the card itself
+   * doesn't have (adopter view, adopted tokens, and unlinked plants render no
+   * care buttons at all, and therefore get no menu).
+   */
+  function bindLongPressMenu(view) {
+    const HOLD_MS = 480;
+    const MOVE_CANCEL = 10;
+    let timer = null;
+    let menu = null;
+    let startX = 0;
+    let startY = 0;
+
+    function closeMenu() {
+      if (menu) {
+        menu.remove();
+        menu = null;
+      }
+    }
+
+    function cancelPress() {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    }
+
+    function openMenu(card, x, y) {
+      closeMenu();
+      const wanted = ['water', 'feed', 'coach'];
+      const items = [];
+      wanted.forEach(function (action) {
+        const src = card.querySelector('.adopt-care-btn[data-care="' + action + '"]');
+        if (!src || src.disabled) return;
+        items.push(
+          '<button type="button" class="adopt-care-btn longpress-menu-item" data-care="' +
+            esc(action) +
+            '" data-token-id="' +
+            esc(src.dataset.tokenId || '') +
+            '">' +
+            esc(src.getAttribute('title') || action) +
+            '</button>'
+        );
+      });
+      if (!items.length) return;
+
+      menu = document.createElement('div');
+      menu.className = 'longpress-menu';
+      menu.setAttribute('role', 'menu');
+      menu.innerHTML = items.join('');
+      view.appendChild(menu);
+
+      // Keep it on screen near the press point.
+      const rect = menu.getBoundingClientRect();
+      const left = Math.max(8, Math.min(x, window.innerWidth - rect.width - 8));
+      const top = Math.max(8, Math.min(y, window.innerHeight - rect.height - 8));
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+      menu.classList.add('is-open');
+    }
+
+    view.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (menu && menu.contains(e.target)) return;
+      closeMenu();
+      const card = e.target.closest('.adopt-token-card');
+      if (!card) return;
+      // A press that starts on a real control belongs to that control.
+      if (e.target.closest('button, a, input, textarea, select, summary, details')) return;
+      startX = e.clientX;
+      startY = e.clientY;
+      cancelPress();
+      timer = setTimeout(function () {
+        timer = null;
+        openMenu(card, startX, startY);
+      }, HOLD_MS);
+    });
+
+    view.addEventListener('pointermove', (e) => {
+      if (!timer) return;
+      if (
+        Math.abs(e.clientX - startX) > MOVE_CANCEL ||
+        Math.abs(e.clientY - startY) > MOVE_CANCEL
+      ) {
+        cancelPress();
+      }
+    });
+
+    view.addEventListener('pointerup', cancelPress);
+    view.addEventListener('pointercancel', cancelPress);
+
+    // Menu items are .adopt-care-btn, so the existing delegated click handler
+    // runs them — this only has to dismiss the menu afterwards.
+    view.addEventListener('click', (e) => {
+      if (menu && e.target.closest('.longpress-menu-item')) closeMenu();
+    });
+
+    document.addEventListener('pointerdown', (e) => {
+      if (menu && !menu.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+    window.addEventListener('scroll', closeMenu, true);
+
+    // Suppress the OS text-selection callout on a real touch long-press.
+    view.addEventListener('contextmenu', (e) => {
+      if (e.target.closest('.adopt-token-card')) e.preventDefault();
+    });
+  }
+
   function bindEvents() {
     const view = document.getElementById('view-adopt');
     if (!view || view.dataset.bound === '1') return;
     view.dataset.bound = '1';
+    bindLongPressMenu(view);
 
     // Delegated clicks for everything that is re-rendered.
     view.addEventListener('click', async (e) => {

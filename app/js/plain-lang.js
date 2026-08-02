@@ -118,7 +118,17 @@
     document.querySelectorAll('[data-crypto-mode-label]').forEach(function (el) {
       el.textContent = mode === 'simple' ? 'Simple' : 'Advanced';
     });
+    document.querySelectorAll('[data-crypto-mode-segmented]').forEach(function (group) {
+      group.setAttribute('data-active', mode);
+    });
     document.querySelectorAll('[data-crypto-mode-btn]').forEach(function (btn) {
+      var value = btn.getAttribute('data-crypto-mode-btn');
+      if (value === 'simple' || value === 'advanced') {
+        // Segmented control: both options stay visible, one is checked.
+        btn.setAttribute('aria-checked', value === mode ? 'true' : 'false');
+        return;
+      }
+      // Legacy single toggle button (label swaps to name the other mode).
       btn.setAttribute('aria-pressed', mode === 'advanced' ? 'true' : 'false');
       btn.textContent = mode === 'simple' ? 'Show advanced details' : 'Use simple view';
     });
@@ -151,9 +161,57 @@
       var btn = e.target.closest('[data-crypto-mode-btn]');
       if (!btn) return;
       e.preventDefault();
+      var value = btn.getAttribute('data-crypto-mode-btn');
+      if (value === 'simple' || value === 'advanced') {
+        if (value !== getMode()) setMode(value);
+        return;
+      }
       setMode(getMode() === 'simple' ? 'advanced' : 'simple');
     });
     applyMode();
+  }
+
+  /** Thin-stroke empty-state glyphs, matching the nav/grouped-row icon language. */
+  var EMPTY_ICONS = {
+    plant:
+      '<svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M12 15c-1.5-3-4-4-7-3.5 0 3.5 3 5.5 7 3.5z"/><path d="M12 12c1.5-3 4-4 7-3.5 0 3.5-3 5.5-7 3.5z"/></svg>',
+    journal:
+      '<svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8a2 2 0 012 2v14l-6-3-6 3V6a2 2 0 012-2z"/><path d="M10 9h4M10 13h4"/></svg>',
+    market:
+      '<svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg>',
+    coach:
+      '<svg viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg>',
+  };
+
+  /**
+   * Shared first-run empty state: soft icon, headline, one-line body, single CTA.
+   * `ctaId`/`ctaLabel` are optional — omit them for states with no next action.
+   */
+  function emptyStateHtml(opts) {
+    var o = opts || {};
+    var icon = EMPTY_ICONS[o.icon] || '';
+    return (
+      '<div class="empty-state empty-state--next' +
+      (o.adopter ? ' adopt-empty-adopter' : '') +
+      '">' +
+      (icon ? '<span class="empty-state-icon" aria-hidden="true">' + icon + '</span>' : '') +
+      '<p class="adopt-empty-lead">' +
+      esc(o.lead || '') +
+      '</p>' +
+      '<p class="adopt-empty-body">' +
+      esc(o.body || '') +
+      '</p>' +
+      (o.ctaId
+        ? '<button type="button" class="btn btn-sm ' +
+          (o.ghost ? 'btn-ghost' : 'btn-primary') +
+          '" id="' +
+          esc(o.ctaId) +
+          '">' +
+          esc(o.ctaLabel || 'Continue') +
+          '</button>'
+        : '') +
+      '</div>'
+    );
   }
 
   function totalGrowRewards() {
@@ -190,6 +248,7 @@
     getMode: getMode,
     setMode: setMode,
     applyMode: applyMode,
+    emptyStateHtml: emptyStateHtml,
     totalGrowRewards: totalGrowRewards,
     remainingGrowRewards: remainingGrowRewards,
   };

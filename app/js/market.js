@@ -1063,6 +1063,35 @@
     return esc(label || term);
   }
 
+  /** Thin-stroke glyphs matching the nav/icon language. */
+  const GROUPED_ICONS = {
+    batch:
+      '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2.4"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',
+    nft: '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v10l-7 4-7-4V7z"/><path d="M12 3v18M5 7l7 4 7-4"/></svg>',
+    pda: '<svg viewBox="0 0 24 24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-10a7 7 0 0114 0c0 5.5-7 10-7 10z"/><circle cx="12" cy="11" r="2.4"/></svg>',
+  };
+
+  /**
+   * One grouped-list row: tinted icon, label, value.
+   * A chevron is only rendered when the row genuinely drills out (a link).
+   */
+  function groupedRowHtml(icon, label, valueHtml, isLink) {
+    return (
+      '<div class="grouped-list-row">' +
+      '<span class="grouped-list-icon" aria-hidden="true">' +
+      (GROUPED_ICONS[icon] || '') +
+      '</span>' +
+      '<span class="grouped-list-label">' +
+      esc(label) +
+      '</span>' +
+      '<span class="grouped-list-value">' +
+      valueHtml +
+      (isLink ? '<span class="grouped-list-chevron" aria-hidden="true">&rsaquo;</span>' : '') +
+      '</span>' +
+      '</div>'
+    );
+  }
+
   /** Collapsible mint / pubkey chrome — open by default only in advanced mode. */
   function chainDetailsHtml(innerHtml, opts) {
     if (!innerHtml) return '';
@@ -1471,25 +1500,39 @@
           ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
         : '') +
       chainDetailsHtml(
-        (listing.batch
-          ? '<p class="market-card-meta">Batch <code>' + esc(listing.batch) + '</code></p>'
-          : '') +
-          '<p class="market-card-meta">NFT <a href="' +
-          esc(explorerAddress(listing.mintAddress)) +
-          '" target="_blank" rel="noopener noreferrer"><code>' +
-          esc(shortAddr(listing.mintAddress)) +
-          '</code></a>' +
-          ' · grower <code>' +
-          esc(shortAddr(listing.sellerPubkey)) +
-          '</code>' +
-          (isMine ? ' (you)' : '') +
-          (isBuyer ? ' · your investment' : '') +
-          '</p>' +
+        '<div class="grouped-list">' +
+          (listing.batch
+            ? groupedRowHtml('batch', 'Batch', '<code>' + esc(listing.batch) + '</code>', false)
+            : '') +
+          groupedRowHtml(
+            'nft',
+            'NFT',
+            '<a href="' +
+              esc(explorerAddress(listing.mintAddress)) +
+              '" target="_blank" rel="noopener noreferrer"><code>' +
+              esc(shortAddr(listing.mintAddress)) +
+              '</code></a>',
+            true
+          ) +
+          groupedRowHtml(
+            'nft',
+            'Grower',
+            '<code>' +
+              esc(shortAddr(listing.sellerPubkey)) +
+              '</code>' +
+              (isMine ? ' (you)' : '') +
+              (isBuyer ? ' · your investment' : ''),
+            false
+          ) +
           (listing.listingPda
-            ? '<p class="market-card-meta">Listing PDA <code>' +
-              esc(shortAddr(listing.listingPda)) +
-              '</code></p>'
-            : ''),
+            ? groupedRowHtml(
+                'pda',
+                'Listing PDA',
+                '<code>' + esc(shortAddr(listing.listingPda)) + '</code>',
+                false
+              )
+            : '') +
+          '</div>',
         { summary: 'Chain details' }
       ) +
       '</div>' +
@@ -1650,6 +1693,7 @@
             }).join('')
           : isGrowerUi()
             ? emptyNextStepHtml({
+                icon: 'market',
                 lead: 'No live offers on the board',
                 body: 'Seal a plant on Tokenise, then post it here.',
                 ctaId: 'market-empty-tokenise-btn',
@@ -1657,6 +1701,7 @@
               })
             : emptyNextStepHtml({
                 adopter: true,
+                icon: 'market',
                 lead: 'No open offers right now',
                 body: 'When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.',
                 ctaId: 'market-empty-garden-btn',
@@ -1670,6 +1715,7 @@
               return listingCardHtml(l, uid);
             }).join('')
           : emptyNextStepHtml({
+              icon: 'market',
               lead: 'No offers posted yet',
               body: listableTokens().length
                 ? 'Pick a sealed plant above and post your ask.'
@@ -1721,8 +1767,12 @@
     return Promise.resolve(window.confirm(fallback));
   }
 
+  /** Delegates to the shared helper so every surface renders the same empty state. */
   function emptyNextStepHtml(opts) {
     opts = opts || {};
+    if (window.GrowtooPlain && typeof GrowtooPlain.emptyStateHtml === 'function') {
+      return GrowtooPlain.emptyStateHtml(opts);
+    }
     return (
       '<div class="empty-state empty-state--next' +
       (opts.adopter ? ' adopt-empty-adopter' : '') +
