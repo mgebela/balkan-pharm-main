@@ -1194,7 +1194,10 @@
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
     document.getElementById('ai-coach-close').addEventListener('click', close);
     document.getElementById('ai-coach-clear').addEventListener('click', clearChat);
-    document.getElementById('ai-coach-backdrop').addEventListener('click', close);
+    document.getElementById('ai-coach-backdrop').addEventListener('click', function (e) {
+      // Only the dimmed overlay closes — never a bubbled composer/panel tap.
+      if (e.target === e.currentTarget) close();
+    });
     document.getElementById('ai-coach-form').addEventListener('submit', onSubmit);
     document.getElementById('ai-coach-mic').addEventListener('click', toggleVoice);
     document.getElementById('ai-coach-quick').addEventListener('click', function (e) {
@@ -1275,7 +1278,10 @@
       return;
     }
     const vv = window.visualViewport;
-    const inset = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    const raw = Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop));
+    // Cap so a tall keyboard cannot collapse the sheet to a sliver.
+    const maxInset = Math.round(window.innerHeight * 0.52);
+    const inset = Math.min(raw, maxInset);
     document.documentElement.style.setProperty('--coach-kbd-inset', inset + 'px');
   }
 

@@ -7867,6 +7867,7 @@ body.crypto-simple .crypto-simple-only {
 .ai-coach-backdrop {
   position: fixed;
   inset: 0;
+  /* Below panel — if this is ≥ panel z-index, taps on the composer close the coach. */
   z-index: 94;
   border: 0;
   padding: 0;
@@ -7925,6 +7926,7 @@ body.crypto-simple .crypto-simple-only {
   position: absolute;
   right: 0;
   bottom: calc(100% + 0.65rem);
+  z-index: 97;
   width: min(420px, calc(100vw - 1.25rem));
   height: min(70vh, 640px);
   display: flex;
@@ -8573,11 +8575,12 @@ body.ai-coach-open {
     width: 100%;
     height: min(88vh, 44rem);
     max-height: calc(100dvh - var(--coach-kbd-inset, 0px));
+    min-height: min(42vh, 22rem);
     border-radius: 18px 18px 0 0;
     border-left: 0;
     border-right: 0;
     border-bottom: 0;
-    z-index: 96;
+    z-index: 97;
     animation: ai-coach-sheet 0.24s ease;
   }
 
