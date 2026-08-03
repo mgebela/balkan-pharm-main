@@ -96,6 +96,28 @@ body.app-loading .app {
   color: var(--text-muted);
 }
 
+.app-boot-stalled {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: center;
+  max-width: 24rem;
+  margin-top: 0.5rem;
+}
+
+.app-boot-stalled-text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.app-boot-stalled-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
 .app-boot-pulse {
   width: 2.5rem;
   height: 2px;
@@ -174,18 +196,21 @@ body.app-loading .app {
   transition: opacity 0.3s ease;
 }
 
-.admin-only,
-.admin-super-only {
-  display: none;
-}
+/* Admin gating lives on the `hidden` attribute (set in the markup, toggled by
+   applyRoleUI) — not on a base `display: none`, which lost to later
+   equal-specificity rules like `.nav-item { display: flex }` and let the admin
+   nav item render for everyone until JS ran. */
 
 .grower-only,
 .adopter-only {
   display: none !important;
 }
 
-body.profile-grower .grower-only,
-body.profile-adopter .adopter-only {
+/* `:not([hidden])` matters: without it this !important revert out-ranks the
+   element's own `hidden` attribute, so every grower-only section JS had hidden
+   (dashboard strips, Tokenise seal card, Market list) rendered empty anyway. */
+body.profile-grower .grower-only:not([hidden]),
+body.profile-adopter .adopter-only:not([hidden]) {
   display: revert !important;
 }
 
@@ -195,6 +220,15 @@ body.profile-grower .more-nav-list > .more-nav-item.grower-only,
 body.profile-adopter .sidebar-nav > .nav-item.adopter-only,
 body.profile-adopter .bottom-nav > .nav-item.adopter-only,
 body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
+  display: flex !important;
+}
+
+/* `.more-nav-item` is `display: none` by default, so admin entries need an
+   explicit show rule like the profile ones above. `:not([hidden])` is the gate:
+   applyRoleUI clears `hidden` only for admin roles, and it is set in the markup
+   so the entry stays hidden before that runs. Orthogonal to profile type, hence
+   no `body.profile-*` prefix. */
+.more-nav-list > .more-nav-item.admin-only:not([hidden]) {
   display: flex !important;
 }
 
@@ -361,7 +395,10 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
 
 #view-plants .plants-weather-city-form {
   display: flex;
-  flex-wrap: nowrap;
+  /* `wrap`, not `nowrap`: with a large system font scale the input + Refresh
+     can exceed the card, and nowrap clipped the button off-screen. Wrapping
+     drops Refresh to its own line instead. */
+  flex-wrap: wrap;
   gap: 0.4rem;
   align-items: center;
   width: 100%;
@@ -371,7 +408,11 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
 }
 
 #view-plants .plants-weather-city-form input {
-  flex: 1 1 auto;
+  /* `appearance: none` — the UA search-field chrome carries an intrinsic min
+     width on mobile WebKit/Blink that defeats `min-width: 0`. */
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1 1 8rem;
   min-width: 0;
   width: auto;
   height: 38px;
@@ -395,7 +436,8 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
 }
 
 #view-plants .plants-weather-refresh-btn {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  max-width: 100%;
   align-self: center;
   height: 38px;
   border: 0;
@@ -4427,8 +4469,10 @@ body.soil-moisture-tool-visible .toolbox-card.tool-soil-moisture-only {
   display: flex !important;
 }
 
-body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-only.open,
-body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-only[style*="block"] {
+/* The `[style*="block"]` half of this selector matched a second click handler
+   that set `style.display` directly; that handler is gone and `.open` is now
+   the only mechanism. */
+body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-only.open {
   display: block !important;
 }
 
@@ -10230,8 +10274,12 @@ table td {
   display: grid;
   gap: 0.4rem;
   margin-bottom: 0.95rem;
-  max-height: 11rem;
+  /* Viewport-relative so tall phones show more than 3.5 rows; the fixed 11rem
+     cut a row in half with no hint that the list scrolled. */
+  max-height: min(42vh, 15rem);
   overflow-y: auto;
+  /* Don't chain the scroll to the page behind the sheet. */
+  overscroll-behavior: contain;
 }
 
 .log-sheet-plant {
@@ -11436,4 +11484,22 @@ body.product-tour-open {
   .product-tour-spotlight {
     transition: none;
   }
+}
+
+/* ——— `hidden` always wins ———
+   A class that sets a layout `display` out-ranks the UA rule for the `hidden`
+   attribute, so any such element JS had hidden kept rendering anyway — the "No
+   plants yet" block under a populated plant list, the Tokenise CTA on Market,
+   wizard controls on the wrong step, and (via the !important `display: revert`
+   on `body.profile-grower .grower-only`) whole dashboard and Market sections.
+   This makes `hidden` authoritative so the bug class cannot come back.
+
+   The three sheet overlays opt out on purpose: they stay in flow while hidden
+   and animate open/closed through `:not([hidden])` opacity + transform, with
+   `pointer-events: none` keeping them inert. `display: none` would kill the
+   transition. Everything else — including the Toolbox panels (`.open` class)
+   and the admin controls (CSS-default `display: none`) — is governed by a
+   different mechanism entirely and is unaffected. */
+[hidden]:not(.notif-overlay):not(.daily-status-overlay):not(.app-confirm-overlay) {
+  display: none !important;
 }

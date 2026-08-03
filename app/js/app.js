@@ -1839,24 +1839,18 @@ function applyRoleUI(role) {
   const superEls = document.querySelectorAll(".admin-super-only");
 
  
-  adminEls.forEach(el => el.style.display = "none");
-  superEls.forEach(el => el.style.display = "none");
-
- 
-  if (isAdminPanelRole(role)) {
-    adminEls.forEach((el) => (el.style.display = "flex"));
-  }
-
-  if (isSuperadminRole(role)) {
-    superEls.forEach((el) => (el.style.display = "flex"));
-  }
+  // These start `hidden` in the markup so they fail closed before this runs.
+  const showAdmin = isAdminPanelRole(role);
+  const showSuper = isSuperadminRole(role);
+  adminEls.forEach((el) => (el.hidden = !showAdmin));
+  superEls.forEach((el) => (el.hidden = !showSuper));
 
   applySoilMoistureToolUI(role);
 
   const superHub = document.getElementById('admin-super-hub');
   if (superHub) {
-    superHub.style.display = isSuperadminRole(role) ? 'flex' : 'none';
-    superHub.setAttribute('aria-hidden', !isSuperadminRole(role));
+    superHub.hidden = !showSuper;
+    superHub.setAttribute('aria-hidden', String(!showSuper));
   }
 
   applyProfileTypeUI(currentProfileType || PROFILE_TYPES.grower);
@@ -4289,15 +4283,14 @@ function initFirebaseSync() {
     if (!outdoorBlock || !typeEl) return;
     const subVal = subSel ? normalizeSubphase(subSel.value) : null;
     const showOutdoor = isOutdoorPlantContext(typeEl.value, subVal);
+    // `hidden` alone is enough now that it out-ranks the class `display`.
     outdoorBlock.hidden = !showOutdoor;
-    outdoorBlock.style.display = showOutdoor ? '' : 'none';
     if (plantingWrap && fieldInput) {
       const plantingInput = document.getElementById('plant-planting-location');
       const showPlanting =
         showOutdoor &&
         (fieldInput.value.trim().length > 0 || (plantingInput && plantingInput.value.trim().length > 0));
       plantingWrap.hidden = !showPlanting;
-      plantingWrap.style.display = showPlanting ? '' : 'none';
     }
     if (subVal === SUBPHASE_FIELD && typeEl.value !== 'outdoor') typeEl.value = 'outdoor';
     updatePlantSubphaseActions();
@@ -6019,24 +6012,6 @@ function initFirebaseSync() {
   initFirebaseSync();
   fillEntryPlantSelect();
   fillJournalPlantFilter();
-
-  document.querySelectorAll('.toolbox-card-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const tool = btn.dataset.tool;
-
-      document.querySelectorAll('.toolbox-panel').forEach((panel) => {
-        panel.style.display = 'none';
-        panel.setAttribute('aria-hidden', 'true');
-      });
-
-      const activePanel = document.getElementById(`toolbox-panel-${tool}`);
-
-      if (activePanel) {
-        activePanel.style.display = 'block';
-        activePanel.setAttribute('aria-hidden', 'false');
-      }
-    });
-  });
 
 document.addEventListener("click", (e) => {
 

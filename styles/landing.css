@@ -5730,3 +5730,55 @@ body:has(.devnet-banner) .header {
 .proof-fork-lead {
   color: rgba(196, 163, 90, 0.7);
 }
+
+/* ——— Touch target sizes (Apple HIG 44pt / WCAG 2.5.8) ———
+   These links are intentionally small type, so the fix grows the *hit area*
+   rather than the visible element — type scale and layout are unchanged.
+   Safe by measurement: the nearest vertical neighbour in each of these lists
+   is >=49px away, so the expanded bands never overlap each other. */
+.hero-cta-link,
+.hero-specimen-verify,
+.trail-card-verify,
+.verify-code,
+.stakes-row-link,
+.stakes-panel-cta,
+.powered-by-solana,
+.join-signin a {
+  position: relative;
+}
+
+.hero-cta-link::after,
+.hero-specimen-verify::after,
+.trail-card-verify::after,
+.verify-code::after,
+.stakes-row-link::after,
+.stakes-panel-cta::after,
+.powered-by-solana::after,
+.join-signin a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+/* Header wordmark is a real link home but sat at 40px. */
+.logo {
+  min-height: 44px;
+}
+
+/* Footer/status links wrap into rows only ~10px apart, so an invisible 44px
+   band would overlap the row above. Give these real height instead and drop
+   the now-redundant row gap. */
+.footer-links a,
+.status-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.footer-links {
+  row-gap: 0;
+}

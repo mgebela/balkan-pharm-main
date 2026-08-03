@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260803b" />
+  <link rel="stylesheet" href="styles/app.css?v=20260803c" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -22,9 +22,60 @@
   <div id="app-boot" class="app-boot" role="status" aria-live="polite" aria-busy="true">
     <img src="../images/growtoo-mark-brass.png?v=20260731a" alt="" width="64" height="64" class="app-boot-mark" />
     <p class="app-boot-word">growtoo</p>
-    <p class="app-boot-line">Opening your journal…</p>
-    <span class="app-boot-pulse" aria-hidden="true"></span>
+    <p class="app-boot-line" id="app-boot-line">Opening your journal…</p>
+    <span class="app-boot-pulse" id="app-boot-pulse" aria-hidden="true"></span>
+    <div class="app-boot-stalled" id="app-boot-stalled" hidden>
+      <p class="app-boot-stalled-text">
+        This is taking longer than it should — your connection may have dropped, or a
+        script failed to load. Your journal entries are safe.
+      </p>
+      <div class="app-boot-stalled-actions">
+        <button type="button" class="btn btn-primary btn-tap" id="app-boot-retry">Try again</button>
+        <a class="btn btn-ghost btn-tap" href="../dnevnik/">Back to sign in</a>
+      </div>
+    </div>
   </div>
+  <script>
+    /* Boot watchdog. Deliberately inline and dependency-free: the thing that
+       failed may be app.js itself, so nothing here may rely on it. Without this
+       the splash sits on "Opening your journal…" forever with no way out. */
+    (function () {
+      var STALL_MS = 12000;
+      var timer = window.setTimeout(showStalled, STALL_MS);
+
+      function showStalled() {
+        // finishAppLoading() drops .app-loading and hides #app-boot — if either
+        // already happened the app booted fine and this is a no-op.
+        if (!document.body || !document.body.classList.contains('app-loading')) return;
+        var boot = document.getElementById('app-boot');
+        if (!boot || boot.hidden) return;
+        var line = document.getElementById('app-boot-line');
+        var pulse = document.getElementById('app-boot-pulse');
+        var stalled = document.getElementById('app-boot-stalled');
+        if (line) line.textContent = 'Still trying to reach growtoo…';
+        if (pulse) pulse.hidden = true;
+        if (stalled) stalled.hidden = false;
+        boot.setAttribute('aria-busy', 'false');
+      }
+
+      // A <script> that 404s or is blocked fires `error` on the capture phase.
+      // Don't wait out the full timeout when we already know something broke.
+      window.addEventListener(
+        'error',
+        function (e) {
+          if (e && e.target && e.target.tagName === 'SCRIPT') {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(showStalled, 1500);
+          }
+        },
+        true
+      );
+
+      document.addEventListener('click', function (e) {
+        if (e.target && e.target.id === 'app-boot-retry') window.location.reload();
+      });
+    })();
+  </script>
   <div class="app">
     <aside class="sidebar">
       <a href="../index.html" class="sidebar-logo" aria-label="growtoo">
@@ -64,7 +115,7 @@
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
           <span>Today</span>
         </a>
-        <a href="#" class="nav-item admin-only" data-view="admin">
+        <a href="#" class="nav-item admin-only" data-view="admin" hidden>
           <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
           <span>Admin</span>
         </a>
@@ -184,7 +235,7 @@
               <span>Daily care checklist</span>
             </span>
           </a>
-          <a href="#" class="more-nav-item admin-only" data-view="admin">
+          <a href="#" class="more-nav-item admin-only" data-view="admin" hidden>
             <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
             <span class="more-nav-copy">
               <strong>Admin</strong>
@@ -711,7 +762,7 @@
             <h3>Stressors</h3>
             <p>Record stress conditions and pests.</p>
           </button>
-          <button type="button" class="toolbox-card toolbox-card-btn tool-soil-moisture-only admin-super-only" data-tool="soil-moisture">
+          <button type="button" class="toolbox-card toolbox-card-btn tool-soil-moisture-only admin-super-only" data-tool="soil-moisture" hidden>
             <h3>Soil moisture</h3>
             <p>Live soil moisture sensor (Greenhouse).</p>
           </button>
@@ -857,18 +908,18 @@
       <p>Manage entries</p>
     </button>
 
-    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-tenant">
+    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-tenant" hidden>
       <h3>Tenants</h3>
       <p>View tenants</p>
     </button>
 
-    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-system">
+    <button class="toolbox-card toolbox-card-btn admin-super-only admin-system-card" id="admin-system" hidden>
       <h3>Settings</h3>
       <p>System settings</p>
     </button>
   </div>
 
-  <div id="admin-super-hub" class="admin-super-hub admin-super-only" aria-hidden="true">
+  <div id="admin-super-hub" class="admin-super-hub admin-super-only" aria-hidden="true" hidden>
     <section id="admin-user-report-section" class="admin-hub-card admin-user-report-section">
       <header class="admin-hub-card-head">
         <span class="admin-hub-icon" aria-hidden="true">📊</span>
@@ -1229,7 +1280,7 @@
   <script src="js/product-tour.js?v=20260802o"></script>
   <script src="js/coach-core.js?v=20260803a"></script>
   <script src="js/ai-coach.js?v=20260803a"></script>
-  <script src="js/app.js?v=20260803b"></script>
+  <script src="js/app.js?v=20260803c"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
 </body>
 </html>
