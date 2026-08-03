@@ -1840,6 +1840,7 @@
     if (!res.ok) {
       const err = new Error(data.error || 'Coach request failed');
       err.status = res.status;
+      err.serverCode = data.code || '';
       throw err;
     }
     return {
@@ -1898,6 +1899,10 @@
       actions = local.actions || [];
       if (err && err.code === 'auth') {
         reply += '\n\n(Sign in to use the live coach. Using local helpers for now.)';
+      } else if (err && (err.serverCode === 'email_unverified' || err.serverCode === 'quota_exceeded')) {
+        // Say why the live coach went quiet — otherwise the silent fall back to
+        // local helpers just looks like the coach got worse for no reason.
+        reply += '\n\n(' + err.message + ' Using local helpers until then.)';
       }
       source = 'local';
     }

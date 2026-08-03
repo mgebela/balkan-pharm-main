@@ -3,7 +3,6 @@ const {onSchedule} = require('firebase-functions/v2/scheduler');
 const {onDocumentWritten} = require('firebase-functions/v2/firestore');
 const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
-const {getAuth} = require('firebase-admin/auth');
 const {GoogleGenAI, Type} = require('@google/genai');
 const {getRelevantKnowledge} = require('./coach-knowledge');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
@@ -22,11 +21,22 @@ const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {syncMarketPublicTape} = require('./market-public-tape');
 const {reservePaymentSignatureOnListingWrite} = require('./used-payment-signatures');
 const {clientIp} = require('./solana-rpc-proxy');
+const {
+  requireVerifiedUser,
+  consumeDailyQuota,
+  sendGuardError,
+} = require('./user-guards');
 
 initializeApp();
 
 // Set after: firebase functions:secrets:set GEMINI_API_KEY
 const geminiApiKey = defineSecret('GEMINI_API_KEY');
+
+// Per-user daily caps for the Gemini endpoints. Image analysis costs more per
+// call than chat, hence the lower cap. Override via Cloud Run env vars without
+// a code change.
+const COACH_CHAT_DAILY_MAX = Number(process.env.COACH_CHAT_DAILY_MAX || 60);
+const GROW_FRAMES_DAILY_MAX = Number(process.env.GROW_FRAMES_DAILY_MAX || 25);
 
 const REGION = 'europe-west1';
 
@@ -371,13 +381,12 @@ exports.analyzeGrowFrames = onRequest(
       }
 
       try {
-        const authHeader = req.headers.authorization || '';
-        const match = authHeader.match(/^Bearer (.+)$/i);
-        if (!match) {
-          res.status(401).json({error: 'Missing Authorization Bearer token'});
-          return;
-        }
-        await getAuth().verifyIdToken(match[1]);
+        const user = await requireVerifiedUser(req);
+        await consumeDailyQuota(
+            user.uid,
+            'analyzeGrowFrames',
+            GROW_FRAMES_DAILY_MAX,
+        );
 
         const {frames, plantName, stage, locale} = req.body || {};
         if (!Array.isArray(frames) || frames.length === 0 || frames.length > 2) {
@@ -436,9 +445,7 @@ Do not invent details not visible in the images.`;
         const report = JSON.parse(jsonMatch[0]);
         res.json(report);
       } catch (err) {
-        console.error('analyzeGrowFrames', err);
-        const code = err.code === 'auth/id-token-expired' ? 401 : 500;
-        res.status(code).json({error: err.message || 'Internal error'});
+        sendGuardError('analyzeGrowFrames', err, res);
       }
     },
 );
@@ -474,13 +481,8 @@ exports.coachChat = onRequest(
       }
 
       try {
-        const authHeader = req.headers.authorization || '';
-        const match = authHeader.match(/^Bearer (.+)$/i);
-        if (!match) {
-          res.status(401).json({error: 'Missing Authorization Bearer token'});
-          return;
-        }
-        await getAuth().verifyIdToken(match[1]);
+        const user = await requireVerifiedUser(req);
+        await consumeDailyQuota(user.uid, 'coachChat', COACH_CHAT_DAILY_MAX);
 
         const body = req.body || {};
         const message = String(body.message || '').trim();
@@ -565,9 +567,7 @@ exports.coachChat = onRequest(
           source: 'gemini',
         });
       } catch (err) {
-        console.error('coachChat', err);
-        const code = err.code === 'auth/id-token-expired' ? 401 : 500;
-        res.status(code).json({error: err.message || 'Internal error'});
+        sendGuardError('coachChat', err, res);
       }
     },
 );

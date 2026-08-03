@@ -267,6 +267,13 @@ service cloud.firestore {
     allow update, delete: if false;
   }
 
+  // Per-user daily AI quota counters (aiUsage/{uid}_{yyyy-mm-dd}).
+  // Written only by the Admin SDK in functions/user-guards.js — a client that
+  // could read or reset these could trivially bypass its own spend limit.
+  match /aiUsage/{usageId} {
+    allow read, create, update, delete: if false;
+  }
+
   // Consumed $GROWTOO payment tx signatures (one sig → one listing). Admin SDK only.
   match /usedPaymentSignatures/{signature} {
     allow read, create, update, delete: if false;
