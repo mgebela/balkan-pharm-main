@@ -8657,6 +8657,11 @@ body.crypto-simple .crypto-simple-only {
   flex-direction: column;
   gap: 0.85rem;
   padding: 0.15rem 0 0.25rem;
+  /* Centre in the scroll area. The starter-card grid used to fill this space;
+     with the capability row under the composer doing that job, top-aligning a
+     short hero just leaves a void beneath it. */
+  flex: 1;
+  justify-content: center;
 }
 
 .ai-coach-empty-hero {
@@ -8846,6 +8851,18 @@ body.crypto-simple .crypto-simple-only {
   border-bottom-left-radius: 5px;
   color: var(--coach-ink);
   box-shadow: none;
+}
+
+/* Marks a reply that came from the built-in guidance because the live coach
+   was unreachable — deliberately quiet, but present so a degraded answer is
+   never mistaken for the real thing. */
+.ai-coach-source {
+  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 214, 200, 0.55);
 }
 
 .ai-coach-bubble--user {
@@ -9121,6 +9138,70 @@ body.crypto-simple .crypto-simple-only {
 @keyframes ai-coach-spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* ——— Capability row under the composer ———
+   Standing answer to "what can this thing do?", which matters now that the
+   panel opens without focusing the input: the first thing a grower sees is a
+   set of concrete starting points rather than an empty text field. Scrolls
+   horizontally rather than wrapping, so composer height stays predictable. */
+.ai-coach-capabilities {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  /* Bleed to the composer edges so the row reads as scrollable, not clipped. */
+  padding: 0 0.8rem;
+  margin-left: -0.8rem;
+  margin-right: -0.8rem;
+}
+
+.ai-coach-capabilities::-webkit-scrollbar {
+  display: none;
+}
+
+.ai-coach-cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--coach-line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--coach-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 550;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ai-coach-cap svg {
+  flex: 0 0 auto;
+  color: var(--brass);
+  opacity: 0.9;
+}
+
+.ai-coach-cap:hover,
+.ai-coach-cap:focus-visible {
+  background: rgba(201, 165, 94, 0.14);
+  border-color: rgba(201, 165, 94, 0.45);
+}
+
+.ai-coach-cap:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-coach-cap:active {
+    transform: none;
   }
 }
 

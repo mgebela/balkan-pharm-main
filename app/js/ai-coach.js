@@ -137,6 +137,63 @@
     },
   ];
 
+  /*
+   * What the coach can actually do, shown as a persistent row under the
+   * composer. The panel opens without focusing the input — raising the
+   * keyboard on open hid this row and left the user staring at a blank
+   * text field with no idea what to ask.
+   */
+  const COACH_CAPABILITIES = [
+    {
+      id: 'today',
+      label: 'Today',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>',
+      text:
+        'What should I do next for my current plants?',
+    },
+    {
+      id: 'care',
+      label: 'Log care',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s5 5.5 5 9a5 5 0 01-10 0c0-3.5 5-9 5-9z"/></svg>',
+      text:
+        'Log watering for my current plant.',
+    },
+    {
+      id: 'diagnose',
+      label: 'Diagnose',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+      text:
+        'Something looks wrong with my plant. Ask me what you need to know and help me diagnose it.',
+    },
+    {
+      id: 'weather',
+      label: 'Weather',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17a4 4 0 010-8 5.5 5.5 0 0110.5 1.5A3.5 3.5 0 1117.5 17z"/></svg>',
+      text:
+        'What does the weather forecast mean for my grow over the next few days?',
+    },
+    {
+      id: 'stage',
+      label: 'Stage',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg>',
+      text:
+        'Help me update my plant to the next growth stage.',
+    },
+    {
+      id: 'tokenise',
+      label: 'Tokenise',
+      icon:
+        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h5M9.5 14h5"/></svg>',
+      text:
+        'Mint a seed or the next growth stage for my linked plant if journal proof is ready.',
+    },
+  ];
+
   let open = false;
   let busy = false;
   let history = [];
@@ -1202,11 +1259,10 @@
       '<div class="ai-coach-tab-panel" data-coach-panel="settings" id="ai-coach-settings-panel" hidden></div>' +
       '</div>' +
       '<div class="ai-coach-composer">' +
-      '<div class="ai-coach-quick" id="ai-coach-quick" aria-label="Suggestions"></div>' +
       '<form class="ai-coach-form" id="ai-coach-form">' +
       '<label class="ai-coach-field">' +
       '<span class="visually-hidden">Message</span>' +
-      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask about care, weather, or what to log next…" autocomplete="off"></textarea>' +
+      '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask your coach…" autocomplete="off"></textarea>' +
       '</label>' +
       '<div class="ai-coach-form-actions">' +
       '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
@@ -1218,11 +1274,25 @@
       '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
       '</svg></button>' +
       '</div></form>' +
+      '<div class="ai-coach-capabilities" id="ai-coach-capabilities" role="group" aria-label="What the coach can do">' +
+      COACH_CAPABILITIES.map(function (c) {
+        return (
+          '<button type="button" class="ai-coach-cap" data-prompt="' +
+          esc(c.text) +
+          '" title="' +
+          esc(c.text) +
+          '">' +
+          c.icon +
+          '<span>' +
+          esc(c.label) +
+          '</span></button>'
+        );
+      }).join('') +
+      '</div>' +
       '<p class="ai-coach-foot">Routine nudges can run quietly. Journal drafts need your tap. Minting and plant-health calls stay with you.</p>' +
       '</div></aside>';
     document.body.appendChild(root);
 
-    renderQuickPrompts();
 
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
     document.getElementById('ai-coach-close').addEventListener('click', close);
@@ -1241,8 +1311,8 @@
     });
     document.getElementById('ai-coach-form').addEventListener('submit', onSubmit);
     document.getElementById('ai-coach-mic').addEventListener('click', toggleVoice);
-    document.getElementById('ai-coach-quick').addEventListener('click', function (e) {
-      const chip = e.target.closest('.ai-coach-chip');
+    document.getElementById('ai-coach-capabilities').addEventListener('click', function (e) {
+      const chip = e.target.closest('.ai-coach-cap');
       if (!chip) return;
       const text = chip.getAttribute('data-prompt');
       if (text) ask(text);
@@ -1326,29 +1396,6 @@
     document.documentElement.style.setProperty('--coach-kbd-inset', inset + 'px');
   }
 
-  function renderQuickPrompts() {
-    const quick = document.getElementById('ai-coach-quick');
-    if (!quick) return;
-    // Empty state already shows starter cards — keep chips for mid-chat only.
-    if (!history.length) {
-      quick.innerHTML = '';
-      quick.hidden = true;
-      return;
-    }
-    quick.hidden = false;
-    quick.classList.add('ai-coach-quick--compact');
-    quick.innerHTML = QUICK_PROMPTS.map(function (p) {
-      return (
-        '<button type="button" class="ai-coach-chip" data-prompt="' +
-        esc(p.text) +
-        '">' +
-        '<span class="ai-coach-chip-label">' +
-        esc(p.label) +
-        '</span>' +
-        '</button>'
-      );
-    }).join('');
-  }
 
   function autoResizeInput() {
     const input = document.getElementById('ai-coach-input');
@@ -1370,13 +1417,13 @@
     saveHistory();
     clearComposerDraft();
     renderMessages();
-    renderQuickPrompts();
     setStatus('Fresh chat');
     const input = document.getElementById('ai-coach-input');
     if (input) {
       input.value = '';
       autoResizeInput();
-      input.focus();
+      // No focus here either — clearing the chat is not the same as wanting to
+      // type, and on mobile it would throw the keyboard up over the fresh panel.
     }
   }
 
@@ -1547,24 +1594,6 @@
       '<p>A low-key grow buddy — care pace, weather, and plain-language next steps. Not a feature pitch.</p>' +
       '</div>' +
       trustHtml +
-      '<div class="ai-coach-empty-grid" role="list">' +
-      QUICK_PROMPTS.slice(0, 4)
-        .map(function (p) {
-          return (
-            '<button type="button" class="ai-coach-starter" data-coach-prompt="' +
-            esc(p.text) +
-            '" role="listitem">' +
-            '<strong>' +
-            esc(p.label) +
-            '</strong>' +
-            '<span>' +
-            esc(p.hint || '') +
-            '</span>' +
-            '</button>'
-          );
-        })
-        .join('') +
-      '</div>' +
       reminderCardsHtml(reminders) +
       '</div>'
     );
@@ -1584,7 +1613,6 @@
     if (!el) return;
     if (!history.length && !typing) {
       el.innerHTML = emptyStateHtml(buildContext());
-      renderQuickPrompts();
       return;
     }
 
@@ -1592,10 +1620,18 @@
       .map(function (m) {
         const cls =
           'ai-coach-row ai-coach-row--' + (m.role === 'user' ? 'user' : 'assistant');
+        // Answers from the offline helpers are noticeably thinner than the live
+        // coach. Without a marker a network blip just reads as "the coach got
+        // worse", and beta reports become impossible to attribute.
+        const offline = m.role === 'assistant' && m.source && m.source !== 'gemini';
         let body =
           '<div class="ai-coach-bubble ai-coach-bubble--' +
           (m.role === 'user' ? 'user' : 'assistant') +
           '">' +
+          (offline
+            ? '<p class="ai-coach-source" title="The live coach was unreachable, ' +
+              'so this came from the built-in guidance.">Offline guidance</p>'
+            : '') +
           '<p>' +
           esc(humanizeCoachText(m.content)).replace(/\n/g, '<br/>') +
           '</p>';
@@ -1655,7 +1691,6 @@
 
     el.innerHTML = html;
     el.scrollTop = el.scrollHeight;
-    renderQuickPrompts();
   }
 
   function syncCoachNavState(isOpen) {
@@ -1686,7 +1721,6 @@
       if (!busy) loadHistory();
       else sanitizeChatState();
       renderMessages();
-      renderQuickPrompts();
       restoreComposerDraft();
       setStatus(
         busy
@@ -1697,13 +1731,10 @@
               ? 'Confirm actions below'
               : 'Ready to help'
       );
-      const input = document.getElementById('ai-coach-input');
-      if (input) {
-        autoResizeInput();
-        setTimeout(function () {
-          input.focus();
-        }, 40);
-      }
+      // Deliberately not focusing the input: on mobile that throws the
+      // keyboard up over the capability row and the conversation. The user
+      // taps the field when they actually want to type.
+      autoResizeInput();
     } else {
       saveComposerDraft();
       stopVoice();
@@ -1853,6 +1884,9 @@
     const text = String(message || '').trim();
     if (!text || busy) return;
     const input = document.getElementById('ai-coach-input');
+    // Captured before the field is disabled below — disabling drops focus, so
+    // this cannot be read back afterwards.
+    const wasTyping = !!input && document.activeElement === input;
     if (input) {
       input.value = '';
       autoResizeInput();
@@ -1929,7 +1963,9 @@
     }
     if (input) {
       input.disabled = false;
-      input.focus();
+      // Return focus only to someone who was typing. A capability-chip tap
+      // should not summon a keyboard the user never asked for.
+      if (wasTyping) input.focus();
     }
   }
 
