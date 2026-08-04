@@ -583,8 +583,13 @@
   </form>
   <script src="../app/js/signup.js?v=20260802f"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
+  <script src="../js/appcheck-config.js?v=20260803a"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+    import {
+      initializeAppCheck,
+      ReCaptchaEnterpriseProvider,
+    } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
     import {
       getAuth,
       signInWithEmailAndPassword,
@@ -639,6 +644,18 @@
     let profileWritePromise = null;
 
     const app = initializeApp(firebaseConfig);
+    // Must follow initializeApp; no-op until a site key is configured. Never
+    // let App Check be the reason sign-in fails to load.
+    try {
+      if (window.growtooAppCheckEnabled && window.growtooAppCheckEnabled()) {
+        initializeAppCheck(app, {
+          provider: new ReCaptchaEnterpriseProvider(window.GROWTOO_APPCHECK_SITE_KEY),
+          isTokenAutoRefreshEnabled: true,
+        });
+      }
+    } catch (err) {
+      console.warn('App Check init skipped', err);
+    }
     const auth = getAuth(app);
     const db = getFirestore(app);
     const googleProvider = new GoogleAuthProvider();

@@ -49,6 +49,7 @@ const realResolve = Module._resolveFilename;
 Module._resolveFilename = function(request, ...rest) {
   if (request === 'firebase-admin/firestore') return 'FAKE_FS';
   if (request === 'firebase-admin/auth') return 'FAKE_AUTH';
+  if (request === 'firebase-admin/app-check') return 'FAKE_AC';
   return realResolve.call(this, request, ...rest);
 };
 require.cache['FAKE_FS'] = {id: 'FAKE_FS', filename: 'FAKE_FS', loaded: true,
@@ -59,7 +60,20 @@ require.cache['FAKE_AUTH'] = {id: 'FAKE_AUTH', filename: 'FAKE_AUTH', loaded: tr
     return fakeToken;
   }})}};
 
+let appCheckValid = true;
+require.cache['FAKE_AC'] = {id: 'FAKE_AC', filename: 'FAKE_AC', loaded: true,
+  exports: {getAppCheck: () => ({verifyToken: async () => {
+    if (!appCheckValid) throw new Error('invalid app check token');
+    return {appId: 'app'};
+  }})}};
+
+// Loaded twice on purpose: APP_CHECK_ENFORCE is read at module load, so the
+// monitor-mode and enforce-mode paths need separate module instances.
 const g = require(path.join(FN, 'user-guards.js'));
+process.env.APP_CHECK_ENFORCE = 'true';
+delete require.cache[require.resolve(path.join(FN, 'user-guards.js'))];
+const gEnforce = require(path.join(FN, 'user-guards.js'));
+delete process.env.APP_CHECK_ENFORCE;
 
 // ---- tests ----
 let pass = 0; let fail = 0;
@@ -134,6 +148,36 @@ function check(name, cond, extra) {
   });
   check('guard message passes through with code',
       status === 429 && body.code === 'quota_exceeded', {status, body});
+
+  console.log('\n[appcheck] monitor mode never blocks');
+  appCheckValid = true;
+  let r = await g.verifyAppCheck({headers: {'x-firebase-appcheck': 't'}}, 'test');
+  check('valid token -> ok', r.ok === true && r.reason === 'appcheck_ok', r);
+  r = await g.verifyAppCheck({headers: {}}, 'test');
+  check('missing token -> reported, not thrown', r.ok === false && r.reason === 'appcheck_missing', r);
+  appCheckValid = false;
+  r = await g.verifyAppCheck({headers: {'x-firebase-appcheck': 'bad'}}, 'test');
+  check('invalid token -> reported, not thrown', r.ok === false && r.reason === 'appcheck_invalid', r);
+
+  console.log('\n[appcheck] enforce mode blocks');
+  check('enforce flag read from env', gEnforce.APP_CHECK_ENFORCE === true, gEnforce.APP_CHECK_ENFORCE);
+  appCheckValid = true;
+  r = await gEnforce.verifyAppCheck({headers: {'x-firebase-appcheck': 't'}}, 'test');
+  check('valid token still passes', r.ok === true, r);
+  try {
+    await gEnforce.verifyAppCheck({headers: {}}, 'test');
+    check('missing token rejected', false, 'no throw');
+  } catch (e) {
+    check('missing token -> 401/appcheck_missing', e.status === 401 && e.code === 'appcheck_missing', e);
+  }
+  appCheckValid = false;
+  try {
+    await gEnforce.verifyAppCheck({headers: {'x-firebase-appcheck': 'bad'}}, 'test');
+    check('invalid token rejected', false, 'no throw');
+  } catch (e) {
+    check('invalid token -> 401/appcheck_invalid', e.status === 401 && e.code === 'appcheck_invalid', e);
+  }
+  check('default build is monitor mode', g.APP_CHECK_ENFORCE === false, g.APP_CHECK_ENFORCE);
 
   console.log('\n' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);

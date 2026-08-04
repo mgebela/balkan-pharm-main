@@ -16,6 +16,11 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
 
+import {
+  initializeAppCheck,
+  ReCaptchaEnterpriseProvider
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg",
@@ -24,6 +29,18 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+// Must follow initializeApp; no-op until a site key is configured. Set by the
+// classic script js/appcheck-config.js, which runs before this module.
+try {
+  if (window.growtooAppCheckEnabled && window.growtooAppCheckEnabled()) {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(window.GROWTOO_APPCHECK_SITE_KEY),
+      isTokenAutoRefreshEnabled: true,
+    });
+  }
+} catch (err) {
+  console.warn('App Check init skipped', err);
+}
 const db = getFirestore(app);
 const auth = getAuth(app);
 

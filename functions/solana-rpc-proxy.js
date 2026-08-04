@@ -8,6 +8,8 @@
  */
 'use strict';
 
+const {verifyAppCheck} = require('./user-guards');
+
 const PUBLIC_FALLBACK = 'https://api.devnet.solana.com';
 
 /** Never proxy these — abuse / faucet / admin. */
@@ -156,6 +158,20 @@ async function handleSolanaRpc(req, res) {
     res.status(429).json({
       jsonrpc: '2.0',
       error: {code: -32005, message: 'Too many RPC requests'},
+      id: null,
+    });
+    return;
+  }
+
+  // This endpoint has no user auth at all — it relays to a paid RPC provider,
+  // so App Check is the only thing that can tie a caller to our app. Monitor
+  // mode until APP_CHECK_ENFORCE=true; see functions/user-guards.js.
+  try {
+    await verifyAppCheck(req, 'solanaRpc');
+  } catch (err) {
+    res.status(err.status || 401).json({
+      jsonrpc: '2.0',
+      error: {code: -32001, message: err.message || 'Unverified caller'},
       id: null,
     });
     return;

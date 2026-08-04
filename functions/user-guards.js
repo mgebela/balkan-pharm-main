@@ -9,7 +9,20 @@
  */
 
 const {getAuth} = require('firebase-admin/auth');
+const {getAppCheck} = require('firebase-admin/app-check');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+
+// App Check rollout switch. `onRequest` functions are not covered by the
+// console's enforcement toggle (that only applies to callable functions), so
+// enforcement has to happen here.
+//
+// Ships OFF on purpose: clients only start sending tokens once a reCAPTCHA
+// site key is set in js/appcheck-config.js and deployed. Turning this on
+// before that lands would reject every real request. Roll out in order —
+// deploy the client, watch the appcheck_missing / appcheck_invalid logs drop
+// to ~zero, then set APP_CHECK_ENFORCE=true.
+const APP_CHECK_ENFORCE =
+  String(process.env.APP_CHECK_ENFORCE || '').toLowerCase() === 'true';
 
 /** Error carrying the HTTP status the handler should return. */
 class GuardError extends Error {
@@ -63,6 +76,58 @@ async function requireVerifiedUser(req) {
   }
 
   return decoded;
+}
+
+/**
+ * Verify the Firebase App Check token on an incoming request.
+ *
+ * In monitor mode (the default) the outcome is logged and the request always
+ * proceeds, so this can be deployed ahead of the client rollout. Once
+ * APP_CHECK_ENFORCE=true, a missing or invalid token is rejected outright.
+ *
+ * This attests that the caller is our app — it says nothing about *who* they
+ * are, so it complements requireVerifiedUser() rather than replacing it.
+ *
+ * @param {!Object} req Incoming request.
+ * @param {string} label Log label for the calling endpoint.
+ * @return {Promise<{ok: boolean, reason: string}>} Verification outcome.
+ */
+async function verifyAppCheck(req, label) {
+  const token =
+    req.headers['x-firebase-appcheck'] || req.headers['X-Firebase-AppCheck'];
+
+  let outcome;
+  if (!token) {
+    outcome = {ok: false, reason: 'appcheck_missing'};
+  } else {
+    try {
+      await getAppCheck().verifyToken(String(token));
+      outcome = {ok: true, reason: 'appcheck_ok'};
+    } catch (err) {
+      outcome = {ok: false, reason: 'appcheck_invalid'};
+    }
+  }
+
+  if (!outcome.ok) {
+    // Structured so the rollout can be measured before enforcing.
+    console.warn(
+        JSON.stringify({
+          event: 'appcheck',
+          endpoint: label,
+          reason: outcome.reason,
+          enforcing: APP_CHECK_ENFORCE,
+        }),
+    );
+    if (APP_CHECK_ENFORCE) {
+      throw new GuardError(
+          401,
+          'This request could not be verified as coming from the growtoo app.',
+          outcome.reason,
+      );
+    }
+  }
+
+  return outcome;
 }
 
 /**
@@ -144,6 +209,8 @@ function sendGuardError(label, err, res) {
 module.exports = {
   GuardError,
   requireVerifiedUser,
+  verifyAppCheck,
   consumeDailyQuota,
   sendGuardError,
+  APP_CHECK_ENFORCE,
 };

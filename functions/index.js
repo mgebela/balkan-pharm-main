@@ -23,6 +23,7 @@ const {reservePaymentSignatureOnListingWrite} = require('./used-payment-signatur
 const {clientIp} = require('./solana-rpc-proxy');
 const {
   requireVerifiedUser,
+  verifyAppCheck,
   consumeDailyQuota,
   sendGuardError,
 } = require('./user-guards');
@@ -381,6 +382,7 @@ exports.analyzeGrowFrames = onRequest(
       }
 
       try {
+        await verifyAppCheck(req, 'analyzeGrowFrames');
         const user = await requireVerifiedUser(req);
         await consumeDailyQuota(
             user.uid,
@@ -481,6 +483,7 @@ exports.coachChat = onRequest(
       }
 
       try {
+        await verifyAppCheck(req, 'coachChat');
         const user = await requireVerifiedUser(req);
         await consumeDailyQuota(user.uid, 'coachChat', COACH_CHAT_DAILY_MAX);
 
