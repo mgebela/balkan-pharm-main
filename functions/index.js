@@ -94,12 +94,13 @@ Allowed action types:
 Rules:
 - Prefer plant names from the journal snapshot when resolving plants.
 - Never invent plantIds that are not in context unless creating a new plant first.
-- The snapshot's "toolboxRecent" holds the grower's actual latest logged readings
-  (watering mL, feeding product/dose, environment temp/humidity) — use these real numbers
-  when giving advice instead of speaking generically. E.g. if toolboxRecent.environment
-  shows humidity above the stage's target range, say so specifically rather than giving a
-  generic humidity tip. If toolboxRecent is empty for something relevant, say what's missing
-  ("log an environment reading and I can check it") instead of guessing.
+- Ground advice in the snapshot: toolboxRecent readings, daysInStage / daysSinceStart,
+  subphase, weather forecast, and recentEntries meta. Prefer those numbers over generic tips.
+  If a relevant reading is missing, say what to log (pH, EC, temp/RH, watering mL) instead of guessing.
+- Never invent sensor readings, dates, or symptoms that are not in the snapshot or photo.
+- When a plant photo is attached: describe what is visibly present first, then separate
+  facts from hypotheses. Ask at most one clarifying question if needed. Suggest concrete
+  journal logs that would confirm the top hypothesis.
 - Max 5 actions per response.
 - Destructive deletes are NOT allowed.
 - Be concise. Reply language: match the user (default English; Croatian if they write Croatian).
@@ -459,7 +460,8 @@ Do not invent details not visible in the images.`;
  *   message: string,
  *   history?: { role: 'user'|'assistant', content: string }[],
  *   context?: object,
- *   locale?: string
+ *   locale?: string,
+ *   image?: data:image/(jpeg|png|webp);base64,...
  * }
  * Header: Authorization: Bearer <Firebase ID token>
  */
@@ -470,7 +472,7 @@ exports.coachChat = onRequest(
       cors: true,
       invoker: 'public',
       maxInstances: 20,
-      timeoutSeconds: 60,
+      timeoutSeconds: 90,
       memory: '512MiB',
     },
     async (req, res) => {
@@ -490,8 +492,29 @@ exports.coachChat = onRequest(
 
         const body = req.body || {};
         const message = String(body.message || '').trim();
-        if (!message || message.length > 4000) {
-          res.status(400).json({error: 'Provide a message (1–4000 chars)'});
+        const imageRaw = typeof body.image === 'string' ? body.image.trim() : '';
+        let imagePart = null;
+        if (imageRaw) {
+          const m = imageRaw.match(
+              /^data:(image\/(?:jpeg|jpg|png|webp));base64,([A-Za-z0-9+/=\s]+)$/i,
+          );
+          if (!m) {
+            res.status(400).json({
+              error: 'image must be a data:image/jpeg|png|webp;base64,... URL',
+            });
+            return;
+          }
+          const mimeType = m[1].toLowerCase() === 'image/jpg' ? 'image/jpeg' : m[1].toLowerCase();
+          const data = m[2].replace(/\s+/g, '');
+          if (!data || data.length > 600000) {
+            res.status(400).json({error: 'Image payload is too large'});
+            return;
+          }
+          imagePart = {inlineData: {mimeType, data}};
+        }
+
+        if ((!message && !imagePart) || message.length > 4000) {
+          res.status(400).json({error: 'Provide a message (1–4000 chars) and/or an image'});
           return;
         }
 
@@ -504,9 +527,11 @@ exports.coachChat = onRequest(
         const history = Array.isArray(body.history) ? body.history.slice(-8) : [];
         const context = body.context && typeof body.context === 'object' ? body.context : {};
         const locale = body.locale === 'hr' ? 'hr' : 'en';
+        const userText = message ||
+          'Please look at this plant photo and help me diagnose what you see.';
 
         const stageKey = context.focusPlant && context.focusPlant.stage;
-        const knowledgeBlock = getRelevantKnowledge(message, stageKey);
+        const knowledgeBlock = getRelevantKnowledge(userText, stageKey);
 
         // Structural trim, not a string slice — see functions/coach-context.js.
         const fitted = buildContextJson(context);
@@ -526,6 +551,7 @@ exports.coachChat = onRequest(
           fitted.json,
           trimNote,
           locale === 'hr' ? 'Prefer Croatian replies.' : 'Prefer English replies.',
+          imagePart ? 'A plant photo is attached to the latest user message — use it.' : null,
           knowledgeBlock,
         ]
             .filter(Boolean)
@@ -543,7 +569,10 @@ exports.coachChat = onRequest(
             parts: [{text: String(turn.content).slice(0, 2000)}],
           });
         });
-        contents.push({role: 'user', parts: [{text: message}]});
+
+        const latestParts = [{text: userText}];
+        if (imagePart) latestParts.push(imagePart);
+        contents.push({role: 'user', parts: latestParts});
 
         const genAI = new GoogleGenAI({apiKey});
         const result = await genAI.models.generateContent({
@@ -583,6 +612,7 @@ exports.coachChat = onRequest(
           actions,
           model: 'gemini-2.0-flash',
           source: 'gemini',
+          sawImage: !!imagePart,
         });
       } catch (err) {
         sendGuardError('coachChat', err, res);

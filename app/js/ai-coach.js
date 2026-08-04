@@ -166,7 +166,7 @@
       icon:
         '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
       text:
-        'Something looks wrong with my plant. Ask me what you need to know and help me diagnose it.',
+        'Something looks wrong with my plant. Attach a leaf photo with + for a better read, then ask what you need and help me diagnose it.',
     },
     {
       id: 'weather',
@@ -194,13 +194,133 @@
     },
   ];
 
+  const MAX_COACH_IMAGE_EDGE = 800;
+  const MAX_COACH_IMAGE_CHARS = 350000;
+
   let open = false;
   let busy = false;
   let history = [];
   let pendingActions = [];
+  let pendingImage = null;
   let recognition = null;
   let listening = false;
   let typing = false;
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      const r = new FileReader();
+      r.onload = function () {
+        resolve(r.result);
+      };
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+  }
+
+  function resizeCoachImageDataUrl(dataUrl, maxEdge) {
+    const edge = Math.max(64, Number(maxEdge) || MAX_COACH_IMAGE_EDGE);
+    return new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () {
+        let w = img.width || 0;
+        let h = img.height || 0;
+        if (!w || !h) {
+          reject(new Error('Could not read image dimensions.'));
+          return;
+        }
+        const long = Math.max(w, h);
+        if (long > edge) {
+          const scale = edge / long;
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Could not process image.'));
+          return;
+        }
+        ctx.fillStyle = '#0f1a12';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        let quality = 0.82;
+        let out = '';
+        try {
+          out = canvas.toDataURL('image/jpeg', quality);
+          while (out.length > MAX_COACH_IMAGE_CHARS && quality > 0.45) {
+            quality -= 0.1;
+            out = canvas.toDataURL('image/jpeg', quality);
+          }
+        } catch (err) {
+          reject(err || new Error('Could not encode image.'));
+          return;
+        }
+        if (!out || out.length > MAX_COACH_IMAGE_CHARS) {
+          reject(new Error('Photo is still too large after compression. Try a smaller image.'));
+          return;
+        }
+        resolve(out);
+      };
+      img.onerror = function () {
+        reject(new Error('Could not load that image. Try JPG or PNG.'));
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  function detectCoachLocale(message) {
+    const t = String(message || '');
+    if (/[čćžšđČĆŽŠĐ]/.test(t)) return 'hr';
+    if (
+      /\b(biljk|zalij|gnoj|faz|cvjetanj|sadnic|klij|vlag|temperat|što|kako|moj[ae]?)\b/i.test(t)
+    ) {
+      return 'hr';
+    }
+    return 'en';
+  }
+
+  function syncAttachPreview() {
+    const preview = document.getElementById('ai-coach-attach-preview');
+    const thumb = document.getElementById('ai-coach-attach-thumb');
+    const attachBtn = document.getElementById('ai-coach-attach');
+    if (!preview || !thumb) return;
+    if (pendingImage) {
+      preview.hidden = false;
+      thumb.src = pendingImage;
+      if (attachBtn) attachBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      preview.hidden = true;
+      thumb.removeAttribute('src');
+      if (attachBtn) attachBtn.setAttribute('aria-pressed', 'false');
+    }
+  }
+
+  function clearPendingImage() {
+    pendingImage = null;
+    const input = document.getElementById('ai-coach-file');
+    if (input) input.value = '';
+    syncAttachPreview();
+  }
+
+  async function onCoachFileSelected(file) {
+    if (!file) return;
+    if (!String(file.type || '').startsWith('image/')) {
+      setStatus('Choose an image file (JPG or PNG).');
+      return;
+    }
+    setStatus('Preparing photo…');
+    try {
+      const raw = await readFileAsDataUrl(file);
+      pendingImage = await resizeCoachImageDataUrl(raw, MAX_COACH_IMAGE_EDGE);
+      syncAttachPreview();
+      setStatus('Photo attached — add a note and send.');
+    } catch (err) {
+      clearPendingImage();
+      setStatus((err && err.message) || 'Could not attach that photo.');
+    }
+  }
 
   function readJson(key, fallback) {
     try {
@@ -606,6 +726,87 @@
     return null;
   }
 
+  function plantTimingFields(p) {
+    if (!p) return {};
+    const stage = p.stage || '';
+    const stageAt = toMs((p.stageDates && p.stageDates[stage]) || p.startDate);
+    const startAt = toMs(p.startDate || p.createdAt);
+    return {
+      subphase: p.subphase || null,
+      subphaseLabel: p.subphase ? subphaseLabel(p.subphase) : null,
+      daysInStage: daysSinceMs(stageAt),
+      daysSinceStart: daysSinceMs(startAt),
+      notes: p.notes ? String(p.notes).slice(0, 160) : null,
+      hasPhoto: !!(p.photo || p.photoDataUrl || p.image),
+      fieldLocation: p.fieldLocation || null,
+      plantingLocation: p.plantingLocation || null,
+    };
+  }
+
+  function entryMetaSnippet(e) {
+    if (!e || !e.meta || typeof e.meta !== 'object') return null;
+    const m = e.meta;
+    const out = {};
+    if (m.stresori && typeof m.stresori === 'object') {
+      const s = m.stresori;
+      if (s.temp != null || s.temperature != null) {
+        out.tempC = s.temp != null ? s.temp : s.temperature;
+      }
+      if (s.humidity != null || s.rh != null) {
+        out.humidityPct = s.humidity != null ? s.humidity : s.rh;
+      }
+      if (s.vpd != null) out.vpd = s.vpd;
+      if (s.pests) out.pests = String(s.pests).slice(0, 80);
+      if (s.notes) out.stressNotes = String(s.notes).slice(0, 80);
+    }
+    if (m.temperature != null) out.tempC = m.temperature;
+    if (m.humidity != null) out.humidityPct = m.humidity;
+    if (m.amountMl != null) out.amountMl = m.amountMl;
+    if (m.product) out.product = String(m.product).slice(0, 60);
+    return Object.keys(out).length ? out : null;
+  }
+
+  function readWeatherContext() {
+    try {
+      let cache = null;
+      let city = '';
+      if (window.CoachCore) {
+        if (typeof CoachCore.readWeatherCache === 'function') {
+          cache = CoachCore.readWeatherCache();
+        }
+        if (typeof CoachCore.getWeatherCity === 'function') {
+          city = CoachCore.getWeatherCity() || '';
+        }
+      }
+      if (!city) {
+        try {
+          city = String(localStorage.getItem('dnevnik-live-weather-city') || '').trim();
+        } catch {
+          city = '';
+        }
+      }
+      if (!cache || !Array.isArray(cache.days) || !cache.days.length) {
+        return city ? { city: city, days: [] } : null;
+      }
+      return {
+        city: city || cache.city || null,
+        days: cache.days.slice(0, 4).map(function (d) {
+          return {
+            date: d.date || null,
+            label: d.label || null,
+            avgtemp: d.avgtemp != null ? d.avgtemp : null,
+            maxtemp: d.maxtemp != null ? d.maxtemp : null,
+            mintemp: d.mintemp != null ? d.mintemp : null,
+            rainChance: d.rainChance != null ? d.rainChance : null,
+            condition: d.condition || d.text || null,
+          };
+        }),
+      };
+    } catch {
+      return null;
+    }
+  }
+
   function buildContext() {
     const plants = getPlants();
     const entries = getEntries();
@@ -613,15 +814,20 @@
     const focusId = currentGrowlogPlantId();
     const focus = focusId ? plants.find((p) => p && String(p.id) === String(focusId)) : null;
 
-    const plantSummaries = plants.slice(0, 12).map((p) => ({
-      id: p.id,
-      name: p.name,
-      strain: p.strain || null,
-      stage: p.stage || null,
-      stageLabel: STAGE_LABELS[p.stage] || p.stage || null,
-      environmentType: p.environmentType || null,
-      startDate: p.startDate || null,
-    }));
+    const plantSummaries = plants.slice(0, 12).map((p) =>
+      Object.assign(
+        {
+          id: p.id,
+          name: p.name,
+          strain: p.strain || null,
+          stage: p.stage || null,
+          stageLabel: STAGE_LABELS[p.stage] || p.stage || null,
+          environmentType: p.environmentType || null,
+          startDate: p.startDate || null,
+        },
+        plantTimingFields(p)
+      )
+    );
 
     const recentEntries = entries
       .slice()
@@ -632,6 +838,8 @@
         plantId: e.plantId,
         date: e.date || null,
         note: e.note ? String(e.note).slice(0, 120) : null,
+        hasPhoto: !!(e.photo || e.photoDataUrl),
+        meta: entryMetaSnippet(e),
       }));
 
     let tokens = [];
@@ -716,13 +924,17 @@
 
     return {
       focusPlant: focus
-        ? {
-            id: focus.id,
-            name: focus.name,
-            strain: focus.strain || null,
-            stage: focus.stage || null,
-            stageLabel: STAGE_LABELS[focus.stage] || focus.stage || null,
-          }
+        ? Object.assign(
+            {
+              id: focus.id,
+              name: focus.name,
+              strain: focus.strain || null,
+              stage: focus.stage || null,
+              stageLabel: STAGE_LABELS[focus.stage] || focus.stage || null,
+              environmentType: focus.environmentType || null,
+            },
+            plantTimingFields(focus)
+          )
         : null,
       plants: plantSummaries,
       tokens: tokens,
@@ -733,6 +945,7 @@
         environment: Array.isArray(toolbox.environment) ? toolbox.environment.length : 0,
       },
       toolboxRecent: toolboxRecent,
+      weather: readWeatherContext(),
       reminders: reminders,
       mintQuest: questHint,
       growSetup: growSetup,
@@ -1139,9 +1352,31 @@
 
   function saveHistory() {
     try {
-      localStorage.setItem(scopedKey(STORAGE_CHAT), JSON.stringify(history.slice(-20)));
+      // Keep full photo data only on the newest few turns — older thumbs drop to a flag.
+      const slim = history.slice(-20).map(function (m, idx, arr) {
+        if (!m || !m.image) return m;
+        if (idx >= arr.length - 4) return m;
+        const copy = Object.assign({}, m);
+        copy.hasImage = true;
+        delete copy.image;
+        return copy;
+      });
+      localStorage.setItem(scopedKey(STORAGE_CHAT), JSON.stringify(slim));
+      history = slim;
     } catch {
-      // ignore
+      // Quota: strip all image payloads and retry once.
+      try {
+        history = history.map(function (m) {
+          if (!m || !m.image) return m;
+          const copy = Object.assign({}, m);
+          copy.hasImage = true;
+          delete copy.image;
+          return copy;
+        });
+        localStorage.setItem(scopedKey(STORAGE_CHAT), JSON.stringify(history.slice(-20)));
+      } catch {
+        // ignore
+      }
     }
   }
 
@@ -1296,12 +1531,21 @@
       '<div class="ai-coach-tab-panel" data-coach-panel="settings" id="ai-coach-settings-panel" hidden></div>' +
       '</div>' +
       '<div class="ai-coach-composer">' +
+      '<div class="ai-coach-attach-preview" id="ai-coach-attach-preview" hidden>' +
+      '<img id="ai-coach-attach-thumb" class="ai-coach-attach-thumb" alt="Attached plant photo" />' +
+      '<button type="button" class="ai-coach-attach-remove" id="ai-coach-attach-remove" aria-label="Remove photo">Remove</button>' +
+      '</div>' +
       '<form class="ai-coach-form" id="ai-coach-form">' +
+      '<input type="file" id="ai-coach-file" class="ai-coach-file" accept="image/*" hidden />' +
       '<label class="ai-coach-field">' +
       '<span class="visually-hidden">Message</span>' +
       '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask your coach…" autocomplete="off"></textarea>' +
       '</label>' +
       '<div class="ai-coach-form-actions">' +
+      '<button type="button" class="ai-coach-icon-btn ai-coach-attach" id="ai-coach-attach" title="Add photo" aria-label="Add plant photo" aria-pressed="false">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">' +
+      '<path d="M12 5v14M5 12h14"/>' +
+      '</svg></button>' +
       '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
       '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3"/>' +
@@ -1348,6 +1592,24 @@
     });
     document.getElementById('ai-coach-form').addEventListener('submit', onSubmit);
     document.getElementById('ai-coach-mic').addEventListener('click', toggleVoice);
+    const attachBtn = document.getElementById('ai-coach-attach');
+    const fileInput = document.getElementById('ai-coach-file');
+    const removeAttach = document.getElementById('ai-coach-attach-remove');
+    if (attachBtn && fileInput) {
+      attachBtn.addEventListener('click', function () {
+        fileInput.click();
+      });
+      fileInput.addEventListener('change', function () {
+        const file = fileInput.files && fileInput.files[0];
+        onCoachFileSelected(file);
+      });
+    }
+    if (removeAttach) {
+      removeAttach.addEventListener('click', function () {
+        clearPendingImage();
+        setStatus('Photo removed');
+      });
+    }
     document.getElementById('ai-coach-capabilities').addEventListener('click', function (e) {
       const chip = e.target.closest('.ai-coach-cap');
       if (!chip) return;
@@ -1528,6 +1790,7 @@
     typing = false;
     saveHistory();
     clearComposerDraft();
+    clearPendingImage();
     renderMessages();
     setStatus('Fresh chat');
     const input = document.getElementById('ai-coach-input');
@@ -1735,7 +1998,16 @@
         let body =
           '<div class="ai-coach-bubble ai-coach-bubble--' +
           (m.role === 'user' ? 'user' : 'assistant') +
-          '">' +
+          '">';
+        if (m.role === 'user' && m.image) {
+          body +=
+            '<img class="ai-coach-bubble-photo" src="' +
+            esc(m.image) +
+            '" alt="Attached plant photo" />';
+        } else if (m.role === 'user' && m.hasImage) {
+          body += '<p class="ai-coach-bubble-photo-note">Photo attached</p>';
+        }
+        body +=
           '<p>' +
           esc(humanizeCoachText(m.content)).replace(/\n/g, '<br/>') +
           '</p>';
@@ -1954,27 +2226,36 @@
     return null;
   }
 
-  async function askRemote(message, context) {
+  async function askRemote(message, context, imageDataUrl) {
     const token = await getIdToken();
     if (!token) {
       const err = new Error('Sign in required for live coach');
       err.code = 'auth';
       throw err;
     }
+    if (imageDataUrl && String(imageDataUrl).length > MAX_COACH_IMAGE_CHARS + 64) {
+      const err = new Error('Photo is too large to send. Try a smaller image.');
+      err.code = 'image_too_large';
+      throw err;
+    }
+    // Exclude the just-pushed user turn — it is sent as `message` (+ image).
+    const prior = history.slice(0, -1).slice(-8).map(function (h) {
+      return { role: h.role, content: h.content };
+    });
+    const payload = {
+      message: message,
+      history: prior,
+      context: context,
+      locale: detectCoachLocale(message),
+    };
+    if (imageDataUrl) payload.image = imageDataUrl;
     const res = await fetch(COACH_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
       },
-      body: JSON.stringify({
-        message: message,
-        history: history.slice(-8).map(function (h) {
-          return { role: h.role, content: h.content };
-        }),
-        context: context,
-        locale: 'en',
-      }),
+      body: JSON.stringify(payload),
     });
     const data = await res.json().catch(function () {
       return {};
@@ -1993,7 +2274,13 @@
 
   async function ask(message) {
     const text = String(message || '').trim();
-    if (!text || busy) return;
+    const image = pendingImage;
+    if ((!text && !image) || busy) return;
+    const sendText =
+      text ||
+      (image
+        ? 'Please look at this plant photo and help me diagnose what you see.'
+        : '');
     const input = document.getElementById('ai-coach-input');
     // Captured before the field is disabled below — disabling drops focus, so
     // this cannot be read back afterwards.
@@ -2003,11 +2290,18 @@
       autoResizeInput();
     }
     clearComposerDraft();
+    clearPendingImage();
 
-    history.push({ role: 'user', content: humanizeCoachText(text), at: Date.now() });
+    const userTurn = {
+      role: 'user',
+      content: humanizeCoachText(sendText),
+      at: Date.now(),
+    };
+    if (image) userTurn.image = image;
+    history.push(userTurn);
     typing = true;
     busy = true;
-    setStatus('Thinking…');
+    setStatus(image ? 'Looking at your photo…' : 'Thinking…');
     renderMessages();
     saveHistory();
 
@@ -2025,13 +2319,13 @@
     let source = 'local';
     let needsVerify = false;
     try {
-      const remote = await askRemote(text, context);
+      const remote = await askRemote(sendText, context, image || null);
       reply = remote.reply;
       actions = remote.actions || [];
       source = 'gemini';
       // If model returned advice-only but user clearly asked to act, merge local intents
       if (!actions.length) {
-        const local = parseLocalIntents(text, context);
+        const local = parseLocalIntents(sendText, context);
         if (local.actions && local.actions.length) {
           actions = local.actions;
           if (!reply) reply = local.reply;
@@ -2040,11 +2334,13 @@
       }
     } catch (err) {
       console.warn('AI coach remote failed, using local knowledge', err);
-      const local = localReply(text, context);
+      const local = localReply(sendText, context);
       reply = local.reply;
       actions = local.actions || [];
       if (err && err.code === 'auth') {
         reply += '\n\n(Sign in to use the live coach. Using local helpers for now.)';
+      } else if (err && err.code === 'image_too_large') {
+        reply += '\n\n(' + err.message + ')';
       } else if (err && err.serverCode === 'email_unverified') {
         needsVerify = true;
         reply +=
@@ -2053,6 +2349,10 @@
           ' Also check Spam / Promotions for “Verify your email · growtoo”. Using local helpers until then.)';
       } else if (err && err.serverCode === 'quota_exceeded') {
         reply += '\n\n(' + err.message + ' Using local helpers until then.)';
+      }
+      if (image) {
+        reply +=
+          '\n\n(Photo diagnosis needs the live coach — your picture wasn’t analyzed offline. Try again when the live coach is available.)';
       }
       source = 'local';
     }

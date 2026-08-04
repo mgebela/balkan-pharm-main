@@ -24,6 +24,7 @@ const PRIORITY_FIELDS = [
   'focusPlant',
   'toolboxRecent',
   'toolboxCounts',
+  'weather',
   'reminders',
   'mintQuest',
   'growSetup',
