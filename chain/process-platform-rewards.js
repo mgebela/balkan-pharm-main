@@ -162,6 +162,23 @@ async function processDoc(doc) {
 
     // Adopter Devnet test faucet — fixed mint, no grower activity scoring.
     if (data.source === 'adopter_faucet') {
+      if (!data.dayKey) throw new Error('Faucet claim requires a dayKey.');
+
+      // Idempotency: one minted faucet claim per uid+dayKey. The rules bind the
+      // doc id to the day, which stops a user creating extras — this is the
+      // second lock, and it also catches anything created before that rule
+      // landed. Equality-only filters, so no composite index needed.
+      const priorFaucet = await db
+        .collection('platformRewards')
+        .where('uid', '==', data.uid)
+        .where('source', '==', 'adopter_faucet')
+        .where('dayKey', '==', data.dayKey)
+        .where('status', '==', 'minted')
+        .get();
+      if (priorFaucet.docs.some((d) => d.id !== doc.id)) {
+        throw new Error(`Faucet already minted for ${data.uid} on ${data.dayKey}.`);
+      }
+
       const amount = Math.max(1, Math.min(500, Number(data.amount || 100)));
       const recipient = publicKey(data.recipient);
       const token = findAssociatedTokenPda(umi, { mint: GROW_MINT, owner: recipient });
