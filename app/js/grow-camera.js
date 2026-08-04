@@ -4,8 +4,8 @@
 (function () {
   'use strict';
 
-  const MAX_EDGE = 800;
-  const MAX_CHARS = 350000;
+  const MAX_EDGE = 640;
+  const MAX_CHARS = 160000;
 
   let root = null;
   let stream = null;

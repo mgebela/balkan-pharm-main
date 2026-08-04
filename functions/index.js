@@ -575,17 +575,30 @@ exports.coachChat = onRequest(
         contents.push({role: 'user', parts: latestParts});
 
         const genAI = new GoogleGenAI({apiKey});
-        const result = await genAI.models.generateContent({
-          model: 'gemini-2.0-flash',
-          contents,
-          config: {
-            responseMimeType: 'application/json',
-            responseSchema: COACH_RESPONSE_SCHEMA,
-          },
-        });
+        let result;
+        try {
+          result = await genAI.models.generateContent({
+            model: 'gemini-2.0-flash',
+            contents,
+            config: {
+              responseMimeType: 'application/json',
+              responseSchema: COACH_RESPONSE_SCHEMA,
+            },
+          });
+        } catch (modelErr) {
+          console.error(
+              'coachChat: generateContent failed',
+              modelErr && modelErr.message ? modelErr.message : modelErr,
+          );
+          res.status(502).json({
+            error: 'Live coach model failed. Try a smaller photo or try again in a moment.',
+            code: 'model_failed',
+          });
+          return;
+        }
         const text = String(result.text || '').trim();
         if (!text) {
-          res.status(502).json({error: 'Empty model response'});
+          res.status(502).json({error: 'Empty model response', code: 'empty_model'});
           return;
         }
 
@@ -598,7 +611,10 @@ exports.coachChat = onRequest(
           parsed = JSON.parse(text);
         } catch (parseErr) {
           console.error('coachChat: model returned non-JSON despite schema', text.slice(0, 500));
-          res.status(502).json({error: 'Coach response was malformed. Try again.'});
+          res.status(502).json({
+            error: 'Coach response was malformed. Try again.',
+            code: 'bad_model_json',
+          });
           return;
         }
 

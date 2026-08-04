@@ -194,8 +194,10 @@
     },
   ];
 
-  const MAX_COACH_IMAGE_EDGE = 800;
-  const MAX_COACH_IMAGE_CHARS = 350000;
+  // Keep coach photos small — large data-URLs make the live request fragile
+  // (slow mobile upload / localStorage quota) and we only need leaf detail.
+  const MAX_COACH_IMAGE_EDGE = 640;
+  const MAX_COACH_IMAGE_CHARS = 160000;
 
   let open = false;
   let busy = false;
@@ -2221,10 +2223,10 @@
     }
   }
 
-  async function getIdToken() {
+  async function getIdToken(forceRefresh) {
     try {
       if (window.firebase && firebase.auth && firebase.auth().currentUser) {
-        return await firebase.auth().currentUser.getIdToken();
+        return await firebase.auth().currentUser.getIdToken(!!forceRefresh);
       }
     } catch {
       // ignore
@@ -2233,7 +2235,7 @@
   }
 
   async function askRemote(message, context, imageDataUrl) {
-    const token = await getIdToken();
+    const token = await getIdToken(true);
     if (!token) {
       const err = new Error('Sign in required for live coach');
       err.code = 'auth';
@@ -2255,14 +2257,23 @@
       locale: detectCoachLocale(message),
     };
     if (imageDataUrl) payload.image = imageDataUrl;
-    const res = await fetch(COACH_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-      body: JSON.stringify(payload),
-    });
+    let res;
+    try {
+      res = await fetch(COACH_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (netErr) {
+      const err = new Error(
+        (netErr && netErr.message) || 'Network error reaching the live coach'
+      );
+      err.code = 'network';
+      throw err;
+    }
     const data = await res.json().catch(function () {
       return {};
     });
@@ -2303,7 +2314,9 @@
       content: humanizeCoachText(sendText),
       at: Date.now(),
     };
-    if (image) userTurn.image = image;
+    // Keep a light marker in history until the live call finishes — storing the
+    // full data-URL before the request can blow localStorage quota on mobile.
+    if (image) userTurn.hasImage = true;
     history.push(userTurn);
     typing = true;
     busy = true;
@@ -2329,8 +2342,15 @@
       reply = remote.reply;
       actions = remote.actions || [];
       source = 'gemini';
+      if (image && history.length) {
+        const lastUser = history[history.length - 1];
+        if (lastUser && lastUser.role === 'user') {
+          lastUser.image = image;
+          delete lastUser.hasImage;
+        }
+      }
       // If model returned advice-only but user clearly asked to act, merge local intents
-      if (!actions.length) {
+      if (!actions.length && !image) {
         const local = parseLocalIntents(sendText, context);
         if (local.actions && local.actions.length) {
           actions = local.actions;
@@ -2340,25 +2360,35 @@
       }
     } catch (err) {
       console.warn('AI coach remote failed, using local knowledge', err);
-      const local = localReply(sendText, context);
-      reply = local.reply;
-      actions = local.actions || [];
-      if (err && err.code === 'auth') {
-        reply += '\n\n(Sign in to use the live coach. Using local helpers for now.)';
-      } else if (err && err.code === 'image_too_large') {
-        reply += '\n\n(' + err.message + ')';
-      } else if (err && err.serverCode === 'email_unverified') {
+      const code = (err && (err.serverCode || err.code)) || '';
+      const status = err && err.status;
+      if (code === 'email_unverified') {
         needsVerify = true;
+        reply =
+          'Verify your email to unlock the live coach (including photo diagnosis). ' +
+          'Check inbox/Spam for “Verify your email · growtoo”, then tap I already verified and send the photo again.';
+      } else if (code === 'auth') {
+        reply = 'Sign in again to use the live coach, then resend your photo.';
+      } else if (code === 'image_too_large') {
+        reply = err.message || 'Photo is too large. Retake a closer leaf shot and try again.';
+      } else if (code === 'quota_exceeded') {
+        reply =
+          (err && err.message) ||
+          'Daily live-coach limit reached. Try again tomorrow, or log care in the journal for now.';
+      } else if (image) {
+        reply =
+          'Couldn’t analyze this photo with the live coach yet. ' +
+          (err && err.message ? '(' + err.message + (status ? ' · ' + status : '') + ') ' : '') +
+          'Make sure you’re online, your email is verified, then try Ask coach again.';
+      } else {
+        const local = localReply(sendText, context);
+        reply = local.reply;
+        actions = local.actions || [];
         reply +=
-          '\n\n(' +
-          err.message +
-          ' Also check Spam / Promotions for “Verify your email · growtoo”. Using local helpers until then.)';
-      } else if (err && err.serverCode === 'quota_exceeded') {
-        reply += '\n\n(' + err.message + ' Using local helpers until then.)';
-      }
-      if (image) {
-        reply +=
-          '\n\n(Photo diagnosis needs the live coach — your picture wasn’t analyzed offline. Try again when the live coach is available.)';
+          '\n\n(Live coach unavailable' +
+          (err && err.message ? ': ' + err.message : '') +
+          (status ? ' · ' + status : '') +
+          '. Using local helpers for now.)';
       }
       source = 'local';
     }
