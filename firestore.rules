@@ -38,16 +38,39 @@ service cloud.firestore {
         : 'none';
     }
 
+    // Admin panel / privileged ops: only these Firebase Auth emails.
+    // Grower/adopter accounts must never receive admin privileges.
+    function isAllowedAdminEmail() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.lower() in [
+          'supadmin@dnevnik.live',
+          'admin@dnevnik.live'
+        ];
+    }
+
     function isSuperadmin() {
-      return callerRole() == 'superadmin';
+      return callerRole() == 'superadmin' && isAllowedAdminEmail();
     }
 
     function isAdminOrSuper() {
-      return callerRole() in ['admin', 'superadmin'];
+      return callerRole() in ['admin', 'superadmin'] && isAllowedAdminEmail();
     }
 
     function isPrivilegedRole(role) {
       return normalizedRole(role) in ['admin', 'superadmin'];
+    }
+
+    // Prevent promoting arbitrary users to admin/superadmin in Firestore.
+    function privilegedRoleAssignmentAllowed() {
+      return !isPrivilegedRole(request.resource.data.role)
+        || (
+          request.resource.data.email is string
+          && request.resource.data.email.lower() in [
+            'supadmin@dnevnik.live',
+            'admin@dnevnik.live'
+          ]
+        );
     }
 
     function hasSharedGrant(ownerUid) {
@@ -131,7 +154,8 @@ service cloud.firestore {
           || (!('profileType' in resource.data) && isValidProfileType(request.resource.data.profileType))))
       || (request.auth.uid == userId && walletUnlinkAllowed())
       || (request.auth.uid == userId && profileTypeUpdateAllowed())
-      || isSuperadmin()
+      // Superadmin may edit users, but cannot promote non-allowlisted emails to admin.
+      || (isSuperadmin() && privilegedRoleAssignmentAllowed())
     );
 
     allow delete: if isSuperadmin();

@@ -963,6 +963,36 @@ body.profile-adopter .account-profile-avatar {
   flex: 1 1 auto;
 }
 
+.account-profile-verify {
+  margin: 0.75rem 0 0;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(157, 255, 176, 0.22);
+  background: rgba(12, 32, 20, 0.72);
+}
+.account-profile-verify p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: rgba(220, 245, 226, 0.92);
+}
+.account-profile-verify-hint {
+  margin-top: 0.35rem !important;
+  color: rgba(180, 220, 190, 0.78) !important;
+  font-size: 0.78rem !important;
+}
+.account-profile-verify-actions {
+  margin-top: 0.55rem;
+}
+.account-profile-verify-status {
+  margin-top: 0.45rem !important;
+  font-size: 0.78rem !important;
+  color: rgba(157, 255, 176, 0.9) !important;
+}
+.account-profile-verify-status.is-error {
+  color: #ffb4a8 !important;
+}
+
 .more-nav-overlay:not([hidden]) .more-nav-sheet {
   transform: translateY(0);
 }
@@ -8949,6 +8979,13 @@ body.crypto-simple .crypto-simple-only {
 
 .ai-coach-action-bar .btn {
   font-weight: 650;
+}
+
+.ai-coach-verify-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
 }
 
 .ai-coach-composer {

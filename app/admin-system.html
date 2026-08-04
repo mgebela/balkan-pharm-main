@@ -25,7 +25,11 @@ firebase.auth().onAuthStateChanged(async (user) => {
     return v;
   })(snap.data().role);
 
-  if (role !== 'admin' && role !== 'superadmin') {
+  const email = String(user.email || '').trim().toLowerCase();
+  const allowed =
+    email === 'supadmin@dnevnik.live' || email === 'admin@dnevnik.live';
+
+  if ((role !== 'admin' && role !== 'superadmin') || !allowed) {
     window.location.href = "index.html";
     return;
   }
@@ -90,7 +94,7 @@ button {
 <div id="app"></div>
 
 <script src="../js/appcheck-config.js?v=20260803a"></script>
-<script type="module" src="js/admin.js?v=20260803a"></script>
+<script type="module" src="js/admin.js?v=20260804a"></script>
 
 </body>
 </html>

@@ -1416,8 +1416,83 @@
       }
       if (e.target.closest('[data-coach-cancel]')) {
         cancelPendingActions();
+        return;
+      }
+      if (e.target.closest('[data-coach-resend-verify]')) {
+        resendCoachVerification(e.target.closest('[data-coach-resend-verify]'));
+        return;
+      }
+      if (e.target.closest('[data-coach-refresh-verify]')) {
+        refreshCoachVerification(e.target.closest('[data-coach-refresh-verify]'));
       }
     });
+  }
+
+  async function resendCoachVerification(btn) {
+    if (!window.GrowtooEmailVerify || typeof GrowtooEmailVerify.resend !== 'function') {
+      setStatus('Resend unavailable — open Account and try there.');
+      return;
+    }
+    if (btn) btn.disabled = true;
+    setStatus('Sending verification email…');
+    try {
+      const result = await GrowtooEmailVerify.resend();
+      if (result && result.already) {
+        setStatus('Already verified — live coach unlocked.');
+        clearVerifyFlags();
+        return;
+      }
+      setStatus(
+        'Verification sent' +
+          (result && result.email ? ' to ' + result.email : '') +
+          ' — check inbox & Spam.'
+      );
+    } catch (err) {
+      const code = err && err.code;
+      if (code === 'auth/too-many-requests') {
+        setStatus('Too many sends — wait a few minutes.');
+      } else {
+        setStatus((err && err.message) || 'Could not resend verification.');
+      }
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  async function refreshCoachVerification(btn) {
+    if (!window.GrowtooEmailVerify || typeof GrowtooEmailVerify.refresh !== 'function') {
+      setStatus('Refresh unavailable — reopen the app after verifying.');
+      return;
+    }
+    if (btn) btn.disabled = true;
+    setStatus('Checking verification…');
+    try {
+      const ok = await GrowtooEmailVerify.refresh();
+      if (ok) {
+        setStatus('Email verified — try the coach again.');
+        clearVerifyFlags();
+      } else {
+        setStatus('Still unverified — open the email link, then tap again.');
+      }
+    } catch (err) {
+      setStatus((err && err.message) || 'Could not refresh verification.');
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  }
+
+  function clearVerifyFlags() {
+    let changed = false;
+    history.forEach(function (m) {
+      if (m && m.needsVerify) {
+        m.needsVerify = false;
+        changed = true;
+      }
+    });
+    if (changed) {
+      saveHistory();
+      renderMessages();
+    }
   }
 
   function syncCoachKeyboardInset() {
@@ -1712,6 +1787,13 @@
             (m.source === 'gemini' ? 'Live coach' : 'Local helper') +
             '</span>';
         }
+        if (m.role === 'assistant' && m.needsVerify) {
+          body +=
+            '<div class="ai-coach-verify-bar">' +
+            '<button type="button" class="btn btn-primary btn-sm" data-coach-resend-verify>Resend verification email</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-coach-refresh-verify>I already verified</button>' +
+            '</div>';
+        }
         return '<div class="' + cls + '">' + body + '</div>';
       })
       .join('');
@@ -1941,6 +2023,7 @@
     let reply = '';
     let actions = [];
     let source = 'local';
+    let needsVerify = false;
     try {
       const remote = await askRemote(text, context);
       reply = remote.reply;
@@ -1962,9 +2045,13 @@
       actions = local.actions || [];
       if (err && err.code === 'auth') {
         reply += '\n\n(Sign in to use the live coach. Using local helpers for now.)';
-      } else if (err && (err.serverCode === 'email_unverified' || err.serverCode === 'quota_exceeded')) {
-        // Say why the live coach went quiet — otherwise the silent fall back to
-        // local helpers just looks like the coach got worse for no reason.
+      } else if (err && err.serverCode === 'email_unverified') {
+        needsVerify = true;
+        reply +=
+          '\n\n(' +
+          err.message +
+          ' Also check Spam / Promotions for “Verify your email · growtoo”. Using local helpers until then.)';
+      } else if (err && err.serverCode === 'quota_exceeded') {
         reply += '\n\n(' + err.message + ' Using local helpers until then.)';
       }
       source = 'local';
@@ -1980,6 +2067,7 @@
       at: Date.now(),
       source: source,
       actions: actions.length ? actions : undefined,
+      needsVerify: needsVerify,
     });
     saveHistory();
     renderMessages();

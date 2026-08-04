@@ -379,6 +379,33 @@
     }
   }
 
+  /** Same gate as the adopt how-to: hide once a plant is adopted. */
+  function adopterOnboardingDone() {
+    try {
+      if (!window.PlantToken || typeof PlantToken.getWallet !== 'function') return false;
+      const w = PlantToken.getWallet() || {};
+      if (Array.isArray(w.tokens) && w.tokens.length > 0) return true;
+      if (window.Market && typeof Market.getListings === 'function') {
+        const uid = currentUid();
+        if (
+          uid &&
+          (Market.getListings() || []).some(function (l) {
+            return (
+              l &&
+              l.buyerUid === uid &&
+              (l.status === 'sold' || l.status === 'sale_pending')
+            );
+          })
+        ) {
+          return true;
+        }
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function nextStep(adopter) {
     if (adopter) {
       const copy =
@@ -423,6 +450,12 @@
     const lead = document.getElementById('daily-start-lead');
     const actions = document.getElementById('daily-start-actions');
     if (!strip || !actions) return;
+    // Intro only — hide once the adopter has connected a wallet and adopted.
+    if (adopter && adopterOnboardingDone()) {
+      strip.hidden = true;
+      actions.innerHTML = '';
+      return;
+    }
     const step = nextStep(adopter);
     if (kicker) kicker.textContent = step.kicker;
     if (lead) lead.textContent = step.lead;

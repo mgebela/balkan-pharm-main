@@ -44,6 +44,8 @@ try {
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+const ADMIN_PANEL_EMAILS = ['supadmin@dnevnik.live', 'admin@dnevnik.live'];
+
 function normalizeUserRole(role) {
   const r = String(role == null ? '' : role).trim().toLowerCase();
   if (!r) return 'user';
@@ -51,9 +53,14 @@ function normalizeUserRole(role) {
   return r;
 }
 
-function isAdminPanelRole(role) {
+function isAllowedAdminEmail(email) {
+  return ADMIN_PANEL_EMAILS.indexOf(String(email || '').trim().toLowerCase()) !== -1;
+}
+
+function isAdminPanelRole(role, email) {
   const r = normalizeUserRole(role);
-  return r === 'admin' || r === 'superadmin';
+  if (r !== 'admin' && r !== 'superadmin') return false;
+  return isAllowedAdminEmail(email);
 }
 
 // HTML-escape any value before interpolating it into innerHTML. Firestore
@@ -81,19 +88,21 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const role = normalizeUserRole(userSnap.data().role);
+  const email = user.email || '';
 
-  if (!isAdminPanelRole(role) && role !== 'viewer') {
-    window.location.href = "../index.html";
+  // Viewers are not admins. Growers with a mistaken privileged role stay out.
+  if (role === 'viewer') {
+    window.location.href = '../index.html?view=plants';
     return;
   }
 
-  if (role === "viewer") {
-    window.location.href = "../index.html?view=plants";
+  if (!isAdminPanelRole(role, email)) {
+    window.location.href = '../index.html';
     return;
   }
 
   window.__adminPanelRole = role;
-  window.__adminReadOnly = role === "admin";
+  window.__adminReadOnly = role === 'admin';
 
   init();
 });
@@ -366,6 +375,20 @@ function openModal(data, readOnly = false) {
 
   document.getElementById("saveDynamic").onclick = async () => {
     const formData = getFormDataDynamic();
+
+    if (page === 'users') {
+      const nextRole = normalizeUserRole(formData.role);
+      const targetEmail = String(formData.email || '').trim().toLowerCase();
+      if (
+        (nextRole === 'admin' || nextRole === 'superadmin') &&
+        !isAllowedAdminEmail(targetEmail)
+      ) {
+        alert(
+          'Admin / superadmin roles are limited to supadmin@dnevnik.live and admin@dnevnik.live.'
+        );
+        return;
+      }
+    }
 
     if (editId) {
       await updateDoc(doc(db, page, editId), formData);

@@ -2449,14 +2449,60 @@
     }
   }
 
-  function applyProfileChrome() {
+  function linkedWalletPubkey() {
+    try {
+      if (window.WalletLink && typeof WalletLink.getProfile === 'function') {
+        return String((WalletLink.getProfile() || {}).solanaPubkey || '');
+      }
+    } catch {
+      // ignore
+    }
+    return '';
+  }
+
+  /** Intro complete once the garden has an adopted plant (wallet link optional). */
+  function adopterIntroComplete(wallet) {
+    const w = wallet || readWallet() || {};
+    if (Array.isArray(w.tokens) && w.tokens.length > 0) return true;
+    try {
+      if (window.Market && typeof Market.getListings === 'function') {
+        const uid =
+          (window.firebase && firebase.auth && firebase.auth().currentUser && firebase.auth().currentUser.uid) ||
+          accountUid ||
+          '';
+        if (uid) {
+          const mine = (Market.getListings() || []).some(function (l) {
+            return (
+              l &&
+              l.buyerUid === uid &&
+              (l.status === 'sold' || l.status === 'sale_pending')
+            );
+          });
+          if (mine) return true;
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  }
+
+  function applyProfileChrome(wallet) {
     const marketCta = document.getElementById('adopt-market-cta');
     if (marketCta) {
       marketCta.hidden = !isAdopterUi();
     }
     const guide = document.getElementById('adopter-guide');
     if (guide) {
-      guide.hidden = !isAdopterUi();
+      const w = wallet || readWallet() || {};
+      const hasWallet = !!(w.connected || w.address || linkedWalletPubkey());
+      const introDone = adopterIntroComplete(w);
+      // Intro only — hide as soon as a plant is in the garden / adopted.
+      guide.hidden = !isAdopterUi() || introDone;
+      const guideWalletBtn = document.getElementById('adopter-guide-wallet-btn');
+      if (guideWalletBtn) {
+        guideWalletBtn.hidden = guide.hidden || hasWallet;
+      }
     }
     renderTokeniseExplainer();
   }
@@ -2815,12 +2861,19 @@
           ? false
           : !(wallet.connected || (wallet.tokens && wallet.tokens.length > 0));
       }
-      applyProfileChrome();
+      applyProfileChrome(wallet);
       if (!isAdopterUi()) {
         fillSeedPlantOptions();
       }
       if (isAdopterUi() || wallet.connected || (wallet.tokens && wallet.tokens.length > 0)) {
         renderGarden(wallet);
+      }
+      try {
+        if (window.DailyStatus && typeof DailyStatus.renderStrip === 'function') {
+          DailyStatus.renderStrip();
+        }
+      } catch {
+        // ignore
       }
     } finally {
       renderAdoptBusy = false;

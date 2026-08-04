@@ -905,14 +905,20 @@
       try {
         if (mode === 'signup') {
           const cred = await createUserWithEmailAndPassword(auth, email, password);
+          let verifySent = false;
           try {
             await sendEmailVerification(cred.user);
+            verifySent = true;
           } catch (verifyErr) {
             console.warn('email verification', verifyErr);
           }
           profileWritePromise = writeWebsiteProfile(cred.user);
           await profileWritePromise;
-          setStatus('Account created. Check your email to verify — opening the app…');
+          setStatus(
+            verifySent
+              ? 'Account created. Check inbox (and Spam) for “Verify your email · growtoo” — opening the app…'
+              : 'Account created, but the verification email failed to send. Open Account in the app to resend — opening…'
+          );
           goToApp(cred.user);
           return;
         }
@@ -967,15 +973,26 @@
       } catch (err) {
         const code = err && err.code;
         if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-          setStatus('Google sign-in was cancelled.', true);
+          setStatus(
+            'Google window closed before sign-in finished. Allow popups for growto.live and try again.',
+            true
+          );
         } else if (code === 'auth/account-exists-with-different-credential') {
           setStatus('This email already uses password sign-in. Use email/password instead.', true);
         } else if (code === 'auth/unauthorized-domain') {
-          setStatus('This domain is not authorized for Google sign-in in Firebase.', true);
+          setStatus(
+            'Google sign-in blocked for this host (' +
+              (window.location.hostname || 'unknown') +
+              '). Use https://growto.live/dnevnik/ and hard-refresh.',
+            true
+          );
         } else if (code === 'auth/operation-not-allowed') {
           setStatus('Enable Google sign-in in Firebase Authentication → Sign-in method.', true);
         } else {
-          setStatus('Google sign-in failed. Please try again.', true);
+          setStatus(
+            'Google sign-in failed' + (code ? ' (' + code.replace(/^auth\//, '') + ')' : '') + '. Please try again.',
+            true
+          );
           console.warn(err);
         }
       } finally {

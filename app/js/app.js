@@ -63,6 +63,8 @@
     'marko.matosevic2005@gmail.com',
   ];
   const SOIL_MOISTURE_TOOL_EMAILS = ['marko.matosevic2005@gmail.com'];
+  /** Only these accounts may use Admin panel / privileged role — never grower profiles. */
+  const ADMIN_PANEL_EMAILS = ['supadmin@dnevnik.live', 'admin@dnevnik.live'];
   const LOGIN_EVENT_SESSION_KEY = 'dnevnik-login-event-recorded';
   let adminReportPeriod = 'daily';
 
@@ -77,6 +79,46 @@
     const auth = getStoredAuth();
     return (auth && auth.email) || '';
   }
+
+  function isAllowedAdminEmail(email) {
+    return ADMIN_PANEL_EMAILS.indexOf(String(email || '').trim().toLowerCase()) !== -1;
+  }
+
+  function getFirebaseAuthUser() {
+    try {
+      if (window.firebase && firebase.auth) return firebase.auth().currentUser || null;
+    } catch {
+      // ignore
+    }
+    return null;
+  }
+
+  function isCurrentEmailVerified() {
+    const user = getFirebaseAuthUser();
+    return !!(user && user.emailVerified);
+  }
+
+  async function resendVerificationEmail() {
+    const user = getFirebaseAuthUser();
+    if (!user) throw new Error('Sign in first.');
+    if (user.emailVerified) return { already: true };
+    await user.sendEmailVerification();
+    return { sent: true, email: user.email || '' };
+  }
+
+  async function refreshEmailVerifiedStatus() {
+    const user = getFirebaseAuthUser();
+    if (!user) return false;
+    await user.reload();
+    await user.getIdToken(true);
+    return !!user.emailVerified;
+  }
+
+  window.GrowtooEmailVerify = {
+    isVerified: isCurrentEmailVerified,
+    resend: resendVerificationEmail,
+    refresh: refreshEmailVerifiedStatus,
+  };
 
   function canUseSoilMoistureTool(email, role) {
     if (isSuperadminRole(role)) return true;
@@ -1483,6 +1525,17 @@ function renderAccountProfile() {
     '</span>' +
     '</div>' +
     '</div>' +
+    (!isCurrentEmailVerified()
+      ? '<div class="account-profile-verify" id="account-profile-verify">' +
+        '<p>Email not verified yet — live AI coach stays on local helpers until you confirm.</p>' +
+        '<p class="account-profile-verify-hint">Look for <em>Verify your email · growtoo</em> (also check Spam / Promotions).</p>' +
+        '<div class="account-profile-actions account-profile-verify-actions">' +
+        '<button type="button" class="btn btn-primary btn-sm" id="account-resend-verify">Resend verification</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="account-refresh-verify">I already verified</button>' +
+        '</div>' +
+        '<p class="account-profile-verify-status" id="account-verify-status" hidden></p>' +
+        '</div>'
+      : '') +
     '<div class="account-profile-meta">' +
     metaRows +
     '</div>' +
@@ -1534,6 +1587,66 @@ function renderAccountProfile() {
         } else if (!adopter && typeof ProductTour.replayGrower === 'function') {
           ProductTour.replayGrower();
         }
+      }
+    });
+  }
+
+  const verifyStatus = document.getElementById('account-verify-status');
+  function setVerifyStatus(msg, isError) {
+    if (!verifyStatus) return;
+    verifyStatus.hidden = !msg;
+    verifyStatus.textContent = msg || '';
+    verifyStatus.classList.toggle('is-error', !!isError);
+  }
+  const resendBtn = document.getElementById('account-resend-verify');
+  if (resendBtn) {
+    resendBtn.addEventListener('click', async function () {
+      resendBtn.disabled = true;
+      setVerifyStatus('Sending…');
+      try {
+        const result = await resendVerificationEmail();
+        if (result && result.already) {
+          setVerifyStatus('Already verified — refreshing…');
+          renderAccountProfile();
+          return;
+        }
+        setVerifyStatus(
+          'Sent to ' +
+            (result.email || email || 'your inbox') +
+            '. Check inbox and Spam for “Verify your email · growtoo”.'
+        );
+      } catch (err) {
+        const code = err && err.code;
+        if (code === 'auth/too-many-requests') {
+          setVerifyStatus('Too many sends — wait a few minutes, then try again.', true);
+        } else {
+          setVerifyStatus((err && err.message) || 'Could not send verification email.', true);
+        }
+      } finally {
+        resendBtn.disabled = false;
+      }
+    });
+  }
+  const refreshVerifyBtn = document.getElementById('account-refresh-verify');
+  if (refreshVerifyBtn) {
+    refreshVerifyBtn.addEventListener('click', async function () {
+      refreshVerifyBtn.disabled = true;
+      setVerifyStatus('Checking…');
+      try {
+        const ok = await refreshEmailVerifiedStatus();
+        if (ok) {
+          setVerifyStatus('Email verified — live coach unlocked.');
+          renderAccountProfile();
+        } else {
+          setVerifyStatus(
+            'Still unverified. Open the link in the growtoo email, then tap again.',
+            true
+          );
+        }
+      } catch (err) {
+        setVerifyStatus((err && err.message) || 'Could not refresh verification status.', true);
+      } finally {
+        refreshVerifyBtn.disabled = false;
       }
     });
   }
@@ -1873,13 +1986,28 @@ function normalizeUserRole(role) {
   return r;
 }
 
-function isAdminPanelRole(role) {
+/** Admin UI only for allowlisted emails — grower/adopter accounts never get the panel. */
+function isAdminPanelRole(role, email) {
   const r = normalizeUserRole(role);
-  return r === 'admin' || r === 'superadmin';
+  if (r !== 'admin' && r !== 'superadmin') return false;
+  const addr =
+    email != null && String(email).trim() !== '' ? email : getCurrentUserEmail();
+  return isAllowedAdminEmail(addr);
 }
 
-function isSuperadminRole(role) {
-  return normalizeUserRole(role) === 'superadmin';
+function isSuperadminRole(role, email) {
+  if (normalizeUserRole(role) !== 'superadmin') return false;
+  const addr =
+    email != null && String(email).trim() !== '' ? email : getCurrentUserEmail();
+  return isAllowedAdminEmail(addr);
+}
+
+function privilegeRoleForEmail(role, email) {
+  const r = normalizeUserRole(role);
+  if ((r === 'admin' || r === 'superadmin') && !isAllowedAdminEmail(email)) {
+    return 'user';
+  }
+  return r;
 }
 
 async function resolveCurrentUserRole() {
@@ -1912,7 +2040,9 @@ async function getCurrentUserRole(user) {
   }
   hydrateProfileLocalDefaults(data);
 
-  return normalizeUserRole(data.role || "user");
+  // Strip admin/superadmin from any account that is not on the allowlist
+  // (e.g. a grower whose Firestore role was set incorrectly).
+  return privilegeRoleForEmail(data.role || 'user', user.email);
 }
 
 function getInitialViewFromUrl() {
