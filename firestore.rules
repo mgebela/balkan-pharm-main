@@ -267,6 +267,13 @@ service cloud.firestore {
     allow update, delete: if false;
   }
 
+  // Per-user daily AI quota counters (aiUsage/{uid}_{yyyy-mm-dd}).
+  // Written only by the Admin SDK in functions/user-guards.js — a client that
+  // could read or reset these could trivially bypass its own spend limit.
+  match /aiUsage/{usageId} {
+    allow read, create, update, delete: if false;
+  }
+
   // Consumed $GROWTOO payment tx signatures (one sig → one listing). Admin SDK only.
   match /usedPaymentSignatures/{signature} {
     allow read, create, update, delete: if false;
@@ -495,6 +502,17 @@ service cloud.firestore {
     allow read: if signedIn()
       && (resource.data.uid == request.auth.uid || isAdminOrSuper());
 
+    // The faucet mints $GROWTOO on demand, so "one claim per user per day" has
+    // to be enforced by the *document id* — a second create for the same day
+    // collides with the existing doc and fails. Without this the amount cap is
+    // meaningless: nothing limited how many docs a user could create, and the
+    // worker mints every pending one. $GROWTOO is the marketplace currency, so
+    // that was unlimited buying power. The app already writes exactly this id
+    // (see claimTestFaucet in app/js/market.js) — the rule just never checked.
+    function faucetIdMatchesDay(docId, dayKey) {
+      return docId == request.auth.uid + '_faucet_' + dayKey;
+    }
+
     allow create: if signedIn()
       && request.resource.data.uid == request.auth.uid
       && request.resource.data.status == 'pending'
@@ -509,19 +527,40 @@ service cloud.firestore {
           request.resource.data.source == 'adopter_faucet'
           && request.resource.data.dayKey is string
           && request.resource.data.dayKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && faucetIdMatchesDay(rewardId, request.resource.data.dayKey)
           && request.resource.data.amount is number
           && request.resource.data.amount >= 1
           && request.resource.data.amount <= 500
         )
       );
 
+    // Retry after a failed mint. `source` and `dayKey` are pinned: without that
+    // a failed doc could be rewritten with a different dayKey, minted again,
+    // and then a fresh doc created for that day too — one claim per id is only
+    // a limit if the id and the dayKey stay bound together.
     allow update: if signedIn()
       && resource.data.uid == request.auth.uid
       && resource.data.status == 'failed'
       && request.resource.data.status == 'pending'
       && request.resource.data.uid == request.auth.uid
       && request.resource.data.monthKey == resource.data.monthKey
-      && isValidSolanaPubkey(request.resource.data.recipient);
+      && isValidSolanaPubkey(request.resource.data.recipient)
+      && (
+        !('source' in request.resource.data)
+        || request.resource.data.source == resource.data.source
+      )
+      && (
+        !('dayKey' in request.resource.data)
+        || request.resource.data.dayKey == resource.data.dayKey
+      )
+      && (
+        request.resource.data.source != 'adopter_faucet'
+        || (
+          request.resource.data.amount is number
+          && request.resource.data.amount >= 1
+          && request.resource.data.amount <= 500
+        )
+      );
 
     allow delete: if false;
   }
