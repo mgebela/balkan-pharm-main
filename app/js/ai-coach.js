@@ -1620,18 +1620,10 @@
       .map(function (m) {
         const cls =
           'ai-coach-row ai-coach-row--' + (m.role === 'user' ? 'user' : 'assistant');
-        // Answers from the offline helpers are noticeably thinner than the live
-        // coach. Without a marker a network blip just reads as "the coach got
-        // worse", and beta reports become impossible to attribute.
-        const offline = m.role === 'assistant' && m.source && m.source !== 'gemini';
         let body =
           '<div class="ai-coach-bubble ai-coach-bubble--' +
           (m.role === 'user' ? 'user' : 'assistant') +
           '">' +
-          (offline
-            ? '<p class="ai-coach-source" title="The live coach was unreachable, ' +
-              'so this came from the built-in guidance.">Offline guidance</p>'
-            : '') +
           '<p>' +
           esc(humanizeCoachText(m.content)).replace(/\n/g, '<br/>') +
           '</p>';
