@@ -10323,6 +10323,14 @@ table td {
   font-size: 0.9rem;
 }
 
+/* Had no rule at all: the buttons are inline-flex, so a plain block container
+   left them wrapping onto touching rows with only line-height between them. */
+.log-sheet-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .market-empty-cta {
   margin: 0.35rem 0 0.85rem;
   display: grid;
