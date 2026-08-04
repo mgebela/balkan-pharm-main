@@ -889,6 +889,43 @@
         actions: [],
       };
     }
+    // Weather and diagnosis are offered as capability chips, so the offline
+    // path has to answer them with something better than the generic "here is
+    // what I can do" list — that reads as the coach ignoring the question.
+    if (/weather|forecast|rain|heat|frost|vrijeme|prognoz|kiša|vru|mraz/.test(lower)) {
+      let tips = [];
+      try {
+        if (window.CoachCore && typeof CoachCore.weatherAdvice === 'function') {
+          tips = CoachCore.weatherAdvice(CoachCore.readWeatherCache()) || [];
+        }
+      } catch (e) {
+        tips = [];
+      }
+      if (tips.length) {
+        return {
+          reply:
+            'From the forecast on your Plants view:\n• ' +
+            tips
+              .map(function (t) {
+                return t && t.text ? t.text : String(t);
+              })
+              .join('\n• '),
+          actions: [],
+        };
+      }
+      return {
+        reply:
+          'I do not have a forecast cached yet. Open Plants, set your city on the weather card, and refresh it — then ask me again and I can tell you what it means for watering and mould risk.',
+        actions: [],
+      };
+    }
+    if (/problem|wrong|sick|dying|yellow|brown|spot|curl|droop|wilt|pest|mite|mould|mold|rot|deficien|žut|smeđ|mrlj|uvija|ven|štetnic|grinj|plijesan|buđ|trule/.test(lower)) {
+      return {
+        reply:
+          'Let’s narrow it down. Tell me:\n• Where on the plant — lower/older leaves, or new growth at the top?\n• What exactly — yellowing, brown edges, spots, curling, or wilting?\n• Anything changed recently — feed, water, light distance, temperature?\n\nLower/older leaves first usually points to a mobile nutrient (N, P, K, Mg); new growth at the top points to an immobile one (Ca, S, Fe). Check pH before treating either — locked-out nutrients look identical to missing ones.',
+        actions: [],
+      };
+    }
     if (playbook) {
       return {
         reply:
