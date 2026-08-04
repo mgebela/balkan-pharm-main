@@ -5432,6 +5432,21 @@ function initFirebaseSync() {
       });
       if (hasOption) typeSel.value = wanted;
     }
+    if (o.note != null) {
+      const noteEl = document.getElementById('entry-note');
+      if (noteEl) noteEl.value = String(o.note);
+    }
+    if (o.photo) {
+      const photoData = document.getElementById('entry-photo-data');
+      const photoPreview = document.getElementById('entry-photo-preview');
+      if (photoData) photoData.value = String(o.photo);
+      if (photoPreview) {
+        photoPreview.innerHTML =
+          '<img src="' +
+          String(o.photo).replace(/"/g, '&quot;') +
+          '" alt="Entry photo" />';
+      }
+    }
     updateEntryExtraVisibility();
     modalEntry.classList.add('open');
   }
@@ -5502,6 +5517,52 @@ function initFirebaseSync() {
           );
         }
       }
+    });
+  }
+
+  const entryPhotoCamera = document.getElementById('entry-photo-camera');
+  if (entryPhotoCamera) {
+    entryPhotoCamera.addEventListener('click', function () {
+      const plantSelect = document.getElementById('entry-plant');
+      const plantId =
+        (plantSelect && plantSelect.value) || currentGrowlogPlantId || null;
+      if (!window.GrowCamera || typeof GrowCamera.open !== 'function') {
+        const input = document.getElementById('entry-photo');
+        if (input) input.click();
+        return;
+      }
+      GrowCamera.open({
+        source: 'entry-modal',
+        plantId: plantId,
+        onLog: function (payload) {
+          const dataUrl = payload && payload.dataUrl;
+          if (!dataUrl) return;
+          const dataEl = document.getElementById('entry-photo-data');
+          const previewEl = document.getElementById('entry-photo-preview');
+          if (dataEl) dataEl.value = dataUrl;
+          if (previewEl) {
+            previewEl.innerHTML =
+              '<img src="' +
+              dataUrl +
+              '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+            const removeBtn = previewEl.querySelector('.btn-remove-media');
+            if (removeBtn) {
+              removeBtn.addEventListener('click', function () {
+                if (dataEl) dataEl.value = '';
+                previewEl.innerHTML = '';
+              });
+            }
+          }
+          if (!modalEntry.classList.contains('open')) {
+            startJournalEntry({
+              plantId: (payload && payload.plantId) || plantId,
+              type: 'opcenito',
+              photo: dataUrl,
+              note: 'Photo log from plant camera',
+            });
+          }
+        },
+      });
     });
   }
 

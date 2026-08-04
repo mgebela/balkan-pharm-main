@@ -17,7 +17,7 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=(), payment=()"
     # Clickjacking + baseline; full script/connect CSP deferred (wallet inject + Firebase).
     Content-Security-Policy = "frame-ancestors 'none'; base-uri 'self'; object-src 'none'"
 

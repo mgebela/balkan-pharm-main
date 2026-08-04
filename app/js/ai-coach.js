@@ -1595,10 +1595,16 @@
     const attachBtn = document.getElementById('ai-coach-attach');
     const fileInput = document.getElementById('ai-coach-file');
     const removeAttach = document.getElementById('ai-coach-attach-remove');
-    if (attachBtn && fileInput) {
+    if (attachBtn) {
       attachBtn.addEventListener('click', function () {
-        fileInput.click();
+        if (window.GrowCamera && typeof GrowCamera.open === 'function') {
+          GrowCamera.open({ source: 'coach' });
+          return;
+        }
+        if (fileInput) fileInput.click();
       });
+    }
+    if (fileInput) {
       fileInput.addEventListener('change', function () {
         const file = fileInput.files && fileInput.files[0];
         onCoachFileSelected(file);
@@ -2451,11 +2457,22 @@
     init();
   }
 
+  function attachImage(dataUrl) {
+    const url = String(dataUrl || '');
+    if (!url || url.indexOf('data:image/') !== 0) return false;
+    pendingImage = url;
+    ensureDom();
+    syncAttachPreview();
+    setStatus('Photo attached — add a note or Ask coach.');
+    return true;
+  }
+
   window.AICoach = {
     open: openPanel,
     close: close,
     toggle: toggle,
     ask: ask,
+    attachImage: attachImage,
     applyVisibility: applyVisibility,
     buildContext: buildContext,
     getReminders: function () {
