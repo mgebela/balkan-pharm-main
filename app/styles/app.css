@@ -8848,6 +8848,18 @@ body.crypto-simple .crypto-simple-only {
   box-shadow: none;
 }
 
+/* Marks a reply that came from the built-in guidance because the live coach
+   was unreachable — deliberately quiet, but present so a degraded answer is
+   never mistaken for the real thing. */
+.ai-coach-source {
+  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 214, 200, 0.55);
+}
+
 .ai-coach-bubble--user {
   background: var(--brass);
   border: 1px solid var(--brass-active);

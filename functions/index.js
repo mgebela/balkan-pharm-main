@@ -5,6 +5,7 @@ const {defineSecret} = require('firebase-functions/params');
 const {initializeApp} = require('firebase-admin/app');
 const {GoogleGenAI, Type} = require('@google/genai');
 const {getRelevantKnowledge} = require('./coach-knowledge');
+const {buildContextJson} = require('./coach-context');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
 const {handleSolanaRpc} = require('./solana-rpc-proxy');
@@ -507,9 +508,23 @@ exports.coachChat = onRequest(
         const stageKey = context.focusPlant && context.focusPlant.stage;
         const knowledgeBlock = getRelevantKnowledge(message, stageKey);
 
+        // Structural trim, not a string slice — see functions/coach-context.js.
+        const fitted = buildContextJson(context);
+        if (fitted.trimmed) {
+          console.log(
+              JSON.stringify({event: 'coach_context_trimmed', dropped: fitted.dropped}),
+          );
+        }
+
+        const trimNote = fitted.trimmed ?
+          'Note: the snapshot lists only the most recent items; ' +
+            '*Truncated counts say how many were omitted.' :
+          null;
+
         const contextBlock = [
           'Grower journal snapshot (JSON):',
-          JSON.stringify(context).slice(0, 6000),
+          fitted.json,
+          trimNote,
           locale === 'hr' ? 'Prefer Croatian replies.' : 'Prefer English replies.',
           knowledgeBlock,
         ]
