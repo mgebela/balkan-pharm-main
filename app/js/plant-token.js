@@ -2492,17 +2492,21 @@
     if (marketCta) {
       marketCta.hidden = !isAdopterUi();
     }
+    const w = wallet || readWallet() || {};
+    const hasWallet = !!(w.connected || w.address || linkedWalletPubkey());
+    const introDone = isAdopterUi() && adopterIntroComplete(w);
+    // Intro only — hide garden + market how-tos once a plant is adopted.
     const guide = document.getElementById('adopter-guide');
     if (guide) {
-      const w = wallet || readWallet() || {};
-      const hasWallet = !!(w.connected || w.address || linkedWalletPubkey());
-      const introDone = adopterIntroComplete(w);
-      // Intro only — hide as soon as a plant is in the garden / adopted.
       guide.hidden = !isAdopterUi() || introDone;
       const guideWalletBtn = document.getElementById('adopter-guide-wallet-btn');
       if (guideWalletBtn) {
         guideWalletBtn.hidden = guide.hidden || hasWallet;
       }
+    }
+    const marketGuide = document.getElementById('market-adopter-guide');
+    if (marketGuide) {
+      marketGuide.hidden = !isAdopterUi() || introDone;
     }
     renderTokeniseExplainer();
   }
