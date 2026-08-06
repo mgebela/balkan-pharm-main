@@ -448,6 +448,16 @@
       newBtn.dataset.bound = '1';
       newBtn.addEventListener('click', function () {
         resetForm();
+        var composer = document.getElementById('blog-composer');
+        if (composer) {
+          composer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        var titleEl = document.getElementById('blog-title');
+        if (titleEl) {
+          window.setTimeout(function () {
+            titleEl.focus();
+          }, 200);
+        }
       });
     }
     if (titleEl && slugEl && !titleEl.dataset.slugBound) {

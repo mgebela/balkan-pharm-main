@@ -12225,6 +12225,43 @@ body.grow-camera-open {
 }
 
 /* ── Grower Stories (public field notes) ─────────────────── */
+.dashboard-stories-cta {
+  margin: 0 0 1.1rem;
+}
+.dashboard-stories-cta-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 165, 94, 0.32);
+  background:
+    radial-gradient(circle at 90% 20%, rgba(201, 165, 94, 0.14), transparent 55%),
+    var(--desk-panel, var(--surface));
+  box-shadow: var(--shadow);
+}
+.dashboard-stories-cta-eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.dashboard-stories-cta-title {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-display, var(--font-serif));
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.dashboard-stories-cta-body {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  max-width: 28rem;
+}
 .blog-profile-banner {
   margin: 0.5rem 0 1rem;
   padding: 0.75rem 0.9rem;
@@ -12237,10 +12274,34 @@ body.grow-camera-open {
 .blog-profile-banner a {
   color: var(--brass);
 }
-.blog-form {
+.blog-composer-card {
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  border-radius: 16px;
+  padding: 1rem 1.1rem 1.15rem;
+  background: color-mix(in srgb, var(--brass) 5%, var(--surface));
+}
+.blog-composer-hint {
+  margin: -0.35rem 0 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+.blog-cover-label {
+  position: relative;
   display: grid;
-  gap: 0.75rem;
-  max-width: 40rem;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+.blog-cover-label input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.blog-cover-btn {
+  pointer-events: none;
+  justify-self: start;
 }
 .blog-form label {
   display: grid;

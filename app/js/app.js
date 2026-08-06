@@ -3853,6 +3853,15 @@ function initFirebaseSync() {
     return Math.floor((Date.now() - latest) / 86400000);
   }
 
+  function openStoriesComposer() {
+    if (typeof showView === 'function') showView('blog');
+    else if (typeof window.showAppView === 'function') window.showAppView('blog');
+    window.setTimeout(function () {
+      const newBtn = document.getElementById('blog-new');
+      if (newBtn) newBtn.click();
+    }, 50);
+  }
+
   function renderTodayAndSeals(plants, entries) {
     const todaySection = document.getElementById('dashboard-today-section');
     const sealsSection = document.getElementById('dashboard-seals-section');
@@ -3880,14 +3889,21 @@ function initFirebaseSync() {
     if (todayActions) {
       todayActions.innerHTML =
         '<button type="button" class="btn btn-primary btn-tap" id="today-log-water">Log watering</button>' +
-        '<button type="button" class="btn btn-secondary btn-tap" id="today-ask-coach">Ask coach</button>';
+        '<button type="button" class="btn btn-secondary btn-tap" id="today-write-story">Write a story</button>' +
+        '<button type="button" class="btn btn-ghost btn-tap" id="today-ask-coach">Ask coach</button>';
       const waterBtn = document.getElementById('today-log-water');
+      const storyBtn = document.getElementById('today-write-story');
       const coachBtn = document.getElementById('today-ask-coach');
       if (waterBtn) {
         waterBtn.addEventListener('click', function () {
           const plants = loggablePlants();
           if (plants.length > 1) openLogSheet('water');
           else quickLogWatering();
+        });
+      }
+      if (storyBtn) {
+        storyBtn.addEventListener('click', function () {
+          openStoriesComposer();
         });
       }
       if (coachBtn) {
@@ -6277,6 +6293,24 @@ function initFirebaseSync() {
   if (btnOpenCoach) {
     btnOpenCoach.addEventListener('click', () => {
       if (window.AICoach) AICoach.open();
+    });
+  }
+
+  const plantsOpenStories = document.getElementById('plants-open-stories');
+  if (plantsOpenStories && !plantsOpenStories.dataset.bound) {
+    plantsOpenStories.dataset.bound = '1';
+    plantsOpenStories.addEventListener('click', function (e) {
+      e.preventDefault();
+      openStoriesComposer();
+    });
+  }
+
+  const dashboardWriteStory = document.getElementById('dashboard-write-story');
+  if (dashboardWriteStory && !dashboardWriteStory.dataset.bound) {
+    dashboardWriteStory.dataset.bound = '1';
+    dashboardWriteStory.addEventListener('click', function (e) {
+      e.preventDefault();
+      openStoriesComposer();
     });
   }
 

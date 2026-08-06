@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/app.css?v=20260806i" />
+  <link rel="stylesheet" href="styles/app.css?v=20260806k" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -134,6 +134,10 @@
       <a href="#" class="nav-item grower-only" data-view="plants">
         <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg></span>
         <span class="bottom-nav-label">Plants</span>
+      </a>
+      <a href="#" class="nav-item grower-only bottom-nav-stories" data-view="blog">
+        <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h10a2 2 0 012 2v14l-7-3-7 3V6a2 2 0 012-2z"/><path d="M9 8h4M9 12h4"/></svg></span>
+        <span class="bottom-nav-label">Stories</span>
       </a>
       <button
         type="button"
@@ -376,6 +380,16 @@
       </div>
 
       <div id="view-dashboard" class="view active">
+        <section class="dashboard-stories-cta grower-only" id="dashboard-stories-cta" aria-label="Public stories">
+          <div class="dashboard-stories-cta-inner">
+            <div class="dashboard-stories-cta-copy">
+              <p class="dashboard-stories-cta-eyebrow">Public journal</p>
+              <h2 class="dashboard-stories-cta-title">Stories</h2>
+              <p class="dashboard-stories-cta-body">Share tips, plant looks, problems, and products on growto.live/journal.</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="dashboard-write-story">Write a story</button>
+          </div>
+        </section>
         <section class="dashboard-today-section grower-only" id="dashboard-today-section" hidden>
           <article class="shell-card today-card" id="dashboard-today-card">
             <p class="today-card-eyebrow">Today</p>
@@ -454,6 +468,7 @@
           </div>
           <div class="toolbar">
             <button type="button" class="btn btn-primary grower-only" id="plants-quick-log">Log care</button>
+            <button type="button" class="btn btn-secondary grower-only" id="plants-open-stories">Write a story</button>
             <button type="button" class="btn btn-primary grower-only" id="btn-open-coach">Ask coach</button>
             <button type="button" class="btn btn-ghost" id="btn-add-plant">+ New plant</button>
           </div>
@@ -748,21 +763,20 @@
         </div>
       </div>
 
-      </div>
-
-      <div id="view-blog" class="view grower-only">
+      <div id="view-blog" class="view">
         <section class="plants-journal-section">
           <div class="plants-section-head">
             <h2 class="section-heading">Stories</h2>
-            <button type="button" class="btn btn-ghost btn-sm" id="blog-new">+ New story</button>
+            <button type="button" class="btn btn-primary" id="blog-new">+ Write a story</button>
           </div>
           <p class="section-lead">
             Share tips, plant looks, problems, grower visits, and products from your plants on the public journal.
           </p>
           <div class="blog-profile-banner" id="blog-profile-banner" hidden></div>
         </section>
-        <section class="plants-journal-section" id="blog-composer">
-          <h3 class="section-heading" id="blog-composer-title">New story</h3>
+        <section class="plants-journal-section blog-composer-card" id="blog-composer">
+          <h3 class="section-heading" id="blog-composer-title">Write a story</h3>
+          <p class="blog-composer-hint">Title, category, body, and an optional cover photo. Publish when ready.</p>
           <input type="hidden" id="blog-edit-id" value="" />
           <form id="blog-form" class="blog-form" onsubmit="return false;">
             <label>
@@ -786,8 +800,9 @@
               <textarea id="blog-body" rows="8" maxlength="12000" required placeholder="Write like a field note — what you saw, what you tried, what worked."></textarea>
             </label>
             <div class="blog-cover-row">
-              <label class="blog-cover-label">
+              <label class="blog-cover-label" for="blog-cover">
                 Cover photo
+                <span class="blog-cover-btn btn btn-secondary btn-sm">Add photo</span>
                 <input type="file" id="blog-cover" accept="image/jpeg,image/png,image/webp,image/*" />
               </label>
               <button type="button" class="btn btn-ghost btn-sm" id="blog-cover-clear">Clear photo</button>
@@ -1364,8 +1379,8 @@
   <script src="js/coach-core.js?v=20260803a"></script>
   <script src="js/grow-camera.js?v=20260805e"></script>
   <script src="js/ai-coach.js?v=20260806b"></script>
-  <script src="js/grower-blog.js?v=20260806a"></script>
-  <script src="js/app.js?v=20260806i"></script>
+  <script src="js/grower-blog.js?v=20260806b"></script>
+  <script src="js/app.js?v=20260806k"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
 </body>
 </html>
