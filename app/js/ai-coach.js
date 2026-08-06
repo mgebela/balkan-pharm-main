@@ -1544,9 +1544,10 @@
       '<textarea id="ai-coach-input" rows="1" maxlength="2000" placeholder="Ask your coach…" autocomplete="off"></textarea>' +
       '</label>' +
       '<div class="ai-coach-form-actions">' +
-      '<button type="button" class="ai-coach-icon-btn ai-coach-attach" id="ai-coach-attach" title="Add photo" aria-label="Add plant photo" aria-pressed="false">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">' +
-      '<path d="M12 5v14M5 12h14"/>' +
+      '<button type="button" class="ai-coach-icon-btn ai-coach-attach" id="ai-coach-attach" title="Take photo" aria-label="Open plant camera" aria-pressed="false">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/>' +
+      '<circle cx="12" cy="13" r="3.25"/>' +
       '</svg></button>' +
       '<button type="button" class="ai-coach-icon-btn ai-coach-mic" id="ai-coach-mic" title="Speak" aria-pressed="false" aria-label="Voice input">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">' +
