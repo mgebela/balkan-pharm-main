@@ -3266,6 +3266,17 @@ function initFirebaseSync() {
         n > 1 ? 'Plants · ' + n + ' selected' : n === 1 ? 'Plants · 1 selected' : 'Plants';
     }
 
+    const waterBtn = document.getElementById('log-sheet-water');
+    const feedBtn = document.getElementById('log-sheet-feed');
+    if (waterBtn) {
+      waterBtn.classList.toggle('btn-primary', logSheetPendingAction !== 'feed');
+      waterBtn.classList.toggle('btn-secondary', logSheetPendingAction === 'feed');
+    }
+    if (feedBtn) {
+      feedBtn.classList.toggle('btn-primary', logSheetPendingAction === 'feed');
+      feedBtn.classList.toggle('btn-secondary', logSheetPendingAction !== 'feed');
+    }
+
     listEl.querySelectorAll('[data-plant-id]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const id = String(btn.getAttribute('data-plant-id') || '');
@@ -3406,15 +3417,19 @@ function initFirebaseSync() {
       });
     }
     if (water) {
-      water.addEventListener('click', function () {
-        quickLogWatering();
-        setLogSheetOpen(false);
+      water.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        // Only dismiss after a successful write — otherwise keep the sheet
+        // open so the grower can pick plants (feeding used to look "dead").
+        if (quickLogWatering()) setLogSheetOpen(false);
       });
     }
     if (feed) {
-      feed.addEventListener('click', function () {
-        quickLogFeeding();
-        setLogSheetOpen(false);
+      feed.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (quickLogFeeding()) setLogSheetOpen(false);
       });
     }
     if (full) {
@@ -3889,9 +3904,11 @@ function initFirebaseSync() {
     if (todayActions) {
       todayActions.innerHTML =
         '<button type="button" class="btn btn-primary btn-tap" id="today-log-water">Log watering</button>' +
+        '<button type="button" class="btn btn-secondary btn-tap" id="today-log-feed">Log feeding</button>' +
         '<button type="button" class="btn btn-secondary btn-tap" id="today-write-story">Write a story</button>' +
         '<button type="button" class="btn btn-ghost btn-tap" id="today-ask-coach">Ask coach</button>';
       const waterBtn = document.getElementById('today-log-water');
+      const feedBtn = document.getElementById('today-log-feed');
       const storyBtn = document.getElementById('today-write-story');
       const coachBtn = document.getElementById('today-ask-coach');
       if (waterBtn) {
@@ -3899,6 +3916,13 @@ function initFirebaseSync() {
           const plants = loggablePlants();
           if (plants.length > 1) openLogSheet('water');
           else quickLogWatering();
+        });
+      }
+      if (feedBtn) {
+        feedBtn.addEventListener('click', function () {
+          const plants = loggablePlants();
+          if (plants.length > 1) openLogSheet('feed');
+          else quickLogFeeding();
         });
       }
       if (storyBtn) {
@@ -4269,18 +4293,19 @@ function initFirebaseSync() {
     return [];
   }
 
+  /** @returns {boolean} true when an entry was written */
   function quickLogCare(type, note) {
-    if (blockAdminWrite()) return;
+    if (blockAdminWrite()) return false;
     const plants = loggablePlants();
     if (!plants.length) {
       openPlantModal();
-      return;
+      return false;
     }
     let chosen = pickPlantsForQuickLog();
     if (!chosen.length) {
       // Multiple plants and none selected yet — open the Log sheet.
       openLogSheet(type === 'zalijevanje' ? 'water' : type === 'gnojidba' ? 'feed' : null);
-      return;
+      return false;
     }
     try {
       saveJournalEntriesBatch(
@@ -4295,6 +4320,7 @@ function initFirebaseSync() {
         }
       );
       // Toast comes from notifyJournalEntry / batch summary.
+      return true;
     } catch (err) {
       const msg = (err && err.message) || 'Could not log entry.';
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
@@ -4302,15 +4328,16 @@ function initFirebaseSync() {
       } else {
         alert(msg);
       }
+      return false;
     }
   }
 
   function quickLogWatering() {
-    quickLogCare('zalijevanje', 'Watered');
+    return quickLogCare('zalijevanje', 'Watered');
   }
 
   function quickLogFeeding() {
-    quickLogCare('gnojidba', 'Fed');
+    return quickLogCare('gnojidba', 'Fed');
   }
 
   function escapeHtml(s) {
