@@ -12,6 +12,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,350;9..144,400&display=swap" rel="stylesheet" />
+  <script>
+    /* Appearance, before first paint. Dark is the unthemed state, so this
+       only ever ADDS data-theme="light". Same storage key as the app, so a
+       grower's choice carries across the whole site. */
+    (function () {
+      try {
+        var p = localStorage.getItem('growtoo:appearance') || 'dark';
+        var light = p === 'light' ||
+          (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (light) document.documentElement.setAttribute('data-theme', 'light');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles/tokens.css?v=20260806t" />
   <style>
     :root {
       --bg: #0f1a12;
@@ -22,6 +36,14 @@
       --border: rgba(201, 165, 94, 0.2);
       --font: 'Archivo', sans-serif;
       --font-display: 'Fraunces', serif;
+    }
+    :root[data-theme='light'] {
+      --bg: #f3f0e7;
+      --brass: #7d6024;
+      --brass-ink: #241a05;
+      --text: #17251b;
+      --text-muted: rgb(var(--ink-rgb) / 0.8);
+      --border: rgb(var(--brass-rgb) / 0.26);
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }

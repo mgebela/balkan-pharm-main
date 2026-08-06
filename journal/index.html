@@ -10,6 +10,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script>
+    /* Appearance, before first paint. Dark is the unthemed state, so this
+       only ever ADDS data-theme="light". Same storage key as the app, so a
+       grower's choice carries across the whole site. */
+    (function () {
+      try {
+        var p = localStorage.getItem('growtoo:appearance') || 'dark';
+        var light = p === 'light' ||
+          (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (light) document.documentElement.setAttribute('data-theme', 'light');
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
   <link rel="stylesheet" href="/styles/landing.css" />
   <link rel="stylesheet" href="/journal/styles/journal.css?v=20260806b" />
 </head>

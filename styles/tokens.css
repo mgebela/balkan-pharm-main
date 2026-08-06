@@ -24,6 +24,7 @@
   --ink-rgb: 184 196 176;       /* muted green ink */
   --white-rgb: 255 255 255;
   --shadow-rgb: 0 0 0;
+  --scrim-rgb: 0 0 0;      /* modal/overlay backdrops — black in both themes */
   --paper-rgb: 247 238 225;  /* warm off-white ink */
 
   /* Catalog system — warm forest + brass (matches landing). */
@@ -155,6 +156,19 @@
   --warn-rgb: 245 158 11;
   --danger-rgb: 248 113 113;
   --ok-rgb: 52 211 153;
+
+  /* Decorative accents — chart series, badges, tool cards. */
+  --violet-rgb: 199 155 255;
+  --sky-rgb: 95 182 255;
+  --gold-rgb: 230 190 80;
+  --clay-rgb: 224 180 152;
+  --ember-rgb: 180 83 9;
+
+  /* Marketing site (styles/landing.css) shares these. */
+  --cream-rgb: 255 231 168;
+  --mint-bright-rgb: 200 255 212;
+  --umber-rgb: 80 55 10;
+  --teal-rgb: 94 200 216;
 }
 
 /* ============================================================
@@ -176,7 +190,7 @@
    ============================================================ */
 :root[data-theme='light'] {
   /* Channel triplets. Tints derived from these follow automatically. */
-  --brass-rgb: 125 96 36;
+  --brass-rgb: 114 87 31;
   --brass-hi-rgb: 150 116 44;
   --rust-rgb: 141 82 51;
   --alert-rgb: 150 52 28;
@@ -185,6 +199,7 @@
   --white-rgb: 24 34 26;   /* "white" overlays become dark scrims on paper */
   --paper-rgb: 26 38 29;   /* the warm off-white ink inverts to a warm near-black */
   --shadow-rgb: 60 50 20;
+  --scrim-rgb: 0 0 0;
 
   --bg: #f3f0e7;
   --bg-alt: #fbf9f3;
@@ -264,8 +279,8 @@
   --sage-light-rgb: 52 72 54;
   --olive-rgb: 92 108 82;
 
-  --mint-rgb: 47 125 82;
-  --mint-mid-rgb: 42 115 74;
+  --mint-rgb: 36 100 66;
+  --mint-mid-rgb: 33 96 62;
   --green-glow-rgb: 62 130 84;
   --leaf-glow-rgb: 88 125 78;
 
@@ -276,6 +291,17 @@
   --warn-rgb: 154 100 8;
   --danger-rgb: 179 64 44;
   --ok-rgb: 47 125 82;
+
+  --violet-rgb: 118 74 176;
+  --sky-rgb: 26 108 168;
+  --gold-rgb: 148 108 20;
+  --clay-rgb: 150 96 66;
+  --ember-rgb: 154 72 8;
+
+  --cream-rgb: 112 80 16;
+  --mint-bright-rgb: 32 94 60;
+  --umber-rgb: 108 88 44;
+  --teal-rgb: 24 108 120;
 
   --canvas-glow: rgba(90, 140, 90, 0.14);
   --ink-faint: rgb(var(--ink-rgb) / 0.3);

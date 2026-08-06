@@ -427,7 +427,7 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
 }
 
 #view-plants .plants-weather-error {
-  color: #fca5a5;
+  color: rgb(var(--clay-rgb));
 }
 
 #view-plants .plants-weather-body .weather-container,
@@ -454,7 +454,7 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
   min-width: 5.65rem;
   max-width: 5.65rem;
   scroll-snap-align: start;
-  background: rgb(var(--shadow-rgb) / 0.28);
+  background: rgb(var(--scrim-rgb) / 0.28);
   border: 1px solid var(--border);
   padding: 0.5rem 0.35rem 0.45rem;
   border-radius: 12px;
@@ -921,7 +921,7 @@ body.profile-adopter .account-profile-avatar {
 .account-profile-stat {
   padding: 0.45rem 0.55rem;
   border-radius: 10px;
-  background: rgb(var(--shadow-rgb) / 0.22);
+  background: rgb(var(--scrim-rgb) / 0.22);
   border: 1px solid rgb(var(--white-rgb) / 0.05);
 }
 .account-profile-stat span {
@@ -1397,7 +1397,7 @@ body.coach-fab-visible .main {
   padding: 0.12rem 0.4rem;
   border-radius: 999px;
   border: 1px solid rgb(var(--mint-mid-rgb) / 0.18);
-  background: rgb(var(--shadow-rgb) / 0.2);
+  background: rgb(var(--scrim-rgb) / 0.2);
   font-family: var(--font-mono);
   font-size: 0.58rem;
   font-weight: 600;
@@ -1567,7 +1567,7 @@ body.notif-open {
 }
 
 .wallet-link-badge--warn {
-  color: #a16207;
+  color: rgb(var(--ember-rgb));
   background: rgb(var(--warn-rgb) / 0.16);
 }
 
@@ -1588,7 +1588,7 @@ body.notif-open {
   align-items: center;
   justify-content: center;
   padding: 1rem;
-  background: rgb(var(--shadow-rgb) / 0.72);
+  background: rgb(var(--scrim-rgb) / 0.72);
   backdrop-filter: blur(4px);
 }
 
@@ -1801,7 +1801,7 @@ body.notif-open {
   padding: 0.6rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgb(var(--shadow-rgb) / 0.25);
+  background: rgb(var(--scrim-rgb) / 0.25);
   color: inherit;
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.82rem;
@@ -1961,7 +1961,7 @@ body.notif-open {
 
 .btn-destructive:hover {
   background: var(--rust-hover-fill);
-  color: #c4896e;
+  color: rgb(var(--clay-rgb));
   border-color: rgb(var(--rust-rgb) / 0.9);
 }
 
@@ -2349,7 +2349,7 @@ body.notif-open {
 }
 
 .metric-card--prompt .metric-card-label {
-  color: rgba(255, 190, 160, 0.88);
+  color: rgb(var(--clay-rgb) / 0.88);
 }
 
 .metric-card--prompt:hover {
@@ -2417,13 +2417,13 @@ body.notif-open {
 
 .metric-dot--teal { background: var(--accent-bright); }
 .metric-dot--blue { background: var(--info); }
-.metric-dot--violet { background: #c79bff; }
+.metric-dot--violet { background: rgb(var(--violet-rgb)); }
 .metric-dot--amber { background: var(--accent-warm); }
 .metric-dot--muted { background: rgb(var(--white-rgb) / 0.28); }
 
 .metric-card--teal:hover { border-color: rgb(var(--brass-rgb) / 0.28); }
-.metric-card--blue:hover { border-color: rgba(95, 182, 255, 0.22); }
-.metric-card--violet:hover { border-color: rgba(199, 155, 255, 0.22); }
+.metric-card--blue:hover { border-color: rgb(var(--sky-rgb) / 0.22); }
+.metric-card--violet:hover { border-color: rgb(var(--violet-rgb) / 0.22); }
 .metric-card--amber:hover { border-color: rgb(var(--brass-mid-rgb) / 0.28); }
 
 .adopt-wallet-actions {
@@ -3643,7 +3643,7 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 }
 
 .toolbox-bar-item-ph .toolbox-bar-fill-ph {
-  background: linear-gradient(90deg, var(--accent) 0%, #5dd9c8 100%);
+  background: linear-gradient(90deg, var(--accent) 0%, rgb(var(--sky-rgb)) 100%);
 }
 
 .toolbox-timeline-list {
@@ -3675,7 +3675,7 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   display: none;
   position: fixed;
   inset: 0;
-  background: rgb(var(--shadow-rgb) / 0.65);
+  background: rgb(var(--scrim-rgb) / 0.65);
   z-index: 200;
   align-items: center;
   justify-content: center;
@@ -4250,7 +4250,7 @@ select:disabled.is-empty-disabled {
   margin-bottom: 1.1rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.2);
+  background: rgb(var(--scrim-rgb) / 0.2);
 }
 
 .admin-segment {
@@ -4342,7 +4342,7 @@ select:disabled.is-empty-disabled {
   padding: 0.75rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.15);
+  background: rgb(var(--scrim-rgb) / 0.15);
 }
 
 .admin-report-day {
@@ -4356,7 +4356,7 @@ select:disabled.is-empty-disabled {
   overflow-x: auto;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.12);
+  background: rgb(var(--scrim-rgb) / 0.12);
 }
 
 .admin-report-table {
@@ -4417,12 +4417,12 @@ select:disabled.is-empty-disabled {
 }
 
 .admin-role-badge--superadmin {
-  background: rgba(199, 155, 255, 0.2);
-  color: #d4b8ff;
+  background: rgb(var(--violet-rgb) / 0.2);
+  color: rgb(var(--violet-rgb));
 }
 
 .admin-role-badge--admin {
-  background: rgba(95, 182, 255, 0.18);
+  background: rgb(var(--sky-rgb) / 0.18);
   color: var(--info-tint);
 }
 
@@ -4455,7 +4455,7 @@ select:disabled.is-empty-disabled {
   padding: 1rem;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.12);
+  background: rgb(var(--scrim-rgb) / 0.12);
 }
 
 .admin-field {
@@ -4480,7 +4480,7 @@ select:disabled.is-empty-disabled {
   padding: 0.55rem 0.7rem;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.25);
+  background: rgb(var(--scrim-rgb) / 0.25);
   color: var(--text);
   font-family: inherit;
   font-size: 0.9rem;
@@ -4555,7 +4555,7 @@ select:disabled.is-empty-disabled {
   margin-top: 0.5rem;
   border-radius: 10px;
   border: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.2);
+  background: rgb(var(--scrim-rgb) / 0.2);
 }
 
 .admin-plant-pick {
@@ -4668,7 +4668,7 @@ select:disabled.is-empty-disabled {
 }
 
 .admin-grant-badge--journal {
-  background: rgba(95, 182, 255, 0.12);
+  background: rgb(var(--sky-rgb) / 0.12);
   color: var(--info-tint);
 }
 
@@ -4875,7 +4875,7 @@ body.admin-readonly .toolbox-form textarea {
   border: 1px solid rgb(var(--alert-rgb) / 0.28);
   background:
     radial-gradient(ellipse 120% 90% at 10% 0%, rgb(var(--alert-rgb) / 0.22), transparent 52%),
-    radial-gradient(ellipse 80% 70% at 92% 18%, rgba(167, 139, 250, 0.14), transparent 48%),
+    radial-gradient(ellipse 80% 70% at 92% 18%, rgb(var(--violet-rgb) / 0.14), transparent 48%),
     radial-gradient(ellipse 70% 60% at 50% 100%, rgb(var(--peach-rgb) / 0.1), transparent 45%),
     linear-gradient(165deg, rgb(var(--surface-rgb) / 0.98) 0%, rgb(var(--surface-deep-rgb) / 0.99) 48%, rgb(var(--surface-rgb) / 1) 100%);
   box-shadow:
@@ -6066,7 +6066,7 @@ body:not(.app-loading) {
   padding: 0.35rem 0.5rem;
   border-radius: 8px;
   border: 1px solid rgb(var(--white-rgb) / 0.12);
-  background: rgb(var(--shadow-rgb) / 0.25);
+  background: rgb(var(--scrim-rgb) / 0.25);
   color: var(--text);
 }
 .adopt-link-plant .btn {
@@ -6079,7 +6079,7 @@ body:not(.app-loading) {
   padding: 0.65rem 0.75rem;
   border-radius: 10px;
   border: 1px solid rgb(var(--white-rgb) / 0.08);
-  background: rgb(var(--shadow-rgb) / 0.18);
+  background: rgb(var(--scrim-rgb) / 0.18);
 }
 .grower-quest--ready {
   border-color: rgb(var(--ok-rgb) / 0.35);
@@ -6211,12 +6211,12 @@ body:not(.app-loading) {
 .adopt-care-btn--primary {
   border-color: rgb(var(--rust-rgb) / 0.4);
   background: rgb(var(--rust-rgb) / 0.14);
-  color: #e0b498;
+  color: rgb(var(--clay-rgb));
 }
 .adopt-care-btn--primary:hover:not(:disabled) {
   border-color: rgb(var(--rust-rgb) / 0.55);
   background: rgb(var(--rust-rgb) / 0.22);
-  color: #f0d0ba;
+  color: rgb(var(--clay-rgb));
 }
 .adopt-care-xp {
   font-size: 0.64rem;
@@ -6245,7 +6245,7 @@ body:not(.app-loading) {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--accent-bright, #c4a574);
+  color: var(--accent-bright, rgb(var(--clay-rgb)));
 }
 .grower-profile-title {
   font-size: 0.9rem;
@@ -6709,7 +6709,7 @@ body.profile-adopter .adopt-hero-text h2 {
   border-radius: 999px;
   background: rgb(var(--alert-rgb) / 0.16);
   border: 1px solid rgb(var(--orange-rgb) / 0.28);
-  color: #ffc9b4;
+  color: rgb(var(--clay-rgb));
 }
 .market-asset-badge--flower {
   background: rgb(var(--mint-rgb) / 0.08);
@@ -6853,7 +6853,7 @@ body.profile-adopter .adopt-hero-text h2 {
   transition: width 0.35s ease;
 }
 .adopt-unlock-panel--lag .adopt-unlock-meter-fill {
-  background: linear-gradient(90deg, #b45309, var(--warn));
+  background: linear-gradient(90deg, rgb(var(--ember-rgb)), var(--warn));
 }
 .adopt-unlock-foot {
   margin: 0.55rem 0 0;
@@ -6998,7 +6998,7 @@ body.profile-adopter .adopt-hero-text h2 {
   color: rgb(var(--sage-light-rgb));
 }
 .adopt-rank-badge--tier-2 {
-  border-color: rgba(100, 180, 220, 0.4);
+  border-color: rgb(var(--sky-rgb) / 0.4);
   color: #b8e0ff;
 }
 .adopt-rank-badge--tier-3 {
@@ -7006,12 +7006,12 @@ body.profile-adopter .adopt-hero-text h2 {
   color: var(--brass);
 }
 .adopt-rank-badge--tier-4 {
-  border-color: rgba(220, 180, 90, 0.45);
-  color: #ffe0a0;
+  border-color: rgb(var(--gold-rgb) / 0.45);
+  color: rgb(var(--clay-rgb));
 }
 .adopt-rank-badge--tier-5 {
-  border-color: rgba(220, 140, 255, 0.5);
-  color: #e8c4ff;
+  border-color: rgb(var(--violet-rgb) / 0.5);
+  color: rgb(var(--violet-rgb));
 }
 /* Semafor / phase rail for invest + mint + harvest-claim pipelines */
 .adopt-stake-panel .status-rail,
@@ -7060,7 +7060,7 @@ body.profile-adopter .adopt-hero-text h2 {
 }
 .status-rail-step--fail:not(:last-child)::after,
 .status-rail-step--current:not(:last-child)::after {
-  background: rgba(220, 170, 70, 0.4);
+  background: rgb(var(--gold-rgb) / 0.4);
 }
 .status-rail-dot {
   width: 0.72rem;
@@ -7079,7 +7079,7 @@ body.profile-adopter .adopt-hero-text h2 {
   background: rgb(var(--leaf-glow-rgb));
 }
 .status-rail-step--current .status-rail-dot {
-  border-color: rgba(230, 180, 70, 0.9);
+  border-color: rgb(var(--gold-rgb) / 0.9);
   background: rgb(var(--brass-mid-rgb));
   box-shadow: 0 0 0 3px rgb(var(--brass-mid-rgb) / 0.22);
   animation: status-rail-pulse 1.6s ease-in-out infinite;
@@ -7158,11 +7158,11 @@ body.profile-adopter .adopt-hero-text h2 {
 }
 .market-status--sold {
   background: rgb(var(--brass-mid-rgb) / 0.22);
-  color: #ffe39a;
-  border-color: rgba(230, 190, 80, 0.28);
+  color: rgb(var(--clay-rgb));
+  border-color: rgb(var(--gold-rgb) / 0.28);
 }
 .market-status--failed {
-  background: rgba(180, 60, 50, 0.22);
+  background: rgb(var(--ember-rgb) / 0.22);
   color: var(--danger-ink);
   border-color: rgb(var(--peach-rgb) / 0.28);
 }
@@ -7332,7 +7332,7 @@ body.profile-adopter .adopt-hero-text h2 {
   margin: 0.85rem 0 0;
   padding: 0.75rem;
   border-radius: 10px;
-  background: rgb(var(--shadow-rgb) / 0.2);
+  background: rgb(var(--scrim-rgb) / 0.2);
   border: 1px solid var(--border);
 }
 .adopt-hist-item {
@@ -10762,7 +10762,7 @@ table td {
   flex: 0 0 2.4rem;
   border: 0;
   border-left: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.15);
+  background: rgb(var(--scrim-rgb) / 0.15);
   color: var(--brass);
   cursor: pointer;
   font-size: 0.85rem;
@@ -10773,7 +10773,7 @@ table td {
   gap: 0.35rem;
   padding: 0.35rem 0.45rem 0.55rem;
   border-top: 1px solid var(--border);
-  background: rgb(var(--shadow-rgb) / 0.12);
+  background: rgb(var(--scrim-rgb) / 0.12);
 }
 
 .log-sheet-stack-members .log-sheet-plant {
@@ -11933,7 +11933,7 @@ body.daily-status-open {
 .view-tour-help:focus-visible {
   border-color: rgb(var(--brass-rgb) / 0.75);
   background: rgb(var(--brass-rgb) / 0.12);
-  color: #f0d9a0;
+  color: rgb(var(--clay-rgb));
   outline: none;
 }
 body.profile-adopter .view-tour-help {
