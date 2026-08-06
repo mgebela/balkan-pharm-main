@@ -3181,6 +3181,15 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   gap: 0.75rem;
 }
 
+.journal-entries .plant-stack {
+  width: 100%;
+}
+
+.plant-stack--journal .plant-stack-members {
+  grid-template-columns: 1fr;
+  padding-top: 0.75rem;
+}
+
 .journal-cpvo {
   margin-top: 2rem;
   background: var(--surface);
@@ -10662,13 +10671,20 @@ table td {
   color: var(--brass);
 }
 
+.log-sheet-hint {
+  margin: -0.15rem 0 0.55rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
 .log-sheet-plants {
   display: grid;
   gap: 0.4rem;
   margin-bottom: 0.95rem;
   /* Viewport-relative so tall phones show more than 3.5 rows; the fixed 11rem
      cut a row in half with no hint that the list scrolled. */
-  max-height: min(42vh, 15rem);
+  max-height: min(42vh, 18rem);
   overflow-y: auto;
   /* Don't chain the scroll to the page behind the sheet. */
   overscroll-behavior: contain;
@@ -10694,6 +10710,23 @@ table td {
   background: rgba(201, 165, 94, 0.12);
 }
 
+.log-sheet-plant-check {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 4px;
+  border: 1px solid rgba(201, 165, 94, 0.45);
+  background: transparent;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.log-sheet-plant.is-selected .log-sheet-plant-check,
+.log-sheet-stack-all.is-selected .log-sheet-plant-check {
+  background: rgba(201, 165, 94, 0.85);
+  border-color: rgba(201, 165, 94, 0.95);
+  box-shadow: inset 0 0 0 2px rgba(6, 14, 10, 0.85);
+}
+
 .log-sheet-plant-no {
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -10705,6 +10738,156 @@ table td {
   font-family: var(--font-display);
   font-weight: 350;
   font-size: 1rem;
+}
+
+.log-sheet-stack {
+  border: 1px solid color-mix(in srgb, var(--brass) 28%, var(--border));
+  border-radius: 10px;
+  background: rgba(8, 18, 12, 0.45);
+  overflow: hidden;
+}
+
+.log-sheet-stack.is-all-selected {
+  border-color: rgba(201, 165, 94, 0.55);
+}
+
+.log-sheet-stack.is-partial {
+  border-color: rgba(201, 165, 94, 0.35);
+}
+
+.log-sheet-stack-head {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.log-sheet-stack-all {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  text-align: left;
+  padding: 0.7rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.log-sheet-stack-copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.log-sheet-stack-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 350;
+}
+
+.log-sheet-stack-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.log-sheet-stack-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--brass);
+  margin-left: auto;
+}
+
+.log-sheet-stack-expand {
+  flex: 0 0 2.4rem;
+  border: 0;
+  border-left: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--brass);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.log-sheet-stack-members {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.35rem 0.45rem 0.55rem;
+  border-top: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.log-sheet-stack-members .log-sheet-plant {
+  background: rgba(6, 14, 10, 0.4);
+}
+
+.entry-plants-multi {
+  margin: 0 0 0.85rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.entry-plants-multi-label {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.entry-plants-multi-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.entry-plants-multi-list {
+  display: grid;
+  gap: 0.35rem;
+  max-height: min(36vh, 14rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.entry-plant-stack {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.35rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.entry-plant-stack-members {
+  display: grid;
+  gap: 0.25rem;
+  padding-left: 0.85rem;
+}
+
+.entry-plant-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(6, 14, 10, 0.45);
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.entry-plant-check.is-selected {
+  border-color: rgba(201, 165, 94, 0.55);
+  background: rgba(201, 165, 94, 0.1);
+}
+
+.entry-plant-check em {
+  font-style: normal;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.entry-plant-check--stack {
+  border-style: dashed;
 }
 
 .log-sheet-empty {

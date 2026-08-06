@@ -3021,22 +3021,99 @@ function initFirebaseSync() {
     }
   }
 
-  let logSheetSelectedPlantId = '';
+  let logSheetSelectedPlantIds = [];
   let logSheetPendingAction = null; // 'water' | 'feed' | null
+  let logSheetExpandedStacks = Object.create(null);
+  let entryModalPlantIds = null; // multi-select for full entry modal
 
   function loggablePlants() {
     return getPlants().filter((p) => p && p.id && !isSharedPlantId(p.id));
+  }
+
+  function normalizeSelectedPlantIds(ids, plants) {
+    const allowed = Object.create(null);
+    (plants || []).forEach(function (p) {
+      if (p && p.id) allowed[String(p.id)] = true;
+    });
+    const out = [];
+    const seen = Object.create(null);
+    (ids || []).forEach(function (id) {
+      const key = String(id || '');
+      if (!key || !allowed[key] || seen[key]) return;
+      seen[key] = true;
+      out.push(key);
+    });
+    return out;
+  }
+
+  function selectedLogPlantIds() {
+    return logSheetSelectedPlantIds.slice();
+  }
+
+  function plantStackAccessors() {
+    return {
+      getStrain: function (p) {
+        return p && p.strain;
+      },
+      getName: function (p) {
+        return p && p.name;
+      },
+      getStage: function (p) {
+        return p && p.stage;
+      },
+      getWeight: function (p) {
+        return Math.max(1, Number((p && p.count) || 1) || 1);
+      },
+    };
+  }
+
+  function groupLoggablePlants(plants) {
+    const Stacks = window.GrowtooStacks;
+    if (!Stacks || typeof Stacks.groupItems !== 'function') {
+      return (plants || []).map(function (p) {
+        return {
+          key: String(p.id),
+          name: p.name || 'Plant',
+          strain: p.strain || '',
+          stage: p.stage || '',
+          size: Math.max(1, Number(p.count || 1) || 1),
+          members: [p],
+        };
+      });
+    }
+    return Stacks.groupItems(plants, plantStackAccessors());
+  }
+
+  function logSheetPlantButtonHtml(p, specimenNo, selected) {
+    return (
+      '<button type="button" class="log-sheet-plant' +
+      (selected ? ' is-selected' : '') +
+      '" role="option" aria-selected="' +
+      (selected ? 'true' : 'false') +
+      '" data-plant-id="' +
+      escapeHtml(p.id) +
+      '">' +
+      '<span class="log-sheet-plant-check" aria-hidden="true"></span>' +
+      '<span class="log-sheet-plant-no">№ ' +
+      plantSpecimenNo(specimenNo) +
+      '</span>' +
+      '<span class="log-sheet-plant-name">' +
+      escapeHtml(p.name || 'Plant') +
+      '</span>' +
+      '</button>'
+    );
   }
 
   function renderLogSheet() {
     const listEl = document.getElementById('log-sheet-plants');
     const emptyEl = document.getElementById('log-sheet-empty');
     const actionsEl = document.getElementById('log-sheet-actions');
+    const labelEl = document.getElementById('log-sheet-plant-label');
     const plants = loggablePlants();
     if (!listEl) return;
 
     if (!plants.length) {
-      logSheetSelectedPlantId = '';
+      logSheetSelectedPlantIds = [];
       listEl.innerHTML = '';
       listEl.hidden = true;
       if (emptyEl) emptyEl.hidden = false;
@@ -3048,35 +3125,169 @@ function initFirebaseSync() {
     listEl.hidden = false;
     if (actionsEl) actionsEl.hidden = false;
 
-    if (!logSheetSelectedPlantId || !plants.some((p) => p.id === logSheetSelectedPlantId)) {
-      logSheetSelectedPlantId = plants[0].id;
+    logSheetSelectedPlantIds = normalizeSelectedPlantIds(logSheetSelectedPlantIds, plants);
+    if (!logSheetSelectedPlantIds.length) {
+      logSheetSelectedPlantIds = [String(plants[0].id)];
     }
 
-    listEl.innerHTML = plants
-      .map(function (p, i) {
-        const selected = p.id === logSheetSelectedPlantId;
+    const selectedSet = Object.create(null);
+    logSheetSelectedPlantIds.forEach(function (id) {
+      selectedSet[id] = true;
+    });
+
+    const groups = groupLoggablePlants(plants);
+    const Stacks = window.GrowtooStacks;
+    let specimen = 0;
+    const indexById = Object.create(null);
+    plants.forEach(function (p, i) {
+      indexById[String(p.id)] = i;
+    });
+
+    listEl.innerHTML = groups
+      .map(function (g) {
+        const memberIds = g.members.map(function (p) {
+          return String(p.id);
+        });
+        const selectedCount = memberIds.filter(function (id) {
+          return selectedSet[id];
+        }).length;
+        const allOn = selectedCount === memberIds.length;
+        const someOn = selectedCount > 0 && !allOn;
+
+        if (!(Stacks && Stacks.shouldStack(g))) {
+          const p = g.members[0];
+          const idx = indexById[String(p.id)];
+          specimen += 1;
+          return logSheetPlantButtonHtml(
+            p,
+            idx != null ? idx : specimen - 1,
+            !!selectedSet[String(p.id)]
+          );
+        }
+
+        const expanded = !!logSheetExpandedStacks[g.key] || someOn;
+        const stageLab =
+          Stacks && typeof Stacks.stageLabel === 'function'
+            ? Stacks.stageLabel(g.stage)
+            : g.stage || '';
+        const membersHtml = g.members
+          .map(function (p) {
+            const idx = indexById[String(p.id)];
+            return logSheetPlantButtonHtml(
+              p,
+              idx != null ? idx : 0,
+              !!selectedSet[String(p.id)]
+            );
+          })
+          .join('');
+
         return (
-          '<button type="button" class="log-sheet-plant' +
-          (selected ? ' is-selected' : '') +
-          '" role="option" aria-selected="' +
-          (selected ? 'true' : 'false') +
-          '" data-plant-id="' +
-          escapeHtml(p.id) +
+          '<div class="log-sheet-stack' +
+          (expanded ? ' is-open' : '') +
+          (allOn ? ' is-all-selected' : someOn ? ' is-partial' : '') +
+          '" data-stack-key="' +
+          escapeHtml(g.key) +
           '">' +
-          '<span class="log-sheet-plant-no">№ ' +
-          plantSpecimenNo(i) +
+          '<div class="log-sheet-stack-head">' +
+          '<button type="button" class="log-sheet-stack-all' +
+          (allOn ? ' is-selected' : '') +
+          '" data-stack-toggle="' +
+          escapeHtml(g.key) +
+          '" aria-pressed="' +
+          (allOn ? 'true' : 'false') +
+          '">' +
+          '<span class="log-sheet-plant-check" aria-hidden="true"></span>' +
+          '<span class="log-sheet-stack-copy">' +
+          '<span class="log-sheet-stack-title">' +
+          escapeHtml(g.name || g.strain || 'Plants') +
           '</span>' +
-          '<span class="log-sheet-plant-name">' +
-          escapeHtml(p.name || 'Plant') +
+          '<span class="log-sheet-stack-meta">' +
+          escapeHtml(stageLab) +
+          ' · ' +
+          g.members.length +
+          ' rows · tap for all</span>' +
           '</span>' +
-          '</button>'
+          '<span class="log-sheet-stack-count">×' +
+          escapeHtml(String(g.size || g.members.length)) +
+          '</span>' +
+          '</button>' +
+          '<button type="button" class="log-sheet-stack-expand" data-stack-expand="' +
+          escapeHtml(g.key) +
+          '" aria-expanded="' +
+          (expanded ? 'true' : 'false') +
+          '" aria-label="Show rows">' +
+          (expanded ? '▴' : '▾') +
+          '</button>' +
+          '</div>' +
+          '<div class="log-sheet-stack-members"' +
+          (expanded ? '' : ' hidden') +
+          '>' +
+          membersHtml +
+          '</div>' +
+          '</div>'
         );
       })
       .join('');
 
+    if (labelEl) {
+      const n = logSheetSelectedPlantIds.length;
+      labelEl.textContent =
+        n > 1 ? 'Plants · ' + n + ' selected' : n === 1 ? 'Plants · 1 selected' : 'Plants';
+    }
+
     listEl.querySelectorAll('[data-plant-id]').forEach(function (btn) {
       btn.addEventListener('click', function () {
-        logSheetSelectedPlantId = btn.getAttribute('data-plant-id') || '';
+        const id = String(btn.getAttribute('data-plant-id') || '');
+        if (!id) return;
+        const idx = logSheetSelectedPlantIds.indexOf(id);
+        if (idx >= 0) {
+          if (logSheetSelectedPlantIds.length > 1) {
+            logSheetSelectedPlantIds.splice(idx, 1);
+          }
+        } else {
+          logSheetSelectedPlantIds.push(id);
+        }
+        renderLogSheet();
+      });
+    });
+
+    listEl.querySelectorAll('[data-stack-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const key = btn.getAttribute('data-stack-toggle') || '';
+        const group = groups.find(function (g) {
+          return g.key === key;
+        });
+        if (!group) return;
+        const ids = group.members.map(function (p) {
+          return String(p.id);
+        });
+        const allOn = ids.every(function (id) {
+          return selectedSet[id];
+        });
+        if (allOn) {
+          // Keep at least one plant selected overall when possible.
+          const remaining = logSheetSelectedPlantIds.filter(function (id) {
+            return ids.indexOf(id) < 0;
+          });
+          logSheetSelectedPlantIds = remaining.length
+            ? remaining
+            : ids.slice(0, 1);
+        } else {
+          const merged = logSheetSelectedPlantIds.slice();
+          ids.forEach(function (id) {
+            if (merged.indexOf(id) < 0) merged.push(id);
+          });
+          logSheetSelectedPlantIds = merged;
+          logSheetExpandedStacks[key] = true;
+        }
+        renderLogSheet();
+      });
+    });
+
+    listEl.querySelectorAll('[data-stack-expand]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const key = btn.getAttribute('data-stack-expand') || '';
+        logSheetExpandedStacks[key] = !logSheetExpandedStacks[key];
         renderLogSheet();
       });
     });
@@ -3177,12 +3388,16 @@ function initFirebaseSync() {
     }
     if (full) {
       full.addEventListener('click', function () {
-        const plantId = logSheetSelectedPlantId;
+        const plantIds = selectedLogPlantIds();
         const pending = logSheetPendingAction;
         const typeHint =
           pending === 'water' ? 'zalijevanje' : pending === 'feed' ? 'gnojidba' : null;
         setLogSheetOpen(false);
-        startJournalEntry({ plantId: plantId || null, type: typeHint });
+        startJournalEntry({
+          plantId: plantIds[0] || null,
+          plantIds: plantIds.length > 1 ? plantIds : null,
+          type: typeHint,
+        });
       });
     }
   })();
@@ -3990,15 +4205,21 @@ function initFirebaseSync() {
     }
   }
 
-  function pickPlantForQuickLog() {
+  function pickPlantsForQuickLog() {
     const plants = loggablePlants();
-    if (!plants.length) return null;
-    if (logSheetSelectedPlantId) {
-      const selected = plants.find((p) => p.id === logSheetSelectedPlantId);
-      if (selected) return selected;
+    if (!plants.length) return [];
+    const selected = normalizeSelectedPlantIds(logSheetSelectedPlantIds, plants);
+    if (selected.length) {
+      return selected
+        .map(function (id) {
+          return plants.find(function (p) {
+            return String(p.id) === String(id);
+          });
+        })
+        .filter(Boolean);
     }
-    if (plants.length === 1) return plants[0];
-    return null;
+    if (plants.length === 1) return [plants[0]];
+    return [];
   }
 
   function quickLogCare(type, note) {
@@ -4008,21 +4229,25 @@ function initFirebaseSync() {
       openPlantModal();
       return;
     }
-    let plant = pickPlantForQuickLog();
-    if (!plant) {
+    let chosen = pickPlantsForQuickLog();
+    if (!chosen.length) {
       // Multiple plants and none selected yet — open the Log sheet.
       openLogSheet(type === 'zalijevanje' ? 'water' : type === 'gnojidba' ? 'feed' : null);
       return;
     }
     try {
-      saveJournalEntry({
-        plantId: plant.id,
-        type: type,
-        note: note,
-        source: 'quick-log',
-        requireNoteDefault: false,
-      });
-      // Toast comes from notifyJournalEntry inside saveJournalEntry (inbox stays clear).
+      saveJournalEntriesBatch(
+        chosen.map(function (p) {
+          return p.id;
+        }),
+        {
+          type: type,
+          note: note,
+          source: 'quick-log',
+          requireNoteDefault: false,
+        }
+      );
+      // Toast comes from notifyJournalEntry / batch summary.
     } catch (err) {
       const msg = (err && err.message) || 'Could not log entry.';
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
@@ -5238,7 +5463,13 @@ function initFirebaseSync() {
     const sel = document.getElementById('entry-plant');
     if (!sel) return;
     const plants = getPlants();
-    sel.innerHTML = '<option value="">-- Select a plant --</option>' + plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+    sel.innerHTML =
+      '<option value="">-- Select a plant --</option>' +
+      plants
+        .map(function (p) {
+          return '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>';
+        })
+        .join('');
   }
 
   function fillJournalPlantFilter() {
@@ -5246,10 +5477,75 @@ function initFirebaseSync() {
     if (!sel) return;
     const prev = sel.value;
     const plants = getPlants();
-    sel.innerHTML =
-      '<option value="">All plants</option>' +
-      plants.map((p) => `<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
-    if (prev && plants.some((p) => p && p.id === prev)) sel.value = prev;
+    const Stacks = window.GrowtooStacks;
+    let html = '<option value="">All plants</option>';
+    if (Stacks && typeof Stacks.groupItems === 'function') {
+      const groups = Stacks.groupItems(plants, plantStackAccessors());
+      groups.forEach(function (g) {
+        if (Stacks.shouldStack(g)) {
+          const stageLab = Stacks.stageLabel(g.stage);
+          html +=
+            '<option value="stack:' +
+            escapeHtml(g.key) +
+            '">' +
+            escapeHtml(g.name || g.strain || 'Plants') +
+            ' · ' +
+            escapeHtml(stageLab) +
+            ' (all ' +
+            g.members.length +
+            ' rows)</option>';
+        }
+        g.members.forEach(function (p) {
+          html +=
+            '<option value="' +
+            escapeHtml(p.id) +
+            '">' +
+            (Stacks.shouldStack(g) ? '  ' : '') +
+            escapeHtml(p.name || 'Plant') +
+            '</option>';
+        });
+      });
+    } else {
+      html += plants
+        .map(function (p) {
+          return '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>';
+        })
+        .join('');
+    }
+    sel.innerHTML = html;
+    if (prev) {
+      const ok =
+        prev === '' ||
+        plants.some(function (p) {
+          return p && p.id === prev;
+        }) ||
+        (prev.indexOf('stack:') === 0 &&
+          Stacks &&
+          Stacks.groupItems(plants, plantStackAccessors()).some(function (g) {
+            return 'stack:' + g.key === prev;
+          }));
+      if (ok) sel.value = prev;
+    }
+  }
+
+  function journalFilterPlantIds(filter) {
+    const raw = String(filter || '');
+    if (!raw) return null;
+    if (raw.indexOf('stack:') === 0) {
+      const key = raw.slice(6);
+      const plants = getPlants();
+      const Stacks = window.GrowtooStacks;
+      if (!Stacks || typeof Stacks.groupItems !== 'function') return [];
+      const group = Stacks.groupItems(plants, plantStackAccessors()).find(function (g) {
+        return g.key === key;
+      });
+      return group
+        ? group.members.map(function (p) {
+            return String(p.id);
+          })
+        : [];
+    }
+    return [raw];
   }
 
   function syncEntryFazaLocationsFromPlant() {
@@ -5299,13 +5595,29 @@ function initFirebaseSync() {
 
   function renderJournal() {
     fillJournalPlantFilter();
-    const filter = document.getElementById('journal-plant-filter').value;
+    const filterEl = document.getElementById('journal-plant-filter');
+    const filter = filterEl ? filterEl.value : '';
     let entries = getEntries();
-    if (filter) entries = entries.filter((e) => e.plantId === filter);
-    entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const filterIds = journalFilterPlantIds(filter);
+    if (filterIds) {
+      const allow = Object.create(null);
+      filterIds.forEach(function (id) {
+        allow[String(id)] = true;
+      });
+      entries = entries.filter(function (e) {
+        return e && allow[String(e.plantId)];
+      });
+    }
+    entries.sort(function (a, b) {
+      return (b.date || '').localeCompare(a.date || '');
+    });
 
     const container = document.getElementById('journal-entries');
     const plants = getPlants();
+    const plantById = Object.create(null);
+    plants.forEach(function (p) {
+      if (p && p.id) plantById[String(p.id)] = p;
+    });
     if (entries.length === 0) {
       container.innerHTML = emptyStateHtml({
         icon: 'journal',
@@ -5316,119 +5628,227 @@ function initFirebaseSync() {
       });
       return;
     }
-    container.innerHTML = entries
-      .map((e) => {
-        const plant = plants.find((p) => p.id === e.plantId);
-        const plantName = escapeHtml(plant ? plant.name : 'Plant');
-        const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-        const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
-        const viaTools = entrySourceBadgeHtml(e);
-        const noteText = displayEntryNote(e.note);
-        const media = [];
-        if (e.photo) media.push('<div class="entry-media entry-photo"><img src="' + escapeHtml(e.photo) + '" alt="Photo" /></div>');
-        if (e.video) media.push('<div class="entry-media entry-video"><video src="' + escapeHtml(e.video) + '" controls></video></div>');
-        let metaHtml = toolboxMeasurementMetaHtml(e);
-        if (e.meta) {
-          if (e.meta.faza) {
-            const m = e.meta.faza;
-            const parts = [];
-            if (m.from) parts.push('From: ' + escapeHtml(STAGES[m.from] || m.from));
-            parts.push('To: ' + escapeHtml(STAGES[m.to] || m.to));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stage transition</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
-            if (e.meta.fieldLocation) {
-              metaHtml +=
-                '<div class="entry-meta-block"><strong>Field location</strong><p>' +
-                escapeHtml(e.meta.fieldLocation) +
-                '</p></div>';
-            }
-            if (e.meta.plantingLocation) {
-              metaHtml +=
-                '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
-                escapeHtml(e.meta.plantingLocation) +
-                '</p></div>';
-            }
+
+    function entryCardHtml(e) {
+      const plant = plantById[String(e.plantId)];
+      const plantName = escapeHtml(plant ? plant.name : 'Plant');
+      const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
+      const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
+      const viaTools = entrySourceBadgeHtml(e);
+      const noteText = displayEntryNote(e.note);
+      const media = [];
+      if (e.photo) {
+        media.push(
+          '<div class="entry-media entry-photo"><img src="' +
+            escapeHtml(e.photo) +
+            '" alt="Photo" /></div>'
+        );
+      }
+      if (e.video) {
+        media.push(
+          '<div class="entry-media entry-video"><video src="' +
+            escapeHtml(e.video) +
+            '" controls></video></div>'
+        );
+      }
+      let metaHtml = toolboxMeasurementMetaHtml(e);
+      if (e.meta) {
+        if (e.meta.faza) {
+          const m = e.meta.faza;
+          const parts = [];
+          if (m.from) parts.push('From: ' + escapeHtml(STAGES[m.from] || m.from));
+          parts.push('To: ' + escapeHtml(STAGES[m.to] || m.to));
+          if (parts.length) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Stage transition</strong><ul><li>' +
+              parts.join('</li><li>') +
+              '</li></ul></div>';
           }
-          if (e.meta.podfaza) {
-            const m = e.meta.podfaza;
-            const parts = [];
-            if (m.from) parts.push('From: ' + escapeHtml(subphaseLabel(m.from)));
-            parts.push('To: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
-            if (parts.length) {
-              metaHtml += '<div class="entry-meta-block"><strong>Sub-phase transition</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
-            }
-            if (e.meta.fieldLocation) {
-              metaHtml +=
-                '<div class="entry-meta-block"><strong>Field location</strong><p>' +
-                escapeHtml(e.meta.fieldLocation) +
-                '</p></div>';
-            }
-            if (e.meta.plantingLocation) {
-              metaHtml +=
-                '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
-                escapeHtml(e.meta.plantingLocation) +
-                '</p></div>';
-            }
+          if (e.meta.fieldLocation) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Field location</strong><p>' +
+              escapeHtml(e.meta.fieldLocation) +
+              '</p></div>';
           }
-          if (e.meta.presadjivanje) {
-            const m = e.meta.presadjivanje;
-            const parts = [];
-            if (m.soilQuality) parts.push('Soil quality: ' + escapeHtml(m.soilQuality));
-            if (m.plantAge) parts.push('Plant age: ' + escapeHtml(m.plantAge));
-            if (m.plantCondition) parts.push('Plant condition: ' + escapeHtml(m.plantCondition));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Transplanting</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
-          }
-          if (e.meta.stresori) {
-            const m = e.meta.stresori;
-            const parts = [];
-            if (m.temperature) parts.push('Temperature: ' + escapeHtml(m.temperature));
-            if (m.humidity) parts.push('Humidity: ' + escapeHtml(m.humidity));
-            if (m.vpd) parts.push('VPD: ' + escapeHtml(m.vpd));
-            if (m.pests) parts.push('Pests: ' + escapeHtml(m.pests));
-            if (parts.length) metaHtml += '<div class="entry-meta-block"><strong>Stressors</strong><ul><li>' + parts.join('</li><li>') + '</li></ul></div>';
+          if (e.meta.plantingLocation) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
+              escapeHtml(e.meta.plantingLocation) +
+              '</p></div>';
           }
         }
-        const deletable = !isSharedPlantId(e.plantId);
-        const entryHtml = `
-          <div class="journal-entry${isToolboxMirroredEntry(e) ? ' journal-entry--from-tools' : ''}" data-entry-id="${escapeHtml(e.id)}">
-            <div class="entry-meta">
-              <span class="entry-type">${typeLabel}</span>
-              ${viaTools}
-              ${plantName} · ${date}
-              ${
-                deletable
-                  ? '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
-                  : ''
-              }
-            </div>
-            <div class="entry-note">${escapeHtml(noteText)}</div>
-            ${
-              (function () {
-                const coachNote =
-                  window.AICoach && typeof AICoach.getEntryNote === 'function'
-                    ? AICoach.getEntryNote(e.id)
-                    : '';
-                if (!coachNote) return '';
-                return (
-                  '<p class="entry-coach-note"><span class="entry-coach-note-label">Coach</span> ' +
-                  escapeHtml(coachNote) +
-                  '</p>'
-                );
-              })()
-            }
-            ${metaHtml ? '<div class="entry-meta-blocks">' + metaHtml + '</div>' : ''}
-            ${media.length ? '<div class="entry-media-wrap">' + media.join('') + '</div>' : ''}
-          </div>
-        `;
-        // Swipe-to-delete is an extra affordance, not a replacement: the inline
-        // Delete button above stays so the action is never gesture-only.
-        return deletable
-          ? `<div class="journal-swipe">
-               <div class="journal-swipe-actions">
-                 <button type="button" class="journal-swipe-delete" tabindex="-1" aria-hidden="true">Delete</button>
-               </div>
-               ${entryHtml}
-             </div>`
-          : entryHtml;
+        if (e.meta.podfaza) {
+          const m = e.meta.podfaza;
+          const parts = [];
+          if (m.from) parts.push('From: ' + escapeHtml(subphaseLabel(m.from)));
+          parts.push('To: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
+          if (parts.length) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Sub-phase transition</strong><ul><li>' +
+              parts.join('</li><li>') +
+              '</li></ul></div>';
+          }
+          if (e.meta.fieldLocation) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Field location</strong><p>' +
+              escapeHtml(e.meta.fieldLocation) +
+              '</p></div>';
+          }
+          if (e.meta.plantingLocation) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
+              escapeHtml(e.meta.plantingLocation) +
+              '</p></div>';
+          }
+        }
+        if (e.meta.presadjivanje) {
+          const m = e.meta.presadjivanje;
+          const parts = [];
+          if (m.soilQuality) parts.push('Soil quality: ' + escapeHtml(m.soilQuality));
+          if (m.plantAge) parts.push('Plant age: ' + escapeHtml(m.plantAge));
+          if (m.plantCondition) parts.push('Plant condition: ' + escapeHtml(m.plantCondition));
+          if (parts.length) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Transplanting</strong><ul><li>' +
+              parts.join('</li><li>') +
+              '</li></ul></div>';
+          }
+        }
+        if (e.meta.stresori) {
+          const m = e.meta.stresori;
+          const parts = [];
+          if (m.temperature) parts.push('Temperature: ' + escapeHtml(m.temperature));
+          if (m.humidity) parts.push('Humidity: ' + escapeHtml(m.humidity));
+          if (m.vpd) parts.push('VPD: ' + escapeHtml(m.vpd));
+          if (m.pests) parts.push('Pests: ' + escapeHtml(m.pests));
+          if (parts.length) {
+            metaHtml +=
+              '<div class="entry-meta-block"><strong>Stressors</strong><ul><li>' +
+              parts.join('</li><li>') +
+              '</li></ul></div>';
+          }
+        }
+      }
+      const deletable = !isSharedPlantId(e.plantId);
+      const entryHtml =
+        '<div class="journal-entry' +
+        (isToolboxMirroredEntry(e) ? ' journal-entry--from-tools' : '') +
+        '" data-entry-id="' +
+        escapeHtml(e.id) +
+        '">' +
+        '<div class="entry-meta">' +
+        '<span class="entry-type">' +
+        typeLabel +
+        '</span>' +
+        viaTools +
+        plantName +
+        ' · ' +
+        date +
+        (deletable
+          ? '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
+          : '') +
+        '</div>' +
+        '<div class="entry-note">' +
+        escapeHtml(noteText) +
+        '</div>' +
+        (function () {
+          const coachNote =
+            window.AICoach && typeof AICoach.getEntryNote === 'function'
+              ? AICoach.getEntryNote(e.id)
+              : '';
+          if (!coachNote) return '';
+          return (
+            '<p class="entry-coach-note"><span class="entry-coach-note-label">Coach</span> ' +
+            escapeHtml(coachNote) +
+            '</p>'
+          );
+        })() +
+        (metaHtml ? '<div class="entry-meta-blocks">' + metaHtml + '</div>' : '') +
+        (media.length ? '<div class="entry-media-wrap">' + media.join('') + '</div>' : '') +
+        '</div>';
+      return deletable
+        ? '<div class="journal-swipe">' +
+            '<div class="journal-swipe-actions">' +
+            '<button type="button" class="journal-swipe-delete" tabindex="-1" aria-hidden="true">Delete</button>' +
+            '</div>' +
+            entryHtml +
+            '</div>'
+        : entryHtml;
+    }
+
+    const Stacks = window.GrowtooStacks;
+    const singlePlantFilter = filterIds && filterIds.length === 1 && String(filter || '').indexOf('stack:') !== 0;
+    if (!Stacks || typeof Stacks.groupItems !== 'function' || singlePlantFilter) {
+      container.innerHTML = entries.map(entryCardHtml).join('');
+      bindJournalRowActions(container);
+      return;
+    }
+
+    const plantGroups = Stacks.groupItems(plants, plantStackAccessors());
+    const groupByKey = Object.create(null);
+    plantGroups.forEach(function (g) {
+      groupByKey[g.key] = g;
+    });
+
+    const entryBuckets = Object.create(null);
+    const bucketOrder = [];
+    entries.forEach(function (e) {
+      const plant = plantById[String(e.plantId)];
+      const key = plant
+        ? Stacks.groupKey({
+            strain: plant.strain,
+            name: plant.name,
+            stage: plant.stage,
+          })
+        : 'unknown|' + String(e.plantId || '');
+      if (!entryBuckets[key]) {
+        entryBuckets[key] = [];
+        bucketOrder.push(key);
+      }
+      entryBuckets[key].push(e);
+    });
+
+    container.innerHTML = bucketOrder
+      .map(function (key) {
+        const bucket = entryBuckets[key] || [];
+        const membersHtml = bucket.map(entryCardHtml).join('');
+        const plantGroup = groupByKey[key];
+        const distinctIds = Object.create(null);
+        bucket.forEach(function (e) {
+          if (e && e.plantId) distinctIds[String(e.plantId)] = true;
+        });
+        const rowCount = Object.keys(distinctIds).length;
+        const shouldWrap =
+          plantGroup && Stacks.shouldStack(plantGroup)
+            ? true
+            : rowCount > 1;
+        if (!shouldWrap) return membersHtml;
+
+        const faceGroup = plantGroup || {
+          key: key,
+          name: (plantById[Object.keys(distinctIds)[0]] || {}).name || 'Plants',
+          strain: (plantById[Object.keys(distinctIds)[0]] || {}).strain || '',
+          stage: key.split('|')[1] || '',
+          size: rowCount,
+          members: Object.keys(distinctIds).map(function (id) {
+            return plantById[id] || { id: id };
+          }),
+        };
+        return Stacks.wrapStackHtml(faceGroup, membersHtml, {
+          surface: 'journal',
+          meta:
+            (faceGroup.strain ? escapeHtml(faceGroup.strain) + ' · ' : '') +
+            escapeHtml(Stacks.stageLabel(faceGroup.stage)) +
+            ' · ' +
+            rowCount +
+            ' row' +
+            (rowCount === 1 ? '' : 's') +
+            ' · ' +
+            bucket.length +
+            ' entr' +
+            (bucket.length === 1 ? 'y' : 'ies'),
+          photo: Stacks.firstPhoto(faceGroup.members || []),
+        });
       })
       .join('');
     bindJournalRowActions(container);
@@ -5575,17 +5995,173 @@ function initFirebaseSync() {
 
   /**
    * Shared opener for every “New entry” CTA (Journal, plant detail, Log sheet).
-   * @param {{ plantId?: string|null, type?: string|null }} [opts]
+   * @param {{ plantId?: string|null, plantIds?: string[]|null, type?: string|null }} [opts]
    */
   function startJournalEntry(opts) {
     const o = opts || {};
-    const plantId = o.plantId || null;
-    if (plantId) {
-      if (blockWrite({ plantId: plantId })) return;
+    const plantIds =
+      Array.isArray(o.plantIds) && o.plantIds.length
+        ? o.plantIds.map(String)
+        : o.plantId
+          ? [String(o.plantId)]
+          : null;
+    if (plantIds && plantIds.length) {
+      if (plantIds.some(function (id) {
+        return blockWrite({ plantId: id });
+      })) {
+        return;
+      }
     } else if (blockAdminWrite()) {
       return;
     }
-    openEntryModal(plantId, o);
+    openEntryModal(plantIds && plantIds.length === 1 ? plantIds[0] : null, Object.assign({}, o, {
+      plantIds: plantIds && plantIds.length > 1 ? plantIds : plantIds,
+    }));
+  }
+
+  function renderEntryPlantsMulti(selectedIds, locked) {
+    const wrap = document.getElementById('entry-plants-multi');
+    const list = document.getElementById('entry-plants-multi-list');
+    const singleLabel = document.getElementById('entry-plant-label');
+    const singleSel = document.getElementById('entry-plant');
+    if (!wrap || !list) return;
+    const plants = loggablePlants();
+    const selected = normalizeSelectedPlantIds(selectedIds || [], plants);
+    const useMulti = !locked && plants.length > 1;
+
+    if (!useMulti) {
+      wrap.hidden = true;
+      list.innerHTML = '';
+      if (singleLabel) singleLabel.hidden = false;
+      if (singleSel) {
+        singleSel.required = true;
+        singleSel.hidden = false;
+      }
+      entryModalPlantIds = null;
+      return;
+    }
+
+    if (singleLabel) singleLabel.hidden = true;
+    if (singleSel) {
+      singleSel.required = false;
+      singleSel.hidden = true;
+      singleSel.value = selected[0] || '';
+    }
+    wrap.hidden = false;
+    entryModalPlantIds = selected.length ? selected.slice() : plants[0] ? [String(plants[0].id)] : [];
+
+    const selectedSet = Object.create(null);
+    entryModalPlantIds.forEach(function (id) {
+      selectedSet[id] = true;
+    });
+    const groups = groupLoggablePlants(plants);
+    const Stacks = window.GrowtooStacks;
+
+    list.innerHTML = groups
+      .map(function (g) {
+        const ids = g.members.map(function (p) {
+          return String(p.id);
+        });
+        const allOn = ids.every(function (id) {
+          return selectedSet[id];
+        });
+        if (!(Stacks && Stacks.shouldStack(g))) {
+          const p = g.members[0];
+          const id = String(p.id);
+          return (
+            '<label class="entry-plant-check' +
+            (selectedSet[id] ? ' is-selected' : '') +
+            '">' +
+            '<input type="checkbox" data-entry-plant-id="' +
+            escapeHtml(id) +
+            '"' +
+            (selectedSet[id] ? ' checked' : '') +
+            ' />' +
+            '<span>' +
+            escapeHtml(p.name || 'Plant') +
+            '</span>' +
+            '</label>'
+          );
+        }
+        const stageLab =
+          Stacks && typeof Stacks.stageLabel === 'function'
+            ? Stacks.stageLabel(g.stage)
+            : g.stage || '';
+        return (
+          '<div class="entry-plant-stack">' +
+          '<label class="entry-plant-check entry-plant-check--stack' +
+          (allOn ? ' is-selected' : '') +
+          '">' +
+          '<input type="checkbox" data-entry-stack-key="' +
+          escapeHtml(g.key) +
+          '"' +
+          (allOn ? ' checked' : '') +
+          ' />' +
+          '<span>' +
+          escapeHtml(g.name || g.strain || 'Plants') +
+          ' · ' +
+          escapeHtml(stageLab) +
+          ' <em>all ' +
+          g.members.length +
+          ' rows</em></span>' +
+          '</label>' +
+          '<div class="entry-plant-stack-members">' +
+          g.members
+            .map(function (p) {
+              const id = String(p.id);
+              return (
+                '<label class="entry-plant-check' +
+                (selectedSet[id] ? ' is-selected' : '') +
+                '">' +
+                '<input type="checkbox" data-entry-plant-id="' +
+                escapeHtml(id) +
+                '"' +
+                (selectedSet[id] ? ' checked' : '') +
+                ' />' +
+                '<span>' +
+                escapeHtml(p.name || 'Plant') +
+                '</span>' +
+                '</label>'
+              );
+            })
+            .join('') +
+          '</div></div>'
+        );
+      })
+      .join('');
+
+    function syncFromDom() {
+      const ids = [];
+      list.querySelectorAll('[data-entry-plant-id]').forEach(function (input) {
+        if (input.checked) ids.push(String(input.getAttribute('data-entry-plant-id')));
+      });
+      entryModalPlantIds = ids;
+      if (singleSel && ids[0]) singleSel.value = ids[0];
+      list.querySelectorAll('.entry-plant-check').forEach(function (lab) {
+        const input = lab.querySelector('input');
+        lab.classList.toggle('is-selected', !!(input && input.checked));
+      });
+    }
+
+    list.querySelectorAll('[data-entry-plant-id]').forEach(function (input) {
+      input.addEventListener('change', syncFromDom);
+    });
+    list.querySelectorAll('[data-entry-stack-key]').forEach(function (input) {
+      input.addEventListener('change', function () {
+        const key = input.getAttribute('data-entry-stack-key') || '';
+        const group = groups.find(function (g) {
+          return g.key === key;
+        });
+        if (!group) return;
+        group.members.forEach(function (p) {
+          const el = list.querySelector(
+            '[data-entry-plant-id="' + String(p.id).replace(/"/g, '') + '"]'
+          );
+          if (el) el.checked = input.checked;
+        });
+        syncFromDom();
+      });
+    });
   }
 
   function openEntryModal(plantId, opts) {
@@ -5601,14 +6177,21 @@ function initFirebaseSync() {
     document.getElementById('entry-photo-preview').innerHTML = '';
     document.getElementById('entry-video-preview').innerHTML = '';
     const plantSelect = document.getElementById('entry-plant');
+    const multiIds =
+      Array.isArray(o.plantIds) && o.plantIds.length
+        ? o.plantIds.map(String)
+        : plantId
+          ? [String(plantId)]
+          : [];
+    const lockSelect = !!(o.lockPlant || (plantId && !o.plantIds && currentGrowlogPlantId && String(currentGrowlogPlantId) === String(plantId)));
     if (plantSelect) {
-      if (plantId) {
-        plantSelect.value = plantId;
-        plantSelect.disabled = true;
-      } else {
-        plantSelect.disabled = false;
-      }
+      if (plantId) plantSelect.value = plantId;
+      plantSelect.disabled = lockSelect;
     }
+    renderEntryPlantsMulti(
+      multiIds.length ? multiIds : plantId ? [plantId] : [],
+      lockSelect
+    );
     const typeSel = document.getElementById('entry-type');
     if (typeSel && o.type) {
       const wanted = String(o.type);
@@ -5647,7 +6230,7 @@ function initFirebaseSync() {
   if (btnAddEntryGrowlog) {
     btnAddEntryGrowlog.addEventListener('click', () => {
       if (!currentGrowlogPlantId) return;
-      startJournalEntry({ plantId: currentGrowlogPlantId });
+      startJournalEntry({ plantId: currentGrowlogPlantId, lockPlant: true });
     });
   }
 
@@ -5869,8 +6452,14 @@ function initFirebaseSync() {
       }
     }
     try {
-      saveJournalEntry({
-        plantId: plantIdForEntry,
+      const multiWrap = document.getElementById('entry-plants-multi');
+      const multiActive = multiWrap && !multiWrap.hidden;
+      const plantIdsForEntry = multiActive
+        ? normalizeSelectedPlantIds(entryModalPlantIds || [], loggablePlants())
+        : plantIdForEntry
+          ? [plantIdForEntry]
+          : [];
+      saveJournalEntriesBatch(plantIdsForEntry, {
         type: type,
         note: document.getElementById('entry-note').value,
         date: document.getElementById('entry-date').value || localDateYYYYMMDD(),
@@ -5889,8 +6478,17 @@ function initFirebaseSync() {
       }
       return;
     }
+    entryModalPlantIds = null;
     const plantSelect = document.getElementById('entry-plant');
-    if (plantSelect) plantSelect.disabled = false;
+    if (plantSelect) {
+      plantSelect.disabled = false;
+      plantSelect.hidden = false;
+      plantSelect.required = true;
+    }
+    const plantLabel = document.getElementById('entry-plant-label');
+    if (plantLabel) plantLabel.hidden = false;
+    const multiEl = document.getElementById('entry-plants-multi');
+    if (multiEl) multiEl.hidden = true;
     modalEntry.classList.remove('open');
   });
 
@@ -6624,8 +7222,61 @@ document.addEventListener("click", (e) => {
         // ignore
       }
     }
+    if (!o.deferRefresh) {
+      maybeNotifyCareProgress();
+      refreshAfterJournalWrite(plantId);
+    }
+    return landed;
+  }
+
+  /**
+   * Write the same care/journal payload to one or many plants (same-species rows).
+   */
+  function saveJournalEntriesBatch(plantIds, opts) {
+    const o = opts || {};
+    const plants = loggablePlants();
+    const ids = normalizeSelectedPlantIds(plantIds || [], plants.length ? plants : getPlants());
+    if (!ids.length) throw new Error('Choose a plant before saving the entry.');
+
+    const landed = [];
+    ids.forEach(function (id) {
+      landed.push(
+        saveJournalEntry(
+          Object.assign({}, o, {
+            plantId: id,
+            silent: true,
+            deferRefresh: true,
+          })
+        )
+      );
+    });
+
     maybeNotifyCareProgress();
-    refreshAfterJournalWrite(plantId);
+    refreshAfterJournalWrite(ids[0]);
+
+    if (!o.silent && window.DnevnikNotifications) {
+      try {
+        const typeLabel =
+          typeof ENTRY_TYPE_LABELS !== 'undefined' && ENTRY_TYPE_LABELS[o.type]
+            ? ENTRY_TYPE_LABELS[o.type]
+            : o.type || 'Entry';
+        if (ids.length === 1) {
+          const plant = getPlants().find(function (p) {
+            return p && String(p.id) === String(ids[0]);
+          });
+          if (typeof DnevnikNotifications.notifyJournalEntry === 'function') {
+            DnevnikNotifications.notifyJournalEntry(landed[0], plant && plant.name);
+          }
+        } else if (typeof DnevnikNotifications.toast === 'function') {
+          DnevnikNotifications.toast(
+            'Logged ' + typeLabel + ' for ' + ids.length + ' plants',
+            'success'
+          );
+        }
+      } catch (_) {
+        // ignore
+      }
+    }
     return landed;
   }
 
