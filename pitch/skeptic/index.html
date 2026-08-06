@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>growtoo — Due diligence deck</title>
+    <meta name="description" content="growtoo for the skeptical reader: what's real, what's mocked, who you have to trust, and how to check it yourself." />
+    <link rel="canonical" href="https://growto.live/pitch/skeptic/" />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260806a" />
+    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260806a" />
+  </head>
+  <body>
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main id="deck" class="deck deck--dense">
+      <!-- 1. COVER -->
+      <section class="slide slide--cover" data-title="Cover">
+        <div class="cover">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true">
+              <img src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" />
+            </span>
+            <span class="brand-name">growtoo</span>
+          </div>
+
+          <h1 class="cover-headline">
+            Check it. <span class="grad">Don’t trust it.</span>
+          </h1>
+          <p class="cover-sub">The deck for the person in the room who’s heard this pitch before and didn’t like it.</p>
+
+          <div class="say">
+            <span class="say-label">Open with</span>
+            <p>
+              “Short version: it’s a free grow journal, and there’s an optional crypto layer most users never
+              touch. I’d rather you check the limits than take my word for it — so here they are first.”
+            </p>
+          </div>
+
+          <div class="cover-meta">
+            <div class="cover-meta-row"><span class="meta-label">For</span><span class="meta-value">Due diligence · skeptics · partners</span></div>
+            <div class="cover-meta-row"><span class="meta-label">Method</span><span class="meta-value">Limits first, features after</span></div>
+            <div class="cover-meta-row"><span class="meta-label">Sources</span><span class="meta-value"><a href="https://growto.live/risks/" target="_blank" rel="noreferrer">risks</a> · <a href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">architecture</a></span></div>
+          </div>
+
+          <div class="deck-switch">
+            <span>Other decks</span>
+            <a href="../grower/">Grower</a>
+            <a href="../adopter/">Adopter</a>
+            <a href="../investor/">Investor</a>
+            <a href="../skeptic/" aria-current="page">Due diligence</a>
+          </div>
+
+          <div class="cover-footer">
+            <span>Due diligence deck · 2026</span>
+            <span>growto.live</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. CLAIMS -->
+      <section class="slide slide--dense" data-title="Claims">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">02 · Claims</span>
+            <h2>What we claim, <span class="grad">and what we don’t.</span></h2>
+            <p class="slide-remark">
+              This slide comes first on purpose. If a claim you expected is missing from the left column,
+              that’s deliberate.
+            </p>
+          </header>
+          <div class="claims">
+            <div class="claim-col claim-col--yes">
+              <h3>We do claim</h3>
+              <ul>
+                <li>The journal is free, works with no wallet, and is shipping today</li>
+                <li>Every mint is a real transaction you can open in a public explorer</li>
+                <li>Adopters see the same trail the grower sees</li>
+                <li>The architecture and the risks are published, not on request</li>
+              </ul>
+            </div>
+            <div class="claim-col claim-col--no">
+              <h3>We do not claim</h3>
+              <ul>
+                <li>That $GROWTOO has value — it’s a devnet test asset</li>
+                <li>Any yield, return, or financial outcome</li>
+                <li>That the system is trustless today</li>
+                <li>That harvest redemption works — it’s specified, not shipped</li>
+                <li>That growtoo is legal advice for your jurisdiction</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. TRUST MODEL -->
+      <section class="slide slide--dense" data-title="Trust model">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">03 · Trust model</span>
+            <h2>Who you have to trust <span class="grad">right now.</span></h2>
+            <p class="slide-remark">
+              The honest answer is: us, at one specific step. A grower could in principle write a journal entry
+              that didn’t happen, so today the platform operator reviews progress before a stage is minted.
+              That is a single point of trust and we name it rather than hide it behind the word “on-chain”.
+            </p>
+          </header>
+          <div class="pipeline pipeline--dense">
+            <div class="pipe-step"><div class="pipe-num">1</div><h3>Grower logs</h3><p>Self-reported, like any journal</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">2</div><h3>Operator reviews</h3><p>The trusted step. Today, that’s us</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3>Chain records</h3><p>Immutable once written — not proof it was true</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">4</div><h3>Anyone checks</h3><p>Public tx, linked to the entry</p></div>
+          </div>
+          <div class="quote">
+            <p>The chain proves what was recorded and when. It does not prove the plant was watered.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. WHERE TRUST MOVES -->
+      <section class="slide slide--dense" data-title="Where trust moves">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">04 · Where trust moves</span>
+            <h2>Nobody should be trusted <span class="grad">forever.</span></h2>
+            <p class="slide-remark">
+              The roadmap is about removing ourselves from the middle of that review step, in the order that
+              actually reduces risk rather than the order that sounds most decentralised.
+            </p>
+          </header>
+          <div class="steps-plain">
+            <div>
+              <span class="step-num">01</span>
+              <h3>Timestamped evidence</h3>
+              <p>Photos and entries captured in-app, harder to backfill after the fact.</p>
+            </div>
+            <div>
+              <span class="step-num">02</span>
+              <h3>Independent attestation</h3>
+              <p>More than one party signing that a stage happened, not just the operator.</p>
+            </div>
+            <div>
+              <span class="step-num">03</span>
+              <h3>Redemption with teeth</h3>
+              <p>A real fulfillment path, so a false claim has a consequence at harvest.</p>
+            </div>
+          </div>
+          <p class="footnote">
+            Current design and the intended path are written up in the
+            <a href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">architecture docs</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- 5. VERIFY YOURSELF -->
+      <section class="slide slide--dense" data-title="Verify yourself">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">05 · Verify yourself</span>
+            <h2>Don’t take the deck’s <span class="grad">word for it.</span></h2>
+            <p class="slide-remark">
+              Four real plants on Solana’s public test network. Open the transactions, check the timestamps,
+              compare them against the journal in the app.
+            </p>
+          </header>
+          <div class="verify-grid">
+            <article class="verify-card">
+              <span class="verify-seal" aria-hidden="true"><svg viewBox="0 0 40 40" width="26" height="26" focusable="false"><circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2.5 2.2" /><path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" /></svg></span>
+              <span class="v-name">Seed № 0001 — CBD Auto</span>
+              <span class="v-meta">sealed · 15 Jul · 31H6…5emD</span>
+              <a href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noreferrer">Open tx →</a>
+            </article>
+            <article class="verify-card">
+              <span class="verify-seal" aria-hidden="true"><svg viewBox="0 0 40 40" width="26" height="26" focusable="false"><circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2.5 2.2" /><path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" /></svg></span>
+              <span class="v-name">Seed № 0002 — Gold Bloom</span>
+              <span class="v-meta">sealed · 19 Jul · 2xds…nozH</span>
+              <a href="https://explorer.solana.com/tx/2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH?cluster=devnet" target="_blank" rel="noreferrer">Open tx →</a>
+            </article>
+            <article class="verify-card">
+              <span class="verify-seal" aria-hidden="true"><svg viewBox="0 0 40 40" width="26" height="26" focusable="false"><circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2.5 2.2" /><path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" /></svg></span>
+              <span class="v-name">Seed № 0003 — Charlotte’s Web</span>
+              <span class="v-meta">sealed · 15 Jul · 4wPz…QZDv</span>
+              <a href="https://explorer.solana.com/tx/4wPzcmqEZMt4eBTUURAYq59TCwHmmidz9A28YTYwZ8PvcVkrzY7w5T5bZ8PX33meGJcbHSyy2wbgmE1Nf9c3QZDv?cluster=devnet" target="_blank" rel="noreferrer">Open tx →</a>
+            </article>
+            <article class="verify-card">
+              <span class="verify-seal" aria-hidden="true"><svg viewBox="0 0 40 40" width="26" height="26" focusable="false"><circle cx="20" cy="20" r="17.5" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2.5 2.2" /><path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" /></svg></span>
+              <span class="v-name">Seed № 0004 — Harlequin</span>
+              <span class="v-meta">sealed · 15 Jul · 2ku2…BRqu</span>
+              <a href="https://explorer.solana.com/tx/2ku2UhinDShq7Qdtr8EdQy7J5VZJdjuLRJ4U23S2Fuxcv6RaQrD1Viqaj2W2BeUXj1iu9eRMtW9ekWKTz6TqBRqu?cluster=devnet" target="_blank" rel="noreferrer">Open tx →</a>
+            </article>
+          </div>
+          <div class="chip-row chip-row--center">
+            <span class="chip">Sign up free, no wallet</span>
+            <span class="chip">Read the risks page</span>
+            <span class="chip">Read the architecture docs</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. RISKS -->
+      <section class="slide slide--dense" data-title="Risks">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">06 · Risks</span>
+            <h2>The ways this <span class="grad">could go wrong.</span></h2>
+            <p class="slide-remark">
+              Listed because they’re real, not because a lawyer asked. Detail and mitigations live on the risks page.
+            </p>
+          </header>
+          <div class="grid grid-3">
+            <article class="card card--dense">
+              <h3>Regulatory</h3>
+              <p class="card-tagline">Cultivation and redemption rules differ per country and can move against us.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Fulfillment</h3>
+              <p class="card-tagline">Turning a harvest token into a physical counterpart is the hardest unsolved step.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Falsified logs</h3>
+              <p class="card-tagline">Self-reported entries can be gamed until attestation is stronger.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Key &amp; wallet loss</h3>
+              <p class="card-tagline">Self-custody means a lost key is a lost token. No recovery on our side.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Operator dependence</h3>
+              <p class="card-tagline">Today one party reviews mints. That’s a concentration risk until it isn’t.</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Migration</h3>
+              <p class="card-tagline">Devnet balances aren’t transferable value. Migration rules publish before launch.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. WHAT'S REAL -->
+      <section class="slide slide--dense" data-title="What's real">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">07 · What’s real</span>
+            <h2>After all that — <span class="grad">this part stands.</span></h2>
+            <p class="slide-remark">
+              Strip out everything unproven and there’s still a working product that people use for free
+              with no exposure to any of the above.
+            </p>
+          </header>
+          <div class="status-table">
+            <div class="status-row status-head">
+              <span>Capability</span><span>Status</span><span>How you check it</span>
+            </div>
+            <div class="status-row">
+              <span>Grow journal · camera · coach · reminders</span>
+              <span class="tag tag--live">Live</span>
+              <span>Sign up free at growto.live, no wallet</span>
+            </div>
+            <div class="status-row">
+              <span>Stage minting linked to journal entries</span>
+              <span class="tag tag--devnet">Devnet</span>
+              <span>Explorer links, previous slide</span>
+            </div>
+            <div class="status-row">
+              <span>Adopt · escrow market</span>
+              <span class="tag tag--devnet">Devnet</span>
+              <span>Live stakes board on the landing page</span>
+            </div>
+            <div class="status-row">
+              <span>Harvest redemption</span>
+              <span class="tag tag--mocked">Mocked</span>
+              <span>Specified in docs, stated as not shipped</span>
+            </div>
+            <div class="status-row">
+              <span>Token value</span>
+              <span class="tag tag--planned">None by design</span>
+              <span>Repeated on the site, FAQ, and this deck</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. CLOSE -->
+      <section class="slide slide--dense slide--contact" data-title="Close">
+        <div class="slide-inner contact contact--dense">
+          <span class="kicker">08 · Close</span>
+          <h2>Test network <span class="grad">on purpose.</span></h2>
+          <p class="closer">
+            “The tokens are worth nothing right now, and I’ll keep saying that until they’re not.
+            What’s real today is the record.”
+            <span class="closer-attr">Say this, then stop talking</span>
+          </p>
+          <div class="contact-grid">
+            <div><span class="meta-label">Risks</span><a class="meta-value" href="https://growto.live/risks/" target="_blank" rel="noreferrer">Risks &amp; scope</a></div>
+            <div><span class="meta-label">Docs</span><a class="meta-value" href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
+            <div><span class="meta-label">Contact</span><span class="meta-value">admin@growto.live</span></div>
+          </div>
+          <p class="thanks">Anyone can claim a grow. We’re building the part where you can check.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="hud" aria-hidden="true">
+      <button class="hud-btn" id="prevBtn" aria-label="Previous slide">←</button>
+      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">8</span></span>
+      <button class="hud-btn" id="nextBtn" aria-label="Next slide">→</button>
+    </div>
+
+    <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+
+    <nav class="sidenav" aria-label="Slides">
+      <ol id="sideNavList"></ol>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle slide menu">☰</button>
+
+    <script src="/app/pitch-deck/script.js"></script>
+  </body>
+</html>

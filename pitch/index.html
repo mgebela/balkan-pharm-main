@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>growtoo — Which deck?</title>
+    <meta name="description" content="Pick the growtoo deck that matches the room: grower, adopter, investor, or due diligence." />
+    <link rel="canonical" href="https://growto.live/pitch/" />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260806a" />
+    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260806a" />
+    <style>
+      html { scroll-snap-type: none; }
+      .chooser { max-width: var(--maxw); margin: 0 auto; padding: 80px 40px 100px; }
+      .chooser-head { margin-bottom: 40px; }
+      .chooser-head h1 { font-size: clamp(34px, 4vw, 54px); margin-bottom: 14px; }
+      .chooser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+      .deck-card {
+        display: block;
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--r-lg);
+        padding: 28px 30px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .deck-card:hover { border-color: var(--border-strong); background: var(--panel-strong); color: inherit; }
+      .deck-card h2 { font-size: 24px; margin-bottom: 8px; }
+      .deck-card .who { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); }
+      .deck-card p { font-size: 15px; margin-top: 10px; }
+      .deck-card .open-line { margin-top: 16px; font-style: italic; color: var(--ink); font-size: 15px; }
+      .deck-card .len { margin-top: 14px; font-size: 12px; color: var(--ink-mute); }
+      @media (max-width: 900px) { .chooser-grid { grid-template-columns: 1fr; } .chooser { padding: 48px 20px 70px; } }
+    </style>
+  </head>
+  <body>
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main class="chooser">
+      <header class="chooser-head">
+        <span class="kicker">growtoo · decks</span>
+        <h1>Which room are you <span class="grad">walking into?</span></h1>
+        <p class="slide-remark">
+          Four decks, same product, different order of arguments. Every one opens with the spoken line that
+          matches it and closes with a single sentence to end on.
+        </p>
+      </header>
+
+      <div class="chooser-grid">
+        <a class="deck-card" href="grower/">
+          <span class="who">Growers · communities · expos</span>
+          <h2>Grower deck</h2>
+          <p>
+            Journal only. The problem, what you get today, a day in the app, and one low-key slide on optional
+            proof. Crypto never leads.
+          </p>
+          <p class="open-line">“It’s a free journal for cannabis growers — all in one place.”</p>
+          <p class="len">7 slides · 5–7 min</p>
+        </a>
+
+        <a class="deck-card" href="adopter/">
+          <span class="who">Plant followers · RWA-curious</span>
+          <h2>Adopter deck</h2>
+          <p>
+            What adoption actually is, how to follow a grow, four real transactions to open, and an honest
+            limits slide before any ask.
+          </p>
+          <p class="open-line">“Own the story of a real plant.”</p>
+          <p class="len">7 slides · 6–8 min</p>
+        </a>
+
+        <a class="deck-card" href="investor/">
+          <span class="who">Investors · partners</span>
+          <h2>Investor deck</h2>
+          <p>
+            The gap in RWA, why journal-first is the strategy, the built stack, an honest live/devnet/mocked
+            table, economics, timing, roadmap, team.
+          </p>
+          <p class="open-line">“Everyone tokenises a promise. We tokenise a paper trail.”</p>
+          <p class="len">10 slides · 10–12 min</p>
+        </a>
+
+        <a class="deck-card" href="skeptic/">
+          <span class="who">Skeptics · due diligence</span>
+          <h2>Due diligence deck</h2>
+          <p>
+            Limits first: what we don’t claim, who you have to trust today, where that trust moves, the risk
+            list, and how to verify everything yourself.
+          </p>
+          <p class="open-line">“Check it. Don’t trust it.”</p>
+          <p class="len">8 slides · 8–10 min</p>
+        </a>
+      </div>
+
+      <p class="footnote">
+        Full technical deck: <a href="/app/pitch-deck/">Growtoo — technical overview</a> ·
+        Live product: <a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a><br />
+        Keyboard in every deck: <strong>→ / ←</strong> to move, <strong>F</strong> for fullscreen,
+        <strong>P</strong> to print or export as PDF, <strong>☰</strong> for the slide list.
+      </p>
+    </main>
+  </body>
+</html>

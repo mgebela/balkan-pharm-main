@@ -1,0 +1,252 @@
+/* ==========================================================
+   growtoo — audience deck extras (catalog theme)
+   Loaded on top of styles.css by the per-audience decks
+   (grower / adopter / investor / skeptic).
+   ========================================================== */
+
+/* ---- Presenter line: the spoken opener that matches the deck ---- */
+.say {
+  margin-top: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--green);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  max-width: 860px;
+}
+.say-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  padding-top: 4px;
+}
+.say p {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 350;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+/* ---- Status table: claim / where it stands / how to check ---- */
+.status-table {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-top: 28px;
+}
+.status-row {
+  display: grid;
+  grid-template-columns: 1.4fr 0.7fr 1.3fr;
+  gap: 18px;
+  align-items: center;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+.status-row:last-child { border-bottom: none; }
+.status-row > span:first-child { color: var(--ink); font-weight: 600; }
+.status-row > span:last-child { color: var(--ink-dim); font-size: 14px; }
+.status-head {
+  background: rgba(201, 165, 94, 0.06);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.status-head > span:first-child,
+.status-head > span:last-child { color: var(--ink-mute); font-weight: 600; font-size: 11px; }
+
+.tag {
+  justify-self: start;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  color: var(--ink-dim);
+  white-space: nowrap;
+}
+.tag--live { background: rgba(201, 165, 94, 0.14); border-color: rgba(201, 165, 94, 0.45); color: var(--green); }
+.tag--devnet { background: rgba(184, 212, 176, 0.1); border-color: rgba(184, 212, 176, 0.35); color: var(--blue); }
+.tag--mocked { background: rgba(168, 107, 79, 0.14); border-color: rgba(168, 107, 79, 0.45); color: #c98a6b; }
+.tag--planned { background: rgba(180, 200, 180, 0.05); color: var(--ink-mute); }
+
+/* ---- Two-column "we claim / we don't claim" ---- */
+.claims {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 28px;
+}
+.claim-col {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px 26px;
+}
+.claim-col--no { border-color: rgba(168, 107, 79, 0.34); }
+.claim-col h3 { font-size: 17px; margin-bottom: 14px; }
+.claim-col ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+.claim-col li {
+  font-size: 15px;
+  color: var(--ink-dim);
+  padding-left: 26px;
+  position: relative;
+  line-height: 1.45;
+}
+.claim-col li::before {
+  position: absolute;
+  left: 0; top: 0;
+  font-weight: 700;
+}
+.claim-col--yes li::before { content: "✓"; color: var(--green); }
+.claim-col--no li::before { content: "✕"; color: #c98a6b; }
+
+/* ---- Verify strip: real devnet transactions ---- */
+.verify-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 28px;
+}
+.verify-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* Wax seal, same device as the site's trail cards. */
+.verify-seal {
+  color: var(--green);
+  display: inline-flex;
+  line-height: 0;
+  margin-bottom: 2px;
+}
+.verify-card .v-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.25;
+}
+.verify-card .v-meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+}
+.verify-card a { font-size: 13px; margin-top: 4px; }
+
+/* ---- Plain numbered list for "how it works" on light decks ---- */
+.steps-plain {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  counter-reset: step;
+}
+.steps-plain > div {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 24px 26px;
+}
+.steps-plain h3 { font-size: 18px; margin: 10px 0 8px; }
+.steps-plain p { font-size: 15px; }
+.step-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--green);
+}
+
+/* ---- Closing line ---- */
+.closer {
+  margin-top: 30px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 2vw, 30px);
+  font-weight: 350;
+  color: var(--ink);
+  line-height: 1.25;
+  max-width: 900px;
+}
+.closer-attr {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+/* ---- Deck switcher shown on the cover of every audience deck ---- */
+.deck-switch {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.deck-switch span {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.deck-switch a {
+  font-size: 13px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--ink-dim);
+  background: var(--panel);
+}
+.deck-switch a:hover { color: var(--ink); border-color: var(--border-strong); }
+.deck-switch a[aria-current="page"] {
+  color: var(--brass-ink, #1a1408);
+  background: var(--green);
+  border-color: var(--green);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .claims,
+  .steps-plain,
+  .verify-grid { grid-template-columns: 1fr; }
+  .status-row { grid-template-columns: 1fr; gap: 6px; }
+  .say { flex-direction: column; gap: 8px; }
+}
+
+/* ---- Print / PDF export (P in any deck) ---- */
+@media print {
+  .deck-switch { display: none !important; }
+  .say,
+  .claim-col,
+  .status-table,
+  .verify-card,
+  .steps-plain > div {
+    box-shadow: none;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    page-break-inside: avoid;
+  }
+  .status-row { page-break-inside: avoid; }
+  .closer { font-size: 22px; }
+}

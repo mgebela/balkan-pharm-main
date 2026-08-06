@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>growtoo — Investor deck</title>
+    <meta name="description" content="growtoo: journal first, proof second. Real-world assets backed by a grower's daily care log on Solana." />
+    <link rel="canonical" href="https://growto.live/pitch/investor/" />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260806a" />
+    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260806a" />
+  </head>
+  <body>
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <main id="deck" class="deck deck--dense">
+      <!-- 1. COVER -->
+      <section class="slide slide--cover" data-title="Cover">
+        <div class="cover">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true">
+              <img src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" />
+            </span>
+            <span class="brand-name">growtoo</span>
+          </div>
+
+          <h1 class="cover-headline">
+            Everyone tokenises a promise. <span class="grad">We tokenise a paper trail.</span>
+          </h1>
+          <p class="cover-sub">A free grow journal underneath a real-world asset — documentation first, token second.</p>
+
+          <div class="say">
+            <span class="say-label">Open with</span>
+            <p>
+              “Everyone tokenising real-world assets starts with the token. We started with the paperwork,
+              because the paperwork is the asset.”
+            </p>
+          </div>
+
+          <div class="cover-meta">
+            <div class="cover-meta-row"><span class="meta-label">Stack</span><span class="meta-value">PWA · Firebase · Solana devnet</span></div>
+            <div class="cover-meta-row"><span class="meta-label">Scope</span><span class="meta-value">Journal · seal · adopt · escrow market</span></div>
+            <div class="cover-meta-row"><span class="meta-label">Status</span><span class="meta-value">Public test network, test assets</span></div>
+            <div class="cover-meta-row"><span class="meta-label">Live</span><span class="meta-value"><a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></span></div>
+          </div>
+
+          <div class="deck-switch">
+            <span>Other decks</span>
+            <a href="../grower/">Grower</a>
+            <a href="../adopter/">Adopter</a>
+            <a href="../investor/" aria-current="page">Investor</a>
+            <a href="../skeptic/">Due diligence</a>
+          </div>
+
+          <div class="cover-footer">
+            <span>Investor deck · 2026</span>
+            <span>Confidential</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. THE GAP -->
+      <section class="slide slide--dense" data-title="The gap">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">02 · The gap</span>
+            <h2>Beautiful token. <span class="grad">Uploaded PDF underneath.</span></h2>
+            <p class="slide-remark">
+              Most real-world-asset products are strong at the token layer and weak exactly where it matters:
+              the evidence that the physical thing exists and was handled the way somebody claims.
+            </p>
+          </header>
+          <div class="grid grid-3 why-cards">
+            <article class="card card--dense">
+              <h3>Evidence is an afterthought</h3>
+              <p class="card-tagline">A document nobody can re-derive</p>
+            </article>
+            <article class="card card--dense">
+              <h3>One-shot attestation</h3>
+              <p class="card-tagline">Signed once, never updated again</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Nothing to watch</h3>
+              <p class="card-tagline">Holders get a number, not a story</p>
+            </article>
+          </div>
+          <div class="why-arrow" aria-hidden="true">
+            <span>→</span>
+            <span class="why-arrow-label">Invert the order</span>
+          </div>
+          <div class="quote">
+            <p>Build the underneath first. The token is the easy part.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ORDER OF OPERATIONS -->
+      <section class="slide slide--dense" data-title="Our order">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">03 · Order of operations</span>
+            <h2>Journal first. <span class="grad">Proof second.</span></h2>
+            <p class="slide-remark">
+              The journal is a product growers want on its own — free, no wallet, no crypto knowledge. That’s the
+              acquisition channel and the data moat in one. The asset layer only turns on when a grower opts in.
+            </p>
+          </header>
+          <div class="pipeline pipeline--dense">
+            <div class="pipe-step"><div class="pipe-num">1</div><h3>Journal</h3><p>Daily care logs, photos, stages</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">2</div><h3>Seal</h3><p>Stage minted, linked to the entry</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3>Adopt</h3><p>Backer follows one specific plant</p></div>
+            <div class="pipe-arrow">→</div>
+            <div class="pipe-step"><div class="pipe-num">4</div><h3>Settle</h3><p>Escrow, then harvest redemption</p></div>
+          </div>
+          <div class="chip-grid chip-grid--3">
+            <span class="chip chip--lg chip--g">Free journal = top of funnel</span>
+            <span class="chip chip--lg chip--b">Continuous evidence, not one PDF</span>
+            <span class="chip chip--lg">Opt-in asset layer</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. STACK -->
+      <section class="slide slide--dense" data-title="Stack">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">04 · Stack</span>
+            <h2>What’s actually <span class="grad">built.</span></h2>
+            <p class="slide-remark">
+              A working system, not a design doc: web app, backend with auth and rules, wallet linking,
+              SPL token, seed NFTs, and an on-chain escrow program for the market.
+            </p>
+          </header>
+          <div class="grid grid-3">
+            <article class="card card--dense">
+              <h3>App</h3>
+              <p class="card-tagline">PWA · journal, camera, coach, reminders, weather</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Backend</h3>
+              <p class="card-tagline">Firebase auth · Firestore rules · functions</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Wallets</h3>
+              <p class="card-tagline">Phantom · Solflare · watch-only address linking</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Tokens</h3>
+              <p class="card-tagline">$GROWTOO SPL · seed NFT collection per plant</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Market</h3>
+              <p class="card-tagline">Anchor escrow program · open asks · settlement</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Docs</h3>
+              <p class="card-tagline">Public RWA architecture · risks page</p>
+            </article>
+          </div>
+          <div class="chip-row chip-row--center">
+            <span class="chip">Solana devnet</span>
+            <span class="chip">Metaplex</span>
+            <span class="chip">Anchor</span>
+            <span class="chip">Firebase</span>
+            <span class="chip">GitHub Pages</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. STATUS -->
+      <section class="slide slide--dense" data-title="Status">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">05 · Honest status</span>
+            <h2>Live, devnet, <span class="grad">or still mocked.</span></h2>
+            <p class="slide-remark">
+              We publish this table rather than let a demo imply more than it should. Anything marked mocked is
+              specified and designed, not shipped.
+            </p>
+          </header>
+          <div class="status-table">
+            <div class="status-row status-head">
+              <span>Capability</span><span>Status</span><span>How you check it</span>
+            </div>
+            <div class="status-row">
+              <span>Grow journal · camera · coach</span>
+              <span class="tag tag--live">Live</span>
+              <span>Sign up at growto.live, no wallet needed</span>
+            </div>
+            <div class="status-row">
+              <span>Stage minting · seed NFTs</span>
+              <span class="tag tag--devnet">Devnet</span>
+              <span>Explorer links on the landing page</span>
+            </div>
+            <div class="status-row">
+              <span>Adopt a plant · escrow market</span>
+              <span class="tag tag--devnet">Devnet</span>
+              <span>Market desk in the app, live board on the site</span>
+            </div>
+            <div class="status-row">
+              <span>$GROWTOO value</span>
+              <span class="tag tag--mocked">None</span>
+              <span>Test asset by design — stated on every page</span>
+            </div>
+            <div class="status-row">
+              <span>Harvest redemption</span>
+              <span class="tag tag--mocked">Mocked</span>
+              <span>Specified in the RWA docs, not a fulfillment pipeline</span>
+            </div>
+            <div class="status-row">
+              <span>Trustless attestation</span>
+              <span class="tag tag--planned">Planned</span>
+              <span>Operator reviews today — see the trust model</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. ECONOMICS -->
+      <section class="slide slide--dense slide--adopt" data-title="Economics">
+        <div class="adopt-deco" aria-hidden="true"><div class="adopt-orb"></div></div>
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">06 · Economics</span>
+            <h2>Back it early. <span class="grad">Own more of the harvest.</span></h2>
+            <p class="slide-remark">
+              A grower opens a plant or batch for backing, adopters stake in, and earlier entry carries a heavier
+              share weight because it carries more risk. Harvest proceeds split pro-rata.
+            </p>
+          </header>
+          <div class="grid grid-3 economics-roles">
+            <article class="card card--dense">
+              <h3>Grower</h3>
+              <p class="card-tagline">Documents the grow · keeps the majority share</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Adopter</h3>
+              <p class="card-tagline">Backs early · weight by stage of entry</p>
+            </article>
+            <article class="card card--dense">
+              <h3>Platform</h3>
+              <p class="card-tagline">Escrow · market · verification · fee</p>
+            </article>
+          </div>
+          <div class="economics-weights">
+            <span class="economics-weight economics-weight--seed"><strong>Seed</strong> 3×</span>
+            <span class="economics-weight economics-weight--growth"><strong>Growth</strong> 2×</span>
+            <span class="economics-weight economics-weight--flower"><strong>Flower</strong> 1.5×</span>
+            <span class="economics-weight economics-weight--late"><strong>Late</strong> 1×</span>
+          </div>
+          <p class="footnote">
+            Weights are the designed model on devnet, not a live financial instrument. Nothing here is an offer
+            or a return promise; see the risks page.
+          </p>
+        </div>
+      </section>
+
+      <!-- 7. WHY NOW -->
+      <section class="slide slide--dense" data-title="Why now">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">07 · Why now</span>
+            <h2>Rules opening. <span class="grad">Tooling missing.</span></h2>
+            <p class="slide-remark">
+              European cultivation rules are loosening, which means more people are being asked to document grows
+              properly — and almost none of them have a decent way to do it. Meanwhile RWA capital keeps looking
+              for assets that aren’t another fund wrapper.
+            </p>
+          </header>
+          <div class="grid grid-3 traction traction--dense">
+            <div class="t-card"><span class="t-num">Demand</span><span class="t-label">Documentation becoming expected</span></div>
+            <div class="t-card"><span class="t-num">Gap</span><span class="t-label">Few tools built for cannabis growers</span></div>
+            <div class="t-card"><span class="t-num">Angle</span><span class="t-label">RWA that a person can actually watch</span></div>
+          </div>
+          <div class="personas--dense grid grid-3">
+            <article class="persona"><div class="persona-tag">Grower</div><h3>Journal · seal stages</h3></article>
+            <article class="persona persona--mid"><div class="persona-tag">Adopter</div><h3>Back a plant · verify</h3></article>
+            <article class="persona"><div class="persona-tag">Buyer</div><h3>Documented harvest lots</h3></article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. ROADMAP -->
+      <section class="slide slide--dense" data-title="Roadmap">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">08 · Roadmap</span>
+            <h2>Live today. <span class="grad">Building next.</span></h2>
+            <p class="slide-remark">
+              We publish milestones instead of a vague “soon”. The gate to the live network is the redemption flow,
+              not a marketing date.
+            </p>
+          </header>
+          <div class="timeline-viz" aria-label="Roadmap">
+            <div class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · seal · adopt · escrow on devnet</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node"><span class="tl-q">Next</span><span class="tl-title">Stronger attestations · batch backing</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node"><span class="tl-q">Then</span><span class="tl-title">Harvest redemption · mainnet pilot</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">EU batches · documented harvest market</span></div>
+          </div>
+          <div class="chip-row chip-row--center">
+            <span class="chip">Journal is free, always</span>
+            <span class="chip">Asset layer opt-in</span>
+            <span class="chip">Docs public before launch</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. TEAM -->
+      <section class="slide slide--dense" data-title="Team">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span class="kicker">09 · Team</span>
+            <h2>Builders who <span class="grad">ship.</span></h2>
+            <p class="slide-remark">
+              Product and engineering in one pair of hands, with the whole stack — app, backend, programs, docs —
+              built and deployed rather than outsourced.
+            </p>
+          </header>
+          <div class="grid team team--founders team--dense">
+            <div class="member">
+              <div class="avatar">BI</div>
+              <h3>Bela Ikotić</h3>
+              <p class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
+              <p class="member-short">growtoo architecture &amp; AI roadmap.</p>
+            </div>
+          </div>
+          <p class="footnote">
+            Everything in this deck is checkable today: the app, the transactions, the architecture docs, and the
+            risks page are all public.
+          </p>
+        </div>
+      </section>
+
+      <!-- 10. CLOSE -->
+      <section class="slide slide--dense slide--contact" data-title="Close">
+        <div class="slide-inner contact contact--dense">
+          <span class="kicker">10 · Close</span>
+          <h2>Documentation <span class="grad">is the asset.</span></h2>
+          <p class="closer">
+            “Everyone else is tokenising a promise. We’re tokenising a paper trail.”
+            <span class="closer-attr">Say this, then stop talking</span>
+          </p>
+          <div class="vision-points vision-points--dense">
+            <div><strong>Y1</strong> Devnet proof loop + EU journal</div>
+            <div><strong>Y2</strong> Batch backing · mainnet pilot</div>
+            <div><strong>Y3</strong> Documented harvest market</div>
+          </div>
+          <div class="contact-grid">
+            <div><span class="meta-label">Live</span><a class="meta-value" href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></div>
+            <div><span class="meta-label">Docs</span><a class="meta-value" href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
+            <div><span class="meta-label">Contact</span><span class="meta-value">admin@growto.live</span></div>
+          </div>
+          <p class="thanks">Thank you.</p>
+        </div>
+      </section>
+    </main>
+
+    <div class="hud" aria-hidden="true">
+      <button class="hud-btn" id="prevBtn" aria-label="Previous slide">←</button>
+      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">10</span></span>
+      <button class="hud-btn" id="nextBtn" aria-label="Next slide">→</button>
+    </div>
+
+    <div class="progress" aria-hidden="true"><div id="progressBar"></div></div>
+
+    <nav class="sidenav" aria-label="Slides">
+      <ol id="sideNavList"></ol>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle slide menu">☰</button>
+
+    <script src="/app/pitch-deck/script.js"></script>
+  </body>
+</html>
