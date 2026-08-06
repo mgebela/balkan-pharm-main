@@ -1,5 +1,11 @@
 name: Deploy to GitHub Pages
 
+# Static mirror at https://mgebela.github.io/balkan-pharm-main/
+# (growto.live is Netlify from main — independent of this workflow.)
+#
+# Pages backend sometimes parks a deploy in deployment_in_progress longer
+# than the old single-job + 10m poll window, which cancels the deploy and
+# leaves the mirror stale. Split build/deploy + a longer poll timeout.
 on:
   push:
     branches: [main]
@@ -11,15 +17,13 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +48,20 @@ jobs:
         with:
           path: _site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    # Allow Pages backend to finish after a slow queue (default poll is 10m).
+    timeout-minutes: 25
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # 20 minutes — GitHub has been slow to leave deployment_in_progress.
+          timeout: 1200000
+          error_count: 20
+          reporting_interval: 10000
