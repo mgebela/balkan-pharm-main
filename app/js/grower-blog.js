@@ -294,7 +294,7 @@
           var id = doc.id;
           var publicUrl =
             p.status === 'published' && p.slug
-              ? '../journal/p/?slug=' + encodeURIComponent(p.slug)
+              ? 'https://journal.growto.live/p/?slug=' + encodeURIComponent(p.slug)
               : '';
           return (
             '<article class="blog-card" data-post-id="' +
@@ -518,15 +518,15 @@
       if (enabled && slug) {
         el.hidden = false;
         el.innerHTML =
-          '<p>Public profile live at <a href="../journal/g/?slug=' +
+          '<p>Public profile live at <a href="https://journal.growto.live/g/?slug=' +
           encodeURIComponent(slug) +
-          '" target="_blank" rel="noopener">/journal/g/' +
+          '" target="_blank" rel="noopener">journal.growto.live/g/' +
           esc(slug) +
           '</a>. Manage it in Account.</p>';
       } else {
         el.hidden = false;
         el.innerHTML =
-          '<p>Enable a <strong>public grower profile</strong> in Account (slug + bio) so published stories show your name on the journal.</p>';
+          '<p>Enable a <strong>public grower profile</strong> in Account (slug + bio) so published stories show your name on <a href="https://journal.growto.live/" target="_blank" rel="noopener">journal.growto.live</a>.</p>';
       }
     } catch (_) {
       el.hidden = true;
@@ -558,7 +558,7 @@
       '<div class="account-profile-actions">' +
       '<button type="button" class="btn btn-primary btn-sm" id="account-public-save">Save public profile</button>' +
       (enabled && slug
-        ? '<a class="btn btn-ghost btn-sm" href="../journal/g/?slug=' +
+        ? '<a class="btn btn-ghost btn-sm" href="https://journal.growto.live/g/?slug=' +
           encodeURIComponent(slug) +
           '" target="_blank" rel="noopener">Preview</a>'
         : '') +
@@ -608,7 +608,7 @@
         if (status) {
           status.hidden = false;
           status.textContent = enabled
-            ? 'Public profile saved. Stories will attribute to /journal/g/' + slug
+            ? 'Public profile saved. Stories will attribute to journal.growto.live/g/' + slug
             : 'Public profile disabled.';
         }
         toast('Public profile saved', 'success');

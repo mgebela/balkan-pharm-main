@@ -1,5 +1,6 @@
 /**
  * Public grower journal — unauth reads of publicJournalPosts / publicGrowerProfiles.
+ * Works on https://growto.live/journal/ and https://journal.growto.live/
  */
 (function () {
   'use strict';
@@ -30,6 +31,31 @@
     } catch (_) {
       return '';
     }
+  }
+
+  function isJournalHost() {
+    return /(^|\.)journal\.growto\.live$/i.test(String(location.hostname || ''));
+  }
+
+  /** Browser path prefix for journal routes ('' on subdomain, '/journal' on apex). */
+  function journalBase() {
+    if (isJournalHost()) return '';
+    if (/\/journal(\/|$)/i.test(location.pathname || '')) return '/journal';
+    return '/journal';
+  }
+
+  function postHref(slug) {
+    return journalBase() + '/p/?slug=' + encodeURIComponent(slug || '');
+  }
+
+  function growerHref(slug) {
+    return journalBase() + '/g/?slug=' + encodeURIComponent(slug || '');
+  }
+
+  function feedHref(cat) {
+    var base = journalBase() + '/';
+    if (!cat) return base;
+    return base + '?cat=' + encodeURIComponent(cat);
   }
 
   function formatDate(iso) {
@@ -66,14 +92,7 @@
 
   function postCard(p) {
     var author = p.author || {};
-    var href = '../p/?slug=' + encodeURIComponent(p.slug || '');
-    // From /journal/ index, path is journal/p/
-    if (/\/journal\/?$/.test(location.pathname) || /\/journal\/index\.html$/.test(location.pathname)) {
-      href = 'p/?slug=' + encodeURIComponent(p.slug || '');
-    }
-    if (/\/journal\/g\//.test(location.pathname)) {
-      href = '../p/?slug=' + encodeURIComponent(p.slug || '');
-    }
+    var href = postHref(p.slug);
     return (
       '<article class="gj-card">' +
       '<a class="gj-card-link" href="' +
@@ -112,7 +131,6 @@
     var q = firestore.collection('publicJournalPosts').where('hiddenByAdmin', '==', false);
     if (o.category) q = q.where('category', '==', o.category);
     if (o.authorSlug) q = q.where('author.slug', '==', o.authorSlug);
-    // Prefer publishedAt ordering; fallback client-side if index missing.
     try {
       var snap = await q.orderBy('publishedAt', 'desc').limit(o.limit || 40).get();
       return snap.docs.map(function (d) {
@@ -178,14 +196,16 @@
       filters.innerHTML =
         '<a class="gj-filter' +
         (!cat ? ' is-active' : '') +
-        '" href="./">All</a>' +
+        '" href="' +
+        esc(feedHref('')) +
+        '">All</a>' +
         Object.keys(CATEGORIES)
           .map(function (k) {
             return (
               '<a class="gj-filter' +
               (cat === k ? ' is-active' : '') +
-              '" href="./?cat=' +
-              encodeURIComponent(k) +
+              '" href="' +
+              esc(feedHref(k)) +
               '">' +
               esc(CATEGORIES[k]) +
               '</a>'
@@ -198,7 +218,7 @@
       var posts = await fetchPosts({ category: cat || null, limit: 48 });
       if (!posts.length) {
         root.innerHTML =
-          '<p class="gj-muted">No published stories yet. Growers share tips, plant looks, and harvest products here.</p>';
+          '<p class="gj-muted">No published stories yet. Growers share tips, plant looks, and harvest products here — open to everyone, no sign-in.</p>';
         return;
       }
       root.innerHTML = '<div class="gj-grid">' + posts.map(postCard).join('') + '</div>';
@@ -227,13 +247,24 @@
       document.title = (post.title || 'Story') + ' · growtoo journal';
       var meta = document.querySelector('meta[name="description"]');
       if (meta) meta.setAttribute('content', excerpt(post.body, 155));
+      var canon = document.querySelector('link[rel="canonical"]');
+      if (canon) {
+        canon.setAttribute(
+          'href',
+          (isJournalHost() ? 'https://journal.growto.live' : 'https://growto.live/journal') +
+            '/p/?slug=' +
+            encodeURIComponent(slug)
+        );
+      }
 
       var more = [];
       if (author.slug) {
         more = await fetchPosts({ authorSlug: author.slug, limit: 4 });
-        more = more.filter(function (p) {
-          return p.slug !== post.slug;
-        }).slice(0, 3);
+        more = more
+          .filter(function (p) {
+            return p.slug !== post.slug;
+          })
+          .slice(0, 3);
       }
 
       root.innerHTML =
@@ -253,8 +284,8 @@
         '<h1 class="gj-article-title">' +
         esc(post.title) +
         '</h1>' +
-        '<a class="gj-byline" href="../g/?slug=' +
-        encodeURIComponent(author.slug || '') +
+        '<a class="gj-byline" href="' +
+        esc(growerHref(author.slug || '')) +
         '">' +
         (author.photo
           ? '<img class="gj-avatar" src="' + esc(author.photo) + '" alt="" />'

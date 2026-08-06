@@ -4,27 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Grower journal · growtoo</title>
-  <meta name="description" content="Field notes from growtoo growers — tips, plant looks, problems solved, visits, and products from the garden." />
-  <link rel="canonical" href="https://growto.live/journal/" />
+  <meta name="description" content="Public field notes from growtoo growers — tips, plant looks, problems solved, visits, and products. Open to everyone — no sign-in." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://journal.growto.live/" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles/landing.css" />
-  <link rel="stylesheet" href="styles/journal.css?v=20260806a" />
+  <link rel="stylesheet" href="/styles/landing.css" />
+  <link rel="stylesheet" href="/journal/styles/journal.css?v=20260806b" />
 </head>
 <body data-gj-page="feed">
   <div class="gj-shell">
     <header class="gj-top">
-      <a class="gj-brand" href="./">growtoo <em>journal</em></a>
+      <a class="gj-brand" href="/journal/">growtoo <em>journal</em></a>
       <nav class="gj-nav" aria-label="Journal">
-        <a href="../">Home</a>
-        <a href="../dnevnik/">Sign in</a>
-        <a href="../app/">Open app</a>
+        <a href="https://growto.live/">Home</a>
+        <a href="https://growto.live/dnevnik/">Sign in to write</a>
+        <a href="https://growto.live/app/">Open app</a>
       </nav>
     </header>
     <section class="gj-hero-block">
       <h1>Field notes from the garden</h1>
-      <p>Tips, plant looks, problems, grower visits, and products — published by growers with a public profile.</p>
+      <p>Tips, plant looks, problems, grower visits, and products — published by growers. Anyone can read; no account needed.</p>
     </section>
     <div class="gj-filters" id="gj-filters" aria-label="Filter by category"></div>
     <div id="gj-feed"></div>
@@ -47,6 +48,6 @@
       }
     })();
   </script>
-  <script src="js/journal-public.js?v=20260806a"></script>
+  <script src="/journal/js/journal-public.js?v=20260806b"></script>
 </body>
 </html>
