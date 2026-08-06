@@ -848,6 +848,50 @@ body.profile-adopter .account-profile {
   color: var(--brass);
   border: 1px solid rgba(201, 165, 94, 0.35);
   background: rgba(8, 14, 10, 0.7);
+  overflow: hidden;
+}
+.account-profile-avatar--photo {
+  padding: 0;
+}
+.account-profile-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.account-profile-logo-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+  margin: 0.75rem 0 0.25rem;
+}
+.account-logo-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  width: 100%;
+}
+.account-profile-logo-edit input[type="file"] {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  max-width: 100%;
+}
+.account-profile-logo-hint {
+  margin: 0;
+  width: 100%;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.header-avatar-mark--photo {
+  padding: 0;
+  overflow: hidden;
+}
+.header-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
 }
 body.profile-adopter .account-profile-avatar {
   color: #ffd9c8;
@@ -2832,6 +2876,184 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
+}
+
+/* Expandable stacks — same strain+stage (and seller on market) share one face */
+.plant-stack {
+  --tint: var(--brass);
+  position: relative;
+  align-self: start;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  overflow: visible;
+}
+
+.plant-stack[data-stage-key="seed"] { --tint: #c9a55e; }
+.plant-stack[data-stage-key="germination"] { --tint: #9ab97f; }
+.plant-stack[data-stage-key="seedling"] { --tint: #86ad72; }
+.plant-stack[data-stage-key="vegetative"] { --tint: #6f9457; }
+.plant-stack[data-stage-key="flowering"] { --tint: #c98a4f; }
+.plant-stack[data-stage-key="harvest"] { --tint: #b08f45; }
+
+.plant-stack[open] {
+  grid-column: 1 / -1;
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--tint) 45%, var(--border));
+}
+
+.plant-stack-face {
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 1.1rem 1.15rem 1.05rem;
+  border-radius: 16px;
+  overflow: hidden;
+  user-select: none;
+}
+
+.plant-stack-face::-webkit-details-marker {
+  display: none;
+}
+
+.plant-stack-face::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--tint), transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.plant-stack-face:hover {
+  background: color-mix(in srgb, var(--tint) 8%, transparent);
+}
+
+.plant-stack-deck {
+  position: absolute;
+  inset: 0.55rem 0.65rem auto auto;
+  width: 2.4rem;
+  height: 2rem;
+  pointer-events: none;
+}
+
+.plant-stack-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--tint) 40%, var(--border));
+  background: color-mix(in srgb, var(--tint) 12%, var(--surface));
+}
+
+.plant-stack-layer--1 {
+  transform: translate(5px, -4px) rotate(2.5deg);
+  opacity: 0.55;
+}
+
+.plant-stack-layer--2 {
+  transform: translate(2px, -2px) rotate(1.2deg);
+  opacity: 0.75;
+}
+
+.plant-stack-layer--top {
+  background: color-mix(in srgb, var(--tint) 22%, var(--surface));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.plant-stack-photo {
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--tint) 28%, var(--border));
+  flex-shrink: 0;
+  z-index: 1;
+}
+
+.plant-stack-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.plant-stack-copy {
+  min-width: 0;
+  flex: 1;
+  z-index: 1;
+  padding-right: 2.2rem;
+}
+
+.plant-stack-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.plant-stack-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+.plant-stack-count {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--tint) 85%, var(--text));
+  background: color-mix(in srgb, var(--tint) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tint) 35%, var(--border));
+  border-radius: 6px;
+  padding: 0.12rem 0.45rem;
+}
+
+.plant-stack-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.plant-stack-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--tint) 70%, var(--text-muted));
+}
+
+.plant-stack[open] .plant-stack-hint {
+  opacity: 0.55;
+}
+
+.plant-stack[open] .plant-stack-hint::after {
+  content: ' · tap to close';
+}
+
+.plant-stack-members {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.9rem;
+  padding: 0 1rem 1rem;
+  border-top: 1px solid color-mix(in srgb, var(--tint) 22%, var(--border));
+  background: color-mix(in srgb, var(--tint) 4%, transparent);
+}
+
+.plant-stack-members .plant-card,
+.plant-stack-members .adopt-token-card,
+.plant-stack-members .market-card {
+  margin: 0;
 }
 
 .plant-card {
@@ -9417,7 +9639,8 @@ body.ai-coach-open {
 .modal-content,
 .wallet-panel,
 .adopt-card,
-.growlog-entry {
+.growlog-entry,
+.plant-stack {
   background: var(--desk-panel) !important;
   border-color: var(--desk-line) !important;
   color: var(--text);

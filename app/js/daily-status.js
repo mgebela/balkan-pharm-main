@@ -406,6 +406,38 @@
     }
   }
 
+  /** Hide grower START HERE after the first Market listing (any status). */
+  function growerMarketIntroDone() {
+    try {
+      const uid = currentUid();
+      if (!uid) return false;
+      try {
+        if (localStorage.getItem('dnevnik-live-grower-listed:' + uid) === '1') return true;
+      } catch (_) {
+        /* ignore */
+      }
+      if (window.Market && typeof Market.getListings === 'function') {
+        return (Market.getListings() || []).some(function (l) {
+          return l && l.uid === uid;
+        });
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markGrowerListed() {
+    const uid = currentUid();
+    if (!uid) return;
+    try {
+      localStorage.setItem('dnevnik-live-grower-listed:' + uid, '1');
+    } catch (_) {
+      /* ignore */
+    }
+    renderStrip(false);
+  }
+
   function nextStep(adopter) {
     if (adopter) {
       const copy =
@@ -450,8 +482,13 @@
     const lead = document.getElementById('daily-start-lead');
     const actions = document.getElementById('daily-start-actions');
     if (!strip || !actions) return;
-    // Intro only — hide once the adopter has connected a wallet and adopted.
+    // Intro only — hide once the adopter has adopted, or the grower has listed once.
     if (adopter && adopterOnboardingDone()) {
+      strip.hidden = true;
+      actions.innerHTML = '';
+      return;
+    }
+    if (!adopter && growerMarketIntroDone()) {
       strip.hidden = true;
       actions.innerHTML = '';
       return;
@@ -682,6 +719,14 @@
     bindPopupOnce();
     renderStrip(adopter);
 
+    // When Market listings sync (or a new offer posts), refresh grower START HERE hide.
+    if (!adopter && window.Market && typeof Market.onChange === 'function' && !window.__growtooStripMarketBound) {
+      window.__growtooStripMarketBound = true;
+      Market.onChange(function () {
+        if (!isAdopter()) renderStrip(false);
+      });
+    }
+
     if (alreadyShownThisSession(uid, adopter)) {
       // Daily status already handled this session — still offer the tour once.
       maybeKickTour(adopter, uid);
@@ -720,6 +765,8 @@
       bindStripOnce();
       renderStrip(isAdopter());
     },
+    markGrowerListed: markGrowerListed,
+    growerMarketIntroDone: growerMarketIntroDone,
     hide: function () {
       hidePopup(currentUid(), isAdopter());
     },

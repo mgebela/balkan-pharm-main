@@ -360,6 +360,173 @@
     return document.body.classList.contains('profile-grower');
   }
 
+  function isAdopter() {
+    if (window.DnevnikProfile && typeof DnevnikProfile.isAdopter === 'function') {
+      return DnevnikProfile.isAdopter();
+    }
+    return document.body.classList.contains('profile-adopter');
+  }
+
+  function readStoredJournalSkill() {
+    try {
+      const raw = localStorage.getItem('dnevnik-live-journal-skill');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      const level = Math.max(1, Math.min(5, Number(parsed.level) || 1));
+      return {
+        level: level,
+        title: parsed.title || null,
+        xp: Number(parsed.xp || 0),
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function inferJournalSkillFromEntries(entries) {
+    const list = Array.isArray(entries) ? entries : [];
+    const recent = list
+      .slice()
+      .sort(function (a, b) {
+        return String(b.date || '').localeCompare(String(a.date || ''));
+      })
+      .slice(0, 30);
+    if (!recent.length) return { level: 1, title: 'New journaler', xp: 0 };
+    let rich = 0;
+    recent.forEach(function (e) {
+      const note = String((e && e.note) || '');
+      if (note.length >= 40) rich += 1;
+      if (/\d+(\.\d+)?\s*(ml|ec|ph|%|°|c\b)/i.test(note)) rich += 1;
+      if (e && e.meta && e.meta.journalSkill) {
+        rich += Math.max(0, Number(e.meta.journalSkill) - 1);
+      }
+    });
+    const ratio = rich / Math.max(1, recent.length);
+    let level = 1;
+    if (recent.length >= 5 && ratio > 0.2) level = 2;
+    if (recent.length >= 10 && ratio > 0.45) level = 3;
+    if (recent.length >= 15 && ratio > 0.7) level = 4;
+    if (recent.length >= 20 && ratio > 0.9) level = 5;
+    const titles = {
+      1: 'New journaler',
+      2: 'Active journaler',
+      3: 'Dedicated journaler',
+      4: 'Seasoned journaler',
+      5: 'Master journaler',
+    };
+    return { level: level, title: titles[level], xp: level * 60 };
+  }
+
+  function coachAdaptationForSkill(level, profileType) {
+    const n = Math.max(1, Math.min(5, Number(level) || 1));
+    if (profileType === 'adopter') {
+      return {
+        tone: 'portfolio advisor — clear, non-hype',
+        teach: [
+          'read live stage and care counters',
+          'what harvest unlock months mean',
+          'how to judge grower log quality',
+        ],
+        avoid: ['proposing grower journal edits or mints'],
+      };
+    }
+    const map = {
+      1: {
+        tone: 'patient, celebrate small consistent logs',
+        teach: ['useful daily notes', 'log amount after watering', 'stage names'],
+        avoid: ['advanced EC lectures', 'token deep-dives unless asked'],
+      },
+      2: {
+        tone: 'encouraging, push for slightly richer notes',
+        teach: ['one measurement per care log', 'name the plant in notes'],
+        avoid: ['assuming they track VPD'],
+      },
+      3: {
+        tone: 'peer coach — concise, actionable',
+        teach: ['temp/RH readings', 'feeding discipline', 'growth mint checklist'],
+        avoid: ['repeating beginner how-to-water'],
+      },
+      4: {
+        tone: 'expert peer; ground tips in snapshot numbers',
+        teach: ['readings vs stage', 'harvest care months', 'photo diagnosis'],
+        avoid: ['generic blog tips'],
+      },
+      5: {
+        tone: 'brief expert; challenge weak hypotheses',
+        teach: ['anomaly fine-tuning', 'A/B options', 'market timing if asked'],
+        avoid: ['hand-holding on basics'],
+      },
+    };
+    return map[n] || map[1];
+  }
+
+  function buildAdopterPortfolioContext() {
+    const out = {
+      adoptedCount: 0,
+      lowCareCount: 0,
+      harvestReadyCount: 0,
+      items: [],
+    };
+    try {
+      const wallet =
+        window.PlantToken && typeof PlantToken.getWallet === 'function'
+          ? PlantToken.getWallet()
+          : null;
+      const tokens = (wallet && wallet.tokens) || [];
+      const adopted = tokens.filter(function (t) {
+        return t && t.adopted;
+      });
+      out.adoptedCount = adopted.length;
+      const listings =
+        window.Market && typeof Market.getListings === 'function' ? Market.getListings() || [] : [];
+      const byId = {};
+      listings.forEach(function (l) {
+        if (l && l.id) byId[l.id] = l;
+      });
+      adopted.slice(0, 20).forEach(function (t) {
+        const l = t.listingId ? byId[t.listingId] : null;
+        const daysHit = l ? Number(l.currentMonthDaysHit || 0) : 0;
+        const harvestReady = !!(l && l.harvestReady);
+        if (daysHit < 6) out.lowCareCount += 1;
+        if (harvestReady) out.harvestReadyCount += 1;
+        out.items.push({
+          name: t.name || (l && l.name) || 'Adopted plant',
+          listingId: t.listingId || null,
+          liveStage: (l && (l.liveStage || l.stage)) || null,
+          currentMonthDaysHit: daysHit,
+          currentMonthMinDays: (l && l.currentMonthMinDays) || 12,
+          harvestReady: harvestReady,
+          sellerCity: (l && l.sellerCity) || null,
+          investedGrow: Number(t.investedGrow || (l && l.priceGrow) || 0),
+        });
+      });
+    } catch {
+      // ignore
+    }
+    return out;
+  }
+
+  function resolveJournalSkill(entries) {
+    const stored = readStoredJournalSkill();
+    if (stored && stored.level) return stored;
+    if (window.GrowerQuests && typeof GrowerQuests.getGrowerProfile === 'function') {
+      try {
+        const p = GrowerQuests.getGrowerProfile();
+        if (p && p.level) {
+          return {
+            level: p.level,
+            title: p.title || null,
+            xp: p.xp || 0,
+          };
+        }
+      } catch {
+        // ignore
+      }
+    }
+    return inferJournalSkillFromEntries(entries);
+  }
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -839,7 +1006,7 @@
         type: e.type,
         plantId: e.plantId,
         date: e.date || null,
-        note: e.note ? String(e.note).slice(0, 120) : null,
+        note: e.note ? String(e.note).slice(0, 220) : null,
         hasPhoto: !!(e.photo || e.photoDataUrl),
         meta: entryMetaSnippet(e),
       }));
@@ -882,6 +1049,32 @@
     }
 
     const reminders = buildReminders(plants, entries, toolbox);
+    const adopter = isAdopter();
+    const journalSkill = resolveJournalSkill(entries);
+    const coachAdaptation = coachAdaptationForSkill(journalSkill.level, adopter ? 'adopter' : 'grower');
+
+    let growerRank = null;
+    if (!adopter && window.GrowerQuests && typeof GrowerQuests.growerRankFromLocal === 'function') {
+      try {
+        growerRank = GrowerQuests.growerRankFromLocal();
+      } catch {
+        growerRank = null;
+      }
+    }
+
+    const adoptedPortfolio = adopter ? buildAdopterPortfolioContext() : null;
+    const userNeeds = adopter
+      ? {
+          adoptedCount: adoptedPortfolio.adoptedCount,
+          lowCareCount: adoptedPortfolio.lowCareCount,
+          harvestReadyCount: adoptedPortfolio.harvestReadyCount,
+          intent: localStorage.getItem('dnevnik-live-adopter-intent') || null,
+        }
+      : {
+          journalSkillLevel: journalSkill.level,
+          missingMeasurements: reminders && reminders.length ? reminders.slice(0, 3) : [],
+          mintQuestReady: !!(questHint && questHint.ready),
+        };
 
     // Real recent readings (not just counts) so the coach can reason about actual
     // conditions — "humidity's high for flowering" instead of only "3 logs exist".
@@ -938,9 +1131,9 @@
             plantTimingFields(focus)
           )
         : null,
-      plants: plantSummaries,
+      plants: adopter ? [] : plantSummaries,
       tokens: tokens,
-      recentEntries: recentEntries,
+      recentEntries: adopter ? [] : recentEntries,
       toolboxCounts: {
         watering: Array.isArray(toolbox.watering) ? toolbox.watering.length : 0,
         feeding: Array.isArray(toolbox.feeding) ? toolbox.feeding.length : 0,
@@ -948,12 +1141,17 @@
       },
       toolboxRecent: toolboxRecent,
       weather: readWeatherContext(),
-      reminders: reminders,
-      mintQuest: questHint,
+      reminders: adopter ? [] : reminders,
+      mintQuest: adopter ? null : questHint,
       growSetup: growSetup,
       growStyleNote: growStyleNote,
-      profileType: 'grower',
-      canAct: true,
+      profileType: adopter ? 'adopter' : 'grower',
+      canAct: !adopter,
+      journalSkill: journalSkill,
+      coachAdaptation: coachAdaptation,
+      growerRank: growerRank,
+      adoptedPortfolio: adoptedPortfolio,
+      userNeeds: userNeeds,
     };
   }
 
@@ -2453,14 +2651,18 @@
     ensureDom();
     const root = document.getElementById('ai-coach-root');
     if (!root) return;
-    // Panel-only: care Log lives in the tab bar — no overlapping FAB.
-    const show = isGrower();
+    // Growers + adopters: panel coach. Care Log FAB stays grower-only elsewhere.
+    const show = isGrower() || isAdopter();
     root.hidden = !show;
     root.setAttribute('aria-hidden', show ? 'false' : 'true');
     root.classList.add('ai-coach-root--panel-only');
     const fab = document.getElementById('ai-coach-fab');
     if (fab) fab.hidden = true;
     document.body.classList.remove('coach-fab-visible');
+    const title = document.getElementById('ai-coach-title');
+    if (title) {
+      title.textContent = isAdopter() ? 'Adopter coach' : 'Grower coach';
+    }
     if (!show) close();
     else syncAccountChatScope();
   }

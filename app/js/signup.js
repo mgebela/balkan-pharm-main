@@ -98,6 +98,12 @@
       if (city) payload.homeCity = city;
       var note = trimStr(raw.growStyleNote, 240);
       if (note) payload.growStyleNote = note;
+      var photo = trimStr(raw.profilePhoto, 220000);
+      if (photo && photo.indexOf('data:image/') === 0) {
+        payload.profilePhoto = photo;
+      } else if (photo && /^https?:\/\//i.test(photo)) {
+        payload.profilePhoto = photo.slice(0, 500);
+      }
     } else {
       var intent = normalizeAdopterIntent(raw.adopterIntent);
       if (!intent) return { ok: false, error: 'Choose why you’re joining as an adopter.' };
@@ -161,6 +167,9 @@
         if (payload.growStyleNote) {
           localStorage.setItem('dnevnik-live-grow-style-note', trimStr(payload.growStyleNote, 240));
         }
+        if (payload.profilePhoto) {
+          localStorage.setItem('dnevnik-live-profile-photo', String(payload.profilePhoto));
+        }
       }
       if (profileType === PROFILE_TYPES.adopter) {
         var intent = normalizeAdopterIntent(payload.adopterIntent);
@@ -190,6 +199,20 @@
       if (data.adopterIntent && !localStorage.getItem('dnevnik-live-adopter-intent')) {
         var intent = normalizeAdopterIntent(data.adopterIntent);
         if (intent) localStorage.setItem('dnevnik-live-adopter-intent', intent);
+      }
+      if (data.journalSkill && typeof data.journalSkill === 'object') {
+        try {
+          localStorage.setItem('dnevnik-live-journal-skill', JSON.stringify(data.journalSkill));
+        } catch (skillErr) {
+          // ignore
+        }
+      }
+      if (data.profilePhoto) {
+        try {
+          localStorage.setItem('dnevnik-live-profile-photo', String(data.profilePhoto));
+        } catch (photoErr) {
+          // ignore
+        }
       }
     } catch (err) {
       // ignore
@@ -221,6 +244,14 @@
       if (setup) setField('growSetup', setup);
       setField('homeCity', trimStr(payload.homeCity, 80));
       setField('growStyleNote', trimStr(payload.growStyleNote, 240));
+      if (payload.profilePhoto) {
+        var photo = String(payload.profilePhoto);
+        if (photo.indexOf('data:image/') === 0 && photo.length <= 220000) {
+          setField('profilePhoto', photo);
+        } else if (/^https?:\/\//i.test(photo)) {
+          setField('profilePhoto', photo.slice(0, 500));
+        }
+      }
     }
     if (profileType === PROFILE_TYPES.adopter) {
       var intent = normalizeAdopterIntent(payload.adopterIntent);

@@ -14,6 +14,7 @@
   let platformRewards = [];
   let harvestClaims = [];
   let unsubscribe = null;
+  let mineUnsub = null;
   let platformUnsub = null;
   let harvestUnsub = null;
   let watchedUid = '';
@@ -21,6 +22,30 @@
   let reconcileTimer = null;
   let lastReconcileAt = 0;
   const HCLAIM_OPT_KEY = 'growtoo-hclaim-optimistic';
+  /** Board window (latest N) + this user's investments (may fall outside the board window). */
+  let boardListings = [];
+  let mineListings = [];
+
+  function mergeMarketListings() {
+    const byId = Object.create(null);
+    boardListings.forEach(function (l) {
+      if (l && l.id) byId[l.id] = l;
+    });
+    mineListings.forEach(function (l) {
+      if (l && l.id) byId[l.id] = l;
+    });
+    const next = Object.keys(byId).map(function (id) {
+      return byId[id];
+    });
+    next.sort(function (a, b) {
+      return String(b.createdAt || '').localeCompare(String(a.createdAt || ''));
+    });
+    listings = next;
+    syncMyInvestments();
+    emit();
+    maybeRequestEscrowReconcile(next);
+    maybeRequestMarketSettle(next);
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => {
@@ -200,8 +225,14 @@
       unsubscribe();
       unsubscribe = null;
     }
+    if (mineUnsub) {
+      mineUnsub();
+      mineUnsub = null;
+    }
     watchedUid = uid;
     listings = [];
+    boardListings = [];
+    mineListings = [];
     if (!uid || !firebaseReady()) {
       startPlatformWatch('');
       startHarvestWatch('');
@@ -221,14 +252,30 @@
           snap.forEach(function (doc) {
             next.push(Object.assign({ id: doc.id }, doc.data()));
           });
-          listings = next;
-          syncMyInvestments();
-          emit();
-          maybeRequestEscrowReconcile(next);
-          maybeRequestMarketSettle(next);
+          boardListings = next;
+          mergeMarketListings();
         },
         function (err) {
           console.warn('marketListings watch failed', err);
+        }
+      );
+    // Serious adopters can own more investments than fit in the global board window.
+    mineUnsub = firebase
+      .firestore()
+      .collection('marketListings')
+      .where('buyerUid', '==', uid)
+      .limit(200)
+      .onSnapshot(
+        function (snap) {
+          const next = [];
+          snap.forEach(function (doc) {
+            next.push(Object.assign({ id: doc.id }, doc.data()));
+          });
+          mineListings = next;
+          mergeMarketListings();
+        },
+        function (err) {
+          console.warn('marketListings mine watch failed', err);
         }
       );
   }
@@ -1541,6 +1588,49 @@
     );
   }
 
+  function listingStackHtml(list, uid) {
+    const Stacks = window.GrowtooStacks;
+    if (!Stacks || typeof Stacks.groupItems !== 'function') {
+      return list
+        .map(function (l) {
+          return listingCardHtml(l, uid);
+        })
+        .join('');
+    }
+    const groups = Stacks.groupItems(list, {
+      getStrain: function (l) {
+        return l.strain;
+      },
+      getName: function (l) {
+        return l.name;
+      },
+      getStage: function (l) {
+        return l.liveStageKey || l.liveStage || l.stage || l.journalStage;
+      },
+      getSeller: function (l) {
+        return l.uid || '';
+      },
+      getWeight: function () {
+        return 1;
+      },
+    });
+    return groups
+      .map(function (g) {
+        const membersHtml = g.members
+          .map(function (l) {
+            return listingCardHtml(l, uid);
+          })
+          .join('');
+        return Stacks.wrapStackHtml(g, membersHtml, {
+          surface: 'market',
+          photo: Stacks.firstPhoto(g.members, function (l) {
+            return l && l.photo;
+          }),
+        });
+      })
+      .join('');
+  }
+
   let marketRenderBusy = false;
 
   function render() {
@@ -1688,9 +1778,7 @@
 
       if (browseGrid) {
         browseGrid.innerHTML = open.length
-          ? open.map(function (l) {
-              return listingCardHtml(l, uid);
-            }).join('')
+          ? listingStackHtml(open, uid)
           : isGrowerUi()
             ? emptyNextStepHtml({
                 icon: 'market',
@@ -1711,9 +1799,7 @@
       }
       if (mineGrid) {
         mineGrid.innerHTML = mine.length
-          ? mine.map(function (l) {
-              return listingCardHtml(l, uid);
-            }).join('')
+          ? listingStackHtml(mine, uid)
           : emptyNextStepHtml({
               icon: 'market',
               lead: 'No offers posted yet',
@@ -2085,6 +2171,13 @@
           });
           form.reset();
           syncSettlementFromRadios();
+          if (window.DailyStatus && typeof DailyStatus.markGrowerListed === 'function') {
+            try {
+              DailyStatus.markGrowerListed();
+            } catch (_) {
+              /* ignore */
+            }
+          }
           flashOk(
             used === 'adopt_stake'
               ? 'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'

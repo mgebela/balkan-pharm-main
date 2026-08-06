@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="Luka Zagreb">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a2e22"/>
+      <stop offset="100%" stop-color="#0c1610"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="48" fill="url(#g)"/>
+  <circle cx="128" cy="128" r="108" fill="none" stroke="#c9a55e" stroke-width="3" opacity="0.55"/>
+  <text x="128" y="118" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#c9a55e">L</text>
+  <text x="128" y="168" text-anchor="middle" font-family="system-ui,sans-serif" font-size="22" fill="#d8e8d8" letter-spacing="2">ZAGREB</text>
+</svg>

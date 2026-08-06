@@ -2538,7 +2538,56 @@
       }
       return;
     }
-    grid.innerHTML = wallet.tokens.map(tokenCardHtml).join('');
+    grid.innerHTML = (function () {
+      const Stacks = window.GrowtooStacks;
+      if (!Stacks || typeof Stacks.groupItems !== 'function') {
+        return wallet.tokens.map(tokenCardHtml).join('');
+      }
+      const groups = Stacks.groupItems(wallet.tokens, {
+        getStrain: function (t) {
+          return t.strain;
+        },
+        getName: function (t) {
+          return t.name;
+        },
+        getStage: function (t) {
+          const stage = GROWTH_STAGES[t.stageIndex] || GROWTH_STAGES[0];
+          return (stage && stage.key) || t.stageIndex;
+        },
+        getWeight: function () {
+          return 1;
+        },
+      });
+      return groups
+        .map(function (g) {
+          const membersHtml = g.members.map(tokenCardHtml).join('');
+          let photo = '';
+          g.members.some(function (t) {
+            if (!t || !t.plantId) return false;
+            let plants = [];
+            try {
+              if (window.DnevnikJournal && typeof DnevnikJournal.getPlants === 'function') {
+                plants = DnevnikJournal.getPlants() || [];
+              }
+            } catch (_) {
+              plants = [];
+            }
+            const linked = plants.find(function (p) {
+              return p && String(p.id) === String(t.plantId);
+            });
+            if (linked && linked.photo) {
+              photo = linked.photo;
+              return true;
+            }
+            return false;
+          });
+          return Stacks.wrapStackHtml(g, membersHtml, {
+            surface: 'tokenise',
+            photo: photo,
+          });
+        })
+        .join('');
+    })();
   }
 
   function journalStageLabel(plant) {

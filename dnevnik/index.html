@@ -225,6 +225,52 @@
       color: var(--text-muted);
       line-height: 1.35;
     }
+    .signup-photo-row {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .signup-photo-preview {
+      width: 4.25rem;
+      height: 4.25rem;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.25);
+      flex-shrink: 0;
+    }
+    .signup-photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .signup-photo-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      min-width: 0;
+      flex: 1;
+    }
+    .signup-photo-actions input[type="file"] {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      max-width: 100%;
+    }
+    .btn-text {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--brass);
+      font: inherit;
+      font-size: 0.8rem;
+      padding: 0;
+      cursor: pointer;
+      text-align: left;
+      width: fit-content;
+    }
+    .btn-text:hover { color: var(--brass-hover); }
     input,
     select,
     textarea {
@@ -528,6 +574,20 @@
         <label for="grow-style-note">Grow style <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
         <textarea id="grow-style-note" maxlength="240" placeholder="e.g. autoflowers, 4 tents"></textarea>
       </div>
+      <div class="field-block" id="field-profile-photo">
+        <label for="profile-photo-input">Profile picture / logo <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <p class="field-hint">Shown on your account — square crop works best. JPEG or PNG.</p>
+        <div class="signup-photo-row">
+          <div class="signup-photo-preview" id="profile-photo-preview" hidden>
+            <img id="profile-photo-preview-img" alt="Profile preview" />
+          </div>
+          <div class="signup-photo-actions">
+            <input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,image/*" />
+            <button type="button" class="btn-text" id="profile-photo-clear" hidden>Remove</button>
+          </div>
+        </div>
+        <input type="hidden" id="profile-photo-data" value="" />
+      </div>
     </div>
 
     <div class="role-fields" id="signup-adopter-fields" hidden>
@@ -758,6 +818,8 @@
 
     function collectSignupInput(authProvider) {
       const consented = !!document.getElementById('accept-consent').checked;
+      const photoEl = document.getElementById('profile-photo-data');
+      const profilePhoto = photoEl && photoEl.value ? String(photoEl.value).trim() : '';
       return {
         profileType: profileType,
         displayName: document.getElementById('display-name').value.trim(),
@@ -767,11 +829,101 @@
         growSetup: growSetup,
         homeCity: document.getElementById('home-city').value.trim(),
         growStyleNote: document.getElementById('grow-style-note').value.trim(),
+        profilePhoto: profilePhoto,
         adopterIntent: adopterIntent,
         acceptedDevnet: !!document.getElementById('accept-devnet').checked,
         authProvider: authProvider || 'email',
       };
     }
+
+    async function resizeProfilePhoto(dataUrl) {
+      return new Promise(function (resolve) {
+        const img = new Image();
+        img.onload = function () {
+          const max = 320;
+          let w = img.width;
+          let h = img.height;
+          if (w > max || h > max) {
+            const scale = max / Math.max(w, h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          try {
+            resolve(canvas.toDataURL('image/jpeg', 0.82));
+          } catch (err) {
+            resolve(dataUrl);
+          }
+        };
+        img.onerror = function () {
+          resolve('');
+        };
+        img.src = dataUrl;
+      });
+    }
+
+    (function bindProfilePhoto() {
+      const input = document.getElementById('profile-photo-input');
+      const hidden = document.getElementById('profile-photo-data');
+      const preview = document.getElementById('profile-photo-preview');
+      const previewImg = document.getElementById('profile-photo-preview-img');
+      const clearBtn = document.getElementById('profile-photo-clear');
+      if (!input || !hidden) return;
+
+      function clearPhoto() {
+        hidden.value = '';
+        input.value = '';
+        if (preview) preview.hidden = true;
+        if (previewImg) previewImg.removeAttribute('src');
+        if (clearBtn) clearBtn.hidden = true;
+      }
+
+      input.addEventListener('change', async function () {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!/^image\//.test(file.type || '')) {
+          setStatus('Choose a JPEG or PNG image for your logo.');
+          clearPhoto();
+          return;
+        }
+        if (file.size > 6 * 1024 * 1024) {
+          setStatus('Image is too large — try one under 6 MB.');
+          clearPhoto();
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = async function () {
+          const raw = String(reader.result || '');
+          const resized = await resizeProfilePhoto(raw);
+          if (!resized || resized.indexOf('data:image/') !== 0) {
+            setStatus('Could not read that image. Try another file.');
+            clearPhoto();
+            return;
+          }
+          if (resized.length > 220000) {
+            setStatus('Image is still too large after resize. Try a smaller photo.');
+            clearPhoto();
+            return;
+          }
+          hidden.value = resized;
+          if (previewImg) previewImg.src = resized;
+          if (preview) preview.hidden = false;
+          if (clearBtn) clearBtn.hidden = false;
+          setStatus('');
+        };
+        reader.onerror = function () {
+          setStatus('Could not read that image.');
+          clearPhoto();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      if (clearBtn) clearBtn.addEventListener('click', clearPhoto);
+    })();
 
     async function writeWebsiteProfile(user) {
       if (!Signup || !user) return;

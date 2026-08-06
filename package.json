@@ -8,7 +8,10 @@
     "functions:install": "npm install --prefix functions",
     "pdf:investor": "python3 docs/generate_investor_pdf.py",
     "generate:token-art": "node chain/generate-token-art.js && cp shared/token-botanical-art.js app/js/token-botanical-art.js",
-    "emails:push-sender": "NODE_PATH=chain/node_modules node emails/firebase/push-templates.mjs"
+    "emails:push-sender": "NODE_PATH=chain/node_modules node emails/firebase/push-templates.mjs",
+    "traffic:seed": "npm run traffic:seed --prefix chain",
+    "traffic:day": "npm run traffic:day --prefix chain",
+    "traffic:wipe": "npm run traffic:wipe --prefix chain"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.4"

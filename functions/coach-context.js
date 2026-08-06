@@ -29,6 +29,12 @@ const PRIORITY_FIELDS = [
   'mintQuest',
   'growSetup',
   'growStyleNote',
+  'profileType',
+  'canAct',
+  'journalSkill',
+  'coachAdaptation',
+  'adoptedPortfolio',
+  'userNeeds',
 ];
 
 // Long arrays, in the order they give up elements. Entries are the most

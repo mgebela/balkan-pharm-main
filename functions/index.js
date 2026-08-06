@@ -6,6 +6,7 @@ const {initializeApp} = require('firebase-admin/app');
 const {GoogleGenAI, Type} = require('@google/genai');
 const {getRelevantKnowledge} = require('./coach-knowledge');
 const {buildContextJson} = require('./coach-context');
+const {buildCoachSystem} = require('./coach-system');
 const {reconcileEscrowPending, setPreferredRpc} = require('./market-reconcile');
 const {settleMarketPending} = require('./market-settle');
 const {handleSolanaRpc} = require('./solana-rpc-proxy');
@@ -107,6 +108,8 @@ Rules:
 - If the request is unclear, ask one clarifying question with actions:[].
 - If a "Relevant cultivation reference" block is provided below, ground your advice in it —
   apply it to the grower's specific plant/situation rather than repeating it verbatim.`;
+
+// Prefer buildCoachSystem(context) in coachChat — COACH_SYSTEM kept as fallback / docs reference.
 
 // Structured-output schema for coachChat. Using Gemini's native JSON mode instead of
 // regex-extracting a JSON blob from free text — the old approach could silently break if the
@@ -547,7 +550,9 @@ exports.coachChat = onRequest(
           null;
 
         const contextBlock = [
-          'Grower journal snapshot (JSON):',
+          context.profileType === 'adopter' || context.canAct === false
+            ? 'Adopter portfolio snapshot (JSON):'
+            : 'Grower journal snapshot (JSON):',
           fitted.json,
           trimNote,
           locale === 'hr' ? 'Prefer Croatian replies.' : 'Prefer English replies.',
@@ -557,8 +562,9 @@ exports.coachChat = onRequest(
             .filter(Boolean)
             .join('\n\n');
 
+        const systemPrompt = buildCoachSystem(context) || COACH_SYSTEM;
         const contents = [
-          {role: 'user', parts: [{text: COACH_SYSTEM + '\n\n' + contextBlock}]},
+          {role: 'user', parts: [{text: systemPrompt + '\n\n' + contextBlock}]},
         ];
 
         history.forEach((turn) => {
@@ -619,9 +625,13 @@ exports.coachChat = onRequest(
         }
 
         const reply = typeof parsed.reply === 'string' ? parsed.reply : '';
-        const actions = Array.isArray(parsed.actions)
+        let actions = Array.isArray(parsed.actions)
           ? parsed.actions.slice(0, 5).filter((a) => a && typeof a === 'object' && a.type)
           : [];
+        // Adopters never get journal/mint mutations from the coach.
+        if (context.profileType === 'adopter' || context.canAct === false) {
+          actions = [];
+        }
 
         res.json({
           reply,
@@ -629,6 +639,8 @@ exports.coachChat = onRequest(
           model: 'gemini-2.0-flash',
           source: 'gemini',
           sawImage: !!imagePart,
+          adaptedFor: context.profileType === 'adopter' ? 'adopter' : 'grower',
+          journalSkill: context.journalSkill || null,
         });
       } catch (err) {
         sendGuardError('coachChat', err, res);

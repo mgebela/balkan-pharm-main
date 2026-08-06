@@ -279,6 +279,10 @@
         plants: Array.isArray(data.plants) ? data.plants : [],
         entries: Array.isArray(data.entries) ? data.entries : [],
         toolbox: data.toolbox && typeof data.toolbox === 'object' ? data.toolbox : {},
+        journalSkill:
+          data.journalSkill && typeof data.journalSkill === 'object' ? data.journalSkill : null,
+        coachProfile:
+          data.coachProfile && typeof data.coachProfile === 'object' ? data.coachProfile : null,
       };
     } catch {
       return null;
@@ -290,6 +294,13 @@
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants || []));
     localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries || []));
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox || {}));
+    if (state.journalSkill && typeof state.journalSkill === 'object') {
+      try {
+        localStorage.setItem('dnevnik-live-journal-skill', JSON.stringify(state.journalSkill));
+      } catch {
+        // ignore
+      }
+    }
   }
 
   /** Merge cloud + device so a slow sync / auth reload cannot erase a just-saved entry. */
@@ -1307,6 +1318,9 @@ function hydrateProfileLocalDefaults(data) {
     if (data.chainOptIn) {
       writeChainOptInLocal(true);
     }
+    if (data.profilePhoto) {
+      localStorage.setItem('dnevnik-live-profile-photo', String(data.profilePhoto));
+    }
   } catch {
     // ignore
   }
@@ -1373,6 +1387,40 @@ function readDisplayName() {
   }
 }
 
+  function readProfilePhoto() {
+    try {
+      return String(localStorage.getItem('dnevnik-live-profile-photo') || '').trim();
+    } catch {
+      return '';
+    }
+  }
+
+  function writeProfilePhotoLocal(url) {
+    try {
+      if (url) localStorage.setItem('dnevnik-live-profile-photo', String(url));
+      else localStorage.removeItem('dnevnik-live-profile-photo');
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function applyHeaderAvatar() {
+    const avatarMark = document.querySelector('#btn-account .header-avatar-mark');
+    if (!avatarMark) return;
+    const photo = readProfilePhoto();
+    const type = getProfileType();
+    if (photo && (photo.indexOf('data:image/') === 0 || /^https?:\/\//i.test(photo))) {
+      avatarMark.innerHTML =
+        '<img class="header-avatar-img" src="' +
+        String(photo).replace(/"/g, '&quot;') +
+        '" alt="" />';
+      avatarMark.classList.add('header-avatar-mark--photo');
+    } else {
+      avatarMark.textContent = type === PROFILE_TYPES.adopter ? 'A' : 'G';
+      avatarMark.classList.remove('header-avatar-mark--photo');
+    }
+  }
+
 function renderAccountProfile() {
   const el = document.getElementById('account-profile');
   if (!el) return;
@@ -1399,6 +1447,12 @@ function renderAccountProfile() {
   const name = readDisplayName() || (email ? email.split('@')[0] : '') || 'growtoo member';
   const mark = adopter ? 'A' : 'G';
   const roleLabel = adopter ? 'Adopter' : 'Grower';
+  const profilePhoto = readProfilePhoto();
+  const avatarHtml = profilePhoto
+    ? '<img class="account-profile-avatar-img" src="' +
+      esc(profilePhoto) +
+      '" alt="" />'
+    : esc(mark);
 
   let wallet = '';
   try {
@@ -1510,8 +1564,10 @@ function renderAccountProfile() {
   el.hidden = false;
   el.innerHTML =
     '<div class="account-profile-top">' +
-    '<div class="account-profile-avatar" aria-hidden="true">' +
-    esc(mark) +
+    '<div class="account-profile-avatar' +
+    (profilePhoto ? ' account-profile-avatar--photo' : '') +
+    '" aria-hidden="true">' +
+    avatarHtml +
     '</div>' +
     '<div class="account-profile-id">' +
     '<p class="account-profile-name">' +
@@ -1525,6 +1581,16 @@ function renderAccountProfile() {
     '</span>' +
     '</div>' +
     '</div>' +
+    (!adopter
+      ? '<div class="account-profile-logo-edit">' +
+        '<label class="account-logo-label" for="account-profile-photo-input">Update logo / photo</label>' +
+        '<input id="account-profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,image/*" />' +
+        (profilePhoto
+          ? '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-photo-clear">Remove photo</button>'
+          : '') +
+        '<p class="account-profile-logo-hint" id="account-profile-photo-status" hidden></p>' +
+        '</div>'
+      : '') +
     (!isCurrentEmailVerified()
       ? '<div class="account-profile-verify" id="account-profile-verify">' +
         '<p>Email not verified yet — live AI coach stays on local helpers until you confirm.</p>' +
@@ -1587,6 +1653,100 @@ function renderAccountProfile() {
         } else if (!adopter && typeof ProductTour.replayGrower === 'function') {
           ProductTour.replayGrower();
         }
+      }
+    });
+  }
+
+  async function resizeAccountPhoto(dataUrl) {
+    return new Promise(function (resolve) {
+      const img = new Image();
+      img.onload = function () {
+        const max = 320;
+        let w = img.width;
+        let h = img.height;
+        if (w > max || h > max) {
+          const scale = max / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        try {
+          resolve(canvas.toDataURL('image/jpeg', 0.82));
+        } catch {
+          resolve(dataUrl);
+        }
+      };
+      img.onerror = function () {
+        resolve('');
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  async function persistProfilePhoto(dataUrl) {
+    writeProfilePhotoLocal(dataUrl || '');
+    applyHeaderAvatar();
+    const uid =
+      (window.firebase && firebase.auth && firebase.auth().currentUser && firebase.auth().currentUser.uid) ||
+      null;
+    if (!uid || !window.firebase || !firebase.firestore) return;
+    await firebase
+      .firestore()
+      .collection('users')
+      .doc(uid)
+      .set(
+        dataUrl
+          ? { profilePhoto: dataUrl, updatedAt: new Date().toISOString() }
+          : { profilePhoto: firebase.firestore.FieldValue.delete(), updatedAt: new Date().toISOString() },
+        { merge: true }
+      );
+  }
+
+  const photoInput = document.getElementById('account-profile-photo-input');
+  const photoStatus = document.getElementById('account-profile-photo-status');
+  if (photoInput) {
+    photoInput.addEventListener('change', async function () {
+      const file = photoInput.files && photoInput.files[0];
+      if (!file) return;
+      if (photoStatus) {
+        photoStatus.hidden = false;
+        photoStatus.textContent = 'Uploading…';
+      }
+      try {
+        const raw = await new Promise(function (resolve, reject) {
+          const reader = new FileReader();
+          reader.onload = function () {
+            resolve(String(reader.result || ''));
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        const resized = await resizeAccountPhoto(raw);
+        if (!resized || resized.indexOf('data:image/') !== 0 || resized.length > 220000) {
+          throw new Error('Image too large or unreadable.');
+        }
+        await persistProfilePhoto(resized);
+        if (photoStatus) photoStatus.textContent = 'Logo saved.';
+        renderAccountProfile();
+      } catch (err) {
+        if (photoStatus) {
+          photoStatus.hidden = false;
+          photoStatus.textContent = (err && err.message) || 'Could not save photo.';
+        }
+      }
+    });
+  }
+  const photoClear = document.getElementById('account-profile-photo-clear');
+  if (photoClear) {
+    photoClear.addEventListener('click', async function () {
+      try {
+        await persistProfilePhoto('');
+        renderAccountProfile();
+      } catch {
+        /* ignore */
       }
     });
   }
@@ -1859,7 +2019,7 @@ function applyProfileTypeUI(profileType) {
 
   const avatarMark = document.querySelector('#btn-account .header-avatar-mark');
   if (avatarMark) {
-    avatarMark.textContent = type === PROFILE_TYPES.adopter ? 'A' : 'G';
+    applyHeaderAvatar();
   }
 
   const title = document.querySelector('title');
@@ -4323,37 +4483,34 @@ function initFirebaseSync() {
       });
       return;
     }
-    list.innerHTML = plants
-      .map((p) => {
-        const shared = isSharedPlantId(p.id);
-        const stageLabelText = STAGES[p.stage] || p.stage;
-        const entries = getPlantEntries(p.id) || [];
-        const lastWater = entries
-          .filter(function (e) {
-            const t = String((e && (e.type || e.kind || e.category)) || '').toLowerCase();
-            return t.includes('water') || t.includes('zalij');
-          })
-          .sort(function (a, b) {
-            return new Date(b.date || b.ts || 0) - new Date(a.date || a.ts || 0);
-          })[0];
-        const lastWaterLabel = lastWater
-          ? 'Watered ' +
-            new Date(lastWater.date || lastWater.ts).toLocaleDateString('en-GB')
-          : 'No watering log yet';
-        const photoOverlay = p.photo
-          ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
-          : '';
-        // Same restrained stage-tint language as the token cards on Tokenise —
-        // one visual system, not a separate look per surface.
-        const stageTintKey =
-          {
-            klijanje: 'germination',
-            sadnica: 'seedling',
-            vegetativna: 'vegetative',
-            cvjetanje: 'flowering',
-            susenje: 'harvest',
-          }[p.stage] || 'germination';
-        return `
+
+    function plantCardHtml(p) {
+      const shared = isSharedPlantId(p.id);
+      const stageLabelText = STAGES[p.stage] || p.stage;
+      const entries = getPlantEntries(p.id) || [];
+      const lastWater = entries
+        .filter(function (e) {
+          const t = String((e && (e.type || e.kind || e.category)) || '').toLowerCase();
+          return t.includes('water') || t.includes('zalij');
+        })
+        .sort(function (a, b) {
+          return new Date(b.date || b.ts || 0) - new Date(a.date || a.ts || 0);
+        })[0];
+      const lastWaterLabel = lastWater
+        ? 'Watered ' + new Date(lastWater.date || lastWater.ts).toLocaleDateString('en-GB')
+        : 'No watering log yet';
+      const photoOverlay = p.photo
+        ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
+        : '';
+      const stageTintKey =
+        {
+          klijanje: 'germination',
+          sadnica: 'seedling',
+          vegetativna: 'vegetative',
+          cvjetanje: 'flowering',
+          susenje: 'harvest',
+        }[p.stage] || 'germination';
+      return `
       <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}" data-stage-key="${stageTintKey}">
         ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" />${photoOverlay}</div>` : ''}
         <div class="plant-card-header">
@@ -4390,8 +4547,36 @@ function initFirebaseSync() {
         </div>
       </div>
     `;
-      })
-      .join('');
+    }
+
+    const Stacks = window.GrowtooStacks;
+    if (Stacks && typeof Stacks.groupItems === 'function') {
+      const groups = Stacks.groupItems(plants, {
+        getStrain: function (p) {
+          return p.strain;
+        },
+        getName: function (p) {
+          return p.name;
+        },
+        getStage: function (p) {
+          return p.stage;
+        },
+        getWeight: function (p) {
+          return Math.max(1, Number(p.count || 1) || 1);
+        },
+      });
+      list.innerHTML = groups
+        .map(function (g) {
+          const membersHtml = g.members.map(plantCardHtml).join('');
+          return Stacks.wrapStackHtml(g, membersHtml, {
+            surface: 'plants',
+            photo: Stacks.firstPhoto(g.members),
+          });
+        })
+        .join('');
+    } else {
+      list.innerHTML = plants.map(plantCardHtml).join('');
+    }
 
     list.querySelectorAll('.btn-growlog').forEach((btn) => {
       btn.addEventListener('click', () => openGrowlog(btn.closest('.plant-card').dataset.id));
