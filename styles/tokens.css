@@ -124,6 +124,37 @@
   --field-bg: rgba(6, 14, 10, 0.55);
   --field-bg-strong: rgba(6, 14, 10, 0.65);
   --border-muted: rgba(106, 117, 104, 0.45);
+
+  /* ---- Surface & accent scale -------------------------------------
+     The app had ~300 near-identical one-off tints — a dozen shades of
+     deep forest, a dozen pale sages, several mints. They were drift,
+     not intent. Each is now one of eighteen channel triplets composed
+     with its original alpha, which is what makes a second theme
+     possible: restate eighteen lines instead of three hundred.
+
+     Three surface depths preserve the elevation order (deep < base <
+     raised); collapsing them to one would have flattened it. */
+  --surface-deep-rgb: 6 14 10;
+  --surface-rgb: 12 24 16;
+  --surface-raised-rgb: 30 48 35;
+
+  --text-rgb: 243 239 230;
+  --sage-rgb: 160 195 160;
+  --sage-light-rgb: 190 215 188;
+  --olive-rgb: 120 145 110;
+
+  --mint-rgb: 152 242 172;
+  --mint-mid-rgb: 120 221 141;
+  --green-glow-rgb: 40 110 58;
+  --leaf-glow-rgb: 90 140 80;
+
+  --brass-mid-rgb: 185 134 46;
+  --rust-deep-rgb: 142 53 32;
+  --orange-rgb: 212 90 56;
+  --peach-rgb: 255 160 120;
+  --warn-rgb: 245 158 11;
+  --danger-rgb: 248 113 113;
+  --ok-rgb: 52 211 153;
 }
 
 /* ============================================================
@@ -216,6 +247,35 @@
   --surface-panel: #f0ece0;
   --warn: #9a6408;
   --warn-tint: #8a5c12;
+
+  /* ---- Surface & accent scale, on paper ---------------------------
+     Surfaces keep their elevation ORDER but reverse direction: on dark,
+     raised means lighter; on paper, raised means whiter than the cream
+     canvas while "deep" recedes into it. Inks flip to near-black. The
+     glow colours (mint, peach, warn) cannot simply darken — at the low
+     alphas they are used at they would vanish, so they move to
+     mid-weight versions that still register over cream. */
+  --surface-deep-rgb: 226 220 205;
+  --surface-rgb: 244 240 230;
+  --surface-raised-rgb: 255 254 250;
+
+  --text-rgb: 23 37 27;
+  --sage-rgb: 74 96 76;
+  --sage-light-rgb: 52 72 54;
+  --olive-rgb: 92 108 82;
+
+  --mint-rgb: 47 125 82;
+  --mint-mid-rgb: 42 115 74;
+  --green-glow-rgb: 62 130 84;
+  --leaf-glow-rgb: 88 125 78;
+
+  --brass-mid-rgb: 140 100 30;
+  --rust-deep-rgb: 150 62 38;
+  --orange-rgb: 180 74 44;
+  --peach-rgb: 175 85 50;
+  --warn-rgb: 154 100 8;
+  --danger-rgb: 179 64 44;
+  --ok-rgb: 47 125 82;
 
   --canvas-glow: rgba(90, 140, 90, 0.14);
   --ink-faint: rgb(var(--ink-rgb) / 0.3);
