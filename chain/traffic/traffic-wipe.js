@@ -26,6 +26,39 @@ async function main() {
     'marketListings'
   );
 
+  let journalDeleted = 0;
+  try {
+    journalDeleted = await deleteQueryInChunks(
+      db,
+      db.collection('publicJournalPosts').where('trafficBatch', '==', TRAFFIC_BATCH),
+      'publicJournalPosts'
+    );
+  } catch (err) {
+    console.warn('publicJournalPosts wipe skipped', err.message || err);
+  }
+
+  let profilesDeleted = 0;
+  try {
+    profilesDeleted = await deleteQueryInChunks(
+      db,
+      db.collection('publicGrowerProfiles').where('trafficBatch', '==', TRAFFIC_BATCH),
+      'publicGrowerProfiles'
+    );
+  } catch (err) {
+    console.warn('publicGrowerProfiles wipe skipped', err.message || err);
+  }
+
+  let claimsDeleted = 0;
+  try {
+    claimsDeleted = await deleteQueryInChunks(
+      db,
+      db.collection('publicSlugClaims').where('trafficBatch', '==', TRAFFIC_BATCH),
+      'publicSlugClaims'
+    );
+  } catch (err) {
+    console.warn('publicSlugClaims wipe skipped', err.message || err);
+  }
+
   // adoptStakes mirrors (if any were written by care sync)
   let stakesDeleted = 0;
   try {
@@ -71,6 +104,18 @@ async function main() {
       await batch.commit();
     }
 
+    const postsSnap = await db
+      .collection('users')
+      .doc(uid)
+      .collection('growerPosts')
+      .limit(400)
+      .get();
+    if (!postsSnap.empty) {
+      const batch = db.batch();
+      postsSnap.docs.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+
     await userDoc.ref.delete();
 
     try {
@@ -103,7 +148,7 @@ async function main() {
   }
 
   console.log(
-    `Done · listings ${listingsDeleted} · adoptStakes ${stakesDeleted} · users ${userDocs.length}`
+    `Done · listings ${listingsDeleted} · journal ${journalDeleted} · profiles ${profilesDeleted} · claims ${claimsDeleted} · adoptStakes ${stakesDeleted} · users ${userDocs.length}`
   );
 }
 

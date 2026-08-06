@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Story · growtoo journal</title>
+  <meta name="description" content="A grower field note on growtoo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../styles/landing.css" />
+  <link rel="stylesheet" href="../styles/journal.css?v=20260806a" />
+</head>
+<body data-gj-page="post">
+  <div class="gj-shell">
+    <header class="gj-top">
+      <a class="gj-brand" href="../">growtoo <em>journal</em></a>
+      <nav class="gj-nav" aria-label="Journal">
+        <a href="../">All stories</a>
+        <a href="../../dnevnik/">Sign in</a>
+      </nav>
+    </header>
+    <div id="gj-post"></div>
+  </div>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+  <script>
+    (function () {
+      var firebaseConfig = {
+        apiKey: 'AIzaSyB-3wuIEOqpnnAqWiBYuSTEp1is_n76DEg',
+        authDomain: 'balpha-9dab9.firebaseapp.com',
+        projectId: 'balpha-9dab9',
+        storageBucket: 'balpha-9dab9.firebasestorage.app',
+        messagingSenderId: '398537397385',
+        appId: '1:398537397385:web:9bd3aec82f44ddec20e258',
+        measurementId: 'G-HLXHTQP41H',
+      };
+      if (window.firebase && !window.firebase.apps.length) {
+        window.firebase.initializeApp(firebaseConfig);
+      }
+    })();
+  </script>
+  <script src="../js/journal-public.js?v=20260806a"></script>
+</body>
+</html>

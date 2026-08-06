@@ -7,6 +7,32 @@
         { "fieldPath": "mintAddress", "order": "ASCENDING" },
         { "fieldPath": "status", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "publicJournalPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hiddenByAdmin", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "publicJournalPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hiddenByAdmin", "order": "ASCENDING" },
+        { "fieldPath": "category", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "publicJournalPosts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "hiddenByAdmin", "order": "ASCENDING" },
+        { "fieldPath": "author.slug", "order": "ASCENDING" },
+        { "fieldPath": "publishedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

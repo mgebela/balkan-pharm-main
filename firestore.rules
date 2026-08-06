@@ -171,6 +171,53 @@ service cloud.firestore {
       allow write: if signedIn() && request.auth.uid == userId;
     }
 
+    // Public field-note blogs (Stories). Drafts stay private; CF mirrors published.
+    match /growerPosts/{postId} {
+      allow read: if signedIn() && (
+        request.auth.uid == userId || isAdminOrSuper()
+      );
+
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 12000
+        && request.resource.data.slug is string
+        && request.resource.data.slug.size() >= 3
+        && request.resource.data.slug.size() <= 48
+        && request.resource.data.category in
+          ['tip', 'look', 'problem', 'visit', 'product', 'daybook']
+        && request.resource.data.status in ['draft', 'published', 'unpublished']
+        && request.resource.data.createdAt is string
+        && request.resource.data.updatedAt is string
+        && !('hiddenByAdmin' in request.resource.data);
+
+      allow update: if signedIn() && (
+        (
+          request.auth.uid == userId
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 120
+          && request.resource.data.body is string
+          && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() <= 12000
+          && request.resource.data.slug is string
+          && request.resource.data.category in
+            ['tip', 'look', 'problem', 'visit', 'product', 'daybook']
+          && request.resource.data.status in ['draft', 'published', 'unpublished']
+          && request.resource.data.updatedAt is string
+        )
+        || isAdminOrSuper()
+      );
+
+      allow delete: if signedIn() && (
+        request.auth.uid == userId || isAdminOrSuper()
+      );
+    }
+
     // In-app notification inbox
     match /notifications/{notifId} {
       allow read: if signedIn() && (
@@ -481,6 +528,29 @@ service cloud.firestore {
   match /marketPublicTape/{listingId} {
     allow read: if true;
     allow create, update, delete: if false;
+  }
+
+  // ── Public grower journal (Stories) ───────────────────────
+  // Written only by Admin SDK (syncPublicJournal*). Scrubbed field notes.
+
+  match /publicJournalPosts/{postId} {
+    allow read: if true;
+    // Admins may hide a live post without deleting the private draft.
+    allow update: if isAdminOrSuper()
+      && request.resource.data.diff(resource.data).affectedKeys()
+        .hasOnly(['hiddenByAdmin', 'updatedAt'])
+      && request.resource.data.hiddenByAdmin is bool;
+    allow create, delete: if false;
+  }
+
+  match /publicGrowerProfiles/{slug} {
+    allow read: if true;
+    allow create, update, delete: if false;
+  }
+
+  // Slug ownership claims — Admin SDK only (unique publicSlug).
+  match /publicSlugClaims/{slug} {
+    allow read, create, update, delete: if false;
   }
 
   // ── Adopt-stake harvest claims (locked 50% release / refund) ──

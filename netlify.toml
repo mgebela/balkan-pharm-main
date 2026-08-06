@@ -1,4 +1,8 @@
 # growtoo static site (Netlify)
+# Public journal lives at /journal/ (and /journal/p/, /journal/g/).
+# To serve the same pages on journal.growto.live later: add the subdomain in
+# Netlify Domain management and redirect journal.growto.live/* → /journal/:splat
+# (or set a domain alias with path prefix). No separate site binary required.
 [build]
   publish = "."
   command = "echo 'Static site — no build step'"

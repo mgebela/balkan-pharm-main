@@ -12223,3 +12223,152 @@ body.grow-camera-open {
   flex: 1 1 10rem;
   min-width: 0;
 }
+
+/* ── Grower Stories (public field notes) ─────────────────── */
+.blog-profile-banner {
+  margin: 0.5rem 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 165, 94, 0.28);
+  background: rgba(201, 165, 94, 0.08);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+.blog-profile-banner a {
+  color: var(--brass);
+}
+.blog-form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 40rem;
+}
+.blog-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+.blog-cover-row {
+  display: grid;
+  gap: 0.5rem;
+}
+.blog-cover-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+.blog-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.blog-status {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.blog-status--ok { color: #9ab97f; }
+.blog-status--error { color: #c98a4f; }
+.blog-list {
+  display: grid;
+  gap: 0.85rem;
+}
+.blog-empty {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+.blog-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  padding: 0.9rem;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.blog-card-photo {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.blog-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.blog-card:not(:has(.blog-card-photo)) {
+  grid-template-columns: 1fr;
+}
+.blog-card-title {
+  margin: 0.25rem 0;
+  font-size: 1.05rem;
+}
+.blog-card-excerpt {
+  margin: 0 0 0.55rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.blog-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.blog-card-cat {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.blog-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+.blog-badge--published {
+  color: #9ab97f;
+  border-color: rgba(154, 185, 127, 0.45);
+}
+.blog-badge--draft,
+.blog-badge--unpublished {
+  color: var(--brass);
+  border-color: rgba(201, 165, 94, 0.4);
+}
+.blog-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.account-public-profile {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 0.55rem;
+}
+.account-public-title {
+  margin: 0;
+  font-size: 0.95rem;
+}
+.account-public-hint,
+.account-public-status {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.account-public-check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+}
+.account-public-profile label:not(.account-public-check) {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+}

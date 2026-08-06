@@ -1630,7 +1630,8 @@ function renderAccountProfile() {
     '<button type="button" class="btn btn-primary btn-sm" id="account-profile-primary">' +
     esc(adopter ? 'Open market' : 'Open journal') +
     '</button>' +
-    '</div>';
+    '</div>' +
+    '<div id="account-public-profile-slot"></div>';
 
   const primary = document.getElementById('account-profile-primary');
   if (primary) {
@@ -1655,6 +1656,32 @@ function renderAccountProfile() {
         }
       }
     });
+  }
+
+  if (!adopter && window.GrowerBlog && typeof GrowerBlog.publicProfileFieldsHtml === 'function') {
+    const slot = document.getElementById('account-public-profile-slot');
+    const fillPublic = async function () {
+      let profile = {};
+      try {
+        const uid =
+          window.firebase && firebase.auth && firebase.auth().currentUser
+            ? firebase.auth().currentUser.uid
+            : '';
+        if (uid) {
+          const snap = await firebase.firestore().collection('users').doc(uid).get();
+          if (snap.exists) profile = snap.data() || {};
+        }
+      } catch (_) {
+        profile = {};
+      }
+      if (slot) {
+        slot.innerHTML = GrowerBlog.publicProfileFieldsHtml(profile);
+        if (typeof GrowerBlog.bindPublicProfileActions === 'function') {
+          GrowerBlog.bindPublicProfileActions();
+        }
+      }
+    };
+    fillPublic();
   }
 
   async function resizeAccountPhoto(dataUrl) {
@@ -2092,7 +2119,7 @@ function isViewAllowedForProfile(viewId) {
   if (!viewId) return false;
   if (viewId === 'admin') return isAdminPanelRole(currentUserRole);
   if (viewId === 'growlog') return isGrowerProfile();
-  if (['plants', 'toolbox', 'danas'].includes(viewId)) return isGrowerProfile();
+  if (['plants', 'toolbox', 'danas', 'blog'].includes(viewId)) return isGrowerProfile();
   // Growers post RWA offers; adopters browse & invest.
   // Pure growers stay on the journal path until they unlock Tokenise/Market.
   if (viewId === 'market') {
@@ -2748,6 +2775,7 @@ function initFirebaseSync() {
   const titles = {
     dashboard: 'Journal',
     plants: 'Plants',
+    blog: 'Stories',
     adopt: 'Tokenise',
     market: 'Market',
     growlog: 'Grow log',
@@ -2877,6 +2905,9 @@ function initFirebaseSync() {
       initPlantsWeatherWidget();
       renderPlants();
       renderJournal();
+    }
+    if (id === 'blog' && window.GrowerBlog && typeof GrowerBlog.render === 'function') {
+      GrowerBlog.render();
     }
     if (id === 'adopt' && window.AdoptPlant) window.AdoptPlant.render();
     if (id === 'market' && window.Market) window.Market.render();

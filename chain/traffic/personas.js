@@ -60,6 +60,8 @@ export const GROWERS = [
     logLocale: 'en',
     /** Starts green; climbs toward 4–5 over the 21-day history + traffic:day. */
     journalSkillStart: 1,
+    publicSlug: 'luka-zagreb',
+    publicBio: 'Zagreb closet grower. Short honest notes — including the boring days.',
     profilePhoto: 'https://growto.live/images/traffic/logos/luka-zagreb.svg',
     plantPhotoPool: [
       'https://growto.live/images/traffic/plants/plant-seedling.png',
@@ -106,6 +108,8 @@ export const GROWERS = [
     plantLabel: 'Cohort',
     logLocale: 'en',
     journalSkillStart: 2,
+    publicSlug: 'ivan-zadar',
+    publicBio: 'Zadar County tent. Coastal humidity is the daily fight; logs stay straight.',
     profilePhoto: 'https://growto.live/images/traffic/logos/ivan-zadar.svg',
     plantPhotoPool: [
       'https://growto.live/images/traffic/plants/plant-vegetative.png',
@@ -152,6 +156,8 @@ export const GROWERS = [
     plantLabel: 'Row',
     logLocale: 'en',
     journalSkillStart: 3,
+    publicSlug: 'marko-osijek',
+    publicBio: 'Osijek / Baranja field grower. Weather and soil first — farm daybook in English.',
     profilePhoto: 'https://growto.live/images/traffic/logos/marko-osijek.svg',
     plantPhotoPool: [
       'https://growto.live/images/traffic/plants/hemp-field.jpg',

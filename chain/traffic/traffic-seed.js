@@ -26,6 +26,7 @@ import {
   buildJournalSkillProfile,
 } from './synth.js';
 import { coachHintsForAdopter } from './journal-skill.js';
+import { buildJournalSeedWrites } from './journal-posts.js';
 
 async function main() {
   const { db } = initTraffic();
@@ -245,6 +246,11 @@ async function main() {
       data: { ...data, id },
       merge: false,
     });
+  }
+
+  // --- Public journal stories + grower profiles ---
+  for (const g of growerRuntime) {
+    writes.push(...buildJournalSeedWrites(db, g));
   }
 
   await commitBatches(db, writes);

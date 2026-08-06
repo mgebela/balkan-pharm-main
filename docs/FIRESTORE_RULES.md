@@ -37,6 +37,10 @@ npx firebase-tools deploy --only firestore:rules --project balpha-9dab9
 | `users/{uid}/app/state` | vlasnik, admin, superadmin, korisnik s `sharedGrants` | samo vlasnik |
 | `users/{uid}/sharedGrants/{viewer}` | vlasnik, viewer, superadmin | vlasnik, superadmin |
 | `loginEvents` | superadmin | bilo koji prijavljeni korisnik (svoj `uid`) |
+| `marketPublicTape` | anyone | Admin SDK only |
+| `publicJournalPosts` | anyone | Admin SDK (+ admin hide) |
+| `publicGrowerProfiles` | anyone | Admin SDK only |
+| `users/{uid}/growerPosts` | owner / admin | owner / admin |
 | `plants`, `entries` | admin, superadmin | admin, superadmin |
 | `tenants` | superadmin | superadmin |
 

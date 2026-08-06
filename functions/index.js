@@ -21,6 +21,10 @@ const {
 const {kickChainQueues, becamePending} = require('./kick-chain-queues');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {syncMarketPublicTape} = require('./market-public-tape');
+const {
+  syncPublicJournalPost,
+  syncPublicGrowerProfile,
+} = require('./grower-journal-public');
 const {reservePaymentSignatureOnListingWrite} = require('./used-payment-signatures');
 const {clientIp} = require('./solana-rpc-proxy');
 const {
@@ -644,6 +648,76 @@ exports.coachChat = onRequest(
         });
       } catch (err) {
         sendGuardError('coachChat', err, res);
+      }
+    },
+);
+
+/**
+ * Mirror published grower Stories → publicJournalPosts (landing /journal/).
+ */
+exports.onGrowerPostPublic = onDocumentWritten(
+    {
+      document: 'users/{uid}/growerPosts/{postId}',
+      region: REGION,
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (event) => {
+      const uid = event.params.uid;
+      const postId = event.params.postId;
+      const after = event.data && event.data.after && event.data.after.exists
+        ? event.data.after.data()
+        : null;
+      try {
+        await syncPublicJournalPost(uid, postId, after);
+      } catch (err) {
+        console.error('syncPublicJournalPost', uid, postId, err);
+      }
+    },
+);
+
+/**
+ * Mirror grower public profile (slug / bio) → publicGrowerProfiles.
+ */
+exports.onGrowerProfilePublic = onDocumentWritten(
+    {
+      document: 'users/{uid}',
+      region: REGION,
+      timeoutSeconds: 60,
+      memory: '256MiB',
+      maxInstances: 4,
+    },
+    async (event) => {
+      const uid = event.params.uid;
+      const before = event.data && event.data.before && event.data.before.exists
+        ? event.data.before.data()
+        : null;
+      const after = event.data && event.data.after && event.data.after.exists
+        ? event.data.after.data()
+        : null;
+      // Only run when public-profile fields change (avoid noise on lastLoginAt etc.).
+      const keys = [
+        'publicSlug',
+        'publicBio',
+        'publicProfileEnabled',
+        'displayName',
+        'profilePhoto',
+        'growSetup',
+        'homeCity',
+        'city',
+        'profileType',
+      ];
+      const changed = keys.some(function (k) {
+        const a = before ? before[k] : undefined;
+        const b = after ? after[k] : undefined;
+        return a !== b;
+      });
+      if (!changed && after) return;
+      try {
+        await syncPublicGrowerProfile(uid, before, after);
+      } catch (err) {
+        console.error('syncPublicGrowerProfile', uid, err && err.message ? err.message : err);
       }
     },
 );
