@@ -60,6 +60,47 @@
   --metric-card-bg: rgba(10, 18, 14, 0.96);
   --metric-card-border: rgb(var(--white-rgb) / 0.07);
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--brass);
+
+  /* Semantic colours. Values are unchanged from the literals they replace —
+     this pass only gives them a name so a second theme has one place to
+     restate them. Grouped as status, ink, brass, foliage, decorative
+     accents and deep surfaces. */
+  --accent-forest: #3d5c44;
+  --accent-moss: #2f4a36;
+  --brass-earth: #c98a4f;
+  --brass-hi: #e8c46a;
+  --brass-lo: #8a7340;
+  --brass-pale: #f0d58a;
+  --brass-pale-2: #f0d090;
+  --canvas-bottom: #101c14;
+  --canvas-top: #0c1610;
+  --danger: #f87171;
+  --danger-ink: #ffb4a8;
+  --danger-ink-soft: #ffd9c8;
+  --danger-solid: #b4472b;
+  --danger-tint: #fecaca;
+  --info: #5fb6ff;
+  --info-tint: #9ecfff;
+  --ink-bright: #f4fff4;
+  --ink-on-brass: #06201a;
+  --ink-panel: #f2f6f0;
+  --ink-panel-2: #f2f4ef;
+  --ink-soft: #9aab9c;
+  --ink-warm: #faf4ea;
+  --leaf: #9ab97f;
+  --leaf-deep: #6f9457;
+  --leaf-mid: #86ad72;
+  --ok: #34d399;
+  --ok-soft: #6fbf78;
+  --ok-solid: #2f8f4e;
+  --ok-tint: #c8ffd4;
+  --ok-tint-2: #b6f4c4;
+  --ok-tint-3: #b8e0c2;
+  --rust-soft: #b87658;
+  --surface-panel: #121c16;
+  --warn: #f59e0b;
+  --warn-tint: #ffd9a8;
+
 }
 
 /* Boot splash — catalog seal mark (replaces plain "Loading...") */
@@ -80,7 +121,7 @@ body.app-loading .app {
   background:
     radial-gradient(700px 380px at 80% -5%, rgb(var(--brass-rgb) / 0.1) 0%, transparent 55%),
     radial-gradient(560px 360px at 12% 40%, rgba(40, 80, 50, 0.16) 0%, transparent 50%),
-    linear-gradient(180deg, #0c1610 0%, var(--bg) 45%, #101c14 100%);
+    linear-gradient(180deg, var(--canvas-top) 0%, var(--bg) 45%, var(--canvas-bottom) 100%);
   color: var(--text);
   text-align: center;
 }
@@ -286,7 +327,7 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
   border: 1px solid rgba(120, 220, 140, 0.3);
 }
 .profile-type-badge--adopter {
-  color: #ffd9c8;
+  color: var(--danger-ink-soft);
   background: rgb(var(--alert-rgb) / 0.28);
   border: 1px solid rgba(255, 160, 120, 0.28);
 }
@@ -464,7 +505,7 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  color: #06201a;
+  color: var(--ink-on-brass);
   background: linear-gradient(90deg, var(--accent), var(--accent-bright));
 }
 
@@ -686,7 +727,7 @@ body {
   background:
     radial-gradient(900px 480px at 85% -5%, rgb(var(--brass-rgb) / 0.07) 0%, transparent 55%),
     radial-gradient(700px 420px at 8% 40%, rgba(40, 80, 50, 0.16) 0%, transparent 50%),
-    linear-gradient(180deg, #0c1610 0%, var(--bg) 40%, #101c14 100%);
+    linear-gradient(180deg, var(--canvas-top) 0%, var(--bg) 40%, var(--canvas-bottom) 100%);
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
@@ -910,7 +951,7 @@ body.profile-adopter .account-profile {
   border-radius: 50%;
 }
 body.profile-adopter .account-profile-avatar {
-  color: #ffd9c8;
+  color: var(--danger-ink-soft);
   border-color: rgba(255, 160, 120, 0.4);
 }
 .account-profile-id {
@@ -922,7 +963,7 @@ body.profile-adopter .account-profile-avatar {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 550;
-  color: #f4fff4;
+  color: var(--ink-bright);
   line-height: 1.2;
   word-break: break-word;
 }
@@ -948,7 +989,7 @@ body.profile-adopter .account-profile-avatar {
   border: 1px solid rgba(120, 220, 140, 0.3);
 }
 .account-profile-role--adopter {
-  color: #ffd9c8;
+  color: var(--danger-ink-soft);
   background: rgb(var(--alert-rgb) / 0.28);
   border: 1px solid rgba(255, 160, 120, 0.28);
 }
@@ -967,7 +1008,7 @@ body.profile-adopter .account-profile-avatar {
   color: var(--text-muted);
 }
 .account-profile-row strong {
-  color: #f4fff4;
+  color: var(--ink-bright);
   font-weight: 600;
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -995,7 +1036,7 @@ body.profile-adopter .account-profile-avatar {
   display: block;
   margin-top: 0.15rem;
   font-size: 0.95rem;
-  color: #f4fff4;
+  color: var(--ink-bright);
   font-variant-numeric: tabular-nums;
 }
 .account-profile-mode-hint {
@@ -1050,7 +1091,7 @@ body.profile-adopter .account-profile-avatar {
   color: rgba(157, 255, 176, 0.9) !important;
 }
 .account-profile-verify-status.is-error {
-  color: #ffb4a8 !important;
+  color: var(--danger-ink) !important;
 }
 
 .more-nav-overlay:not([hidden]) .more-nav-sheet {
@@ -1074,7 +1115,7 @@ body.profile-adopter .account-profile-avatar {
 
 .more-nav-head strong {
   font-size: 1.05rem;
-  color: #f4fff4;
+  color: var(--ink-bright);
 }
 
 .more-nav-close {
@@ -1138,7 +1179,7 @@ body.profile-adopter .account-profile-avatar {
 .more-nav-copy strong {
   font-size: 0.95rem;
   font-weight: 650;
-  color: #f4fff4;
+  color: var(--ink-bright);
 }
 
 .more-nav-copy span {
@@ -1240,8 +1281,8 @@ body.coach-fab-visible .main {
   height: 1.15rem;
   padding: 0 0.28rem;
   border-radius: 999px;
-  background: #2f8f4e;
-  color: #f4fff4;
+  background: var(--ok-solid);
+  color: var(--ink-bright);
   font-family: var(--font-mono);
   font-size: 0.62rem;
   font-weight: 700;
@@ -1290,7 +1331,7 @@ body.coach-fab-visible .main {
   flex-direction: column;
   border: 1px solid rgba(120, 220, 140, 0.22);
   border-radius: 14px;
-  background: #121c16;
+  background: var(--surface-panel);
   box-shadow: 0 18px 50px rgb(var(--shadow-rgb) / 0.45);
   overflow: hidden;
   transform: translateY(-6px);
@@ -1786,7 +1827,7 @@ body.notif-open {
 }
 
 .wallet-picker-status--error {
-  color: #fecaca;
+  color: var(--danger-tint);
   background: rgba(248, 113, 113, 0.12);
   border-color: rgba(248, 113, 113, 0.35);
 }
@@ -1815,7 +1856,7 @@ body.notif-open {
 .wallet-picker-manual-submit {
   width: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent-bright)) !important;
-  color: #06201a !important;
+  color: var(--ink-on-brass) !important;
 }
 
 .wallet-picker-manual-toggle {
@@ -1868,13 +1909,13 @@ body.notif-open {
 }
 
 .wallet-picker-manual-input--error {
-  border-color: #f87171;
+  border-color: var(--danger);
 }
 
 .wallet-picker-manual-error {
   margin: 0;
   font-size: 0.78rem;
-  color: #f87171;
+  color: var(--danger);
   line-height: 1.35;
 }
 
@@ -1899,7 +1940,7 @@ body.notif-open {
   font-size: 1.55rem;
   font-weight: 350;
   letter-spacing: -0.02em;
-  color: #f3efe6;
+  color: var(--text);
 }
 
 .view {
@@ -1997,7 +2038,7 @@ body.notif-open {
 .btn-secondary:hover,
 .btn-ghost:hover {
   background: rgb(var(--brass-rgb) / 0.12);
-  color: #f3efe6;
+  color: var(--text);
   border-color: rgb(var(--brass-rgb) / 0.85);
 }
 
@@ -2086,7 +2127,7 @@ body.notif-open {
   font-size: 1.35rem;
   font-weight: 350;
   letter-spacing: -0.02em;
-  color: #faf4ea;
+  color: var(--ink-warm);
 }
 
 .dashboard-first-run-body {
@@ -2255,7 +2296,7 @@ body.notif-open {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: #6fbf78;
+  background: var(--ok-soft);
   box-shadow: 0 0 0 2px rgba(111, 191, 120, 0.2);
   flex: 0 0 auto;
 }
@@ -2293,7 +2334,7 @@ body.notif-open {
 .tokenise-explainer-title {
   margin: 0 0 0.4rem;
   font-size: 1rem;
-  color: #faf4ea;
+  color: var(--ink-warm);
 }
 
 .tokenise-explainer-copy p {
@@ -2476,7 +2517,7 @@ body.notif-open {
 }
 
 .metric-dot--teal { background: var(--accent-bright); }
-.metric-dot--blue { background: #5fb6ff; }
+.metric-dot--blue { background: var(--info); }
 .metric-dot--violet { background: #c79bff; }
 .metric-dot--amber { background: var(--accent-warm); }
 .metric-dot--muted { background: rgb(var(--white-rgb) / 0.28); }
@@ -2906,12 +2947,12 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   overflow: visible;
 }
 
-.plant-stack[data-stage-key="seed"] { --tint: #c9a55e; }
-.plant-stack[data-stage-key="germination"] { --tint: #9ab97f; }
-.plant-stack[data-stage-key="seedling"] { --tint: #86ad72; }
-.plant-stack[data-stage-key="vegetative"] { --tint: #6f9457; }
-.plant-stack[data-stage-key="flowering"] { --tint: #c98a4f; }
-.plant-stack[data-stage-key="harvest"] { --tint: #b08f45; }
+.plant-stack[data-stage-key="seed"] { --tint: var(--brass); }
+.plant-stack[data-stage-key="germination"] { --tint: var(--leaf); }
+.plant-stack[data-stage-key="seedling"] { --tint: var(--leaf-mid); }
+.plant-stack[data-stage-key="vegetative"] { --tint: var(--leaf-deep); }
+.plant-stack[data-stage-key="flowering"] { --tint: var(--brass-earth); }
+.plant-stack[data-stage-key="harvest"] { --tint: var(--brass-active); }
 
 .plant-stack[open] {
   grid-column: 1 / -1;
@@ -3087,11 +3128,11 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 /* Same stage-tint scale as the Tokenise token cards — one system, lighter
    touch here: just a scan-at-a-glance accent, no card restructure. This
    view stays plain-journal by design (no wallet, no quest framing). */
-.plant-card[data-stage-key="germination"] { --tint: #9ab97f; }
-.plant-card[data-stage-key="seedling"] { --tint: #86ad72; }
-.plant-card[data-stage-key="vegetative"] { --tint: #6f9457; }
-.plant-card[data-stage-key="flowering"] { --tint: #c98a4f; }
-.plant-card[data-stage-key="harvest"] { --tint: #b08f45; }
+.plant-card[data-stage-key="germination"] { --tint: var(--leaf); }
+.plant-card[data-stage-key="seedling"] { --tint: var(--leaf-mid); }
+.plant-card[data-stage-key="vegetative"] { --tint: var(--leaf-deep); }
+.plant-card[data-stage-key="flowering"] { --tint: var(--brass-earth); }
+.plant-card[data-stage-key="harvest"] { --tint: var(--brass-active); }
 
 .plant-card::before {
   content: '';
@@ -3146,7 +3187,7 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   font-size: 0.75rem;
   font-weight: 500;
   background: linear-gradient(90deg, var(--accent), var(--accent-bright));
-  color: #06201a;
+  color: var(--ink-on-brass);
 }
 
 .plant-card-subphases {
@@ -3499,7 +3540,7 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
 }
 
 .toolbox-journal-bridge strong {
-  color: #f3efe6;
+  color: var(--text);
   font-weight: 650;
 }
 
@@ -4360,7 +4401,7 @@ select:disabled.is-empty-disabled {
 
 .admin-report-stat--logins { border-left-color: var(--accent-bright); }
 .admin-report-stat--users { border-left-color: var(--accent-warm); }
-.admin-report-stat--total { border-left-color: #5fb6ff; }
+.admin-report-stat--total { border-left-color: var(--info); }
 
 .admin-report-stat strong {
   display: block;
@@ -4483,17 +4524,17 @@ select:disabled.is-empty-disabled {
 
 .admin-role-badge--admin {
   background: rgba(95, 182, 255, 0.18);
-  color: #9ecfff;
+  color: var(--info-tint);
 }
 
 .admin-role-badge--viewer {
   background: rgba(255, 184, 107, 0.15);
-  color: #ffd9a8;
+  color: var(--warn-tint);
 }
 
 .admin-role-badge--user {
   background: rgba(120, 224, 143, 0.12);
-  color: #b6f4c4;
+  color: var(--ok-tint-2);
 }
 
 /* Sharing layout */
@@ -4724,17 +4765,17 @@ select:disabled.is-empty-disabled {
 
 .admin-grant-badge--plants {
   background: rgba(120, 224, 143, 0.12);
-  color: #b6f4c4;
+  color: var(--ok-tint-2);
 }
 
 .admin-grant-badge--journal {
   background: rgba(95, 182, 255, 0.12);
-  color: #9ecfff;
+  color: var(--info-tint);
 }
 
 .admin-grant-badge--toolbox {
   background: rgba(255, 184, 107, 0.12);
-  color: #ffd9a8;
+  color: var(--warn-tint);
 }
 
 /* Soil moisture tool (Marko) */
@@ -4768,7 +4809,7 @@ body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-
   border-radius: 10px;
   border: 1px solid rgb(var(--alert-rgb) / 0.35);
   background: rgba(142, 53, 32, 0.12);
-  color: var(--accent-bright, #b4472b);
+  color: var(--accent-bright, var(--danger-solid));
   font-size: 0.88rem;
   line-height: 1.45;
 }
@@ -4798,7 +4839,7 @@ body.admin-readonly .toolbox-form textarea {
 .plant-shared-badge {
   margin-left: 0.35rem;
   background: rgb(var(--alert-rgb) / 0.15);
-  color: var(--accent-bright, #b4472b);
+  color: var(--accent-bright, var(--danger-solid));
   font-size: 0.72rem;
 }
 
@@ -5605,7 +5646,7 @@ body:not(.app-loading) {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  color: #f3efe6;
+  color: var(--text);
   font-family: var(--font-display);
   font-weight: 350;
   letter-spacing: -0.015em;
@@ -5660,10 +5701,10 @@ body:not(.app-loading) {
 }
 
 /* Colorful dashboard cards (desk palette: rust / chlorophyll / brass) */
-.dashboard-card:nth-child(4n + 1) { --card-accent: #8a7340; --card-accent-2: #c9a55e; }
-.dashboard-card:nth-child(4n + 2) { --card-accent: #3d5c44; --card-accent-2: #b8d4b0; }
-.dashboard-card:nth-child(4n + 3) { --card-accent: #8a7340; --card-accent-2: #d8b872; }
-.dashboard-card:nth-child(4n + 4) { --card-accent: #2f4a36; --card-accent-2: #cfe0c6; }
+.dashboard-card:nth-child(4n + 1) { --card-accent: var(--brass-lo); --card-accent-2: var(--brass); }
+.dashboard-card:nth-child(4n + 2) { --card-accent: var(--accent-forest); --card-accent-2: var(--green); }
+.dashboard-card:nth-child(4n + 3) { --card-accent: var(--brass-lo); --card-accent-2: var(--brass-hover); }
+.dashboard-card:nth-child(4n + 4) { --card-accent: var(--accent-moss); --card-accent-2: var(--green-light); }
 
 .dashboard-card .value {
   color: var(--card-accent-2, var(--accent-bright));
@@ -5678,12 +5719,12 @@ body:not(.app-loading) {
   opacity: 0.45;
 }
 
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 1) { --card-accent: #8a7340; --card-accent-2: #c9a55e; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 2) { --card-accent: #3d5c44; --card-accent-2: #b8d4b0; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 3) { --card-accent: #8a7340; --card-accent-2: #d8b872; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 4) { --card-accent: #2f4a36; --card-accent-2: #cfe0c6; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 5) { --card-accent: #6b5340; --card-accent-2: #a86b4f; }
-.toolbox-grid .toolbox-card-btn:nth-child(6n + 6) { --card-accent: #3d5c44; --card-accent-2: #b8d4b0; }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 1) { --card-accent: var(--brass-lo); --card-accent-2: var(--brass); }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 2) { --card-accent: var(--accent-forest); --card-accent-2: var(--green); }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 3) { --card-accent: var(--brass-lo); --card-accent-2: var(--brass-hover); }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 4) { --card-accent: var(--accent-moss); --card-accent-2: var(--green-light); }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 5) { --card-accent: #6b5340; --card-accent-2: var(--rust); }
+.toolbox-grid .toolbox-card-btn:nth-child(6n + 6) { --card-accent: var(--accent-forest); --card-accent-2: var(--green); }
 
 .toolbox-card-btn:hover {
   box-shadow: var(--shadow-md);
@@ -5755,7 +5796,7 @@ body:not(.app-loading) {
   font-size: 1.45rem;
   font-weight: 350;
   letter-spacing: -0.02em;
-  color: #f3efe6;
+  color: var(--text);
 }
 
 .adopt-hero-text p {
@@ -5976,12 +6017,12 @@ body:not(.app-loading) {
 /* Stage tint — analogous shifts within the site's existing brass/green/rust
    family, not a new rainbow rarity scale. Read by the banner accent line,
    hover border, and the trail-summary chevron. */
-.adopt-token-card[data-stage-key="seed"] { --tint: #c9a55e; }
-.adopt-token-card[data-stage-key="germination"] { --tint: #9ab97f; }
-.adopt-token-card[data-stage-key="seedling"] { --tint: #86ad72; }
-.adopt-token-card[data-stage-key="vegetative"] { --tint: #6f9457; }
-.adopt-token-card[data-stage-key="flowering"] { --tint: #c98a4f; }
-.adopt-token-card[data-stage-key="harvest"] { --tint: #b08f45; }
+.adopt-token-card[data-stage-key="seed"] { --tint: var(--brass); }
+.adopt-token-card[data-stage-key="germination"] { --tint: var(--leaf); }
+.adopt-token-card[data-stage-key="seedling"] { --tint: var(--leaf-mid); }
+.adopt-token-card[data-stage-key="vegetative"] { --tint: var(--leaf-deep); }
+.adopt-token-card[data-stage-key="flowering"] { --tint: var(--brass-earth); }
+.adopt-token-card[data-stage-key="harvest"] { --tint: var(--brass-active); }
 
 .adopt-token-card:hover {
   border-color: color-mix(in srgb, var(--tint) 55%, var(--border));
@@ -6043,18 +6084,18 @@ body:not(.app-loading) {
   text-decoration: underline;
 }
 .adopt-token-chain--minted {
-  color: #34d399;
+  color: var(--ok);
 }
 .adopt-token-chain--minted a {
-  color: #34d399;
+  color: var(--ok);
 }
 .adopt-token-chain--failed {
-  color: #f87171;
+  color: var(--danger);
   display: grid;
   gap: 0.45rem;
 }
 .adopt-token-chain--failed .adopt-mint-err {
-  color: #fecaca;
+  color: var(--danger-tint);
   font-size: 0.85em;
 }
 .adopt-token-chain--failed .adopt-mint-hint {
@@ -6064,7 +6105,7 @@ body:not(.app-loading) {
   font-weight: 400;
 }
 .adopt-token-link--warn {
-  color: #f59e0b;
+  color: var(--warn);
 }
 .adopt-mint-repair {
   margin: 0 0 0.75rem;
@@ -6102,7 +6143,7 @@ body:not(.app-loading) {
   background: rgba(245, 158, 11, 0.06);
 }
 .adopt-mint-repair--stub strong {
-  color: #f59e0b;
+  color: var(--warn);
 }
 .adopt-mint-btn--locked {
   opacity: 0.65;
@@ -6181,7 +6222,7 @@ body:not(.app-loading) {
   line-height: 1.35;
 }
 .grower-quest-item--ok {
-  color: #34d399;
+  color: var(--ok);
 }
 .grower-quest-item--optional:not(.grower-quest-item--ok) {
   opacity: 0.75;
@@ -6198,7 +6239,7 @@ body:not(.app-loading) {
   line-height: 1.35;
 }
 .grower-quest--ready .grower-quest-msg {
-  color: #34d399;
+  color: var(--ok);
 }
 
 /* Tokenise — grower care tools (dashboard Tools, on-card) */
@@ -6595,7 +6636,7 @@ body.profile-adopter .adopt-hero-text h2 {
 .market-asset-badge--instant {
   background: rgba(157, 255, 176, 0.1);
   border-color: rgba(157, 255, 176, 0.28);
-  color: #c8ffd4;
+  color: var(--ok-tint);
 }
 
 @media (max-width: 720px) {
@@ -6695,8 +6736,8 @@ body.profile-adopter .adopt-hero-text h2 {
    plant-stage tint used on token cards: what matters here is "can I still
    act on this listing", not the grow stage. */
 .market-card[data-status-tint="active"] { --tint: #7fae72; }
-.market-card[data-status-tint="pending"] { --tint: #c9a55e; }
-.market-card[data-status-tint="sold"] { --tint: #b08f45; }
+.market-card[data-status-tint="pending"] { --tint: var(--brass); }
+.market-card[data-status-tint="sold"] { --tint: var(--brass-active); }
 .market-card[data-status-tint="dead"] { --tint: #8a7266; }
 .market-card::before {
   content: '';
@@ -6741,7 +6782,7 @@ body.profile-adopter .adopt-hero-text h2 {
   border-bottom: 1px solid rgb(var(--brass-hi-rgb) / 0.35);
 }
 .market-card-meta a:hover {
-  color: #f0d58a;
+  color: var(--brass-pale);
   border-bottom-color: rgb(var(--brass-hi-rgb) / 0.6);
 }
 .market-card-foot {
@@ -6774,12 +6815,12 @@ body.profile-adopter .adopt-hero-text h2 {
 .market-asset-badge--flower {
   background: rgba(157, 255, 176, 0.08);
   border-color: rgba(157, 255, 176, 0.28);
-  color: #c8ffd4;
+  color: var(--ok-tint);
 }
 .market-asset-badge--stake {
   background: rgb(var(--brass-hi-rgb) / 0.1);
   border-color: rgb(var(--brass-hi-rgb) / 0.32);
-  color: #f0d58a;
+  color: var(--brass-pale);
 }
 .platform-bonus-panel {
   margin-top: 0.5rem;
@@ -6805,14 +6846,14 @@ body.profile-adopter .adopt-hero-text h2 {
 .test-faucet-copy strong {
   display: block;
   font-size: 0.92rem;
-  color: #f0d090;
+  color: var(--brass-pale-2);
   margin-bottom: 0.25rem;
 }
 .test-faucet-copy p {
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.4;
-  color: var(--text-muted, #9aab9c);
+  color: var(--text-muted, var(--ink-soft));
 }
 .test-faucet-card .btn {
   flex: 0 0 auto;
@@ -6868,13 +6909,13 @@ body.profile-adopter .adopt-hero-text h2 {
   text-align: right;
 }
 .adopt-unlock-panel--lag .adopt-unlock-status {
-  color: #f59e0b;
+  color: var(--warn);
 }
 .adopt-unlock-panel--released .adopt-unlock-status {
-  color: #34d399;
+  color: var(--ok);
 }
 .adopt-unlock-panel--refunded .adopt-unlock-status {
-  color: #f87171;
+  color: var(--danger);
 }
 .adopt-unlock-grid {
   display: grid;
@@ -6913,7 +6954,7 @@ body.profile-adopter .adopt-hero-text h2 {
   transition: width 0.35s ease;
 }
 .adopt-unlock-panel--lag .adopt-unlock-meter-fill {
-  background: linear-gradient(90deg, #b45309, #f59e0b);
+  background: linear-gradient(90deg, #b45309, var(--warn));
 }
 .adopt-unlock-foot {
   margin: 0.55rem 0 0;
@@ -6983,8 +7024,8 @@ body.profile-adopter .adopt-hero-text h2 {
   z-index: 1;
 }
 .adopt-unlock-tl-item--ok .adopt-unlock-tl-dot {
-  border-color: #34d399;
-  background: #34d399;
+  border-color: var(--ok);
+  background: var(--ok);
   box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.12);
 }
 .adopt-unlock-tl-item--current .adopt-unlock-tl-dot {
@@ -6993,12 +7034,12 @@ body.profile-adopter .adopt-hero-text h2 {
   animation: status-rail-pulse 1.6s ease-in-out infinite;
 }
 .adopt-unlock-tl-item--lag .adopt-unlock-tl-dot {
-  border-color: #f59e0b;
-  background: #f59e0b;
+  border-color: var(--warn);
+  background: var(--warn);
   animation: status-rail-pulse 1.6s ease-in-out infinite;
 }
 .adopt-unlock-tl-item--short .adopt-unlock-tl-dot {
-  border-color: #f87171;
+  border-color: var(--danger);
   background: rgba(248, 113, 113, 0.35);
 }
 .adopt-unlock-tl-item--todo .adopt-unlock-tl-dot {
@@ -7017,16 +7058,16 @@ body.profile-adopter .adopt-hero-text h2 {
   white-space: nowrap;
 }
 .adopt-unlock-tl-item--ok .adopt-unlock-tl-detail {
-  color: #34d399;
+  color: var(--ok);
 }
 .adopt-unlock-tl-item--current .adopt-unlock-tl-detail {
   color: var(--brass);
 }
 .adopt-unlock-tl-item--lag .adopt-unlock-tl-detail {
-  color: #f59e0b;
+  color: var(--warn);
 }
 .adopt-unlock-tl-item--short .adopt-unlock-tl-detail {
-  color: #f87171;
+  color: var(--danger);
 }
 
 .grower-quest--care {
@@ -7155,32 +7196,32 @@ body.profile-adopter .adopt-hero-text h2 {
   font-weight: 650;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--text-muted, #9aab9c);
+  color: var(--text-muted, var(--ink-soft));
   line-height: 1.2;
   max-width: 100%;
   overflow-wrap: anywhere;
 }
 .status-rail-step--done .status-rail-label {
-  color: #b8e0c2;
+  color: var(--ok-tint-3);
 }
 .status-rail-step--current .status-rail-label {
-  color: #f0d090;
+  color: var(--brass-pale-2);
 }
 .status-rail-step--fail .status-rail-label {
-  color: #ffb4a8;
+  color: var(--danger-ink);
 }
 .status-rail-caption {
   margin: 0.45rem 0 0;
   font-size: 0.75rem;
   line-height: 1.35;
-  color: var(--text-muted, #9aab9c);
+  color: var(--text-muted, var(--ink-soft));
   text-align: center;
 }
 .status-rail--fail .status-rail-caption {
-  color: #ffb4a8;
+  color: var(--danger-ink);
 }
 .status-rail--ok .status-rail-caption {
-  color: #b8e0c2;
+  color: var(--ok-tint-3);
 }
 @keyframes status-rail-pulse {
   0%,
@@ -7213,7 +7254,7 @@ body.profile-adopter .adopt-hero-text h2 {
 }
 .market-status--active {
   background: rgba(157, 255, 176, 0.08);
-  color: #c8ffd4;
+  color: var(--ok-tint);
   border-color: rgba(157, 255, 176, 0.28);
 }
 .market-status--sold {
@@ -7223,13 +7264,13 @@ body.profile-adopter .adopt-hero-text h2 {
 }
 .market-status--failed {
   background: rgba(180, 60, 50, 0.22);
-  color: #ffb4a8;
+  color: var(--danger-ink);
   border-color: rgba(255, 140, 120, 0.28);
 }
 .market-card-error {
   margin: 0.3rem 0 0;
   font-size: 0.75rem;
-  color: #f87171;
+  color: var(--danger);
 }
 
 /* Same disclosure language as .adopt-token-trail — identity, status, price
@@ -7508,7 +7549,7 @@ body.profile-adopter .adopt-hero-text h2 {
   border-radius: 999px;
   border: 1px solid rgba(140, 200, 140, 0.35);
   background: rgba(8, 18, 12, 0.92);
-  color: #f4fff4;
+  color: var(--ink-bright);
   font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
@@ -7610,7 +7651,7 @@ body.profile-adopter .adopt-hero-text h2 {
 
 .market-offer-card.is-selected,
 .market-offer-card:has(input:checked) {
-  border-color: var(--accent-warm, #e8c46a);
+  border-color: var(--accent-warm, var(--brass-hi));
   background: rgb(var(--brass-hi-rgb) / 0.1);
   box-shadow: 0 0 0 1px rgb(var(--brass-hi-rgb) / 0.25);
 }
@@ -8089,7 +8130,7 @@ body.crypto-simple .crypto-simple-only {
 .plain-tip-btn:hover,
 .plain-tip-btn:focus-visible {
   color: var(--text);
-  border-color: var(--accent-warm, #e8c46a);
+  border-color: var(--accent-warm, var(--brass-hi));
   outline: none;
 }
 
@@ -8162,7 +8203,7 @@ body.crypto-simple .crypto-simple-only {
   height: 72px;
   border-radius: 12px;
   overflow: hidden;
-  background: #132016;
+  background: var(--card-bg);
   border: 1px solid rgb(var(--brass-rgb) / 0.22);
 }
 
@@ -8180,7 +8221,7 @@ body.crypto-simple .crypto-simple-only {
   padding: 0.2rem;
   background:
     radial-gradient(ellipse 70% 55% at 50% 42%, rgba(70, 100, 65, 0.2), transparent),
-    #132016;
+    var(--card-bg);
 }
 
 .market-card-photo--art .plant-grow-svg {
@@ -8202,7 +8243,7 @@ body.crypto-simple .crypto-simple-only {
   height: 1.55rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #0f1a12;
+  border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.4);
 }
 
@@ -8215,7 +8256,7 @@ body.crypto-simple .crypto-simple-only {
   font-weight: 650;
   letter-spacing: 0.02em;
   background: rgb(var(--brass-hi-rgb) / 0.16);
-  color: var(--accent-warm, #e8c46a);
+  color: var(--accent-warm, var(--brass-hi));
 }
 
 .market-card-journal {
@@ -8493,7 +8534,7 @@ body.crypto-simple .crypto-simple-only {
   height: 2.35rem;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #0f1a12;
+  border: 2px solid var(--bg);
   box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.45);
 }
 
@@ -8501,7 +8542,7 @@ body.crypto-simple .crypto-simple-only {
   min-height: 188px;
   padding: 1rem 0.75rem 1.1rem;
   background: radial-gradient(ellipse 70% 55% at 50% 42%, color-mix(in srgb, var(--tint) 16%, transparent), transparent),
-    #132016;
+    var(--card-bg);
 }
 
 .adopt-token-banner--art::before {
@@ -8711,7 +8752,7 @@ body.crypto-simple .crypto-simple-only {
 /* Grower AI Coach — forest desk chat (catalog brass) */
 :root {
   --coach-kbd-inset: 0px;
-  --coach-ink: #f2f6f0;
+  --coach-ink: var(--ink-panel);
   --coach-muted: rgba(190, 205, 180, 0.78);
   --coach-paper: #0c1a12;
   --coach-wash: #102016;
@@ -8785,7 +8826,7 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-fab:focus-visible {
-  outline: 2px solid #e8c46a;
+  outline: 2px solid var(--brass-hi);
   outline-offset: 3px;
 }
 
@@ -8952,7 +8993,7 @@ body.crypto-simple .crypto-simple-only {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #2f8f4e;
+  color: var(--ok-solid);
 }
 
 .ai-coach-empty-hero h3 {
@@ -8984,7 +9025,7 @@ body.crypto-simple .crypto-simple-only {
   padding: 0.75rem 0.8rem;
   cursor: pointer;
   font: inherit;
-  color: #f2f6f0;
+  color: var(--ink-panel);
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
   box-shadow: none;
 }
@@ -9162,7 +9203,7 @@ body.crypto-simple .crypto-simple-only {
   width: 0.35rem;
   height: 0.35rem;
   border-radius: 50%;
-  background: #2f8f4e;
+  background: var(--ok-solid);
   opacity: 0.55;
   animation: ai-coach-bounce 1s infinite ease-in-out;
 }
@@ -9637,7 +9678,7 @@ body.ai-coach-open {
 /* ── Desk theme hardening (align with landing commodity board) ── */
 .view-title {
   letter-spacing: -0.02em;
-  color: #f4fff4;
+  color: var(--ink-bright);
 }
 
 /* Large-title header: sticky + translucent material so it stays pinned and
@@ -9749,7 +9790,7 @@ table td {
 .ai-coach-panel {
   background: linear-gradient(180deg, rgba(14, 36, 24, 0.98) 0%, rgba(8, 18, 12, 0.99) 100%) !important;
   border-color: rgba(140, 200, 140, 0.22) !important;
-  color: #f2f6f0 !important;
+  color: var(--ink-panel) !important;
   box-shadow: 0 22px 56px rgb(var(--shadow-rgb) / 0.45) !important;
 }
 
@@ -9759,13 +9800,13 @@ table td {
 .ai-coach-panel .ai-coach-bubble--assistant,
 .ai-coach-panel .ai-coach-bubble--assistant p,
 .ai-coach-panel .ai-coach-chip {
-  color: #f2f6f0 !important;
+  color: var(--ink-panel) !important;
 }
 
 .ai-coach-panel .ai-coach-status,
 .ai-coach-panel .ai-coach-meta,
 .ai-coach-panel .ai-coach-empty-kicker {
-  color: #b8d4b0 !important;
+  color: var(--green) !important;
 }
 
 .ai-coach-panel .ai-coach-empty-hero p,
@@ -9777,7 +9818,7 @@ table td {
 .ai-coach-panel .ai-coach-starter {
   background: rgba(18, 36, 24, 0.95) !important;
   border-color: rgba(140, 180, 140, 0.3) !important;
-  color: #f2f6f0 !important;
+  color: var(--ink-panel) !important;
   box-shadow: none !important;
 }
 
@@ -9804,7 +9845,7 @@ table td {
 
 .ai-coach-panel .ai-coach-form textarea {
   background: rgba(6, 16, 10, 0.75) !important;
-  color: #f2f6f0 !important;
+  color: var(--ink-panel) !important;
   border: 1px solid rgba(140, 180, 140, 0.32) !important;
 }
 
@@ -9821,7 +9862,7 @@ table td {
 .ai-coach-panel .ai-coach-chip {
   background: rgba(18, 36, 24, 0.9) !important;
   border-color: rgba(140, 180, 140, 0.28) !important;
-  color: #f2f6f0 !important;
+  color: var(--ink-panel) !important;
 }
 
 .ai-coach-panel .ai-coach-chip:hover {
@@ -9852,7 +9893,7 @@ table td {
   border-radius: 10px;
   border: 1px solid rgba(157, 255, 176, 0.28);
   background: rgba(20, 70, 36, 0.28);
-  color: #c8ffd4;
+  color: var(--ok-tint);
   font-size: 0.82rem;
   line-height: 1.4;
 }
@@ -9944,7 +9985,7 @@ table td {
   bottom: 0;
   padding: 1.4rem 0.75rem 0.55rem;
   background: linear-gradient(180deg, transparent 0%, rgba(4, 12, 8, 0.88) 70%);
-  color: #f4fff4;
+  color: var(--ink-bright);
   font-size: 0.82rem;
   line-height: 1.3;
 }
@@ -9978,7 +10019,7 @@ table td {
   gap: 0.25rem;
   padding: 0.35rem 0.85rem 0;
   border-bottom: 1px solid rgba(120, 140, 110, 0.28);
-  background: var(--coach-panel, #142018);
+  background: var(--coach-panel, var(--bg-alt));
 }
 
 .ai-coach-tab {
@@ -9996,7 +10037,7 @@ table td {
 
 .ai-coach-tab.is-active {
   color: var(--text);
-  border-bottom-color: var(--accent-warm, #e8c46a);
+  border-bottom-color: var(--accent-warm, var(--brass-hi));
 }
 
 .ai-coach-tab-panels {
@@ -10109,7 +10150,7 @@ table td {
   font-weight: 650;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--accent-warm, #e8c46a);
+  color: var(--accent-warm, var(--brass-hi));
 }
 
 .coach-log-empty {
@@ -10138,7 +10179,7 @@ table td {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent-warm, #e8c46a);
+  color: var(--accent-warm, var(--brass-hi));
 }
 
 .entry-coach-note {
@@ -10174,7 +10215,7 @@ table td {
   font-weight: 650;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--accent-warm, #e8c46a);
+  color: var(--accent-warm, var(--brass-hi));
 }
 
 .ai-coach-confirm--high {
@@ -10200,7 +10241,7 @@ table td {
 /* Combined Coach settings + activity (trust screen) */
 .coach-settings {
   padding: 0.85rem 1rem 1.35rem;
-  color: var(--coach-ink, #f2f4ef);
+  color: var(--coach-ink, var(--ink-panel-2));
 }
 
 .coach-settings-head {
@@ -10281,7 +10322,7 @@ table td {
 
 .coach-settings-label {
   font-size: 0.9rem;
-  color: #f2f4ef;
+  color: var(--ink-panel-2);
 }
 
 .coach-settings-always {
@@ -10379,7 +10420,7 @@ table td {
 }
 
 .coach-activity-item--done .coach-activity-mark {
-  color: #6fbf78;
+  color: var(--ok-soft);
 }
 
 .coach-activity-item--pending .coach-activity-mark {
@@ -10517,7 +10558,7 @@ table td {
   font-size: clamp(1.15rem, 3.6vw, 1.45rem);
   line-height: 1.35;
   letter-spacing: -0.015em;
-  color: #f3efe6;
+  color: var(--text);
 }
 
 .today-card-actions {
@@ -10579,7 +10620,7 @@ table td {
   font-weight: 350;
   font-size: 1.05rem;
   line-height: 1.25;
-  color: #f3efe6;
+  color: var(--text);
 }
 
 .plant-seal-title em {
@@ -11297,7 +11338,7 @@ body.ai-coach-open .nav-coach-mark {
   background-repeat: no-repeat;
   border: 1px solid var(--border);
   border-radius: var(--shell-card-radius, 12px);
-  color: #f3efe6;
+  color: var(--text);
   font-family: var(--font-display);
   font-style: italic;
   font-weight: 350;
@@ -11419,7 +11460,7 @@ body.ai-coach-open .nav-coach-mark {
   min-width: 0;
   border: 0;
   background: transparent;
-  color: #f3efe6;
+  color: var(--text);
   font-size: 1.05rem;
   font-weight: 600;
   padding: 0.7rem 0.7rem;
@@ -11631,7 +11672,7 @@ body.ai-coach-open .nav-coach-mark {
   padding: 0.85rem 1.1rem 1.1rem;
   border: 1px solid rgb(var(--brass-rgb) / 0.28);
   border-radius: 16px 16px 12px 12px;
-  background: linear-gradient(180deg, #18261c 0%, #121c16 100%);
+  background: linear-gradient(180deg, var(--card-hover) 0%, var(--surface-panel) 100%);
   box-shadow: 0 18px 50px rgb(var(--shadow-rgb) / 0.5);
   transform: translateY(12px);
   opacity: 0;
@@ -11681,8 +11722,8 @@ body.ai-coach-open .nav-coach-mark {
   color: #fff8f2;
 }
 .app-confirm-sheet--danger #app-confirm-ok:hover {
-  background: #b87658;
-  border-color: #b87658;
+  background: var(--rust-soft);
+  border-color: var(--rust-soft);
 }
 body.app-confirm-open {
   overflow: hidden;
@@ -11826,7 +11867,7 @@ body.app-confirm-open {
   border-radius: 18px 18px 12px 12px;
   background:
     radial-gradient(280px 140px at 10% 0%, rgb(var(--brass-rgb) / 0.14), transparent 55%),
-    linear-gradient(180deg, #1a2a1f 0%, #121c16 100%);
+    linear-gradient(180deg, #1a2a1f 0%, var(--surface-panel) 100%);
   box-shadow: 0 22px 60px rgb(var(--shadow-rgb) / 0.55);
   transform: translateY(16px);
   opacity: 0;
@@ -11981,7 +12022,7 @@ body.daily-status-open {
   border-radius: 999px;
   border: 1px solid rgb(var(--brass-rgb) / 0.4);
   background: rgba(15, 26, 18, 0.55);
-  color: var(--brass, #c9a55e);
+  color: var(--brass, var(--brass));
   font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
@@ -11998,7 +12039,7 @@ body.daily-status-open {
 }
 body.profile-adopter .view-tour-help {
   border-color: rgba(255, 160, 120, 0.4);
-  color: #ffd9c8;
+  color: var(--danger-ink-soft);
 }
 body.profile-adopter .view-tour-help:hover,
 body.profile-adopter .view-tour-help:focus-visible {
@@ -12038,7 +12079,7 @@ body.profile-adopter .view-tour-help:focus-visible {
     radial-gradient(240px 90px at 100% 0%, rgb(var(--brass-rgb) / 0.12), transparent 60%),
     linear-gradient(180deg, rgba(22, 34, 26, 0.98), rgba(10, 16, 12, 0.99));
   box-shadow: 0 18px 48px rgb(var(--shadow-rgb) / 0.45);
-  color: #f4fff4;
+  color: var(--ink-bright);
 }
 body.profile-adopter .product-tour-card {
   border-color: rgba(255, 160, 120, 0.28);
@@ -12055,7 +12096,7 @@ body.profile-adopter .product-tour-card {
   color: var(--brass);
 }
 body.profile-adopter .product-tour-step {
-  color: #ffd9c8;
+  color: var(--danger-ink-soft);
 }
 .product-tour-title {
   margin: 0 0 0.35rem;
@@ -12063,7 +12104,7 @@ body.profile-adopter .product-tour-step {
   font-size: 1.15rem;
   font-weight: 550;
   line-height: 1.25;
-  color: #f4fff4;
+  color: var(--ink-bright);
 }
 .product-tour-body {
   margin: 0;
@@ -12187,7 +12228,7 @@ body.grow-camera-open {
 }
 .grow-camera-btn--ghost:hover {
   border-color: rgb(var(--brass-rgb) / 0.5);
-  color: var(--brass, #c9a55e);
+  color: var(--brass, var(--brass));
 }
 .grow-camera-spacer {
   min-width: 4.2rem;
@@ -12208,7 +12249,7 @@ body.grow-camera-open {
   width: 3.35rem;
   height: 3.35rem;
   border-radius: 50%;
-  background: #f4fff4;
+  background: var(--ink-bright);
   box-shadow: 0 0 0 2px rgb(var(--brass-rgb) / 0.35);
 }
 .grow-camera-shutter:active .grow-camera-shutter-ring {
@@ -12236,7 +12277,7 @@ body.grow-camera-open {
   color: rgba(220, 245, 226, 0.92);
 }
 .grow-camera-status.is-error {
-  color: #ffb4a8;
+  color: var(--danger-ink);
 }
 .entry-photo-actions {
   display: flex;
@@ -12355,8 +12396,8 @@ body.grow-camera-open {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
-.blog-status--ok { color: #9ab97f; }
-.blog-status--error { color: #c98a4f; }
+.blog-status--ok { color: var(--leaf); }
+.blog-status--error { color: var(--brass-earth); }
 .blog-list {
   display: grid;
   gap: 0.85rem;
@@ -12418,7 +12459,7 @@ body.grow-camera-open {
   border: 1px solid var(--border);
 }
 .blog-badge--published {
-  color: #9ab97f;
+  color: var(--leaf);
   border-color: rgba(154, 185, 127, 0.45);
 }
 .blog-badge--draft,
