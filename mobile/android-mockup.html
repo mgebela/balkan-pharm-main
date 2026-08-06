@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>growtoo · Android app mockup</title>
+<style>
+/* ============================================================
+   growtoo Android mockup — Material 3 (Material You) expression
+   of the same catalog system used in app/styles/app.css.
+   Brand colours are mapped onto M3 colour roles rather than
+   used raw, so the palette survives tonal-elevation surfaces.
+   ============================================================ */
+:root {
+  /* --- brand, verbatim from app/styles/app.css --- */
+  --brass: #c9a55e;
+  --brass-active: #b08f45;
+  --brass-ink: #1a1408;
+  --green: #b8d4b0;
+  --rust: #a86b4f;
+
+  /* --- M3 colour roles (dark scheme) --- */
+  --m3-primary: var(--brass);
+  --m3-on-primary: var(--brass-ink);
+  --m3-primary-container: #3d3018;
+  --m3-on-primary-container: #f0d9a8;
+  --m3-secondary-container: rgba(201, 165, 94, .17);
+  --m3-on-secondary-container: #f0d9a8;
+  --m3-surface: #0f1a12;
+  --m3-surface-container-low: #142018;
+  --m3-surface-container: #17251b;
+  --m3-surface-container-high: #1d2c21;
+  --m3-surface-container-highest: #223227;
+  --m3-on-surface: #f3efe6;
+  --m3-on-surface-variant: rgba(184, 196, 176, .78);
+  --m3-outline: rgba(184, 196, 176, .38);
+  --m3-outline-variant: rgba(201, 165, 94, .2);
+  --m3-error: var(--rust);
+  --m3-inverse-surface: #e6e2d6;
+  --m3-inverse-on-surface: #1a2119;
+
+  /* Roboto is Android's system face; falls back to the host UI font here. */
+  --font: Roboto, 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* M3 shape scale */
+  --shape-xs: 4px;
+  --shape-sm: 8px;
+  --shape-md: 12px;
+  --shape-lg: 16px;
+  --shape-xl: 28px;
+  --shape-full: 999px;
+
+  /* Android layout metrics, in dp */
+  --status-h: 28px;
+  --appbar-h: 64px;
+  --navbar-h: 80px;
+  --gesture-h: 24px;
+  --m3-ease: cubic-bezier(.2, 0, 0, 1);
+
+  /* Theme-swappable extras that don't map onto a stock M3 role. --brass is
+     the ink-weight accent used for text and icons; --m3-primary stays the
+     gold used for filled surfaces. In light mode the two have to diverge. */
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, .16), rgba(23, 37, 27, .9));
+  --seal-border: rgba(201, 165, 94, .45);
+  --photo-bg: linear-gradient(165deg, #1d2c20, #101c14);
+  --photo-glow: rgba(120, 170, 110, .3);
+  --gesture-color: rgba(243, 239, 230, .55);
+  --snack-action: #6b5215;
+  --ok-text: var(--green);
+  --ok-bg: rgba(184, 212, 176, .16);
+  --warn-text: #e6b39c;
+  --warn-bg: rgba(168, 107, 79, .2);
+}
+
+/* Light scheme. M3 derives light and dark from the same source colour but
+   they are not inversions of each other — container tones step *down* from
+   the surface here, and the accent darkens to hold contrast on paper.
+   Settings › Theme switches this at runtime. */
+.screen-host[data-theme="light"] {
+  --m3-primary: #c9a55e;
+  --m3-on-primary: #241a05;
+  --m3-primary-container: #f6e6bd;
+  --m3-on-primary-container: #2a1e00;
+  --m3-secondary-container: #e9dfc2;
+  --m3-on-secondary-container: #3a3520;
+  --m3-surface: #fcf9f1;
+  --m3-surface-container-low: #f7f3e9;
+  --m3-surface-container: #f2eee2;
+  --m3-surface-container-high: #ece7d9;
+  --m3-surface-container-highest: #e6e0d0;
+  --m3-on-surface: #1b1c17;
+  --m3-on-surface-variant: #4b4a3e;
+  --m3-outline: #7d7b6c;
+  --m3-outline-variant: rgba(125, 96, 36, .28);
+  --m3-inverse-surface: #313029;
+  --m3-inverse-on-surface: #f5f1e6;
+  --brass: #6f5416;
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, .34), rgba(252, 249, 241, .95));
+  --seal-border: rgba(125, 96, 36, .5);
+  --photo-bg: linear-gradient(165deg, #dbe4d4, #c2d1bc);
+  --photo-glow: rgba(96, 150, 88, .34);
+  --gesture-color: rgba(27, 28, 23, .5);
+  --snack-action: #e5c37e;
+  --ok-text: #3d6a38;
+  --ok-bg: rgba(61, 106, 56, .13);
+  --warn-text: #8d3f1a;
+  --warn-bg: rgba(141, 63, 26, .13);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(201,165,94,.07) 0%, transparent 55%),
+    radial-gradient(700px 460px at 10% 30%, rgba(40,80,50,.12) 0%, transparent 50%),
+    #0a120c;
+  color: var(--m3-on-surface);
+  min-height: 100vh;
+  padding: 32px 24px 64px;
+}
+
+/* ---------- page chrome ---------- */
+.page-head { max-width: 1180px; margin: 0 auto 26px; }
+.page-kicker {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--brass); margin: 0 0 8px;
+}
+.page-title { font-size: 30px; font-weight: 400; letter-spacing: -.01em; margin: 0 0 6px; }
+.page-sub { margin: 0; color: var(--m3-on-surface-variant); font-size: 14px; max-width: 64ch; line-height: 1.55; }
+.page-sub a { color: var(--brass); }
+
+.stage {
+  max-width: 1180px; margin: 0 auto; display: grid;
+  grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+  gap: 44px; align-items: start;
+}
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; justify-items: center; } }
+
+.screen-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+/* M3 filter chip */
+.chip {
+  font: inherit; font-size: 13px; height: 32px; padding: 0 14px; border-radius: var(--shape-sm);
+  cursor: pointer; background: transparent; border: 1px solid var(--m3-outline);
+  color: var(--m3-on-surface-variant); display: inline-flex; align-items: center; gap: 6px;
+  transition: background .15s var(--m3-ease), color .15s var(--m3-ease);
+}
+.chip:hover { background: rgba(201,165,94,.08); }
+.chip .check { width: 0; overflow: hidden; transition: width .15s var(--m3-ease); }
+.chip.is-on {
+  background: var(--m3-secondary-container); border-color: transparent;
+  color: var(--m3-on-secondary-container);
+}
+.chip.is-on .check { width: 16px; }
+
+/* ---------- device ---------- */
+.phone-wrap { position: sticky; top: 32px; }
+.phone {
+  width: 412px; height: 915px; border-radius: 36px; padding: 8px;
+  background: linear-gradient(160deg, #33382f, #14180f 45%, #2a2e26);
+  box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+  position: relative;
+}
+.phone::after { /* power + volume rocker */
+  content: ''; position: absolute; right: -2px; top: 170px; width: 3px; height: 132px;
+  border-radius: 2px; background: linear-gradient(#3e4437, #20241b);
+}
+.screen-host {
+  position: relative; width: 100%; height: 100%; border-radius: 30px; overflow: hidden;
+  background: var(--m3-surface); color: var(--m3-on-surface); isolation: isolate;
+  transition: background .28s var(--m3-ease);
+}
+
+/* status bar — Android puts the clock on the right */
+.statusbar {
+  position: absolute; inset: 0 0 auto 0; height: var(--status-h); z-index: 40;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; pointer-events: none; font-size: 13px; font-weight: 500;
+}
+.status-left { display: flex; align-items: center; gap: 6px; opacity: .9; }
+.status-right { display: flex; align-items: center; gap: 6px; }
+.punch-hole {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 12px; height: 12px; border-radius: 50%; background: #000; z-index: 45;
+}
+.batt { font-size: 12px; font-weight: 500; }
+
+/* ---------- screens ---------- */
+.screen {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; display: none;
+  padding-bottom: calc(var(--navbar-h) + var(--gesture-h) + 12px);
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.is-active { display: block; }
+/* M3 fade-through: outgoing fades, incoming fades + scales up from 92% */
+.screen.is-active.anim { animation: fade-through .3s var(--m3-ease); }
+@keyframes fade-through {
+  from { opacity: 0; transform: scale(.94); }
+  to { opacity: 1; transform: none; }
+}
+
+/* M3 large top app bar → collapses to the small top app bar on scroll */
+.appbar {
+  position: sticky; top: 0; z-index: 30; padding-top: var(--status-h);
+  background: var(--m3-surface); transition: background .2s var(--m3-ease);
+}
+.appbar.is-collapsed { background: var(--m3-surface-container); } /* tonal elevation, not a shadow */
+.appbar-row {
+  height: var(--appbar-h); display: flex; align-items: center; gap: 4px; padding: 0 4px 0 16px;
+}
+.appbar-row .spacer { flex: 1; }
+.appbar-title {
+  font-size: 22px; font-weight: 400; letter-spacing: 0;
+  opacity: 0; transform: translateY(4px); transition: opacity .2s var(--m3-ease), transform .2s var(--m3-ease);
+}
+.appbar.is-collapsed .appbar-title { opacity: 1; transform: none; }
+.headline {
+  font-size: 28px; font-weight: 400; letter-spacing: 0; margin: 0; padding: 0 16px 22px;
+  transition: opacity .18s var(--m3-ease);
+}
+.appbar.is-collapsed .headline { opacity: 0; }
+.appbar.has-back { }
+.appbar.has-back .appbar-title { margin-left: 4px; }
+
+/* icon button with M3 state layer */
+.icon-btn {
+  width: 48px; height: 48px; flex: none; border-radius: 50%; border: 0; background: none;
+  color: var(--m3-on-surface); display: grid; place-items: center; cursor: pointer; position: relative;
+  font-family: inherit;
+}
+.icon-btn::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; background: currentColor;
+  opacity: 0; transition: opacity .12s var(--m3-ease);
+}
+.icon-btn:hover::before { opacity: .08; }
+.icon-btn:active::before { opacity: .12; }
+.icon-btn .badge {
+  position: absolute; top: 9px; right: 10px; min-width: 8px; height: 8px; border-radius: 999px;
+  background: var(--m3-error);
+}
+
+.body { padding: 0 16px; }
+
+/* ---------- M3 components ---------- */
+.label-sm {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--brass); margin: 0 0 8px;
+}
+.sect-head { display: flex; align-items: center; justify-content: space-between; margin: 24px 0 10px; }
+.sect-head h2 { font-size: 16px; font-weight: 500; letter-spacing: .01em; margin: 0; color: var(--m3-on-surface-variant); }
+
+/* filled + outlined cards (M3 card variants) */
+.card {
+  background: var(--m3-surface-container); border-radius: var(--shape-md);
+  padding: 16px; margin-bottom: 12px; border: 0;
+}
+.card.outlined { background: transparent; border: 1px solid var(--m3-outline-variant); }
+.card.tonal { background: var(--m3-primary-container); color: var(--m3-on-primary-container); }
+.card-lead { margin: 0; font-size: 15px; line-height: 1.45; }
+.muted { color: var(--m3-on-surface-variant); }
+.dim { color: rgba(184,196,176,.5); }
+.mono { font-family: var(--font-mono); }
+
+/* M3 buttons are fully rounded */
+.btn {
+  font-family: inherit; font-size: 14px; font-weight: 500; letter-spacing: .01em;
+  height: 40px; padding: 0 20px; border-radius: var(--shape-full); border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-filled { background: var(--m3-primary); color: var(--m3-on-primary); }
+.btn-filled:active { background: var(--brass-active); }
+.btn-tonal { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.btn-outlined { background: transparent; border: 1px solid var(--m3-outline); color: var(--m3-primary); }
+.btn-text { background: transparent; color: var(--m3-primary); padding: 0 12px; }
+.btn-row { display: flex; gap: 8px; margin-top: 14px; }
+
+/* M3 lists are edge-to-edge, not inset cards */
+.list { margin: 0 -16px; }
+.list.boxed { margin: 0; background: var(--m3-surface-container-low); border-radius: var(--shape-md); overflow: hidden; }
+.row {
+  display: flex; align-items: center; gap: 16px; padding: 12px 16px; width: 100%;
+  background: none; border: 0; font-family: inherit; color: var(--m3-on-surface); text-align: left;
+  cursor: pointer; min-height: 72px; position: relative;
+}
+.row::before {
+  content: ''; position: absolute; inset: 0; background: currentColor; opacity: 0;
+  transition: opacity .12s var(--m3-ease);
+}
+.row:hover::before { opacity: .05; }
+.row:active::before { opacity: .1; }
+.row-glyph {
+  width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); font-size: 14px;
+}
+.row-glyph.mark { font-family: var(--font-mono); font-size: 12px; }
+.row-text { flex: 1; min-width: 0; }
+.row-title { display: block; font-size: 16px; letter-spacing: .005em; }
+.row-sub { display: block; font-size: 13px; color: var(--m3-on-surface-variant); margin-top: 3px; }
+.row-trail { flex: none; color: var(--m3-on-surface-variant); font-size: 12px; }
+.divider { height: 1px; background: var(--m3-outline-variant); margin: 0 16px; }
+
+/* wax-seal marks — the catalog motif carried over unchanged */
+.seal-rail { display: flex; gap: 16px; overflow-x: auto; padding: 4px 16px 8px; scrollbar-width: none; }
+.seal-rail::-webkit-scrollbar { display: none; }
+.seal { flex: none; width: 80px; text-align: center; background: none; border: 0; font-family: inherit; cursor: pointer; padding: 0; color: inherit; }
+.seal-disc {
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 8px; display: grid; place-items: center;
+  border: 1.5px dashed var(--seal-border);
+  background: var(--seal-bg);
+  position: relative;
+}
+.seal-disc > span:first-child { font-size: 22px; color: var(--brass); }
+.seal-disc .seal-day {
+  position: absolute; bottom: -4px; right: -6px; background: var(--m3-surface-container-high);
+  border-radius: var(--shape-sm); font-family: var(--font-mono); font-size: 10px; line-height: 1.3;
+  padding: 2px 6px; color: var(--brass);
+}
+.seal-name { font-size: 12px; color: var(--m3-on-surface-variant); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seal.is-add .seal-disc { border-style: solid; border-color: var(--m3-outline); }
+.seal.is-add .seal-disc > span:first-child { color: var(--m3-on-surface-variant); }
+
+/* stat row */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.metric { background: var(--m3-surface-container-low); border-radius: var(--shape-md); padding: 14px 12px; }
+.metric-val { font-family: var(--font-mono); font-size: 22px; display: block; }
+.metric-lbl { font-size: 12px; color: var(--m3-on-surface-variant); display: block; margin-top: 4px; }
+
+/* M3 assist / suggestion chips */
+.pill {
+  display: inline-flex; align-items: center; height: 24px; padding: 0 10px; font-size: 12px;
+  border-radius: var(--shape-sm); background: var(--m3-secondary-container);
+  color: var(--m3-on-secondary-container);
+}
+.pill.rust { background: var(--warn-bg); color: var(--warn-text); }
+.pill.green { background: var(--ok-bg); color: var(--ok-text); }
+.pill.outline { background: transparent; border: 1px solid var(--m3-outline); color: var(--m3-on-surface-variant); }
+
+/* M3 segmented button — outlined, pill, check icon on the selected segment */
+.segmented {
+  display: flex; border: 1px solid var(--m3-outline); border-radius: var(--shape-full);
+  overflow: hidden; margin-bottom: 16px; height: 40px;
+}
+.segmented button {
+  flex: 1; font-family: inherit; font-size: 14px; font-weight: 500; border: 0;
+  background: none; color: var(--m3-on-surface); cursor: pointer;
+  border-right: 1px solid var(--m3-outline); display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.segmented button:last-child { border-right: 0; }
+.segmented button[aria-selected="true"] { background: var(--m3-secondary-container); color: var(--m3-on-secondary-container); }
+.segmented .tick { display: none; }
+.segmented button[aria-selected="true"] .tick { display: block; }
+
+/* photo placeholder — themed, so light mode gets daylight rather than a hole */
+.photo-ph {
+  background: radial-gradient(60% 60% at 50% 45%, var(--photo-glow), transparent 70%), var(--photo-bg);
+  display: grid; place-items: center;
+}
+
+/* M3 switch — the track carries an outline when off, and the thumb grows
+   and gains a check when on. That size change is the M3 tell. */
+.switch {
+  width: 52px; height: 32px; border-radius: var(--shape-full); flex: none; cursor: pointer;
+  background: var(--m3-surface-container-highest); border: 2px solid var(--m3-outline);
+  padding: 0; position: relative; transition: background .18s var(--m3-ease), border-color .18s var(--m3-ease);
+}
+.switch::after {
+  content: ''; position: absolute; top: 50%; left: 6px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--m3-outline); transform: translateY(-50%);
+  transition: all .18s var(--m3-ease);
+}
+.switch[aria-checked="true"] { background: var(--m3-primary); border-color: var(--m3-primary); }
+.switch[aria-checked="true"]::after {
+  width: 24px; height: 24px; left: 24px; background: var(--m3-on-primary);
+}
+
+/* M3 radio button, for the single-choice theme group */
+.radio {
+  width: 20px; height: 20px; border-radius: 50%; flex: none;
+  border: 2px solid var(--m3-on-surface-variant); position: relative;
+}
+.row[aria-selected="true"] .radio { border-color: var(--brass); }
+.row[aria-selected="true"] .radio::after {
+  content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--brass);
+}
+
+.settings-note { font-size: 13px; color: var(--m3-on-surface-variant); line-height: 1.55; padding: 10px 16px 0; margin: 0; }
+
+/* theme preview swatches */
+.swatch {
+  width: 40px; height: 40px; border-radius: 50%; flex: none; border: 1px solid var(--m3-outline-variant);
+  display: grid; place-items: center;
+}
+.swatch.dark { background: #0f1a12; }
+.swatch.light { background: #fcf9f1; }
+.swatch.auto { background: linear-gradient(115deg, #fcf9f1 0 50%, #0f1a12 50% 100%); }
+.swatch i { width: 13px; height: 13px; border-radius: 50%; background: #c9a55e; display: block; }
+
+/* M3 search bar (docked) */
+.searchbar {
+  display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px;
+  background: var(--m3-surface-container-high); border-radius: var(--shape-xl);
+  color: var(--m3-on-surface-variant); font-size: 16px; margin-bottom: 16px;
+}
+
+/* ---------- navigation bar (M3) ---------- */
+.navbar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 35;
+  height: calc(var(--navbar-h) + var(--gesture-h));
+  padding-bottom: var(--gesture-h);
+  display: grid; grid-template-columns: repeat(4, 1fr); align-items: start;
+  background: var(--m3-surface-container); /* elevation via tone */
+}
+.nav-dest {
+  background: none; border: 0; font-family: inherit; cursor: pointer; padding: 12px 0 0;
+  display: grid; justify-items: center; gap: 4px; color: var(--m3-on-surface-variant);
+}
+.nav-pill {
+  width: 64px; height: 32px; border-radius: var(--shape-full); display: grid; place-items: center;
+  transition: background .2s var(--m3-ease);
+}
+.nav-lbl { font-size: 12px; font-weight: 500; letter-spacing: .01em; }
+.nav-dest.is-on { color: var(--m3-on-secondary-container); }
+.nav-dest.is-on .nav-pill { background: var(--m3-secondary-container); }
+
+/* Extended FAB — Android's answer to the centred iOS tab-bar action */
+.fab {
+  position: absolute; right: 16px; bottom: calc(var(--navbar-h) + var(--gesture-h) + 16px);
+  z-index: 36; height: 56px; padding: 0 20px; border: 0; cursor: pointer;
+  border-radius: var(--shape-lg); background: var(--m3-primary-container); color: var(--m3-on-primary-container);
+  font-family: inherit; font-size: 14px; font-weight: 500; letter-spacing: .01em;
+  display: inline-flex; align-items: center; gap: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.35), 0 1px 3px rgba(0,0,0,.3);
+  transition: transform .2s var(--m3-ease), opacity .16s var(--m3-ease);
+}
+.fab[hidden] { display: none; }
+
+.gesture-bar {
+  position: absolute; bottom: 9px; left: 50%; transform: translateX(-50%); z-index: 60;
+  width: 108px; height: 4px; border-radius: 2px; background: var(--gesture-color); pointer-events: none;
+}
+
+/* ---------- bottom sheet ---------- */
+.scrim {
+  position: absolute; inset: 0; z-index: 50; background: rgba(0,0,0,.4);
+  opacity: 0; pointer-events: none; transition: opacity .25s var(--m3-ease);
+}
+.scrim.is-open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 55;
+  background: var(--m3-surface-container-low); border-radius: var(--shape-xl) var(--shape-xl) 0 0;
+  padding: 0 0 calc(var(--gesture-h) + 12px);
+  transform: translateY(100%); transition: transform .3s var(--m3-ease);
+  max-height: 74%; overflow-y: auto;
+}
+.sheet.is-open { transform: none; }
+.drag-handle { width: 32px; height: 4px; border-radius: 2px; background: var(--m3-outline); margin: 12px auto 8px; }
+.sheet h3 { font-size: 16px; font-weight: 500; margin: 0; padding: 8px 16px 4px; color: var(--m3-on-surface-variant); }
+.sheet .sheet-sub { margin: 0; padding: 0 16px 8px; font-size: 13px; color: var(--m3-on-surface-variant); }
+.sheet .list { margin: 0; }
+
+/* ---------- coach ---------- */
+.chat { padding: 8px 16px 0; display: flex; flex-direction: column; gap: 8px; }
+.bubble { max-width: 82%; padding: 12px 16px; font-size: 15px; line-height: 1.45; }
+.bubble.them {
+  background: var(--m3-surface-container-high); align-self: flex-start;
+  border-radius: var(--shape-lg) var(--shape-lg) var(--shape-lg) var(--shape-xs);
+}
+.bubble.me {
+  background: var(--m3-primary-container); color: var(--m3-on-primary-container); align-self: flex-end;
+  border-radius: var(--shape-lg) var(--shape-lg) var(--shape-xs) var(--shape-lg);
+}
+.bubble-photo {
+  width: 160px; height: 112px; border-radius: var(--shape-md); align-self: flex-end;
+  background: var(--photo-bg);
+  display: grid; place-items: center; color: var(--m3-on-surface-variant); font-size: 12px;
+}
+.composer {
+  /* Sticks to the bottom of the content box, which the screen's padding keeps
+     clear of the navigation bar. */
+  position: sticky; bottom: 0; margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--m3-surface-container); display: flex; align-items: center; gap: 8px;
+}
+.composer .field {
+  flex: 1; background: var(--m3-surface-container-highest); border-radius: var(--shape-xl);
+  padding: 14px 18px; color: var(--m3-on-surface-variant); font-size: 15px;
+}
+
+/* ---------- camera ---------- */
+.cam { position: absolute; inset: 0; background: #050906; display: flex; flex-direction: column; }
+.cam-view {
+  flex: 1; position: relative; margin-top: var(--status-h);
+  background:
+    radial-gradient(60% 45% at 50% 42%, rgba(120,170,110,.3), transparent 70%),
+    linear-gradient(170deg, #16241a, #0a130c);
+}
+.cam-guide { position: absolute; inset: 15% 11%; border: 1.5px solid rgba(201,165,94,.5); border-radius: var(--shape-lg); }
+.cam-hint { position: absolute; left: 0; right: 0; bottom: 20px; text-align: center; font-size: 13px; color: var(--m3-on-surface-variant); }
+.cam-modes { display: flex; justify-content: center; gap: 10px; padding: 16px 0 8px; }
+.cam-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 32px calc(var(--gesture-h) + 20px); }
+.shutter { width: 72px; height: 72px; border-radius: 50%; border: 4px solid var(--m3-on-surface); padding: 5px; background: none; cursor: pointer; }
+.shutter i { display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--m3-on-surface); }
+.cam-thumb { width: 44px; height: 44px; border-radius: var(--shape-sm); background: linear-gradient(150deg,#2b3a2a,#16241a); border: 0; cursor: pointer; }
+
+/* ---------- snackbar (not a toast) ---------- */
+.snackbar {
+  position: absolute; left: 16px; right: 16px;
+  bottom: calc(var(--navbar-h) + var(--gesture-h) + 16px); z-index: 70;
+  min-height: 48px; border-radius: var(--shape-xs); padding: 12px 16px;
+  background: var(--m3-inverse-surface); color: var(--m3-inverse-on-surface);
+  font-size: 14px; display: flex; align-items: center; gap: 12px;
+  box-shadow: 0 3px 6px rgba(0,0,0,.4);
+  opacity: 0; transform: translateY(10px); pointer-events: none;
+  transition: opacity .2s var(--m3-ease), transform .2s var(--m3-ease);
+}
+.snackbar.is-on { opacity: 1; transform: none; }
+.snackbar span { flex: 1; }
+.snackbar b {
+  color: var(--snack-action); font-weight: 500; text-transform: uppercase; font-size: 13px; letter-spacing: .06em;
+}
+
+/* ---------- annotations ---------- */
+.notes { padding-top: 4px; }
+.notes h3 { font-size: 20px; font-weight: 400; margin: 0 0 4px; }
+.notes > p { color: var(--m3-on-surface-variant); font-size: 14px; line-height: 1.6; margin: 0 0 22px; max-width: 62ch; }
+.note-card {
+  border: 1px solid var(--m3-outline-variant); border-radius: var(--shape-md);
+  padding: 15px 17px; margin-bottom: 11px; background: rgba(23,37,27,.6); display: none;
+}
+.note-card.is-on { display: block; }
+.note-card h4 { margin: 0 0 8px; font-size: 15px; font-weight: 500; }
+.note-card ul { margin: 0; padding-left: 17px; color: var(--m3-on-surface-variant); font-size: 13.5px; line-height: 1.62; }
+.note-card li { margin-bottom: 5px; }
+.note-card li strong { color: var(--m3-on-surface); font-weight: 500; }
+
+.legend { border-top: 1px solid var(--m3-outline-variant); margin-top: 22px; padding-top: 18px; }
+.legend h4 { margin: 0 0 9px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass); font-family: var(--font-mono); font-weight: 400; }
+.legend p { margin: 0 0 9px; font-size: 13.5px; color: var(--m3-on-surface-variant); line-height: 1.6; max-width: 62ch; }
+.legend code { font-family: var(--font-mono); font-size: 12.5px; color: var(--green); }
+
+.delta { width: 100%; border-collapse: collapse; margin: 4px 0 0; font-size: 13px; }
+.delta th, .delta td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--m3-outline-variant); vertical-align: top; }
+.delta th { color: var(--brass); font-weight: 500; font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; font-family: var(--font-mono); }
+.delta td:first-child { color: var(--m3-on-surface); width: 30%; }
+.delta td { color: var(--m3-on-surface-variant); }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <p class="page-kicker">growtoo · native client</p>
+  <h1 class="page-title">Android app mockup</h1>
+  <p class="page-sub">
+    The same growtoo screens as the iOS mockup, rebuilt on <strong>Material 3</strong> — large top app bar,
+    edge-to-edge lists, a navigation bar with an active-indicator pill, an extended FAB instead of a
+    centred tab action, and snackbars instead of toasts. Brand colour is mapped onto M3 colour roles so
+    tonal-elevation surfaces stay in the catalog palette. Tap the phone; everything below is live.
+  </p>
+</header>
+
+<div class="stage">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="screen-host" id="host">
+        <div class="punch-hole" aria-hidden="true"></div>
+        <div class="statusbar" aria-hidden="true">
+          <span class="status-left">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg>
+          </span>
+          <span class="status-right">
+            <svg width="15" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2a10 10 0 0 1 14 0"/><path d="M3.6 6.9a6.4 6.4 0 0 1 8.8 0"/><path d="M6.2 9.5a2.7 2.7 0 0 1 3.6 0"/></svg>
+            <svg width="15" height="12" viewBox="0 0 18 12" fill="currentColor"><path d="M17 1 2 11h15z"/></svg>
+            <svg width="11" height="14" viewBox="0 0 12 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1.5" y="2.5" width="9" height="12" rx="2"/><path d="M4.5 2.5V1h3v1.5"/><rect x="2.9" y="5.4" width="6.2" height="7.7" rx="1" fill="currentColor" stroke="none"/></svg>
+            <span class="batt">9:41</span>
+          </span>
+        </div>
+
+        <!-- ============ JOURNAL ============ -->
+        <section class="screen is-active" data-screen="journal">
+          <div class="appbar">
+            <div class="appbar-row">
+              <span class="appbar-title">Journal</span>
+              <span class="spacer"></span>
+              <button class="icon-btn" aria-label="Notifications" data-go="inbox">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <span class="badge"></span>
+              </button>
+              <button class="icon-btn" aria-label="More options" data-sheet="account">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg>
+              </button>
+            </div>
+            <h1 class="headline">Journal</h1>
+          </div>
+
+          <div class="body">
+            <article class="card tonal">
+              <p class="label-sm" style="color:inherit;opacity:.8">Today · day 34</p>
+              <p class="card-lead">Two plants are due for water, and <strong>Northern Lights</strong> hasn't been photographed in six days.</p>
+              <div class="btn-row">
+                <button class="btn btn-filled" data-sheet="log">Log watering</button>
+                <button class="btn btn-text" style="color:var(--m3-on-primary-container)" data-go="camera">Take photo</button>
+              </div>
+            </article>
+
+            <div class="sect-head"><h2>Your plants</h2><button class="btn btn-text" data-tab="plants">See all</button></div>
+          </div>
+          <div class="seal-rail">
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>NL</span><span class="seal-day">d34</span></span><span class="seal-name">Northern Lights</span></button>
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>WW</span><span class="seal-day">d21</span></span><span class="seal-name">White Widow</span></button>
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>CB</span><span class="seal-day">d58</span></span><span class="seal-name">CBD Auto</span></button>
+            <button class="seal is-add" data-sheet="log"><span class="seal-disc"><span>+</span></span><span class="seal-name">New plant</span></button>
+          </div>
+
+          <div class="body">
+            <div class="metrics" style="margin-top:12px">
+              <div class="metric"><span class="metric-val">3</span><span class="metric-lbl">Plants</span></div>
+              <div class="metric"><span class="metric-val">128</span><span class="metric-lbl">Entries</span></div>
+              <div class="metric"><span class="metric-val">2</span><span class="metric-lbl">Sealed</span></div>
+            </div>
+
+            <div class="sect-head"><h2>Recent notes</h2></div>
+          </div>
+          <div class="list">
+            <button class="row">
+              <span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span>
+              <span class="row-text"><span class="row-title">Watered · 1.2 L</span><span class="row-sub">Northern Lights</span></span>
+              <span class="row-trail">08:12</span>
+            </button>
+            <div class="divider"></div>
+            <button class="row">
+              <span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span>
+              <span class="row-text"><span class="row-title">Photo · week 5</span><span class="row-sub">White Widow</span></span>
+              <span class="row-trail">Yest.</span>
+            </button>
+            <div class="divider"></div>
+            <button class="row">
+              <span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.8 3h4.4"/><path d="M10.6 3v6.4L5.8 17.5a2 2 0 0 0 1.7 3h9a2 2 0 0 0 1.7-3l-4.8-8.1V3"/><path d="M7.6 15h8.8"/></svg></span>
+              <span class="row-text"><span class="row-title">Fed · CalMag 2 ml/L</span><span class="row-sub">CBD Auto</span></span>
+              <span class="row-trail">Tue</span>
+            </button>
+          </div>
+
+          <div class="body">
+            <div class="sect-head"><h2>Today's list</h2><button class="btn btn-text" data-go="today">Open</button></div>
+            <div class="card" style="display:flex;align-items:center;gap:12px">
+              <span class="pill green">2 of 5 done</span>
+              <span class="muted" style="font-size:13px">Water · check moisture · note changes</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ PLANTS ============ -->
+        <section class="screen" data-screen="plants">
+          <div class="appbar">
+            <div class="appbar-row">
+              <span class="appbar-title">Plants</span>
+              <span class="spacer"></span>
+              <button class="icon-btn" aria-label="Search"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></button>
+              <button class="icon-btn" aria-label="More options" data-sheet="account"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+            </div>
+            <h1 class="headline">Plants</h1>
+          </div>
+          <div class="body">
+            <div class="searchbar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+              Search plants and entries
+            </div>
+
+            <div class="card" style="display:flex;align-items:center;gap:14px">
+              <span class="row-glyph"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
+              <div style="flex:1">
+                <p style="margin:0;font-size:15px">24° · clear</p>
+                <p style="margin:2px 0 0;font-size:13px" class="muted">Zagreb · 3-day outlook good for outdoor feed</p>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>My plants</h2><span class="pill outline">Rank · Cultivator</span></div>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:56px;height:56px;margin:0"><span style="font-size:17px">NL</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px">Northern Lights</span>
+                <span style="display:block;font-size:13px;margin-top:3px" class="muted">Flowering · day 34 · indoor</span>
+                <span style="display:flex;gap:6px;margin-top:8px"><span class="pill green">Sealed</span><span class="pill outline">Listed · 120</span></span>
+              </span>
+            </button>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:56px;height:56px;margin:0"><span style="font-size:17px">WW</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px">White Widow</span>
+                <span style="display:block;font-size:13px;margin-top:3px" class="muted">Vegetative · day 21 · indoor</span>
+                <span style="display:flex;gap:6px;margin-top:8px"><span class="pill rust">Water due</span></span>
+              </span>
+            </button>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:14px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:56px;height:56px;margin:0"><span style="font-size:17px">CB</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px">CBD Auto</span>
+                <span style="display:block;font-size:13px;margin-top:3px" class="muted">Flowering · day 58 · outdoor</span>
+                <span style="display:flex;gap:6px;margin-top:8px"><span class="pill green">Sealed</span></span>
+              </span>
+            </button>
+
+            <div class="sect-head"><h2>Journal</h2><button class="btn btn-text">Filter</button></div>
+          </div>
+          <div class="list">
+            <button class="row"><span class="row-text"><span class="row-title">Trimmed lower fan leaves</span><span class="row-sub">Northern Lights</span></span><span class="row-trail">3 Aug</span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-text"><span class="row-title">pH drifted to 6.8 — corrected</span><span class="row-sub">CBD Auto</span></span><span class="row-trail">2 Aug</span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-text"><span class="row-title">Moved 10 cm from light</span><span class="row-sub">White Widow</span></span><span class="row-trail">1 Aug</span></button>
+          </div>
+        </section>
+
+        <!-- ============ PLANT DETAIL ============ -->
+        <section class="screen" data-screen="plant">
+          <div class="appbar has-back">
+            <div class="appbar-row">
+              <button class="icon-btn" aria-label="Back" data-tab="plants">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg>
+              </button>
+              <span class="appbar-title">Northern Lights</span>
+              <span class="spacer"></span>
+              <button class="icon-btn" aria-label="Share">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="17.5" cy="5.5" r="2.6"/><circle cx="6.5" cy="12" r="2.6"/><circle cx="17.5" cy="18.5" r="2.6"/><path d="m9 10.7 6-3.9M9 13.3l6 3.9"/></svg>
+              </button>
+              <button class="icon-btn" aria-label="More options"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+            </div>
+            <h1 class="headline" style="padding-left:16px">Northern Lights</h1>
+          </div>
+          <div class="body">
+            <p class="label-sm" style="margin-top:-8px">Seed № 0034 · CBD Auto</p>
+            <div class="photo-ph" style="height:180px;border-radius:var(--shape-md);margin-bottom:12px">
+              <span class="dim" style="font-size:13px">Latest photo · day 34</span>
+            </div>
+
+            <div class="metrics">
+              <div class="metric"><span class="metric-val">34</span><span class="metric-lbl">Day</span></div>
+              <div class="metric"><span class="metric-val">6.4</span><span class="metric-lbl">pH</span></div>
+              <div class="metric"><span class="metric-val">62%</span><span class="metric-lbl">RH</span></div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-filled" data-sheet="log">Log care</button>
+              <button class="btn btn-tonal" data-tab="coach">Ask coach</button>
+            </div>
+
+            <div class="sect-head"><h2>On-chain</h2></div>
+            <div class="card outlined" style="padding:0">
+              <div class="row" style="cursor:default;min-height:64px">
+                <span class="row-text"><span class="row-title" style="font-size:15px">Stage seal · flowering</span><span class="row-sub mono">5Kd9…qA3f · devnet</span></span>
+                <span class="pill green">Confirmed</span>
+              </div>
+              <div class="divider"></div>
+              <div class="row" style="cursor:default;min-height:64px">
+                <span class="row-text"><span class="row-title" style="font-size:15px">Market offer</span><span class="row-sub">Adopt stake · half unlocks on care</span></span>
+                <span class="pill mono">120</span>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>Care trail</h2></div>
+          </div>
+          <div class="list">
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span><span class="row-text"><span class="row-title">Watered 1.2 L</span><span class="row-sub">Today, 08:12</span></span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span><span class="row-text"><span class="row-title">Photo logged</span><span class="row-sub">Yesterday, 19:40</span></span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg></span><span class="row-text"><span class="row-title">Stage → flowering</span><span class="row-sub">28 Jul</span></span></button>
+          </div>
+        </section>
+
+        <!-- ============ MARKET ============ -->
+        <section class="screen" data-screen="market">
+          <div class="appbar">
+            <div class="appbar-row">
+              <span class="appbar-title">Market</span>
+              <span class="spacer"></span>
+              <button class="icon-btn" aria-label="Wallet" data-sheet="wallet">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M2.5 10h19"/></svg>
+              </button>
+              <button class="icon-btn" aria-label="More options" data-sheet="account"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+            </div>
+            <h1 class="headline">Market</h1>
+          </div>
+          <div class="body">
+            <div class="segmented" role="tablist">
+              <button role="tab" aria-selected="true">
+                <svg class="tick" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+                Simple
+              </button>
+              <button role="tab" aria-selected="false">
+                <svg class="tick" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+                Advanced
+              </button>
+            </div>
+
+            <div class="card" style="display:flex;align-items:center;gap:12px">
+              <div style="flex:1">
+                <p class="label-sm" style="margin:0 0 4px">Balance</p>
+                <p style="margin:0;font-size:22px" class="mono">1,240 $GROWTOO</p>
+              </div>
+              <button class="btn btn-tonal" data-snack="Faucet claimed · +100 $GROWTOO">Faucet</button>
+            </div>
+
+            <div class="sect-head"><h2>Open market</h2></div>
+
+            <article class="card">
+              <div style="display:flex;gap:14px;align-items:center">
+                <span class="seal-disc" style="width:48px;height:48px;margin:0"><span style="font-size:14px">GG</span></span>
+                <div style="flex:1">
+                  <p style="margin:0;font-size:16px">Gorilla Glue · day 41</p>
+                  <p style="margin:3px 0 0;font-size:13px" class="muted">Grower <span class="mono">7fQ2…m1Bd</span> · Split, HR</p>
+                </div>
+                <span class="mono" style="font-size:16px;color:var(--brass)">85</span>
+              </div>
+              <p style="margin:12px 0 0;font-size:13px" class="muted"><span class="pill">Adopt stake</span> Half now, half unlocks as the grower keeps logging care.</p>
+              <div class="btn-row">
+                <button class="btn btn-filled" data-snack="Confirm with fingerprint">Invest</button>
+                <button class="btn btn-outlined">Care trail</button>
+              </div>
+            </article>
+
+            <article class="card">
+              <div style="display:flex;gap:14px;align-items:center">
+                <span class="seal-disc" style="width:48px;height:48px;margin:0"><span style="font-size:14px">AK</span></span>
+                <div style="flex:1">
+                  <p style="margin:0;font-size:16px">Amnesia Kush · day 62</p>
+                  <p style="margin:3px 0 0;font-size:13px" class="muted">Grower <span class="mono">Bx4v…9Kp2</span> · Zadar, HR</p>
+                </div>
+                <span class="mono" style="font-size:16px;color:var(--brass)">140</span>
+              </div>
+              <p style="margin:12px 0 0;font-size:13px" class="muted"><span class="pill green">Instant sale</span> Full price to the grower at purchase.</p>
+              <div class="btn-row">
+                <button class="btn btn-filled" data-snack="Confirm with fingerprint">Invest</button>
+                <button class="btn btn-outlined">Care trail</button>
+              </div>
+            </article>
+
+            <div class="sect-head"><h2>My offers</h2></div>
+          </div>
+          <div class="list">
+            <button class="row">
+              <span class="row-text"><span class="row-title">Northern Lights · flowering</span><span class="row-sub">Posted 2 Aug · adopt stake</span></span>
+              <span class="pill mono">120</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ COACH ============ -->
+        <section class="screen" data-screen="coach">
+          <div class="appbar">
+            <div class="appbar-row">
+              <span class="appbar-title">Grow coach</span>
+              <span class="spacer"></span>
+              <button class="icon-btn" aria-label="New chat"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button class="icon-btn" aria-label="More options"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+            </div>
+            <h1 class="headline">Grow coach</h1>
+          </div>
+          <div class="chat">
+            <div class="bubble them">Northern Lights is on day 34 of flowering and last watered 08:12 today. What are you seeing?</div>
+            <div class="bubble-photo">photo · day 34</div>
+            <div class="bubble me">Lower leaves are yellowing from the edges in.</div>
+            <div class="bubble them">
+              That pattern on the older growth during flower usually reads as nitrogen moving up the plant — normal fade
+              if it's slow and bottom-up. Watch for it climbing above the mid-canopy in the next week.
+            </div>
+            <div class="bubble them">Your last three feeds skipped CalMag. Want me to add a check to today's list?</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+              <button class="btn btn-tonal" data-snack="Added to today's list">Add the check</button>
+              <button class="btn btn-outlined" data-go="camera">Send a photo</button>
+            </div>
+          </div>
+          <div class="composer">
+            <button class="icon-btn" aria-label="Camera" data-go="camera">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg>
+            </button>
+            <span class="field">Ask about your grow…</span>
+            <button class="icon-btn" aria-label="Send" style="background:var(--m3-primary);color:var(--m3-on-primary);border-radius:var(--shape-lg);width:48px">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5 21.5 12 3 3.5 3 10l12 2-12 2z"/></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ TOKENISE ============ -->
+        <section class="screen" data-screen="tokenise">
+          <div class="appbar has-back">
+            <div class="appbar-row">
+              <button class="icon-btn" aria-label="Back" data-tab="market">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg>
+              </button>
+              <span class="appbar-title">Tokenise</span>
+            </div>
+            <h1 class="headline" style="padding-left:16px">Tokenise</h1>
+          </div>
+          <div class="body">
+            <p class="muted" style="font-size:14px;line-height:1.55;margin:0 0 16px">
+              Seal a stage of a plant on-chain. The seal becomes a specimen NFT you can list on the market.
+            </p>
+            <div class="sect-head" style="margin-top:8px"><h2>Choose a plant</h2></div>
+          </div>
+          <div class="list">
+            <button class="row"><span class="row-glyph mark">NL</span><span class="row-text"><span class="row-title">Northern Lights</span><span class="row-sub">Flowering · day 34</span></span><span class="pill green">Sealed</span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph mark">WW</span><span class="row-text"><span class="row-title">White Widow</span><span class="row-sub">Vegetative · day 21</span></span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph mark">CB</span><span class="row-text"><span class="row-title">CBD Auto</span><span class="row-sub">Flowering · day 58</span></span><span class="pill green">Sealed</span></button>
+          </div>
+          <div class="body">
+            <div class="sect-head"><h2>Stage</h2></div>
+            <div class="segmented" role="tablist">
+              <button role="tab" aria-selected="false"><svg class="tick" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Seedling</button>
+              <button role="tab" aria-selected="true"><svg class="tick" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Veg</button>
+              <button role="tab" aria-selected="false"><svg class="tick" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Flower</button>
+            </div>
+
+            <article class="card outlined">
+              <p class="label-sm">Wallet</p>
+              <p style="margin:0;font-size:15px">Phantom · <span class="mono">7fQ2…m1Bd</span></p>
+              <p style="margin:6px 0 0;font-size:13px" class="dim">Devnet · $GROWTOO has no monetary value</p>
+            </article>
+
+            <button class="btn btn-filled" style="width:100%;margin-top:4px" data-snack="Seal submitted · awaiting confirmation">Seal this stage</button>
+          </div>
+        </section>
+
+        <!-- ============ TODAY ============ -->
+        <section class="screen" data-screen="today">
+          <div class="appbar has-back">
+            <div class="appbar-row">
+              <button class="icon-btn" aria-label="Back" data-tab="journal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg>
+              </button>
+              <span class="appbar-title">Today</span>
+            </div>
+            <h1 class="headline" style="padding-left:16px">Today</h1>
+          </div>
+          <div class="body">
+            <p class="muted" style="font-size:14px;margin:0 0 8px">Wednesday, 6 August · 5 things</p>
+          </div>
+          <div class="list">
+            <label class="row"><input type="checkbox" checked style="accent-color:var(--brass);width:20px;height:20px"><span class="row-text"><span class="row-title">Water the plants</span><span class="row-sub">2 plants need watering</span></span></label>
+            <label class="row"><input type="checkbox" checked style="accent-color:var(--brass);width:20px;height:20px"><span class="row-text"><span class="row-title">Check moisture</span><span class="row-sub">Check the soil in the pots</span></span></label>
+            <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:20px;height:20px"><span class="row-text"><span class="row-title">Photograph Northern Lights</span><span class="row-sub">Last photo 6 days ago</span></span></label>
+            <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:20px;height:20px"><span class="row-text"><span class="row-title">Add CalMag to next feed</span><span class="row-sub">Suggested by coach</span></span></label>
+            <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:20px;height:20px"><span class="row-text"><span class="row-title">Add a note</span><span class="row-sub">Write down any changes</span></span></label>
+          </div>
+          <div class="body">
+            <p class="dim" style="font-size:13px;margin-top:14px;line-height:1.55">
+              On Android this list also drives the daily notification, the home-screen widget and the At a Glance slot.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============ INBOX ============ -->
+        <section class="screen" data-screen="inbox">
+          <div class="appbar has-back">
+            <div class="appbar-row">
+              <button class="icon-btn" aria-label="Back" data-tab="journal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg>
+              </button>
+              <span class="appbar-title">Notifications</span>
+              <span class="spacer"></span>
+              <button class="btn btn-text" data-snack="All marked read">Mark read</button>
+            </div>
+            <h1 class="headline" style="padding-left:16px">Notifications</h1>
+          </div>
+          <div class="list">
+            <button class="row"><span class="row-glyph" style="background:var(--warn-bg);color:var(--warn-text)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 6.5v7"/><circle cx="12" cy="17.5" r=".2"/></svg></span><span class="row-text"><span class="row-title">Your offer was adopted</span><span class="row-sub">Northern Lights · 120 $GROWTOO</span></span><span class="row-trail">2 h</span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></span><span class="row-text"><span class="row-title">Seal confirmed on devnet</span><span class="row-sub mono">5Kd9…qA3f</span></span><span class="row-trail">Yest.</span></button>
+            <div class="divider"></div>
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg></span><span class="row-text"><span class="row-title">CBD Auto reached day 56</span><span class="row-sub">Harvest window opens soon</span></span><span class="row-trail">3 d</span></button>
+          </div>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section class="screen" data-screen="settings">
+          <div class="appbar has-back">
+            <div class="appbar-row">
+              <button class="icon-btn" aria-label="Back" data-tab="journal">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H4"/><path d="m10 6-6 6 6 6"/></svg>
+              </button>
+              <span class="appbar-title">Settings</span>
+            </div>
+            <h1 class="headline" style="padding-left:16px">Settings</h1>
+          </div>
+
+          <div class="body"><div class="sect-head" style="margin-top:0"><h2>Theme</h2></div></div>
+          <div class="list" id="android-theme-group">
+            <button class="row" data-theme-choice="light" aria-selected="false">
+              <span class="swatch light"><i></i></span>
+              <span class="row-text"><span class="row-title">Light</span><span class="row-sub">Catalog on paper</span></span>
+              <span class="radio"></span>
+            </button>
+            <button class="row" data-theme-choice="dark" aria-selected="true">
+              <span class="swatch dark"><i></i></span>
+              <span class="row-text"><span class="row-title">Dark</span><span class="row-sub">Warm forest + brass</span></span>
+              <span class="radio"></span>
+            </button>
+            <button class="row" data-theme-choice="system" aria-selected="false">
+              <span class="swatch auto"></span>
+              <span class="row-text"><span class="row-title">System default</span><span class="row-sub">Follow the device theme</span></span>
+              <span class="radio"></span>
+            </button>
+          </div>
+          <p class="settings-note">
+            Dark is the default — it's the identity the catalog system was drawn for. Light exists for daylight
+            in a tent or a greenhouse, where a dark screen is unreadable.
+          </p>
+          <div class="body">
+            <div class="card outlined" style="margin-top:16px;display:flex;align-items:center;gap:14px">
+              <span class="row-text">
+                <span class="row-title" style="font-size:15px">Use wallpaper colours</span>
+                <span class="row-sub">Material You dynamic colour, instead of growtoo brass</span>
+              </span>
+              <button class="switch" role="switch" aria-checked="false" aria-label="Use wallpaper colours"></button>
+            </div>
+          </div>
+
+          <div class="body"><div class="sect-head"><h2>Notifications</h2></div></div>
+          <div class="list">
+            <div class="row" style="cursor:default">
+              <span class="row-text"><span class="row-title">Daily care reminder</span><span class="row-sub">08:00 · from Today's list</span></span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="Daily care reminder"></button>
+            </div>
+            <div class="row" style="cursor:default">
+              <span class="row-text"><span class="row-title">On-chain confirmations</span><span class="row-sub">Seals, offers, adoptions</span></span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="On-chain confirmations"></button>
+            </div>
+            <div class="row" style="cursor:default">
+              <span class="row-text"><span class="row-title">Market activity</span><span class="row-sub">New asks from growers you follow</span></span>
+              <button class="switch" role="switch" aria-checked="false" aria-label="Market activity"></button>
+            </div>
+          </div>
+
+          <div class="body"><div class="sect-head"><h2>Journal</h2></div></div>
+          <div class="list">
+            <button class="row"><span class="row-text"><span class="row-title">Units</span><span class="row-sub">Metric</span></span></button>
+            <button class="row"><span class="row-text"><span class="row-title">Default plant</span><span class="row-sub">Northern Lights</span></span></button>
+            <div class="row" style="cursor:default">
+              <span class="row-text"><span class="row-title">Private journal</span><span class="row-sub">Hide entries from adopters</span></span>
+              <button class="switch" role="switch" aria-checked="false" aria-label="Private journal"></button>
+            </div>
+          </div>
+
+          <div class="body"><div class="sect-head"><h2>Network</h2></div></div>
+          <div class="list">
+            <div class="row" style="cursor:default">
+              <span class="row-text"><span class="row-title">Solana network</span><span class="row-sub mono">devnet</span></span>
+              <span class="pill">Test</span>
+            </div>
+          </div>
+          <p class="settings-note">$GROWTOO on devnet has no monetary value.</p>
+        </section>
+
+        <!-- ============ CAMERA ============ -->
+        <section class="screen" data-screen="camera" style="padding:0">
+          <div class="cam">
+            <div class="cam-view">
+              <div class="cam-guide"></div>
+              <p class="cam-hint">Fill the frame with one plant · even light</p>
+            </div>
+            <div class="cam-modes">
+              <span class="pill outline">Journal</span>
+              <span class="pill">Diagnose</span>
+              <span class="pill outline">Seal</span>
+            </div>
+            <div class="cam-bar">
+              <button class="cam-thumb" aria-label="Gallery"></button>
+              <button class="shutter" data-snack="Photo added to Northern Lights"><i></i></button>
+              <button class="icon-btn" data-tab="journal" aria-label="Close">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ navigation bar + FAB ============ -->
+        <button class="fab" id="fab" data-sheet="log">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Log care
+        </button>
+
+        <nav class="navbar" id="navbar">
+          <button class="nav-dest is-on" data-tab="journal">
+            <span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/></svg></span>
+            <span class="nav-lbl">Journal</span>
+          </button>
+          <button class="nav-dest" data-tab="plants">
+            <span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg></span>
+            <span class="nav-lbl">Plants</span>
+          </button>
+          <button class="nav-dest" data-tab="market">
+            <span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg></span>
+            <span class="nav-lbl">Market</span>
+          </button>
+          <button class="nav-dest" data-tab="coach">
+            <span class="nav-pill"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
+            <span class="nav-lbl">Coach</span>
+          </button>
+        </nav>
+
+        <!-- ============ bottom sheets ============ -->
+        <div class="scrim" id="scrim"></div>
+
+        <div class="sheet" data-sheet-panel="log">
+          <div class="drag-handle"></div>
+          <h3>Log care · Northern Lights</h3>
+          <p class="sheet-sub">Day 34 · flowering</p>
+          <div class="list">
+            <button class="row" data-snack="Watering logged · 1.2 L"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span><span class="row-text"><span class="row-title">Watering</span><span class="row-sub">Last: today, 08:12</span></span></button>
+            <button class="row" data-snack="Feeding logged"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.8 3h4.4"/><path d="M10.6 3v6.4L5.8 17.5a2 2 0 0 0 1.7 3h9a2 2 0 0 0 1.7-3l-4.8-8.1V3"/><path d="M7.6 15h8.8"/></svg></span><span class="row-text"><span class="row-title">Feeding</span><span class="row-sub">Last: Tue · CalMag 2 ml/L</span></span></button>
+            <button class="row" data-go="camera"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span><span class="row-text"><span class="row-title">Photo</span><span class="row-sub">Camera or gallery</span></span></button>
+            <button class="row" data-snack="Opening full entry"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14.5 5.5 18.5 9.5"/></svg></span><span class="row-text"><span class="row-title">Full journal entry</span><span class="row-sub">Notes, metrics, stage change</span></span></button>
+          </div>
+        </div>
+
+        <div class="sheet" data-sheet-panel="account">
+          <div class="drag-handle"></div>
+          <h3>Account</h3>
+          <p class="sheet-sub">Grower · bela@growto.live</p>
+          <div class="list">
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.6 20a7.6 7.6 0 0 1 14.8 0"/></svg></span><span class="row-text"><span class="row-title">Profile &amp; rank</span><span class="row-sub">Cultivator · 1,240 XP</span></span></button>
+            <button class="row" data-sheet="wallet"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M2.5 10h19"/></svg></span><span class="row-text"><span class="row-title">Wallet</span><span class="row-sub mono">7fQ2…m1Bd · devnet</span></span></button>
+            <button class="row" data-go="tokenise"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 2.6"/><path d="M12 8.5 13.3 11l2.7.4-2 1.9.5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-1.9 2.7-.4z"/></svg></span><span class="row-text"><span class="row-title">Tokenise</span><span class="row-sub">Seal a stage on-chain</span></span></button>
+            <button class="row" data-go="settings"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.17l-.05.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3.1 14H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.16-2.9l-.06-.05a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.16l.05-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 20.9 10H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span><span class="row-text"><span class="row-title">Settings</span><span class="row-sub">Notifications, units, privacy</span></span></button>
+          </div>
+        </div>
+
+        <div class="sheet" data-sheet-panel="wallet">
+          <div class="drag-handle"></div>
+          <h3>Connect wallet</h3>
+          <p class="sheet-sub">Solana devnet · $GROWTOO has no monetary value</p>
+          <div class="list">
+            <button class="row" data-snack="Opening Phantom…"><span class="row-glyph mark">Ph</span><span class="row-text"><span class="row-title">Phantom</span><span class="row-sub">Mobile Wallet Adapter</span></span></button>
+            <button class="row" data-snack="Opening Solflare…"><span class="row-glyph mark">Sf</span><span class="row-text"><span class="row-title">Solflare</span><span class="row-sub">Mobile Wallet Adapter</span></span></button>
+            <button class="row"><span class="row-glyph"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span class="row-text"><span class="row-title">Watch-only address</span><span class="row-sub">Paste a public key</span></span></button>
+          </div>
+        </div>
+
+        <div class="snackbar" id="snackbar"><span id="snackbar-text"></span><b>Undo</b></div>
+        <div class="gesture-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <div class="screen-picker" id="picker">
+      <button class="chip is-on" data-tab="journal"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Journal</button>
+      <button class="chip" data-tab="plants"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Plants</button>
+      <button class="chip" data-tab="plant"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Plant detail</button>
+      <button class="chip" data-tab="market"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Market</button>
+      <button class="chip" data-tab="coach"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Coach</button>
+      <button class="chip" data-tab="tokenise"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Tokenise</button>
+      <button class="chip" data-tab="today"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Today</button>
+      <button class="chip" data-tab="inbox"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Notifications</button>
+      <button class="chip" data-tab="camera"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Camera</button>
+      <button class="chip" data-tab="settings"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Settings</button>
+      <button class="chip" data-sheet="log"><svg class="check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Log sheet</button>
+    </div>
+
+    <h3>What changes going Material</h3>
+    <p>Same screens and same content model as the iOS mockup — the platform grammar is what differs. Notes below track with the screen on the phone.</p>
+
+    <div class="note-card is-on" data-note="journal">
+      <h4>Journal — the start destination</h4>
+      <ul>
+        <li><strong>Large top app bar</strong> collapses to the 64 dp small bar, and the surface shifts tone on scroll — M3 signals elevation with colour, not a shadow line.</li>
+        <li>Overflow <strong>⋮</strong> replaces the iOS avatar button; account lives behind it.</li>
+        <li>The today card is a <strong>filled tonal card</strong> in primary-container.</li>
+        <li>Recent notes go <strong>edge-to-edge</strong> with 72 dp rows — no inset card grouping.</li>
+        <li>Native adds: home-screen widget for the seal rail, ongoing notification while a seal confirms.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="plants">
+      <h4>Plants</h4>
+      <ul>
+        <li>A <strong>docked search bar</strong> heads the list — search is a first-class M3 component, not a hidden field.</li>
+        <li>State reads as tonal chips (<strong>Sealed</strong>, <strong>Water due</strong>, <strong>Listed</strong>).</li>
+        <li>Swipe-to-dismiss on rows; pull-to-refresh on the list.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="plant">
+      <h4>Plant detail</h4>
+      <ul>
+        <li>A back <strong>arrow</strong>, not a chevron-plus-label — and the system back gesture does the same thing, with predictive-back preview.</li>
+        <li>On-chain facts sit in an outlined card, tx hashes in monospace as on web.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="market">
+      <h4>Market</h4>
+      <ul>
+        <li>Simple / Advanced is an M3 <strong>segmented button</strong> — a check mark marks the selection, not a sliding thumb.</li>
+        <li>Invest confirms through <strong>BiometricPrompt</strong>.</li>
+        <li>Wallet connect uses <strong>Mobile Wallet Adapter</strong> — this is Android's native path, and it's better here than on iOS.</li>
+        <li>Play policy: keep token flows framed as utility/test, and expect the same scrutiny the web app already writes around.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="coach">
+      <h4>Grow coach</h4>
+      <ul>
+        <li>Bubbles use asymmetric M3 corner shapes; the send button is a filled icon button.</li>
+        <li>The composer is a surface-container bar, not a translucent blur — M3 leans on tone over material blur.</li>
+        <li>Coach suggestions write into <strong>Today</strong>, which drives the daily notification.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="tokenise">
+      <h4>Tokenise</h4>
+      <ul>
+        <li>Reached from the overflow menu and from a plant — not frequent enough for a nav destination.</li>
+        <li>Sealing runs as a <strong>foreground service with an ongoing notification</strong> until the devnet tx confirms.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="today">
+      <h4>Today</h4>
+      <ul>
+        <li>Drives the daily notification, a Glance/Compose home-screen widget, and the At a Glance slot.</li>
+        <li>Checkboxes use the brand as <code>accent-color</code>; ripple on the whole row.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="inbox">
+      <h4>Notifications</h4>
+      <ul>
+        <li>Called Notifications, not Inbox — it mirrors the system shade, and rows deep-link to their plant or offer.</li>
+        <li>Three channels users can mute independently: confirmations, adoptions, stage milestones.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="camera">
+      <h4>Camera</h4>
+      <ul>
+        <li><strong>CameraX</strong> preview + capture; the mode strip is a row of chips rather than an iOS mode wheel.</li>
+        <li>Frame guide keeps diagnosis photos comparable week to week.</li>
+      </ul>
+    </div>
+
+    <div class="note-card" data-note="settings">
+      <h4>Settings — Theme</h4>
+      <ul>
+        <li>Three values, one preference — the shape of <code>AppCompatDelegate.MODE_NIGHT_*</code>: no / yes / follow system.</li>
+        <li>A <strong>radio group</strong>, not iOS's checkmark list, and M3 switches whose thumb grows and gains a check when on.</li>
+        <li>Light isn't the dark scheme inverted: M3 container tones step <em>down</em> from the surface here, and the accent darkens to <strong>#6f5416</strong> to hold contrast on paper while filled buttons keep the gold.</li>
+        <li><strong>Use wallpaper colours</strong> is the Material You opt-in — off by default, since brand beats wallpaper for this product. Android-only; iOS has no equivalent.</li>
+      </ul>
+    </div>
+
+    <div class="legend">
+      <h4>iOS → Android deltas</h4>
+      <table class="delta">
+        <tr><th>Element</th><th>iOS</th><th>Android</th></tr>
+        <tr><td>Primary action</td><td>Centred tab-bar FAB</td><td>Extended FAB, bottom-right, above the nav bar</td></tr>
+        <tr><td>Navigation</td><td>5 tabs, 49 pt bar</td><td>4 destinations, 80 dp bar, active-indicator pill</td></tr>
+        <tr><td>Back</td><td>Chevron + previous title</td><td>Arrow + system back gesture (predictive back)</td></tr>
+        <tr><td>Elevation</td><td>Blur + hairline</td><td>Surface tone steps, no shadow line</td></tr>
+        <tr><td>Feedback</td><td>Toast/HUD</td><td>Snackbar with an Undo action</td></tr>
+        <tr><td>Lists</td><td>Inset grouped, 18 pt radius</td><td>Edge-to-edge, 72 dp rows, dividers</td></tr>
+        <tr><td>Biometrics</td><td>Face ID</td><td>BiometricPrompt</td></tr>
+        <tr><td>Status bar</td><td>Clock left, Dynamic Island</td><td>Clock right, notification icons left, punch-hole</td></tr>
+        <tr><td>Theme setting</td><td>Checkmark list, <code>UIUserInterfaceStyle</code></td><td>Radio group, <code>MODE_NIGHT_*</code>, plus a Material You opt-in</td></tr>
+      </table>
+      <h4 style="margin-top:20px">Notes</h4>
+      <p>Brand colours from <code>app/styles/app.css</code> are mapped onto M3 roles — brass <code>#c9a55e</code> becomes <code>primary</code>, forest <code>#0f1a12</code> becomes <code>surface</code>, and container tones step up from it. That mapping is what a real <code>ColorScheme</code> in Compose would hold.</p>
+      <p>Material You dynamic colour is deliberately <em>not</em> adopted — the wax-seal catalog identity is the product, so brand colour wins over wallpaper-derived colour.</p>
+      <p>Metrics are dp at 412 × 915 (Pixel 8/9 class): 28 dp status bar, 64 dp small app bar, 80 dp navigation bar, 24 dp gesture inset.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  var screens = {};
+  var current = 'journal';
+  // Destinations the navigation bar owns; everything else is a push or a modal.
+  var DESTINATIONS = ['journal', 'plants', 'market', 'coach'];
+  // The extended FAB only makes sense where "log care" is the obvious next act.
+  var FAB_SCREENS = ['journal', 'plants', 'plant'];
+
+  document.querySelectorAll('.screen').forEach(function (el) {
+    screens[el.dataset.screen] = el;
+    el.addEventListener('scroll', function () {
+      var bar = el.querySelector('.appbar');
+      if (bar) bar.classList.toggle('is-collapsed', el.scrollTop > 24);
+    });
+  });
+
+  function show(name) {
+    if (!screens[name] || name === current) { closeSheets(); return; }
+    screens[current].classList.remove('is-active', 'anim');
+    current = name;
+    var el = screens[name];
+    el.classList.add('is-active', 'anim');
+    el.scrollTop = 0;
+    var bar = el.querySelector('.appbar');
+    if (bar) bar.classList.remove('is-collapsed');
+
+    // Camera takes the whole window — nav bar and FAB go with it.
+    var immersive = name === 'camera';
+    document.getElementById('navbar').style.display = immersive ? 'none' : '';
+    document.getElementById('fab').hidden = immersive || FAB_SCREENS.indexOf(name) === -1;
+
+    document.querySelectorAll('.nav-dest').forEach(function (d) {
+      d.classList.toggle('is-on', d.dataset.tab === name);
+    });
+    document.querySelectorAll('#picker .chip[data-tab]').forEach(function (c) {
+      c.classList.toggle('is-on', c.dataset.tab === name);
+    });
+    document.querySelectorAll('.note-card').forEach(function (n) {
+      n.classList.toggle('is-on', n.dataset.note === name);
+    });
+    // Pushed screens keep their parent destination lit.
+    if (DESTINATIONS.indexOf(name) === -1) {
+      var owner = name === 'plant' ? 'plants' : name === 'tokenise' ? 'market' : 'journal';
+      var d = document.querySelector('.nav-dest[data-tab="' + owner + '"]');
+      if (d) d.classList.add('is-on');
+    }
+    closeSheets();
+  }
+
+  function closeSheets() {
+    document.getElementById('scrim').classList.remove('is-open');
+    document.querySelectorAll('.sheet').forEach(function (s) { s.classList.remove('is-open'); });
+  }
+
+  function openSheet(name) {
+    var panel = document.querySelector('.sheet[data-sheet-panel="' + name + '"]');
+    if (!panel) return;
+    closeSheets();
+    document.getElementById('scrim').classList.add('is-open');
+    panel.classList.add('is-open');
+  }
+
+  var snackbar = document.getElementById('snackbar');
+  var snackbarText = document.getElementById('snackbar-text');
+  var snackTimer;
+  function snack(msg) {
+    snackbarText.textContent = msg;
+    snackbar.classList.add('is-on');
+    // M3: a snackbar lifts the FAB rather than covering it.
+    document.getElementById('fab').style.transform = 'translateY(-56px)';
+    clearTimeout(snackTimer);
+    // M3 short duration.
+    snackTimer = setTimeout(function () {
+      snackbar.classList.remove('is-on');
+      document.getElementById('fab').style.transform = '';
+    }, 2200);
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-tab],[data-go],[data-sheet],[data-snack]');
+    if (!el) return;
+    if (el.dataset.snack) { closeSheets(); snack(el.dataset.snack); }
+    var dest = el.dataset.tab || el.dataset.go;
+    if (dest) { show(dest); return; }
+    if (el.dataset.sheet) openSheet(el.dataset.sheet);
+  });
+
+  document.getElementById('scrim').addEventListener('click', closeSheets);
+
+  /* ---- Theme ----------------------------------------------------------
+     One preference with three values, matching AppCompatDelegate's
+     MODE_NIGHT_NO / MODE_NIGHT_YES / MODE_NIGHT_FOLLOW_SYSTEM. Only the
+     device is themed — the page around it stays dark. */
+  var host = document.getElementById('host');
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  var themePref = 'dark';
+
+  function applyTheme() {
+    var resolved = themePref === 'system' ? (systemDark.matches ? 'dark' : 'light') : themePref;
+    host.dataset.theme = resolved;
+    document.querySelectorAll('[data-theme-choice]').forEach(function (btn) {
+      btn.setAttribute('aria-selected', String(btn.dataset.themeChoice === themePref));
+    });
+  }
+  systemDark.addEventListener('change', applyTheme);
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-theme-choice]');
+    if (!btn) return;
+    themePref = btn.dataset.themeChoice;
+    applyTheme();
+    snack(themePref === 'system' ? 'Following the system theme' : 'Theme: ' + themePref);
+  });
+
+  applyTheme();
+
+  document.addEventListener('click', function (e) {
+    var sw = e.target.closest('.switch');
+    if (!sw) return;
+    sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
+  });
+
+  document.querySelectorAll('.segmented').forEach(function (group) {
+    group.addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      group.querySelectorAll('button').forEach(function (b) {
+        b.setAttribute('aria-selected', String(b === btn));
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>growtoo web · light theme mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   growto.live — light theme mockup for the WEB app.
+   The dark values are copied from app/styles/app.css so this is a
+   true before/after; the light block is the proposal. Nothing here
+   is loaded by the app — this is the design proof that comes before
+   the port.
+   ============================================================ */
+
+/* ---- page shell (the frame around the mockup, always dark) ---- */
+:root {
+  --page-bg: #0a120c;
+  --page-ink: #f3efe6;
+  --page-muted: rgba(184, 196, 176, 0.78);
+  --page-brass: #c9a55e;
+  --page-line: rgba(201, 165, 94, 0.18);
+  --page-card: rgba(19, 32, 22, 0.6);
+  --font-page: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-page);
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(201,165,94,.07) 0%, transparent 55%),
+    radial-gradient(700px 460px at 10% 30%, rgba(40,80,50,.12) 0%, transparent 50%),
+    var(--page-bg);
+  color: var(--page-ink);
+  min-height: 100vh;
+  padding: 32px 28px 72px;
+}
+.wrap { max-width: 1320px; margin: 0 auto; }
+.page-kicker {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--page-brass); margin: 0 0 8px;
+}
+.page-title { font-size: 30px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; }
+.page-sub { margin: 0 0 24px; color: var(--page-muted); font-size: 14px; max-width: 74ch; line-height: 1.6; }
+.page-sub strong { color: var(--page-ink); font-weight: 500; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 22px; align-items: center; margin-bottom: 18px; }
+.toolbar-group { display: flex; align-items: center; gap: 8px; }
+.toolbar-label {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--page-muted); margin-right: 2px;
+}
+.chip {
+  font: inherit; font-size: 12.5px; padding: 7px 13px; border-radius: 999px; cursor: pointer;
+  background: rgba(201,165,94,.06); border: 1px solid var(--page-line); color: var(--page-muted);
+  transition: all .16s ease;
+}
+.chip:hover { background: rgba(201,165,94,.13); color: var(--page-ink); }
+.chip.is-on { background: var(--page-brass); border-color: var(--page-brass); color: #1a1408; font-weight: 600; }
+
+/* browser chrome */
+.browser {
+  border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 40px 90px rgba(0,0,0,.55); background: #1b201c;
+}
+.browser-bar {
+  height: 40px; display: flex; align-items: center; gap: 8px; padding: 0 14px;
+  background: linear-gradient(#2a2f29, #1f241f); border-bottom: 1px solid rgba(0,0,0,.4);
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.url {
+  flex: 1; margin-left: 10px; height: 24px; border-radius: 6px; background: rgba(0,0,0,.32);
+  display: flex; align-items: center; padding: 0 10px; gap: 7px;
+  font-family: var(--mono); font-size: 11.5px; color: rgba(243,239,230,.7);
+}
+
+/* ============================================================
+   BELOW THIS LINE: the app itself.
+   Token names and dark values match app/styles/app.css exactly.
+   ============================================================ */
+.app-root {
+  /* --- dark, as shipping today --- */
+  --bg: #0f1a12;
+  --bg-alt: #142018;
+  --green: #b8d4b0;
+  --brass: #c9a55e;
+  --brass-hover: #d8b872;
+  --brass-active: #b08f45;
+  --brass-ink: #1a1408;
+  --rust: #a86b4f;
+  --text: #f3efe6;
+  --text-muted: rgba(184, 196, 176, 0.78);
+  --border: rgba(201, 165, 94, 0.18);
+  --card-bg: #132016;
+  --card-hover: #18261c;
+  --desk-line: rgba(201, 165, 94, 0.14);
+  --shell-card-radius: 12px;
+
+  /* --- new: the values that currently sit inline as literals --- */
+  --app-canvas: linear-gradient(180deg, #0c1610 0%, var(--bg) 40%, #101c14 100%);
+  --canvas-glow-brass: rgba(201, 165, 94, 0.07);
+  --canvas-glow-green: rgba(40, 80, 50, 0.16);
+  --sidebar-bg: rgba(12, 20, 14, 0.94);
+  --header-bg: rgba(15, 26, 18, 0.78);
+  --brass-fill: #c9a55e;          /* brass as a filled surface */
+  --brass-wash: rgba(201, 165, 94, 0.08);
+  --brass-wash-strong: rgba(201, 165, 94, 0.16);
+  --nav-active-bg: linear-gradient(90deg, rgba(201, 165, 94, 0.16), rgba(201, 165, 94, 0.04));
+  --metric-bg: rgba(10, 18, 14, 0.96);
+  --metric-border: rgba(255, 255, 255, 0.07);
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, .16), rgba(19, 32, 22, .9));
+  --seal-border: rgba(201, 165, 94, .45);
+  --photo-bg: linear-gradient(165deg, #1d2c20, #101c14);
+  --photo-glow: rgba(120, 170, 110, 0.3);
+  --field-bg: rgba(10, 18, 14, 0.9);
+  --ok-text: var(--green);
+  --ok-bg: rgba(184, 212, 176, 0.08);
+  --ok-border: rgba(184, 212, 176, 0.28);
+  --warn-text: var(--rust);
+  --warn-bg: rgba(168, 107, 79, 0.12);
+  --warn-border: rgba(168, 107, 79, 0.35);
+  --shadow-card: none;
+
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* --- light: the proposal. Not an inversion — brass splits into an
+       ink-weight accent for text and a gold that stays gold on fills. --- */
+.app-root[data-theme="light"] {
+  --bg: #f3f0e7;
+  --bg-alt: #fbf9f3;
+  --green: #3d6a38;
+  --brass: #7d6024;
+  --brass-hover: #6a5019;
+  --brass-active: #8f7030;
+  --brass-ink: #241a05;
+  --rust: #8d5233;
+  --text: #17251b;
+  --text-muted: rgba(37, 58, 42, 0.72);
+  --border: rgba(125, 96, 36, 0.2);
+  --card-bg: #fffefa;
+  --card-hover: #f7f3e8;
+  --desk-line: rgba(125, 96, 36, 0.16);
+
+  --app-canvas: linear-gradient(180deg, #f6f3ea 0%, var(--bg) 40%, #eeeade 100%);
+  --canvas-glow-brass: rgba(201, 165, 94, 0.16);
+  --canvas-glow-green: rgba(90, 140, 90, 0.12);
+  --sidebar-bg: rgba(250, 247, 240, 0.94);
+  --header-bg: rgba(246, 243, 234, 0.82);
+  --brass-fill: #c9a55e;
+  --brass-wash: rgba(125, 96, 36, 0.07);
+  --brass-wash-strong: rgba(125, 96, 36, 0.14);
+  --nav-active-bg: linear-gradient(90deg, rgba(125, 96, 36, 0.14), rgba(125, 96, 36, 0.03));
+  --metric-bg: #fffefa;
+  --metric-border: rgba(125, 96, 36, 0.14);
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, .34), rgba(255, 254, 250, .95));
+  --seal-border: rgba(125, 96, 36, .5);
+  --photo-bg: linear-gradient(165deg, #dbe4d4, #c2d1bc);
+  --photo-glow: rgba(96, 150, 88, 0.34);
+  --field-bg: rgba(232, 227, 213, 0.8);
+  --ok-text: #3d6a38;
+  --ok-bg: rgba(61, 106, 56, 0.1);
+  --ok-border: rgba(61, 106, 56, 0.3);
+  --warn-text: #8d5233;
+  --warn-bg: rgba(141, 82, 51, 0.1);
+  --warn-border: rgba(141, 82, 51, 0.32);
+  /* Dark mode hides layout in shadowless flatness; light mode needs a
+     little lift or every card dissolves into the page. */
+  --shadow-card: 0 1px 2px rgba(60, 50, 20, 0.05);
+}
+
+.app-root {
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(900px 480px at 85% -5%, var(--canvas-glow-brass) 0%, transparent 55%),
+    radial-gradient(700px 420px at 8% 40%, var(--canvas-glow-green) 0%, transparent 50%),
+    var(--app-canvas);
+  line-height: 1.6;
+  display: flex;
+  height: 760px;
+  overflow: hidden;
+  transition: background .3s ease, color .3s ease;
+}
+
+/* ---- sidebar ---- */
+.sidebar {
+  width: 240px; min-width: 240px; background: var(--sidebar-bg);
+  border-right: 1px solid var(--desk-line); padding: 1.25rem 0;
+  display: flex; flex-direction: column;
+}
+.sidebar-logo {
+  display: inline-flex; align-items: center; gap: .6rem; padding: 0 1.25rem 1.1rem;
+  font-family: var(--font-display); font-size: 1.15rem; letter-spacing: -.02em; color: var(--text);
+  text-decoration: none;
+}
+.logo-mark {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  border: 1.5px dashed var(--seal-border); background: var(--seal-bg);
+  color: var(--brass); font-size: 13px;
+}
+.sidebar-nav { display: flex; flex-direction: column; gap: 2px; padding: 0 .75rem; }
+.nav-item {
+  display: flex; align-items: center; gap: .75rem; padding: .6rem .75rem; border-radius: 12px;
+  color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: .93rem;
+  background: none; border: 0; font-family: inherit; cursor: pointer; text-align: left; width: 100%;
+  transition: background .15s, color .15s;
+}
+.nav-item:hover { background: var(--brass-wash); color: var(--text); }
+.nav-item.active { background: var(--nav-active-bg); color: var(--brass); }
+.nav-item svg { flex: none; }
+.sidebar-foot { margin-top: auto; padding: 0 1.25rem; }
+
+/* ---- main ---- */
+.main { flex: 1; padding: 1.5rem 2rem; overflow-y: auto; }
+.main::-webkit-scrollbar { width: 8px; }
+.main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.main-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-bottom: 1px solid var(--desk-line); padding-bottom: .85rem; margin-bottom: 1.25rem;
+  position: sticky; top: -1.5rem; z-index: 40; background: var(--header-bg);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  margin-top: -1.5rem; padding-top: 1.5rem;
+}
+.view-title { font-family: var(--font-display); font-weight: 400; font-size: 1.6rem; letter-spacing: -.02em; margin: 0; }
+.header-actions { display: flex; align-items: center; gap: .7rem; position: relative; }
+.header-icon-btn {
+  width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+  background: var(--brass-wash); color: var(--brass); display: grid; place-items: center; cursor: pointer;
+  position: relative;
+}
+.header-icon-btn:hover { background: var(--brass-wash-strong); }
+.notif-dot {
+  position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--warn-text);
+}
+.wallet-chip {
+  font-family: var(--font-mono); font-size: 12px; padding: 7px 11px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--brass-wash); color: var(--brass);
+}
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border);
+  background: var(--brass-wash-strong); color: var(--brass); display: grid; place-items: center;
+  font-weight: 600; cursor: pointer; font-size: .9rem;
+}
+
+/* ---- account menu (where the setting lives) ---- */
+.account-menu {
+  position: absolute; top: 46px; right: 0; width: 268px; z-index: 60;
+  background: var(--bg-alt); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.28); padding: 12px; display: none;
+}
+.account-menu.is-open { display: block; }
+.account-menu-head { padding: 2px 6px 10px; border-bottom: 1px solid var(--desk-line); margin-bottom: 10px; }
+.account-menu-head strong { display: block; font-size: .92rem; font-weight: 500; }
+.account-menu-head span { font-size: .78rem; color: var(--text-muted); }
+.menu-label {
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--brass); padding: 0 6px; margin: 0 0 7px;
+}
+.theme-seg {
+  display: flex; background: var(--field-bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 3px; gap: 3px; margin-bottom: 12px;
+}
+.theme-seg button {
+  flex: 1; font-family: inherit; font-size: 12.5px; font-weight: 500; padding: 6px 4px; border: 0;
+  border-radius: 7px; background: none; color: var(--text-muted); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.theme-seg button[aria-checked="true"] { background: var(--brass-wash-strong); color: var(--text); }
+.menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 6px; border: 0;
+  background: none; font-family: inherit; font-size: .88rem; color: var(--text); cursor: pointer;
+  border-radius: 8px; text-align: left;
+}
+.menu-item:hover { background: var(--brass-wash); }
+.menu-item svg { color: var(--text-muted); flex: none; }
+
+/* ---- content ---- */
+.section-heading {
+  font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; letter-spacing: -.015em;
+  margin: 1.6rem 0 .75rem;
+}
+.section-heading:first-child { margin-top: 0; }
+.shell-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--shell-card-radius); box-shadow: var(--shadow-card);
+}
+.today-card { padding: 1.1rem 1.25rem; margin-bottom: 1.4rem; border-color: var(--seal-border); }
+.today-card-eyebrow {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--brass); margin: 0 0 .4rem;
+}
+.today-card-line { margin: 0; font-size: 1rem; }
+.today-card-line strong { font-weight: 600; }
+.card-actions { display: flex; gap: .5rem; margin-top: .9rem; }
+
+.btn {
+  font-family: inherit; font-size: .88rem; font-weight: 600; border-radius: 10px;
+  padding: .55rem 1rem; border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background: var(--brass-fill); color: var(--brass-ink); }
+.btn-primary:hover { background: var(--brass-hover); color: var(--brass-ink); }
+.btn-secondary { background: var(--brass-wash); color: var(--brass); border-color: var(--border); }
+.btn-secondary:hover { background: var(--brass-wash-strong); }
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
+
+.plant-seal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)); gap: 1rem; }
+.plant-seal {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--shell-card-radius);
+  padding: 1rem .75rem; text-align: center; cursor: pointer; box-shadow: var(--shadow-card);
+  transition: background .15s, border-color .15s;
+}
+.plant-seal:hover { background: var(--card-hover); border-color: var(--seal-border); }
+.seal-disc {
+  width: 66px; height: 66px; border-radius: 50%; margin: 0 auto .6rem; display: grid; place-items: center;
+  border: 1.5px dashed var(--seal-border); background: var(--seal-bg); position: relative;
+}
+.seal-disc span { font-family: var(--font-display); font-size: 1.25rem; color: var(--brass); }
+.seal-disc .seal-day {
+  position: absolute; bottom: -4px; right: -6px; background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: 999px; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.4;
+  padding: 1px 6px; color: var(--brass);
+}
+.seal-name { font-size: .84rem; display: block; }
+.seal-stage { font-size: .74rem; color: var(--text-muted); display: block; }
+
+.dashboard-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; margin-bottom: .5rem; }
+.metric-card {
+  background: var(--metric-bg); border: 1px solid var(--metric-border);
+  border-radius: var(--shell-card-radius); padding: .85rem .95rem; box-shadow: var(--shadow-card);
+}
+.metric-val { font-family: var(--font-mono); font-size: 1.5rem; display: block; line-height: 1.2; }
+.metric-lbl { font-size: .76rem; color: var(--text-muted); display: block; }
+
+.two-col { display: grid; grid-template-columns: 1.35fr 1fr; gap: 1.25rem; align-items: start; }
+
+.recent-notes { display: flex; flex-direction: column; }
+.note-row {
+  display: flex; align-items: center; gap: .85rem; padding: .7rem .9rem;
+  border: 1px solid var(--border); border-bottom: 0; background: var(--card-bg); cursor: pointer;
+}
+.note-row:first-child { border-radius: var(--shell-card-radius) var(--shell-card-radius) 0 0; }
+.note-row:last-child { border-bottom: 1px solid var(--border); border-radius: 0 0 var(--shell-card-radius) var(--shell-card-radius); }
+.note-row:hover { background: var(--card-hover); }
+.note-glyph {
+  width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; flex: none;
+  background: var(--brass-wash-strong); color: var(--brass);
+}
+.note-body { flex: 1; min-width: 0; }
+.note-title { display: block; font-size: .89rem; }
+.note-sub { display: block; font-size: .76rem; color: var(--text-muted); }
+.note-time { font-family: var(--font-mono); font-size: .74rem; color: var(--text-muted); }
+
+.pill {
+  display: inline-block; font-size: .7rem; padding: 2px 9px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--brass); background: var(--brass-wash);
+}
+.pill.ok { color: var(--ok-text); border-color: var(--ok-border); background: var(--ok-bg); }
+.pill.warn { color: var(--warn-text); border-color: var(--warn-border); background: var(--warn-bg); }
+
+.photo-ph {
+  border-radius: var(--shell-card-radius); border: 1px solid var(--border);
+  background: radial-gradient(60% 60% at 50% 45%, var(--photo-glow), transparent 70%), var(--photo-bg);
+  display: grid; place-items: center; color: var(--text-muted); font-size: .8rem;
+}
+
+/* market cards */
+.market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.market-card { padding: 1rem; }
+.market-card-head { display: flex; align-items: center; gap: .8rem; }
+.market-price { font-family: var(--font-mono); font-size: 1.05rem; color: var(--brass); }
+.market-note { font-size: .82rem; color: var(--text-muted); margin: .75rem 0 0; }
+
+/* chart placeholder — proves the data ink reads in both themes */
+.chart { padding: 1rem; }
+.chart-bars { display: flex; align-items: flex-end; gap: 7px; height: 110px; margin-top: .8rem; }
+.chart-bars i {
+  flex: 1; border-radius: 4px 4px 0 0; display: block;
+  background: linear-gradient(180deg, var(--brass-fill), var(--brass-wash-strong));
+}
+.chart-axis {
+  display: flex; justify-content: space-between; font-family: var(--font-mono);
+  font-size: .66rem; color: var(--text-muted); margin-top: .4rem;
+}
+
+.coach-strip {
+  display: flex; gap: .8rem; align-items: flex-start; padding: .9rem 1rem; margin-top: 1rem;
+}
+.coach-mark {
+  width: 34px; height: 34px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  border: 1.5px dashed var(--seal-border); background: var(--seal-bg); color: var(--brass);
+}
+.coach-text { font-size: .86rem; margin: 0; }
+
+.view { display: none; }
+.view.is-on { display: block; }
+
+/* ---- annotations under the browser ---- */
+.notes { margin-top: 34px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 34px; align-items: start; }
+@media (max-width: 1000px) { .notes { grid-template-columns: 1fr; } }
+.notes h3 { font-size: 20px; font-weight: 400; margin: 0 0 10px; }
+.notes h4 {
+  font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--page-brass); font-weight: 400; margin: 26px 0 9px;
+}
+.notes p { color: var(--page-muted); font-size: 14px; line-height: 1.65; margin: 0 0 12px; max-width: 68ch; }
+.notes strong { color: var(--page-ink); font-weight: 500; }
+.notes ol, .notes ul { color: var(--page-muted); font-size: 14px; line-height: 1.7; padding-left: 20px; margin: 0 0 12px; }
+.notes li { margin-bottom: 7px; }
+.notes code { font-family: var(--mono); font-size: 12.5px; color: #b8d4b0; }
+pre {
+  background: var(--page-card); border: 1px solid var(--page-line); border-radius: 10px;
+  padding: 15px 17px; overflow-x: auto; font-family: var(--mono); font-size: 12px;
+  line-height: 1.65; color: var(--page-muted); margin: 0 0 14px;
+}
+pre .c { color: rgba(184,196,176,.45); }
+pre .v { color: var(--page-brass); }
+pre .n { color: #b8d4b0; }
+.stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 16px; }
+.stat {
+  border: 1px solid var(--page-line); border-radius: 10px; padding: 12px 16px; background: var(--page-card);
+  min-width: 132px;
+}
+.stat b { display: block; font-family: var(--mono); font-size: 21px; font-weight: 400; color: var(--page-ink); }
+.stat span { font-size: 12px; color: var(--page-muted); }
+.callout {
+  border: 1px solid var(--page-line); border-left: 3px solid var(--page-brass);
+  border-radius: 0 10px 10px 0; padding: 14px 17px; background: var(--page-card); margin: 0 0 14px;
+}
+.callout p:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="page-kicker">growto.live · web app</p>
+  <h1 class="page-title">Light theme — mockup</h1>
+  <p class="page-sub">
+    The theme option from the phone mockups, applied to the <strong>web app shell</strong>.
+    Dark values below are copied from <code>app/styles/app.css</code>, so this is a true before/after;
+    the light block is the proposal. The setting lives in the <strong>account menu</strong> —
+    open it with the avatar, top right. Nothing here is wired into the app yet.
+  </p>
+
+  <div class="toolbar">
+    <div class="toolbar-group">
+      <span class="toolbar-label">Theme</span>
+      <button class="chip" data-theme-choice="light">Light</button>
+      <button class="chip is-on" data-theme-choice="dark">Dark</button>
+      <button class="chip" data-theme-choice="system">System</button>
+    </div>
+    <div class="toolbar-group">
+      <span class="toolbar-label">View</span>
+      <button class="chip is-on" data-view="journal">Journal</button>
+      <button class="chip" data-view="plants">Plants</button>
+      <button class="chip" data-view="market">Market</button>
+    </div>
+  </div>
+
+  <div class="browser">
+    <div class="browser-bar">
+      <span class="dot" style="background:#e05c4a"></span>
+      <span class="dot" style="background:#e0b23f"></span>
+      <span class="dot" style="background:#4aa85e"></span>
+      <span class="url">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10.5" width="16" height="10" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        growto.live/app/
+      </span>
+    </div>
+
+    <!-- No data-theme attribute: dark is the default, so the unthemed state is correct. -->
+    <div class="app-root" id="app">
+      <!-- ================= sidebar ================= -->
+      <aside class="sidebar">
+        <a class="sidebar-logo" href="#">
+          <span class="logo-mark">✿</span>
+          <span>growtoo</span>
+        </a>
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-view="journal">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5h16"/><path d="M7 19.5V8.5l5-3 5 3v11"/></svg>
+            Journal
+          </button>
+          <button class="nav-item" data-view="plants">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg>
+            Plants
+          </button>
+          <button class="nav-item">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8a2 2 0 012 2v14l-6-3-6 3V6a2 2 0 012-2z"/><path d="M10 9h4M10 13h4"/></svg>
+            Log
+          </button>
+          <button class="nav-item">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg>
+            Coach
+          </button>
+          <button class="nav-item">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3.2"/><path d="M14.5 7.5c2.2.4 3.8 2.2 3.8 4.5 0 2.6-2.1 4.7-4.7 4.7-.8 0-1.5-.2-2.2-.5"/><path d="M9 12.2V20"/><path d="M6.5 17.5h5"/></svg>
+            Tokenise
+          </button>
+          <button class="nav-item" data-view="market">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0 2.5 2.5 0 01-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg>
+            Market
+          </button>
+          <button class="nav-item">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg>
+            Tools
+          </button>
+          <button class="nav-item">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>
+            Today
+          </button>
+        </nav>
+        <div class="sidebar-foot">
+          <span class="pill">Devnet</span>
+        </div>
+      </aside>
+
+      <!-- ================= main ================= -->
+      <main class="main">
+        <header class="main-header">
+          <h1 class="view-title" id="view-title">Journal</h1>
+          <div class="header-actions">
+            <span class="pill">Grower</span>
+            <span class="wallet-chip">7fQ2…m1Bd</span>
+            <button class="header-icon-btn" aria-label="Inbox">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span class="notif-dot"></span>
+            </button>
+            <button class="avatar" id="avatar" aria-haspopup="menu" aria-expanded="false">G</button>
+
+            <div class="account-menu" id="account-menu" role="menu">
+              <div class="account-menu-head">
+                <strong>bela@growto.live</strong>
+                <span>Grower · Cultivator · 1,240 XP</span>
+              </div>
+              <p class="menu-label">Appearance</p>
+              <div class="theme-seg" role="radiogroup" aria-label="Appearance">
+                <button role="radio" aria-checked="false" data-theme-choice="light">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.8 5.8l1.6 1.6M16.6 16.6l1.6 1.6M18.2 5.8l-1.6 1.6M7.4 16.6l-1.6 1.6"/></svg>
+                  Light
+                </button>
+                <button role="radio" aria-checked="true" data-theme-choice="dark">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+                  Dark
+                </button>
+                <button role="radio" aria-checked="false" data-theme-choice="system">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8.5 20h7"/></svg>
+                  Auto
+                </button>
+              </div>
+              <button class="menu-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.6 20a7.6 7.6 0 0 1 14.8 0"/></svg>
+                Profile &amp; rank
+              </button>
+              <button class="menu-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M2.5 10h19"/></svg>
+                Wallet
+              </button>
+              <button class="menu-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.17l-.05.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3.1 14H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.16-2.9l-.06-.05a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.16l.05-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 20.9 10H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+                Settings
+              </button>
+              <button class="menu-item" role="menuitem">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 17l5-5-5-5"/><path d="M20 12H9"/><path d="M12 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6"/></svg>
+                Log out
+              </button>
+            </div>
+          </div>
+        </header>
+
+        <!-- ---------- Journal ---------- -->
+        <div class="view is-on" data-view-panel="journal">
+          <article class="shell-card today-card">
+            <p class="today-card-eyebrow">Today · day 34</p>
+            <p class="today-card-line">Two plants are due for water, and <strong>Northern Lights</strong> hasn't been photographed in six days.</p>
+            <div class="card-actions">
+              <button class="btn btn-primary">Log watering</button>
+              <button class="btn btn-secondary">Add photo</button>
+              <button class="btn btn-ghost">Open Today's list</button>
+            </div>
+          </article>
+
+          <h2 class="section-heading">Your plants</h2>
+          <div class="plant-seal-grid">
+            <div class="plant-seal">
+              <span class="seal-disc"><span>NL</span><span class="seal-day">d34</span></span>
+              <span class="seal-name">Northern Lights</span>
+              <span class="seal-stage">Flowering</span>
+            </div>
+            <div class="plant-seal">
+              <span class="seal-disc"><span>WW</span><span class="seal-day">d21</span></span>
+              <span class="seal-name">White Widow</span>
+              <span class="seal-stage">Vegetative</span>
+            </div>
+            <div class="plant-seal">
+              <span class="seal-disc"><span>CB</span><span class="seal-day">d58</span></span>
+              <span class="seal-name">CBD Auto</span>
+              <span class="seal-stage">Flowering</span>
+            </div>
+            <div class="plant-seal">
+              <span class="seal-disc"><span>+</span></span>
+              <span class="seal-name">New plant</span>
+              <span class="seal-stage">&nbsp;</span>
+            </div>
+          </div>
+
+          <article class="shell-card coach-strip">
+            <span class="coach-mark">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg>
+            </span>
+            <p class="coach-text">
+              <strong>Coach</strong> — the yellowing on Northern Lights' lower leaves reads as normal
+              nitrogen fade for day 34. Your last three feeds skipped CalMag.
+            </p>
+          </article>
+
+          <h2 class="section-heading">Overview</h2>
+          <div class="dashboard-metrics">
+            <div class="metric-card"><span class="metric-val">3</span><span class="metric-lbl">Plants</span></div>
+            <div class="metric-card"><span class="metric-val">128</span><span class="metric-lbl">Entries</span></div>
+            <div class="metric-card"><span class="metric-val">2</span><span class="metric-lbl">Sealed</span></div>
+            <div class="metric-card"><span class="metric-val">1,240</span><span class="metric-lbl">$GROWTOO</span></div>
+          </div>
+
+          <div class="two-col" style="margin-top:1.25rem">
+            <div>
+              <h2 class="section-heading">Recent notes</h2>
+              <div class="recent-notes">
+                <div class="note-row">
+                  <span class="note-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span>
+                  <span class="note-body"><span class="note-title">Watered · 1.2 L</span><span class="note-sub">Northern Lights</span></span>
+                  <span class="note-time">08:12</span>
+                </div>
+                <div class="note-row">
+                  <span class="note-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span>
+                  <span class="note-body"><span class="note-title">Photo · week 5</span><span class="note-sub">White Widow</span></span>
+                  <span class="note-time">Yest.</span>
+                </div>
+                <div class="note-row">
+                  <span class="note-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.8 3h4.4"/><path d="M10.6 3v6.4L5.8 17.5a2 2 0 0 0 1.7 3h9a2 2 0 0 0 1.7-3l-4.8-8.1V3"/><path d="M7.6 15h8.8"/></svg></span>
+                  <span class="note-body"><span class="note-title">Fed · CalMag 2 ml/L</span><span class="note-sub">CBD Auto</span></span>
+                  <span class="note-time">Tue</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <h2 class="section-heading">Watering · 7 days</h2>
+              <div class="shell-card chart">
+                <div class="chart-bars">
+                  <i style="height:38%"></i><i style="height:62%"></i><i style="height:44%"></i>
+                  <i style="height:80%"></i><i style="height:30%"></i><i style="height:68%"></i><i style="height:52%"></i>
+                </div>
+                <div class="chart-axis"><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---------- Plants ---------- -->
+        <div class="view" data-view-panel="plants">
+          <h2 class="section-heading">My plants</h2>
+          <div class="two-col">
+            <div>
+              <div class="recent-notes">
+                <div class="note-row">
+                  <span class="seal-disc" style="width:44px;height:44px;margin:0"><span style="font-size:.85rem">NL</span></span>
+                  <span class="note-body">
+                    <span class="note-title">Northern Lights</span>
+                    <span class="note-sub">Flowering · day 34 · indoor</span>
+                  </span>
+                  <span class="pill ok">Sealed</span>
+                  <span class="pill">Listed · 120</span>
+                </div>
+                <div class="note-row">
+                  <span class="seal-disc" style="width:44px;height:44px;margin:0"><span style="font-size:.85rem">WW</span></span>
+                  <span class="note-body">
+                    <span class="note-title">White Widow</span>
+                    <span class="note-sub">Vegetative · day 21 · indoor</span>
+                  </span>
+                  <span class="pill warn">Water due</span>
+                </div>
+                <div class="note-row">
+                  <span class="seal-disc" style="width:44px;height:44px;margin:0"><span style="font-size:.85rem">CB</span></span>
+                  <span class="note-body">
+                    <span class="note-title">CBD Auto</span>
+                    <span class="note-sub">Flowering · day 58 · outdoor</span>
+                  </span>
+                  <span class="pill ok">Sealed</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="photo-ph" style="height:196px">Latest photo · Northern Lights, day 34</div>
+            </div>
+          </div>
+
+          <h2 class="section-heading">Journal</h2>
+          <div class="recent-notes">
+            <div class="note-row"><span class="note-body"><span class="note-title">Trimmed lower fan leaves</span><span class="note-sub">Northern Lights</span></span><span class="note-time">3 Aug</span></div>
+            <div class="note-row"><span class="note-body"><span class="note-title">pH drifted to 6.8 — corrected</span><span class="note-sub">CBD Auto</span></span><span class="note-time">2 Aug</span></div>
+            <div class="note-row"><span class="note-body"><span class="note-title">Moved 10 cm from light</span><span class="note-sub">White Widow</span></span><span class="note-time">1 Aug</span></div>
+          </div>
+        </div>
+
+        <!-- ---------- Market ---------- -->
+        <div class="view" data-view-panel="market">
+          <h2 class="section-heading">Open market</h2>
+          <div class="market-grid">
+            <article class="shell-card market-card">
+              <div class="market-card-head">
+                <span class="seal-disc" style="width:44px;height:44px;margin:0"><span style="font-size:.85rem">GG</span></span>
+                <div style="flex:1">
+                  <div style="font-size:.95rem">Gorilla Glue · day 41</div>
+                  <div style="font-size:.78rem" class="note-sub">Grower <span style="font-family:var(--font-mono)">7fQ2…m1Bd</span> · Split, HR</div>
+                </div>
+                <span class="market-price">85</span>
+              </div>
+              <p class="market-note"><span class="pill">Adopt stake</span> Half now, half unlocks as the grower keeps logging care.</p>
+              <div class="card-actions"><button class="btn btn-primary">Invest</button><button class="btn btn-ghost">Care trail</button></div>
+            </article>
+            <article class="shell-card market-card">
+              <div class="market-card-head">
+                <span class="seal-disc" style="width:44px;height:44px;margin:0"><span style="font-size:.85rem">AK</span></span>
+                <div style="flex:1">
+                  <div style="font-size:.95rem">Amnesia Kush · day 62</div>
+                  <div style="font-size:.78rem" class="note-sub">Grower <span style="font-family:var(--font-mono)">Bx4v…9Kp2</span> · Zadar, HR</div>
+                </div>
+                <span class="market-price">140</span>
+              </div>
+              <p class="market-note"><span class="pill ok">Instant sale</span> Full price to the grower at purchase.</p>
+              <div class="card-actions"><button class="btn btn-primary">Invest</button><button class="btn btn-ghost">Care trail</button></div>
+            </article>
+          </div>
+
+          <h2 class="section-heading">My offers</h2>
+          <div class="recent-notes">
+            <div class="note-row">
+              <span class="note-body"><span class="note-title">Northern Lights · flowering</span><span class="note-sub">Posted 2 Aug · adopt stake</span></span>
+              <span class="market-price">120</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= annotations ================= -->
+  <div class="notes">
+    <div>
+      <h3>What this proposes</h3>
+      <p>
+        One preference — <strong>Light / Dark / Auto</strong> — in the account menu, stored on the user
+        doc so it follows the grower across devices, with <code>prefers-color-scheme</code> as the
+        fallback before the doc loads.
+      </p>
+
+      <h4>The one real design decision</h4>
+      <div class="callout">
+        <p>
+          Brass <code>#c9a55e</code> on cream fails contrast as text. So in light mode the accent
+          <strong>splits in two</strong>: <code>--brass</code> drops to <code>#7d6024</code> for text,
+          icons and links, while <code>--brass-fill</code> keeps the gold for buttons, the chart bars
+          and the wax seals.
+        </p>
+        <p>
+          That split is why light mode still reads as growtoo instead of as a generic light app —
+          and it's the reason a mechanical find-and-replace of the palette would not work.
+        </p>
+      </div>
+      <p>Measured against the light card surface <code>#fffefa</code> — every pair clears AA (4.5:1):</p>
+      <pre><span class="c">/* the problem */</span>
+<span class="v">#c9a55e</span> brass as text      <span class="n">2.31</span>:1  <span class="c">✗ fails</span>
+
+<span class="c">/* the fix */</span>
+<span class="v">#7d6024</span> brass ink          <span class="n">5.83</span>:1  ✓
+<span class="v">#17251b</span> body text         <span class="n">15.80</span>:1  ✓
+<span class="v">#253a2a</span> muted (72%)        <span class="n">5.12</span>:1  ✓
+<span class="v">#3d6a38</span> ok / sealed        <span class="n">6.27</span>:1  ✓
+<span class="v">#8d5233</span> warn / due         <span class="n">6.14</span>:1  ✓
+<span class="v">#241a05</span> on gold fill       <span class="n">7.37</span>:1  ✓</pre>
+
+      <h4>Also not an inversion</h4>
+      <ul>
+        <li>Cards gain a hairline shadow. Dark mode gets away with flat borders; on paper every card dissolves into the page without a little lift.</li>
+        <li>The canvas keeps its two radial glows, warmed and strengthened — flat cream reads as unfinished next to the dark build.</li>
+        <li>Status colours re-derive: <code>--green</code> <code>#b8d4b0</code> → <code>#3d6a38</code>, <code>--rust</code> → <code>#8d5233</code>. The pale versions vanish on cream.</li>
+        <li>Wax seals invert their fill but keep the dashed brass ring — the motif survives intact, which is the test that matters.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h3>What the port actually costs</h3>
+      <div class="stat-row">
+        <div class="stat"><b>12,435</b><span>lines in app.css</span></div>
+        <div class="stat"><b>980</b><span>hardcoded colours</span></div>
+        <div class="stat"><b>940</b><span>existing var() uses</span></div>
+      </div>
+      <p>
+        <code>app/styles/app.css</code> is roughly half-tokenised: 233 hex literals and 747
+        <code>rgba()</code> literals sit outside the token layer. Those are the work — not the
+        <code>:root</code> block, which is the easy part.
+      </p>
+
+      <h4>The token layer to add</h4>
+      <pre><span class="c">/* app/styles/app.css */</span>
+<span class="n">:root</span> {
+  <span class="c">/* existing brand tokens stay exactly as they are */</span>
+  <span class="v">--brass</span>: #c9a55e;
+
+  <span class="c">/* new: what today sits inline as literals */</span>
+  <span class="v">--brass-fill</span>: #c9a55e;
+  <span class="v">--brass-wash</span>: rgba(201,165,94,.08);
+  <span class="v">--sidebar-bg</span>: rgba(12,20,14,.94);
+  <span class="v">--header-bg</span>: rgba(15,26,18,.78);
+  <span class="v">--metric-bg</span>: rgba(10,18,14,.96);
+  <span class="v">--seal-bg</span>: radial-gradient(…);
+  <span class="v">--ok-text</span>: var(--green);
+  <span class="v">--warn-text</span>: var(--rust);
+  <span class="v">--shadow-card</span>: none;
+}
+
+<span class="n">:root[data-theme="light"]</span> {
+  <span class="v">--brass</span>: #7d6024;   <span class="c">/* ink weight */</span>
+  <span class="v">--brass-fill</span>: #c9a55e; <span class="c">/* still gold */</span>
+  <span class="v">--text</span>: #17251b;
+  <span class="v">--bg</span>: #f3f0e7;
+  <span class="v">--card-bg</span>: #fffefa;
+  <span class="v">--shadow-card</span>: 0 1px 2px rgba(60,50,20,.05);
+  <span class="c">/* …the rest of the semantic layer */</span>
+}</pre>
+
+      <h4>Suggested order</h4>
+      <ol>
+        <li><strong>Land the token layer</strong> on dark only. Zero visual change — every new token resolves to the value already there. Safe to ship on its own.</li>
+        <li><strong>Sweep the literals</strong> view by view — shell, journal, plants, market, coach, tools. Still dark-only, still no visual change, reviewable in small diffs.</li>
+        <li><strong>Add the light block</strong> and the account-menu control. Only now does anything look different.</li>
+        <li><strong>Landing page</strong> (<code>styles/landing.css</code>) last, if you want the marketing site to follow.</li>
+      </ol>
+      <p>
+        Steps 1 and 2 are the bulk of it and carry almost no risk — that's deliberate. The reason
+        to do it in that order is that a half-swept sheet in light mode looks broken in ways that are
+        hard to find, so the sweep should be finished and shipped before the theme exists at all.
+      </p>
+
+      <h4>Decided — dark is the default</h4>
+      <p>
+        Dark is the identity the catalog system was drawn for, so it stays the baseline.
+        <strong>Auto is available but opt-in</strong> — defaulting to Auto would hand first
+        impressions to whatever the visitor's OS happens to be set to.
+      </p>
+      <p>What that means concretely:</p>
+      <ul>
+        <li>Dark is the <strong>unthemed</strong> state. No <code>data-theme</code> attribute on
+          <code>&lt;html&gt;</code> means dark, so a user who never opens the menu — and the
+          first paint before the user doc loads — get dark with no flash.</li>
+        <li>Only <code>light</code> is ever written to the attribute. <code>Auto</code> resolves to
+          <code>light</code> or nothing, it is never a value in the DOM.</li>
+        <li>The stored preference defaults to <code>'dark'</code>, not <code>'system'</code>, so the
+          choice survives across devices rather than re-deriving per machine.</li>
+        <li>No <code>@media (prefers-color-scheme: light)</code> block anywhere — the OS only gets a
+          say once the user has explicitly picked Auto.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var app = document.getElementById('app');
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  var pref = 'dark';
+
+  function apply() {
+    // Dark is the *unthemed* state: only `light` is ever written to the DOM.
+    // That's what lets the first paint be correct with no attribute set, and
+    // it's why there is no prefers-color-scheme media block anywhere.
+    var resolved = pref === 'system' ? (systemDark.matches ? 'dark' : 'light') : pref;
+    if (resolved === 'light') app.dataset.theme = 'light';
+    else delete app.dataset.theme;
+    document.querySelectorAll('[data-theme-choice]').forEach(function (el) {
+      var on = el.dataset.themeChoice === pref;
+      if (el.classList.contains('chip')) el.classList.toggle('is-on', on);
+      else el.setAttribute('aria-checked', String(on));
+    });
+  }
+  systemDark.addEventListener('change', apply);
+
+  function showView(name) {
+    document.querySelectorAll('[data-view-panel]').forEach(function (v) {
+      v.classList.toggle('is-on', v.dataset.viewPanel === name);
+    });
+    document.querySelectorAll('.chip[data-view]').forEach(function (c) {
+      c.classList.toggle('is-on', c.dataset.view === name);
+    });
+    document.querySelectorAll('.nav-item[data-view]').forEach(function (n) {
+      n.classList.toggle('active', n.dataset.view === name);
+    });
+    document.getElementById('view-title').textContent =
+      name.charAt(0).toUpperCase() + name.slice(1);
+    document.querySelector('.main').scrollTop = 0;
+  }
+
+  var menu = document.getElementById('account-menu');
+  var avatar = document.getElementById('avatar');
+
+  document.addEventListener('click', function (e) {
+    var theme = e.target.closest('[data-theme-choice]');
+    if (theme) { pref = theme.dataset.themeChoice; apply(); return; }
+
+    var view = e.target.closest('[data-view]');
+    if (view) { showView(view.dataset.view); return; }
+
+    if (e.target.closest('#avatar')) {
+      var open = menu.classList.toggle('is-open');
+      avatar.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    if (!e.target.closest('#account-menu')) {
+      menu.classList.remove('is-open');
+      avatar.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  apply();
+})();
+</script>
+</body>
+</html>

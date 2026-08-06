@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>growtoo · iOS app mockup</title>
+<style>
+/* ============================================================
+   growtoo iOS mockup
+   Design tokens lifted verbatim from app/styles/app.css so the
+   prototype and the shipping web app stay one system.
+   ============================================================ */
+:root {
+  --bg: #0f1a12;
+  --bg-alt: #142018;
+  --green: #b8d4b0;
+  --brass: #c9a55e;
+  --brass-hover: #d8b872;
+  --brass-active: #b08f45;
+  --brass-ink: #1a1408;
+  --rust: #a86b4f;
+  --text: #f3efe6;
+  --text-muted: rgba(184, 196, 176, 0.78);
+  --text-dim: rgba(184, 196, 176, 0.5);
+  --border: rgba(201, 165, 94, 0.18);
+  --card-bg: #132016;
+  --card-hover: #18261c;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  /* iOS layout metrics, in points */
+  --safe-top: 59px;
+  --safe-bottom: 34px;
+  --tabbar-h: 49px;
+
+  /* Semantic layer. Everything below is theme-swappable; the raw brand
+     values above are not. --brass is the ink-weight accent (text, icons)
+     and --brass-fill is the gold used where brass is a filled surface —
+     in light mode those two have to part ways to stay legible. */
+  --brass-fill: #c9a55e;
+  --brass-wash: rgba(201, 165, 94, 0.1);
+  --brass-wash-strong: rgba(201, 165, 94, 0.18);
+  --chrome-bg: rgba(15, 26, 18, 0.72);
+  --field-bg: rgba(10, 18, 14, 0.9);
+  --metric-bg: rgba(10, 18, 14, 0.96);
+  --metric-border: rgba(255, 255, 255, 0.07);
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, 0.16), rgba(19, 32, 22, 0.9));
+  --seal-border: rgba(201, 165, 94, 0.45);
+  --photo-bg: linear-gradient(165deg, #1d2c20, #101c14);
+  --photo-glow: rgba(120, 170, 110, 0.3);
+  --grabber: rgba(243, 239, 230, 0.28);
+  --indicator: rgba(243, 239, 230, 0.5);
+  --toast-bg: rgba(16, 26, 19, 0.95);
+  --border-strong: rgba(201, 165, 94, 0.34);
+  --switch-off: rgba(184, 196, 176, 0.22);
+  --ok-text: var(--green);
+  --ok-bg: rgba(184, 212, 176, 0.08);
+  --ok-border: rgba(184, 212, 176, 0.28);
+  --warn-text: var(--rust);
+  --warn-bg: rgba(168, 107, 79, 0.12);
+  --warn-border: rgba(168, 107, 79, 0.35);
+}
+
+/* Light theme — the catalog printed on paper rather than lit in the dark.
+   Scoped to the device, so the page around it stays dark and the phone
+   reads as the artifact. Settings › Appearance switches this at runtime. */
+.screen-host[data-theme="light"] {
+  --bg: #f3f0e7;
+  --bg-alt: #fbf9f3;
+  --card-bg: #fffefa;
+  --card-hover: #f6f2e7;
+  --brass: #7d6024;
+  --brass-fill: #c9a55e;
+  --brass-ink: #241a05;
+  --brass-wash: rgba(125, 96, 36, 0.09);
+  --brass-wash-strong: rgba(125, 96, 36, 0.16);
+  --text: #17251b;
+  --text-muted: rgba(37, 58, 42, 0.72);
+  --text-dim: rgba(37, 58, 42, 0.46);
+  --border: rgba(125, 96, 36, 0.2);
+  --chrome-bg: rgba(248, 245, 237, 0.78);
+  --field-bg: rgba(232, 227, 213, 0.85);
+  --metric-bg: #fffefa;
+  --metric-border: rgba(125, 96, 36, 0.14);
+  --seal-bg: radial-gradient(circle at 35% 30%, rgba(201, 165, 94, 0.34), rgba(255, 254, 250, 0.95));
+  --seal-border: rgba(125, 96, 36, 0.5);
+  --photo-bg: linear-gradient(165deg, #dbe4d4, #c2d1bc);
+  --photo-glow: rgba(96, 150, 88, 0.34);
+  --grabber: rgba(37, 58, 42, 0.24);
+  --indicator: rgba(37, 58, 42, 0.4);
+  --toast-bg: rgba(255, 253, 247, 0.97);
+  --border-strong: rgba(125, 96, 36, 0.34);
+  --shadow: 0 8px 24px rgba(60, 50, 20, 0.12);
+  --shadow-md: 0 16px 48px rgba(60, 50, 20, 0.18);
+  --switch-off: rgba(37, 58, 42, 0.18);
+  --ok-text: #3d6a38;
+  --ok-bg: rgba(61, 106, 56, 0.1);
+  --ok-border: rgba(61, 106, 56, 0.3);
+  --warn-text: #8d5233;
+  --warn-bg: rgba(141, 82, 51, 0.1);
+  --warn-border: rgba(141, 82, 51, 0.32);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(201,165,94,.07) 0%, transparent 55%),
+    radial-gradient(700px 460px at 10% 30%, rgba(40,80,50,.12) 0%, transparent 50%),
+    #0a120c;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 32px 24px 64px;
+}
+
+/* ---------- page chrome (outside the phone) ---------- */
+.page-head { max-width: 1180px; margin: 0 auto 26px; }
+.page-kicker {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--brass); margin: 0 0 8px;
+}
+.page-title {
+  font-family: var(--font-display); font-weight: 350; font-size: 30px;
+  letter-spacing: -.02em; margin: 0 0 6px;
+}
+.page-sub { margin: 0; color: var(--text-muted); font-size: 14px; max-width: 62ch; line-height: 1.55; }
+
+.stage {
+  max-width: 1180px; margin: 0 auto; display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 44px; align-items: start;
+}
+@media (max-width: 900px) { .stage { grid-template-columns: 1fr; justify-items: center; } }
+
+.screen-picker { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 18px; }
+.chip {
+  font: inherit; font-size: 12.5px; padding: 7px 13px; border-radius: 999px; cursor: pointer;
+  background: rgba(201,165,94,.06); border: 1px solid var(--border); color: var(--text-muted);
+  transition: all .16s ease;
+}
+.chip:hover { background: rgba(201,165,94,.13); color: var(--text); }
+.chip.is-on { background: var(--brass); border-color: var(--brass); color: var(--brass-ink); font-weight: 600; }
+
+/* ---------- device ---------- */
+.phone-wrap { position: sticky; top: 32px; }
+.phone {
+  width: 393px; height: 852px; border-radius: 55px; padding: 11px;
+  background: linear-gradient(160deg, #3a3f3a, #1b201c 40%, #2e332e);
+  box-shadow: 0 40px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.07);
+  position: relative;
+}
+.phone::after { /* side button hints */
+  content: ''; position: absolute; right: -2px; top: 210px; width: 3px; height: 96px;
+  border-radius: 2px; background: linear-gradient(#43483f, #22261f);
+}
+.screen-host {
+  position: relative; width: 100%; height: 100%; border-radius: 45px; overflow: hidden;
+  background: var(--bg); color: var(--text); isolation: isolate;
+  transition: background .28s ease;
+}
+
+/* Dynamic Island + status bar */
+.statusbar {
+  position: absolute; inset: 0 0 auto 0; height: var(--safe-top); z-index: 40;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 15px 30px 0; pointer-events: none;
+  font-size: 15px; font-weight: 600; letter-spacing: -.01em;
+}
+.island {
+  position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+  width: 122px; height: 35px; border-radius: 20px; background: #000; z-index: 45;
+}
+.status-right { display: flex; align-items: center; gap: 5px; }
+.battery { width: 25px; height: 12px; border: 1.2px solid currentColor; border-radius: 3.5px; position: relative; opacity: .82; }
+.battery::after { content:''; position:absolute; right:-3.5px; top:3.5px; width:2px; height:4px; border-radius:0 2px 2px 0; background: currentColor; opacity:.55; }
+.battery i { position: absolute; inset: 1.6px; border-radius: 2px; background: var(--text); display: block; }
+
+/* ---------- screens ---------- */
+.screen {
+  position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; display: none;
+  padding: 0 0 calc(var(--tabbar-h) + var(--safe-bottom) + 12px);
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.is-active { display: block; }
+.screen.is-active.anim { animation: screen-in .26s cubic-bezier(.32,.72,0,1); }
+@keyframes screen-in { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+
+/* Nav bar: large title that collapses into a compact bar on scroll (UINavigationBar) */
+.navbar {
+  position: sticky; top: 0; z-index: 30; padding-top: var(--safe-top);
+  background: var(--chrome-bg); backdrop-filter: blur(22px) saturate(1.6);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  border-bottom: 1px solid transparent; transition: border-color .2s ease;
+}
+.navbar.is-collapsed { border-bottom-color: var(--border); }
+.nav-compact {
+  height: 44px; display: flex; align-items: center; justify-content: center; position: relative;
+  padding: 0 16px;
+}
+.nav-compact-title {
+  font-size: 17px; font-weight: 600; letter-spacing: -.01em;
+  opacity: 0; transform: translateY(6px); transition: opacity .2s ease, transform .2s ease;
+}
+.navbar.is-collapsed .nav-compact-title { opacity: 1; transform: none; }
+.nav-actions { position: absolute; right: 14px; display: flex; gap: 14px; align-items: center; }
+.nav-back { position: absolute; left: 12px; display: flex; align-items: center; gap: 2px; color: var(--brass); font-size: 17px; background: none; border: 0; font-family: inherit; cursor: pointer; padding: 4px 6px 4px 0; }
+.icon-btn { background: none; border: 0; padding: 0; color: var(--brass); cursor: pointer; display: grid; place-items: center; position: relative; }
+.icon-btn .dot { position: absolute; top: -1px; right: -1px; width: 8px; height: 8px; border-radius: 50%; background: var(--warn-text); border: 1.5px solid var(--bg); }
+.large-title {
+  padding: 2px 20px 10px; font-family: var(--font-display); font-size: 34px; font-weight: 400;
+  letter-spacing: -.022em; margin: 0; transition: opacity .18s ease;
+}
+.navbar.is-collapsed .large-title { opacity: 0; }
+
+.body { padding: 6px 20px 0; }
+
+/* ---------- generic iOS-ish building blocks ---------- */
+.eyebrow {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--brass); margin: 0 0 7px;
+}
+.sect-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin: 26px 0 10px; padding: 0 2px;
+}
+.sect-head h2 { font-family: var(--font-display); font-weight: 400; font-size: 20px; letter-spacing: -.015em; margin: 0; }
+.sect-more { color: var(--brass); font-size: 14px; background: none; border: 0; font-family: inherit; cursor: pointer; }
+
+.card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px;
+  padding: 16px; margin-bottom: 12px;
+}
+.card-lead { margin: 0; font-size: 15.5px; line-height: 1.45; }
+.muted { color: var(--text-muted); }
+.dim { color: var(--text-dim); }
+.mono { font-family: var(--font-mono); }
+
+.btn {
+  font-family: inherit; font-size: 15px; font-weight: 600; border-radius: 14px;
+  padding: 12px 16px; border: 1px solid transparent; cursor: pointer; letter-spacing: -.01em;
+}
+.btn-primary { background: var(--brass-fill); color: var(--brass-ink); }
+.btn-primary:active { background: var(--brass-active); }
+.btn-secondary { background: var(--brass-wash); color: var(--brass); border-color: var(--border); }
+.btn-ghost { background: transparent; color: var(--text-muted); border-color: var(--border); }
+.btn-row { display: flex; gap: 8px; margin-top: 14px; }
+.btn-row .btn { flex: 1; }
+.btn-sm { font-size: 13.5px; padding: 9px 13px; border-radius: 12px; }
+
+/* Inset grouped list (UITableView .insetGrouped) */
+.list {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 18px; overflow: hidden;
+}
+.row {
+  display: flex; align-items: center; gap: 13px; padding: 13px 15px; width: 100%;
+  background: none; border: 0; font-family: inherit; color: var(--text); text-align: left;
+  cursor: pointer; border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: 0; }
+.row:active { background: var(--card-hover); }
+.row-glyph {
+  width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; flex: none;
+  background: var(--brass-wash); color: var(--brass); font-size: 14px;
+}
+.row-glyph.mark { font-family: var(--font-mono); font-size: 11px; letter-spacing: .01em; }
+.row-text { flex: 1; min-width: 0; }
+.row-title { display: block; font-size: 15.5px; letter-spacing: -.01em; }
+.row-sub { display: block; font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.chevron { color: var(--text-dim); flex: none; }
+
+/* Wax-seal plant marks — the catalog motif, as a horizontal scroller */
+.seal-rail { display: flex; gap: 14px; overflow-x: auto; padding: 4px 20px 6px; margin: 0 -20px; scrollbar-width: none; }
+.seal-rail::-webkit-scrollbar { display: none; }
+.seal { flex: none; width: 78px; text-align: center; background: none; border: 0; font-family: inherit; cursor: pointer; padding: 0; color: inherit; }
+.seal-disc {
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 7px; display: grid; place-items: center;
+  border: 1.5px dashed var(--seal-border);
+  background: var(--seal-bg);
+  position: relative;
+}
+.seal-disc span { font-family: var(--font-display); font-size: 23px; color: var(--brass); }
+.seal-disc .seal-day {
+  position: absolute; bottom: -4px; right: -6px; background: var(--bg-alt); border: 1px solid var(--border);
+  border-radius: 999px; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.3;
+  padding: 2px 6px; color: var(--brass);
+}
+.seal-name { font-size: 12px; color: var(--text-muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seal.is-add .seal-disc { border-style: solid; border-color: var(--border); }
+.seal.is-add .seal-disc span { color: var(--text-dim); }
+
+/* metrics */
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+.metric { background: var(--metric-bg); border: 1px solid var(--metric-border); border-radius: 15px; padding: 12px 11px; }
+.metric-val { font-family: var(--font-mono); font-size: 20px; color: var(--text); display: block; letter-spacing: -.02em; }
+.metric-lbl { font-size: 11px; color: var(--text-muted); display: block; margin-top: 3px; }
+
+.pill {
+  display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--border); color: var(--brass); background: var(--brass-wash);
+  letter-spacing: .02em;
+}
+.pill.rust { color: var(--warn-text); border-color: var(--warn-border); background: var(--warn-bg); }
+.pill.green { color: var(--ok-text); border-color: var(--ok-border); background: var(--ok-bg); }
+
+/* segmented control */
+.segmented {
+  display: flex; background: var(--field-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 3px; gap: 3px; margin-bottom: 14px;
+}
+.segmented button {
+  flex: 1; font-family: inherit; font-size: 13.5px; font-weight: 500; padding: 7px; border: 0;
+  border-radius: 9px; background: none; color: var(--text-muted); cursor: pointer;
+}
+.segmented button[aria-selected="true"] { background: var(--brass-wash-strong); color: var(--text); }
+
+/* photo placeholder — themed, so light mode gets daylight rather than a hole */
+.photo-ph {
+  background: radial-gradient(60% 60% at 50% 45%, var(--photo-glow), transparent 70%), var(--photo-bg);
+  display: grid; place-items: center;
+}
+
+/* UISwitch */
+.switch {
+  width: 51px; height: 31px; border-radius: 999px; background: var(--switch-off);
+  border: 0; padding: 0; flex: none; cursor: pointer; position: relative;
+  transition: background .22s var(--ease-spring);
+}
+.switch::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px;
+  border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  transition: transform .22s var(--ease-spring);
+}
+.switch[aria-checked="true"] { background: var(--brass-fill); }
+.switch[aria-checked="true"]::after { transform: translateX(20px); }
+
+/* the check that marks the selected row in a settings group */
+.row-check { color: var(--brass); flex: none; opacity: 0; transition: opacity .15s ease; }
+.row[aria-selected="true"] .row-check { opacity: 1; }
+
+.settings-note { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; padding: 8px 6px 0; margin: 0; }
+
+/* theme preview swatches in the appearance rows */
+.swatch {
+  width: 30px; height: 30px; border-radius: 8px; flex: none; border: 1px solid var(--border);
+  display: grid; place-items: center;
+}
+.swatch.dark { background: #0f1a12; }
+.swatch.light { background: #f3f0e7; }
+.swatch.auto { background: linear-gradient(115deg, #f3f0e7 0 50%, #0f1a12 50% 100%); }
+.swatch i { width: 11px; height: 11px; border-radius: 50%; background: var(--brass-fill); display: block; }
+
+/* ---------- tab bar ---------- */
+.tabbar {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 35;
+  height: calc(var(--tabbar-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  display: grid; grid-template-columns: repeat(5, 1fr); align-items: start;
+  background: var(--chrome-bg); backdrop-filter: blur(24px) saturate(1.7);
+  -webkit-backdrop-filter: blur(24px) saturate(1.7);
+  border-top: .5px solid var(--border);
+}
+.tab {
+  background: none; border: 0; font-family: inherit; cursor: pointer; padding: 6px 0 0;
+  display: grid; justify-items: center; gap: 2px; color: var(--text-dim);
+}
+.tab-lbl { font-size: 10px; letter-spacing: .01em; }
+.tab.is-on { color: var(--brass); }
+.tab-log { position: relative; }
+.tab-log .fab {
+  width: 44px; height: 44px; border-radius: 50%; background: var(--brass-fill); color: var(--brass-ink);
+  display: grid; place-items: center; margin-top: -14px;
+  box-shadow: 0 6px 18px rgba(201,165,94,.32);
+}
+.tab-log .tab-lbl { margin-top: 1px; }
+
+.home-indicator {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); z-index: 60;
+  width: 139px; height: 5px; border-radius: 3px; background: var(--indicator); pointer-events: none;
+}
+
+/* ---------- modal sheet ---------- */
+.scrim {
+  position: absolute; inset: 0; z-index: 50; background: rgba(0,0,0,.45);
+  opacity: 0; pointer-events: none; transition: opacity .3s ease;
+}
+.scrim.is-open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 55;
+  background: var(--bg-alt); border-radius: 22px 22px 0 0;
+  border-top: 1px solid var(--border);
+  padding: 8px 20px calc(var(--safe-bottom) + 14px);
+  transform: translateY(100%); transition: transform .34s cubic-bezier(.32,.72,0,1);
+  max-height: 78%; overflow-y: auto;
+}
+.sheet.is-open { transform: none; }
+.grabber { width: 36px; height: 5px; border-radius: 3px; background: var(--grabber); margin: 0 auto 14px; }
+.sheet h3 { font-family: var(--font-display); font-weight: 400; font-size: 21px; margin: 0 0 3px; letter-spacing: -.015em; }
+.sheet .sheet-sub { margin: 0 0 16px; font-size: 13.5px; color: var(--text-muted); }
+
+/* ---------- coach chat ---------- */
+.chat { padding: 14px 20px 0; display: flex; flex-direction: column; gap: 10px; }
+.bubble { max-width: 82%; padding: 11px 14px; border-radius: 19px; font-size: 15px; line-height: 1.42; }
+.bubble.them { background: var(--card-bg); border: 1px solid var(--border); border-bottom-left-radius: 6px; align-self: flex-start; }
+.bubble.me { background: var(--brass-fill); color: var(--brass-ink); border-bottom-right-radius: 6px; align-self: flex-end; }
+.bubble-photo { width: 150px; height: 105px; border-radius: 14px; align-self: flex-end; border: 1px solid var(--border);
+  background: var(--photo-bg); display: grid; place-items: center; color: var(--text-dim); font-size: 11px; }
+.composer {
+  position: sticky; bottom: 0; margin-top: 14px;
+  padding: 9px 16px calc(var(--safe-bottom) + 4px);
+  background: var(--chrome-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: .5px solid var(--border); display: flex; align-items: center; gap: 10px;
+}
+.composer .field {
+  flex: 1; background: var(--field-bg); border: 1px solid var(--border); border-radius: 18px;
+  padding: 9px 14px; color: var(--text-dim); font-size: 15px;
+}
+
+/* ---------- camera ---------- */
+.cam { position: absolute; inset: 0; background: #050906; display: flex; flex-direction: column; }
+.cam-view {
+  flex: 1; position: relative; margin-top: var(--safe-top);
+  background:
+    radial-gradient(60% 45% at 50% 42%, rgba(120,170,110,.30), transparent 70%),
+    linear-gradient(170deg, #16241a, #0a130c);
+}
+.cam-guide { position: absolute; inset: 16% 12%; border: 1.5px solid rgba(201,165,94,.5); border-radius: 20px; }
+.cam-guide::before, .cam-guide::after {
+  content: ''; position: absolute; background: rgba(201,165,94,.5);
+}
+.cam-hint {
+  position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 13px;
+  color: var(--text-muted); text-shadow: 0 1px 6px rgba(0,0,0,.6);
+}
+.cam-modes { display: flex; justify-content: center; gap: 22px; padding: 14px 0 6px; font-size: 12.5px; color: var(--text-dim); }
+.cam-modes .on { color: var(--brass); font-weight: 600; }
+.cam-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 34px calc(var(--safe-bottom) + 16px); }
+.shutter { width: 68px; height: 68px; border-radius: 50%; border: 3.5px solid var(--text); padding: 4px; background: none; cursor: pointer; }
+.shutter i { display: block; width: 100%; height: 100%; border-radius: 50%; background: var(--text); }
+.cam-thumb { width: 42px; height: 42px; border-radius: 10px; border: 1px solid var(--border); background: linear-gradient(150deg,#2b3a2a,#16241a); }
+
+/* ---------- toast ---------- */
+.toast {
+  position: absolute; left: 50%; bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+  transform: translate(-50%, 12px); z-index: 70;
+  background: var(--toast-bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 11px 17px; font-size: 14px; opacity: 0; pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease; box-shadow: 0 12px 30px rgba(0,0,0,.5);
+  display: flex; align-items: center; gap: 9px; white-space: nowrap;
+}
+.toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- annotations column ---------- */
+.notes { padding-top: 4px; }
+.notes h3 { font-family: var(--font-display); font-weight: 400; font-size: 21px; margin: 0 0 4px; letter-spacing: -.015em; }
+.notes > p { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin: 0 0 22px; max-width: 60ch; }
+.note-card {
+  border: 1px solid var(--border); border-radius: 16px; padding: 15px 17px; margin-bottom: 11px;
+  background: rgba(19,32,22,.6); display: none;
+}
+.note-card.is-on { display: block; }
+.note-card h4 { margin: 0 0 8px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.note-card ul { margin: 0; padding-left: 17px; color: var(--text-muted); font-size: 13.5px; line-height: 1.62; }
+.note-card li { margin-bottom: 5px; }
+.note-card li strong { color: var(--text); font-weight: 500; }
+.legend { border-top: 1px solid var(--border); margin-top: 22px; padding-top: 18px; }
+.legend h4 { margin: 0 0 9px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--brass); font-family: var(--font-mono); font-weight: 400; }
+.legend p { margin: 0 0 9px; font-size: 13.5px; color: var(--text-muted); line-height: 1.6; max-width: 60ch; }
+.legend code { font-family: var(--font-mono); font-size: 12.5px; color: var(--green); }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <p class="page-kicker">growtoo · native client</p>
+  <h1 class="page-title">iOS app mockup</h1>
+  <p class="page-sub">
+    Interactive prototype of growto.live as a native iOS app — same catalog system (warm forest + brass),
+    re-laid onto UIKit/SwiftUI conventions: large titles, inset-grouped lists, a blurred tab bar,
+    detented sheets and a full-bleed camera. Tap the phone; every tab, sheet and row below is live.
+  </p>
+</header>
+
+<div class="stage">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="screen-host" id="host">
+        <div class="island" aria-hidden="true"></div>
+        <div class="statusbar" aria-hidden="true">
+          <span>9:41</span>
+          <span class="status-right">
+            <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2a10 10 0 0 1 14 0"/><path d="M3.6 6.9a6.4 6.4 0 0 1 8.8 0"/><path d="M6.2 9.5a2.7 2.7 0 0 1 3.6 0"/></svg>
+            <span class="battery"><i style="width:78%"></i></span>
+          </span>
+        </div>
+
+        <!-- ============ JOURNAL ============ -->
+        <section class="screen is-active" data-screen="journal">
+          <div class="navbar">
+            <div class="nav-compact">
+              <span class="nav-compact-title">Journal</span>
+              <span class="nav-actions">
+                <button class="icon-btn" aria-label="Inbox" data-go="inbox">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                  <span class="dot"></span>
+                </button>
+                <button class="icon-btn" aria-label="Account" data-sheet="account">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.6 20a7.6 7.6 0 0 1 14.8 0"/></svg>
+                </button>
+              </span>
+            </div>
+            <h1 class="large-title">Journal</h1>
+          </div>
+
+          <div class="body">
+            <article class="card" style="border-color:var(--border-strong)">
+              <p class="eyebrow">Today · day 34</p>
+              <p class="card-lead">Two plants are due for water, and <strong>Northern Lights</strong> hasn't been photographed in six days.</p>
+              <div class="btn-row">
+                <button class="btn btn-primary" data-sheet="log">Log watering</button>
+                <button class="btn btn-secondary" data-go="camera">Photo</button>
+              </div>
+            </article>
+
+            <div class="sect-head"><h2>Your plants</h2><button class="sect-more" data-tab="plants">See all</button></div>
+          </div>
+          <div class="seal-rail">
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>NL</span><span class="seal-day">d34</span></span><span class="seal-name">Northern Lights</span></button>
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>WW</span><span class="seal-day">d21</span></span><span class="seal-name">White Widow</span></button>
+            <button class="seal" data-go="plant"><span class="seal-disc"><span>CB</span><span class="seal-day">d58</span></span><span class="seal-name">CBD Auto</span></button>
+            <button class="seal is-add" data-sheet="log"><span class="seal-disc"><span>+</span></span><span class="seal-name">New plant</span></button>
+          </div>
+
+          <div class="body">
+            <div class="metrics" style="margin-top:16px">
+              <div class="metric"><span class="metric-val">3</span><span class="metric-lbl">Plants</span></div>
+              <div class="metric"><span class="metric-val">128</span><span class="metric-lbl">Entries</span></div>
+              <div class="metric"><span class="metric-val">2</span><span class="metric-lbl">Sealed</span></div>
+            </div>
+
+            <div class="sect-head"><h2>Recent notes</h2></div>
+            <div class="list">
+              <button class="row">
+                <span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span>
+                <span class="row-text"><span class="row-title">Watered · 1.2 L</span><span class="row-sub">Northern Lights · today, 08:12</span></span>
+                <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+              </button>
+              <button class="row">
+                <span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span>
+                <span class="row-text"><span class="row-title">Photo · week 5</span><span class="row-sub">White Widow · yesterday, 19:40</span></span>
+                <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+              </button>
+              <button class="row">
+                <span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v16M6 9h12"/></svg></span>
+                <span class="row-text"><span class="row-title">Fed · CalMag 2 ml/L</span><span class="row-sub">CBD Auto · Tue, 07:55</span></span>
+                <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+              </button>
+            </div>
+
+            <div class="sect-head"><h2>Today's list</h2><button class="sect-more" data-go="today">Open</button></div>
+            <div class="card" style="display:flex;align-items:center;gap:12px">
+              <span class="pill green">2 of 5 done</span>
+              <span class="muted" style="font-size:13.5px">Water · check moisture · note changes</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ PLANTS ============ -->
+        <section class="screen" data-screen="plants">
+          <div class="navbar">
+            <div class="nav-compact">
+              <span class="nav-compact-title">Plants</span>
+              <span class="nav-actions">
+                <button class="icon-btn" aria-label="Add plant" data-sheet="log">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                </button>
+              </span>
+            </div>
+            <h1 class="large-title">Plants</h1>
+          </div>
+          <div class="body">
+            <div class="card" style="display:flex;align-items:center;gap:13px">
+              <span class="row-glyph" style="width:38px;height:38px;border-radius:11px"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg></span>
+              <div style="flex:1">
+                <p style="margin:0;font-size:15px">24° · clear</p>
+                <p style="margin:2px 0 0;font-size:12.5px" class="muted">Zagreb · 3-day outlook good for outdoor feed</p>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>My plants</h2><span class="pill">Rank · Cultivator</span></div>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:13px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:54px;height:54px;margin:0"><span style="font-size:17px">NL</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px;letter-spacing:-.01em">Northern Lights</span>
+                <span style="display:block;font-size:12.5px;margin-top:3px" class="muted">Flowering · day 34 · indoor</span>
+                <span style="display:block;margin-top:7px"><span class="pill green">Sealed</span> <span class="pill">Listed · 120 $GROWTOO</span></span>
+              </span>
+              <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+            </button>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:13px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:54px;height:54px;margin:0"><span style="font-size:17px">WW</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px;letter-spacing:-.01em">White Widow</span>
+                <span style="display:block;font-size:12.5px;margin-top:3px" class="muted">Vegetative · day 21 · indoor</span>
+                <span style="display:block;margin-top:7px"><span class="pill rust">Water due</span></span>
+              </span>
+              <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+            </button>
+
+            <button class="card" style="width:100%;text-align:left;display:flex;gap:13px;align-items:center;cursor:pointer" data-go="plant">
+              <span class="seal-disc" style="width:54px;height:54px;margin:0"><span style="font-size:17px">CB</span></span>
+              <span style="flex:1">
+                <span style="display:block;font-size:16px;letter-spacing:-.01em">CBD Auto</span>
+                <span style="display:block;font-size:12.5px;margin-top:3px" class="muted">Flowering · day 58 · outdoor</span>
+                <span style="display:block;margin-top:7px"><span class="pill green">Sealed</span></span>
+              </span>
+              <svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg>
+            </button>
+
+            <div class="sect-head"><h2>Journal</h2><button class="sect-more">Filter</button></div>
+            <div class="list">
+              <button class="row"><span class="row-text"><span class="row-title">Trimmed lower fan leaves</span><span class="row-sub">Northern Lights · 3 Aug</span></span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+              <button class="row"><span class="row-text"><span class="row-title">pH drifted to 6.8 — corrected</span><span class="row-sub">CBD Auto · 2 Aug</span></span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+              <button class="row"><span class="row-text"><span class="row-title">Moved 10 cm from light</span><span class="row-sub">White Widow · 1 Aug</span></span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ PLANT DETAIL (pushed) ============ -->
+        <section class="screen" data-screen="plant">
+          <div class="navbar">
+            <div class="nav-compact">
+              <button class="nav-back" data-tab="plants">
+                <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 1.5 2 9l7.5 7.5"/></svg>
+                Plants
+              </button>
+              <span class="nav-compact-title">Northern Lights</span>
+              <span class="nav-actions">
+                <button class="icon-btn" aria-label="Share">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m8 6.5 4-3.5 4 3.5"/><path d="M5.5 12v7a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-7"/></svg>
+                </button>
+              </span>
+            </div>
+            <h1 class="large-title" style="font-size:30px">Northern Lights</h1>
+          </div>
+          <div class="body">
+            <p class="eyebrow" style="margin-top:-4px">Seed № 0034 · CBD Auto</p>
+            <div class="photo-ph" style="height:168px;border-radius:18px;border:1px solid var(--border);margin-bottom:12px">
+              <span class="dim" style="font-size:12.5px">Latest photo · day 34</span>
+            </div>
+
+            <div class="metrics">
+              <div class="metric"><span class="metric-val">34</span><span class="metric-lbl">Day</span></div>
+              <div class="metric"><span class="metric-val">6.4</span><span class="metric-lbl">pH</span></div>
+              <div class="metric"><span class="metric-val">62%</span><span class="metric-lbl">RH</span></div>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" data-sheet="log">Log care</button>
+              <button class="btn btn-secondary" data-tab="coach">Ask coach</button>
+            </div>
+
+            <div class="sect-head"><h2>On-chain</h2></div>
+            <div class="list">
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Stage seal · flowering</span><span class="row-sub mono">5Kd9…qA3f · devnet</span></span>
+                <span class="pill green">Confirmed</span>
+              </div>
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Market offer</span><span class="row-sub">Adopt stake · half unlocks on care</span></span>
+                <span class="pill mono">120 $GROWTOO</span>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>Care trail</h2></div>
+            <div class="list">
+              <button class="row"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span><span class="row-text"><span class="row-title">Watered 1.2 L</span><span class="row-sub">Today, 08:12</span></span></button>
+              <button class="row"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span><span class="row-text"><span class="row-title">Photo logged</span><span class="row-sub">Yesterday, 19:40</span></span></button>
+              <button class="row"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg></span><span class="row-text"><span class="row-title">Stage → flowering</span><span class="row-sub">28 Jul</span></span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ MARKET ============ -->
+        <section class="screen" data-screen="market">
+          <div class="navbar">
+            <div class="nav-compact">
+              <span class="nav-compact-title">Market</span>
+              <span class="nav-actions">
+                <button class="icon-btn" aria-label="Wallet" data-sheet="wallet">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M2.5 10h19"/><circle cx="17.5" cy="14.2" r="1.2" fill="currentColor" stroke="none"/></svg>
+                </button>
+              </span>
+            </div>
+            <h1 class="large-title">Market</h1>
+          </div>
+          <div class="body">
+            <div class="segmented" role="tablist">
+              <button role="tab" aria-selected="true">Simple</button>
+              <button role="tab" aria-selected="false">Advanced</button>
+            </div>
+
+            <div class="card" style="display:flex;align-items:center;gap:12px;border-color:var(--border-strong)">
+              <div style="flex:1">
+                <p class="eyebrow" style="margin:0 0 4px">Balance</p>
+                <p style="margin:0;font-size:22px" class="mono">1,240 $GROWTOO</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" data-toast="Faucet claimed · +100 $GROWTOO">Faucet</button>
+            </div>
+
+            <div class="sect-head"><h2>Open market</h2></div>
+
+            <article class="card">
+              <div style="display:flex;gap:12px;align-items:center">
+                <span class="seal-disc" style="width:46px;height:46px;margin:0"><span style="font-size:14px">GG</span></span>
+                <div style="flex:1">
+                  <p style="margin:0;font-size:15.5px">Gorilla Glue · day 41</p>
+                  <p style="margin:2px 0 0;font-size:12.5px" class="muted">Grower <span class="mono">7fQ2…m1Bd</span> · Split, HR</p>
+                </div>
+                <span class="mono" style="font-size:15px;color:var(--brass)">85</span>
+              </div>
+              <p style="margin:11px 0 0;font-size:13px" class="muted"><span class="pill">Adopt stake</span> Half now, half unlocks as the grower keeps logging care.</p>
+              <div class="btn-row"><button class="btn btn-primary" data-toast="Confirm with Face ID">Invest</button><button class="btn btn-ghost" style="flex:0 0 auto">Trail</button></div>
+            </article>
+
+            <article class="card">
+              <div style="display:flex;gap:12px;align-items:center">
+                <span class="seal-disc" style="width:46px;height:46px;margin:0"><span style="font-size:14px">AK</span></span>
+                <div style="flex:1">
+                  <p style="margin:0;font-size:15.5px">Amnesia Kush · day 62</p>
+                  <p style="margin:2px 0 0;font-size:12.5px" class="muted">Grower <span class="mono">Bx4v…9Kp2</span> · Zadar, HR</p>
+                </div>
+                <span class="mono" style="font-size:15px;color:var(--brass)">140</span>
+              </div>
+              <p style="margin:11px 0 0;font-size:13px" class="muted"><span class="pill green">Instant sale</span> Full price to the grower at purchase.</p>
+              <div class="btn-row"><button class="btn btn-primary" data-toast="Confirm with Face ID">Invest</button><button class="btn btn-ghost" style="flex:0 0 auto">Trail</button></div>
+            </article>
+
+            <div class="sect-head"><h2>My offers</h2></div>
+            <div class="list">
+              <button class="row">
+                <span class="row-text"><span class="row-title">Northern Lights · flowering</span><span class="row-sub">Posted 2 Aug · adopt stake</span></span>
+                <span class="pill mono">120</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ COACH ============ -->
+        <section class="screen" data-screen="coach">
+          <div class="navbar">
+            <div class="nav-compact">
+              <span class="nav-compact-title">Grow coach</span>
+              <span class="nav-actions"><button class="icon-btn" aria-label="New chat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></span>
+            </div>
+            <h1 class="large-title" style="font-size:31px">Grow coach</h1>
+          </div>
+          <div class="chat">
+            <div class="bubble them">Northern Lights is on day 34 of flowering and last watered 08:12 today. What are you seeing?</div>
+            <div class="bubble-photo">photo · day 34</div>
+            <div class="bubble me">Lower leaves are yellowing from the edges in.</div>
+            <div class="bubble them">
+              That pattern on the older growth during flower usually reads as nitrogen moving up the plant — normal fade if it's slow and bottom-up.
+              Watch for it climbing above the mid-canopy in the next week.
+            </div>
+            <div class="bubble them">Your last three feeds skipped CalMag. Want me to add a check to today's list?</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px">
+              <button class="btn btn-secondary btn-sm" data-toast="Added to today's list">Add the check</button>
+              <button class="btn btn-ghost btn-sm" data-go="camera">Send another photo</button>
+            </div>
+          </div>
+          <div class="composer">
+            <button class="icon-btn" aria-label="Camera" data-go="camera">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg>
+            </button>
+            <span class="field">Ask about your grow…</span>
+            <button class="icon-btn" aria-label="Send" style="color:var(--brass)">
+              <svg width="25" height="25" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="11" opacity=".18"/><path d="M12 6.5 17 12h-3.2v5.5h-3.6V12H7z" /></svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ============ TOKENISE ============ -->
+        <section class="screen" data-screen="tokenise">
+          <div class="navbar">
+            <div class="nav-compact"><span class="nav-compact-title">Tokenise</span></div>
+            <h1 class="large-title">Tokenise</h1>
+          </div>
+          <div class="body">
+            <p class="muted" style="font-size:14px;line-height:1.55;margin:0 0 16px">
+              Seal a stage of a plant on-chain. The seal becomes a specimen NFT you can list on the market.
+            </p>
+
+            <div class="sect-head" style="margin-top:6px"><h2>Choose a plant</h2></div>
+            <div class="list">
+              <button class="row"><span class="row-glyph mark">NL</span><span class="row-text"><span class="row-title">Northern Lights</span><span class="row-sub">Flowering · day 34</span></span><span class="pill green">Sealed</span></button>
+              <button class="row"><span class="row-glyph mark">WW</span><span class="row-text"><span class="row-title">White Widow</span><span class="row-sub">Vegetative · day 21</span></span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+              <button class="row"><span class="row-glyph mark">CB</span><span class="row-text"><span class="row-title">CBD Auto</span><span class="row-sub">Flowering · day 58</span></span><span class="pill green">Sealed</span></button>
+            </div>
+
+            <div class="sect-head"><h2>Stage</h2></div>
+            <div class="segmented" role="tablist">
+              <button role="tab" aria-selected="false">Seedling</button>
+              <button role="tab" aria-selected="true">Vegetative</button>
+              <button role="tab" aria-selected="false">Flowering</button>
+            </div>
+
+            <article class="card">
+              <p class="eyebrow">Wallet</p>
+              <p style="margin:0;font-size:14.5px">Phantom · <span class="mono">7fQ2…m1Bd</span></p>
+              <p style="margin:6px 0 0;font-size:12.5px" class="dim">Devnet · $GROWTOO has no monetary value</p>
+            </article>
+
+            <button class="btn btn-primary" style="width:100%;margin-top:6px" data-toast="Seal submitted · awaiting confirmation">Seal this stage</button>
+          </div>
+        </section>
+
+        <!-- ============ TODAY ============ -->
+        <section class="screen" data-screen="today">
+          <div class="navbar">
+            <div class="nav-compact">
+              <button class="nav-back" data-tab="journal">
+                <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 1.5 2 9l7.5 7.5"/></svg>
+                Journal
+              </button>
+              <span class="nav-compact-title">Today</span>
+            </div>
+            <h1 class="large-title">Today</h1>
+          </div>
+          <div class="body">
+            <p class="muted" style="font-size:14px;margin:0 0 16px">Wednesday, 6 August · 5 things</p>
+            <div class="list" id="today-list">
+              <label class="row"><input type="checkbox" checked style="accent-color:var(--brass);width:21px;height:21px"><span class="row-text"><span class="row-title">Water the plants</span><span class="row-sub">2 plants need watering</span></span></label>
+              <label class="row"><input type="checkbox" checked style="accent-color:var(--brass);width:21px;height:21px"><span class="row-text"><span class="row-title">Check moisture</span><span class="row-sub">Check the soil in the pots</span></span></label>
+              <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:21px;height:21px"><span class="row-text"><span class="row-title">Photograph Northern Lights</span><span class="row-sub">Last photo 6 days ago</span></span></label>
+              <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:21px;height:21px"><span class="row-text"><span class="row-title">Add CalMag to next feed</span><span class="row-sub">Suggested by coach</span></span></label>
+              <label class="row"><input type="checkbox" style="accent-color:var(--brass);width:21px;height:21px"><span class="row-text"><span class="row-title">Add a note</span><span class="row-sub">Write down any changes</span></span></label>
+            </div>
+            <p class="dim" style="font-size:12.5px;margin-top:14px;line-height:1.55">
+              On iOS this list also drives the daily notification and the Lock Screen widget.
+            </p>
+          </div>
+        </section>
+
+        <!-- ============ INBOX ============ -->
+        <section class="screen" data-screen="inbox">
+          <div class="navbar">
+            <div class="nav-compact">
+              <button class="nav-back" data-tab="journal">
+                <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 1.5 2 9l7.5 7.5"/></svg>
+                Journal
+              </button>
+              <span class="nav-compact-title">Inbox</span>
+              <span class="nav-actions"><button class="icon-btn" style="font-size:15px;font-family:inherit">Read</button></span>
+            </div>
+            <h1 class="large-title">Inbox</h1>
+          </div>
+          <div class="body">
+            <div class="list">
+              <button class="row"><span class="row-glyph" style="background:var(--warn-bg);color:var(--warn-text)">!</span><span class="row-text"><span class="row-title">Your offer was adopted</span><span class="row-sub">Northern Lights · 120 $GROWTOO · 2 h ago</span></span></button>
+              <button class="row"><span class="row-glyph"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></span><span class="row-text"><span class="row-title">Seal confirmed on devnet</span><span class="row-sub mono">5Kd9…qA3f · yesterday</span></span></button>
+              <button class="row"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg></span><span class="row-text"><span class="row-title">CBD Auto reached day 56</span><span class="row-sub">Harvest window opens soon · 3 d ago</span></span></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SETTINGS ============ -->
+        <section class="screen" data-screen="settings">
+          <div class="navbar">
+            <div class="nav-compact">
+              <button class="nav-back" data-tab="journal">
+                <svg width="11" height="18" viewBox="0 0 11 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 1.5 2 9l7.5 7.5"/></svg>
+                Journal
+              </button>
+              <span class="nav-compact-title">Settings</span>
+            </div>
+            <h1 class="large-title">Settings</h1>
+          </div>
+          <div class="body">
+            <div class="sect-head"><h2>Appearance</h2></div>
+            <div class="list" id="ios-theme-group">
+              <button class="row" data-theme-choice="light" aria-selected="false">
+                <span class="swatch light"><i></i></span>
+                <span class="row-text"><span class="row-title">Light</span><span class="row-sub">Catalog on paper</span></span>
+                <svg class="row-check" width="15" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+              </button>
+              <button class="row" data-theme-choice="dark" aria-selected="true">
+                <span class="swatch dark"><i></i></span>
+                <span class="row-text"><span class="row-title">Dark</span><span class="row-sub">Warm forest + brass</span></span>
+                <svg class="row-check" width="15" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+              </button>
+              <button class="row" data-theme-choice="system" aria-selected="false">
+                <span class="swatch auto"></span>
+                <span class="row-text"><span class="row-title">System</span><span class="row-sub">Follow iOS appearance</span></span>
+                <svg class="row-check" width="15" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>
+              </button>
+            </div>
+            <p class="settings-note">Dark is the default — it's the identity the catalog system was drawn for. Light exists for daylight in a tent or a greenhouse, where a dark screen is unreadable.</p>
+
+            <div class="sect-head"><h2>Notifications</h2></div>
+            <div class="list">
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Daily care reminder</span><span class="row-sub">08:00 · from Today's list</span></span>
+                <button class="switch" role="switch" aria-checked="true" aria-label="Daily care reminder"></button>
+              </div>
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">On-chain confirmations</span><span class="row-sub">Seals, offers, adoptions</span></span>
+                <button class="switch" role="switch" aria-checked="true" aria-label="On-chain confirmations"></button>
+              </div>
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Market activity</span><span class="row-sub">New asks from growers you follow</span></span>
+                <button class="switch" role="switch" aria-checked="false" aria-label="Market activity"></button>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>Journal</h2></div>
+            <div class="list">
+              <button class="row"><span class="row-text"><span class="row-title">Units</span></span><span class="muted" style="font-size:14px">Metric</span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+              <button class="row"><span class="row-text"><span class="row-title">Default plant</span></span><span class="muted" style="font-size:14px">Northern Lights</span><svg class="chevron" width="8" height="13" viewBox="0 0 8 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1.5 1.5 6.5 6.5l-5 5"/></svg></button>
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Private journal</span><span class="row-sub">Hide entries from adopters</span></span>
+                <button class="switch" role="switch" aria-checked="false" aria-label="Private journal"></button>
+              </div>
+            </div>
+
+            <div class="sect-head"><h2>Network</h2></div>
+            <div class="list">
+              <div class="row" style="cursor:default">
+                <span class="row-text"><span class="row-title">Solana network</span><span class="row-sub mono">devnet</span></span>
+                <span class="pill">Test</span>
+              </div>
+            </div>
+            <p class="settings-note">$GROWTOO on devnet has no monetary value.</p>
+          </div>
+        </section>
+
+        <!-- ============ CAMERA (full screen modal) ============ -->
+        <section class="screen" data-screen="camera" style="padding:0">
+          <div class="cam">
+            <div class="cam-view">
+              <div class="cam-guide"></div>
+              <p class="cam-hint">Fill the frame with one plant · even light</p>
+            </div>
+            <div class="cam-modes"><span>Journal</span><span class="on">Diagnose</span><span>Seal</span></div>
+            <div class="cam-bar">
+              <span class="cam-thumb"></span>
+              <button class="shutter" data-toast="Photo added to Northern Lights"><i></i></button>
+              <button class="icon-btn" data-tab="journal" style="color:var(--text)" aria-label="Close">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ tab bar ============ -->
+        <nav class="tabbar" id="tabbar">
+          <button class="tab is-on" data-tab="journal">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8a2 2 0 0 1 2 2v14l-6-3-6 3V6a2 2 0 0 1 2-2z"/></svg>
+            <span class="tab-lbl">Journal</span>
+          </button>
+          <button class="tab" data-tab="plants">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-1-3-3.5-4.5-7-4 0 3 2.5 5 7 4z"/><path d="M12 12c1-3.2 3.5-4.8 7-4.3 0 3.2-2.5 5.1-7 4.3z"/></svg>
+            <span class="tab-lbl">Plants</span>
+          </button>
+          <button class="tab tab-log" data-sheet="log" aria-label="Log">
+            <span class="fab"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>
+            <span class="tab-lbl">Log</span>
+          </button>
+          <button class="tab" data-tab="market">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l1.5-3h13L20 7"/><path d="M4 7h16v3a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0V7z"/><path d="M5.5 12.5V20h13v-7.5"/></svg>
+            <span class="tab-lbl">Market</span>
+          </button>
+          <button class="tab" data-tab="coach">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg>
+            <span class="tab-lbl">Coach</span>
+          </button>
+        </nav>
+
+        <!-- ============ sheets ============ -->
+        <div class="scrim" id="scrim"></div>
+
+        <div class="sheet" data-sheet-panel="log">
+          <div class="grabber"></div>
+          <h3>Log care</h3>
+          <p class="sheet-sub">Northern Lights · day 34</p>
+          <div class="list" style="margin-bottom:14px">
+            <button class="row" data-toast="Watering logged · 1.2 L"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3s5.5 6.2 5.5 10a5.5 5.5 0 0 1-11 0C6.5 9.2 12 3 12 3z"/></svg></span><span class="row-text"><span class="row-title">Watering</span><span class="row-sub">Last: today, 08:12</span></span></button>
+            <button class="row" data-toast="Feeding logged"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.8 3h4.4"/><path d="M10.6 3v6.4L5.8 17.5a2 2 0 0 0 1.7 3h9a2 2 0 0 0 1.7-3l-4.8-8.1V3"/><path d="M7.6 15h8.8"/></svg></span><span class="row-text"><span class="row-title">Feeding</span><span class="row-sub">Last: Tue · CalMag 2 ml/L</span></span></button>
+            <button class="row" data-go="camera"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="6.5" width="18" height="13" rx="3"/><circle cx="12" cy="13" r="3.6"/><path d="M8.5 6.5 10 4h4l1.5 2.5"/></svg></span><span class="row-text"><span class="row-title">Photo</span><span class="row-sub">Camera or library</span></span></button>
+            <button class="row" data-toast="Opening full entry"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14.5 5.5 18.5 9.5"/></svg></span><span class="row-text"><span class="row-title">Full journal entry</span><span class="row-sub">Notes, metrics, stage change</span></span></button>
+          </div>
+          <button class="btn btn-ghost" style="width:100%" data-close>Cancel</button>
+        </div>
+
+        <div class="sheet" data-sheet-panel="account">
+          <div class="grabber"></div>
+          <h3>Account</h3>
+          <p class="sheet-sub">Grower · bela@growto.live</p>
+          <div class="list" style="margin-bottom:14px">
+            <button class="row"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.6 20a7.6 7.6 0 0 1 14.8 0"/></svg></span><span class="row-text"><span class="row-title">Profile &amp; rank</span><span class="row-sub">Cultivator · 1,240 XP</span></span></button>
+            <button class="row" data-sheet="wallet"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="5.5" width="19" height="13" rx="3"/><path d="M2.5 10h19"/></svg></span><span class="row-text"><span class="row-title">Wallet</span><span class="row-sub mono">7fQ2…m1Bd · devnet</span></span></button>
+            <button class="row" data-go="tokenise"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="8" stroke-dasharray="3 2.6"/><path d="M12 8.5 13.3 11l2.7.4-2 1.9.5 2.7-2.5-1.3-2.5 1.3.5-2.7-2-1.9 2.7-.4z"/></svg></span><span class="row-text"><span class="row-title">Tokenise</span><span class="row-sub">Seal a stage on-chain</span></span></button>
+            <button class="row" data-go="settings"><span class="row-glyph"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 14.5a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.17l-.05.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3.1 14H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.16-2.9l-.06-.05a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.16l.05-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 20.9 10H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span><span class="row-text"><span class="row-title">Settings</span><span class="row-sub">Notifications, units, privacy</span></span></button>
+          </div>
+          <button class="btn btn-ghost" style="width:100%" data-close>Close</button>
+        </div>
+
+        <div class="sheet" data-sheet-panel="wallet">
+          <div class="grabber"></div>
+          <h3>Connect wallet</h3>
+          <p class="sheet-sub">Solana devnet · $GROWTOO has no monetary value</p>
+          <div class="list" style="margin-bottom:14px">
+            <button class="row" data-toast="Opening Phantom…"><span class="row-glyph mark">Ph</span><span class="row-text"><span class="row-title">Phantom</span><span class="row-sub">Mobile Wallet Adapter</span></span></button>
+            <button class="row" data-toast="Opening Solflare…"><span class="row-glyph mark">Sf</span><span class="row-text"><span class="row-title">Solflare</span><span class="row-sub">Mobile Wallet Adapter</span></span></button>
+            <button class="row"><span class="row-glyph"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/></svg></span><span class="row-text"><span class="row-title">Watch-only address</span><span class="row-sub">Paste a public key</span></span></button>
+          </div>
+          <button class="btn btn-ghost" style="width:100%" data-close>Not now</button>
+        </div>
+
+        <div class="toast" id="toast"><span class="pill green" style="padding:2px 7px">✓</span><span id="toast-text"></span></div>
+        <div class="home-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <div class="screen-picker" id="picker">
+      <button class="chip is-on" data-tab="journal">Journal</button>
+      <button class="chip" data-tab="plants">Plants</button>
+      <button class="chip" data-tab="plant">Plant detail</button>
+      <button class="chip" data-tab="market">Market</button>
+      <button class="chip" data-tab="coach">Coach</button>
+      <button class="chip" data-tab="tokenise">Tokenise</button>
+      <button class="chip" data-tab="today">Today</button>
+      <button class="chip" data-tab="inbox">Inbox</button>
+      <button class="chip" data-tab="camera">Camera</button>
+      <button class="chip" data-tab="settings">Settings</button>
+      <button class="chip" data-sheet="log">Log sheet</button>
+    </div>
+
+    <h3>What changes going native</h3>
+    <p>The web app's sidebar + bottom-nav hybrid collapses into five tabs with a centre action. Notes below track with the screen on the phone.</p>
+
+    <div class="note-card is-on" data-note="journal">
+      <h4>Journal — the home tab</h4>
+      <ul>
+        <li><strong>Large title</strong> collapses to a 44 pt bar on scroll — replaces the web header row.</li>
+        <li><strong>Today card</strong> is the same daily-status strip, promoted to the first card.</li>
+        <li><strong>Wax-seal rail</strong> keeps the catalog motif; horizontal scroll instead of a grid.</li>
+        <li>Recent notes become an inset-grouped list with SF-style chevrons.</li>
+        <li>Native adds: Lock Screen widget for the seal rail, Live Activity while a seal confirms.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="plants">
+      <h4>Plants</h4>
+      <ul>
+        <li>Weather widget shrinks to one row — full forecast moves behind a tap.</li>
+        <li>Plant cards carry state as pills (<strong>Sealed</strong>, <strong>Water due</strong>, <strong>Listed</strong>).</li>
+        <li>Swipe actions on each card: water, photo, archive.</li>
+        <li>Pull-to-refresh replaces the Refresh button.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="plant">
+      <h4>Plant detail</h4>
+      <ul>
+        <li>A pushed screen with a back chevron, not a modal — deep-linkable from notifications.</li>
+        <li>On-chain facts sit in their own group, tx hashes in <strong>JetBrains Mono</strong> as on web.</li>
+        <li>Care trail is the journal filtered to one plant.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="market">
+      <h4>Market</h4>
+      <ul>
+        <li>Simple / Advanced stays as a real <strong>UISegmentedControl</strong>.</li>
+        <li>Invest confirms with <strong>Face ID</strong> before the wallet round-trip.</li>
+        <li>Wallet connect uses <strong>Mobile Wallet Adapter</strong> deep links, not an injected provider.</li>
+        <li>App Store note: token flows must read as utility/test, never as investment product.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="coach">
+      <h4>Grow coach</h4>
+      <ul>
+        <li>A messages screen — bubbles, sticky composer, camera button inline.</li>
+        <li>Photo diagnosis is one tap from the composer; the capture returns straight into the thread.</li>
+        <li>Coach suggestions write into <strong>Today</strong>, which drives notifications.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="tokenise">
+      <h4>Tokenise</h4>
+      <ul>
+        <li>Reachable from Account and from a plant — it isn't frequent enough for a tab.</li>
+        <li>Stage picker as a segmented control; wallet state shown before the irreversible action.</li>
+        <li>Sealing shows a <strong>Live Activity</strong> until the devnet tx confirms.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="today">
+      <h4>Today</h4>
+      <ul>
+        <li>The checklist from the web app, now the source for the daily local notification.</li>
+        <li>Also renders as a Home Screen widget and a Lock Screen complication.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="inbox">
+      <h4>Inbox</h4>
+      <ul>
+        <li>Mirrors push notifications; each row deep-links to its plant or offer.</li>
+        <li>Confirmations, adoptions and stage milestones are the three push categories.</li>
+      </ul>
+    </div>
+    <div class="note-card" data-note="camera">
+      <h4>Camera</h4>
+      <ul>
+        <li>Full-bleed <strong>AVFoundation</strong> capture — the web camera's biggest upgrade.</li>
+        <li>Mode strip picks what the shot is for: journal photo, coach diagnosis, or seal evidence.</li>
+        <li>Frame guide keeps diagnosis photos consistent enough to compare week to week.</li>
+      </ul>
+    </div>
+
+    <div class="note-card" data-note="settings">
+      <h4>Settings — Appearance</h4>
+      <ul>
+        <li>Three values, one preference: <strong>Light</strong>, <strong>Dark</strong>, <strong>System</strong> — the same shape as <code>UIUserInterfaceStyle</code>.</li>
+        <li>Dark stays the default. It's the identity the catalog system was drawn for; light is the accommodation, not the baseline.</li>
+        <li>Light isn't dark-inverted: brass drops to <strong>#7d6024</strong> for text and icons so it stays legible on paper, while filled buttons keep the gold.</li>
+        <li>Switching is instant and themes only the device here — the page around the phone stays dark.</li>
+      </ul>
+    </div>
+
+    <div class="legend">
+      <h4>Notes</h4>
+      <p>Tokens are copied from <code>app/styles/app.css</code> — brass <code>#c9a55e</code>, forest <code>#0f1a12</code>, cream <code>#f3efe6</code>. Type is the system stack, which resolves to real SF on Apple hardware.</p>
+      <p>Metrics are iOS points at 393 × 852 (iPhone 16 / 15 Pro class): 59 pt top inset, 44 pt nav bar, 49 pt tab bar, 34 pt home indicator.</p>
+      <p>Android would keep the same screens on Material 3: bottom bar without the raised FAB, an extended FAB on Journal, and back-gesture navigation.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function () {
+  var host = document.getElementById('host');
+  var screens = {};
+  var current = 'journal';
+
+
+  document.querySelectorAll('.screen').forEach(function (el) {
+    screens[el.dataset.screen] = el;
+    el.addEventListener('scroll', function () {
+      var bar = el.querySelector('.navbar');
+      if (bar) bar.classList.toggle('is-collapsed', el.scrollTop > 26);
+    });
+  });
+
+  // Tabs the tab bar actually owns; everything else is a push/modal.
+  var TAB_SCREENS = ['journal', 'plants', 'market', 'coach'];
+
+  function show(name) {
+    if (!screens[name] || name === current) { closeSheets(); return; }
+    screens[current].classList.remove('is-active', 'anim');
+    current = name;
+    var el = screens[name];
+    el.classList.add('is-active', 'anim');
+    el.scrollTop = 0;
+    var bar = el.querySelector('.navbar');
+    if (bar) bar.classList.remove('is-collapsed');
+
+    // Camera is presented full screen — no tab bar behind it.
+    document.getElementById('tabbar').style.display = name === 'camera' ? 'none' : '';
+
+    document.querySelectorAll('.tab[data-tab]').forEach(function (t) {
+      t.classList.toggle('is-on', t.dataset.tab === name);
+    });
+    document.querySelectorAll('#picker .chip[data-tab]').forEach(function (c) {
+      c.classList.toggle('is-on', c.dataset.tab === name);
+    });
+    document.querySelectorAll('.note-card').forEach(function (n) {
+      n.classList.toggle('is-on', n.dataset.note === name);
+    });
+    // Plant detail belongs to the Plants tab; Today/Inbox to Journal.
+    if (TAB_SCREENS.indexOf(name) === -1) {
+      var owner = name === 'plant' ? 'plants' : name === 'tokenise' ? 'market' : 'journal';
+      var t = document.querySelector('.tab[data-tab="' + owner + '"]');
+      if (t) t.classList.add('is-on');
+    }
+    closeSheets();
+  }
+
+  function closeSheets() {
+    document.getElementById('scrim').classList.remove('is-open');
+    document.querySelectorAll('.sheet').forEach(function (s) { s.classList.remove('is-open'); });
+  }
+
+  function openSheet(name) {
+    var panel = document.querySelector('.sheet[data-sheet-panel="' + name + '"]');
+    if (!panel) return;
+    closeSheets();
+    document.getElementById('scrim').classList.add('is-open');
+    panel.classList.add('is-open');
+  }
+
+  var toast = document.getElementById('toast');
+  var toastText = document.getElementById('toast-text');
+  var toastTimer;
+  function flash(msg) {
+    toastText.textContent = msg;
+    toast.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove('is-on'); }, 1900);
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-tab],[data-go],[data-sheet],[data-toast],[data-close]');
+    if (!el) return;
+    if (el.hasAttribute('data-close')) { closeSheets(); return; }
+    if (el.dataset.toast) { closeSheets(); flash(el.dataset.toast); }
+    var dest = el.dataset.tab || el.dataset.go;
+    if (dest) { show(dest); return; }
+    if (el.dataset.sheet) openSheet(el.dataset.sheet);
+  });
+
+  document.getElementById('scrim').addEventListener('click', closeSheets);
+
+  /* ---- Appearance ------------------------------------------------------
+     One preference with three values, exactly as the real app would store
+     it: an explicit light/dark choice, or "system" which defers to the OS.
+     Only the device is themed — the page around it stays dark so the phone
+     reads as the artifact. */
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  var themePref = 'dark';
+
+  function applyTheme() {
+    var resolved = themePref === 'system' ? (systemDark.matches ? 'dark' : 'light') : themePref;
+    host.dataset.theme = resolved;
+    document.querySelectorAll('[data-theme-choice]').forEach(function (btn) {
+      btn.setAttribute('aria-selected', String(btn.dataset.themeChoice === themePref));
+    });
+  }
+  // Only meaningful while "system" is selected, but harmless to keep bound.
+  systemDark.addEventListener('change', applyTheme);
+
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-theme-choice]');
+    if (!btn) return;
+    themePref = btn.dataset.themeChoice;
+    applyTheme();
+    flash(themePref === 'system' ? 'Following system appearance' : 'Appearance: ' + themePref);
+  });
+
+  applyTheme();
+
+  // Switches are the one settings control worth making real.
+  document.addEventListener('click', function (e) {
+    var sw = e.target.closest('.switch');
+    if (!sw) return;
+    sw.setAttribute('aria-checked', sw.getAttribute('aria-checked') === 'true' ? 'false' : 'true');
+  });
+
+  // Segmented controls are the one control worth making real — they read as broken otherwise.
+  document.querySelectorAll('.segmented').forEach(function (group) {
+    group.addEventListener('click', function (e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      group.querySelectorAll('button').forEach(function (b) {
+        b.setAttribute('aria-selected', String(b === btn));
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
