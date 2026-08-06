@@ -24,6 +24,7 @@
   --ink-rgb: 184 196 176;       /* muted green ink */
   --white-rgb: 255 255 255;
   --shadow-rgb: 0 0 0;
+  --paper-rgb: 247 238 225;  /* warm off-white ink */
 
   /* Catalog system — warm forest + brass (matches landing). */
   --bg: #0f1a12;
@@ -31,7 +32,12 @@
   --surface: rgba(180, 200, 180, 0.05);
   --green: #b8d4b0;
   --green-light: #cfe0c6;
+  /* --brass is the ink-weight accent (text, icons, borders — 90 uses).
+     --brass-fill is brass as a filled surface (buttons — 15 uses), with
+     --brass-ink as the text on top of it. They are the same gold in dark
+     mode and must diverge in light: gold text on cream is 2.3:1. */
   --brass: #c9a55e;
+  --brass-fill: #c9a55e;
   --brass-hover: #d8b872;
   --brass-active: #b08f45;
   --brass-ink: #1a1408;
@@ -111,4 +117,110 @@
   --warn: #f59e0b;
   --warn-tint: #ffd9a8;
 
+  /* Used by the sign-in page (dnevnik/), which used to hardcode them. */
+  --canvas-glow: rgba(40, 80, 50, 0.18);
+  --ink-faint: rgba(150, 180, 150, 0.28);
+  --text-strong: rgb(243 239 230 / 0.9);
+  --field-bg: rgba(6, 14, 10, 0.55);
+  --field-bg-strong: rgba(6, 14, 10, 0.65);
+  --border-muted: rgba(106, 117, 104, 0.45);
+}
+
+/* ============================================================
+   Light theme — the catalog printed on paper.
+
+   Dark is the DEFAULT and the unthemed state: this block only ever
+   applies when data-theme="light" is set on <html>. There is no
+   prefers-color-scheme rule anywhere, so the OS gets a say only once
+   the grower explicitly picks Auto in Settings.
+
+   This is not the dark scheme inverted:
+   - brass splits. #c9a55e as text on cream measures 2.31:1, so the
+     ink-weight accent drops to #7d6024 (5.8:1) while --brass-fill
+     keeps the gold for buttons.
+   - status colours re-derive. The pale dark-mode greens and reds
+     vanish on cream.
+   - cards gain a hairline shadow; flat borders that read fine on
+     dark dissolve on paper.
+   ============================================================ */
+:root[data-theme='light'] {
+  /* Channel triplets. Tints derived from these follow automatically. */
+  --brass-rgb: 125 96 36;
+  --brass-hi-rgb: 150 116 44;
+  --rust-rgb: 141 82 51;
+  --alert-rgb: 150 52 28;
+  --forest-rgb: 120 140 122;
+  --ink-rgb: 37 58 42;
+  --white-rgb: 24 34 26;   /* "white" overlays become dark scrims on paper */
+  --paper-rgb: 26 38 29;   /* the warm off-white ink inverts to a warm near-black */
+  --shadow-rgb: 60 50 20;
+
+  --bg: #f3f0e7;
+  --bg-alt: #fbf9f3;
+  --surface: rgb(var(--ink-rgb) / 0.04);
+  --green: #3d6a38;
+  --green-light: #4d7d46;
+  --brass: #7d6024;
+  --brass-fill: #c9a55e;
+  --brass-hover: #b8923f;
+  --brass-active: #8f7030;
+  --brass-ink: #241a05;
+  --brass-disabled-bg: #e2ddce;
+  --brass-disabled-ink: #9a9482;
+  --rust: #8d5233;
+  --text: #17251b;
+  --border: rgb(var(--brass-rgb) / 0.24);
+  --shadow: 0 6px 20px rgb(var(--shadow-rgb) / 0.1);
+  --shadow-md: 0 14px 40px rgb(var(--shadow-rgb) / 0.14);
+  --desk-panel: linear-gradient(180deg, rgba(255, 254, 250, 0.96) 0%, rgba(247, 243, 232, 0.98) 100%);
+  --desk-line: rgb(var(--brass-rgb) / 0.16);
+  --card-bg: #fffefa;
+  --card-hover: #f7f3e8;
+  --metric-panel-bg: rgba(250, 247, 238, 0.9);
+  --metric-card-bg: #fffefa;
+  --metric-card-border: rgb(var(--brass-rgb) / 0.14);
+
+  /* Semantic layer */
+  --accent-forest: #4a6b50;
+  --accent-moss: #3f5a45;
+  --brass-earth: #9a6530;
+  --brass-hi: #96742c;
+  --brass-lo: #6b5220;
+  --brass-pale: #8a6c2a;
+  --brass-pale-2: #8a6828;
+  --canvas-bottom: #eeeade;
+  --canvas-top: #f6f3ea;
+  --danger: #b3402c;
+  --danger-ink: #8d3f1a;
+  --danger-ink-soft: #a05a3c;
+  --danger-solid: #b4472b;
+  --danger-tint: #8f4436;
+  --info: #1f6fb0;
+  --info-tint: #2b6d9e;
+  --ink-bright: #16241a;
+  --ink-on-brass: #241a05;
+  --ink-panel: #1b2a1f;
+  --ink-panel-2: #1e2c22;
+  --ink-soft: #566356;
+  --ink-warm: #3a3327;
+  --leaf: #5b7a45;
+  --leaf-deep: #45632f;
+  --leaf-mid: #517037;
+  --ok: #2f7d52;
+  --ok-soft: #3c7a44;
+  --ok-solid: #2f8f4e;
+  --ok-tint: #2c6b3c;
+  --ok-tint-2: #327040;
+  --ok-tint-3: #3a6b46;
+  --rust-soft: #8a5540;
+  --surface-panel: #f0ece0;
+  --warn: #9a6408;
+  --warn-tint: #8a5c12;
+
+  --canvas-glow: rgba(90, 140, 90, 0.14);
+  --ink-faint: rgb(var(--ink-rgb) / 0.3);
+  --text-strong: rgb(23 37 27 / 0.92);
+  --field-bg: rgba(233, 228, 214, 0.75);
+  --field-bg-strong: rgba(226, 220, 203, 0.85);
+  --border-muted: rgb(var(--brass-rgb) / 0.3);
 }

@@ -19,6 +19,21 @@
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
+  <script>
+    /* Appearance, before first paint. Dark is the unthemed state, so this
+       only ever ADDS data-theme="light" — never removes a flash of dark.
+       Deliberately inline and dependency-free: a deferred script cannot
+       beat first paint, and a wrong first paint is the whole problem. */
+    (function () {
+      try {
+        var p = localStorage.getItem('growtoo:appearance') || 'dark';
+        var light = p === 'light' ||
+          (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (light) document.documentElement.setAttribute('data-theme', 'light');
+        window.__growtooTheme = { pref: p };
+      } catch (e) { /* blocked storage: dark, which is the default anyway */ }
+    })();
+  </script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
   <style>
     :root {
@@ -35,9 +50,9 @@
       padding: 1.35rem 1.5rem;
       font-family: var(--font);
       background:
-        radial-gradient(900px 480px at 85% -5%, rgba(201, 165, 94, 0.08) 0%, transparent 55%),
-        radial-gradient(700px 420px at 8% 45%, rgba(40, 80, 50, 0.18) 0%, transparent 50%),
-        linear-gradient(180deg, #0c1610 0%, var(--bg) 40%, #101c14 100%);
+        radial-gradient(900px 480px at 85% -5%, rgb(var(--brass-rgb) / 0.08) 0%, transparent 55%),
+        radial-gradient(700px 420px at 8% 45%, var(--canvas-glow) 0%, transparent 50%),
+        linear-gradient(180deg, var(--canvas-top) 0%, var(--bg) 40%, var(--canvas-bottom) 100%);
       color: var(--text);
       position: relative;
       overflow-x: clip;
@@ -49,10 +64,10 @@
       pointer-events: none;
       opacity: 0.22;
       background-image:
-        linear-gradient(rgba(201, 165, 94, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(201, 165, 94, 0.03) 1px, transparent 1px);
+        linear-gradient(rgb(var(--brass-rgb) / 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(var(--brass-rgb) / 0.03) 1px, transparent 1px);
       background-size: 48px 48px;
-      mask-image: linear-gradient(180deg, rgba(0,0,0,0.45), transparent 90%);
+      mask-image: linear-gradient(180deg, rgb(var(--shadow-rgb) / 0.45), transparent 90%);
     }
     .login-etch {
       position: fixed;
@@ -60,7 +75,7 @@
       bottom: -5%;
       width: min(52vw, 22rem);
       height: auto;
-      color: rgba(150, 180, 150, 0.28);
+      color: var(--ink-faint);
       pointer-events: none;
       z-index: 0;
     }
@@ -73,7 +88,7 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 1.5rem 1.35rem 1.35rem;
-      box-shadow: 0 22px 48px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 22px 48px rgb(var(--shadow-rgb) / 0.4);
       animation: login-card-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .login-brand {
@@ -87,7 +102,7 @@
       width: 56px;
       height: 56px;
       border-radius: 50%;
-      box-shadow: 0 0 0 1px rgba(201, 165, 94, 0.4);
+      box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.4);
       animation: login-seal-settle 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .login-brand-word {
@@ -129,7 +144,7 @@
       font-weight: 350;
       letter-spacing: -0.02em;
       text-align: center;
-      color: #f3efe6;
+      color: var(--text);
       line-height: 1.2;
     }
     .lead {
@@ -146,7 +161,7 @@
       margin-bottom: 1rem;
       padding: 0.25rem;
       border-radius: 4px;
-      background: rgba(0, 0, 0, 0.28);
+      background: rgb(var(--shadow-rgb) / 0.28);
       border: 1px solid var(--border);
     }
     .auth-tab {
@@ -182,7 +197,7 @@
       padding: 0.75rem 0.85rem;
       border-radius: 4px;
       border: 1px solid var(--border);
-      background: rgba(6, 14, 10, 0.55);
+      background: var(--field-bg);
       color: var(--text);
       font: inherit;
       cursor: pointer;
@@ -196,15 +211,15 @@
     }
     .profile-option.is-selected[data-type="grower"],
     .profile-option.is-selected[data-type="adopter"] {
-      border-color: rgba(201, 165, 94, 0.55);
-      background: rgba(201, 165, 94, 0.12);
+      border-color: rgb(var(--brass-rgb) / 0.55);
+      background: rgb(var(--brass-rgb) / 0.12);
     }
     .field-block { margin-bottom: 0.85rem; }
     label {
       display: block;
       font-size: 0.9rem;
       margin-bottom: 0.35rem;
-      color: rgba(243, 239, 230, 0.9);
+      color: var(--text-strong);
     }
     .field-hint {
       margin: -0.15rem 0 0.4rem;
@@ -224,7 +239,7 @@
       border-radius: 50%;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: rgba(0,0,0,0.25);
+      background: rgb(var(--shadow-rgb) / 0.25);
       flex-shrink: 0;
     }
     .signup-photo-preview img {
@@ -266,7 +281,7 @@
       padding: 0.65rem 0.75rem;
       border-radius: 4px;
       border: 1px solid var(--border);
-      background: rgba(6, 14, 10, 0.65);
+      background: var(--field-bg-strong);
       color: var(--text);
       font-family: inherit;
       font-size: 0.92rem;
@@ -297,7 +312,7 @@
       padding: 0.65rem 0.7rem;
       border-radius: 4px;
       border: 1px solid var(--border);
-      background: rgba(6, 14, 10, 0.55);
+      background: var(--field-bg);
       color: var(--text);
       font: inherit;
       cursor: pointer;
@@ -310,8 +325,8 @@
     }
     .choice-option.is-selected,
     .choice-option.is-selected[data-intent] {
-      border-color: rgba(201, 165, 94, 0.55);
-      background: rgba(201, 165, 94, 0.12);
+      border-color: rgb(var(--brass-rgb) / 0.55);
+      background: rgb(var(--brass-rgb) / 0.12);
     }
     .check-row {
       display: flex;
@@ -380,7 +395,7 @@
     .password-toggle {
       flex: 0 0 auto;
       min-width: 4.25rem;
-      border: 1px solid rgba(201, 165, 94, 0.35);
+      border: 1px solid rgb(var(--brass-rgb) / 0.35);
       border-radius: 4px;
       background: transparent;
       color: var(--brass);
@@ -391,8 +406,8 @@
     }
     .password-toggle:hover,
     .password-toggle[aria-pressed="true"] {
-      border-color: rgba(201, 165, 94, 0.7);
-      background: rgba(201, 165, 94, 0.1);
+      border-color: rgb(var(--brass-rgb) / 0.7);
+      background: rgb(var(--brass-rgb) / 0.1);
     }
     .auth-divider {
       display: flex;
@@ -409,7 +424,7 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: rgba(201, 165, 94, 0.2);
+      background: rgb(var(--brass-rgb) / 0.2);
     }
     .btn-google {
       width: 100%;
@@ -417,7 +432,7 @@
       align-items: center;
       justify-content: center;
       gap: 0.55rem;
-      border: 1px solid rgba(201, 165, 94, 0.55);
+      border: 1px solid rgb(var(--brass-rgb) / 0.55);
       border-radius: 4px;
       padding: 0.75rem 1.35rem;
       min-height: 48px;
@@ -431,8 +446,8 @@
       transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .btn-google:hover {
-      background: rgba(201, 165, 94, 0.12);
-      border-color: rgba(201, 165, 94, 0.85);
+      background: rgb(var(--brass-rgb) / 0.12);
+      border-color: rgb(var(--brass-rgb) / 0.85);
     }
     .btn-google:focus-visible {
       outline: none;
@@ -440,7 +455,7 @@
     }
     .btn-google:disabled {
       color: var(--brass-disabled-ink);
-      border-color: rgba(106, 117, 104, 0.45);
+      border-color: var(--border-muted);
       cursor: wait;
     }
     .btn-google svg { flex-shrink: 0; }
@@ -450,10 +465,10 @@
       font-size: 0.9rem;
     }
     .back-link a {
-      color: rgba(184, 196, 176, 0.78);
+      color: rgb(var(--ink-rgb) / 0.78);
       text-decoration: underline;
       text-underline-offset: 0.22em;
-      text-decoration-color: rgba(201, 165, 94, 0.4);
+      text-decoration-color: rgb(var(--brass-rgb) / 0.4);
     }
     .back-link a:hover {
       color: var(--brass);
@@ -468,7 +483,7 @@
     .role-fields {
       margin-top: 0.15rem;
       padding-top: 0.15rem;
-      border-top: 1px solid rgba(201, 165, 94, 0.14);
+      border-top: 1px solid rgb(var(--brass-rgb) / 0.14);
     }
     .role-fields-title {
       margin: 0.75rem 0 0.65rem;

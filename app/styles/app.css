@@ -302,8 +302,8 @@ body.profile-grower:not(.chain-locked) .more-nav-list > .more-nav-item.chain-ena
 #view-plants .plants-weather-widget-inner {
   /* Deliberately dark "instrument plate" card regardless of page theme —
      text/muted-text are re-scoped to their light-on-dark values here. */
-  --text: rgba(247, 238, 225, 0.94);
-  --text-muted: rgba(247, 238, 225, 0.68);
+  --text: rgb(var(--paper-rgb) / 0.94);
+  --text-muted: rgb(var(--paper-rgb) / 0.68);
   color: var(--text);
   background: linear-gradient(145deg, rgba(142, 53, 32, 0.22) 0%, rgba(23, 16, 8, 0.95) 55%);
   border: 1px solid rgb(var(--alert-rgb) / 0.35);
@@ -1023,7 +1023,7 @@ body.profile-adopter .account-profile-avatar {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: rgba(247, 238, 225, 0.7);
+  color: rgb(var(--paper-rgb) / 0.7);
   font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
@@ -1049,7 +1049,7 @@ body.profile-adopter .account-profile-avatar {
   border-radius: 12px;
   border: 1px solid rgb(var(--white-rgb) / 0.06);
   background: rgb(var(--white-rgb) / 0.03);
-  color: rgba(247, 238, 225, 0.88);
+  color: rgb(var(--paper-rgb) / 0.88);
   text-decoration: none;
   width: 100%;
   text-align: left;
@@ -1083,7 +1083,7 @@ body.profile-adopter .account-profile-avatar {
 
 .more-nav-copy span {
   font-size: 0.78rem;
-  color: rgba(247, 238, 225, 0.55);
+  color: rgb(var(--paper-rgb) / 0.55);
 }
 
 .more-nav-item.active {
@@ -1365,7 +1365,7 @@ body.coach-fab-visible .main {
 }
 
 .notif-item--unread .notif-item-dot {
-  background: var(--brass);
+  background: var(--brass-fill);
   box-shadow: 0 0 0 3px rgba(157, 255, 176, 0.18);
 }
 
@@ -1596,8 +1596,8 @@ body.notif-open {
   /* Opaque dark "ink plate" card over the modal scrim, regardless of page
      theme — text tokens are re-scoped so every nested label reads
      light-on-dark instead of inheriting the light page's dark ink. */
-  --text: rgba(247, 238, 225, 0.94);
-  --text-muted: rgba(247, 238, 225, 0.68);
+  --text: rgb(var(--paper-rgb) / 0.94);
+  --text-muted: rgb(var(--paper-rgb) / 0.68);
   --border: rgb(var(--white-rgb) / 0.14);
   color: var(--text);
   width: min(100%, 420px);
@@ -1899,7 +1899,7 @@ body.notif-open {
 }
 
 .btn-primary {
-  background: var(--brass);
+  background: var(--brass-fill);
   color: var(--brass-ink);
   border-color: var(--brass);
   box-shadow: none;
@@ -2088,7 +2088,7 @@ body.notif-open {
   flex: 1;
   min-width: 0;
   font-size: 0.95rem;
-  color: rgba(247, 238, 225, 0.9);
+  color: rgb(var(--paper-rgb) / 0.9);
 }
 
 .getting-started-action {
@@ -2268,8 +2268,8 @@ body.notif-open {
      re-scoped here so plain content (e.g. the wallet-connect copy rendered
      into it from JS) also reads light-on-dark, not just the classes below
      that already carry their own explicit white-based colors. */
-  --text: rgba(247, 238, 225, 0.94);
-  --text-muted: rgba(247, 238, 225, 0.68);
+  --text: rgb(var(--paper-rgb) / 0.94);
+  --text-muted: rgb(var(--paper-rgb) / 0.68);
   color: var(--text);
   padding: 0.85rem;
   border-radius: 12px;
@@ -4864,8 +4864,8 @@ body.admin-readonly .toolbox-form textarea {
 .growlog-hero {
   /* Deliberately dark, glowy hero card regardless of page theme — text tokens
      are re-scoped here so every nested title/chip/hint reads light-on-dark. */
-  --text: rgba(247, 238, 225, 0.96);
-  --text-muted: rgba(247, 238, 225, 0.68);
+  --text: rgb(var(--paper-rgb) / 0.96);
+  --text-muted: rgb(var(--paper-rgb) / 0.68);
   --border: rgb(var(--white-rgb) / 0.12);
   color: var(--text);
   position: relative;
@@ -5082,7 +5082,7 @@ body.admin-readonly .toolbox-form textarea {
     border-radius: 12px;
     border: 0;
     background: transparent;
-    color: rgba(247, 238, 225, 0.55);
+    color: rgb(var(--paper-rgb) / 0.55);
     font: inherit;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -5633,7 +5633,7 @@ body:not(.app-loading) {
 .btn-primary {
   border: 1px solid var(--brass);
   color: var(--brass-ink);
-  background: var(--brass);
+  background: var(--brass-fill);
   box-shadow: none;
 }
 
@@ -6929,7 +6929,7 @@ body.profile-adopter .adopt-hero-text h2 {
 }
 .adopt-unlock-tl-item--current .adopt-unlock-tl-dot {
   border-color: var(--brass);
-  background: var(--brass);
+  background: var(--brass-fill);
   animation: status-rail-pulse 1.6s ease-in-out infinite;
 }
 .adopt-unlock-tl-item--lag .adopt-unlock-tl-dot {
@@ -7394,7 +7394,7 @@ body.profile-adopter .adopt-hero-text h2 {
   padding: 1.25rem 1rem 1.35rem;
   border-radius: 14px;
   /* Deliberately dark backdrop behind the plant SVG regardless of page theme. */
-  --text-muted: rgba(247, 238, 225, 0.68);
+  --text-muted: rgb(var(--paper-rgb) / 0.68);
   color: var(--text-muted);
   background: radial-gradient(ellipse 90% 70% at 50% 38%, rgba(142, 53, 32, 0.12), transparent 68%),
     rgba(23, 16, 8, 0.72);
@@ -7634,7 +7634,7 @@ body.profile-adopter .adopt-hero-text h2 {
   left: 0.22rem;
   width: calc(50% - 0.22rem);
   border-radius: var(--radius-pill);
-  background: var(--brass);
+  background: var(--brass-fill);
   box-shadow: 0 4px 10px rgb(var(--brass-rgb) / 0.3);
   transition: transform 0.32s var(--ease-spring);
   pointer-events: none;
@@ -8704,7 +8704,7 @@ body.crypto-simple .crypto-simple-only {
   padding: 0.72rem 1rem;
   border-radius: var(--radius-pill);
   border: 1px solid var(--brass);
-  background: var(--brass);
+  background: var(--brass-fill);
   color: var(--brass-ink);
   font: inherit;
   font-weight: 650;
@@ -8807,7 +8807,7 @@ body.crypto-simple .crypto-simple-only {
   align-items: center;
   justify-content: center;
   color: var(--brass-ink);
-  background: var(--brass);
+  background: var(--brass-fill);
   flex-shrink: 0;
 }
 
@@ -9071,7 +9071,7 @@ body.crypto-simple .crypto-simple-only {
 }
 
 .ai-coach-bubble--user {
-  background: var(--brass);
+  background: var(--brass-fill);
   border: 1px solid var(--brass-active);
   border-bottom-right-radius: 5px;
   color: var(--brass-ink);
@@ -9366,7 +9366,7 @@ body.crypto-simple .crypto-simple-only {
   height: 2.5rem;
   border-radius: 4px;
   border: 1px solid var(--brass);
-  background: var(--brass);
+  background: var(--brass-fill);
   color: var(--brass-ink);
   display: inline-flex;
   align-items: center;
@@ -10274,7 +10274,7 @@ table td {
 }
 
 .coach-toggle input:checked + .coach-toggle-ui {
-  background: var(--brass);
+  background: var(--brass-fill);
   border-color: var(--brass-hover);
 }
 
@@ -10425,7 +10425,7 @@ table td {
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 50%;
-  background: var(--brass);
+  background: var(--brass-fill);
   box-shadow: 0 0 0 2px var(--bg);
 }
 
@@ -10911,7 +10911,7 @@ body.log-sheet-open .bottom-nav {
   width: 2rem;
   height: 2rem;
   border-radius: 10px;
-  background: var(--brass);
+  background: var(--brass-fill);
   color: var(--brass-ink);
   border: 1px solid var(--brass-hover);
 }
@@ -10947,7 +10947,7 @@ body.log-sheet-open .bottom-nav {
   width: 2rem;
   height: 2rem;
   border-radius: 10px;
-  background: var(--brass);
+  background: var(--brass-fill);
   color: var(--brass-ink);
   border: 1px solid var(--brass-hover);
   box-shadow: 0 0 0 0 rgb(var(--brass-rgb) / 0.35);
@@ -11116,7 +11116,7 @@ body.ai-coach-open .nav-coach-mark {
     width: 3.35rem;
     height: 3.35rem;
     border-radius: 999px;
-    background: var(--brass);
+    background: var(--brass-fill);
     color: var(--brass-ink);
     border: 1px solid var(--brass-hover);
     box-shadow: 0 8px 20px rgb(var(--shadow-rgb) / 0.35);
@@ -11304,7 +11304,7 @@ body.ai-coach-open .nav-coach-mark {
 }
 
 .trail-bar--current {
-  background: var(--brass);
+  background: var(--brass-fill);
   border-color: var(--brass-hover);
 }
 
@@ -12398,4 +12398,52 @@ body.grow-camera-open {
   display: grid;
   gap: 0.3rem;
   font-size: 0.82rem;
+}
+
+/* ---- Appearance control (account sheet) -------------------------------
+   Dark is the default and the unthemed state; see /styles/tokens.css. */
+.more-nav-item--theme {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: default;
+}
+
+.theme-switch {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--metric-card-bg);
+}
+
+.theme-switch-opt {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.theme-switch-opt:hover {
+  color: var(--text);
+}
+
+.theme-switch-opt[aria-checked='true'] {
+  background: rgb(var(--brass-rgb) / 0.18);
+  color: var(--brass);
+}
+
+.theme-switch-opt:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
