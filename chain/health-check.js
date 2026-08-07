@@ -8,7 +8,7 @@
  * Exit 1 when critical issues are found (stuck pending / custody mismatch).
  * Exit 0 when clean (recent failed mints are warnings only).
  */
-import { Keypair } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { initFirestore } from './firebase.js';
 import {
   loadEscrowSecret,
@@ -25,6 +25,18 @@ const FAILED_LOOKBACK_MS = FAILED_LOOKBACK_HOURS * 60 * 60 * 1000;
 const db = initFirestore();
 const deployed = readDeployed();
 
+/** True for a real 32-byte Solana address (rejects TrafficMint_* UX fixtures). */
+function isOnChainPubkey(value) {
+  const s = String(value || '').trim();
+  if (!s || s.startsWith('TrafficMint_') || s.startsWith('TrafficPk')) return false;
+  try {
+    const pk = new PublicKey(s);
+    return pk.toBase58().length >= 32;
+  } catch {
+    return false;
+  }
+}
+
 function escrowPubkeys() {
   const set = new Set();
   try {
@@ -40,7 +52,7 @@ function escrowPubkeys() {
     LEGACY_ESCROW_ADDRESS,
     process.env.MARKET_ESCROW_ADDRESS,
   ]) {
-    if (key) set.add(String(key));
+    if (key && isOnChainPubkey(key)) set.add(String(key));
   }
   return [...set];
 }
@@ -87,6 +99,7 @@ function shortId(id) {
 }
 
 async function ownerHoldsMint(owner, mintAddress) {
+  if (!isOnChainPubkey(owner) || !isOnChainPubkey(mintAddress)) return false;
   const result = await rpcFetch('getTokenAccountsByOwner', [
     owner,
     { mint: mintAddress },
@@ -108,7 +121,7 @@ async function ownerHoldsMint(owner, mintAddress) {
 
 async function expectedCustodyHolds(row) {
   const owners = new Set();
-  if (row.settlement === 'program' && row.listingPda) {
+  if (row.settlement === 'program' && isOnChainPubkey(row.listingPda)) {
     owners.add(String(row.listingPda));
   }
   for (const owner of CUSTODY_OWNERS) owners.add(owner);
@@ -121,6 +134,7 @@ async function expectedCustodyHolds(row) {
 }
 
 async function largestTokenOwner(mintAddress) {
+  if (!isOnChainPubkey(mintAddress)) return null;
   try {
     const result = await rpcFetch('getTokenLargestAccounts', [
       mintAddress,
@@ -239,6 +253,7 @@ async function checkCustodyDisputes() {
   );
 
   let checked = 0;
+  let skippedSynthetic = 0;
   for (const row of toCheck) {
     if (!row.mintAddress) {
       issue('critical', 'token_dispute', 'Listing missing mintAddress', {
@@ -248,27 +263,41 @@ async function checkCustodyDisputes() {
       });
       continue;
     }
+    // UX traffic seed uses TrafficMint_* placeholders — not on-chain addresses.
+    // RPC rejects them with WrongSize; skip rather than failing the whole job.
+    if (!isOnChainPubkey(row.mintAddress)) {
+      skippedSynthetic += 1;
+      continue;
+    }
     checked += 1;
-    const custody = await expectedCustodyHolds(row);
-    if (custody.held) continue;
+    try {
+      const custody = await expectedCustodyHolds(row);
+      if (custody.held) continue;
 
-    const actualOwner = await largestTokenOwner(row.mintAddress);
-    const sellerStillHolds =
-      row.sellerPubkey && actualOwner && actualOwner === row.sellerPubkey;
+      const actualOwner = await largestTokenOwner(row.mintAddress);
+      const sellerStillHolds =
+        row.sellerPubkey && actualOwner && actualOwner === row.sellerPubkey;
 
-    issue('critical', 'token_dispute', 'NFT not in expected escrow/marketplace custody', {
-      id: row.id,
-      name: row.name || null,
-      status: row.status,
-      settlement: row.settlement || null,
-      mintAddress: row.mintAddress,
-      listingPda: row.listingPda || null,
-      actualOwner: actualOwner || 'unknown',
-      sellerStillHolds: !!sellerStillHolds,
-      expectedOwners: custody.checked,
-    });
+      issue('critical', 'token_dispute', 'NFT not in expected escrow/marketplace custody', {
+        id: row.id,
+        name: row.name || null,
+        status: row.status,
+        settlement: row.settlement || null,
+        mintAddress: row.mintAddress,
+        listingPda: row.listingPda || null,
+        actualOwner: actualOwner || 'unknown',
+        sellerStillHolds: !!sellerStillHolds,
+        expectedOwners: custody.checked,
+      });
+    } catch (err) {
+      issue('warning', 'custody_rpc', 'Custody RPC check failed for listing', {
+        id: row.id,
+        mintAddress: row.mintAddress,
+        error: (err && err.message) || String(err),
+      });
+    }
   }
-  return { checked, active: active.length };
+  return { checked, skippedSynthetic, active: active.length };
 }
 
 async function printReport(summary) {
