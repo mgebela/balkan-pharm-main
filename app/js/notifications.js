@@ -718,7 +718,7 @@
         title: r.title || 'Care reminder',
         body: r.message || 'A plant needs attention.',
         meta: { key: 'care-due:' + id + ':' + day, plantId: r.plantId || null, reminderId: id },
-        action: { view: 'danas', plantId: r.plantId || null, coachDraft: id },
+        action: { view: 'plants', plantId: r.plantId || null, coachDraft: id },
         kind: r.severity === 'urgent' || r.kind === 'predictive' ? 'warn' : 'info',
         dedupKey: 'care-due:' + id + ':' + day,
         toast: false,

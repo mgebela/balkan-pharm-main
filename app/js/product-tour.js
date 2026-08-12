@@ -174,8 +174,9 @@
         id: 'garden-nav',
         view: null,
         selectors: [
-          '.bottom-nav .nav-item[data-view="adopt"]',
-          '.sidebar-nav .nav-item[data-view="adopt"]',
+          '.bottom-nav .nav-item[data-chain-nav]',
+          '.sidebar-nav .nav-item[data-chain-nav]',
+          '.chain-pane-toggle [data-chain-pane="adopt"]',
         ],
         title: 'My garden',
         body: 'After a stake settles, follow the plant here — stage progress and care unlock live on the card.',
@@ -201,30 +202,16 @@
       },
       {
         id: 'journal-nav',
-        view: 'dashboard',
-        // Journal tab = data-view="dashboard" (Plants is a separate tab).
+        view: 'plants',
         selectors: [
           function () {
             return pickNavByLabel(['Journal']);
           },
-          '.bottom-nav .nav-item[data-view="dashboard"]',
-          '.sidebar-nav .nav-item[data-view="dashboard"]',
-        ],
-        title: 'Journal',
-        body: 'This is the Journal tab — your home desk with Today and progress. Next we’ll open Plants for the care diary.',
-      },
-      {
-        id: 'plants-nav',
-        view: null,
-        selectors: [
-          function () {
-            return pickNavByLabel(['Plants']);
-          },
           '.bottom-nav .nav-item[data-view="plants"]',
           '.sidebar-nav .nav-item[data-view="plants"]',
         ],
-        title: 'Plants',
-        body: 'Your plant list and care diary live here. Tap Plants to add a plant and log watering.',
+        title: 'Journal',
+        body: 'This is home — your plants, Today, and the care diary (list or month). Log watering here.',
       },
       {
         id: 'plants-list',
@@ -248,8 +235,9 @@
           id: 'tokenise-nav',
           view: null,
           selectors: [
-            '.bottom-nav .nav-item[data-view="adopt"]',
-            '.sidebar-nav .nav-item[data-view="adopt"]',
+            '.bottom-nav .nav-item[data-chain-nav]',
+            '.sidebar-nav .nav-item[data-chain-nav]',
+            '.chain-pane-toggle [data-chain-pane="adopt"]',
           ],
           title: 'Tokenise',
           body: 'When the journal is ready, seal a stage into a plant token on Devnet.',
@@ -265,8 +253,8 @@
           id: 'market-nav',
           view: null,
           selectors: [
-            '.bottom-nav .nav-item[data-view="market"]',
-            '.sidebar-nav .nav-item[data-view="market"]',
+            '.bottom-nav .nav-item[data-chain-nav]',
+            '.sidebar-nav .nav-item[data-chain-nav]',
           ],
           title: 'Market',
           body: 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.',

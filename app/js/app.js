@@ -2109,10 +2109,7 @@ function syncMoreNavVisibility() {
 }
 
 function defaultViewForProfile() {
-  // Growers land on the Journal dashboard, not Plants — that's where the
-  // TODAY card (Log watering / Ask coach) lives, and those are the two
-  // actions a grower actually reaches for daily.
-  return isAdopterProfile() ? 'adopt' : 'dashboard';
+  return isAdopterProfile() ? 'adopt' : 'plants';
 }
 
 function isViewAllowedForProfile(viewId) {
@@ -2234,7 +2231,9 @@ async function getCurrentUserRole(user) {
 
 function getInitialViewFromUrl() {
   try {
-    return new URLSearchParams(window.location.search).get('view');
+    const view = new URLSearchParams(window.location.search).get('view');
+    if (view === 'dashboard' || view === 'danas') return 'plants';
+    return view;
   } catch {
     return null;
   }
@@ -2771,18 +2770,19 @@ function initFirebaseSync() {
   const views = document.querySelectorAll('.view');
   const viewTitle = document.querySelector('.view-title');
   const logoutBtn = document.getElementById('btn-logout');
-  const MORE_NAV_VIEWS = ['toolbox', 'danas', 'admin'];
+  const MORE_NAV_VIEWS = ['toolbox', 'admin'];
   const titles = {
     dashboard: 'Journal',
-    plants: 'Plants',
+    plants: 'Journal',
     blog: 'Stories',
     adopt: 'Tokenise',
     market: 'Market',
     growlog: 'Grow log',
-    toolbox: 'Tools',
+    toolbox: 'Measurements',
     admin: 'Admin Panel',
     danas: 'Today',
   };
+  let lastChainView = null;
 
   let currentGrowlogPlantId = null;
 
@@ -2839,6 +2839,7 @@ function initFirebaseSync() {
   }
 
   function showView(id, extra) {
+    if (id === 'dashboard' || id === 'danas') id = 'plants';
     // Chain-locked growers: Tokenise/Market CTAs (START HERE, tour, etc.)
     // must open the unlock dialog — never silently fall back to Plants.
     if (
@@ -2881,6 +2882,19 @@ function initFirebaseSync() {
     currentGrowlogPlantId = null;
     const view = document.getElementById('view-' + id);
     document.querySelectorAll('.nav-item[data-view="' + id + '"], .more-nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
+    if (id === 'adopt' || id === 'market') {
+      lastChainView = id;
+      document.querySelectorAll('[data-chain-nav]').forEach(function (n) {
+        n.classList.add('active');
+      });
+      document.querySelectorAll('.chain-pane-toggle').forEach(function (seg) {
+        seg.setAttribute('data-active', id);
+        seg.querySelectorAll('[data-chain-pane]').forEach(function (btn) {
+          const on = btn.getAttribute('data-chain-pane') === id;
+          btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+      });
+    }
     const accountBtn = document.getElementById('btn-account');
     if (accountBtn) {
       accountBtn.classList.toggle('active', MORE_NAV_VIEWS.indexOf(id) !== -1);
@@ -2903,6 +2917,8 @@ function initFirebaseSync() {
     if (id === 'dashboard') renderDashboard();
     if (id === 'plants') {
       initPlantsWeatherWidget();
+      renderCoachBriefingSurfaces();
+      renderTodayAndSeals(getPlants(), getEntries());
       renderPlants();
       renderJournal();
     }
@@ -2977,6 +2993,14 @@ function initFirebaseSync() {
 
     const view = item.dataset.view;
 
+    if (item.hasAttribute('data-chain-nav')) {
+      const fallback = isAdopterProfile() ? 'adopt' : 'market';
+      const next =
+        lastChainView === 'adopt' || lastChainView === 'market' ? lastChainView : fallback;
+      showView(next);
+      return;
+    }
+
     if (view === "admin") {
       await resolveCurrentUserRole();
       if (!isAdminPanelRole(currentUserRole)) {
@@ -2989,6 +3013,14 @@ function initFirebaseSync() {
     showView(view);
   });
 });
+
+  document.addEventListener('click', function (e) {
+    const paneBtn = e.target.closest('[data-chain-pane]');
+    if (!paneBtn) return;
+    e.preventDefault();
+    const pane = paneBtn.getAttribute('data-chain-pane');
+    if (pane === 'adopt' || pane === 'market') showView(pane);
+  });
 
   /**
    * Grabber bars on the Log / More sheets are rendered up front but only become

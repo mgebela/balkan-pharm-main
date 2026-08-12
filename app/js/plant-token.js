@@ -2067,8 +2067,7 @@
     if (!token) throw new Error('Token not found.');
 
     if (action === 'tools') {
-      const nav = document.querySelector('.nav-item[data-view="toolbox"]');
-      if (nav) nav.click();
+      if (typeof window.showAppView === 'function') window.showAppView('toolbox');
       return;
     }
     if (action === 'coach') {

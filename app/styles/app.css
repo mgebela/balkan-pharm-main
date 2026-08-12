@@ -189,10 +189,8 @@ body.profile-adopter .more-nav-list > .more-nav-item.adopter-only {
 }
 
 /* Pure grower: hide Tokenise/Market until they opt into the on-chain path */
-body.profile-grower.chain-locked .sidebar-nav > .nav-item[data-view="adopt"],
-body.profile-grower.chain-locked .sidebar-nav > .nav-item[data-view="market"],
-body.profile-grower.chain-locked .bottom-nav > .nav-item[data-view="adopt"],
-body.profile-grower.chain-locked .bottom-nav > .nav-item[data-view="market"] {
+body.profile-grower.chain-locked .sidebar-nav > .nav-item[data-chain-nav],
+body.profile-grower.chain-locked .bottom-nav > .nav-item[data-chain-nav] {
   display: none !important;
 }
 body.profile-grower .more-nav-list > .more-nav-item.chain-unlock-only,
@@ -725,7 +723,7 @@ body::before {
   display: none;
 }
 
-/* Mobile “More” sheet (Tools / Today / Admin) */
+/* Mobile account sheet (Stories, measurements, chain, admin) */
 .more-nav-overlay {
   position: fixed;
   inset: 0;
@@ -2836,7 +2834,8 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   padding: 0.38rem 0.78rem;
 }
 
-.segmented-control[data-active='month'] .segmented-thumb {
+.segmented-control[data-active='month'] .segmented-thumb,
+.segmented-control[data-active='market'] .segmented-thumb {
   transform: translateX(100%);
 }
 
@@ -7853,6 +7852,16 @@ body.profile-adopter .adopt-hero-text h2 {
   align-items: center;
   gap: 0.55rem 0.85rem;
   margin: 0.75rem 0 0.25rem;
+}
+
+.chain-pane-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 0.65rem;
+}
+
+.chain-pane-toggle .segmented-option {
+  min-width: 6.5rem;
 }
 
 .market-mode-bar {
