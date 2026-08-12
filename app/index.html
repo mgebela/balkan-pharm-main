@@ -29,7 +29,7 @@
     })();
   </script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
-  <link rel="stylesheet" href="styles/app.css?v=20260806m" />
+  <link rel="stylesheet" href="styles/app.css?v=20260812a" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -503,12 +503,26 @@
           <div id="plants-list" class="plants-list"></div>
         </section>
         <section class="plants-journal-section plants-journal-diary">
-          <h2 class="section-heading">Journal</h2>
+          <div class="plants-section-head">
+            <h2 class="section-heading">Journal</h2>
+            <div
+              class="segmented-control journal-view-toggle"
+              id="journal-view-toggle"
+              data-active="list"
+              role="radiogroup"
+              aria-label="Journal view"
+            >
+              <span class="segmented-thumb" aria-hidden="true"></span>
+              <button type="button" class="segmented-option" data-journal-view="list" role="radio" aria-checked="true">List</button>
+              <button type="button" class="segmented-option" data-journal-view="month" role="radio" aria-checked="false">Month</button>
+            </div>
+          </div>
           <div class="journal-filters">
             <select id="journal-plant-filter">
               <option value="">All plants</option>
             </select>
           </div>
+          <div id="journal-calendar" class="journal-calendar" hidden></div>
           <div class="toolbar">
             <button type="button" class="btn btn-secondary" id="btn-add-entry">+ New entry</button>
           </div>
@@ -1393,6 +1407,7 @@
   <script src="js/sheet-drag.js?v=20260802a"></script>
   <script src="js/app-confirm.js?v=20260802k"></script>
   <script src="js/plant-stacks.js?v=20260806a"></script>
+  <script src="js/journal-calendar.js?v=20260812a"></script>
   <script src="js/market.js?v=20260806g"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260731a"></script>
@@ -1408,7 +1423,7 @@
   <script src="js/ai-coach.js?v=20260806b"></script>
   <script src="js/grower-blog.js?v=20260806b"></script>
   <script src="js/theme.js?v=20260806t" defer></script>
-  <script src="js/app.js?v=20260806m"></script>
+  <script src="js/app.js?v=20260812a"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
 </body>
 </html>

@@ -3049,11 +3049,13 @@ function initFirebaseSync() {
       renderLogSheet();
     } else {
       logSheetPendingAction = null;
+      logSheetPendingDate = null;
     }
   }
 
   let logSheetSelectedPlantIds = [];
   let logSheetPendingAction = null; // 'water' | 'feed' | null
+  let logSheetPendingDate = null; // YYYY-MM-DD when opened from the month calendar
   let logSheetExpandedStacks = Object.create(null);
   let entryModalPlantIds = null; // multi-select for full entry modal
 
@@ -3135,11 +3137,26 @@ function initFirebaseSync() {
     );
   }
 
+  function logCareSheetTitle() {
+    const ymd = logSheetPendingDate;
+    const today = localDateYYYYMMDD();
+    if (!ymd || ymd === today) return 'Log care';
+    let label = ymd;
+    if (window.GrowtooCalendar && typeof GrowtooCalendar.formatLong === 'function') {
+      label = GrowtooCalendar.formatLong(ymd);
+      const year = String(new Date().getFullYear());
+      if (label.slice(-5) === ' ' + year) label = label.slice(0, -5);
+    }
+    return 'Log care · ' + label;
+  }
+
   function renderLogSheet() {
     const listEl = document.getElementById('log-sheet-plants');
     const emptyEl = document.getElementById('log-sheet-empty');
     const actionsEl = document.getElementById('log-sheet-actions');
     const labelEl = document.getElementById('log-sheet-plant-label');
+    const titleEl = document.getElementById('log-sheet-title');
+    if (titleEl) titleEl.textContent = logCareSheetTitle();
     const plants = loggablePlants();
     if (!listEl) return;
 
@@ -3335,11 +3352,19 @@ function initFirebaseSync() {
     });
   }
 
-  function openLogSheet(pendingAction) {
+  function openLogSheet(pendingAction, opts) {
     if (blockAdminWrite()) return;
+    const o = opts || {};
     logSheetPendingAction = pendingAction || null;
+    if (Object.prototype.hasOwnProperty.call(o, 'date')) {
+      const raw = o.date ? String(o.date).slice(0, 10) : '';
+      logSheetPendingDate = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null;
+    } else {
+      logSheetPendingDate = null;
+    }
     setLogSheetOpen(true);
-    if (pendingAction && loggablePlants().length === 1) {
+    // Calendar (and any backdated log) must not auto-write — grower confirms.
+    if (pendingAction && !logSheetPendingDate && loggablePlants().length === 1) {
       // Single plant: run immediately after sheet paints.
       window.setTimeout(function () {
         if (pendingAction === 'water') quickLogWatering();
@@ -3436,6 +3461,7 @@ function initFirebaseSync() {
       full.addEventListener('click', function () {
         const plantIds = selectedLogPlantIds();
         const pending = logSheetPendingAction;
+        const pendingDate = logSheetPendingDate;
         const typeHint =
           pending === 'water' ? 'zalijevanje' : pending === 'feed' ? 'gnojidba' : null;
         setLogSheetOpen(false);
@@ -3443,6 +3469,7 @@ function initFirebaseSync() {
           plantId: plantIds[0] || null,
           plantIds: plantIds.length > 1 ? plantIds : null,
           type: typeHint,
+          date: pendingDate || undefined,
         });
       });
     }
@@ -4304,7 +4331,10 @@ function initFirebaseSync() {
     let chosen = pickPlantsForQuickLog();
     if (!chosen.length) {
       // Multiple plants and none selected yet — open the Log sheet.
-      openLogSheet(type === 'zalijevanje' ? 'water' : type === 'gnojidba' ? 'feed' : null);
+      openLogSheet(
+        type === 'zalijevanje' ? 'water' : type === 'gnojidba' ? 'feed' : null,
+        logSheetPendingDate ? { date: logSheetPendingDate } : {}
+      );
       return false;
     }
     try {
@@ -4315,6 +4345,7 @@ function initFirebaseSync() {
         {
           type: type,
           note: note,
+          date: logSheetPendingDate || localDateYYYYMMDD(),
           source: 'quick-log',
           requireNoteDefault: false,
         }
@@ -5667,6 +5698,41 @@ function initFirebaseSync() {
     }
   }
 
+  function journalViewIsMonth() {
+    return !!(window.GrowtooCalendar && GrowtooCalendar.getView() === 'month');
+  }
+
+  function syncJournalViewToggle() {
+    const view = journalViewIsMonth() ? 'month' : 'list';
+    const toggle = document.getElementById('journal-view-toggle');
+    if (toggle) {
+      toggle.setAttribute('data-active', view);
+      toggle.querySelectorAll('[data-journal-view]').forEach(function (btn) {
+        const on = btn.getAttribute('data-journal-view') === view;
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+    }
+    const cal = document.getElementById('journal-calendar');
+    if (cal) cal.hidden = view !== 'month';
+  }
+
+  function renderJournalCalendar(entries, plants, filterIds) {
+    const host = document.getElementById('journal-calendar');
+    syncJournalViewToggle();
+    if (!journalViewIsMonth() || !host || !window.GrowtooCalendar) return;
+    GrowtooCalendar.render(host, {
+      entries: entries,
+      plants: plants,
+      filterIds: filterIds,
+      onChange: renderJournal,
+      onSelectDay: function (ymd, info) {
+        GrowtooCalendar.setSelectedDate(ymd);
+        renderJournal();
+        if (info && info.log) openLogSheet(null, { date: ymd });
+      },
+    });
+  }
+
   function renderJournal() {
     fillJournalPlantFilter();
     const filterEl = document.getElementById('journal-plant-filter');
@@ -5692,14 +5758,28 @@ function initFirebaseSync() {
     plants.forEach(function (p) {
       if (p && p.id) plantById[String(p.id)] = p;
     });
-    if (entries.length === 0) {
-      container.innerHTML = emptyStateHtml({
-        icon: 'journal',
-        lead: 'No entries yet',
-        body: 'Log watering, feeding, or a note to start the trail.',
-        ctaId: 'empty-add-entry',
-        ctaLabel: '+ New entry',
+
+    renderJournalCalendar(entries, plants, filterIds);
+    if (journalViewIsMonth() && window.GrowtooCalendar) {
+      const ymd = GrowtooCalendar.selectedDate();
+      entries = entries.filter(function (e) {
+        return String(e.date || '').slice(0, 10) === ymd;
       });
+    }
+
+    if (!container) return;
+    if (entries.length === 0) {
+      if (journalViewIsMonth()) {
+        container.innerHTML = '<p class="journal-cal-empty">No logs on this day.</p>';
+      } else {
+        container.innerHTML = emptyStateHtml({
+          icon: 'journal',
+          lead: 'No entries yet',
+          body: 'Log watering, feeding, or a note to start the trail.',
+          ctaId: 'empty-add-entry',
+          ctaLabel: '+ New entry',
+        });
+      }
       return;
     }
 
@@ -6047,6 +6127,21 @@ function initFirebaseSync() {
   const journalPlantFilterEl = document.getElementById('journal-plant-filter');
   if (journalPlantFilterEl) journalPlantFilterEl.addEventListener('change', renderJournal);
 
+  (function bindJournalViewToggle() {
+    const toggle = document.getElementById('journal-view-toggle');
+    if (!toggle || toggle.dataset.bound === '1') return;
+    toggle.dataset.bound = '1';
+    toggle.querySelectorAll('[data-journal-view]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const view = btn.getAttribute('data-journal-view');
+        if (window.GrowtooCalendar) GrowtooCalendar.setView(view);
+        syncJournalViewToggle();
+        renderJournal();
+      });
+    });
+    syncJournalViewToggle();
+  })();
+
   const modalEntry = document.getElementById('modal-entry');
   const entryTypeEl = document.getElementById('entry-type');
   if (entryTypeEl) entryTypeEl.addEventListener('change', updateEntryExtraVisibility);
@@ -6069,7 +6164,7 @@ function initFirebaseSync() {
 
   /**
    * Shared opener for every “New entry” CTA (Journal, plant detail, Log sheet).
-   * @param {{ plantId?: string|null, plantIds?: string[]|null, type?: string|null }} [opts]
+   * @param {{ plantId?: string|null, plantIds?: string[]|null, type?: string|null, date?: string|null }} [opts]
    */
   function startJournalEntry(opts) {
     const o = opts || {};
@@ -6245,7 +6340,11 @@ function initFirebaseSync() {
     fillEntryPlantSelect();
     const form = document.getElementById('form-entry');
     if (form) form.reset();
-    document.getElementById('entry-date').value = new Date().toISOString().slice(0, 10);
+    const dateEl = document.getElementById('entry-date');
+    if (dateEl) {
+      const raw = o.date ? String(o.date).slice(0, 10) : '';
+      dateEl.value = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : localDateYYYYMMDD();
+    }
     document.getElementById('entry-photo-data').value = '';
     document.getElementById('entry-video-data').value = '';
     document.getElementById('entry-photo-preview').innerHTML = '';
@@ -6296,7 +6395,11 @@ function initFirebaseSync() {
   const btnAddEntry = document.getElementById('btn-add-entry');
   if (btnAddEntry) {
     btnAddEntry.addEventListener('click', () => {
-      startJournalEntry({ plantId: null });
+      const date =
+        journalViewIsMonth() && window.GrowtooCalendar
+          ? GrowtooCalendar.selectedDate()
+          : null;
+      startJournalEntry({ plantId: null, date: date || undefined });
     });
   }
 
@@ -7405,6 +7508,7 @@ document.addEventListener("click", (e) => {
     setPlantStage: setPlantStageProgrammatic,
     addEntry: addJournalEntryProgrammatic,
     saveEntry: saveJournalEntry,
+    openLogSheet: openLogSheet,
     openEntry: startJournalEntry,
     findPlant: findPlantByNameOrId,
     refresh: refreshAfterJournalWrite,
