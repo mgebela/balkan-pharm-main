@@ -11,6 +11,7 @@
   const STORAGE_ENTRIES = 'dnevnik-live-entries';
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
   const STORAGE_TODAY_STATE = 'dnevnik-live-today-state';
+  let plantsSurfaceDirty = true;
 
   // One-time migration from previous storage keys (older branding).
   (function migrateOldStorageKeys() {
@@ -294,6 +295,7 @@
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants || []));
     localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries || []));
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox || {}));
+    plantsSurfaceDirty = true;
     if (state.journalSkill && typeof state.journalSkill === 'object') {
       try {
         localStorage.setItem('dnevnik-live-journal-skill', JSON.stringify(state.journalSkill));
@@ -1132,12 +1134,12 @@
 
   function refreshAllViewsAfterRemoteLoad() {
     try {
-      renderDashboard();
-      renderPlants();
-      renderJournal();
+      if (typeof fillEntryPlantSelect === 'function') fillEntryPlantSelect();
+      if (typeof fillJournalPlantFilter === 'function') fillJournalPlantFilter();
       if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
-      renderToolbox();
-      if (currentGrowlogPlantId) renderGrowlog(currentGrowlogPlantId);
+      if (currentGrowlogPlantId && typeof renderGrowlog === 'function') {
+        renderGrowlog(currentGrowlogPlantId);
+      }
     } catch {
       // ignore
     }
@@ -2291,6 +2293,25 @@ function initFirebaseSync() {
         DnevnikNotifications.startWatch(user.uid);
         DnevnikNotifications.bindStatusHooks();
       }
+
+      currentUserRole = await getCurrentUserRole(user);
+      applyRoleUI(currentUserRole);
+
+      function bootVisibleView() {
+        const initialView = getInitialViewFromUrl();
+        if (initialView && isViewAllowedForProfile(initialView)) return initialView;
+        return defaultViewForProfile();
+      }
+
+      // Last-session plants/entries are already in localStorage — show them
+      // before wallet + cloud state finish, so the splash is not the wait.
+      try {
+        if (typeof showView === 'function') showView(bootVisibleView());
+      } catch (_) {
+        /* showView may not be bound on a partial boot */
+      }
+      finishAppLoading();
+
       if (window.PlantToken && typeof PlantToken.bindAccount === 'function') {
         await PlantToken.bindAccount(user.uid);
       }
@@ -2322,13 +2343,6 @@ function initFirebaseSync() {
       if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
         window.AdoptPlant.renderGlobalWalletUI();
       }
-      if (window.AdoptPlant && typeof window.AdoptPlant.render === 'function') {
-        try {
-          window.AdoptPlant.render();
-        } catch {
-          // ignore if garden panel not mounted yet
-        }
-      }
       // Bind once — auth can re-fire and would otherwise stack listeners (crash loop).
       if (!window.__dnevnikWalletUiBound) {
         window.__dnevnikWalletUiBound = true;
@@ -2337,7 +2351,12 @@ function initFirebaseSync() {
           if (dashTimer) clearTimeout(dashTimer);
           dashTimer = setTimeout(function () {
             try {
-              renderDashboard();
+              if (typeof renderTodayAndSeals === 'function') {
+                renderTodayAndSeals(getPlants(), getEntries());
+              }
+              if (typeof renderCoachBriefingSurfaces === 'function') {
+                renderCoachBriefingSurfaces();
+              }
             } catch {
               // ignore
             }
@@ -2350,9 +2369,7 @@ function initFirebaseSync() {
           PlantToken.onChange(scheduleDashboardRefresh);
         }
       }
-      currentUserRole = await getCurrentUserRole(user);
       await recordUserLogin(user, currentUserRole);
-      applyRoleUI(currentUserRole);
 
       if (currentUserRole === 'admin') {
         isAdminReadOnly = true;
@@ -2395,14 +2412,8 @@ function initFirebaseSync() {
       }
 
       refreshAllViewsAfterRemoteLoad();
-
-      const initialView = getInitialViewFromUrl();
-      if (initialView && isViewAllowedForProfile(initialView)) {
-        showView(initialView);
-      } else if (initialView && !isViewAllowedForProfile(initialView)) {
-        showView(defaultViewForProfile());
-      } else {
-        showView(defaultViewForProfile());
+      if (typeof showView === 'function') {
+        showView(bootVisibleView(), null, { force: true });
       }
     } catch (err) {
       console.error('App init failed', err);
@@ -2553,6 +2564,7 @@ function initFirebaseSync() {
   function setPlants(plants) {
     if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
+    plantsSurfaceDirty = true;
     scheduleRemoteSync({ plants: plantsForRemoteSync(plants) });
   }
 
@@ -2601,6 +2613,7 @@ function initFirebaseSync() {
     const list = Array.isArray(entries) ? entries : [];
     try {
       localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(list));
+      plantsSurfaceDirty = true;
     } catch (err) {
       console.error('Failed to save journal entries locally', err);
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
@@ -2783,6 +2796,7 @@ function initFirebaseSync() {
     danas: 'Today',
   };
   let lastChainView = null;
+  let currentShownView = null;
 
   let currentGrowlogPlantId = null;
 
@@ -2838,8 +2852,9 @@ function initFirebaseSync() {
     });
   }
 
-  function showView(id, extra) {
+  function showView(id, extra, opts) {
     if (id === 'dashboard' || id === 'danas') id = 'plants';
+    const force = !!(opts && opts.force);
     // Chain-locked growers: Tokenise/Market CTAs (START HERE, tour, etc.)
     // must open the unlock dialog — never silently fall back to Plants.
     if (
@@ -2877,6 +2892,7 @@ function initFirebaseSync() {
         window.AICoach.applyVisibility();
       }
       renderGrowlog(extra);
+      currentShownView = 'growlog';
       return;
     }
     currentGrowlogPlantId = null;
@@ -2902,9 +2918,6 @@ function initFirebaseSync() {
     setMoreNavOpen(false);
     setLogSheetOpen(false);
     if (view) view.classList.add('active');
-    if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
-      window.AdoptPlant.renderGlobalWalletUI();
-    }
     if (viewTitle) {
       if (id === 'adopt' && isAdopterProfile()) {
         viewTitle.textContent = 'My garden';
@@ -2914,21 +2927,42 @@ function initFirebaseSync() {
         viewTitle.textContent = titles[id];
       }
     }
-    if (id === 'dashboard') renderDashboard();
+
+    const sameView =
+      !force &&
+      id !== 'growlog' &&
+      currentShownView === id &&
+      view &&
+      view.classList.contains('active');
+    currentShownView = id;
+    if (sameView) return;
+
     if (id === 'plants') {
       initPlantsWeatherWidget();
-      renderCoachBriefingSurfaces();
-      renderTodayAndSeals(getPlants(), getEntries());
-      renderPlants();
-      renderJournal();
+      if (force || plantsSurfaceDirty) {
+        renderCoachBriefingSurfaces();
+        renderTodayAndSeals(getPlants(), getEntries());
+        renderPlants();
+        renderJournal();
+        plantsSurfaceDirty = false;
+      }
     }
     if (id === 'blog' && window.GrowerBlog && typeof GrowerBlog.render === 'function') {
       GrowerBlog.render();
     }
-    if (id === 'adopt' && window.AdoptPlant) window.AdoptPlant.render();
-    if (id === 'market' && window.Market) window.Market.render();
+    if (id === 'adopt' && window.AdoptPlant) {
+      if (typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+        window.AdoptPlant.renderGlobalWalletUI();
+      }
+      window.AdoptPlant.render();
+    }
+    if (id === 'market' && window.Market) {
+      if (window.AdoptPlant && typeof window.AdoptPlant.renderGlobalWalletUI === 'function') {
+        window.AdoptPlant.renderGlobalWalletUI();
+      }
+      window.Market.render();
+    }
     if (id === 'toolbox') renderToolbox();
-    if (id === 'danas') renderToday();
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
       renderSuperadminSharingPanel();
@@ -2936,18 +2970,6 @@ function initFirebaseSync() {
     if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
       window.AICoach.applyVisibility();
     }
-    if (
-      window.DnevnikNotifications &&
-      typeof window.DnevnikNotifications.syncCareDueFromCoach === 'function'
-    ) {
-      try {
-        window.DnevnikNotifications.syncCareDueFromCoach();
-      } catch {
-        // ignore
-      }
-    }
-
-    maybeNotifyCareProgress();
   }
 
   window.showAppView = function (id, plantId) {
@@ -4672,6 +4694,8 @@ function initFirebaseSync() {
     return getWeather(city);
   }
 
+  let plantsWeatherPainted = false;
+
   function initPlantsWeatherWidget() {
     const form = document.getElementById('plants-weather-city-form');
     const input = document.getElementById('plants-weather-city');
@@ -4701,6 +4725,8 @@ function initFirebaseSync() {
       }
     }
 
+    if (plantsWeatherPainted) return;
+    plantsWeatherPainted = true;
     loadPlantsWeatherFromInput();
   }
 
@@ -7248,8 +7274,10 @@ document.addEventListener("click", (e) => {
   function refreshAfterJournalWrite(plantId) {
     try {
       renderPlants();
-      renderDashboard();
+      renderTodayAndSeals(getPlants(), getEntries());
+      renderCoachBriefingSurfaces();
       renderJournal();
+      plantsSurfaceDirty = false;
       fillEntryPlantSelect();
       fillJournalPlantFilter();
       if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
@@ -7258,8 +7286,13 @@ document.addEventListener("click", (e) => {
         const adoptView = document.getElementById('view-adopt');
         if (adoptView && adoptView.classList.contains('active')) window.AdoptPlant.render();
       }
-      const todayView = document.getElementById('view-danas');
-      if (todayView && todayView.classList.contains('active')) renderToday();
+      maybeNotifyCareProgress();
+      if (
+        window.DnevnikNotifications &&
+        typeof window.DnevnikNotifications.syncCareDueFromCoach === 'function'
+      ) {
+        window.DnevnikNotifications.syncCareDueFromCoach();
+      }
     } catch (err) {
       console.warn('Journal refresh after coach action', err);
     }

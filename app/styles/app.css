@@ -1846,7 +1846,6 @@ body.notif-open {
 
 .view.active {
   display: block;
-  animation: catalog-view-rise 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
 @keyframes catalog-view-rise {
