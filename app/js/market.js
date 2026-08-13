@@ -862,6 +862,147 @@
     return useProgram ? 'program' : stakeMode ? 'adopt_stake' : 'legacy';
   }
 
+  /**
+   * Local receipts for in-flight adopt payments.
+   *
+   * The invest flow reserves a listing, sends $GROWTOO, then writes the real
+   * signature back. If that last write never lands — tab closed, network drop,
+   * browser killed right after signing — the listing keeps its `pending-`
+   * marker and the queue reopens it 15 minutes later, dropping every field
+   * that tied the payment to the adopter. The money is in the care escrow with
+   * nothing pointing at it: no worker scans the chain, and reconcile only ever
+   * reads listing status.
+   *
+   * A receipt is written before the transfer and updated the moment a
+   * signature exists, so the next load can repair the missing write or, if the
+   * listing was already reopened, tell the adopter what they are holding.
+   */
+  const PAY_RECEIPTS_KEY = 'growtoo:adopt-pay-receipts';
+
+  function readPayReceipts() {
+    try {
+      const raw = localStorage.getItem(PAY_RECEIPTS_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writePayReceipts(list) {
+    try {
+      localStorage.setItem(PAY_RECEIPTS_KEY, JSON.stringify(list.slice(-25)));
+    } catch (_) {
+      /* private mode / quota — recovery is best effort */
+    }
+  }
+
+  function savePayReceipt(patch) {
+    const list = readPayReceipts();
+    const idx = list.findIndex(function (r) {
+      return r && r.listingId === patch.listingId && r.reservationId === patch.reservationId;
+    });
+    if (idx === -1) list.push(patch);
+    else list[idx] = Object.assign({}, list[idx], patch);
+    writePayReceipts(list);
+  }
+
+  function clearPayReceipt(listingId, reservationId) {
+    writePayReceipts(
+      readPayReceipts().filter(function (r) {
+        return !(r && r.listingId === listingId && r.reservationId === reservationId);
+      })
+    );
+  }
+
+  /**
+   * Re-attach any payment whose signature never reached Firestore.
+   *
+   * Only repairs a listing that is still reserved by this user and still
+   * carries the matching `pending-` marker — never overwrites a listing that
+   * has moved on or been claimed by someone else.
+   */
+  async function recoverPendingPayments() {
+    const receipts = readPayReceipts().filter(function (r) {
+      return r && r.signature && r.listingId;
+    });
+    if (!receipts.length) return;
+    let user = null;
+    try {
+      user = firebase.auth().currentUser;
+    } catch (_) {
+      return;
+    }
+    if (!user) return;
+
+    for (let i = 0; i < receipts.length; i += 1) {
+      const rec = receipts[i];
+      try {
+        const ref = firebase.firestore().collection('marketListings').doc(rec.listingId);
+        /* eslint-disable no-await-in-loop */
+        const snap = await ref.get();
+        /* eslint-enable no-await-in-loop */
+        if (!snap.exists) {
+          clearPayReceipt(rec.listingId, rec.reservationId);
+          continue;
+        }
+        const data = snap.data() || {};
+        if (data.paymentSignature === rec.signature) {
+          // Already recorded — the write did land.
+          clearPayReceipt(rec.listingId, rec.reservationId);
+          continue;
+        }
+        const stillOurReservation =
+          data.status === 'sale_pending' &&
+          data.buyerUid === user.uid &&
+          String(data.paymentSignature || '') === rec.reservationId;
+        if (stillOurReservation) {
+          // Exactly these two keys: firestore.rules restricts this update to
+          // hasOnly(['paymentSignature', 'investedAt']), so a diagnostic field
+          // here would get the whole write rejected. investedAt carries the
+          // real payment time from the receipt, not the recovery time.
+          /* eslint-disable no-await-in-loop */
+          await ref.update({
+            paymentSignature: rec.signature,
+            investedAt: rec.paidAt || new Date().toISOString(),
+          });
+          /* eslint-enable no-await-in-loop */
+          console.log('Recovered adopt payment for listing', rec.listingId);
+          clearPayReceipt(rec.listingId, rec.reservationId);
+          continue;
+        }
+        // The listing moved on without this payment. Do not touch it — surface
+        // it instead, with the signature the adopter needs to be made whole.
+        console.warn(
+          'Adopt payment has no matching reservation — listing ' +
+            rec.listingId +
+            ' is now "' +
+            (data.status || 'unknown') +
+            '". Signature ' +
+            rec.signature
+        );
+        if (window.DnevnikNotifications) {
+          DnevnikNotifications.push({
+            type: 'sale_settled',
+            title: 'Payment needs review',
+            body:
+              'Your ' +
+              (rec.priceGrow || '') +
+              ' $GROWTOO payment for "' +
+              (rec.name || 'a plant') +
+              '" did not attach to the offer. Keep this reference: ' +
+              rec.signature,
+            meta: { key: 'pay-orphan:' + rec.listingId, listingId: rec.listingId },
+            kind: 'warning',
+            dedupKey: 'pay-orphan:' + rec.listingId,
+          });
+        }
+      } catch (err) {
+        console.warn('Payment recovery failed for', rec.listingId, err);
+      }
+    }
+  }
+
   async function investInListing(listing) {
     const user = currentUser();
     if (!user) throw new Error('Sign in to invest.');
@@ -952,6 +1093,17 @@
           ? listing.careEscrowAddress || cfg().careEscrowAddress || cfg().escrowAddress
           : listing.sellerPubkey;
       if (!payTo) throw new Error('Payment destination is not configured.');
+      // Record the intent before any value moves, so a crash mid-transfer
+      // still leaves a trace of what was attempted and where.
+      savePayReceipt({
+        listingId: listing.id,
+        reservationId: reservationId,
+        name: listing.name || null,
+        priceGrow: listing.priceGrow || null,
+        payTo: payTo,
+        startedAt: new Date().toISOString(),
+        signature: null,
+      });
       paymentSignature = await window.SplTransfer.payGrow(payTo, listing.priceGrow);
     } catch (err) {
       // Confirm timeout after broadcast still includes the signature — recover it.
@@ -962,7 +1114,15 @@
         ) || [])[1];
       if (recovered) {
         paymentSignature = recovered;
+        savePayReceipt({
+          listingId: listing.id,
+          reservationId: reservationId,
+          signature: recovered,
+          paidAt: new Date().toISOString(),
+        });
       } else {
+        // Nothing was broadcast, so there is no payment to protect.
+        clearPayReceipt(listing.id, reservationId);
         try {
           await ref.update({
             status: 'active',
@@ -978,10 +1138,23 @@
       }
     }
 
+    // Persist the signature locally *before* the remote write. This is the gap
+    // that loses money: the transfer has settled, and if this update never
+    // lands the queue reopens the listing and erases every link to it.
+    savePayReceipt({
+      listingId: listing.id,
+      reservationId: reservationId,
+      signature: paymentSignature,
+      paidAt: new Date().toISOString(),
+    });
+
     await ref.update({
       paymentSignature: paymentSignature,
       investedAt: new Date().toISOString(),
     });
+
+    // Recorded remotely — the local receipt has done its job.
+    clearPayReceipt(listing.id, reservationId);
 
     if (window.PlantToken && typeof PlantToken.adoptFromListing === 'function') {
       PlantToken.adoptFromListing(
@@ -2406,8 +2579,15 @@
   };
 
   if (firebaseReady()) {
-    firebase.auth().onAuthStateChanged(function () {
+    firebase.auth().onAuthStateChanged(function (user) {
       startWatch();
+      // Repair any payment whose signature never reached Firestore, before the
+      // 15 minute reservation TTL reopens the listing and erases the link.
+      if (user) {
+        recoverPendingPayments().catch(function (err) {
+          console.warn('Payment recovery pass failed', err);
+        });
+      }
     });
   }
 })();

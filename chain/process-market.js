@@ -309,6 +309,8 @@ async function processSalePending(doc) {
     if (isPendingPaymentReservation(data)) {
       const ageMin = ageMinutes(statusEnteredAt(data, 'sale_pending'));
       if (ageMin != null && ageMin * 60000 >= RESERVATION_TTL_MS) {
+        // Archive before clearing — see the matching note in
+        // process-adopt-stakes.js. A reservation is only presumed unpaid.
         await doc.ref.update({
           status: 'active',
           buyerUid: FieldValue.delete(),
@@ -316,9 +318,20 @@ async function processSalePending(doc) {
           paymentSignature: FieldValue.delete(),
           investedAt: FieldValue.delete(),
           reservationExpiredAt: new Date().toISOString(),
+          expiredReservations: FieldValue.arrayUnion({
+            buyerUid: data.buyerUid || null,
+            buyerPubkey: data.buyerPubkey || null,
+            reservationId: data.paymentSignature || null,
+            investedAt: data.investedAt || null,
+            priceGrow: data.priceGrow || null,
+            expiredAt: new Date().toISOString(),
+          }),
           lastError: FieldValue.delete(),
         });
-        console.warn(`… ${label}: unpaid reservation expired, listing reopened`);
+        console.warn(
+          `… ${label}: unpaid reservation expired, listing reopened ` +
+            `(archived buyerPubkey ${data.buyerPubkey || 'none'})`
+        );
       } else {
         console.log(`… ${label}: waiting for payment signature`);
       }
