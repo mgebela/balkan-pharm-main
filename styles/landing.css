@@ -5467,7 +5467,7 @@ body:has(.devnet-banner) .header {
 }
 
 .hero--catalog .hero-sub {
-  margin: 0 0 1.85rem;
+  margin: 0 0 1.15rem;
   font-size: 1.05rem;
   line-height: 1.55;
   color: rgb(var(--ink-rgb) / 0.92);
@@ -5476,10 +5476,97 @@ body:has(.devnet-banner) .header {
   animation: catalog-rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.24s both;
 }
 
+.hero-journal-mark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 450;
+  font-size: 1.14em;
+  color: var(--brass);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 90%;
+  background-repeat: no-repeat;
+}
+
+.hero-journal-mark:hover,
+.hero-journal-mark:focus-visible {
+  color: var(--brass);
+  background-size: 100% 1.5px;
+}
+
+.hero-journal-mark:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 2px;
+}
+
+.hero-feature-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin: 0 0 1.75rem;
+  padding: 0;
+  list-style: none;
+  animation: catalog-rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.28s both;
+}
+
+.hero-feature-row li {
+  font-family: var(--font);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--ink-rgb) / 0.55);
+}
+
 .hero--catalog .hero-cta-row {
   gap: 1.25rem 1.5rem;
   align-items: center;
   animation: catalog-rise 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.32s both;
+}
+
+.hero-journals-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
+  font-family: var(--font);
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: rgb(var(--ink-rgb) / 0.78);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.hero-journals-link em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 450;
+  font-size: 1.22em;
+  color: var(--brass);
+  letter-spacing: -0.02em;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+}
+
+.hero-journals-link:hover,
+.hero-journals-link:focus-visible {
+  color: rgb(var(--ink-rgb) / 0.92);
+}
+
+.hero-journals-link:hover em,
+.hero-journals-link:focus-visible em {
+  background-size: 100% 1.5px;
+}
+
+.hero-journals-link:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 2px;
 }
 
 .hero--catalog .btn-primary {
@@ -5636,7 +5723,8 @@ body:has(.devnet-banner) .header {
   }
 
   .hero--catalog .hero-cta-link,
-  .hero--catalog .btn-link--quiet {
+  .hero--catalog .btn-link--quiet,
+  .hero--catalog .hero-journals-link {
     align-self: flex-start;
     text-align: left;
   }
@@ -5673,6 +5761,7 @@ body:has(.devnet-banner) .header {
   .hero--catalog .hero-eyebrow,
   .hero--catalog .hero-headline,
   .hero--catalog .hero-sub,
+  .hero-feature-row,
   .hero--catalog .hero-cta-row,
   .hero-specimen,
   .desk-section.is-revealed .desk-header,
@@ -5786,6 +5875,7 @@ body:has(.devnet-banner) .header {
    Safe by measurement: the nearest vertical neighbour in each of these lists
    is >=49px away, so the expanded bands never overlap each other. */
 .hero-cta-link,
+.hero-journals-link,
 .hero-specimen-verify,
 .trail-card-verify,
 .verify-code,
@@ -5797,6 +5887,7 @@ body:has(.devnet-banner) .header {
 }
 
 .hero-cta-link::after,
+.hero-journals-link::after,
 .hero-specimen-verify::after,
 .trail-card-verify::after,
 .verify-code::after,
