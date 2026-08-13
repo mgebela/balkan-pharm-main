@@ -4,6 +4,10 @@
   "scripts": {
     "firebase:login": "firebase login",
     "deploy:firestore-rules": "node scripts/deploy-firestore-rules.mjs",
+    "deploy:firestore-indexes": "node scripts/deploy-firestore-indexes.mjs --wait",
+    "check:firestore-indexes": "node scripts/deploy-firestore-indexes.mjs --dry-run",
+    "deploy:storage-rules": "node scripts/deploy-storage-rules.mjs",
+    "check:storage-rules": "node scripts/deploy-storage-rules.mjs --dry-run",
     "deploy:functions": "firebase deploy --only functions --project balpha-9dab9",
     "functions:install": "npm install --prefix functions",
     "pdf:investor": "python3 docs/generate_investor_pdf.py",

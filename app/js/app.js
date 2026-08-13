@@ -54,6 +54,30 @@
   let remoteSyncTimer = null;
   let remoteSyncPending = {};
   let remoteSyncInFlight = false;
+  let remoteSyncRetries = 0;
+  let remoteSyncBlockedMessage = '';
+  let inlinePhotoMigrationRun = false;
+
+  /**
+   * Firestore rejects any document over 1 MiB, and the whole journal (plants,
+   * entries, toolbox) lives in a single doc — so the client has to police its
+   * own size. The server only reports the overflow *after* the write fails,
+   * and that failure is permanent: retrying the same payload can never work.
+   *
+   * The budget sits under the hard limit to leave room for field names and
+   * UTF-8 overhead that JSON.stringify does not account for.
+   */
+  const FIRESTORE_DOC_LIMIT = 1048576;
+  const REMOTE_SYNC_SIZE_BUDGET = 950000;
+  const REMOTE_SYNC_MAX_ATTEMPTS = 5;
+  const REMOTE_SYNC_RETRY_BASE_MS = 2000;
+  /** Codes that will fail identically however many times we resend. */
+  const REMOTE_SYNC_FATAL_CODES = [
+    'invalid-argument',
+    'permission-denied',
+    'unauthenticated',
+    'not-found',
+  ];
   let isAdminReadOnly = false;
   let readOnlyBannerMessage = '';
   let sharedReadOnlyPlantIds = new Set();
@@ -231,6 +255,44 @@
     }, 500);
   }
 
+  /** Byte size as Firestore counts it — UTF-8, not UTF-16 code units. */
+  function remoteSyncPayloadSize(payload) {
+    let json = '';
+    try {
+      json = JSON.stringify(payload) || '';
+    } catch (_) {
+      return 0;
+    }
+    try {
+      return new Blob([json]).size;
+    } catch (_) {
+      return json.length;
+    }
+  }
+
+  /**
+   * Cloud-sync failures used to be a console.warn and nothing else, so a
+   * journal could stop backing up for weeks with the UI looking perfectly
+   * healthy. Anything that stops the backup has to be visible.
+   */
+  function setRemoteSyncBanner(message) {
+    remoteSyncBlockedMessage = message || '';
+    let banner = document.getElementById('sync-error-banner');
+    if (!remoteSyncBlockedMessage) {
+      if (banner) banner.remove();
+      return;
+    }
+    if (!banner) {
+      banner = document.createElement('div');
+      banner.id = 'sync-error-banner';
+      banner.className = 'admin-readonly-banner sync-error-banner';
+      banner.setAttribute('role', 'alert');
+      const main = document.querySelector('.main');
+      if (main) main.insertBefore(banner, main.firstChild);
+    }
+    banner.textContent = remoteSyncBlockedMessage;
+  }
+
   async function flushRemoteSync() {
     if (remoteSyncInFlight) return;
     const uid = getFirebaseUserId();
@@ -238,8 +300,11 @@
     if (!ref) return;
     const payload = Object.assign({}, remoteSyncPending);
     if (!Object.keys(payload).length) return;
+    // Safe to clear: every field below is rebuilt from local storage on the
+    // next flush, so dropping the queue never loses an edit.
     remoteSyncPending = {};
     remoteSyncInFlight = true;
+    let retryDelay = 0;
     try {
       // Always push the latest local snapshot for requested keys — never a stale
       // array captured before a second write landed during an in-flight sync.
@@ -257,15 +322,116 @@
         }
       }
       payload.updatedAt = Date.now();
+
+      // Check the size here rather than letting Firestore reject it. An
+      // oversized document fails identically every time, so resending it is
+      // pure waste — and this used to resend in a tight loop forever.
+      const size = remoteSyncPayloadSize(payload);
+      if (size > REMOTE_SYNC_SIZE_BUDGET) {
+        console.warn(
+          'Remote journal sync skipped — payload ' +
+            size +
+            ' bytes exceeds the ' +
+            REMOTE_SYNC_SIZE_BUDGET +
+            ' byte budget (Firestore hard limit ' +
+            FIRESTORE_DOC_LIMIT +
+            ')'
+        );
+        setRemoteSyncBanner(
+          'Saved on this device, but too large to back up to the cloud (' +
+            Math.round(size / 1024) +
+            ' KB of ' +
+            Math.round(REMOTE_SYNC_SIZE_BUDGET / 1024) +
+            ' KB). Photos take up most of the space — remove a large one to resume cloud backup.'
+        );
+        return;
+      }
+
       await ref.set(payload, { merge: true });
+      remoteSyncRetries = 0;
+      if (remoteSyncBlockedMessage) setRemoteSyncBanner('');
     } catch (err) {
       console.warn('Remote journal sync failed — keeping local copy', err);
-      // Re-queue so the next edit / retry can push again.
+      const code = String((err && err.code) || '');
+      if (REMOTE_SYNC_FATAL_CODES.indexOf(code) !== -1) {
+        // Permanent rejection. Retrying cannot change the outcome, so stop and
+        // say so; the next edit will schedule a fresh attempt.
+        setRemoteSyncBanner(
+          'Saved on this device, but the cloud backup was rejected (' +
+            (code || 'unknown error') +
+            '). It will try again after your next change.'
+        );
+        return;
+      }
+      remoteSyncRetries += 1;
+      if (remoteSyncRetries >= REMOTE_SYNC_MAX_ATTEMPTS) {
+        setRemoteSyncBanner(
+          'Saved on this device, but the cloud backup keeps failing. ' +
+            'Check your connection — it will try again after your next change.'
+        );
+        remoteSyncRetries = 0;
+        return;
+      }
+      // Looks transient — put the work back and back off before retrying.
       remoteSyncPending = Object.assign({}, payload, remoteSyncPending);
       delete remoteSyncPending.updatedAt;
+      retryDelay = REMOTE_SYNC_RETRY_BASE_MS * Math.pow(2, remoteSyncRetries - 1);
     } finally {
       remoteSyncInFlight = false;
-      if (Object.keys(remoteSyncPending).length) flushRemoteSync();
+      // Never re-enter synchronously. The old code called flushRemoteSync()
+      // straight from here, so a permanently failing write became an unbounded
+      // hot loop — roughly one rejected round trip per second, forever.
+      if (retryDelay > 0 || Object.keys(remoteSyncPending).length) {
+        if (remoteSyncTimer) clearTimeout(remoteSyncTimer);
+        remoteSyncTimer = setTimeout(flushRemoteSync, retryDelay || 500);
+      }
+    }
+  }
+
+  /**
+   * Move any inline base64 photos on existing plants and entries into Storage.
+   *
+   * Runs once per session after sign-in. Existing journals predate Storage and
+   * carry their photos inline; on an account that has already crossed the 1 MiB
+   * document limit this is what brings it back under and lets cloud backup
+   * resume, so it deliberately runs even while the sync is blocked.
+   *
+   * Failures are non-fatal — records keep their inline photo and the next
+   * session tries again.
+   */
+  async function migrateInlinePhotos() {
+    if (inlinePhotoMigrationRun) return;
+    if (!window.JournalPhotos || !window.JournalPhotos.available()) return;
+    inlinePhotoMigrationRun = true;
+    try {
+      const plants = getPlants();
+      const entries = getEntries();
+      const inline = (list) =>
+        (list || []).filter((r) => r && window.JournalPhotos.isDataUrl(r.photo)).length;
+      if (!inline(plants) && !inline(entries)) return;
+
+      const plantRes = await window.JournalPhotos.migrateRecords(plants, 'plant');
+      if (plantRes.moved) setPlants(plants);
+
+      const entryRes = await window.JournalPhotos.migrateRecords(entries, 'entry');
+      if (entryRes.moved) setEntries(entries);
+
+      const moved = plantRes.moved + entryRes.moved;
+      const failed = plantRes.failed + entryRes.failed;
+      const freedKb = Math.round((plantRes.bytesFreed + entryRes.bytesFreed) / 1024);
+      if (moved) {
+        console.log(
+          'Moved ' + moved + ' inline photo(s) to Storage, freeing ~' + freedKb + ' KB'
+        );
+        // The journal is smaller now, so a previously oversized sync can work.
+        scheduleRemoteSync({
+          plants: plantsForRemoteSync(getPlants()),
+          entries: entriesForRemoteSync(getEntries()),
+        });
+      }
+      if (failed) console.warn(failed + ' photo(s) could not be moved to Storage');
+    } catch (err) {
+      console.warn('Inline photo migration failed', err);
     }
   }
 
@@ -2407,6 +2573,10 @@ function initFirebaseSync() {
             entries: entriesForRemoteSync(merged.entries),
             toolbox: merged.toolbox || {},
           });
+          // Journals written before photos moved to Storage still carry inline
+          // base64 images, which is what pushes the document over the 1 MiB
+          // limit. Lift them out in the background so backup can resume.
+          migrateInlinePhotos();
         }
         if (!remoteSyncReady) remoteSyncReady = true;
       }
@@ -4732,7 +4902,15 @@ function initFirebaseSync() {
 
   const MAX_IMAGE_SIZE = 800;
   /** Soft cap after resize — localStorage + Firestore payload stay usable. */
-  const MAX_ENTRY_PHOTO_CHARS = 900000;
+  /**
+   * Per-photo cap, matched to GrowCamera's MAX_CHARS so both ingest paths
+   * agree. This was 900000 — 86% of the entire 1 MiB Firestore document
+   * budget for a *single* photo — because it was reasoned about one image at a
+   * time. Every photo shares one journal document, so the cap that matters is
+   * the cumulative one; nine attachments were enough to pass the hard limit
+   * and silently break cloud backup for good.
+   */
+  const MAX_ENTRY_PHOTO_CHARS = 160000;
   const MAX_VIDEO_SIZE_MB = 2;
 
   function readFileAsDataUrl(file) {
@@ -4742,6 +4920,43 @@ function initFirebaseSync() {
       r.onerror = reject;
       r.readAsDataURL(file);
     });
+  }
+
+  /**
+   * Hand a freshly compressed photo to Storage and return what should be saved
+   * on the record — a short download URL normally, or the original data URL if
+   * the upload could not happen.
+   *
+   * The fallback keeps the grower's photo rather than discarding it, but an
+   * inline photo is what used to break cloud backup, so say so plainly instead
+   * of failing quietly.
+   *
+   * Returns the warning rather than writing it, because callers replace the
+   * preview markup immediately afterwards and would wipe it.
+   *
+   * @return {!Promise<{url: string, warning: string}>}
+   */
+  async function uploadJournalPhoto(dataUrl, kind) {
+    if (!window.JournalPhotos) return { url: dataUrl, warning: '' };
+    const res = await window.JournalPhotos.upload(dataUrl, kind);
+    if (!res.inline) return { url: res.url, warning: '' };
+    console.warn('Journal photo kept inline —', res.error);
+    return {
+      url: res.url,
+      warning:
+        'Photo saved on this device, but could not be uploaded (' +
+        String(res.error || 'unknown') +
+        '). It counts against your cloud backup size.',
+    };
+  }
+
+  /** Append an inline-fallback warning under a photo preview. */
+  function appendPhotoWarning(previewEl, warning) {
+    if (!previewEl || !warning) return;
+    const note = document.createElement('span');
+    note.className = 'media-error';
+    note.textContent = warning;
+    previewEl.appendChild(note);
   }
 
   /**
@@ -5339,11 +5554,15 @@ function initFirebaseSync() {
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
-      photoData.value = dataUrl;
+      // Store the Storage URL, not the image. The preview keeps using the
+      // local data URL so it appears instantly, without waiting on a fetch.
+      const stored = await uploadJournalPhoto(dataUrl, 'plant');
+      photoData.value = stored.url;
       photoPreview.innerHTML =
         '<img src="' +
         dataUrl +
         '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+      appendPhotoWarning(photoPreview, stored.warning);
       photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
         photoData.value = '';
         photoPreview.innerHTML = '';
@@ -6607,11 +6826,15 @@ function initFirebaseSync() {
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
-      dataEl.value = dataUrl;
+      // Store the Storage URL, not the image. The preview keeps using the
+      // local data URL so it appears instantly, without waiting on a fetch.
+      const stored = await uploadJournalPhoto(dataUrl, 'entry');
+      dataEl.value = stored.url;
       previewEl.innerHTML =
         '<img src="' +
         dataUrl +
         '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+      appendPhotoWarning(previewEl, stored.warning);
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
         previewEl.innerHTML = '';
