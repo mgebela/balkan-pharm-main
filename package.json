@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "firebase:login": "firebase login",
+    "firebase": "firebase",
+    "deploy:storage-rules-cli": "firebase deploy --only storage --project balpha-9dab9",
     "deploy:firestore-rules": "node scripts/deploy-firestore-rules.mjs",
     "deploy:firestore-indexes": "node scripts/deploy-firestore-indexes.mjs --wait",
     "check:firestore-indexes": "node scripts/deploy-firestore-indexes.mjs --dry-run",
