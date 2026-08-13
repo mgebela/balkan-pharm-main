@@ -38,6 +38,9 @@ const API = 'https://firestore.googleapis.com/v1';
 
 const WAIT = process.argv.includes('--wait');
 const DRY_RUN = process.argv.includes('--dry-run');
+
+/** Service-account address of the caller, filled in once credentials load. */
+let callerEmail = '';
 const WAIT_TIMEOUT_MS = 10 * 60 * 1000;
 const WAIT_POLL_MS = 10 * 1000;
 
@@ -157,6 +160,37 @@ async function listAllIndexes(auth) {
   return [...byName.values()];
 }
 
+/**
+ * The one failure everybody hits first.
+ *
+ * The default firebase-adminsdk service account can *list* indexes but not
+ * create them, so auth succeeds, the run gets all the way to the create call,
+ * and then returns a bare 403. Read literally that looks like a broken secret
+ * or broken code; it is neither. Say what it actually is, and in CI emit it as
+ * a workflow annotation so it shows up on the run summary instead of only in
+ * the log tail.
+ */
+function reportMissingIndexAdmin() {
+  // The caller's own address, so the command below can be pasted as-is.
+  const sa = callerEmail || 'your firebase-adminsdk service account';
+  const lines = [
+    'Index create was denied (403). Auth worked — the service account is ' +
+      'missing the create permission, not the credential.',
+    `Grant roles/datastore.indexAdmin to ${sa} on project ${PROJECT}:`,
+    `  gcloud projects add-iam-policy-binding ${PROJECT} \\`,
+    `    --member="serviceAccount:${sa}" \\`,
+    '    --role="roles/datastore.indexAdmin"',
+    'Or: Google Cloud console → IAM & Admin → IAM → edit that service ' +
+      'account → Add another role → "Cloud Datastore Index Admin".',
+  ];
+  if (process.env.GITHUB_ACTIONS === 'true') {
+    // %0A keeps a multi-line annotation on one ::error:: directive.
+    console.log('::error title=Missing roles/datastore.indexAdmin::' +
+      lines.join('%0A'));
+  }
+  console.error('\n' + lines.join('\n') + '\n');
+}
+
 async function createIndex(auth, collectionGroup, queryScope, fields) {
   const res = await fetch(indexesUrl(collectionGroup), {
     method: 'POST',
@@ -165,6 +199,15 @@ async function createIndex(auth, collectionGroup, queryScope, fields) {
   });
   const json = await res.json();
   if (res.status === 409) return { status: 'exists' };
+  if (res.status === 403) {
+    reportMissingIndexAdmin();
+    const err = new Error(
+      `Create index denied for ${collectionGroup} — missing ` +
+        'roles/datastore.indexAdmin (see above).',
+    );
+    err.handled = true;
+    throw err;
+  }
   if (!res.ok) {
     throw new Error(
       `Create index failed for ${collectionGroup}: ` + JSON.stringify(json),
@@ -221,6 +264,7 @@ async function main() {
   }
 
   const sa = loadServiceAccount();
+  callerEmail = sa.client_email || '';
   const token = await accessToken(sa);
   const auth = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
 
@@ -296,6 +340,8 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error(err);
+  // Already explained itself — a stack trace here just buries the remedy.
+  if (err && err.handled) console.error(err.message);
+  else console.error(err);
   process.exit(1);
 });
