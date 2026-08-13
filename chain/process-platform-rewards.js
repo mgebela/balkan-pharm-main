@@ -4,12 +4,12 @@
  * Separate from adopter escrow. Growers file platformRewards/{id} with
  * status pending + monthKey; this worker scores activity and mints reward.
  *
- * Formula (Devnet, capped at 50):
- *   base 5
- *   + 2 per new plant created that month
- *   + 5 per seed minted that month
- *   + 3 per qualifying care week that month
- *   + 10 if any linked growth mint reached flowering or harvest that month
+ * Formula (Devnet, capped at 50) — see platform-reward-score.js:
+ *   +1 per distinct watering/feeding day (max 20)
+ *   +1 per distinct feeding day (max 8)
+ *   +5 per published story (max 2)
+ *   +3 per ISO week with 5+ care days (max 4)
+ *   +2 per new plant, +5 per seed mint, +10 flower/harvest seal
  *
  * Also processes source: 'adopter_faucet' docs (fixed test mint, no scoring).
  *
@@ -29,12 +29,8 @@ import { createMintClient } from './mint-seed-lib.js';
 import { readDeployed } from './common.js';
 import { tryClaimLease, clearLease, workerId } from './queue-lease.js';
 import { isRetryableChainError } from './retryable.js';
-import {
-  isoWeekKey,
-  enumerateWeekKeys,
-  validateWeeklyCareProof,
-  weekKeyToUtcMonday,
-} from './weekly-care.js';
+import { isoWeekKey } from './weekly-care.js';
+import { collectMonthlyActivity, scorePlatformReward } from './platform-reward-score.js';
 import { notifyUser } from './notify-user.js';
 
 const db = initFirestore();
@@ -48,8 +44,6 @@ if (!deployed.growMint) {
 }
 const GROW_MINT = publicKey(deployed.growMint);
 const GROW_DECIMALS = Number(deployed.growDecimals || 9);
-const CAP = 50;
-
 console.log('Authority:', String(umi.identity.publicKey));
 console.log('Worker:', workerId());
 
@@ -74,38 +68,16 @@ async function loadGrowerAppState(uid) {
   return snap.data() || {};
 }
 
-function countNewPlants(state, startMs, endMs) {
-  const plants = Array.isArray(state?.plants) ? state.plants : [];
-  return plants.filter((p) => {
-    if (!p) return false;
-    const raw = p.createdAt || p.startDate || p.updatedAt;
-    const t = raw ? Date.parse(raw) : NaN;
-    return Number.isFinite(t) && t >= startMs && t < endMs;
-  }).length;
-}
-
-function countQualifyingWeeksInMonth(state, startMs, endMs) {
-  const plants = Array.isArray(state?.plants) ? state.plants : [];
-  const weekKeys = enumerateWeekKeys(startMs, endMs - 1);
-  let count = 0;
-  const details = [];
-  for (const plant of plants) {
-    if (!plant?.id) continue;
-    for (const wk of weekKeys) {
-      const monday = weekKeyToUtcMonday(wk);
-      if (!monday) continue;
-      const weekEnd = new Date(monday);
-      weekEnd.setUTCDate(monday.getUTCDate() + 7);
-      // Count week if it overlaps the month window
-      if (weekEnd.getTime() <= startMs || monday.getTime() >= endMs) continue;
-      const proof = validateWeeklyCareProof(state, plant.id, wk);
-      if (proof.ok) {
-        count += 1;
-        details.push({ plantId: plant.id, weekKey: wk, daysHit: proof.daysHit });
-      }
-    }
-  }
-  return { count, details };
+async function countPublishedStories(uid, startMs, endMs) {
+  const snap = await db.collection('users').doc(uid).collection('growerPosts').get();
+  let n = 0;
+  snap.forEach((doc) => {
+    const d = doc.data() || {};
+    if (d.status !== 'published') return;
+    const t = Date.parse(d.publishedAt || d.createdAt || '');
+    if (Number.isFinite(t) && t >= startMs && t < endMs) n += 1;
+  });
+  return n;
 }
 
 async function countSeedMints(uid, startMs, endMs) {
@@ -136,16 +108,6 @@ async function hasFloweringOrHarvest(uid, startMs, endMs) {
     if (Number.isFinite(t) && t >= startMs && t < endMs) return true;
   }
   return false;
-}
-
-function scorePlatformReward(parts) {
-  const base = 5;
-  const plants = 2 * Number(parts.newPlants || 0);
-  const seeds = 5 * Number(parts.seedMints || 0);
-  const weeks = 3 * Number(parts.qualifyingWeeks || 0);
-  const flower = parts.flowerBonus ? 10 : 0;
-  const raw = base + plants + seeds + weeks + flower;
-  return Math.min(CAP, Math.max(0, raw));
 }
 
 async function processDoc(doc) {
@@ -241,21 +203,24 @@ async function processDoc(doc) {
     }
 
     const state = (await loadGrowerAppState(data.uid)) || {};
-    const newPlants = countNewPlants(state, bounds.startMs, bounds.endMs);
+    const publishedStories = await countPublishedStories(
+      data.uid,
+      bounds.startMs,
+      bounds.endMs
+    );
     const seedMints = await countSeedMints(data.uid, bounds.startMs, bounds.endMs);
-    const weekInfo = countQualifyingWeeksInMonth(state, bounds.startMs, bounds.endMs);
     const flowerBonus = await hasFloweringOrHarvest(data.uid, bounds.startMs, bounds.endMs);
-
-    const breakdown = {
-      base: 5,
-      newPlants,
+    const breakdown = collectMonthlyActivity(state, data.monthKey, {
+      publishedStories,
       seedMints,
-      qualifyingWeeks: weekInfo.count,
       flowerBonus,
-      weekDetails: weekInfo.details.slice(0, 40),
-    };
+    });
     const reward = scorePlatformReward(breakdown);
-    if (reward <= 0) throw new Error('Computed reward is zero.');
+    if (reward <= 0) {
+      throw new Error(
+        'No activity this month to reward. Log watering or feeding, then claim again.'
+      );
+    }
 
     const recipient = publicKey(data.recipient);
     const token = findAssociatedTokenPda(umi, { mint: GROW_MINT, owner: recipient });
@@ -286,7 +251,14 @@ async function processDoc(doc) {
       await notifyUser(db, data.uid, {
         type: 'platform_bonus',
         title: 'Platform bonus minted',
-        body: '+' + reward + ' $GROWTOO for ' + (data.monthKey || 'this month') + '.',
+        body:
+          '+' +
+          reward +
+          ' $GROWTOO for ' +
+          (breakdown.careDays || 0) +
+          ' care days in ' +
+          (data.monthKey || 'this month') +
+          '.',
         meta: { monthKey: data.monthKey, reward, key: 'platform-mint:' + doc.id },
         action: { view: 'adopt' },
         source: 'process-platform-rewards',

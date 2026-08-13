@@ -29,7 +29,7 @@
     })();
   </script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
-  <link rel="stylesheet" href="styles/app.css?v=20260813b" />
+  <link rel="stylesheet" href="styles/app.css?v=20260813d" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
@@ -437,6 +437,15 @@
             <div class="today-card-actions" id="dashboard-today-actions"></div>
           </article>
         </section>
+        <section class="grower-only" id="activity-reward-section" hidden>
+          <article class="shell-card activity-reward-card" id="activity-reward-card">
+            <p class="today-card-eyebrow">This month’s $GROWTOO</p>
+            <p class="activity-reward-line" id="activity-reward-line"></p>
+            <ul class="activity-reward-meter" id="activity-reward-meter"></ul>
+            <p class="activity-reward-hint" id="activity-reward-hint"></p>
+            <div class="today-card-actions" id="activity-reward-actions"></div>
+          </article>
+        </section>
         <section class="plants-journal-section">
           <div class="plants-section-head">
             <h2 class="section-heading">My plants</h2>
@@ -572,10 +581,9 @@
         <section class="shell-card trail-ahead-card grower-only" id="adopt-growth-guide" aria-label="The trail ahead"></section>
 
         <section class="plants-journal-section grower-only" id="platform-bonus-section">
-          <h2 class="section-heading">Platform monthly bonus</h2>
+          <h2 class="section-heading">Activity bonus</h2>
           <p class="market-hint">
-            Extra test $GROWTOO from growtoo (not adopter funds) for adding plants, sealing stages, weekly progress, and flower stages.
-            Claim once per calendar month to a connected Devnet wallet — separate from adopt-stake harvest unlock. Growers only.
+            Test $GROWTOO for watering, feeding, published stories, and 5-day care weeks — claimed once per calendar month to your Devnet wallet. Distinct days count, not extra logs on the same day. Use tokens later on the market (test network only). Growers only.
           </p>
           <div id="platform-bonus-panel" class="platform-bonus-panel"></div>
         </section>
@@ -1321,6 +1329,30 @@
     </div>
   </div>
 
+  <div id="reward-earn-overlay" class="daily-status-overlay reward-earn-overlay" hidden>
+    <button type="button" class="daily-status-backdrop" id="reward-earn-backdrop" aria-label="Dismiss"></button>
+    <div
+      class="daily-status-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="reward-earn-title"
+    >
+      <div class="daily-status-handle" aria-hidden="true"></div>
+      <button type="button" class="daily-status-x" id="reward-earn-close" aria-label="Close">×</button>
+      <p class="daily-status-eyebrow">Reward</p>
+      <h2 id="reward-earn-title" class="daily-status-title">Care day counted</h2>
+      <p class="daily-status-away" id="reward-earn-lead"></p>
+      <ul class="daily-status-gains" id="reward-earn-gains"></ul>
+      <div class="daily-status-next">
+        <p class="daily-status-next-label">This month</p>
+        <button type="button" class="btn btn-primary" id="reward-earn-next-btn">Continue</button>
+      </div>
+      <button type="button" class="btn btn-ghost btn-sm daily-status-continue" id="reward-earn-continue">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
   <div id="app-confirm-overlay" class="app-confirm-overlay" hidden>
     <button type="button" class="app-confirm-backdrop" id="app-confirm-backdrop" aria-label="Dismiss"></button>
     <div
@@ -1381,20 +1413,20 @@
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260731a"></script>
   <script src="js/plant-botanical-sprites.js?v=20260730d"></script>
-  <script src="js/grower-quests.js?v=20260802u"></script>
-  <script src="js/notifications.js?v=20260812b"></script>
+  <script src="js/grower-quests.js?v=20260813b"></script>
+  <script src="js/notifications.js?v=20260813d"></script>
   <script src="js/signup.js?v=20260806e"></script>
-  <script src="js/plant-token.js?v=20260812b"></script>
-  <script src="js/daily-status.js?v=20260806f"></script>
-  <script src="js/product-tour.js?v=20260812b"></script>
+  <script src="js/plant-token.js?v=20260813d"></script>
+  <script src="js/daily-status.js?v=20260813d"></script>
+  <script src="js/product-tour.js?v=20260813d"></script>
   <script src="js/coach-core.js?v=20260803a"></script>
   <!-- Must precede grow-camera and app.js — both hand photos to it. -->
   <script src="js/journal-photos.js?v=20260813a"></script>
   <script src="js/grow-camera.js?v=20260813b"></script>
   <script src="js/ai-coach.js?v=20260806b"></script>
-  <script src="js/grower-blog.js?v=20260806b"></script>
+  <script src="js/grower-blog.js?v=20260813a"></script>
   <script src="js/theme.js?v=20260806t" defer></script>
-  <script src="js/app.js?v=20260813b"></script>
+  <script src="js/app.js?v=20260813c"></script>
   <script src="../js/site-trust.js?v=20260802a"></script>
 </body>
 </html>

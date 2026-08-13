@@ -216,7 +216,36 @@
             '+' +
             xpGain +
             ' grower XP' +
-            (rank && rank.label ? ' · rank ' + rank.label : ''),
+            (rank && rank.title ? ' · ' + rank.title : ''),
+          view: 'plants',
+        });
+      }
+    }
+
+    if (window.GrowerQuests && typeof GrowerQuests.previewPlatformReward === 'function') {
+      const stories =
+        window.GrowerBlog && typeof GrowerBlog.getPublishedThisMonth === 'function'
+          ? Number(GrowerBlog.getPublishedThisMonth() || 0)
+          : 0;
+      const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
+      const a = preview.activity || {};
+      const claimed =
+        window.Market && typeof Market.platformBonusStatus === 'function'
+          ? Market.platformBonusStatus()
+          : null;
+      if (preview.reward > 0 || (a.careDays || 0) > 0) {
+        const statusBit =
+          claimed && claimed.status === 'minted'
+            ? 'claimed ' + (claimed.reward || preview.reward) + ' $GROWTOO'
+            : claimed && claimed.status === 'pending'
+              ? 'claim pending · ~' + preview.reward + ' $GROWTOO'
+              : '~' + preview.reward + ' $GROWTOO ready to claim';
+        gains.push({
+          icon: '◎',
+          text:
+            (a.careDays || 0) +
+            ' care days this month · ' +
+            statusBit,
           view: 'adopt',
         });
       }
@@ -458,11 +487,38 @@
     }
     return {
       kicker: 'Start here',
-      lead: 'Log care in the journal, seal a stage on Tokenise, then list it on Market.',
+      lead: 'Log watering or feeding to earn $GROWTOO. Claim the month on Tokenise.',
       actions: [
         { id: 'daily-cta-journal', label: 'Open journal', view: 'plants', primary: true },
         { id: 'daily-cta-tokenise', label: 'Tokenise', view: 'adopt' },
         { id: 'daily-cta-list', label: 'Market', view: 'market' },
+      ],
+    };
+  }
+
+  function growerBonusStep() {
+    if (isAdopter()) return null;
+    if (!window.GrowerQuests || typeof GrowerQuests.previewPlatformReward !== 'function') return null;
+    const claimed =
+      window.Market && typeof Market.platformBonusStatus === 'function'
+        ? Market.platformBonusStatus()
+        : null;
+    if (claimed && (claimed.status === 'minted' || claimed.status === 'pending')) return null;
+    const stories =
+      window.GrowerBlog && typeof GrowerBlog.getPublishedThisMonth === 'function'
+        ? Number(GrowerBlog.getPublishedThisMonth() || 0)
+        : 0;
+    const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
+    if (!preview || preview.reward <= 0) return null;
+    return {
+      kicker: 'Activity bonus',
+      lead:
+        'About ' +
+        preview.reward +
+        ' $GROWTOO from this month’s watering, feeding, and stories. Claim on Tokenise.',
+      actions: [
+        { id: 'daily-cta-tokenise', label: 'Claim on Tokenise', view: 'adopt', primary: true },
+        { id: 'daily-cta-journal', label: 'Open journal', view: 'plants' },
       ],
     };
   }
@@ -579,7 +635,7 @@
           .join('')
       : '<li class="daily-status-gain daily-status-gain--quiet"><span>No new gains yet — pick a next step below.</span></li>';
 
-    const step = nextStep(opts.adopter);
+    const step = growerBonusStep() || nextStep(opts.adopter);
     const primary = step.actions.find(function (a) {
       return a.primary;
     }) || step.actions[0];
@@ -599,6 +655,135 @@
     if (overlay) overlay.hidden = true;
     document.body.classList.remove('daily-status-open');
     if (uid) writeLastSeen(uid, Date.now(), !!adopter || isAdopter());
+    flushQueuedReward();
+  }
+
+  let queuedReward = null;
+
+  function rewardCopy(detail) {
+    const d = detail || {};
+    const titles = {
+      watering: 'Watering counted',
+      feeding: 'Feeding counted',
+      stageLogged: 'Stage logged',
+      story_published: 'Story published',
+      claimed: 'Bonus minted',
+    };
+    const preview = d.preview || {};
+    const a = preview.activity || {};
+    const lines = [];
+    if (d.xp) lines.push({ icon: '★', text: '+' + d.xp + ' grower XP' });
+    if (d.kind === 'claimed') {
+      lines.push({
+        icon: '◎',
+        text: '+' + (d.claimed || preview.reward || 0) + ' $GROWTOO sent to your Devnet wallet',
+      });
+    } else {
+      lines.push({
+        icon: '◎',
+        text:
+          (a.careDays || 0) +
+          ' care days this month · ~' +
+          (preview.reward || 0) +
+          ' $GROWTOO when you claim',
+      });
+    }
+    if (d.weekComplete && d.kind !== 'claimed') {
+      lines.push({
+        icon: '◷',
+        text: '5-day week unlocked · extra $GROWTOO on this month’s claim',
+      });
+    }
+    return {
+      title: titles[d.kind] || 'Grower reward',
+      lead:
+        d.kind === 'claimed'
+          ? 'Activity bonus landed in your wallet (test network).'
+          : 'Logged for today. Extra logs today do not add more tokens.',
+      lines: lines,
+      claimable: d.kind !== 'claimed' && (preview.reward || 0) > 0,
+    };
+  }
+
+  function showRewardPopup(detail) {
+    if (isAdopter()) return;
+    const overlay = document.getElementById('reward-earn-overlay');
+    const title = document.getElementById('reward-earn-title');
+    const lead = document.getElementById('reward-earn-lead');
+    const list = document.getElementById('reward-earn-gains');
+    const nextBtn = document.getElementById('reward-earn-next-btn');
+    if (!overlay || !list) return;
+    if (document.body.classList.contains('daily-status-open')) {
+      queuedReward = detail;
+      return;
+    }
+    const copy = rewardCopy(detail);
+    if (title) title.textContent = copy.title;
+    if (lead) lead.textContent = copy.lead;
+    list.innerHTML = copy.lines
+      .map(function (g) {
+        return (
+          '<li class="daily-status-gain">' +
+          '<span class="daily-status-gain-icon" aria-hidden="true">' +
+          esc(g.icon || '•') +
+          '</span>' +
+          '<span>' +
+          esc(g.text) +
+          '</span>' +
+          '</li>'
+        );
+      })
+      .join('');
+    if (nextBtn) {
+      nextBtn.textContent = copy.claimable ? 'Claim on Tokenise' : 'Continue';
+      nextBtn.dataset.view = copy.claimable ? 'adopt' : '';
+    }
+    overlay.hidden = false;
+    document.body.classList.add('reward-earn-open');
+  }
+
+  function hideRewardPopup() {
+    const overlay = document.getElementById('reward-earn-overlay');
+    if (overlay) overlay.hidden = true;
+    document.body.classList.remove('reward-earn-open');
+  }
+
+  function flushQueuedReward() {
+    if (!queuedReward) return;
+    const detail = queuedReward;
+    queuedReward = null;
+    setTimeout(function () {
+      showRewardPopup(detail);
+    }, 280);
+  }
+
+  function bindRewardOnce() {
+    const overlay = document.getElementById('reward-earn-overlay');
+    if (!overlay || overlay.dataset.bound === '1') return;
+    overlay.dataset.bound = '1';
+    const backdrop = document.getElementById('reward-earn-backdrop');
+    const closeBtn = document.getElementById('reward-earn-close');
+    const continueBtn = document.getElementById('reward-earn-continue');
+    const nextBtn = document.getElementById('reward-earn-next-btn');
+    function dismiss() {
+      hideRewardPopup();
+    }
+    if (backdrop) backdrop.addEventListener('click', dismiss);
+    if (closeBtn) closeBtn.addEventListener('click', dismiss);
+    if (continueBtn) continueBtn.addEventListener('click', dismiss);
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        const view = nextBtn.dataset.view || '';
+        dismiss();
+        if (view) goView(view);
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && overlay && !overlay.hidden) dismiss();
+    });
+    window.addEventListener('growtoo:reward', function (e) {
+      showRewardPopup((e && e.detail) || {});
+    });
   }
 
   function maybeKickTour(adopter, uid) {
@@ -717,6 +902,7 @@
 
     bindStripOnce();
     bindPopupOnce();
+    bindRewardOnce();
     renderStrip(adopter);
 
     // When Market listings sync (or a new offer posts), refresh grower START HERE hide.
@@ -770,5 +956,12 @@
     hide: function () {
       hidePopup(currentUid(), isAdopter());
     },
+    showReward: showRewardPopup,
   };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindRewardOnce);
+  } else {
+    bindRewardOnce();
+  }
 })();

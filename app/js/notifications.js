@@ -603,6 +603,22 @@
                 kind: 'success',
                 dedupKey: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':minted',
               });
+              if (!isFaucet) {
+                try {
+                  window.dispatchEvent(
+                    new CustomEvent('growtoo:reward', {
+                      detail: {
+                        kind: 'claimed',
+                        xp: 0,
+                        claimed: d.reward || 0,
+                        preview: { reward: d.reward || 0, cap: 50 },
+                      },
+                    })
+                  );
+                } catch (_) {
+                  /* ignore */
+                }
+              }
             } else if (to === 'failed') {
               push({
                 type: isFaucet ? 'test_faucet' : 'platform_bonus',
@@ -666,6 +682,36 @@
           });
         });
       });
+  }
+
+  function notifyActivityReward(detail) {
+    const d = detail || {};
+    const kind = String(d.kind || 'care');
+    const titles = {
+      watering: 'Care day counted',
+      feeding: 'Feeding counted',
+      stageLogged: 'Stage logged',
+      story_published: 'Story published',
+      claimed: 'Activity bonus minted',
+    };
+    const preview = d.preview || {};
+    const reward = preview.reward != null ? preview.reward : d.claimed;
+    const xpBit = d.xp ? '+' + d.xp + ' XP' : '';
+    const tokenBit =
+      d.kind === 'claimed'
+        ? '+' + (d.claimed || reward || 0) + ' $GROWTOO sent to your wallet'
+        : '~' + (reward || 0) + ' $GROWTOO this month';
+    const day = new Date().toISOString().slice(0, 10);
+    push({
+      type: 'activity_reward',
+      title: titles[kind] || 'Grower reward',
+      body: [xpBit, tokenBit].filter(Boolean).join(' · '),
+      meta: { key: 'activity_reward:' + kind + ':' + day, kind: kind },
+      action: { view: kind === 'claimed' ? 'adopt' : 'plants' },
+      kind: 'success',
+      dedupKey: 'activity_reward:' + kind + ':' + day,
+      toast: false,
+    });
   }
 
   function notifyCareProgress(kind, plantId, plantName, periodKey, daysHit, minDays) {
@@ -1110,6 +1156,7 @@
     },
     bindStatusHooks: bindStatusHooks,
     notifyCareProgress: notifyCareProgress,
+    notifyActivityReward: notifyActivityReward,
     notifyJournalEntry: notifyJournalEntry,
     entryTypeLabel: entryTypeLabel,
     syncCareDueFromCoach: syncCareDueFromCoach,

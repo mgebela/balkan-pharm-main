@@ -7007,8 +7007,37 @@ body.profile-adopter .adopt-hero-text h2 {
   border-color: rgb(var(--brass-hi-rgb) / 0.32);
   color: var(--brass-pale);
 }
-.platform-bonus-panel {
-  margin-top: 0.5rem;
+.activity-reward-card {
+  padding: 0.9rem 1rem 1rem;
+}
+.activity-reward-line {
+  margin: 0.15rem 0 0.55rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+.activity-reward-meter {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.activity-reward-meter li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-muted, var(--ink-soft));
+}
+.activity-reward-meter strong {
+  color: var(--text, var(--ink));
+  font-weight: 600;
+}
+.activity-reward-hint {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-muted, var(--ink-soft));
 }
 .test-faucet-panel {
   margin-top: 0.85rem;
@@ -12179,8 +12208,12 @@ body.app-confirm-open {
   align-self: center;
   margin-top: 0.15rem;
 }
-body.daily-status-open {
+body.daily-status-open,
+body.reward-earn-open {
   overflow: hidden;
+}
+.reward-earn-overlay {
+  z-index: 340;
 }
 @media (min-width: 720px) {
   .daily-status-overlay {
@@ -12345,7 +12378,7 @@ body.product-tour-open {
    transition. Everything else — including the Toolbox panels (`.open` class)
    and the admin controls (CSS-default `display: none`) — is governed by a
    different mechanism entirely and is unaffected. */
-[hidden]:not(.notif-overlay):not(.daily-status-overlay):not(.app-confirm-overlay) {
+[hidden]:not(.notif-overlay):not(.daily-status-overlay):not(.reward-earn-overlay):not(.app-confirm-overlay) {
   display: none !important;
 }
 

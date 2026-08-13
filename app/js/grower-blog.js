@@ -13,9 +13,43 @@
     { key: 'daybook', label: 'Field note' },
   ];
 
-  var editingId = '';
-  var coverDataUrl = '';
-  var bound = false;
+  var publishedThisMonthCache = 0;
+
+  function currentMonthKeyUtc() {
+    var d = new Date();
+    return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0');
+  }
+
+  function countPublishedInMonthFromSnap(snap, monthKey) {
+    var key = monthKey || currentMonthKeyUtc();
+    var n = 0;
+    snap.forEach(function (doc) {
+      var d = doc.data() || {};
+      if (d.status !== 'published') return;
+      var raw = d.publishedAt || d.createdAt || '';
+      if (String(raw).slice(0, 7) === key) n += 1;
+    });
+    return n;
+  }
+
+  async function refreshPublishedMonthCount() {
+    var uid = currentUid();
+    if (!uid || !db()) {
+      publishedThisMonthCache = 0;
+      return 0;
+    }
+    try {
+      var snap = await postsCol(uid).get();
+      publishedThisMonthCache = countPublishedInMonthFromSnap(snap, currentMonthKeyUtc());
+    } catch (_) {
+      publishedThisMonthCache = 0;
+    }
+    return publishedThisMonthCache;
+  }
+
+  function getPublishedThisMonth() {
+    return publishedThisMonthCache;
+  }
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -258,6 +292,10 @@
             : 'Draft saved.';
       setStatus(msg, 'ok');
       toast(msg, 'success');
+      if (status === 'published' && root.GrowerQuests && typeof GrowerQuests.awardXpOncePerDay === 'function') {
+        GrowerQuests.awardXpOncePerDay('story_published', GrowerQuests.QUEST_XP.story || 30);
+      }
+      await refreshPublishedMonthCount();
       await renderList();
     } catch (e) {
       console.error(e);
@@ -630,5 +668,7 @@
     publicProfileFieldsHtml: publicProfileFieldsHtml,
     bindPublicProfileActions: bindPublicProfileActions,
     categories: CATEGORIES,
+    refreshPublishedMonthCount: refreshPublishedMonthCount,
+    getPublishedThisMonth: getPublishedThisMonth,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
