@@ -1,0 +1,91 @@
+# Deploy firestore.indexes.json whenever it changes on main.
+# Uses the Firestore Admin API (not `firebase deploy`) so the CI service
+# account does not need Service Usage Viewer — same reason as the rules
+# workflow next door.
+#
+# Background: this file had no deploy path at all until 2026-08-13. The
+# publicJournalPosts composite indexes were declared but never created, so the
+# public journal query failed with FAILED_PRECONDITION on every page load and
+# silently fell back to an unordered limit(80) scan.
+#
+# Required secret: FIREBASE_SERVICE_ACCOUNT_JSON
+# Required IAM: roles/datastore.indexAdmin on the service account. The default
+# firebase-adminsdk SA can LIST indexes but not CREATE them — creates come back
+# 403 PERMISSION_DENIED until that role is granted.
+name: Deploy Firestore indexes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'firestore.indexes.json'
+      - 'scripts/deploy-firestore-indexes.mjs'
+      - '.github/workflows/deploy-firestore-indexes.yml'
+  pull_request:
+    paths:
+      - 'firestore.indexes.json'
+      - 'scripts/deploy-firestore-indexes.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-firestore-indexes
+  cancel-in-progress: false
+
+jobs:
+  deploy-indexes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # On a PR, only report the plan — never mutate the shared project from an
+      # unmerged branch.
+      - name: Plan (pull request)
+        if: github.event_name == 'pull_request'
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_PROJECT: balpha-9dab9
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT_JSON secret."
+            exit 1
+          fi
+          node scripts/deploy-firestore-indexes.mjs --dry-run
+
+      - name: Deploy indexes via Firestore Admin API
+        if: github.event_name != 'pull_request'
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          FIREBASE_PROJECT: balpha-9dab9
+        run: |
+          if [ -z "${FIREBASE_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "::error::Missing FIREBASE_SERVICE_ACCOUNT_JSON secret."
+            exit 1
+          fi
+          node scripts/deploy-firestore-indexes.mjs --wait
+
+      # The regression test. This is the exact query the public journal feed
+      # runs; it needs the hiddenByAdmin + publishedAt composite index. If the
+      # index is missing the API answers FAILED_PRECONDITION and the site
+      # quietly degrades to the limit(80) fallback, so assert it here rather
+      # than trusting that the create call reported success.
+      - name: Verify the public journal feed query needs no index
+        if: github.event_name != 'pull_request'
+        run: |
+          body='{"structuredQuery":{"from":[{"collectionId":"publicJournalPosts"}],"where":{"fieldFilter":{"field":{"fieldPath":"hiddenByAdmin"},"op":"EQUAL","value":{"booleanValue":false}}},"orderBy":[{"field":{"fieldPath":"publishedAt"},"direction":"DESCENDING"}],"limit":1}}'
+          out=$(curl -sS -m 30 -X POST \
+            "https://firestore.googleapis.com/v1/projects/balpha-9dab9/databases/(default)/documents:runQuery" \
+            -H 'Content-Type: application/json' -d "$body")
+          echo "$out"
+          if echo "$out" | grep -q 'FAILED_PRECONDITION'; then
+            echo "::error::publicJournalPosts feed query still requires an index."
+            exit 1
+          fi
