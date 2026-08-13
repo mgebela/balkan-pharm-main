@@ -2112,12 +2112,6 @@
         note: 'Watering logged from Tokenise',
         meta: { source: 'tokenise-tools' },
       });
-      if (window.GrowerQuests) {
-        GrowerQuests.awardXp(
-          'water_' + token.id + '_' + Date.now(),
-          GrowerQuests.QUEST_XP.watering
-        );
-      }
       return;
     }
     if (action === 'feed') {
@@ -2127,12 +2121,6 @@
         note: 'Feeding logged from Tokenise',
         meta: { source: 'tokenise-tools' },
       });
-      if (window.GrowerQuests) {
-        GrowerQuests.awardXp(
-          'feed_' + token.id + '_' + Date.now(),
-          GrowerQuests.QUEST_XP.feeding
-        );
-      }
       return;
     }
     if (action === 'stage') {
@@ -2143,12 +2131,6 @@
         throw new Error('Stage update is not available.');
       }
       DJ.setPlantStage(token.plantId, plantStage, 'Stage set from Tokenise for ' + next.label);
-      if (window.GrowerQuests) {
-        GrowerQuests.awardXp(
-          'stage_' + token.id + '_' + next.key,
-          GrowerQuests.QUEST_XP.stageLogged
-        );
-      }
       return;
     }
     if (action === 'environment') {
@@ -2840,13 +2822,31 @@
         : null;
     const canSign = signingWalletReady();
     let body =
-      '<p class="market-hint">Monthly activity bonus — earn up to <strong>50 $GROWTOO</strong> based on plants, seed mints, care weeks, and flowering progress. Platform-funded (Devnet). Paid to your connected wallet.</p>' +
+      '<p class="market-hint">Monthly activity bonus — up to <strong>50 $GROWTOO</strong> for watering/feeding days, published stories, and 5-day care weeks. Distinct UTC days count (not extra logs the same day). Claim once per month to your Devnet wallet; spend later on the market. Test network only.</p>' +
       '<details class="platform-bonus-disclosure">' +
       '<summary>How is this calculated?</summary>' +
-      '<p>Base 5, plus points for new plants, seed mints, qualifying care weeks, and reaching flower — capped at 50 for ' +
+      '<p>+1 per care day (max 20), +1 per feeding day (max 8), +5 per published story (max 2), +3 per week with 5+ care days (max 4), plus small extras for new plants and sealed stages — capped at 50 for ' +
       esc(monthKey) +
       '.</p>' +
       '</details>';
+    if (
+      window.GrowerQuests &&
+      typeof GrowerQuests.previewPlatformReward === 'function' &&
+      !(status && status.status === 'minted')
+    ) {
+      const stories =
+        window.GrowerBlog && typeof GrowerBlog.getPublishedThisMonth === 'function'
+          ? Number(GrowerBlog.getPublishedThisMonth() || 0)
+          : 0;
+      const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
+      const care = preview.activity && preview.activity.careDays != null ? preview.activity.careDays : 0;
+      body +=
+        '<p class="market-hint">This month so far: <strong>' +
+        esc(String(preview.reward)) +
+        ' $GROWTOO</strong> from ' +
+        esc(String(care)) +
+        ' care days.</p>';
+    }
     if (status && status.status === 'minted') {
       body +=
         '<p class="adopt-token-chain adopt-token-chain--ok">Claimed this month: <strong>' +

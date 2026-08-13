@@ -43,7 +43,25 @@
     stageLogged: 40,
     watering: 20,
     feeding: 20,
+    story: 30,
     mintReady: 50,
+  };
+
+  const PLATFORM_REWARD_CAP = 50;
+  const CARE_DAY_CAP = 20;
+  const FEEDING_DAY_CAP = 8;
+  const STORY_CAP = 2;
+  const WEEK_CAP = 4;
+  const NEW_PLANT_CAP = 5;
+  const SEED_MINT_CAP = 3;
+  const PLATFORM_RATES = {
+    careDay: 1,
+    feedingDay: 1,
+    story: 5,
+    qualifyingWeek: 3,
+    newPlant: 2,
+    seedMint: 5,
+    flowerBonus: 10,
   };
 
   function readJson(key, fallback) {
@@ -360,6 +378,70 @@
     return state;
   }
 
+  /** One XP grant per reason+UTC day so logging 8 waterings today still pays once. */
+  function awardXpOncePerDay(reason, amount) {
+    const day = new Date().toISOString().slice(0, 10);
+    const key = String(reason || 'quest') + ':' + day;
+    const state = readXp();
+    if (state.events.some(function (e) { return e && e.reason === key; })) {
+      return { awarded: false, total: state.total, events: state.events, reason: key, amount: 0 };
+    }
+    const next = awardXp(key, amount);
+    emitActivityReward(String(reason || 'quest'), Number(amount || 0), next);
+    return {
+      awarded: true,
+      total: next.total,
+      events: next.events,
+      reason: key,
+      amount: Number(amount || 0),
+    };
+  }
+
+  function emitActivityReward(kind, xp, xpState) {
+    let preview = null;
+    try {
+      const stories =
+        window.GrowerBlog && typeof GrowerBlog.getPublishedThisMonth === 'function'
+          ? Number(GrowerBlog.getPublishedThisMonth() || 0)
+          : 0;
+      preview = previewPlatformReward({ publishedStories: stories });
+    } catch {
+      preview = null;
+    }
+    let weekComplete = false;
+    try {
+      const wk = isoWeekKey(Date.now());
+      const monday = weekKeyToUtcMonday(wk);
+      if (monday) {
+        const weekEnd = new Date(monday);
+        weekEnd.setUTCDate(monday.getUTCDate() + 7);
+        const slice = collectCareActivityLocal(monday.getTime(), weekEnd.getTime());
+        weekComplete = slice.careDays === WEEKLY_CARE_MIN_DAYS;
+      }
+    } catch {
+      weekComplete = false;
+    }
+    const detail = {
+      kind: kind,
+      xp: xp,
+      totalXp: xpState && xpState.total,
+      preview: preview,
+      weekComplete: weekComplete,
+    };
+    try {
+      window.dispatchEvent(new CustomEvent('growtoo:reward', { detail: detail }));
+    } catch {
+      // ignore
+    }
+    try {
+      if (window.DnevnikNotifications && typeof DnevnikNotifications.notifyActivityReward === 'function') {
+        DnevnikNotifications.notifyActivityReward(detail);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
   function getGrowerProfile() {
     const xp = readXp();
     const lvl = levelFromXp(xp.total);
@@ -672,6 +754,121 @@
     });
   }
 
+  function collectCareActivityLocal(startMs, endMs) {
+    const waterDays = {};
+    const feedDays = {};
+    getEntries().forEach(function (e) {
+      if (!e || !e.plantId) return;
+      const ms = entryDateMs(e);
+      if (ms < startMs || ms >= endMs) return;
+      const day = dayKeyUtc(ms);
+      if (e.type === 'zalijevanje') waterDays[day] = true;
+      if (e.type === 'gnojidba') feedDays[day] = true;
+    });
+    const toolbox = getToolbox();
+    (toolbox.watering || []).forEach(function (row) {
+      if (!row) return;
+      const ms = toolboxDateMs(row);
+      if (ms < startMs || ms >= endMs) return;
+      waterDays[dayKeyUtc(ms)] = true;
+    });
+    (toolbox.feeding || []).forEach(function (row) {
+      if (!row) return;
+      const ms = toolboxDateMs(row);
+      if (ms < startMs || ms >= endMs) return;
+      feedDays[dayKeyUtc(ms)] = true;
+    });
+    const careDays = Object.assign({}, waterDays, feedDays);
+    return {
+      careDays: Object.keys(careDays).length,
+      wateringDays: Object.keys(waterDays).length,
+      feedingDays: Object.keys(feedDays).length,
+    };
+  }
+
+  function countNewPlantsLocal(startMs, endMs) {
+    return getPlants().filter(function (p) {
+      if (!p) return false;
+      const raw = p.createdAt || p.startDate || p.updatedAt;
+      const t = raw ? Date.parse(raw) : NaN;
+      return Number.isFinite(t) && t >= startMs && t < endMs;
+    }).length;
+  }
+
+  function countQualifyingWeeksLocal(startMs, endMs) {
+    const weekKeys = enumerateWeekKeys(startMs, endMs - 1);
+    let count = 0;
+    weekKeys.forEach(function (wk) {
+      const monday = weekKeyToUtcMonday(wk);
+      if (!monday) return;
+      const weekEnd = new Date(monday);
+      weekEnd.setUTCDate(monday.getUTCDate() + 7);
+      if (weekEnd.getTime() <= startMs || monday.getTime() >= endMs) return;
+      const slice = collectCareActivityLocal(monday.getTime(), weekEnd.getTime());
+      if (slice.careDays >= 5) count += 1;
+    });
+    return count;
+  }
+
+  function scorePlatformReward(parts) {
+    const careDays = Math.min(CARE_DAY_CAP, Math.max(0, Number(parts.careDays || 0)));
+    const feedingDays = Math.min(FEEDING_DAY_CAP, Math.max(0, Number(parts.feedingDays || 0)));
+    const stories = Math.min(STORY_CAP, Math.max(0, Number(parts.publishedStories || 0)));
+    const weeks = Math.min(WEEK_CAP, Math.max(0, Number(parts.qualifyingWeeks || 0)));
+    const plants = Math.min(NEW_PLANT_CAP, Math.max(0, Number(parts.newPlants || 0)));
+    const seeds = Math.min(SEED_MINT_CAP, Math.max(0, Number(parts.seedMints || 0)));
+    const flower = parts.flowerBonus ? PLATFORM_RATES.flowerBonus : 0;
+    const raw =
+      PLATFORM_RATES.careDay * careDays +
+      PLATFORM_RATES.feedingDay * feedingDays +
+      PLATFORM_RATES.story * stories +
+      PLATFORM_RATES.qualifyingWeek * weeks +
+      PLATFORM_RATES.newPlant * plants +
+      PLATFORM_RATES.seedMint * seeds +
+      flower;
+    return Math.min(PLATFORM_REWARD_CAP, Math.max(0, raw));
+  }
+
+  /**
+   * Client preview of this month's $GROWTOO (same formula as the worker).
+   * Pass publishedStories from GrowerBlog when known.
+   */
+  function previewPlatformReward(opts) {
+    const o = opts || {};
+    const key = o.monthKey || monthKey(Date.now());
+    const bounds = monthKeyToUtcBounds(key);
+    if (!bounds) {
+      return { monthKey: key, reward: 0, cap: PLATFORM_REWARD_CAP, activity: {}, lines: [] };
+    }
+    const care = collectCareActivityLocal(bounds.startMs, bounds.endMs);
+    const activity = {
+      monthKey: key,
+      careDays: care.careDays,
+      wateringDays: care.wateringDays,
+      feedingDays: care.feedingDays,
+      qualifyingWeeks: countQualifyingWeeksLocal(bounds.startMs, bounds.endMs),
+      newPlants: countNewPlantsLocal(bounds.startMs, bounds.endMs),
+      publishedStories: Math.max(0, Number(o.publishedStories || 0)),
+      seedMints: Math.max(0, Number(o.seedMints || 0)),
+      flowerBonus: !!o.flowerBonus,
+    };
+    const reward = scorePlatformReward(activity);
+    return {
+      monthKey: key,
+      reward: reward,
+      cap: PLATFORM_REWARD_CAP,
+      activity: activity,
+      loggedToday: (function () {
+        const today = new Date().toISOString().slice(0, 10);
+        const dayBounds = {
+          start: Date.parse(today + 'T00:00:00.000Z'),
+          end: Date.parse(today + 'T00:00:00.000Z') + 86400000,
+        };
+        return collectCareActivityLocal(dayBounds.start, dayBounds.end).careDays > 0;
+      })(),
+    };
+  }
+
   /** Checklist HTML for Adopt token cards. */
   function checklistHtml(quest, escFn) {
     const esc = typeof escFn === 'function' ? escFn : function (s) { return String(s || ''); };
@@ -734,6 +931,10 @@
     buildProof: buildProof,
     getGrowerProfile: getGrowerProfile,
     awardXp: awardXp,
+    awardXpOncePerDay: awardXpOncePerDay,
+    previewPlatformReward: previewPlatformReward,
+    scorePlatformReward: scorePlatformReward,
+    PLATFORM_REWARD_CAP: PLATFORM_REWARD_CAP,
     checklistHtml: checklistHtml,
     levelFromXp: levelFromXp,
     isoWeekKey: isoWeekKey,

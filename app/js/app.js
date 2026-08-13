@@ -3021,6 +3021,11 @@ function initFirebaseSync() {
       applyChainNavUI();
     });
   }
+  if (window.Market && typeof Market.onChange === 'function') {
+    Market.onChange(function () {
+      if (typeof renderActivityRewardCard === 'function') renderActivityRewardCard();
+    });
+  }
 
   function showView(id, extra, opts) {
     if (id === 'dashboard' || id === 'danas') id = 'plants';
@@ -5057,6 +5062,81 @@ function initFirebaseSync() {
     );
   }
 
+  function renderActivityRewardCard() {
+    const section = document.getElementById('activity-reward-section');
+    const line = document.getElementById('activity-reward-line');
+    const meter = document.getElementById('activity-reward-meter');
+    const hint = document.getElementById('activity-reward-hint');
+    const actions = document.getElementById('activity-reward-actions');
+    if (!section || !line || !meter) return;
+    if (!isGrowerProfile() || !window.GrowerQuests || typeof GrowerQuests.previewPlatformReward !== 'function') {
+      section.hidden = true;
+      return;
+    }
+    const plants = getPlants();
+    if (!plants.length) {
+      section.hidden = true;
+      return;
+    }
+    section.hidden = false;
+    const stories =
+      window.GrowerBlog && typeof GrowerBlog.getPublishedThisMonth === 'function'
+        ? Number(GrowerBlog.getPublishedThisMonth() || 0)
+        : 0;
+    const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
+    const a = preview.activity || {};
+    const claimed =
+      window.Market && typeof Market.platformBonusStatus === 'function'
+        ? Market.platformBonusStatus()
+        : null;
+    const claimedAmt =
+      claimed && claimed.status === 'minted' ? Number(claimed.reward || 0) : null;
+    if (claimedAmt != null) {
+      line.innerHTML = 'Claimed <strong>' + claimedAmt + ' $GROWTOO</strong> this month.';
+    } else if (preview.reward <= 0) {
+      line.innerHTML = 'Log watering or feeding to start this month’s bonus.';
+    } else {
+      line.innerHTML =
+        'About <strong>' +
+        preview.reward +
+        ' $GROWTOO</strong> if you claim now (cap ' +
+        preview.cap +
+        ').';
+    }
+    meter.innerHTML =
+      '<li>Care days (water or feed)<strong>' +
+      (a.careDays || 0) +
+      '/20</strong></li>' +
+      '<li>Feeding days<strong>' +
+      (a.feedingDays || 0) +
+      '/8</strong></li>' +
+      '<li>Stories published<strong>' +
+      (a.publishedStories || 0) +
+      '/2</strong></li>' +
+      '<li>Weeks with 5+ care days<strong>' +
+      (a.qualifyingWeeks || 0) +
+      '/4</strong></li>';
+    if (hint) {
+      hint.textContent = preview.loggedToday
+        ? 'Today is already counted. Extra logs today do not add more tokens.'
+        : 'Log watering or feeding today to add a care day.';
+    }
+    if (actions) {
+      if (claimed && (claimed.status === 'minted' || claimed.status === 'pending')) {
+        actions.innerHTML =
+          claimed.status === 'pending'
+            ? '<p class="activity-reward-hint">Claim is in the rewards queue.</p>'
+            : '';
+      } else if (preview.reward <= 0) {
+        actions.innerHTML = '';
+      } else {
+        actions.innerHTML =
+          '<button type="button" class="btn btn-secondary btn-tap" id="activity-reward-claim">Claim on Tokenise</button>';
+      }
+    }
+  }
+  }
+
   (function bindGrowerRankChip() {
     const chip = document.getElementById('grower-rank-chip');
     if (chip && !chip.dataset.bound) {
@@ -5074,6 +5154,12 @@ function initFirebaseSync() {
   function renderPlants() {
     renderCoachBriefingSurfaces();
     renderGrowerRankChip();
+    renderActivityRewardCard();
+    if (window.GrowerBlog && typeof GrowerBlog.refreshPublishedMonthCount === 'function') {
+      GrowerBlog.refreshPublishedMonthCount().then(function () {
+        renderActivityRewardCard();
+      });
+    }
     const list = document.getElementById('plants-list');
     const plants = getPlants();
     if (plants.length === 0) {
@@ -5504,6 +5590,12 @@ function initFirebaseSync() {
       e.preventDefault();
       const real = document.getElementById('btn-add-entry');
       if (real) real.click();
+      return;
+    }
+    const claimBonus = e.target.closest('#activity-reward-claim');
+    if (claimBonus) {
+      e.preventDefault();
+      showView('adopt');
     }
   });
 
@@ -7665,6 +7757,20 @@ document.addEventListener("click", (e) => {
     const landed = verifyEntryLanded(entry);
     if (!landed) {
       throw new Error('Entry did not save. Please try again.');
+    }
+
+    if (window.GrowerQuests && typeof GrowerQuests.awardXpOncePerDay === 'function') {
+      try {
+        if (type === 'zalijevanje') {
+          GrowerQuests.awardXpOncePerDay('watering', GrowerQuests.QUEST_XP.watering);
+        } else if (type === 'gnojidba') {
+          GrowerQuests.awardXpOncePerDay('feeding', GrowerQuests.QUEST_XP.feeding);
+        } else if (type === 'faza') {
+          GrowerQuests.awardXpOncePerDay('stageLogged', GrowerQuests.QUEST_XP.stageLogged);
+        }
+      } catch {
+        // ignore
+      }
     }
 
     // Stage-location fields on a faza entry also update the plant profile.

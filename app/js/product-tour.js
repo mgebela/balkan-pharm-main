@@ -684,6 +684,7 @@
     setTimeout(function () {
       if (hasCompleted(scriptId, uid)) return;
       if (document.body.classList.contains('daily-status-open')) return;
+      if (document.body.classList.contains('reward-earn-open')) return;
       start({ script: scriptId, uid: uid });
     }, 450);
   }
