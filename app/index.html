@@ -1343,6 +1343,8 @@
   <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+  <!-- Journal photos live in Storage, not inline in the journal document. -->
+  <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check-compat.js"></script>
   <script>
     (function () {
@@ -1386,6 +1388,8 @@
   <script src="js/daily-status.js?v=20260806f"></script>
   <script src="js/product-tour.js?v=20260812b"></script>
   <script src="js/coach-core.js?v=20260803a"></script>
+  <!-- Must precede grow-camera and app.js — both hand photos to it. -->
+  <script src="js/journal-photos.js?v=20260813a"></script>
   <script src="js/grow-camera.js?v=20260805e"></script>
   <script src="js/ai-coach.js?v=20260806b"></script>
   <script src="js/grower-blog.js?v=20260806b"></script>

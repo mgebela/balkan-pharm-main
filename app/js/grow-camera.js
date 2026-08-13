@@ -324,10 +324,19 @@
     return '';
   }
 
-  function logToJournal() {
+  async function logToJournal() {
     if (!capturedDataUrl) return;
     const plantId = resolvePlantId();
-    const dataUrl = capturedDataUrl;
+    // Hand the capture to Storage and pass the URL on. Captures are already
+    // compressed to MAX_CHARS, but they still share the one journal document,
+    // so inlining a handful of them is enough to break cloud backup.
+    let dataUrl = capturedDataUrl;
+    if (window.JournalPhotos) {
+      setStatus('Saving photo…');
+      const stored = await window.JournalPhotos.upload(capturedDataUrl, 'camera');
+      dataUrl = stored.url;
+      if (stored.inline) console.warn('camera photo kept inline —', stored.error);
+    }
     if (typeof openOpts.onLog === 'function') {
       try {
         openOpts.onLog({ dataUrl: dataUrl, plantId: plantId });

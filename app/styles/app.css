@@ -4991,6 +4991,14 @@ body.soil-moisture-tool-visible #toolbox-panel-soil-moisture.tool-soil-moisture-
   line-height: 1.45;
 }
 
+/* Cloud backup stopped. Louder than the read-only notice it inherits from,
+   because the app keeps working normally and nothing else signals the loss. */
+.sync-error-banner {
+  border-color: rgb(var(--alert-rgb) / 0.55);
+  background: rgb(var(--alert-rgb) / 0.14);
+  font-weight: 500;
+}
+
 body.admin-readonly #btn-add-plant,
 body.admin-readonly #btn-add-entry,
 body.admin-readonly #btn-add-entry-growlog,
