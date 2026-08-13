@@ -1,6 +1,6 @@
 # growtoo / dnevnik — Devnet test readiness
 
-**As of:** 2026-08-06  
+**As of:** 2026-08-13  
 **Overall:** **9 / 10** — ready for grower + adopter desk testing on [growto.live](https://growto.live)
 
 Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest scripts / CSS / `Permissions-Policy` load.
@@ -17,7 +17,44 @@ Hard-refresh the app (`Cmd+Shift+R`) before testing so the latest scripts / CSS 
 | **Browser RPC** | **9** | `solanaRpc` proxy → QuickNode (secret server-side) |
 | **Grower coach / camera** | **8.5** | Live multimodal coach + in-app camera; needs verified email |
 | **Auth / admin gate** | **9** | Google domain allowlist; Admin only for two emails |
-| **Scalability** | **8** | No hot-wallet settle bottleneck; proxy rate-limited |
+| **UX** | **8** | Honest failure paths throughout; nav collapsed 2026-08-13 and not yet desk-tested |
+| **UI** | **8.5** | Strong token discipline; trust gates are the one unthemed surface |
+| **Scalability** | **8** | No hot-wallet settle bottleneck; proxy rate-limited per instance |
+
+### What the UX and UI scores are counting
+
+These two were scored for the first time on 2026-08-13, against the code rather
+than against impressions, so the evidence is written down here and can be
+re-measured next pass.
+
+**UI — 8.5.** In favour: `app/styles/app.css` resolves **1926** `var(--…)`
+references against only **8** raw hex literals, so the whole app repaints from
+the **229** tokens in `styles/tokens.css`; light theme is one
+`:root[data-theme='light']` block, not a second stylesheet. Accessibility
+hygiene is real and not decorative — 47 `aria-label`, 33 `role`, 5 `aria-modal`,
+23 `:focus-visible` rules, 45 `min-height` tap-target rules, 9
+`prefers-reduced-motion` blocks, and 2/2 `<img>` tags carry `alt` (icons are
+inline SVG marked `aria-hidden`). Against: **`styles/trust-gates.css` never got
+the light theme** — 144 lines, 21 hardcoded colours, zero tokens, zero
+`data-theme` rules, and zero `prefers-reduced-motion`. It is loaded on all three
+entry points, so in light mode the age gate and cookie banner stay dark over a
+light page. That is the first screen a new visitor sees, which is why it costs a
+full point and a half on its own.
+
+**UX — 8.** In favour: the app consistently tells the truth when something
+fails. Chain-locked growers get the **Unlock Tokenise & Market?** dialog instead
+of a dead click; mint toasts distinguish *queued* from *failed* and never claim
+success the queue refused; the coach separates `email_unverified`,
+expired-token, and `quota_exceeded` into distinct copy and labels replies
+**Live coach** vs **Local helper**; the camera separates
+`NotAllowedError`/`PermissionDeniedError` from `NotFoundError`; destructive
+actions use an in-app confirm sheet rather than `window.confirm`; in-flight
+transactions get a persistent status rail. Against: the primary nav collapsed to
+Journal / Log / Coach / Market on **2026-08-13** and **no desk pass has run
+against it**. Tokenise now lives as a pane behind Market, which is a real
+discoverability risk that only human testers can settle — that unknown is the
+whole deduction. `view-dashboard` and `view-danas` also remain in the DOM but
+are unreachable (`showView` redirects both to `plants`).
 
 ---
 
@@ -33,7 +70,31 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Adopter intro** | **START HERE**, **How to adopt**, **Adopting on this board** (+ faucet block) hide after first adoption | Onboarded adopters see garden/market board, not explainer chrome |
 | **Coach** | Richer journal snapshot (stage timing, weather, toolbox readings); photo attach; clearer live-failure errors | Diagnose should cite visible symptoms + logged numbers when live |
 | **Plant camera** | Full in-app camera (preview, shutter, Flip, Gallery); **Log to journal** / **Ask coach** / Retake | Coach control uses a **camera** icon (not `+`); Netlify allows `camera=(self)` |
-| **App Check** | Wired in **monitor** mode (not enforcing) | Should not block desk sign-in / coach; watch metrics before enforce |
+| **App Check** | Code wired end to end but **inert** — `GROWTOO_APPCHECK_SITE_KEY` is still `''` | Cannot block desk sign-in / coach. There are **no metrics to watch**: the client never mints a token, so the server logs `appcheck_missing` for 100% of traffic. Register the reCAPTCHA Enterprise key first — see [app-check-rollout.md](app-check-rollout.md) |
+| **Nav (2026-08-13)** | Primary nav collapsed to **Journal · Log · Coach · Market**; Today and Tools left the bar, plants merged into Journal, Tokenise became a pane on Market | Any older step that says "tap Tokenise" or "the Today tab" is stale — see [Nav map](#nav-map-2026-08-13) below |
+| **Appearance (2026-08-13)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance` | **Untested.** Age gate + cookie banner do not follow it yet |
+| **Stories + public journal** | Grower blogs in-app; public grower journal served on `journal.growto.live` | **Untested.** Public surface — check what it exposes for a signed-out visitor |
+| **Journal month view** | Month calendar over existing logs and Coach due dates | **Untested.** Now the grower's landing view, so it is on the critical path |
+
+---
+
+## Nav map (2026-08-13)
+
+Commit `7443748` collapsed the app so the bar can be worked with a thumb. Steps
+written before that date may name tabs that no longer exist.
+
+| Was | Is now |
+|-----|--------|
+| Journal tab (`dashboard`) | **Journal** — merged with Plants; `dashboard` and `danas` both redirect to `plants` |
+| Plants tab | folded into **Journal** |
+| Today tab | gone from the bar; its Today card lives on Journal |
+| Tokenise tab | **pane on Market** — tap Market, then the Tokenise segment (`data-chain-nav` / `data-chain-pane`) |
+| Tools | renamed **Measurements**, moved into the More menu |
+| Log · Coach · Market | unchanged in place |
+
+Deep links still work: `?view=dashboard` and `?view=danas` resolve to Journal.
+The chain-unlock dialog still fires from any Tokenise/Market entry point, so
+test A below is unaffected apart from how you reach it.
 
 ---
 
@@ -182,7 +243,22 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Removing CF settle entirely (still required for legacy)
 - Physical harvest redemption — **coming later** (Devnet UX states this clearly; practice path ends at care unlock + Claim locked stake `$GROWTOO`)
 - Native App Store / Play wrappers (Capacitor) — web is mobile-ready; not packaged as store apps yet
-- App Check **enforce** mode — still monitor-only
+- App Check — **not yet running at all.** `GROWTOO_APPCHECK_SITE_KEY` is empty, so
+  the client mints no token and the server records `appcheck_missing` for every
+  request. Register the reCAPTCHA Enterprise key and let real metrics accumulate
+  *before* considering `APP_CHECK_ENFORCE=true`
+- `solanaRpc` has **no user auth** — with App Check inert it is an open relay to a
+  paid RPC provider, throttled only by a per-instance in-memory Map (~180/min/IP
+  *per instance*, so the real ceiling scales with instance count)
+- `solanaRpc` upstream `fetch` has **no `AbortSignal`** — a hung provider pins the
+  instance until the platform timeout
+- `solanaRpc` falls back to `api.devnet.solana.com` silently when `SOLANA_RPC_URL`
+  is unset — the exact public-RPC flakiness the proxy exists to avoid, with no
+  alarm. Confirm the env var is set before trusting "→ QuickNode"
+- Light theme misses `styles/trust-gates.css` (age gate + cookie banner) — 21
+  hardcoded colours, no tokens; loaded on landing, sign-in, and app
+- `view-dashboard` and `view-danas` are dead markup — no nav reaches them and
+  `showView` redirects both to `plants`
 - Live coach needs **verified email**; Local helper cannot analyze photos
 - Coach photos are not auto-saved into journal unless the user taps **Log to journal** (or saves from the entry modal)
 - Market / Tokenise use an in-app confirm sheet (invest, claim, cancel, burn) instead of `window.confirm`; empty boards point to one next-step CTA
@@ -204,7 +280,7 @@ Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loa
 
 ### A. Chain unlock (no silent CTA)
 1. Grower account **without** `chainOptIn` (clear `dnevnik-live-chain-opt-in` or use a fresh grower).
-2. From **START HERE**, tap **Tokenise** (and once **Market**).
+2. From **START HERE**, tap **Market** (Tokenise is now a pane there — see [Nav map](#nav-map-2026-08-13)).
 3. Expect the **Unlock Tokenise & Market?** dialog — not a dead click / silent stay on Plants.
 4. Confirm **Unlock** → lands on Tokenise; **Not now** → stays put.
 
@@ -237,6 +313,59 @@ Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loa
 2. Expect **Live coach** reply that references the photo (and journal context when present).
 3. Same capture → **Log to journal** → plant timeline shows photo entry.
 
+### G. Nav collapse (2026-08-13) — first desk pass
+
+The bar changed the day before this doc; nothing below has been exercised by a
+human yet. Test on a phone, not a desktop window — the point of the change was
+thumb reach.
+
+1. Grower signs in → lands on **Journal** (not Today, not Plants).
+2. Bar shows exactly **Journal · Log · Coach · Market**. Tools is not in the bar.
+3. Market → **Tokenise** segment switches panes without a full view reload;
+   Market stays highlighted for both panes.
+4. Leave Tokenise, go to Journal, tap **Market** again → returns to the pane you
+   were last on, not always Market.
+5. More menu → **Measurements** opens the old Tools view.
+6. Old deep links `?view=dashboard` and `?view=danas` land on Journal.
+7. **Discoverability check (the real question):** hand the phone to someone who
+   has not seen the app and ask them to list a plant for sale. Note whether they
+   find Tokenise behind Market unaided, and how long it takes.
+
+### H. Appearance / light theme (2026-08-13)
+
+1. Profile → **Appearance** → Light. Whole app repaints; no unstyled flash on
+   the next navigation.
+2. Hard-refresh. Theme survives before Firebase resolves (it is written to
+   `localStorage` under `growtoo:appearance` and painted pre-paint from `<head>`).
+3. Sign in on a second device → theme follows from the user doc.
+4. Set **Auto** → theme tracks the OS. Light and Dark ignore the OS by design.
+5. **Known gap:** age gate and cookie banner stay dark in light mode
+   (`styles/trust-gates.css` is untokenised). Confirm whether this is fixed
+   before scoring UI again.
+
+### I. Stories + public journal (2026-08-13)
+
+`journal.growto.live` is a **public** surface — treat this as a privacy check,
+not just a rendering one.
+
+1. Grower → Journal → Stories write CTA → publish a post.
+2. Open `https://journal.growto.live/` **signed out, in a private window**.
+3. Confirm the published post renders and the grower profile resolves.
+4. Confirm nothing unpublished leaks: private journal entries, plant counts,
+   wallet addresses, email, or any other grower not opted in.
+5. Unpublish → confirm the public page stops serving it.
+
+### J. Journal month view (2026-08-13)
+
+Now the grower landing view, so a failure here is a first-impression failure.
+
+1. Journal → month grid renders over existing logs with no console errors.
+2. Days with care logs are marked; Coach due dates appear on their days.
+3. Tap a day → that day's entries open.
+4. Page back through months, including one with no entries (expect an empty
+   state, not a blank grid).
+5. Add a log via **Log** → the month view reflects it without a manual refresh.
+
 ---
 
 ## Pass criteria (desk session)
@@ -268,14 +397,27 @@ Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loa
 - [ ] **Adopt stake (fresh):** post “Adopt stake” → adopter pays full price → settle 50/50 (existing stakes already prove settle path)  
 - [ ] **Adopt reservation TTL (live):** abandon unpaid `pending-*` and confirm reopen ~15m  
 - [ ] **Monthly care (UI):** log ≥12 distinct care days; Market / adopter garden show live counters  
-- [ ] **Weekly progress:** grower-only on Tokenise; adopters see **Care unlock** panel with month timeline (Jul qualify · Aug 4/12 · …) + path meters + sync-lag state  
-- [ ] **Ranks:** grower rank on Tokenise wallet; plant rank on token cards (both profiles)  
+- [ ] **Weekly progress:** grower-only on the Tokenise pane (Market → Tokenise); adopters see **Care unlock** panel with month timeline (Jul qualify · Aug 4/12 · …) + path meters + sync-lag state  
+- [ ] **Ranks:** grower rank on the Tokenise pane wallet; plant rank on token cards (both profiles)  
 - [ ] **Harvest claim:** journal at harvest + months qualify → Claim on Market; fail path refunds adopter  
 - [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
 - [ ] **Mark all read** clears badge; click item navigates to related view  
 - [ ] **Adopter intro hide:** START HERE / how-to / market guide gone after first adoption  
 - [ ] **Coach photo:** Live coach diagnoses a leaf photo (camera icon → Ask coach)  
 - [ ] **Camera → journal:** Log to journal creates a photo entry  
+
+### Manual — new since 2026-08-06 (never desk-tested)
+
+- [ ] **Nav collapse:** bar is Journal · Log · Coach · Market on a phone; Tokenise reachable as a Market pane  
+- [ ] **Nav memory:** returning to Market restores the last pane (Market vs Tokenise)  
+- [ ] **Nav deep links:** `?view=dashboard` / `?view=danas` land on Journal  
+- [ ] **Nav discoverability:** a first-time user finds Tokenise behind Market unaided  
+- [ ] **Appearance:** light / dark / auto persists across refresh and across devices  
+- [ ] **Appearance gap:** age gate + cookie banner follow the light theme *(known failing)*  
+- [ ] **Stories:** publish → post renders on `journal.growto.live` signed out  
+- [ ] **Public journal privacy:** no private entries, wallets, emails, or opted-out growers exposed  
+- [ ] **Journal month view:** logs and Coach due dates land on the right days; empty months degrade cleanly  
+- [ ] **Journal month view:** a new log appears without a manual refresh    
 
 ---
 
