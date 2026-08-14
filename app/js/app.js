@@ -5135,7 +5135,6 @@ function initFirebaseSync() {
       }
     }
   }
-  }
 
   (function bindGrowerRankChip() {
     const chip = document.getElementById('grower-rank-chip');
