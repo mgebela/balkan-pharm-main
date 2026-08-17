@@ -3341,7 +3341,7 @@ function initFirebaseSync() {
     }
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
-    document.body.classList.toggle('journal-paper', id === 'plants' || id === 'growlog');
+    document.body.classList.add('journal-paper');
     if (id === 'growlog' && extra) {
       currentGrowlogPlantId = extra;
       const view = document.getElementById('view-growlog');
