@@ -608,7 +608,8 @@
   },
   "entry-plants-multi": {
     "p": "Plants",
-    "p2": "Same strain rows can share one entry."
+    "p2": "Same strain rows can share one entry.",
+    "allRows": "all {count} rows"
   },
   "entry-type": {
     "option": "General",

@@ -7263,6 +7263,27 @@ function initFirebaseSync() {
     }));
   }
 
+  function entryPlantCheckHtml(opts) {
+    const o = opts || {};
+    const selected = !!o.selected;
+    return (
+      '<label class="entry-plant-check' +
+      (o.stack ? ' entry-plant-check--stack' : '') +
+      (selected ? ' is-selected' : '') +
+      '">' +
+      '<input type="checkbox"' +
+      (o.stackKey
+        ? ' data-entry-stack-key="' + escapeHtml(o.stackKey) + '"'
+        : ' data-entry-plant-id="' + escapeHtml(String(o.id || '')) + '"') +
+      (selected ? ' checked' : '') +
+      ' />' +
+      '<span>' +
+      escapeHtml(o.label || T('app.stack.plant', 'Plant')) +
+      (o.meta ? ' <em>' + escapeHtml(o.meta) + '</em>' : '') +
+      '</span></label>'
+    );
+  }
+
   function renderEntryPlantsMulti(selectedIds, locked) {
     const wrap = document.getElementById('entry-plants-multi');
     const list = document.getElementById('entry-plants-multi-list');
@@ -7309,64 +7330,39 @@ function initFirebaseSync() {
         const allOn = ids.every(function (id) {
           return selectedSet[id];
         });
-        if (!(Stacks && Stacks.shouldStack(g))) {
+        /* One journal row is one checkbox — never a nested "all 1 rows" stack. */
+        if (ids.length < 2 || !(Stacks && Stacks.shouldStack(g))) {
           const p = g.members[0];
-          const id = String(p.id);
-          return (
-            '<label class="entry-plant-check' +
-            (selectedSet[id] ? ' is-selected' : '') +
-            '">' +
-            '<input type="checkbox" data-entry-plant-id="' +
-            escapeHtml(id) +
-            '"' +
-            (selectedSet[id] ? ' checked' : '') +
-            ' />' +
-            '<span>' +
-            escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
-            '</span>' +
-            '</label>'
-          );
+          return entryPlantCheckHtml({
+            id: String(p.id),
+            label: p.name,
+            selected: !!selectedSet[String(p.id)],
+          });
         }
         const stageLab =
           Stacks && typeof Stacks.stageLabel === 'function'
             ? Stacks.stageLabel(g.stage)
             : g.stage || '';
+        const title = (g.name || g.strain || T('app.stack.plants', 'Plants')) + ' · ' + stageLab;
         return (
           '<div class="entry-plant-stack">' +
-          '<label class="entry-plant-check entry-plant-check--stack' +
-          (allOn ? ' is-selected' : '') +
-          '">' +
-          '<input type="checkbox" data-entry-stack-key="' +
-          escapeHtml(g.key) +
-          '"' +
-          (allOn ? ' checked' : '') +
-          ' />' +
-          '<span>' +
-          escapeHtml(g.name || g.strain || 'Plants') +
-          ' · ' +
-          escapeHtml(stageLab) +
-          ' <em>all ' +
-          g.members.length +
-          ' rows</em></span>' +
-          '</label>' +
+          entryPlantCheckHtml({
+            stack: true,
+            stackKey: g.key,
+            label: title,
+            meta: T('app.entry-plants-multi.allRows', 'all {count} rows', {
+              count: g.members.length,
+            }),
+            selected: allOn,
+          }) +
           '<div class="entry-plant-stack-members">' +
           g.members
             .map(function (p) {
-              const id = String(p.id);
-              return (
-                '<label class="entry-plant-check' +
-                (selectedSet[id] ? ' is-selected' : '') +
-                '">' +
-                '<input type="checkbox" data-entry-plant-id="' +
-                escapeHtml(id) +
-                '"' +
-                (selectedSet[id] ? ' checked' : '') +
-                ' />' +
-                '<span>' +
-                escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
-                '</span>' +
-                '</label>'
-              );
+              return entryPlantCheckHtml({
+                id: String(p.id),
+                label: p.name,
+                selected: !!selectedSet[String(p.id)],
+              });
             })
             .join('') +
           '</div></div>'

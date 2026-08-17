@@ -492,7 +492,8 @@
   },
   "entry-plants-multi": {
     "p": "Biljke",
-    "p2": "Redovi iste sorte mogu dijeliti jedan unos."
+    "p2": "Redovi iste sorte mogu dijeliti jedan unos.",
+    "allRows": "svih {count} redova"
   },
   "entry-type": {
     "option": "Općenito",

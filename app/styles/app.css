@@ -11283,7 +11283,7 @@ table td {
 
 .entry-plants-multi-list {
   display: grid;
-  gap: 0.35rem;
+  gap: 0.4rem;
   max-height: min(36vh, 14rem);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -11291,30 +11291,35 @@ table td {
 
 .entry-plant-stack {
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.35rem;
+  border-radius: 10px;
+  overflow: hidden;
   display: grid;
-  gap: 0.3rem;
 }
 
 .entry-plant-stack-members {
   display: grid;
-  gap: 0.25rem;
-  padding-left: 0.85rem;
+  border-top: 1px solid var(--border);
 }
 
+/* Modal form labels are block + full-width inputs. These rows must win over
+   that, or each checkbox becomes a nested card with a centered native box. */
+#modal-entry .entry-plant-check,
 .entry-plant-check {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.45rem 0.55rem;
-  border-radius: 8px;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
   border: 1px solid var(--border);
   background: rgb(var(--surface-deep-rgb) / 0.45);
   cursor: pointer;
   font-size: 0.92rem;
+  font-weight: 550;
 }
 
+#modal-entry .entry-plant-check.is-selected,
 .entry-plant-check.is-selected {
   border-color: rgb(var(--brass-rgb) / 0.55);
   background: rgb(var(--brass-rgb) / 0.1);
@@ -11324,10 +11329,51 @@ table td {
   font-style: normal;
   color: var(--text-muted);
   font-size: 0.78rem;
+  font-weight: 500;
+}
+
+#modal-entry .entry-plant-check > input,
+#modal-entry .entry-plant-check > input[type='checkbox'],
+.entry-plant-check > input {
+  display: inline-block;
+  width: 1.15rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  padding: 0;
+  flex: 0 0 auto;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  accent-color: #3d6a38;
+}
+
+#modal-entry .entry-plant-check > span,
+.entry-plant-check > span {
+  min-width: 0;
+  flex: 1;
+  font-weight: 550;
+  line-height: 1.3;
+}
+
+#modal-entry .entry-plant-stack .entry-plant-check,
+.entry-plant-stack .entry-plant-check {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+#modal-entry .entry-plant-stack .entry-plant-check.is-selected,
+.entry-plant-stack .entry-plant-check.is-selected {
+  background: rgb(var(--brass-rgb) / 0.08);
 }
 
 .entry-plant-check--stack {
-  border-style: dashed;
+  border-style: none;
+}
+
+.entry-plant-stack-members .entry-plant-check {
+  padding-left: 1.85rem;
 }
 
 .log-sheet-empty {
@@ -13323,6 +13369,91 @@ body.journal-paper .profile-type-badge {
 
 #view-growlog .btn-ghost,
 #view-growlog .btn-back {
+  background: #fff !important;
+  color: #3d6a38 !important;
+  border: 1px solid rgb(184 212 176 / 0.7) !important;
+  border-radius: var(--radius-pill);
+}
+
+/* New entry is a journal sheet — beat desk-panel !important so the picker
+   and fields sit on growtoo paper, not the dark forest modal. */
+#modal-entry .modal-content {
+  background: #f5faf3 !important;
+  border: 0 !important;
+  color: #1a2c1e;
+  box-shadow: 0 18px 48px rgb(61 106 56 / 0.16) !important;
+}
+
+#modal-entry .modal-header {
+  background: #f5faf3;
+  border-bottom-color: rgb(184 212 176 / 0.55);
+}
+
+#modal-entry .modal-header h2,
+#modal-entry .entry-plants-multi-label,
+#modal-entry label {
+  color: #3d6a38;
+}
+
+#modal-entry .modal-close,
+#modal-entry .entry-plants-multi-hint,
+#modal-entry .field-optional {
+  color: #5a7260;
+}
+
+#modal-entry .entry-plant-stack {
+  background: #fff;
+  border-color: rgb(184 212 176 / 0.75);
+}
+
+#modal-entry .entry-plant-check {
+  background: #fff;
+  border-color: rgb(184 212 176 / 0.75);
+  color: #1a2c1e;
+}
+
+#modal-entry .entry-plant-check.is-selected,
+#modal-entry .entry-plant-stack .entry-plant-check.is-selected {
+  background: #eaf6e6;
+  border-color: #6f9457;
+}
+
+#modal-entry .entry-plant-stack .entry-plant-check {
+  background: transparent;
+}
+
+#modal-entry .entry-plant-check em {
+  color: #5a7260;
+}
+
+#modal-entry input:not([type='checkbox']):not([type='file']):not([type='hidden']),
+#modal-entry select,
+#modal-entry textarea {
+  background: #ffffff !important;
+  color: #1a2c1e !important;
+  border: 1px solid rgb(184 212 176 / 0.75) !important;
+}
+
+#modal-entry input:not([type='checkbox']):focus,
+#modal-entry select:focus,
+#modal-entry textarea:focus {
+  border-color: #3d6a38 !important;
+  box-shadow: 0 0 0 3px rgb(61 106 56 / 0.12);
+}
+
+#modal-entry .modal-actions {
+  border-top-color: rgb(184 212 176 / 0.55);
+}
+
+#modal-entry .btn-primary {
+  background: #3d6a38 !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+
+#modal-entry .btn-ghost {
   background: #fff !important;
   color: #3d6a38 !important;
   border: 1px solid rgb(184 212 176 / 0.7) !important;

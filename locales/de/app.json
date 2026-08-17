@@ -492,7 +492,8 @@
   },
   "entry-plants-multi": {
     "p": "Pflanzen",
-    "p2": "Zeilen derselben Sorte können sich einen Eintrag teilen."
+    "p2": "Zeilen derselben Sorte können sich einen Eintrag teilen.",
+    "allRows": "alle {count} Zeilen"
   },
   "entry-type": {
     "option": "Allgemein",
