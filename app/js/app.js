@@ -3543,6 +3543,7 @@ function initFirebaseSync() {
     if (open) bindSheetDrag();
     if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
     document.body.classList.toggle('more-nav-open', !!open);
+    if (!open) closeSettingsPanels();
     if (open) {
       try {
         renderAccountProfile();
@@ -3905,10 +3906,49 @@ function initFirebaseSync() {
     }
   }
 
+  function closeSettingsPanels() {
+    document.querySelectorAll('.settings-panel').forEach(function (panel) {
+      panel.hidden = true;
+    });
+    document.querySelectorAll('[data-settings-panel]').forEach(function (tile) {
+      tile.setAttribute('aria-expanded', 'false');
+      tile.classList.remove('is-open');
+    });
+  }
+
+  function paintLanguagePicker() {
+    const host = document.getElementById('settings-language-picker');
+    if (!host) return;
+    const I18N = window.I18N;
+    const list = (I18N && I18N.locales) || [];
+    const current = I18N && I18N.locale;
+    const check = '<span class="settings-picker-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 5 9-10"/></svg></span>';
+    host.innerHTML = '';
+    list.forEach(function (meta) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'settings-picker-opt';
+      btn.setAttribute('role', 'option');
+      btn.setAttribute('data-locale', meta.code);
+      btn.setAttribute('aria-selected', String(meta.code === current));
+      btn.innerHTML = check;
+      const label = document.createElement('span');
+      label.textContent = meta.nativeName || meta.name || meta.code;
+      btn.appendChild(label);
+      btn.addEventListener('click', function () {
+        if (I18N && typeof I18N.setLocale === 'function') {
+          I18N.setLocale(meta.code, { navigate: true });
+        }
+      });
+      host.appendChild(btn);
+    });
+  }
+
   (function bindMoreNav() {
     const btn = document.getElementById('btn-account');
     const backdrop = document.getElementById('more-nav-backdrop');
     const closeBtn = document.getElementById('more-nav-close');
+    const grid = document.querySelector('.settings-grid');
     if (btn) {
       btn.addEventListener('click', function (e) {
         e.preventDefault();
@@ -3918,6 +3958,24 @@ function initFirebaseSync() {
     }
     if (backdrop) backdrop.addEventListener('click', function () { setMoreNavOpen(false); });
     if (closeBtn) closeBtn.addEventListener('click', function () { setMoreNavOpen(false); });
+    if (grid) {
+      grid.addEventListener('click', function (e) {
+        const tile = e.target.closest('[data-settings-panel]');
+        if (!tile || !grid.contains(tile)) return;
+        const panel = document.getElementById('settings-panel-' + tile.getAttribute('data-settings-panel'));
+        if (!panel) return;
+        const willOpen = panel.hidden;
+        closeSettingsPanels();
+        if (willOpen) {
+          panel.hidden = false;
+          tile.setAttribute('aria-expanded', 'true');
+          tile.classList.add('is-open');
+          try { panel.scrollIntoView({ block: 'nearest' }); } catch (err) { /* ignore */ }
+        }
+      });
+    }
+    if (window.I18N && typeof I18N.whenReady === 'function') I18N.whenReady(paintLanguagePicker);
+    else paintLanguagePicker();
   })();
 
   function openGrowCoachFromNav() {

@@ -30,6 +30,15 @@
   "more-nav-title": {
     "strong": "Profil"
   },
+  "settings": {
+    "appearance": "Darstellung",
+    "goto": "Gehe zu",
+    "language": "Sprache",
+    "logout": "Abmelden",
+    "privacy": "Datenschutz",
+    "terms": "Bedingungen",
+    "title": "Einstellungen"
+  },
   "more-nav-overlay": {
     "a": "<span class=\"more-nav-copy\"> <strong>Markt</strong> <span>Aktuelle Pflanzenangebote ansehen</span> </span>",
     "a2": "<span class=\"more-nav-copy\"> <strong>Mein Garten</strong> <span>Adoptierte Pflanzen &amp; Einsätze</span> </span>",

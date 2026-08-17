@@ -30,6 +30,15 @@
   "more-nav-title": {
     "strong": "Profil"
   },
+  "settings": {
+    "appearance": "Izgled",
+    "goto": "Idi na",
+    "language": "Jezik",
+    "logout": "Odjava",
+    "privacy": "Privatnost",
+    "terms": "Uvjeti",
+    "title": "Postavke"
+  },
   "more-nav-overlay": {
     "a": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Pregledaj aktualne ponude biljaka</span> </span>",
     "a2": "<span class=\"more-nav-copy\"> <strong>Moj vrt</strong> <span>Posvojene biljke i ulozi</span> </span>",

@@ -1019,6 +1019,15 @@
   "more-nav-title": {
     "strong": "Profile"
   },
+  "settings": {
+    "appearance": "Appearance",
+    "goto": "Go to",
+    "language": "Language",
+    "logout": "Log out",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "title": "Settings"
+  },
   "nav": {
     "admin": "Admin Panel",
     "garden": "Garden",
