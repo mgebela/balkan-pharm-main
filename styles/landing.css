@@ -6256,7 +6256,7 @@ body.landing-page .hero--catalog {
     radial-gradient(ellipse 62% 72% at 90% 36%, rgb(111 148 87 / 0.42) 0%, transparent 64%),
     radial-gradient(ellipse 48% 42% at 6% 88%, rgb(61 106 56 / 0.16) 0%, transparent 70%),
     linear-gradient(165deg, #f2f8ee 0%, #e4f0de 42%, #cfe3c4 100%);
-  border-bottom-color: #9fc094;
+  border-bottom: 0;
 }
 
 body.landing-page .hero-catalog-etch {
@@ -6310,25 +6310,34 @@ body.landing-page .nav .btn-primary:hover {
 }
 
 body.landing-page .hero-specimen {
-  background: #1e3a22;
-  border-top-color: #1e3a22;
+  background: transparent;
+  border-top: 0;
+  padding: 0 0 1.85rem;
+}
+
+body.landing-page .hero-specimen-inner {
+  background: #ffffff;
+  border: 1px solid #9fc094;
+  border-radius: 16px;
+  padding: 0.95rem 1.15rem;
+  box-shadow: 0 12px 32px rgb(36 68 40 / 0.1);
 }
 
 body.landing-page .hero-specimen-title {
-  color: #f3faf0;
+  color: #122418;
 }
 
 body.landing-page .hero-specimen-tx {
-  color: #b8d4b0;
+  color: #2a4536;
 }
 
-body.landing-page .hero-specimen-seal,
-body.landing-page .hero-specimen-verify {
-  color: #e0c56a;
+body.landing-page .hero-specimen-seal {
+  color: #2f542c;
 }
 
+body.landing-page .hero-specimen-verify,
 body.landing-page .hero-specimen-verify:hover {
-  color: #f3de9a;
+  color: #2f542c;
 }
 
 body.landing-page .desk-header h2,
@@ -6340,7 +6349,7 @@ body.landing-page .footer-brand {
 }
 
 body.landing-page .desk-tag {
-  color: #8a6418;
+  color: #2f542c;
 }
 
 body.landing-page .desk-section--proof,
@@ -6351,7 +6360,7 @@ body.landing-page .desk-section--adopter,
 body.landing-page .section-alt,
 body.landing-page .footer,
 body.landing-page .desk-footer {
-  background: #d7e8ce;
+  background: #e7f0e2;
 }
 
 body.landing-page .desk-panel,
