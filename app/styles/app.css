@@ -1039,7 +1039,7 @@ body.profile-adopter .account-profile-avatar {
 }
 
 #more-nav-settings-title {
-  margin-top: 0.55rem;
+  margin-top: 0.15rem;
 }
 
 .settings-grid {
@@ -1081,7 +1081,8 @@ body.profile-adopter .account-profile-avatar {
   box-shadow: var(--focus-ring);
 }
 
-.settings-tile.is-open {
+.settings-tile.is-open,
+.settings-tile.active {
   background: rgb(var(--brass-rgb) / 0.16);
   box-shadow: inset 0 0 0 1px rgb(var(--brass-rgb) / 0.42), var(--fill-sheen);
 }
@@ -1123,6 +1124,30 @@ body.profile-adopter .account-profile-avatar {
 .settings-tile--logout:hover,
 .settings-tile--logout:focus-visible {
   background: rgb(var(--alert-rgb) / 0.16);
+}
+
+.settings-tile--grower,
+.settings-tile--unlock,
+.settings-grid > .admin-only {
+  display: none;
+}
+
+body.profile-grower .settings-tile--grower {
+  display: flex;
+}
+
+body.profile-grower.chain-locked .settings-tile--unlock {
+  display: flex;
+}
+
+.settings-grid > .admin-only:not([hidden]) {
+  display: flex !important;
+}
+
+@media (min-width: 769px) {
+  .settings-grid > .settings-tile--mobile-only {
+    display: none !important;
+  }
 }
 
 .settings-panel {

@@ -1020,13 +1020,17 @@
     "strong": "Profile"
   },
   "settings": {
+    "admin": "Admin",
     "appearance": "Appearance",
     "goto": "Go to",
     "language": "Language",
     "logout": "Log out",
+    "measurements": "Measurements",
     "privacy": "Privacy",
+    "stories": "Stories",
     "terms": "Terms",
-    "title": "Settings"
+    "title": "Settings",
+    "unlock": "Unlock chain"
   },
   "nav": {
     "admin": "Admin Panel",

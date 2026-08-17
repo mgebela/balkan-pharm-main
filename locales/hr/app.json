@@ -31,13 +31,17 @@
     "strong": "Profil"
   },
   "settings": {
+    "admin": "Admin",
     "appearance": "Izgled",
     "goto": "Idi na",
     "language": "Jezik",
     "logout": "Odjava",
+    "measurements": "Mjerenja",
     "privacy": "Privatnost",
+    "stories": "Priče",
     "terms": "Uvjeti",
-    "title": "Postavke"
+    "title": "Postavke",
+    "unlock": "Otključaj lanac"
   },
   "more-nav-overlay": {
     "a": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Pregledaj aktualne ponude biljaka</span> </span>",

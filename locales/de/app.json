@@ -31,13 +31,17 @@
     "strong": "Profil"
   },
   "settings": {
+    "admin": "Admin",
     "appearance": "Darstellung",
     "goto": "Gehe zu",
     "language": "Sprache",
     "logout": "Abmelden",
+    "measurements": "Messwerte",
     "privacy": "Datenschutz",
+    "stories": "Storys",
     "terms": "Bedingungen",
-    "title": "Einstellungen"
+    "title": "Einstellungen",
+    "unlock": "Freischalten"
   },
   "more-nav-overlay": {
     "a": "<span class=\"more-nav-copy\"> <strong>Markt</strong> <span>Aktuelle Pflanzenangebote ansehen</span> </span>",

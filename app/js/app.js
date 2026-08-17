@@ -2458,22 +2458,7 @@ function applySignupProfileCopy(profileType) {
 }
 
 function syncMoreNavVisibility() {
-  const accountBtn = document.getElementById('btn-account');
-  if (!accountBtn) return;
-  const items = document.querySelectorAll('.more-nav-item');
-  let visible = 0;
-  items.forEach(function (el) {
-    const style = window.getComputedStyle(el);
-    if (style.display !== 'none' && style.visibility !== 'hidden') visible += 1;
-  });
-  // Account menu always stays available (privacy/terms/logout).
-  if (visible === 0) {
-    const overlay = document.getElementById('more-nav-overlay');
-    if (overlay) overlay.hidden = true;
-    document.body.classList.remove('more-nav-open');
-    accountBtn.classList.remove('active');
-    accountBtn.setAttribute('aria-expanded', 'false');
-  }
+  /* Profile always has Settings, so the account control stays. */
 }
 
 function defaultViewForProfile() {
@@ -3233,7 +3218,7 @@ function initFirebaseSync() {
   }
 
   // --- Navigation ---
-  const navItems = document.querySelectorAll('.nav-item[data-view], .more-nav-item[data-view]');
+  const navItems = document.querySelectorAll('.nav-item[data-view], .more-nav-item[data-view], .settings-tile[data-view]');
   const views = document.querySelectorAll('.view');
   const viewTitle = document.querySelector('.view-title');
   const logoutBtn = document.getElementById('btn-logout');
@@ -3379,7 +3364,7 @@ function initFirebaseSync() {
     }
     currentGrowlogPlantId = null;
     const view = document.getElementById('view-' + id);
-    document.querySelectorAll('.nav-item[data-view="' + id + '"], .more-nav-item[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
+    document.querySelectorAll('.nav-item[data-view="' + id + '"], .more-nav-item[data-view="' + id + '"], .settings-tile[data-view="' + id + '"]').forEach((n) => n.classList.add('active'));
     if (id === 'adopt' || id === 'market') {
       lastChainView = id;
       document.querySelectorAll('[data-chain-nav]').forEach(function (n) {

@@ -41,7 +41,7 @@
   </script>
   <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,app" data-i18n-reload></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260817p" />
-  <link rel="stylesheet" href="styles/app.css?v=20260817q" />
+  <link rel="stylesheet" href="styles/app.css?v=20260817r" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260817p" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
@@ -187,72 +187,6 @@
           <button type="button" class="more-nav-close" id="more-nav-close" aria-label="Close">×</button>
         </div>
         <div class="account-profile" id="account-profile" hidden></div>
-        <p data-i18n="app.settings.goto" class="more-nav-label">Go to</p>
-        <div class="more-nav-list">
-          <a data-i18n-html="app.more-nav-overlay.a" href="#" class="more-nav-item adopter-only" data-view="market">
-            <span class="more-nav-copy">
-              <strong>Market</strong>
-              <span>Browse live plant asks</span>
-            </span>
-          </a>
-          <a data-i18n-html="app.more-nav-overlay.a2" href="#" class="more-nav-item adopter-only" data-view="adopt">
-            <span class="more-nav-copy">
-              <strong>My garden</strong>
-              <span>Adopted plants &amp; stakes</span>
-            </span>
-          </a>
-          <a data-i18n-html="app.more-nav-overlay.a3" href="#" class="more-nav-item grower-only" data-view="plants">
-            <span class="more-nav-copy">
-              <strong>Journal</strong>
-              <span>Plants &amp; care logs</span>
-            </span>
-          </a>
-          <a data-i18n-html="app.more-nav-overlay.a4" href="#" class="more-nav-item grower-only" data-view="blog">
-            <span class="more-nav-copy">
-              <strong>Stories</strong>
-              <span>Public tips, plant looks &amp; field notes</span>
-            </span>
-          </a>
-          <button type="button" class="more-nav-item more-nav-item--coach" id="more-nav-coach">
-            <span class="nav-icon nav-coach-mark" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/></svg></span>
-            <span data-i18n-html="app.more-nav-coach.span" class="more-nav-copy">
-              <strong>Coach</strong>
-              <span>Ask what to log, care for, or check on adopted plants</span>
-            </span>
-          </button>
-          <button data-i18n-html="app.btn-unlock-chain.button" type="button" class="more-nav-item chain-unlock-only" id="btn-unlock-chain">
-            <span class="more-nav-copy">
-              <strong>Unlock Tokenise &amp; Market</strong>
-              <span>Optional on-chain path — seal stages &amp; list asks</span>
-            </span>
-          </button>
-          <a data-i18n-html="app.more-nav-overlay.a5" href="#" class="more-nav-item chain-enabled-only" data-view="adopt">
-            <span class="more-nav-copy">
-              <strong>Tokenise</strong>
-              <span>Seal stages on Devnet</span>
-            </span>
-          </a>
-          <a data-i18n-html="app.more-nav-overlay.a6" href="#" class="more-nav-item chain-enabled-only" data-view="market">
-            <span class="more-nav-copy">
-              <strong>Market</strong>
-              <span>List sealed plants</span>
-            </span>
-          </a>
-          <a href="#" class="more-nav-item grower-only" data-view="toolbox">
-            <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
-            <span data-i18n-html="app.more-nav-overlay.span" class="more-nav-copy">
-              <strong>Measurements</strong>
-              <span>Charts for water, feed, and environment</span>
-            </span>
-          </a>
-          <a href="#" class="more-nav-item admin-only" data-view="admin" hidden>
-            <span class="nav-icon"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
-            <span data-i18n-html="app.more-nav-overlay.span2" class="more-nav-copy">
-              <strong>Admin</strong>
-              <span>Platform controls</span>
-            </span>
-          </a>
-        </div>
         <p data-i18n="app.settings.title" class="more-nav-label" id="more-nav-settings-title">Settings</p>
         <div class="settings-grid">
           <button type="button" class="settings-tile" id="settings-tile-appearance" data-settings-panel="appearance" aria-expanded="false" aria-controls="settings-panel-appearance">
@@ -282,6 +216,22 @@
           <div class="settings-panel" id="settings-panel-language" hidden>
             <div class="settings-picker" id="settings-language-picker" role="listbox" data-i18n-attr="aria-label:app.settings.language" aria-label="Language"></div>
           </div>
+          <a href="#" class="settings-tile settings-tile--grower settings-tile--mobile-only" data-view="blog">
+            <span class="settings-tile-icon" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h10a2 2 0 012 2v14l-7-3-7 3V6a2 2 0 012-2z"/><path d="M9 8h4M9 12h4"/></svg></span>
+            <span data-i18n="app.settings.stories" class="settings-tile-label">Stories</span>
+          </a>
+          <a href="#" class="settings-tile settings-tile--grower" data-view="toolbox">
+            <span class="settings-tile-icon" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="8" width="17" height="11.5" rx="2.5"/><path d="M8.5 8V6.5A2.5 2.5 0 0111 4h2a2.5 2.5 0 012.5 2.5V8"/><path d="M3.5 13h17"/></svg></span>
+            <span data-i18n="app.settings.measurements" class="settings-tile-label">Measurements</span>
+          </a>
+          <a href="#" class="settings-tile admin-only settings-tile--mobile-only" data-view="admin" hidden>
+            <span class="settings-tile-icon" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 7a3.5 3.5 0 00-4.6 4.2l-5.6 5.6 1.9 1.9 5.6-5.6A3.5 3.5 0 0017 8.5l-2 2-1.5-1.5 2-2z"/></svg></span>
+            <span data-i18n="app.settings.admin" class="settings-tile-label">Admin</span>
+          </a>
+          <button type="button" class="settings-tile settings-tile--wide settings-tile--unlock" id="btn-unlock-chain">
+            <span class="settings-tile-icon" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 017.5-2"/></svg></span>
+            <span data-i18n="app.settings.unlock" class="settings-tile-label">Unlock chain</span>
+          </button>
           <a href="../privacy/" class="settings-tile" target="_blank" rel="noopener noreferrer">
             <span class="settings-tile-icon" aria-hidden="true"><svg class="nav-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8.5-8 9.5C7.5 20.5 4 17 4 12V6l8-3z"/></svg></span>
             <span data-i18n="app.settings.privacy" class="settings-tile-label">Privacy</span>
@@ -1439,7 +1389,7 @@
   <script src="js/ai-coach.js?v=20260806b"></script>
   <script src="js/grower-blog.js?v=20260817a"></script>
   <script src="js/theme.js?v=20260806t" defer></script>
-  <script src="js/app.js?v=20260817q"></script>
+  <script src="js/app.js?v=20260817r"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>
