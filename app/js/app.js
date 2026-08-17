@@ -3341,6 +3341,7 @@ function initFirebaseSync() {
     }
     views.forEach((v) => v.classList.remove('active'));
     navItems.forEach((n) => n.classList.remove('active'));
+    document.body.classList.toggle('journal-paper', id === 'plants');
     if (id === 'growlog' && extra) {
       currentGrowlogPlantId = extra;
       const view = document.getElementById('view-growlog');
@@ -5655,6 +5656,69 @@ function initFirebaseSync() {
   })();
 
   // --- Plants ---
+  let journalStageFilter = '';
+
+  function paintJournalStageFilters() {
+    const bar = document.getElementById('journal-stage-filters');
+    if (!bar) return;
+    const keys = Object.keys(STAGES);
+    if (bar.dataset.bound !== '1') {
+      bar.dataset.bound = '1';
+      bar.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-stage]');
+        if (!btn || !bar.contains(btn)) return;
+        journalStageFilter = btn.getAttribute('data-stage') || '';
+        paintJournalStageFilters();
+        applyJournalStageFilter();
+      });
+    }
+    bar.innerHTML =
+      '<button type="button" class="journal-stage-filter' +
+      (!journalStageFilter ? ' is-active' : '') +
+      '" data-stage="" role="tab" aria-selected="' +
+      (!journalStageFilter ? 'true' : 'false') +
+      '">' +
+      escapeHtml(T('app.plants.filterAll', 'All')) +
+      '</button>' +
+      keys
+        .map(function (key) {
+          const on = journalStageFilter === key;
+          return (
+            '<button type="button" class="journal-stage-filter' +
+            (on ? ' is-active' : '') +
+            '" data-stage="' +
+            escapeHtml(key) +
+            '" role="tab" aria-selected="' +
+            (on ? 'true' : 'false') +
+            '">' +
+            escapeHtml(stageName(key)) +
+            '</button>'
+          );
+        })
+        .join('');
+  }
+
+  function applyJournalStageFilter() {
+    const list = document.getElementById('plants-list');
+    if (!list) return;
+    list.querySelectorAll('.plant-card, .plant-stack').forEach(function (el) {
+      if (!journalStageFilter) {
+        el.hidden = false;
+        return;
+      }
+      const raw = el.getAttribute('data-stage') || el.getAttribute('data-stage-key') || '';
+      const bucket =
+        {
+          klijanje: 'germination',
+          sadnica: 'seedling',
+          vegetativna: 'vegetative',
+          cvjetanje: 'flowering',
+          susenje: 'harvest',
+        }[journalStageFilter] || journalStageFilter;
+      el.hidden = raw !== journalStageFilter && raw !== bucket;
+    });
+  }
+
   function renderPlants() {
     renderCoachBriefingSurfaces();
     renderGrowerRankChip();
@@ -5679,6 +5743,7 @@ function initFirebaseSync() {
 
     function plantCardHtml(p) {
       const shared = isSharedPlantId(p.id);
+      const stageSlug = canonicalPlantStage(p.stage);
       const stageLabelText = stageName(p.stage);
       const entries = getPlantEntries(p.id) || [];
       const lastWater = entries
@@ -5694,9 +5759,17 @@ function initFirebaseSync() {
             date: new Date(lastWater.date || lastWater.ts).toLocaleDateString(intlTag()),
           })
         : T('app.plants.noWateringLog', 'No watering log yet');
-      const photoOverlay = p.photo
-        ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
+      const sinceLabel = p.startDate
+        ? new Date(p.startDate).toLocaleDateString(intlTag())
         : '';
+      const byline = [p.strain, sinceLabel].filter(Boolean).join(' · ');
+      const initial = String(p.name || '?').trim().charAt(0).toUpperCase() || '?';
+      const tldr =
+        T('app.plants.tldr', 'TL;DR:') +
+        ' ' +
+        stageLabelText +
+        ' · ' +
+        lastWaterLabel;
       const stageTintKey =
         {
           klijanje: 'germination',
@@ -5705,40 +5778,38 @@ function initFirebaseSync() {
           cvjetanje: 'flowering',
           susenje: 'harvest',
         }[p.stage] || 'germination';
+      const photo = p.photo
+        ? '<img src="' + p.photo + '" alt="" />'
+        : '';
       return `
-      <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}" data-stage-key="${stageTintKey}">
-        ${p.photo ? `<div class="plant-card-photo"><img src="${p.photo}" alt="" />${photoOverlay}</div>` : ''}
-        <div class="plant-card-header">
+      <div class="plant-card${shared ? ' plant-card--shared' : ''}" data-id="${p.id}" data-stage="${stageSlug}" data-stage-key="${stageTintKey}">
+        <div class="plant-card-photo${p.photo ? '' : ' plant-card-photo--empty'}">${photo}</div>
+        <div class="plant-card-body">
+          <div class="plant-card-byline">
+            <span class="plant-card-avatar" aria-hidden="true">${escapeHtml(initial)}</span>
+            <span>${escapeHtml(byline || stageLabelText)}</span>
+          </div>
           <h3>${escapeHtml(p.name)}</h3>
-          <span class="stage-badge">${escapeHtml(stageLabelText)}</span>
-          ${shared ? '<span class="stage-badge plant-shared-badge" title="Shared library">Shared</span>' : ''}
-        </div>
-        ${
-          p.subphase
-            ? `<div class="plant-card-subphases"><span class="subphase-badge" title="Pot volume">${escapeHtml(subphaseLabel(p.subphase))}</span></div>`
-            : ''
-        }
-        ${p.strain ? `<div class="strain">${escapeHtml(p.strain)}</div>` : ''}
-        ${
-          p.fieldLocation
-            ? `<div class="text-muted" style="font-size:0.85rem">📍 ${escapeHtml(p.fieldLocation)}</div>`
-            : ''
-        }
-        ${
-          p.plantingLocation
-            ? `<div class="text-muted" style="font-size:0.85rem">🌱 ${escapeHtml(p.plantingLocation)}</div>`
-            : ''
-        }
-        <div class="text-muted" style="font-size:0.85rem">Batch: <strong style="color:var(--text)">${Math.max(1, Number(p.count || 1))}</strong> plants</div>
-        ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Since ${new Date(p.startDate).toLocaleDateString(intlTag())}</div>` : ''}
-        <div class="plant-card-actions">
-          <button type="button" class="btn btn-primary btn-growlog">Grow log</button>
+          <p class="plant-card-tldr">${escapeHtml(tldr)}</p>
           ${
-            shared
-              ? ''
-              : `<button type="button" class="btn btn-ghost btn-edit-plant">✎ Edit plant</button>
-          <button type="button" class="btn btn-ghost btn-delete-plant">Delete</button>`
+            p.subphase
+              ? `<div class="plant-card-subphases"><span class="subphase-badge" title="Pot volume">${escapeHtml(subphaseLabel(p.subphase))}</span></div>`
+              : ''
           }
+          ${
+            p.fieldLocation
+              ? `<div class="plant-card-meta-line">${escapeHtml(p.fieldLocation)}</div>`
+              : ''
+          }
+          <div class="plant-card-actions">
+            <button type="button" class="btn btn-primary btn-growlog">${escapeHtml(T('app.plants.logCare', 'Log care'))}</button>
+            ${
+              shared
+                ? ''
+                : `<button type="button" class="btn btn-ghost btn-edit-plant">${escapeHtml(T('app.btn-edit-plant.button', '✎ Edit plant'))}</button>
+            <button type="button" class="btn btn-ghost btn-delete-plant">${escapeHtml(T('app.plants.deleteConfirm', 'Delete plant'))}</button>`
+            }
+          </div>
         </div>
       </div>
     `;
@@ -5772,6 +5843,9 @@ function initFirebaseSync() {
     } else {
       list.innerHTML = plants.map(plantCardHtml).join('');
     }
+
+    paintJournalStageFilters();
+    applyJournalStageFilter();
 
     list.querySelectorAll('.btn-growlog').forEach((btn) => {
       btn.addEventListener('click', () => openGrowlog(btn.closest('.plant-card').dataset.id));

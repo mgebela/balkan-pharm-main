@@ -41,7 +41,7 @@
   </script>
   <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,app" data-i18n-reload></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260817p" />
-  <link rel="stylesheet" href="styles/app.css?v=20260817r" />
+  <link rel="stylesheet" href="styles/app.css?v=20260817s" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260817p" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
@@ -373,6 +373,10 @@
       </div>
 
       <div id="view-plants" class="view active">
+        <section class="journal-hero">
+          <h2 data-i18n="app.plants.hero" class="journal-hero-title">Your plants, in one garden</h2>
+          <p data-i18n="app.plants.heroSub" class="journal-hero-sub">A light journal of what you grew, watered, and learned.</p>
+        </section>
         <div class="view-tour-bar grower-only">
           <button
             type="button"
@@ -435,6 +439,7 @@
               title="Open profile for full rank &amp; XP"
             ></button>
           </div>
+          <div class="journal-stage-filters" id="journal-stage-filters" role="tablist" aria-label="Filter by stage"></div>
           <div class="toolbar">
             <button data-i18n="app.plants-open-stories.button" type="button" class="btn btn-secondary grower-only" id="plants-open-stories">Write a story</button>
             <button data-i18n="app.btn-add-plant.button" type="button" class="btn btn-ghost" id="btn-add-plant">+ New plant</button>
@@ -1389,7 +1394,7 @@
   <script src="js/ai-coach.js?v=20260806b"></script>
   <script src="js/grower-blog.js?v=20260817a"></script>
   <script src="js/theme.js?v=20260806t" defer></script>
-  <script src="js/app.js?v=20260817r"></script>
+  <script src="js/app.js?v=20260817s"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

@@ -1734,6 +1734,9 @@
     "restored": "Pflanze wiederhergestellt",
     "emptyLead": "Noch keine Pflanzen",
     "emptyBody": "Füge deine erste Pflanze hinzu, um ein Grow-Journal zu starten.",
+    "filterAll": "Alle",
+    "hero": "Deine Pflanzen, in einem Garten",
+    "heroSub": "Ein luftiges Journal dessen, was du angebaut, gegossen und gelernt hast.",
     "deletedUndo": "Pflanze gelöscht — Rückgängig möglich",
     "updated": "Pflanze aktualisiert",
     "added": "Pflanze hinzugefügt — {name}",
@@ -1745,7 +1748,8 @@
     "mintNotStarted": "Die Pflanze wurde gespeichert, aber der On-Chain-Mint startete nicht. Versuch es unter Tokenisieren → erweitert.",
     "nameRequired": "Der Name der Pflanze ist erforderlich.",
     "notFound": "Pflanze nicht gefunden.",
-    "wateredOn": "Gegossen {date}"
+    "wateredOn": "Gegossen {date}",
+    "tldr": "Kurz:"
   },
   "growlog": {
     "dayWeek": "Tag {day} (Woche {week})",

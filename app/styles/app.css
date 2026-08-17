@@ -12936,3 +12936,316 @@ body.grow-camera-open {
   outline: none;
   box-shadow: var(--focus-ring);
 }
+
+/* ---- Journal paper ------------------------------------------------
+   Light, airy plant grid (Grow-with-Jane structure) painted in growtoo
+   sage — #b8d4b0 / #3d6a38 / #cfe0c6 — never the dark forest canvas. */
+#view-plants {
+  --journal-paper: #f5faf3;
+  --journal-card: #ffffff;
+  --journal-ink: #1a2c1e;
+  --journal-muted: #5a7260;
+  --journal-green: #3d6a38;
+  --journal-sage: #b8d4b0;
+  --journal-sage-light: #cfe0c6;
+  --journal-wash: #eaf6e6;
+  --journal-leaf: #6f9457;
+  background: var(--journal-paper);
+  color: var(--journal-ink);
+  border-radius: 24px;
+  padding: 0.2rem 0.15rem 1.15rem;
+}
+
+body.journal-paper .main {
+  --journal-paper: #f5faf3;
+  --journal-card: #ffffff;
+  --journal-ink: #1a2c1e;
+  --journal-muted: #5a7260;
+  --journal-green: #3d6a38;
+  --journal-sage: #b8d4b0;
+  --journal-sage-light: #cfe0c6;
+  --journal-wash: #eaf6e6;
+  --journal-leaf: #6f9457;
+  background: var(--journal-paper);
+  color: var(--journal-ink);
+}
+
+body.journal-paper .main-header {
+  background: rgb(245 250 243 / 0.9);
+  border-bottom-color: rgb(184 212 176 / 0.45);
+}
+
+body.journal-paper .view-title {
+  color: var(--journal-green);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+body.journal-paper .header-icon-btn,
+body.journal-paper .profile-type-badge {
+  color: var(--journal-green);
+}
+
+#view-plants .journal-hero {
+  max-width: 38rem;
+  margin: 0 0 1.35rem;
+}
+
+#view-plants .journal-hero-title {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.55rem, 4vw, 2.15rem);
+  font-weight: 750;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  color: var(--journal-green, #3d6a38);
+}
+
+#view-plants .journal-hero-sub {
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--journal-muted, #5a7260);
+}
+
+#view-plants .plants-weather-widget-inner {
+  --text: var(--journal-ink);
+  --text-muted: var(--journal-muted);
+  background: var(--journal-wash);
+  border: 0;
+  border-radius: 22px;
+  box-shadow: none;
+  padding: 1rem 1.1rem;
+  filter: none;
+}
+
+#view-plants .plants-weather-widget-icon {
+  filter: none;
+}
+
+#view-plants .plants-weather-widget-title {
+  color: var(--journal-green);
+}
+
+#view-plants .plants-weather-refresh-btn,
+#view-plants .btn-primary {
+  background: var(--journal-green) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+
+#view-plants .btn-ghost,
+#view-plants .btn-secondary {
+  background: #fff !important;
+  color: var(--journal-green) !important;
+  border: 1px solid rgb(184 212 176 / 0.7) !important;
+  border-radius: var(--radius-pill);
+}
+
+#view-plants .shell-card,
+#view-plants .today-card,
+#view-plants .activity-reward-card {
+  background: var(--journal-card) !important;
+  border: 0 !important;
+  border-radius: 20px;
+  box-shadow: 0 10px 28px rgb(61 106 56 / 0.07);
+  color: var(--journal-ink);
+}
+
+#view-plants .section-heading {
+  color: var(--journal-green);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+#view-plants .section-heading::before {
+  display: none;
+}
+
+.journal-stage-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+}
+
+.journal-stage-filter {
+  appearance: none;
+  margin: 0;
+  padding: 0.42rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgb(184 212 176 / 0.7);
+  background: #fff;
+  color: var(--journal-ink, #1a2c1e);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.journal-stage-filter.is-active,
+.journal-stage-filter[aria-selected='true'] {
+  background: var(--journal-green, #3d6a38);
+  border-color: var(--journal-green, #3d6a38);
+  color: #fff;
+}
+
+#view-plants .plants-list {
+  gap: 1.25rem;
+}
+
+#view-plants .plant-card,
+#view-plants .plant-stack {
+  background: var(--journal-card) !important;
+  border: 0 !important;
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgb(61 106 56 / 0.08) !important;
+  color: var(--journal-ink);
+  padding: 0.75rem;
+  transform: none;
+}
+
+#view-plants .plant-card::before,
+#view-plants .plant-stack-face::before {
+  display: none;
+}
+
+#view-plants .plant-card:hover,
+#view-plants .plant-stack:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgb(61 106 56 / 0.12) !important;
+}
+
+#view-plants .plant-card-photo {
+  margin: 0;
+  max-height: none;
+  aspect-ratio: 16 / 10;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--journal-wash);
+}
+
+#view-plants .plant-card-photo img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+#view-plants .plant-card-photo--empty {
+  background:
+    radial-gradient(circle at 30% 28%, rgb(184 212 176 / 0.9), transparent 55%),
+    linear-gradient(160deg, #eaf6e6, #cfe0c6);
+}
+
+#view-plants .plant-card-photo-overlay {
+  display: none;
+}
+
+#view-plants .plant-card-body {
+  padding: 0.85rem 0.35rem 0.25rem;
+}
+
+#view-plants .plant-card-byline {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  color: var(--journal-muted);
+}
+
+#view-plants .plant-card-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  background: var(--journal-sage);
+  color: var(--journal-green);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+#view-plants .plant-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.12rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  color: var(--journal-ink);
+}
+
+#view-plants .plant-card-tldr {
+  margin: 0 0 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: var(--journal-muted);
+}
+
+#view-plants .plant-card-meta-line,
+#view-plants .subphase-badge {
+  color: var(--journal-muted);
+  background: var(--journal-wash);
+  border: 0;
+}
+
+#view-plants .plant-card-actions {
+  margin-top: 0.65rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(184 212 176 / 0.4);
+  flex-wrap: wrap;
+}
+
+#view-plants .plant-stack-face {
+  background: transparent;
+  color: var(--journal-ink);
+}
+
+#view-plants .plant-stack-title {
+  color: var(--journal-ink);
+}
+
+#view-plants .plant-stack-meta,
+#view-plants .plant-stack-hint {
+  color: var(--journal-muted);
+}
+
+#view-plants .journal-entry,
+#view-plants .journal-cal {
+  background: var(--journal-card) !important;
+  border: 0 !important;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgb(61 106 56 / 0.07) !important;
+  color: var(--journal-ink);
+}
+
+#view-plants .journal-entry .entry-type {
+  background: var(--journal-wash);
+  color: var(--journal-green);
+  border-radius: var(--radius-pill);
+  padding: 0.15rem 0.55rem;
+}
+
+#view-plants .journal-filters select {
+  background: #fff !important;
+  color: var(--journal-ink) !important;
+  border: 1px solid rgb(184 212 176 / 0.7) !important;
+  border-radius: var(--radius-pill);
+}
+
+#view-plants .grower-rank-chip {
+  background: var(--journal-wash);
+  color: var(--journal-green);
+  box-shadow: none;
+}
+
+#view-plants .segmented-control {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px rgb(184 212 176 / 0.55);
+}
+
+#view-plants .empty-state {
+  color: var(--journal-muted);
+}
+

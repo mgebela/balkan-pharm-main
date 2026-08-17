@@ -1235,6 +1235,9 @@
     "deletedUndo": "Plant deleted — undo available",
     "emptyBody": "Add your first plant to start a grow journal.",
     "emptyLead": "No plants yet",
+    "filterAll": "All",
+    "hero": "Your plants, in one garden",
+    "heroSub": "A light journal of what you grew, watered, and learned.",
     "logCare": "Log care",
     "logCareOn": "Log care · {date}",
     "mintNotStarted": "Plant saved, but on-chain mint did not start. Try Tokenise → advanced.",
@@ -1249,6 +1252,7 @@
     "rowsTapForAll": " rows · tap for all",
     "selectedCount": "Plants · {count} selected",
     "selectedCount_one": "Plants · 1 selected",
+    "tldr": "TL;DR:",
     "updated": "Plant updated",
     "wateredOn": "Watered {date}",
     "wateredToday": "watered today"

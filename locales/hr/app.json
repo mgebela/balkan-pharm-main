@@ -1761,6 +1761,9 @@
     "restored": "Biljka vraćena",
     "emptyLead": "Još nema biljaka",
     "emptyBody": "Dodaj prvu biljku da pokreneš dnevnik uzgoja.",
+    "filterAll": "Sve",
+    "hero": "Tvoje biljke, u jednom vrtu",
+    "heroSub": "Svijetli dnevnik onoga što si uzgojio, zalio i naučio.",
     "deletedUndo": "Biljka obrisana — možeš vratiti",
     "updated": "Biljka ažurirana",
     "added": "Biljka dodana — {name}",
@@ -1772,7 +1775,8 @@
     "mintNotStarted": "Biljka je spremljena, ali kovanje na lancu nije pokrenuto. Pokušaj u Tokeniziraj → napredno.",
     "nameRequired": "Ime biljke je obavezno.",
     "notFound": "Biljka nije pronađena.",
-    "wateredOn": "Zalijevano {date}"
+    "wateredOn": "Zalijevano {date}",
+    "tldr": "Ukratko:"
   },
   "growlog": {
     "dayWeek": "{day}. dan ({week}. tjedan)",
