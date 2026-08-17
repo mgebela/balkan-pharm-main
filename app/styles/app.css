@@ -12950,8 +12950,8 @@ body.grow-camera-open {
   --journal-sage-light: #cfe0c6;
   --journal-wash: #eaf6e6;
   --journal-leaf: #6f9457;
-  background: var(--journal-paper);
-  color: var(--journal-ink);
+  background: #f5faf3;
+  color: #1a2c1e;
   border-radius: 24px;
   padding: 0.2rem 0.15rem 1.15rem;
 }
@@ -13098,11 +13098,11 @@ body.journal-paper .profile-type-badge {
 
 #view-plants .plant-card,
 #view-plants .plant-stack {
-  background: var(--journal-card) !important;
+  background: #ffffff !important;
   border: 0 !important;
   border-radius: 22px;
   box-shadow: 0 10px 28px rgb(61 106 56 / 0.08) !important;
-  color: var(--journal-ink);
+  color: #1a2c1e;
   padding: 0.75rem;
   transform: none;
 }
@@ -13248,4 +13248,85 @@ body.journal-paper .profile-type-badge {
 #view-plants .empty-state {
   color: var(--journal-muted);
 }
+
+#view-growlog {
+  --journal-paper: #f5faf3;
+  --journal-card: #ffffff;
+  --journal-ink: #1a2c1e;
+  --journal-muted: #5a7260;
+  --journal-green: #3d6a38;
+  --journal-sage: #b8d4b0;
+  --journal-wash: #eaf6e6;
+  background: #f5faf3;
+  color: #1a2c1e;
+  border-radius: 24px;
+  padding: 0.35rem 0.15rem 1.25rem;
+}
+
+#view-growlog .growlog-header-bar,
+#view-growlog .growlog-updated,
+#view-growlog .growlog-views,
+#view-growlog .growlog-section-title,
+#view-growlog .growlog-metric {
+  color: #1a2c1e;
+  border-color: rgb(184 212 176 / 0.45);
+}
+
+#view-growlog .growlog-hero {
+  --text: #1a2c1e;
+  --text-muted: #5a7260;
+  --border: rgb(184 212 176 / 0.45);
+  color: #1a2c1e;
+  background: #eaf6e6 !important;
+  border: 0 !important;
+  box-shadow: 0 10px 28px rgb(61 106 56 / 0.08);
+  border-radius: 22px;
+}
+
+#view-growlog .growlog-hero-glow {
+  display: none;
+}
+
+#view-growlog .growlog-hero-title {
+  color: #3d6a38;
+}
+
+#view-growlog .growlog-hero-chip {
+  background: #fff;
+  color: #3d6a38;
+  box-shadow: none;
+  border: 1px solid rgb(184 212 176 / 0.7);
+}
+
+#view-growlog .growlog-hero-chip--accent {
+  background: #3d6a38;
+  color: #fff;
+  border-color: #3d6a38;
+}
+
+#view-growlog .growlog-section,
+#view-growlog .growlog-metric,
+#view-growlog .growlog-entry {
+  background: #ffffff !important;
+  border: 0 !important;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgb(61 106 56 / 0.07) !important;
+  color: #1a2c1e;
+}
+
+#view-growlog .btn-primary {
+  background: #3d6a38 !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: var(--radius-pill);
+}
+
+#view-growlog .btn-ghost,
+#view-growlog .btn-back {
+  background: #fff !important;
+  color: #3d6a38 !important;
+  border: 1px solid rgb(184 212 176 / 0.7) !important;
+  border-radius: var(--radius-pill);
+}
+
 
