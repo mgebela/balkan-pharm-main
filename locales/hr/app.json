@@ -17,7 +17,7 @@
   "sidebar-coach-btn": {
     "span": "Savjetnik"
   },
-  "span4": "Tržnica",
+  "span4": "Market",
   "span5": "Admin",
   "span6": "Dnevnik",
   "bottom-nav-log": {
@@ -26,7 +26,7 @@
   "bottom-nav-coach": {
     "span": "Savjetnik"
   },
-  "span7": "Tržnica",
+  "span7": "Market",
   "more-nav-title": {
     "strong": "Profil"
   },
@@ -44,12 +44,12 @@
     "unlock": "Otključaj lanac"
   },
   "more-nav-overlay": {
-    "a": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Pregledaj aktualne ponude biljaka</span> </span>",
+    "a": "<span class=\"more-nav-copy\"> <strong>Market</strong> <span>Pregledaj aktualne ponude biljaka</span> </span>",
     "a2": "<span class=\"more-nav-copy\"> <strong>Moj vrt</strong> <span>Posvojene biljke i ulozi</span> </span>",
     "a3": "<span class=\"more-nav-copy\"> <strong>Dnevnik</strong> <span>Biljke i zapisi njege</span> </span>",
     "a4": "<span class=\"more-nav-copy\"> <strong>Priče</strong> <span>Javni savjeti, izgled biljaka i bilješke s terena</span> </span>",
     "a5": "<span class=\"more-nav-copy\"> <strong>Tokeniziraj</strong> <span>Zapečati faze na Devnetu</span> </span>",
-    "a6": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Objavi zapečaćene biljke</span> </span>",
+    "a6": "<span class=\"more-nav-copy\"> <strong>Market</strong> <span>Objavi zapečaćene biljke</span> </span>",
     "span": "<strong>Izgled</strong> <span>Tamno je growtoo zadano</span>",
     "span2": "<strong>Admin</strong> <span>Upravljanje platformom</span>",
     "span3": "<strong>Izgled</strong> <span>Tamno je growtoo zadano</span>",
@@ -63,7 +63,7 @@
     "span": "<strong>Savjetnik</strong> <span>Pitaj što zapisati, kako njegovati ili što provjeriti na posvojenim biljkama</span>"
   },
   "btn-unlock-chain": {
-    "button": "<span class=\"more-nav-copy\"> <strong>Otključaj Tokeniziraj i Tržnicu</strong> <span>Izborni put na lancu — pečati faze i objavljuj ponude</span> </span>"
+    "button": "<span class=\"more-nav-copy\"> <strong>Otključaj Tokeniziraj i Market</strong> <span>Izborni put na lancu — pečati faze i objavljuj ponude</span> </span>"
   },
   "btn-logout-sheet": {
     "button": "<span class=\"more-nav-copy\"> <strong>Odjava</strong> <span>Završi ovu sesiju</span> </span>"
@@ -156,13 +156,13 @@
   },
   "view-adopt": {
     "button": "Tokeniziraj",
-    "button2": "Tržnica",
+    "button2": "Market",
     "button3": "Jednostavno",
     "button4": "Napredno"
   },
   "adopter-guide": {
     "h3": "Kako posvojiti biljku",
-    "strong": "Pregledaj tržnicu",
+    "strong": "Pregledaj Market",
     "p": "Otvorene ponude su zapečaćeni tokeni biljaka iza kojih stoji trag iz dnevnika.",
     "strong2": "Poveži novčanik testne mreže",
     "p2": "Phantom ili Solflare na Devnetu — dodirni pilulu novčanika u zaglavlju kad si spreman uložiti.",
@@ -173,7 +173,7 @@
     "p5": "Samo testna mreža — $GROWTOO nema novčanu vrijednost. Učiš kako povjerenje teče prije nego što ulozi postanu stvarni."
   },
   "adopter-guide-market": {
-    "button": "Pregledaj tržnicu"
+    "button": "Pregledaj Market"
   },
   "adopter-guide-wallet": {
     "button": "Poveži novčanik"
@@ -193,7 +193,7 @@
   },
   "platform-bonus-section": {
     "h2": "Bonus za aktivnost",
-    "p": "Testni $GROWTOO za zalijevanje, prihranu, objavljene priče i tjedne s 5 dana njege — preuzima se jednom po kalendarskom mjesecu na tvoj Devnet novčanik. Broje se različiti dani, ne dodatni zapisi istog dana. Tokene poslije koristi na tržnici (samo testna mreža). Samo za uzgajivače."
+    "p": "Testni $GROWTOO za zalijevanje, prihranu, objavljene priče i tjedne s 5 dana njege — preuzima se jednom po kalendarskom mjesecu na tvoj Devnet novčanik. Broje se različiti dani, ne dodatni zapisi istog dana. Tokene poslije koristi na Marketu (samo testna mreža). Samo za uzgajivače."
   },
   "adopt-garden-section": {
     "h2": "Zapečaćene biljke",
@@ -204,20 +204,20 @@
     "p": "Pregledaj otvorene ponude i uloži $GROWTOO. Namirene biljke pojavljuju se gore pod Moje posvojene biljke."
   },
   "adopt-open-market": {
-    "button": "Otvori tržnicu"
+    "button": "Otvori Market"
   },
   "view-market": {
     "button": "Tokeniziraj",
-    "button2": "Tržnica",
+    "button2": "Market",
     "button3": "Jednostavno",
     "button4": "Napredno",
     "h2": "Moje ponude",
     "p": "Tvoji objavljeni ugovori: aktivni, posvojeni ili otkazani.",
-    "h22": "<span class=\"adopter-only\">Biljke koje možeš posvojiti</span> <span class=\"grower-only\">Otvorena tržnica</span>"
+    "h22": "<span class=\"adopter-only\">Biljke koje možeš posvojiti</span> <span class=\"grower-only\">Otvoreni Market</span>"
   },
   "market-adopter-guide": {
     "h3": "Posvajanje na ovoj ploči",
-    "li": "<strong>Otvorena tržnica</strong> prikazuje aktualne ponude uzgajivača u koje možeš uložiti.",
+    "li": "<strong>Otvoreni Market</strong> prikazuje aktualne ponude uzgajivača u koje možeš uložiti.",
     "li2": "Dodirni <strong>Uloži</strong> na kartici — poveži novčanik ako te pita, pa potvrdi trošak u $GROWTOO.",
     "li3": "<strong>Trenutna prodaja</strong>: puna cijena uzgajivaču pri kupnji. Gotovo.",
     "li4": "<strong>Ulog posvajanja</strong>: pola sad, pola se otključava dok uzgajivač nastavlja zapisivati njegu.",
@@ -235,7 +235,7 @@
     "span3": "Ulog posvajanja",
     "span4": "Pola sad, pola se otključava dok nastavljaš zapisivati njegu.",
     "label2": "Tražena cijena",
-    "button": "Objavi na tržnicu"
+    "button": "Objavi na Market"
   },
   "market-asset-select": {
     "option": "Odaberi zapečaćenu biljku"
@@ -575,7 +575,7 @@
     "continue": "Nastavi"
   },
   "plainLang": {
-    "escrow": "Privremeno zadržavanje: token tvoje biljke sigurno stoji kod tržnice dok netko ne uloži ili dok ne otkažeš — kao međupolica, ne trajni prijenos.",
+    "escrow": "Privremeno zadržavanje: token tvoje biljke sigurno stoji kod Marketa dok netko ne uloži ili dok ne otkažeš — kao polog, ne trajni prijenos.",
     "settlement": "Kad se posao dovrši: plaćanje je potvrđeno i token biljke prelazi posvojitelju (ili se vraća tebi ako otkažeš).",
     "rwa": "Token „stvarne imovine” — ovdje jednostavno znači token biljke povezan sa stvarnim tragom u dnevniku na testnoj mreži. Nije dionica ni novac.",
     "plantToken": "Digitalna potvrda na Solaninoj testnoj mreži povezana s jednom biljkom iz dnevnika. Izborno — dnevnik radi i bez toga.",
@@ -678,9 +678,9 @@
     "careProgressed_one": "Njega je napredovala na 1 tvom ulogu",
     "careProgressed_few": "Njega je napredovala na {count} tvoja uloga",
     "careProgressed_other": "Njega je napredovala na {count} tvojih uloga",
-    "newOffers_one": "1 nova ponuda na tržnici",
-    "newOffers_few": "{count} nove ponude na tržnici",
-    "newOffers_other": "{count} novih ponuda na tržnici",
+    "newOffers_one": "1 nova ponuda na Marketu",
+    "newOffers_few": "{count} nove ponude na Marketu",
+    "newOffers_other": "{count} novih ponuda na Marketu",
     "awayShort": "kratko",
     "awayMinute": "otprilike minutu",
     "awayFor": "Nisi bio {time}.",
@@ -693,11 +693,11 @@
     "adopterLead": "Preuzmi testni $GROWTOO, pa uloži u aktualnu ponudu biljke.",
     "growerLead": "Zapiši zalijevanje ili prihranu i zaradi $GROWTOO. Preuzmi mjesec u Tokeniziraj.",
     "ctaFaucet": "Otvori slavinu",
-    "ctaMarket": "Pregledaj tržnicu",
+    "ctaMarket": "Pregledaj Market",
     "ctaGarden": "Moj vrt",
     "ctaJournal": "Otvori dnevnik",
     "ctaTokenise": "Tokeniziraj",
-    "ctaMarketShort": "Tržnica",
+    "ctaMarketShort": "Market",
     "ctaClaim": "Preuzmi u Tokeniziraj",
     "ctaContinue": "Nastavi",
     "bonusKicker": "Bonus za aktivnost",
@@ -843,15 +843,15 @@
   },
   "escrow": {
     "expired": "Odobrenje u novčaniku trajalo je predugo pa je Solana transakcija istekla. Odobri unutar otprilike minute pa pokušaj ponovno.",
-    "missingNft": "Ovaj povezani novčanik ne drži taj NFT. Prebaci se na novčanik koji je primio kovanje ili otkaži postojeću escrow ponudu ako je NFT već zaključan u trezoru tržnice.",
-    "notActive": "Ta ponuda na lancu nije aktivna. Osvježi tržnicu pa pokušaj ponovno.",
+    "missingNft": "Ovaj povezani novčanik ne drži taj NFT. Prebaci se na novčanik koji je primio kovanje ili otkaži postojeću escrow ponudu ako je NFT već zaključan u trezoru Marketa.",
+    "notActive": "Ta ponuda na lancu nije aktivna. Osvježi Market pa pokušaj ponovno.",
     "sellerMismatch": "Povezani novčanik nije prodavatelj na ovoj ponudi.",
-    "needsTokenAccount": "Tvoj novčanik još treba $GROWTOO token račun s pokrićem na Devnetu. Preuzmi testnu slavinu za posvojitelje na Tržnici pa ponovno pokušaj uložiti.",
+    "needsTokenAccount": "Tvoj novčanik još treba $GROWTOO token račun s pokrićem na Devnetu. Preuzmi testnu slavinu za posvojitelje na Marketu pa ponovno pokušaj uložiti.",
     "insufficient": "Nema dovoljno $GROWTOO u ovom novčaniku za tu traženu cijenu na Devnetu. Nadopuni pa pokušaj ponovno.",
     "confirmTimeout": "Transakcija je poslana, ali je potvrda istekla na javnom Devnet RPC-u. Potpis: {signature}. Osvježi i provjeri je li se NFT / ponuda već pomaknuo prije novog pokušaja.",
-    "alreadyLocked": "Ovaj NFT već je zaključan u escrow trezoru tržnice. Otkaži tu ponudu (ili pričekaj namiru) prije nove objave.",
+    "alreadyLocked": "Ovaj NFT već je zaključan u escrow trezoru Marketa. Otkaži tu ponudu (ili pričekaj namiru) prije nove objave.",
     "missingNftShort": "Ovaj povezani novčanik ne drži taj NFT (MissingNft). Poveži novčanik koji ga posjeduje pa pokušaj ponovno.",
-    "noGrowtoo": "Ovaj novčanik još nema $GROWTOO na Devnetu. Preuzmi testnu slavinu na Tržnici (posvojitelj) pa ponovno uloži.",
+    "noGrowtoo": "Ovaj novčanik još nema $GROWTOO na Devnetu. Preuzmi testnu slavinu na Marketu (posvojitelj) pa ponovno uloži.",
     "needMore": "Nema dovoljno $GROWTOO za ovu ponudu. Treba {need}, novčanik ima {have} na Devnetu."
   },
   "wallet": {
@@ -1054,7 +1054,7 @@
     "setWeatherNudges": "Poticaji za njegu prema vremenu",
     "setDraftEntries": "Skiciraj unose u dnevnik",
     "setSuggestStages": "Predloži prijelaze faza",
-    "setMintList": "Kovanje ili objava na tržnici",
+    "setMintList": "Kovanje ili objava na Marketu",
     "setEditDelete": "Uređivanje ili brisanje unosa",
     "activityTitle": "Aktivnost savjetnika",
     "activityEmpty": "Još nema radnji savjetnika. Podsjetnici, skice i potvrde pojavljuju se ovdje.",
@@ -1145,7 +1145,7 @@
     "bonusMinted": "Bonus platforme iskovan",
     "bonusBody": "+{amount} $GROWTOO za {month}.",
     "faucetFailed": "Testna slavina nije uspjela",
-    "faucetFailedBody": "Pokušaj preuzeti slavinu ponovno s Tržnice.",
+    "faucetFailedBody": "Pokušaj preuzeti slavinu ponovno s Marketa.",
     "bonusFailed": "Bonus platforme nije uspio",
     "bonusFailedBody": "Pokušaj ponovno u sljedećem mjesečnom prozoru.",
     "claimReleased": "Zahtjev za berbu otpušten",
@@ -1208,7 +1208,7 @@
     "adopterFull": {
       "start_strip": {
         "title": "Kreni odavde",
-        "body": "Nakon prijave ova traka je tvoj kratki put: slavina, tržnica, pa vrt."
+        "body": "Nakon prijave ova traka je tvoj kratki put: slavina, Market, pa vrt."
       },
       "faucet": {
         "title": "Preuzmi testni $GROWTOO",
@@ -1230,7 +1230,7 @@
     "growerFull": {
       "start_strip": {
         "title": "Kreni odavde",
-        "body": "Tvoj put uzgajivača: prvo zapisuj njegu u dnevnik. Tokeniziraj i Tržnica su izborni, kad ih poželiš."
+        "body": "Tvoj put uzgajivača: prvo zapisuj njegu u dnevnik. Tokeniziraj i Market su izborni, kad ih poželiš."
       },
       "journal_nav": {
         "title": "Dnevnik",
@@ -1253,7 +1253,7 @@
         "body": "Odaberi biljku iz dnevnika i zapečati sljedeću fazu. Red za kovanje kuje / ažurira NFT na Devnetu."
       },
       "market_nav": {
-        "title": "Tržnica",
+        "title": "Market",
         "body": "Objavi zapečaćenu biljku kao ponudu — Trenutna prodaja ili Ulog posvajanja — da je posvojitelji podupru s $GROWTOO."
       },
       "market_list": {
@@ -1262,7 +1262,7 @@
       },
       "chain_optional": {
         "title": "Tokeniziraj ostaje izborno",
-        "body": "Pečaćenje na lancu i Tržnica ostaju izvan navigacije dok ih ne otključaš u Profilu. Besplatan dnevnik radi bez novčanika."
+        "body": "Pečaćenje na lancu i Market ostaju izvan navigacije dok ih ne otključaš u Profilu. Besplatan dnevnik radi bez novčanika."
       }
     },
     "plants": {
@@ -1294,13 +1294,13 @@
       },
       "sealed": {
         "title": "Zapečaćene biljke",
-        "body": "Tvoji tokeni slijeću ovdje. Kad je jedan spreman, objavi ga na Tržnici."
+        "body": "Tvoji tokeni slijeću ovdje. Kad je jedan spreman, objavi ga na Marketu."
       }
     },
     "adoptAdopter": {
       "guide": {
         "title": "Moj vrt",
-        "body": "Posvojene biljke i napredak uloga žive ovdje nakon namire ulaganja s Tržnice."
+        "body": "Posvojene biljke i napredak uloga žive ovdje nakon namire ulaganja s Marketa."
       },
       "summary": {
         "title": "Stanja",
@@ -1308,7 +1308,7 @@
       },
       "cards": {
         "title": "Kartice biljaka",
-        "body": "Otvori karticu za fazu, otključavanje njege i povijest. Ako je vrt prazan, pregledaj Tržnicu."
+        "body": "Otvori karticu za fazu, otključavanje njege i povijest. Ako je vrt prazan, pregledaj Market."
       }
     },
     "marketGrower": {
@@ -1325,7 +1325,7 @@
         "body": "Ovdje prati aktivne, posvojene i otkazane objave — uključujući zahtjev za berbu kad je spreman."
       },
       "open_board": {
-        "title": "Otvorena tržnica",
+        "title": "Otvoreni Market",
         "body": "Aktualne ponude drugih uzgajivača. Korisno da vidiš kako ploča izgleda posvojiteljima."
       }
     },
@@ -1365,8 +1365,8 @@
     "reasonPending": "Kovanje je još u redu",
     "reasonListed": "Već objavljeno",
     "reasonNoMint": "Još nema Devnet kovanja — otvori Tokeniziraj",
-    "nftInVault": "Ovaj NFT već je zaključan u trezoru tržnice na lancu. Prvo otkaži tu objavu, pa objavi ponovno.",
-    "nftInEscrow": "Ovaj NFT već je u escrowu vrućeg novčanika. Osvježi Tržnicu — možda se još aktivira.",
+    "nftInVault": "Ovaj NFT već je zaključan u trezoru Marketa na lancu. Prvo otkaži tu objavu, pa objavi ponovno.",
+    "nftInEscrow": "Ovaj NFT već je u escrowu vrućeg novčanika. Osvježi Market — možda se još aktivira.",
     "ownerHint": "Vlasnik na lancu je {owner}, a ti si povezao {connected}.",
     "walletMissingNft": "Ovaj povezani novčanik ne drži taj NFT.",
     "walletMissingNftHint": "Otvori Tokeniziraj, potvrdi „Iskovano na devnetu”, poveži novčanik koji je primio kovanje (ili ponovi kovanje), pa pokušaj objaviti ponovno.",
@@ -1430,8 +1430,8 @@
     "redemptionLater": "Fizički otkup berbe — dolazi poslije. Ovaj zahtjev namiruje samo zaključani $GROWTOO.",
     "claimQueued": "Zahtjev je u redu — čeka radnika za posvajanje (~5 min).",
     "reachHarvest": "Dođi do faze berbe u dnevniku da preuzmeš zaključanu polovicu $GROWTOO.",
-    "signInNotice": "Prijavi se za korištenje tržnice.",
-    "needsDeploy": "Tržnica traži $GROWTOO mint i kolekciju sjemena na devnetu. Do tada su ponude ispod samo za čitanje.",
+    "signInNotice": "Prijavi se za korištenje Marketa.",
+    "needsDeploy": "Market traži $GROWTOO mint i kolekciju sjemena na devnetu. Do tada su ponude ispod samo za čitanje.",
     "adopterNotice": "Uloži $GROWTOO da posvojiš zapečaćenu biljku uzgajivača. Novčanik povezuješ kad dodirneš Uloži na otvorenoj ponudi.",
     "chooseSealed": "Odaberi zapečaćenu biljku",
     "seedOption": "Sjeme № {no} — {name}",
@@ -1450,7 +1450,7 @@
     "ctaPostOffer": "Objavi ponudu",
     "stakeReceivedBody": "Posvojitelj je uložio {amount} $GROWTOO na „{plant}” (50 % zaključano do mjesečne njege).",
     "investReceivedBody": "Posvojitelj je uložio {amount} $GROWTOO u „{plant}”.",
-    "newInvestment": "Novo ulaganje na tržnici",
+    "newInvestment": "Novo ulaganje na Marketu",
     "hintStakeMode": "Posvojitelj sad plaća punu traženu cijenu. Pola stiže tebi pri namiri; pola se otključava dok zapisuješ njegu do berbe.",
     "hintInstantMode": "Punu traženu cijenu dobivaš pri kupnji. Objava zaključava NFT u trezoru programa na lancu — ponuda odmah ide uživo.",
     "done": "Gotovo.",
@@ -1458,7 +1458,7 @@
     "investing": "Ulažem…",
     "cancelling": "Otkazujem…",
     "holdingToken": "Držim token za objavu…",
-    "postToMarket": "Objavi na tržnicu",
+    "postToMarket": "Objavi na Market",
     "faucetQueued": "Testna slavina u redu: +{amount} $GROWTOO. Kovanje obično stigne u nekoliko minuta.",
     "faucetQueueBody": "Red kuje $GROWTOO na tvoj Devnet novčanik…",
     "faucetAlready": "Današnju Devnet slavinu si već preuzeo ({day}). Pokušaj nakon UTC ponoći.",
@@ -1497,8 +1497,8 @@
     "bonusAlready": "Za {month} si već preuzeo (ili imaš zahtjev u obradi).",
     "signInFaucet": "Prijavi se za preuzimanje testnog $GROWTOO.",
     "adopterOnlyFaucet": "Prebaci se na račun posvojitelja za korištenje testne slavine.",
-    "ctaOpenMarket": "Otvori tržnicu",
-    "ctaBrowseMarket": "Pregledaj tržnicu"
+    "ctaOpenMarket": "Otvori Market",
+    "ctaBrowseMarket": "Pregledaj Market"
   },
   "trail": {
     "seed": "Sjeme",
@@ -1623,9 +1623,9 @@
   "intent": {
     "collect": {
       "hero": "Skupljaj posvojene biljke i prati svaku fazu rasta u svom vrtu.",
-      "empty": "Pregledaj tržnicu da posvojiš prvu biljku i počneš zbirku.",
+      "empty": "Pregledaj Market da posvojiš prvu biljku i počneš zbirku.",
       "market": "Nađi otvorene ponude biljaka i podupri ih s $GROWTOO kad budeš spreman.",
-      "strip": "Preuzmi testni $GROWTOO, pregledaj tržnicu i skupi prvu biljku.",
+      "strip": "Preuzmi testni $GROWTOO, pregledaj Market i skupi prvu biljku.",
       "label": "Skupi vrt"
     },
     "earn": {
@@ -1637,7 +1637,7 @@
     },
     "support": {
       "hero": "Prati trag iz dnevnika prave biljke. Podupiranje s $GROWTOO je izborno.",
-      "empty": "Pregledaj tržnicu i podupri uzgoj s $GROWTOO kad budeš spreman.",
+      "empty": "Pregledaj Market i podupri uzgoj s $GROWTOO kad budeš spreman.",
       "market": "Uloži $GROWTOO da posvojiš token biljke uzgajivača. Novčanik povezuješ kad dodirneš Uloži.",
       "strip": "Preuzmi testni $GROWTOO, pa uloži u aktualnu ponudu biljke.",
       "label": "Podupri uzgajivače"
@@ -1688,11 +1688,11 @@
     "field": "Na polju"
   },
   "unlock": {
-    "title": "Otključati Tokeniziraj i Tržnicu?",
+    "title": "Otključati Tokeniziraj i Market?",
     "body": "Ovo dodaje izborne alate na lancu: pečaćenje faza na Devnetu i objavu ponuda. Tvoj dnevnik ostaje besplatan i radi bez novčanika.",
     "confirm": "Otključaj",
     "cancel": "Ne sada",
-    "fallback": "Otključati Tokeniziraj i Tržnicu?\n\nIzborni alati na lancu. Tvoj dnevnik ostaje besplatan bez novčanika."
+    "fallback": "Otključati Tokeniziraj i Market?\n\nIzborni alati na lancu. Tvoj dnevnik ostaje besplatan bez novčanika."
   },
   "docTitle": {
     "adopter": "growtoo – Posvoji i prati",
@@ -1764,7 +1764,7 @@
     "emptyBody": "Dodaj prvu biljku da pokreneš dnevnik uzgoja.",
     "filterAll": "Sve",
     "hero": "Tvoje biljke, u jednom vrtu",
-    "heroSub": "Svijetli dnevnik onoga što si uzgojio, zalio i naučio.",
+    "heroSub": "Jednostavan dnevnik onoga što si uzgojio, zalio i naučio.",
     "deletedUndo": "Biljka obrisana — možeš vratiti",
     "updated": "Biljka ažurirana",
     "added": "Biljka dodana — {name}",
@@ -1807,7 +1807,7 @@
   },
   "garden": {
     "emptyTitle": "Još nema posvojenih biljaka",
-    "emptyBody": "Pregledaj tržnicu za otvorene ponude, pa uloži testni $GROWTOO kad budeš spreman."
+    "emptyBody": "Pregledaj Market za otvorene ponude, pa uloži testni $GROWTOO kad budeš spreman."
   },
   "metric": {
     "growBalance": "Stanje $GROWTOO",

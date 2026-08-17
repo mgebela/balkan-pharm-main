@@ -13,7 +13,7 @@
   "ask": {
     "span": "CIJ",
     "h2": "Kako nastaju cijene",
-    "p": "Nema bonding krivulje ni cjenovnog orakla. Uzgajivač (ili prodavatelj) pri objavi postavlja traženu cijenu u <strong>$GROWTOO</strong>. Posvojitelj tu ponudu ispunjava kroz escrow tržnice. Zadnja cijena na ploči je najnovija objavljena tražena cijena (ili uzorak dubine kad je traka prazna)."
+    "p": "Nema bonding krivulje ni cjenovnog orakla. Uzgajivač (ili prodavatelj) pri objavi postavlja traženu cijenu u <strong>$GROWTOO</strong>. Posvojitelj tu ponudu ispunjava kroz Market escrow. Zadnja cijena na ploči je najnovija objavljena tražena cijena (ili uzorak dubine kad je traka prazna)."
   },
   "span4": "POVJ",
   "h22": "Model povjerenja (centralizirani MVP)",
