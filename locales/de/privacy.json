@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../terms/\" class=\"nav-link\">AGB</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Anmelden</a>"
+  },
+  "span2": "RECHT",
+  "h1": "Datenschutzerklärung",
+  "p": "Zuletzt aktualisiert: 29. Juli 2026. Hier steht in klarer Sprache, was growtoo erhebt und warum. Sie ersetzt keine Rechtsberatung.",
+  "div": "<span>Betreiber</span> <span class=\"desk-panel-meta\">growto.live</span>",
+  "span3": "WER",
+  "h2": "Wer wir sind",
+  "p2": "growtoo (das Grow-Journal und die optionalen Solana-Testnetz-Funktionen auf <strong>growto.live</strong>) wird für Produkttests und frühe Nutzer betrieben. Kontakt für Datenschutzfragen: <a href=\"mailto:hello@growto.live\">hello@growto.live</a>.",
+  "span4": "DAT",
+  "h22": "Was wir erheben",
+  "p3": "<strong>Konto:</strong> E-Mail-Adresse, Passwort (von Firebase Auth gehasht), optionaler Anzeigename, Profiltyp (Grower / Adopter) und Anmeldezeitpunkte.<br /> <strong>Journal:</strong> Pflanzeneinträge, Pflegeprotokolle, hochgeladene Fotos, Notizen und zugehörige Grow-Metadaten.<br /> <strong>Optional Krypto:</strong> öffentliche Solana-Adressen, die du verbindest, sowie On-Chain-Aktivität, die wir für Tokenisieren / Markt spiegeln.<br /> <strong>Ungefährer Ort:</strong> eine Stadt, die du für die Wettervorhersage einträgst (kein genaues GPS, außer du fügst selbst Koordinaten in Notizen ein).<br /> <strong>Gerät / Nutzung:</strong> notwendiger Browser-Speicher für Sitzung und Einstellungen; optionale Analytik nur mit deiner Einwilligung.",
+  "span5": "WOZU",
+  "h23": "Warum wir sie verarbeiten",
+  "p4": "Um das Journal und zugehörige Funktionen bereitzustellen, dein Konto zu sichern, das Wetter für deine Stadt zu zeigen, optionale Devnet-Marktplatzabläufe zu betreiben, die Zuverlässigkeit zu verbessern und gesetzliche Pflichten zu erfüllen. Rechtsgrundlagen nach DSGVO sind in der Regel Vertrag (Bereitstellung des Dienstes), Einwilligung (optionale Analytik / Marketing) und berechtigte Interessen (Sicherheit, Missbrauchsabwehr), soweit einschlägig.",
+  "span6": "TEIL",
+  "h24": "Auftragsverarbeiter &amp; Weitergabe",
+  "p5": "Wir nutzen Dienstleister wie <strong>Google Firebase</strong> (Authentifizierung, Firestore-Hosting) und, wenn du zustimmst, <strong>Google Analytics</strong>. Wallet-Interaktionen laufen über deine Wallet und das öffentliche Solana-Netz — das liegt außerhalb unserer privaten Datenbank. Wir verkaufen deine personenbezogenen Daten nicht.",
+  "span7": "DAU",
+  "h25": "Speicherdauer",
+  "p6": "Konto- und Journaldaten bewahren wir auf, solange dein Konto aktiv ist. Du kannst die Löschung deines Kontos und der zugehörigen Journaldaten per E-Mail verlangen. Backups und Logs können aus Sicherheitsgründen für einen begrenzten Zeitraum bestehen bleiben. On-Chain-Einträge auf Solana können wir nicht löschen.",
+  "span8": "RECH",
+  "h26": "Deine Rechte (EU/EWR)",
+  "p7": "Du kannst Auskunft, Berichtigung, Löschung, Einschränkung und Datenübertragbarkeit verlangen oder bestimmten Verarbeitungen widersprechen. Wo wir uns auf Einwilligung stützen, kannst du sie widerrufen (z. B. Analytik über die Cookie-Einstellungen / durch Löschen des Einwilligungsspeichers). Du kannst dich bei deiner zuständigen Aufsichtsbehörde beschweren.",
+  "span9": "COOK",
+  "h27": "Cookies &amp; lokaler Speicher",
+  "p8": "<strong>Notwendig:</strong> Anmeldesitzung, Altersbestätigung, Cookie-Auswahl, Journal-Einstellungen und ähnlicher Speicher, ohne den die App nicht läuft.<br /> <strong>Analytik:</strong> erst wenn du im Cookie-Banner „Alle akzeptieren“ wählst.",
+  "span10": "ALT",
+  "h28": "Alter",
+  "p9": "Der Dienst richtet sich an Erwachsene <strong>18+</strong>. Wir erheben wissentlich keine Daten von Kindern. Wenn du glaubst, dass eine minderjährige Person ein Konto angelegt hat, melde dich, damit wir es entfernen.",
+  "p10": "<a href=\"../terms/\">Nutzungsbedingungen</a> · <a href=\"../risks/\">Risiken</a> · <a href=\"../index.html\">Zurück zu growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Datenschutz</a> <a href=\"../terms/\">AGB</a> <a href=\"../risks/\">Risiken</a>",
+  "p11": "© growtoo. Alle Rechte vorbehalten.",
+  "meta": {
+    "title": "Datenschutzerklärung · growtoo"
+  }
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign in · growtoo</title>
+  <title data-i18n="signin.meta.title">Sign in · growtoo</title>
   <meta name="description" content="Sign in to growtoo — free grow journal for cannabis growers." />
   <link rel="canonical" href="https://growto.live/dnevnik/" />
   <meta name="robots" content="noindex, follow" />
@@ -18,6 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
+  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,signin"></script>
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <script>
     /* Appearance, before first paint. Dark is the unthemed state, so this
@@ -35,6 +36,7 @@
     })();
   </script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
+  <link rel="stylesheet" href="../styles/i18n.css?v=20260816a" />
   <style>
     :root {
       /* Palette comes from /styles/tokens.css so this page follows the
@@ -507,85 +509,85 @@
       <img src="../images/growtoo-mark-brass.png?v=20260731a" alt="" width="56" height="56" />
       <span class="login-brand-word">growtoo</span>
     </div>
-    <p class="login-eyebrow">Private journal</p>
-    <h1 id="auth-title">Sign in to growtoo</h1>
-    <p class="lead" id="auth-lead">Welcome back. Your Grower or Adopter workspace opens automatically.</p>
+    <p data-i18n="signin.login-form.p" class="login-eyebrow">Private journal</p>
+    <h1 data-i18n="signin.auth-title.h1" id="auth-title">Sign in to growtoo</h1>
+    <p data-i18n="signin.auth-lead.p" class="lead" id="auth-lead">Welcome back. Your Grower or Adopter workspace opens automatically.</p>
 
-    <div class="auth-tabs" role="tablist" aria-label="Auth mode">
-      <button type="button" class="auth-tab is-active" id="tab-signin" data-mode="signin">Sign in</button>
-      <button type="button" class="auth-tab" id="tab-signup" data-mode="signup">Create account</button>
+    <div class="auth-tabs" role="tablist" data-i18n-attr="aria-label:signin.aria.authMode" aria-label="Auth mode">
+      <button data-i18n="common.cta.signIn" type="button" class="auth-tab is-active" id="tab-signin" data-mode="signin">Sign in</button>
+      <button data-i18n="signin.tab-signup.button" type="button" class="auth-tab" id="tab-signup" data-mode="signup">Create account</button>
     </div>
 
     <div class="profile-pick" id="profile-pick" hidden>
-      <button type="button" class="profile-option" data-type="grower" id="pick-grower">
+      <button data-i18n-html="signin.pick-grower.button" type="button" class="profile-option" data-type="grower" id="pick-grower">
         <strong>Grower</strong>
         <span>Free journal first. Optional on-chain proof when you want it.</span>
       </button>
-      <button type="button" class="profile-option" data-type="adopter" id="pick-adopter">
+      <button data-i18n-html="signin.pick-adopter.button" type="button" class="profile-option" data-type="adopter" id="pick-adopter">
         <strong>Adopter</strong>
         <span>Follow a real plant’s trail. Crypto is optional until you invest.</span>
       </button>
     </div>
 
     <div class="field-block signup-only" id="field-display-name" hidden>
-      <label for="display-name">Display name</label>
-      <input id="display-name" type="text" maxlength="64" placeholder="How you appear in growtoo" autocomplete="nickname" />
+      <label data-i18n="signin.field-display-name.label" for="display-name">Display name</label>
+      <input id="display-name" type="text" maxlength="64" data-i18n-attr="placeholder:signin.field.namePlaceholder" placeholder="How you appear in growtoo" autocomplete="nickname" />
     </div>
 
     <div class="field-block">
-      <label for="email">Email</label>
-      <input id="email" type="email" required placeholder="you@email.com" autocomplete="email" />
+      <label data-i18n="signin.login-form.label" for="email">Email</label>
+      <input id="email" type="email" required data-i18n-attr="placeholder:signin.field.emailPlaceholder" placeholder="you@email.com" autocomplete="email" />
     </div>
     <div class="field-block">
-      <label for="password">Password</label>
+      <label data-i18n="signin.login-form.label2" for="password">Password</label>
       <div class="password-field">
         <input id="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="8" />
-        <button type="button" class="password-toggle" id="password-toggle" aria-pressed="false" aria-label="Show password">
+        <button data-i18n="signin.password-toggle.button" type="button" class="password-toggle" id="password-toggle" aria-pressed="false" aria-label="Show password">
           Show
         </button>
       </div>
-      <p class="field-hint signup-only" id="password-hint" hidden>At least 8 characters. Use a unique password you don’t reuse elsewhere.</p>
+      <p data-i18n="signin.password-hint.p" class="field-hint signup-only" id="password-hint" hidden>At least 8 characters. Use a unique password you don’t reuse elsewhere.</p>
     </div>
 
     <div class="role-fields" id="signup-grower-fields" hidden>
-      <p class="role-fields-title">Grower setup</p>
+      <p data-i18n="signin.signup-grower-fields.p" class="role-fields-title">Grower setup</p>
       <div class="field-block">
-        <label>Grow setup</label>
-        <p class="field-hint">Seeds plant defaults and coaching.</p>
-        <div class="choice-grid choice-grid--3" id="grow-setup-choices" role="group" aria-label="Grow setup">
-          <button type="button" class="choice-option is-selected" data-setup="indoor">
+        <label data-i18n="signin.signup-grower-fields.label">Grow setup</label>
+        <p data-i18n="signin.signup-grower-fields.p2" class="field-hint">Seeds plant defaults and coaching.</p>
+        <div class="choice-grid choice-grid--3" id="grow-setup-choices" role="group" data-i18n-attr="aria-label:signin.aria.growSetup" aria-label="Grow setup">
+          <button data-i18n-html="signin.grow-setup-choices.button" type="button" class="choice-option is-selected" data-setup="indoor">
             <strong>Indoor</strong>
             <span>Tents &amp; rooms</span>
           </button>
-          <button type="button" class="choice-option" data-setup="outdoor">
+          <button data-i18n-html="signin.grow-setup-choices.button2" type="button" class="choice-option" data-setup="outdoor">
             <strong>Outdoor</strong>
             <span>Field &amp; garden</span>
           </button>
-          <button type="button" class="choice-option" data-setup="mixed">
+          <button data-i18n-html="signin.grow-setup-choices.button3" type="button" class="choice-option" data-setup="mixed">
             <strong>Mixed</strong>
             <span>Both setups</span>
           </button>
         </div>
       </div>
       <div class="field-block">
-        <label for="home-city">Home city <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
-        <p class="field-hint">Only used for the Plants weather forecast — skip if you grow indoors.</p>
-        <input id="home-city" type="text" maxlength="80" placeholder="e.g. Denver" autocomplete="address-level2" />
+        <label data-i18n-html="signin.signup-grower-fields.label2" for="home-city">Home city <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <p data-i18n="signin.signup-grower-fields.p3" class="field-hint">Only used for the Plants weather forecast — skip if you grow indoors.</p>
+        <input id="home-city" type="text" maxlength="80" data-i18n-attr="placeholder:signin.field.cityPlaceholder" placeholder="e.g. Denver" autocomplete="address-level2" />
       </div>
       <div class="field-block">
-        <label for="grow-style-note">Grow style <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
-        <textarea id="grow-style-note" maxlength="240" placeholder="e.g. autoflowers, 4 tents"></textarea>
+        <label data-i18n-html="signin.signup-grower-fields.label3" for="grow-style-note">Grow style <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <textarea id="grow-style-note" maxlength="240" data-i18n-attr="placeholder:signin.field.stylePlaceholder" placeholder="e.g. autoflowers, 4 tents"></textarea>
       </div>
       <div class="field-block" id="field-profile-photo">
-        <label for="profile-photo-input">Profile picture / logo <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
-        <p class="field-hint">Shown on your account — square crop works best. JPEG or PNG.</p>
+        <label data-i18n-html="signin.field-profile-photo.label" for="profile-photo-input">Profile picture / logo <span style="font-weight:500;color:var(--text-muted)">(optional)</span></label>
+        <p data-i18n="signin.field-profile-photo.p" class="field-hint">Shown on your account — square crop works best. JPEG or PNG.</p>
         <div class="signup-photo-row">
           <div class="signup-photo-preview" id="profile-photo-preview" hidden>
             <img id="profile-photo-preview-img" alt="Profile preview" />
           </div>
           <div class="signup-photo-actions">
             <input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,image/*" />
-            <button type="button" class="btn-text" id="profile-photo-clear" hidden>Remove</button>
+            <button data-i18n="signin.profile-photo-clear.button" type="button" class="btn-text" id="profile-photo-clear" hidden>Remove</button>
           </div>
         </div>
         <input type="hidden" id="profile-photo-data" value="" />
@@ -593,19 +595,19 @@
     </div>
 
     <div class="role-fields" id="signup-adopter-fields" hidden>
-      <p class="role-fields-title">Adopter setup</p>
+      <p data-i18n="signin.signup-adopter-fields.p" class="role-fields-title">Adopter setup</p>
       <div class="field-block">
-        <label>Why you’re here</label>
-        <div class="choice-grid" id="adopter-intent-choices" role="group" aria-label="Adopter intent">
-          <button type="button" class="choice-option is-selected" data-intent="support_growers">
+        <label data-i18n="signin.signup-adopter-fields.label">Why you’re here</label>
+        <div class="choice-grid" id="adopter-intent-choices" role="group" data-i18n-attr="aria-label:signin.aria.adopterIntent" aria-label="Adopter intent">
+          <button data-i18n-html="signin.adopter-intent-choices.button" type="button" class="choice-option is-selected" data-intent="support_growers">
             <strong>Support growers</strong>
             <span>Follow a real plant’s care trail</span>
           </button>
-          <button type="button" class="choice-option" data-intent="collect_garden">
+          <button data-i18n-html="signin.adopter-intent-choices.button2" type="button" class="choice-option" data-intent="collect_garden">
             <strong>Collect a garden</strong>
             <span>Adopt plant tokens and watch stages</span>
           </button>
-          <button type="button" class="choice-option" data-intent="earn_rewards">
+          <button data-i18n-html="signin.adopter-intent-choices.button3" type="button" class="choice-option" data-intent="earn_rewards">
             <strong>Learn the flow</strong>
             <span>Practice stakes on test assets (no real value)</span>
           </button>
@@ -613,13 +615,13 @@
       </div>
       <label class="check-row signup-only">
         <input type="checkbox" id="accept-devnet" />
-        <span>I understand this uses Solana’s public test network (Devnet) — assets have no monetary value.</span>
+        <span data-i18n="signin.signup-adopter-fields.span">I understand this uses Solana’s public test network (Devnet) — assets have no monetary value.</span>
       </label>
     </div>
 
     <label class="check-row signup-only" id="field-accept-consent" hidden>
       <input type="checkbox" id="accept-consent" />
-      <span>
+      <span data-i18n-html="signin.field-accept-consent.span">
         I’m <strong>18+</strong> and agree to the
         <a href="../terms/" target="_blank" rel="noopener noreferrer">Terms</a>
         &amp;
@@ -627,9 +629,9 @@
       </span>
     </label>
 
-    <button type="submit" id="submit-btn">Sign in</button>
+    <button data-i18n="common.cta.signIn" type="submit" id="submit-btn">Sign in</button>
 
-    <div class="auth-divider" aria-hidden="true">or</div>
+    <div data-i18n="signin.login-form.div" class="auth-divider" aria-hidden="true">or</div>
     <button type="button" class="btn-google" id="btn-google-auth">
       <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
         <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l5.7-5.7C34.2 6.1 29.4 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.5-.4-3.5z"/>
@@ -637,14 +639,14 @@
         <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.2 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39.6 16.3 44 24 44z"/>
         <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-1.1 3.2-3.5 5.7-6.5 7.1l.1.1 6.2 5.2C36.8 39.2 44 34 44 24c0-1.3-.1-2.5-.4-3.5z"/>
       </svg>
-      <span id="google-auth-label">Continue with Google</span>
+      <span data-i18n="signin.google-auth-label.span" id="google-auth-label">Continue with Google</span>
     </button>
 
     <p id="login-status" aria-live="polite"></p>
-    <div class="back-link"><a href="../index.html">← Back to home</a></div>
+    <div data-i18n-html="signin.login-form.div2" class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
-  <script src="../app/js/signup.js?v=20260802f"></script>
-  <script src="../js/site-trust.js?v=20260802a"></script>
+  <script src="../app/js/signup.js?v=20260817a"></script>
+  <script src="../js/site-trust.js?v=20260817a"></script>
   <script src="../js/appcheck-config.js?v=20260803a"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
@@ -775,29 +777,39 @@
       if (password) password.minLength = isSignup ? 8 : 6;
 
       submitBtn.classList.remove('submit--grower', 'submit--adopter');
+      /* The heading, lead and buttons change with the chosen desk. Each one
+         is written through setCopy so it carries its key: a later language
+         switch re-translates whatever is on screen without re-running this. */
       if (isSignup && profileType === 'grower') {
         submitBtn.classList.add('submit--grower');
-        submitBtn.textContent = 'Start your journal free';
-        googleLabel.textContent = 'Sign up with Google';
-        titleEl.textContent = 'Start your journal free';
-        leadEl.textContent = 'Log watering, feeding, and stages. On-chain proof is optional — never required to start.';
+        setCopy(submitBtn, 'signin.mode.growerCta', 'Start your journal free');
+        setCopy(googleLabel, 'signin.mode.googleSignup', 'Sign up with Google');
+        setCopy(titleEl, 'signin.mode.growerCta', 'Start your journal free');
+        setCopy(leadEl, 'signin.mode.growerLead', 'Log watering, feeding, and stages. On-chain proof is optional — never required to start.');
       } else if (isSignup && profileType === 'adopter') {
         submitBtn.classList.add('submit--adopter');
-        submitBtn.textContent = 'Enter as Adopter';
-        googleLabel.textContent = 'Sign up with Google';
-        titleEl.textContent = 'Enter as Adopter';
-        leadEl.textContent = 'Follow a plant’s journal trail. Test-network stakes are optional and have no monetary value.';
+        setCopy(submitBtn, 'common.cta.enterAdopter', 'Enter as Adopter');
+        setCopy(googleLabel, 'signin.mode.googleSignup', 'Sign up with Google');
+        setCopy(titleEl, 'common.cta.enterAdopter', 'Enter as Adopter');
+        setCopy(leadEl, 'signin.mode.adopterLead', 'Follow a plant’s journal trail. Test-network stakes are optional and have no monetary value.');
       } else if (isSignup) {
-        submitBtn.textContent = 'Create account';
-        googleLabel.textContent = 'Sign up with Google';
-        titleEl.textContent = 'Create your account';
-        leadEl.textContent = 'Growers start with the journal. Adopters follow a plant. Pick your desk.';
+        setCopy(submitBtn, 'signin.tab-signup.button', 'Create account');
+        setCopy(googleLabel, 'signin.mode.googleSignup', 'Sign up with Google');
+        setCopy(titleEl, 'signin.mode.signupTitle', 'Create your account');
+        setCopy(leadEl, 'signin.mode.signupLead', 'Growers start with the journal. Adopters follow a plant. Pick your desk.');
       } else {
-        submitBtn.textContent = 'Sign in';
-        googleLabel.textContent = 'Continue with Google';
-        titleEl.textContent = 'Sign in to growtoo';
-        leadEl.textContent = 'Welcome back. Your Grower or Adopter workspace opens automatically.';
+        setCopy(submitBtn, 'signin.tab-signin.button', 'Sign in');
+        setCopy(googleLabel, 'signin.google-auth-label.span', 'Continue with Google');
+        setCopy(titleEl, 'signin.auth-title.h1', 'Sign in to growtoo');
+        setCopy(leadEl, 'signin.auth-lead.p', 'Welcome back. Your Grower or Adopter workspace opens automatically.');
       }
+    }
+
+    /* Writes copy and leaves the key behind, so I18N.apply() can redo it. */
+    function setCopy(el, key, en) {
+      if (!el) return;
+      el.setAttribute('data-i18n', key);
+      el.textContent = window.I18N ? window.I18N.tf(key, en) : en;
     }
 
     function setMode(next) {
@@ -1155,5 +1167,6 @@
       }
     });
   </script>
+  <div class="lang-switch-floating"><div class="nav-lang" data-i18n-switcher></div></div>
 </body>
 </html>

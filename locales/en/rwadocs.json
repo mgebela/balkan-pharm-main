@@ -1,0 +1,82 @@
+{
+  "div": "<strong>Solana Devnet</strong> <span>Technical docs for plant tokens &amp; $GROWTOO — <em>no monetary value</em>.</span> <a href=\"../risks/\">Risks</a>",
+  "main-nav": {
+    "a": "Risks",
+    "a2": "Privacy",
+    "a3": "Sign in"
+  },
+  "span2": "DOCS",
+  "h1": "Plant token architecture",
+  "p": "How growtoo links a journal plant to an optional Solana Devnet plant token: standards, growth rewards, marketplace hold/settle, and planned redemption.",
+  "li": "<a href=\"#architecture\">Architecture</a>",
+  "li2": "<a href=\"#standards\">Standards</a>",
+  "li3": "<a href=\"#growth\">Growth</a>",
+  "li4": "<a href=\"#marketplace\">Market</a>",
+  "li5": "<a href=\"#redemption\">Redemption</a>",
+  "li6": "<a href=\"#addresses\">Addresses</a>",
+  "p2": "<strong>Who this is for:</strong> builders and curious adopters who want the plumbing. Regular growers can stay in the journal — you do not need this page to log watering. Prefer the honest product limits? Start with <a href=\"../risks/\">Risks &amp; scope</a>.",
+  "div2": "<span>growtoo · public docs</span> <span class=\"desk-panel-meta\">DEVNET</span>",
+  "architecture": {
+    "h2": "1. Architecture"
+  },
+  "p3": "Each physical seed you choose to tokenise is represented by a <strong>plant token</strong> (a Metaplex NFT in the verified growtoo Seeds collection). The NFT is the on-chain record; the public grow journal is the off-chain evidence trail. They link both ways: metadata references the journal plant ID, and the app shows mint address and transactions for each token.",
+  "h3": "Components",
+  "li7": "<strong>App (growto.live/app)</strong> — Firebase-authenticated grow journal. Optional Solana wallet (extension or watch-only) linked by a signed message.",
+  "li8": "<strong>Plant tokens</strong> — one per minted seed; strain, batch, and linked plant ID live in metadata (often Arweave via Irys).",
+  "li9": "<strong>$GROWTOO</strong> — fungible SPL reward token (9 decimals). Minted as plants advance stages; used as marketplace currency on Devnet.",
+  "li10": "<strong>Mint queue</strong> — mint/settlement requests in Firestore; an authority worker executes them on Devnet. Stand-in for future on-chain programs.",
+  "h32": "Trust model (Devnet MVP)",
+  "p4": "On Devnet, one collection authority also controls metadata updates, $GROWTOO minting, and marketplace hold/release. Stage updates only run after matching journal progress exists. Mainnet aims to replace the queue with an on-chain escrow program and stronger attestations — see <a href=\"../risks/\">Risks</a>.",
+  "standards": {
+    "h2": "2. Token standards"
+  },
+  "h33": "Plant token (non-fungible)",
+  "p5": "Metaplex Token Metadata, extended with a machine-readable <code>rwa</code> block. Schema reference (legacy path may still use the older filename): <code>seed-rwa.schema.json</code>.",
+  "pre": "<code>{ \"name\": \"CBD Auto #1\", \"symbol\": \"SEED\", \"attributes\": [ { \"trait_type\": \"Strain\", \"value\": \"CBD Auto\" }, { \"trait_type\": \"Batch\", \"value\": \"B-2026-07-A\" }, { \"trait_type\": \"Stage\", \"value\": \"Flowering\" }, { \"trait_type\": \"Plant ID\", \"value\": \"plant-abc\" } ], \"rwa\": { \"standard\": \"growtoo/seed-rwa\", \"version\": \"1.0.0\", \"assetType\": \"flower\", \"strain\": \"CBD Auto\", \"batch\": \"B-2026-07-A\", \"plantId\": \"plant-abc\", \"cluster\": \"devnet\" } }</code>",
+  "p6": "Metadata URI updates each growth stage; <code>rwa.assetType</code> flips from <code>seed</code> to <code>flower</code> at flowering so marketplace listings can distinguish them.",
+  "h34": "$GROWTOO (fungible SPL)",
+  "th": "Property",
+  "th2": "Value",
+  "td": "Standard",
+  "td2": "SPL token + Metaplex fungible metadata",
+  "td3": "Symbol / decimals",
+  "td4": "GROW / 9",
+  "td5": "Issuance",
+  "td6": "Per stage: Germination 10, Seedling 20, Vegetative 35, Flowering 60, Harvest 100",
+  "td7": "Utility",
+  "td8": "Devnet marketplace currency; future redemption &amp; governance (planned)",
+  "growth": {
+    "h2": "3. Growth minting flow"
+  },
+  "li11": "Document growth in the journal and advance the plant token a stage in the app.",
+  "li12": "The app files a growth-mint request for that mint address.",
+  "li13": "The worker uploads stage metadata and updates the NFT metadata URI on-chain.",
+  "li14": "The worker mints that stage’s $GROWTOO reward to the holder’s wallet.",
+  "li15": "The app shows real transaction signatures (e.g. Solscan) in token history.",
+  "marketplace": {
+    "h2": "4. Marketplace (Devnet MVP)"
+  },
+  "li16": "<strong>List:</strong> seller moves the NFT into a marketplace hold; listing goes live with a $GROWTOO ask.",
+  "li17": "<strong>Invest:</strong> buyer pays $GROWTOO (instant sale or adopt-stake split).",
+  "li18": "<strong>Settle:</strong> payment is confirmed; the plant token is released to the buyer. Sellers can cancel live listings.",
+  "p7": "Instant sale pays the full ask on buy. Adopt stake locks half until monthly care qualifies at harvest (all-or-nothing). Devnet settlement is operator-assisted; mainnet targets a fully on-chain program.",
+  "redemption": {
+    "h2": "5. Redemption (planned)"
+  },
+  "p8": "Redemption would convert the on-chain asset into its real-world counterpart (harvest share), subject to regulation. Still mock / planned — not live fulfillment.",
+  "li19": "Harvest-stage holder requests redemption in the app (planned).",
+  "li20": "NFT is burned or marked redeemed.",
+  "li21": "Operator records physical fulfilment against the batch and journal.",
+  "li22": "$GROWTOO already earned stays with the holder; only the asset NFT is retired.",
+  "addresses": {
+    "h2": "6. Deployed addresses (Devnet)"
+  },
+  "p9": "After deploy, addresses live in <a href=\"https://github.com/mgebela/balkan-pharm-main\">the repository</a> <code>chain/deployed.devnet.json</code> and the app chain config. Devnet only — no monetary value.",
+  "p10": "<a href=\"../risks/\">Risks &amp; scope</a> · <a href=\"../privacy/\">Privacy</a> · <a href=\"../terms/\">Terms</a> · <a href=\"../index.html\">Back to growtoo</a>",
+  "p11": "Technical reference for the Devnet MVP. Not investment advice. Tokens have no monetary value.",
+  "div3": "<a href=\"../privacy/\">Privacy</a> <a href=\"../terms/\">Terms</a> <a href=\"../risks/\">Risks</a> <a href=\"../index.html\">Home</a>",
+  "p12": "© growtoo. All rights reserved.",
+  "meta": {
+    "title": "Plant token docs · growtoo"
+  }
+}

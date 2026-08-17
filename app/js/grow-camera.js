@@ -56,7 +56,7 @@
         let w = img.width || 0;
         let h = img.height || 0;
         if (!w || !h) {
-          reject(new Error('Could not read image.'));
+          reject(new Error(T('app.camera.readFailed', 'Could not read image.')));
           return;
         }
         const long = Math.max(w, h);
@@ -70,7 +70,7 @@
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error('Could not process image.'));
+          reject(new Error(T('app.camera.processFailed', 'Could not process image.')));
           return;
         }
         ctx.fillStyle = '#0a120e';
@@ -85,17 +85,17 @@
             out = canvas.toDataURL('image/jpeg', quality);
           }
         } catch (err) {
-          reject(err || new Error('Could not encode image.'));
+          reject(err || new Error(T('app.camera.encodeFailed', 'Could not encode image.')));
           return;
         }
         if (!out || out.length > MAX_CHARS) {
-          reject(new Error('Photo is still too large. Try again.'));
+          reject(new Error(T('app.camera.tooLarge', 'Photo is still too large. Try again.')));
           return;
         }
         resolve(out);
       };
       img.onerror = function () {
-        reject(new Error('Could not load that image.'));
+        reject(new Error(T('app.camera.loadFailed', 'Could not load that image.')));
       };
       img.src = dataUrl;
     });
@@ -113,29 +113,53 @@
     root.innerHTML =
       '<div class="grow-camera-stage">' +
       '<video id="grow-camera-video" class="grow-camera-video" playsinline muted autoplay></video>' +
-      '<img id="grow-camera-shot" class="grow-camera-shot" alt="Captured plant photo" hidden />' +
+      '<img id="grow-camera-shot" class="grow-camera-shot" alt="' +
+      esc(T('app.camera.shotAlt', 'Captured plant photo')) +
+      '" hidden />' +
       '<canvas id="grow-camera-canvas" hidden></canvas>' +
       '</div>' +
       '<header class="grow-camera-bar grow-camera-bar--top">' +
-      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-close" aria-label="Close camera">Close</button>' +
+      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-close" aria-label="' +
+      esc(T('app.camera.closeAria', 'Close camera')) +
+      '">' +
+      esc(T('app.camera.close', 'Close')) +
+      '</button>' +
       '<div class="grow-camera-title-wrap">' +
-      '<strong id="grow-camera-title">Plant camera</strong>' +
-      '<span class="grow-camera-sub" id="grow-camera-sub">Frame the plant, then shoot</span>' +
+      '<strong id="grow-camera-title">' +
+      esc(T('app.camera.title', 'Plant camera')) +
+      '</strong>' +
+      '<span class="grow-camera-sub" id="grow-camera-sub">' +
+      esc(T('app.camera.frameHint', 'Frame the plant, then shoot')) +
+      '</span>' +
       '</div>' +
-      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-flip" aria-label="Flip camera">Flip</button>' +
+      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-flip" aria-label="' +
+      esc(T('app.camera.flipAria', 'Flip camera')) +
+      '">' +
+      esc(T('app.camera.flip', 'Flip')) +
+      '</button>' +
       '</header>' +
       '<p class="grow-camera-status" id="grow-camera-status" hidden></p>' +
       '<footer class="grow-camera-bar grow-camera-bar--bottom" id="grow-camera-live-bar">' +
-      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-gallery">Gallery</button>' +
-      '<button type="button" class="grow-camera-shutter" id="grow-camera-shutter" aria-label="Take photo">' +
+      '<button type="button" class="grow-camera-btn grow-camera-btn--ghost" id="grow-camera-gallery">' +
+      esc(T('app.camera.gallery', 'Gallery')) +
+      '</button>' +
+      '<button type="button" class="grow-camera-shutter" id="grow-camera-shutter" aria-label="' +
+      esc(T('app.camera.shutterAria', 'Take photo')) +
+      '">' +
       '<span class="grow-camera-shutter-ring" aria-hidden="true"></span>' +
       '</button>' +
       '<span class="grow-camera-spacer" aria-hidden="true"></span>' +
       '</footer>' +
       '<footer class="grow-camera-bar grow-camera-bar--review" id="grow-camera-review-bar" hidden>' +
-      '<button type="button" class="btn btn-ghost" id="grow-camera-retake">Retake</button>' +
-      '<button type="button" class="btn btn-secondary" id="grow-camera-log">Log to journal</button>' +
-      '<button type="button" class="btn btn-primary" id="grow-camera-coach">Ask coach</button>' +
+      '<button type="button" class="btn btn-ghost" id="grow-camera-retake">' +
+      esc(T('app.camera.retake', 'Retake')) +
+      '</button>' +
+      '<button type="button" class="btn btn-secondary" id="grow-camera-log">' +
+      esc(T('app.camera.logToJournal', 'Log to journal')) +
+      '</button>' +
+      '<button type="button" class="btn btn-primary" id="grow-camera-coach">' +
+      esc(T('app.camera.askCoach', 'Ask coach')) +
+      '</button>' +
       '</footer>' +
       '<input type="file" id="grow-camera-file" accept="image/*" hidden />';
     document.body.appendChild(root);
@@ -158,13 +182,13 @@
       e.target.value = '';
       if (!file) return;
       try {
-        setStatus('Preparing photo…');
+        setStatus(T('app.camera.preparing', 'Preparing photo…'));
         const raw = await readFileAsDataUrl(file);
         const resized = await resizeDataUrl(raw);
         showReview(resized);
         setStatus('');
       } catch (err) {
-        setStatus((err && err.message) || 'Could not open that photo.', true);
+        setStatus((err && err.message) || T('app.camera.openPhotoFailed', 'Could not open that photo.'), true);
       }
     });
 
@@ -202,8 +226,8 @@
     if (flip) flip.hidden = isReview;
     if (sub) {
       sub.textContent = isReview
-        ? 'Save a journal log or send to the coach'
-        : 'Frame the plant, then shoot';
+        ? T('app.camera.reviewHint', 'Save a journal log or send to the coach')
+        : T('app.camera.frameHint', 'Frame the plant, then shoot');
     }
     root.classList.toggle('grow-camera-root--review', isReview);
   }
@@ -221,12 +245,12 @@
 
   async function startCamera() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      setStatus('Camera not supported here — use Gallery.', true);
+      setStatus(T('app.camera.unsupported', 'Camera not supported here — use Gallery.'), true);
       return;
     }
     if (starting) return;
     starting = true;
-    setStatus('Starting camera…');
+    setStatus(T('app.camera.starting', 'Starting camera…'));
     stopStream();
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -250,11 +274,11 @@
       console.warn('grow camera', err);
       const name = err && err.name;
       if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
-        setStatus('Camera permission blocked — use Gallery, or allow camera for growto.live.', true);
+        setStatus(T('app.camera.blocked', 'Camera permission blocked — use Gallery, or allow camera for growto.live.'), true);
       } else if (name === 'NotFoundError') {
-        setStatus('No camera found — use Gallery.', true);
+        setStatus(T('app.camera.notFound', 'No camera found — use Gallery.'), true);
       } else {
-        setStatus('Could not open camera — use Gallery.', true);
+        setStatus(T('app.camera.openFailed', 'Could not open camera — use Gallery.'), true);
       }
     } finally {
       starting = false;
@@ -265,20 +289,20 @@
     const video = document.getElementById('grow-camera-video');
     const canvas = document.getElementById('grow-camera-canvas');
     if (!video || !canvas || !stream) {
-      setStatus('Camera not ready.', true);
+      setStatus(T('app.camera.notReady', 'Camera not ready.'), true);
       return;
     }
     const w = video.videoWidth || 0;
     const h = video.videoHeight || 0;
     if (!w || !h) {
-      setStatus('Wait for the preview, then try again.', true);
+      setStatus(T('app.camera.waitPreview', 'Wait for the preview, then try again.'), true);
       return;
     }
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-      setStatus('Could not capture frame.', true);
+      setStatus(T('app.camera.captureFailed', 'Could not capture frame.'), true);
       return;
     }
     ctx.drawImage(video, 0, 0, w, h);
@@ -288,7 +312,7 @@
       showReview(resized);
       setStatus('');
     } catch (err) {
-      setStatus((err && err.message) || 'Capture failed.', true);
+      setStatus((err && err.message) || T('app.camera.captureGeneric', 'Capture failed.'), true);
     }
   }
 
@@ -332,7 +356,7 @@
     // so inlining a handful of them is enough to break cloud backup.
     let dataUrl = capturedDataUrl;
     if (window.JournalPhotos) {
-      setStatus('Saving photo…');
+      setStatus(T('app.camera.saving', 'Saving photo…'));
       const stored = await window.JournalPhotos.upload(capturedDataUrl, 'camera');
       dataUrl = stored.url;
       if (stored.inline) console.warn('camera photo kept inline —', stored.error);
@@ -342,14 +366,14 @@
         openOpts.onLog({ dataUrl: dataUrl, plantId: plantId });
       } catch (err) {
         console.warn('camera onLog', err);
-        setStatus((err && err.message) || 'Could not use photo.', true);
+        setStatus((err && err.message) || T('app.camera.usePhotoFailed', 'Could not use photo.'), true);
         return;
       }
       close();
       return;
     }
     if (!plantId) {
-      setStatus('Add a plant in the journal first, then log a photo.', true);
+      setStatus(T('app.camera.needPlant', 'Add a plant in the journal first, then log a photo.'), true);
       return;
     }
     close();
@@ -358,7 +382,7 @@
         DnevnikJournal.saveEntry({
           plantId: plantId,
           type: 'opcenito',
-          note: 'Photo log from plant camera',
+          note: T('app.camera.photoNote', 'Photo log from plant camera'),
           photo: dataUrl,
           source: 'grow-camera',
           requireNoteDefault: false,
@@ -381,7 +405,7 @@
         });
         return;
       }
-      alert((err && err.message) || 'Could not save photo log.');
+      alert((err && err.message) || T('app.camera.saveLogFailed', 'Could not save photo log.'));
       return;
     }
     if (typeof window.showAppView === 'function') {
@@ -412,7 +436,10 @@
       }
       if (typeof AICoach.ask === 'function') {
         AICoach.ask(
-          'Please look at this plant photo and help me diagnose what you see. Cite what is visible, then suggest the next journal log if needed.'
+          T(
+            'app.camera.coachPrompt',
+            'Please look at this plant photo and help me diagnose what you see. Cite what is visible, then suggest the next journal log if needed.'
+          )
         );
       }
     }

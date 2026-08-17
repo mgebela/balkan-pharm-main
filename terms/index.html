@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service · growtoo</title>
+  <title data-i18n="terms.meta.title">Terms of Service · growtoo</title>
   <meta name="description" content="Terms for using growtoo: adult users only, journal service, Devnet crypto features, and acceptable use." />
   <link rel="canonical" href="https://growto.live/terms/" />
   <meta name="robots" content="index,follow" />
@@ -23,9 +23,11 @@
       } catch (e) {}
     })();
   </script>
+  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,terms"></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
   <link rel="stylesheet" href="../styles/landing.css?v=20260801d" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
+  <link rel="stylesheet" href="../styles/i18n.css?v=20260816a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
 </head>
 <body>
@@ -36,8 +38,9 @@
         <span class="logo-word">growtoo</span>
       </a>
       <nav class="nav" id="main-nav">
-        <a href="../privacy/" class="nav-link">Privacy</a>
-        <a href="../dnevnik/" class="btn btn-primary">Sign in</a>
+        <a data-i18n="common.footer.privacy" href="../privacy/" class="nav-link">Privacy</a>
+        <a data-i18n="common.cta.signIn" href="../dnevnik/" class="btn btn-primary">Sign in</a>
+        <div class="nav-lang" data-i18n-switcher></div>
       </nav>
     </div>
   </header>
@@ -46,25 +49,25 @@
     <section class="section desk-section risks-page is-revealed">
       <div class="container risks-wrap">
         <div class="desk-header">
-          <span class="desk-tag">LEGAL</span>
-          <h1 class="risks-title">Terms of Service</h1>
-          <p class="section-lead">
+          <span data-i18n="terms.span2" class="desk-tag">LEGAL</span>
+          <h1 data-i18n="terms.h1" class="risks-title">Terms of Service</h1>
+          <p data-i18n="terms.p" class="section-lead">
             Last updated: 29 July 2026. By creating an account or using growtoo you agree to these terms.
             This is a product draft for an early-access / Devnet MVP — have counsel review before relying on it commercially.
           </p>
         </div>
 
         <div class="desk-panel risks-panel">
-          <div class="desk-panel-bar">
+          <div data-i18n-html="terms.div" class="desk-panel-bar">
             <span>Agreement</span>
             <span class="desk-panel-meta">18+</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
-              <span class="desk-spec-code">AGE</span>
+              <span data-i18n="terms.span3" class="desk-spec-code">AGE</span>
               <div>
-                <h2>Eligibility</h2>
-                <p>
+                <h2 data-i18n="terms.h2">Eligibility</h2>
+                <p data-i18n-html="terms.p2">
                   You must be at least <strong>18 years old</strong> and legally allowed to use cultivation-related
                   information services where you live. You are responsible for complying with local law.
                   growtoo does not encourage illegal activity.
@@ -72,10 +75,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">SVC</span>
+              <span data-i18n="terms.span4" class="desk-spec-code">SVC</span>
               <div>
-                <h2>The service</h2>
-                <p>
+                <h2 data-i18n="terms.h22">The service</h2>
+                <p data-i18n-html="terms.p3">
                   growtoo provides a digital grow journal and optional Solana <strong>Devnet</strong> features
                   (plant tokens, test $GROWTOO, marketplace flows). Journal features can be used without a wallet.
                   Devnet assets have <strong>no monetary value</strong>. See
@@ -84,10 +87,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">ACCT</span>
+              <span data-i18n="terms.span5" class="desk-spec-code">ACCT</span>
               <div>
-                <h2>Accounts</h2>
-                <p>
+                <h2 data-i18n="terms.h23">Accounts</h2>
+                <p data-i18n="terms.p4">
                   Keep your credentials secure. You are responsible for activity under your account.
                   We may suspend accounts for abuse, fraud, or risk to other users.
                   Email verification may be required to keep full access.
@@ -95,10 +98,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">CONTENT</span>
+              <span data-i18n="terms.span6" class="desk-spec-code">CONTENT</span>
               <div>
-                <h2>Your content</h2>
-                <p>
+                <h2 data-i18n="terms.h24">Your content</h2>
+                <p data-i18n="terms.p5">
                   You retain rights to journal content you create. You grant us a licence to host, display, and process it
                   to run the service (including optional sharing features you enable). Do not upload unlawful, infringing,
                   or harmful content. Do not fabricate logs to deceive adopters on the marketplace.
@@ -106,10 +109,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--brass">CHAIN</span>
+              <span data-i18n="terms.span7" class="desk-spec-code desk-spec-code--brass">CHAIN</span>
               <div>
-                <h2>Blockchain &amp; wallets</h2>
-                <p>
+                <h2 data-i18n-html="terms.h25">Blockchain &amp; wallets</h2>
+                <p data-i18n="terms.p6">
                   Wallet connections and on-chain transactions are irreversible network operations you authorize.
                   We do not custody your keys. Test-network tokens are for experimentation only and are not securities,
                   cash, or a claim on physical harvest unless a future licensed product expressly says so.
@@ -117,10 +120,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--rust">DISCLAIM</span>
+              <span data-i18n="terms.span8" class="desk-spec-code desk-spec-code--rust">DISCLAIM</span>
               <div>
-                <h2>Disclaimers</h2>
-                <p>
+                <h2 data-i18n="terms.h26">Disclaimers</h2>
+                <p data-i18n="terms.p7">
                   The service is provided “as is.” Cultivation advice (including Coach) is informational, not agronomic,
                   medical, or legal advice. We do not guarantee uptime, data permanence, or marketplace outcomes.
                   To the fullest extent allowed by law, we are not liable for indirect or consequential losses.
@@ -128,10 +131,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">LAW</span>
+              <span data-i18n="terms.span9" class="desk-spec-code">LAW</span>
               <div>
-                <h2>Governing law</h2>
-                <p>
+                <h2 data-i18n="terms.h27">Governing law</h2>
+                <p data-i18n-html="terms.p8">
                   These terms are governed by the laws of Croatia / the European Union consumer protections that
                   mandatorily apply to you, without prejudice to rights you cannot waive. Disputes should first be raised
                   at <a href="mailto:hello@growto.live">hello@growto.live</a>.
@@ -139,10 +142,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">CHG</span>
+              <span data-i18n="terms.span10" class="desk-spec-code">CHG</span>
               <div>
-                <h2>Changes</h2>
-                <p>
+                <h2 data-i18n="terms.h28">Changes</h2>
+                <p data-i18n="terms.p9">
                   We may update these terms as the product evolves. Continued use after a posted update constitutes acceptance
                   of the revised terms for future use. Material changes may also be called out in-app or by email.
                 </p>
@@ -151,7 +154,7 @@
           </div>
         </div>
 
-        <p class="risks-footer-note">
+        <p data-i18n-html="terms.p10" class="risks-footer-note">
           <a href="../privacy/">Privacy Policy</a> ·
           <a href="../risks/">Risks</a> ·
           <a href="../index.html">Back to growtoo</a>
@@ -162,14 +165,14 @@
 
   <footer class="footer desk-footer">
     <div class="container">
-      <div class="footer-links" style="justify-content:center;margin-bottom:1rem">
+      <div data-i18n-html="terms.div2" class="footer-links" style="justify-content:center;margin-bottom:1rem">
         <a href="../privacy/">Privacy</a>
         <a href="../terms/">Terms</a>
         <a href="../risks/">Risks</a>
       </div>
-      <p class="footer-copy">© growtoo. All rights reserved.</p>
+      <p data-i18n="common.footer.copy" class="footer-copy">© growtoo. All rights reserved.</p>
     </div>
   </footer>
-  <script src="../js/site-trust.js?v=20260729g"></script>
+  <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

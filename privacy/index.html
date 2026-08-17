@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy · growtoo</title>
+  <title data-i18n="privacy.meta.title">Privacy Policy · growtoo</title>
   <meta name="description" content="How growtoo collects, uses, and stores account, journal, wallet, and location-related data." />
   <link rel="canonical" href="https://growto.live/privacy/" />
   <meta name="robots" content="index,follow" />
@@ -23,9 +23,11 @@
       } catch (e) {}
     })();
   </script>
+  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,privacy"></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
   <link rel="stylesheet" href="../styles/landing.css?v=20260801d" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260731c" />
+  <link rel="stylesheet" href="../styles/i18n.css?v=20260816a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
 </head>
 <body>
@@ -36,8 +38,9 @@
         <span class="logo-word">growtoo</span>
       </a>
       <nav class="nav" id="main-nav">
-        <a href="../terms/" class="nav-link">Terms</a>
-        <a href="../dnevnik/" class="btn btn-primary">Sign in</a>
+        <a data-i18n="common.footer.terms" href="../terms/" class="nav-link">Terms</a>
+        <a data-i18n="common.cta.signIn" href="../dnevnik/" class="btn btn-primary">Sign in</a>
+        <div class="nav-lang" data-i18n-switcher></div>
       </nav>
     </div>
   </header>
@@ -46,25 +49,25 @@
     <section class="section desk-section risks-page is-revealed">
       <div class="container risks-wrap">
         <div class="desk-header">
-          <span class="desk-tag">LEGAL</span>
-          <h1 class="risks-title">Privacy Policy</h1>
-          <p class="section-lead">
+          <span data-i18n="privacy.span2" class="desk-tag">LEGAL</span>
+          <h1 data-i18n="privacy.h1" class="risks-title">Privacy Policy</h1>
+          <p data-i18n="privacy.p" class="section-lead">
             Last updated: 29 July 2026. This explains what growtoo collects and why — in plain language.
             It is not a substitute for legal advice.
           </p>
         </div>
 
         <div class="desk-panel risks-panel">
-          <div class="desk-panel-bar">
+          <div data-i18n-html="privacy.div" class="desk-panel-bar">
             <span>Operator</span>
             <span class="desk-panel-meta">growto.live</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
-              <span class="desk-spec-code">WHO</span>
+              <span data-i18n="privacy.span3" class="desk-spec-code">WHO</span>
               <div>
-                <h2>Who we are</h2>
-                <p>
+                <h2 data-i18n="privacy.h2">Who we are</h2>
+                <p data-i18n-html="privacy.p2">
                   growtoo (the grow journal and optional Solana test-network features on
                   <strong>growto.live</strong>) is operated for product testing and early users.
                   Contact for privacy questions:
@@ -73,10 +76,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">DATA</span>
+              <span data-i18n="privacy.span4" class="desk-spec-code">DATA</span>
               <div>
-                <h2>What we collect</h2>
-                <p>
+                <h2 data-i18n="privacy.h22">What we collect</h2>
+                <p data-i18n-html="privacy.p3">
                   <strong>Account:</strong> email address, password (hashed by Firebase Auth), optional display name,
                   profile type (Grower / Adopter), and sign-in timestamps.<br />
                   <strong>Journal:</strong> plant records, care logs, photos you upload, notes, and related grow metadata.<br />
@@ -87,10 +90,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">WHY</span>
+              <span data-i18n="privacy.span5" class="desk-spec-code">WHY</span>
               <div>
-                <h2>Why we process it</h2>
-                <p>
+                <h2 data-i18n="privacy.h23">Why we process it</h2>
+                <p data-i18n="privacy.p4">
                   To provide the journal and related features, secure your account, show weather for your city,
                   operate optional Devnet marketplace flows, improve reliability, and meet legal obligations.
                   Legal bases under GDPR typically include contract (providing the service), consent (optional analytics / marketing),
@@ -99,10 +102,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">SHARE</span>
+              <span data-i18n="privacy.span6" class="desk-spec-code">SHARE</span>
               <div>
-                <h2>Processors &amp; sharing</h2>
-                <p>
+                <h2 data-i18n-html="privacy.h24">Processors &amp; sharing</h2>
+                <p data-i18n-html="privacy.p5">
                   We use service providers such as <strong>Google Firebase</strong> (Authentication, Firestore hosting)
                   and, if you opt in, <strong>Google Analytics</strong>. Wallet interactions go through your chosen wallet
                   and the public Solana network — those are outside our private database.
@@ -111,10 +114,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">KEEP</span>
+              <span data-i18n="privacy.span7" class="desk-spec-code">KEEP</span>
               <div>
-                <h2>Retention</h2>
-                <p>
+                <h2 data-i18n="privacy.h25">Retention</h2>
+                <p data-i18n="privacy.p6">
                   We keep account and journal data while your account is active. You may request deletion of your account
                   and associated journal data by emailing us. Backups and logs may persist for a limited period for security.
                   On-chain records on Solana cannot be erased by us.
@@ -122,10 +125,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--green">RIGHTS</span>
+              <span data-i18n="privacy.span8" class="desk-spec-code desk-spec-code--green">RIGHTS</span>
               <div>
-                <h2>Your rights (EU/EEA)</h2>
-                <p>
+                <h2 data-i18n="privacy.h26">Your rights (EU/EEA)</h2>
+                <p data-i18n="privacy.p7">
                   You may request access, correction, deletion, restriction, portability, or object to certain processing.
                   Where we rely on consent, you can withdraw it (e.g. analytics via cookie settings / clearing consent storage).
                   You may lodge a complaint with your local supervisory authority.
@@ -133,10 +136,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code">COOKIE</span>
+              <span data-i18n="privacy.span9" class="desk-spec-code">COOKIE</span>
               <div>
-                <h2>Cookies &amp; local storage</h2>
-                <p>
+                <h2 data-i18n-html="privacy.h27">Cookies &amp; local storage</h2>
+                <p data-i18n-html="privacy.p8">
                   <strong>Essential:</strong> sign-in session, age confirmation, cookie-choice, journal preferences, and similar
                   storage required for the app to work.<br />
                   <strong>Analytics:</strong> only after you choose “Accept all” on the cookie banner.
@@ -144,10 +147,10 @@
               </div>
             </div>
             <div class="desk-spec">
-              <span class="desk-spec-code desk-spec-code--rust">KIDS</span>
+              <span data-i18n="privacy.span10" class="desk-spec-code desk-spec-code--rust">KIDS</span>
               <div>
-                <h2>Age</h2>
-                <p>
+                <h2 data-i18n="privacy.h28">Age</h2>
+                <p data-i18n-html="privacy.p9">
                   The service is intended for adults <strong>18+</strong>. We do not knowingly collect data from children.
                   If you believe a minor created an account, contact us to remove it.
                 </p>
@@ -156,7 +159,7 @@
           </div>
         </div>
 
-        <p class="risks-footer-note">
+        <p data-i18n-html="privacy.p10" class="risks-footer-note">
           <a href="../terms/">Terms of Service</a> ·
           <a href="../risks/">Risks</a> ·
           <a href="../index.html">Back to growtoo</a>
@@ -167,14 +170,14 @@
 
   <footer class="footer desk-footer">
     <div class="container">
-      <div class="footer-links" style="justify-content:center;margin-bottom:1rem">
+      <div data-i18n-html="privacy.div2" class="footer-links" style="justify-content:center;margin-bottom:1rem">
         <a href="../privacy/">Privacy</a>
         <a href="../terms/">Terms</a>
         <a href="../risks/">Risks</a>
       </div>
-      <p class="footer-copy">© growtoo. All rights reserved.</p>
+      <p data-i18n="common.footer.copy" class="footer-copy">© growtoo. All rights reserved.</p>
     </div>
   </footer>
-  <script src="../js/site-trust.js?v=20260729g"></script>
+  <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

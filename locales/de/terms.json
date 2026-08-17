@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../privacy/\" class=\"nav-link\">Datenschutz</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Anmelden</a>"
+  },
+  "span2": "RECHT",
+  "h1": "Nutzungsbedingungen",
+  "p": "Zuletzt aktualisiert: 29. Juli 2026. Mit dem Anlegen eines Kontos oder der Nutzung von growtoo stimmst du diesen Bedingungen zu. Dies ist ein Entwurf für ein Early-Access-/Devnet-MVP — lass ihn prüfen, bevor du dich geschäftlich darauf verlässt.",
+  "div": "<span>Vereinbarung</span> <span class=\"desk-panel-meta\">18+</span>",
+  "span3": "ALT",
+  "h2": "Wer teilnehmen darf",
+  "p2": "Du musst mindestens <strong>18 Jahre alt</strong> und an deinem Wohnort rechtlich berechtigt sein, anbaubezogene Informationsdienste zu nutzen. Für die Einhaltung lokalen Rechts bist du selbst verantwortlich. growtoo ermutigt nicht zu illegalen Handlungen.",
+  "span4": "DNST",
+  "h22": "Der Dienst",
+  "p3": "growtoo bietet ein digitales Grow-Journal und optionale Solana-<strong>Devnet</strong>-Funktionen (Pflanzen-Token, Test-$GROWTOO, Marktplatzabläufe). Die Journalfunktionen lassen sich ohne Wallet nutzen. Devnet-Werte haben <strong>keinen Geldwert</strong>. Siehe <a href=\"../risks/\">Risiken &amp; Umfang</a>.",
+  "span5": "KTO",
+  "h23": "Konten",
+  "p4": "Halte deine Zugangsdaten sicher. Für Aktivitäten unter deinem Konto bist du verantwortlich. Wir können Konten bei Missbrauch, Betrug oder Risiko für andere Nutzer sperren. Für vollen Zugang kann eine E-Mail-Bestätigung nötig sein.",
+  "span6": "INH",
+  "h24": "Deine Inhalte",
+  "p5": "Die Rechte an den von dir erstellten Journalinhalten bleiben bei dir. Du erteilst uns eine Lizenz, sie zu hosten, anzuzeigen und zu verarbeiten, um den Dienst zu betreiben (einschließlich optionaler Teilen-Funktionen, die du aktivierst). Lade keine rechtswidrigen, rechtsverletzenden oder schädlichen Inhalte hoch. Erfinde keine Protokolle, um Adopter auf dem Marktplatz zu täuschen.",
+  "span7": "CHN",
+  "h25": "Blockchain &amp; Wallets",
+  "p6": "Wallet-Verbindungen und On-Chain-Transaktionen sind unumkehrbare Netzwerkvorgänge, die du selbst autorisierst. Wir verwahren deine Schlüssel nicht. Testnetz-Token dienen ausschließlich dem Experimentieren und sind keine Wertpapiere, kein Geld und kein Anspruch auf eine physische Ernte, sofern ein künftiges lizenziertes Produkt das nicht ausdrücklich anders regelt.",
+  "span8": "HAFT",
+  "h26": "Haftungsausschluss",
+  "p7": "Der Dienst wird „wie besehen“ bereitgestellt. Anbauhinweise (auch vom Coach) sind informativ und keine agronomische, medizinische oder rechtliche Beratung. Wir garantieren weder Verfügbarkeit noch Datenbestand noch Marktplatzergebnisse. Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden oder Folgeschäden.",
+  "span9": "JUR",
+  "h27": "Anwendbares Recht",
+  "p8": "Für diese Bedingungen gilt kroatisches Recht sowie der EU-Verbraucherschutz, der zwingend für dich gilt, unbeschadet der Rechte, auf die du nicht verzichten kannst. Streitfälle bitte zuerst an <a href=\"mailto:hello@growto.live\">hello@growto.live</a> richten.",
+  "span10": "ÄND",
+  "h28": "Änderungen",
+  "p9": "Wir können diese Bedingungen anpassen, während das Produkt wächst. Weitere Nutzung nach einer veröffentlichten Aktualisierung gilt als Zustimmung zur geänderten Fassung für die Zukunft. Wesentliche Änderungen weisen wir ggf. auch in der App oder per E-Mail aus.",
+  "p10": "<a href=\"../privacy/\">Datenschutzerklärung</a> · <a href=\"../risks/\">Risiken</a> · <a href=\"../index.html\">Zurück zu growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Datenschutz</a> <a href=\"../terms/\">AGB</a> <a href=\"../risks/\">Risiken</a>",
+  "p11": "© growtoo. Alle Rechte vorbehalten.",
+  "meta": {
+    "title": "Nutzungsbedingungen · growtoo"
+  }
+}

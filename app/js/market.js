@@ -396,11 +396,18 @@
   const OPEN_STATUSES = ['escrow_pending', 'active', 'sale_pending', 'cancel_requested'];
   const STUCK_MS = 5 * 60 * 1000;
 
+  /* [dictionary key, English] — resolved at render time, since this table
+     is built while the page parses, before the dictionary lands. */
   const STUCK_STATUS_LABELS = {
-    escrow_pending: 'Activating escrow…',
-    sale_pending: 'Investment settling…',
-    cancel_requested: 'Cancelling…',
+    escrow_pending: ['app.market.stuckActivating', 'Activating escrow…'],
+    sale_pending: ['app.market.stuckSettling', 'Investment settling…'],
+    cancel_requested: ['app.market.stuckCancelling', 'Cancelling…'],
   };
+
+  function stuckStatusLabel(status) {
+    const row = STUCK_STATUS_LABELS[status];
+    return row ? T(row[0], row[1]) : status || '';
+  }
 
   function stuckSinceRaw(listing) {
     if (!listing) return null;
@@ -455,9 +462,9 @@
       const mins = Math.max(1, Math.round(listingAgeMs(l) / 60000));
       return (
         '<li><strong>' +
-        esc(l.name || 'Offer') +
+        esc(l.name || T('app.market.offer', 'Offer')) +
         '</strong> — ' +
-        esc(STUCK_STATUS_LABELS[l.status] || l.status) +
+        esc(stuckStatusLabel(l.status)) +
         ' for ~' +
         mins +
         ' min</li>'
@@ -468,13 +475,24 @@
     el.innerHTML =
       '<div class="market-stuck-inner">' +
       '<div class="market-stuck-copy">' +
-      '<strong>Settlement pending</strong>' +
-      '<p>Cloud workers auto-activate escrow and settle buys/cancels about every 5 minutes. Retry now nudges both.</p>' +
+      '<strong>' +
+      esc(T('app.market.settlementPending', 'Settlement pending')) +
+      '</strong>' +
+      '<p>' +
+      esc(
+        T(
+          'app.market.settlementPendingBody',
+          'Cloud workers auto-activate escrow and settle buys/cancels about every 5 minutes. Retry now nudges both.'
+        )
+      ) +
+      '</p>' +
       '<ul>' +
       parts.join('') +
       '</ul>' +
       '</div>' +
-      '<button type="button" class="btn btn-ghost btn-sm" id="market-stuck-retry">Retry now</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="market-stuck-retry">' +
+      esc(T('app.market.retryNow', 'Retry now')) +
+      '</button>' +
       '</div>';
   }
 
@@ -484,7 +502,7 @@
     const btn = document.getElementById('market-stuck-retry');
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Retrying…';
+      btn.textContent = T('app.market.retrying', 'Retrying…');
     }
     lastReconcileAt = 0;
     lastSettleAt = 0;
@@ -514,24 +532,31 @@
       const settle = results[1] || {};
       if (btn) {
         btn.disabled = false;
-        btn.textContent = 'Retry now';
+        btn.textContent = T('app.market.retryNow', 'Retry now');
       }
       if (esc.activated > 0) {
-        flashOk('Activated ' + esc.activated + ' listing(s). Refresh if status lags.');
+        flashOk(
+          T('app.market.activatedListings', 'Activated {count} listings. Refresh if status lags.', {
+            count: esc.activated,
+          })
+        );
         return;
       }
       if (settle.sold > 0 || settle.cancelled > 0) {
         flashOk(
-          'Settled ' +
-            (settle.sold || 0) +
-            ' sale(s) and ' +
-            (settle.cancelled || 0) +
-            ' cancel(s). Refresh if status lags.'
+          T(
+            'app.market.settledCounts',
+            'Settled {sold} sales and {cancelled} cancels. Refresh if status lags.',
+            { sold: settle.sold || 0, cancelled: settle.cancelled || 0 }
+          )
         );
         return;
       }
       flashOk(
-        'Retry sent to escrow + settle workers. Status should update within a minute if the chain confirms.'
+        T(
+          'app.market.retrySent',
+          'Retry sent to escrow + settle workers. Status should update within a minute if the chain confirms.'
+        )
       );
     });
   }
@@ -592,17 +617,24 @@
         const mint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
         const mintAddress =
           (mint && mint.mintAddress) || token.mintAddress || null;
-        let reason = 'Mint not confirmed on Devnet yet';
-        if (mint && mint.status === 'failed') reason = 'Mint failed — Retry mint on Tokenise';
-        else if (mint && mint.status === 'pending') reason = 'Mint still pending in queue';
-        else if (mintAddress && listed.has(mintAddress)) reason = 'Already listed';
-        else if (!mint && !mintAddress) reason = 'No Devnet mint yet — open Tokenise';
+        let reason = T('app.market.reasonUnconfirmed', 'Mint not confirmed on Devnet yet');
+        if (mint && mint.status === 'failed') {
+          reason = T('app.market.reasonFailed', 'Mint failed — Retry mint on Tokenise');
+        } else if (mint && mint.status === 'pending') {
+          reason = T('app.market.reasonPending', 'Mint still pending in queue');
+        } else if (mintAddress && listed.has(mintAddress)) {
+          reason = T('app.market.reasonListed', 'Already listed');
+        } else if (!mint && !mintAddress) {
+          reason = T('app.market.reasonNoMint', 'No Devnet mint yet — open Tokenise');
+        }
         return { token: token, reason: reason };
       })
       .filter(Boolean);
   }
 
   async function assertWalletHoldsListingNft(mintAddress, mintOwnerHint) {
+    // i18n-ignore — a load failure, reported through the console.
+    // i18n-ignore — deploy misconfiguration, not grower-facing.
     if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
     const SW = window.SolanaWallet;
     const connected = SW && SW.isConnected() ? SW.getPublicKey() : '';
@@ -627,32 +659,38 @@
 
     if (vaultHeld >= 1n) {
       throw new Error(
-        'This NFT is already locked in the on-chain market vault. Cancel that listing first, then post again.'
+        T(
+          'app.market.nftInVault',
+          'This NFT is already locked in the on-chain market vault. Cancel that listing first, then post again.'
+        )
       );
     }
     if (escrowHeld >= 1n) {
       throw new Error(
-        'This NFT is already in the hot-wallet escrow. Refresh Market — it may still be activating.'
+        T(
+          'app.market.nftInEscrow',
+          'This NFT is already in the hot-wallet escrow. Refresh Market — it may still be activating.'
+        )
       );
     }
 
     const ownerHint =
       mintOwnerHint && connected && mintOwnerHint !== connected
-        ? ' On-chain owner is ' +
-          mintOwnerHint.slice(0, 4) +
-          '…' +
-          mintOwnerHint.slice(-4) +
-          ', but you connected ' +
-          connected.slice(0, 4) +
-          '…' +
-          connected.slice(-4) +
-          '.'
+        ? ' ' +
+          T('app.market.ownerHint', 'On-chain owner is {owner}, but you connected {connected}.', {
+            owner: mintOwnerHint.slice(0, 4) + '…' + mintOwnerHint.slice(-4),
+            connected: connected.slice(0, 4) + '…' + connected.slice(-4),
+          })
         : '';
 
     throw new Error(
-      'This connected wallet does not hold that NFT.' +
+      T('app.market.walletMissingNft', 'This connected wallet does not hold that NFT.') +
         ownerHint +
-        ' Open Tokenise, confirm “Minted on devnet”, connect the wallet that received the mint (or Retry mint), then try posting again.'
+        ' ' +
+        T(
+          'app.market.walletMissingNftHint',
+          'Open Tokenise, confirm “Minted on devnet”, connect the wallet that received the mint (or Retry mint), then try posting again.'
+        )
     );
   }
 
@@ -706,21 +744,38 @@
 
   /** Ensure a live extension session that can sign (not just a linked profile). */
   async function ensureSigningWallet(purpose, opts) {
-    const why = purpose || 'sign';
+    /* `purpose` arrives already translated from the call sites below — it is
+       spliced into sentences, so it has to be in the reader's language. */
+    const why = purpose || T('app.market.purposeSign', 'sign');
     const options = opts || {};
     const SW = window.SolanaWallet;
-    if (!SW) throw new Error('Solana wallet module failed to load. Refresh and try again.');
+    if (!SW) {
+      throw new Error(
+        T(
+          'app.market.walletModuleFailed',
+          'Solana wallet module failed to load. Refresh and try again.'
+        )
+      );
+    }
 
     function assertSigningSession() {
       if (!SW.isConnected() || !SW.getPublicKey()) {
         throw new Error(
-          'Reconnect your wallet extension to ' + why + '. The account is linked, but Phantom/Solflare is not signed in for this tab.'
+          T(
+            'app.market.reconnectToSign',
+            'Reconnect your wallet extension to {purpose}. The account is linked, but Phantom/Solflare is not signed in for this tab.',
+            { purpose: why }
+          )
         );
       }
       const provider = SW.getProviderName();
       if (provider === 'watch-only' || provider === 'manual') {
         throw new Error(
-          'Watch-only wallets cannot ' + why + '. Connect Phantom or Solflare.'
+          T(
+            'app.market.watchOnlyCannot',
+            'Watch-only wallets cannot {purpose}. Connect Phantom or Solflare.',
+            { purpose: why }
+          )
         );
       }
       return SW;
@@ -734,7 +789,9 @@
     // with the wallet picker — surface a clear next step instead.
     if (options.autoConnect === false) {
       throw new Error(
-        'Connect Phantom or Solflare first to ' + why + '.'
+        T('app.market.connectFirstTo', 'Connect Phantom or Solflare first to {purpose}.', {
+          purpose: why,
+        })
       );
     }
 
@@ -750,10 +807,16 @@
 
   async function createListing(tokenEntry, priceGrow, opts) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to post a plant offer.');
-    if (!isGrowerUi()) throw new Error('Only grower accounts can post plant offers.');
+    if (!user) throw new Error(T('app.market.signInToPost', 'Sign in to post a plant offer.'));
+    if (!isGrowerUi()) {
+      throw new Error(
+        T('app.market.growerOnlyPost', 'Only grower accounts can post plant offers.')
+      );
+    }
 
-    const SW = await ensureSigningWallet('post an offer (hold the plant token)');
+    const SW = await ensureSigningWallet(
+      T('app.market.purposePost', 'post an offer (hold the plant token)')
+    );
     const token = tokenEntry.token;
     const priceRounded = Math.round(priceGrow);
     const stakeMode = opts && opts.settlement === 'adopt_stake';
@@ -768,6 +831,7 @@
     const careEscrow = cfg().careEscrowAddress || cfg().escrowAddress;
 
     if (useProgram) {
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
       await assertWalletHoldsListingNft(tokenEntry.mintAddress, tokenEntry.mintOwner);
       const result = await window.EscrowProgram.listNft(tokenEntry.mintAddress, priceRounded);
@@ -801,8 +865,11 @@
       });
     } else {
       const escrow = cfg().escrowAddress;
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!escrow) throw new Error('Escrow address is not configured.');
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!window.SplTransfer) throw new Error('Token transfer helper is not loaded.');
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (stakeMode && !careEscrow) throw new Error('Care escrow address is not configured.');
 
       await assertWalletHoldsListingNft(tokenEntry.mintAddress, tokenEntry.mintOwner);
@@ -816,7 +883,10 @@
         const escrowHeld = await window.SplTransfer.getRawBalanceOf(escrow, tokenEntry.mintAddress);
         if (escrowHeld < 1n) {
           throw new Error(
-            'This connected wallet does not hold that NFT. Confirm mint on Tokenise, then connect the owning wallet.'
+            T(
+              'app.market.walletMissingNftOwning',
+              'This connected wallet does not hold that NFT. Confirm mint on Tokenise, then connect the owning wallet.'
+            )
           );
         }
         escrowSignature = 'recovered-escrow-' + Date.now();
@@ -973,6 +1043,7 @@
         }
         // The listing moved on without this payment. Do not touch it — surface
         // it instead, with the signature the adopter needs to be made whole.
+        // i18n-ignore — console diagnostic for the recovery path.
         console.warn(
           'Adopt payment has no matching reservation — listing ' +
             rec.listingId +
@@ -984,14 +1055,16 @@
         if (window.DnevnikNotifications) {
           DnevnikNotifications.push({
             type: 'sale_settled',
-            title: 'Payment needs review',
-            body:
-              'Your ' +
-              (rec.priceGrow || '') +
-              ' $GROWTOO payment for "' +
-              (rec.name || 'a plant') +
-              '" did not attach to the offer. Keep this reference: ' +
-              rec.signature,
+            title: T('app.market.paymentReviewTitle', 'Payment needs review'),
+            body: T(
+              'app.market.paymentReviewBody',
+              'Your {amount} $GROWTOO payment for "{plant}" did not attach to the offer. Keep this reference: {signature}',
+              {
+                amount: rec.priceGrow || '',
+                plant: rec.name || T('app.market.aPlant', 'a plant'),
+                signature: rec.signature,
+              }
+            ),
             meta: { key: 'pay-orphan:' + rec.listingId, listingId: rec.listingId },
             kind: 'warning',
             dedupKey: 'pay-orphan:' + rec.listingId,
@@ -1005,13 +1078,21 @@
 
   async function investInListing(listing) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to invest.');
-    if (!isAdopterUi()) throw new Error('Switch to an adopter account to invest in plant offers.');
+    if (!user) throw new Error(T('app.market.signInToInvest', 'Sign in to invest.'));
+    if (!isAdopterUi()) {
+      throw new Error(
+        T(
+          'app.market.adopterOnlyInvest',
+          'Switch to an adopter account to invest in plant offers.'
+        )
+      );
+    }
 
-    const SW = await ensureSigningWallet('invest ($GROWTOO payment)');
+    const SW = await ensureSigningWallet(T('app.market.purposeInvest', 'invest ($GROWTOO payment)'));
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
 
     if (listing.settlement === 'program') {
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
       let buySignature = null;
       try {
@@ -1056,8 +1137,11 @@
       if (window.DnevnikNotifications) {
         DnevnikNotifications.push({
           type: 'sale_settled',
-          title: 'Investment complete',
-          body: 'You adopted "' + (listing.name || 'plant') + '" for ' + listing.priceGrow + ' $GROWTOO.',
+          title: T('app.market.investDoneTitle', 'Investment complete'),
+          body: T('app.market.investDoneBody', 'You adopted "{plant}" for {amount} $GROWTOO.', {
+            plant: listing.name || T('app.notif.plantLower', 'plant'),
+            amount: listing.priceGrow,
+          }),
           meta: { key: 'buy:' + listing.id, listingId: listing.id },
           action: { view: 'adopt' },
           kind: 'success',
@@ -1072,10 +1156,12 @@
     // Reserve before paying so a second buyer cannot also send $GROWTOO.
     await firebase.firestore().runTransaction(async function (tx) {
       const snap = await tx.get(ref);
-      if (!snap.exists) throw new Error('Offer no longer exists.');
+      if (!snap.exists) throw new Error(T('app.market.offerGone', 'Offer no longer exists.'));
       const data = snap.data() || {};
       if (data.status !== 'active') {
-        throw new Error('This offer is no longer open for investment.');
+        throw new Error(
+          T('app.market.offerClosed', 'This offer is no longer open for investment.')
+        );
       }
       tx.update(ref, {
         status: 'sale_pending',
@@ -1092,6 +1178,7 @@
         listing.settlement === 'adopt_stake'
           ? listing.careEscrowAddress || cfg().careEscrowAddress || cfg().escrowAddress
           : listing.sellerPubkey;
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!payTo) throw new Error('Payment destination is not configured.');
       // Record the intent before any value moves, so a crash mid-transfer
       // still leaves a trace of what was attempted and where.
@@ -1177,13 +1264,12 @@
     if (window.DnevnikNotifications) {
       DnevnikNotifications.push({
         type: 'sale_settled',
-        title: 'Investment submitted',
-        body:
-          'Paid ' +
-          listing.priceGrow +
-          ' $GROWTOO for "' +
-          (listing.name || 'plant') +
-          '". NFT settles via queue.',
+        title: T('app.market.investSentTitle', 'Investment submitted'),
+        body: T(
+          'app.market.investSentBody',
+          'Paid {amount} $GROWTOO for "{plant}". NFT settles via queue.',
+          { amount: listing.priceGrow, plant: listing.name || T('app.notif.plantLower', 'plant') }
+        ),
         meta: { key: 'buy-pending:' + listing.id, listingId: listing.id },
         action: { view: 'adopt' },
         kind: 'success',
@@ -1195,7 +1281,8 @@
   async function cancelListing(listing) {
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
     if (listing.settlement === 'program') {
-      await ensureSigningWallet('cancel offer (reclaim NFT)');
+      await ensureSigningWallet(T('app.market.purposeCancel', 'cancel offer (reclaim NFT)'));
+      // i18n-ignore — deploy misconfiguration, not grower-facing.
       if (!window.EscrowProgram) throw new Error('Escrow program client is not loaded.');
       let cancelSignature = null;
       try {
@@ -1225,22 +1312,29 @@
 
   // --- UI --------------------------------------------------------------------
 
+  /* [dictionary key, English] — resolved in statusLabel(), since this table
+     is built while the page parses, before the dictionary lands. */
   const STATUS_LABELS = {
-    escrow_pending: 'Preparing listing…',
-    active: 'Open for investment',
-    sale_pending: 'Investment settling…',
-    cancel_requested: 'Cancelling…',
-    sold: 'Adopted',
-    cancelled: 'Cancelled',
-    failed: 'Failed',
+    escrow_pending: ['app.market.statusPreparing', 'Preparing listing…'],
+    active: ['app.market.statusActive', 'Open for investment'],
+    sale_pending: ['app.market.stuckSettling', 'Investment settling…'],
+    cancel_requested: ['app.market.stuckCancelling', 'Cancelling…'],
+    sold: ['app.market.statusSold', 'Adopted'],
+    cancelled: ['app.market.statusCancelled', 'Cancelled'],
+    failed: ['app.market.statusFailed', 'Failed'],
   };
+
+  function statusLabel(status) {
+    const row = STATUS_LABELS[status];
+    return row ? T(row[0], row[1]) : status || '';
+  }
 
   function statusBadge(status) {
     return (
       '<span class="market-status market-status--' +
       esc(status) +
       '">' +
-      esc(STATUS_LABELS[status] || status) +
+      esc(statusLabel(status)) +
       '</span>'
     );
   }
@@ -1249,11 +1343,11 @@
     const flower = assetType === 'flower';
     const label = isAdopterUi()
       ? flower
-        ? 'Flower'
-        : 'Seed'
+        ? T('app.market.badgeFlower', 'Flower')
+        : T('app.market.badgeSeed', 'Seed')
       : flower
-        ? 'Flower token'
-        : 'Seed token';
+        ? T('app.market.badgeFlowerToken', 'Flower token')
+        : T('app.market.badgeSeedToken', 'Seed token');
     return (
       '<span class="market-asset-badge market-asset-badge--' +
       esc(assetType || 'seed') +
@@ -1266,13 +1360,26 @@
   function settlementBadge(listing) {
     if (listing.settlement === 'adopt_stake') {
       return (
-        '<span class="market-asset-badge market-asset-badge--stake" title="You pay full price now. Half to grower on settle; half locked until harvest care.">' +
-        'Adopt stake</span>'
+        '<span class="market-asset-badge market-asset-badge--stake" title="' +
+        esc(
+          T(
+            'app.market.stakeBadgeTitle',
+            'You pay full price now. Half to grower on settle; half locked until harvest care.'
+          )
+        ) +
+        '">' +
+        esc(T('app.market.badgeAdoptStake', 'Adopt stake')) +
+        '</span>'
       );
     }
     return (
-      '<span class="market-asset-badge market-asset-badge--instant" title="Full price to grower; plant token transfers on buy.">' +
-      'Instant sale</span>'
+      '<span class="market-asset-badge market-asset-badge--instant" title="' +
+      esc(
+        T('app.market.instantBadgeTitle', 'Full price to grower; plant token transfers on buy.')
+      ) +
+      '">' +
+      esc(T('app.market.badgeInstantSale', 'Instant sale')) +
+      '</span>'
     );
   }
 
@@ -1312,21 +1419,17 @@
     );
   }
 
-  /** Collapsible mint / pubkey chrome — open by default only in advanced mode. */
+  /** Collapsible mint / pubkey chrome. Closed until opened. */
   function chainDetailsHtml(innerHtml, opts) {
     if (!innerHtml) return '';
     const o = opts || {};
-    const advanced =
-      window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function'
-        ? GrowtooPlain.getMode() === 'advanced'
-        : false;
-    const open = o.forceOpen === true || (advanced && o.forceClosed !== true);
+    const open = o.forceOpen === true;
     return (
       '<details class="chain-details"' +
       (open ? ' open' : '') +
       '>' +
       '<summary class="chain-details-summary">' +
-      esc(o.summary || 'Chain details') +
+      esc(o.summary || T('app.market.chainDetails', 'Chain details')) +
       '</summary>' +
       '<div class="chain-details-body">' +
       innerHtml +
@@ -1411,25 +1514,26 @@
           : Number(listing.priceGrow || 0) - locked;
       return (
         '<p class="market-card-explain market-card-explain--stake">' +
-        'Pay <strong>' +
-        esc(String(listing.priceGrow)) +
-        '</strong> now · ' +
-        '<strong>' +
-        esc(String(immediate)) +
-        '</strong> to grower on ' +
-        tip('settle', 'settle') +
-        ' · ' +
-        '<strong>' +
-        esc(String(locked)) +
-        '</strong> locked until harvest care. Token after settlement.' +
+        T(
+          'app.market.explainStake',
+          'Pay <strong>{total}</strong> now · <strong>{immediate}</strong> to grower on {settle} · <strong>{locked}</strong> locked until harvest care. Token after settlement.',
+          {
+            total: esc(String(listing.priceGrow)),
+            immediate: esc(String(immediate)),
+            locked: esc(String(locked)),
+            settle: tip('settle', T('app.market.settleWord', 'settle')),
+          }
+        ) +
         '</p>'
       );
     }
     return (
       '<p class="market-card-explain market-card-explain--instant">' +
-      'Pay <strong>' +
-      esc(String(listing.priceGrow)) +
-      ' $GROWTOO</strong> and receive the plant token in this flow.' +
+      T(
+        'app.market.explainInstant',
+        'Pay <strong>{total} $GROWTOO</strong> and receive the plant token in this flow.',
+        { total: esc(String(listing.priceGrow)) }
+      ) +
       '</p>'
     );
   }
@@ -1487,7 +1591,14 @@
           })
           .join('') +
         '</ul>'
-      : '<p class="market-card-journal-empty">Journal trail linked — open after adopt to follow care logs.</p>';
+      : '<p class="market-card-journal-empty">' +
+        esc(
+          T(
+            'app.market.journalEmpty',
+            'Journal trail linked — open after adopt to follow care logs.'
+          )
+        ) +
+        '</p>';
     return (
       '<div class="market-card-story">' +
       '<div class="market-card-photo-wrap">' +
@@ -1584,8 +1695,10 @@
         }
       }
       careLine =
-        '<p class="market-card-meta">Care ' +
-        tip('escrow', 'escrow') +
+        '<p class="market-card-meta">' +
+        T('app.market.careEscrowLabel', 'Care {escrow}', {
+          escrow: tip('escrow', T('app.market.escrowWord', 'escrow')),
+        }) +
         ': <strong>' +
         esc(listing.careStatus) +
         '</strong>' +
@@ -1627,12 +1740,14 @@
     }
     const priceLabel =
       listing.status === 'sold' || listing.status === 'sale_pending'
-        ? 'Stake / sale'
+        ? T('app.market.priceStakeSale', 'Stake / sale')
         : listing.status === 'cancelled'
-          ? 'Was listed at'
-          : 'Ask price';
+          ? T('app.market.priceWasListed', 'Was listed at')
+          : T('app.market.priceAsk', 'Ask price');
     const investLabel =
-      listing.settlement === 'adopt_stake' ? 'Adopt · stake' : 'Adopt · buy';
+      listing.settlement === 'adopt_stake'
+        ? T('app.market.investStake', 'Adopt · stake')
+        : T('app.market.investBuy', 'Adopt · buy');
     const showStory = isAdopterUi() || listing.status === 'active';
     const statusTint =
       listing.status === 'active'
@@ -1685,23 +1800,45 @@
       (canCancel
         ? '<button type="button" class="btn btn-ghost btn-sm market-cancel-btn" data-id="' +
           esc(listing.id) +
-          '">Cancel</button>'
+          '">' +
+          esc(T('app.market.cancelBtn', 'Cancel')) +
+          '</button>'
         : '') +
       (canHarvestClaim && harvestReady
         ? '<button type="button" class="btn btn-primary btn-sm market-harvest-claim-btn" data-id="' +
           esc(listing.id) +
           '" data-plant-id="' +
           esc(listing.plantId || '') +
-          '">Claim locked stake ($GROWTOO)</button>'
+          '">' +
+          esc(T('app.market.claimLockedBtn', 'Claim locked stake ($GROWTOO)')) +
+          '</button>'
         : '') +
       (canHarvestClaim && harvestReady
-        ? '<p class="market-card-redeem-note market-card-redeem-note--later">Physical harvest redemption — coming later. This claim only settles the locked $GROWTOO.</p>'
+        ? '<p class="market-card-redeem-note market-card-redeem-note--later">' +
+          esc(
+            T(
+              'app.market.redemptionLater',
+              'Physical harvest redemption — coming later. This claim only settles the locked $GROWTOO.'
+            )
+          ) +
+          '</p>'
         : '') +
       '</div>' +
       (harvestClaimPending && isMine
-        ? '<p class="market-card-meta">Claim queued — waiting for the adopt worker (~5 min).</p>'
+        ? '<p class="market-card-meta">' +
+          esc(
+            T('app.market.claimQueued', 'Claim queued — waiting for the adopt worker (~5 min).')
+          ) +
+          '</p>'
         : canHarvestClaim && !harvestReady
-          ? '<p class="market-card-meta">Reach harvest stage in the journal to claim the locked $GROWTOO half.</p>'
+          ? '<p class="market-card-meta">' +
+            esc(
+              T(
+                'app.market.reachHarvest',
+                'Reach harvest stage in the journal to claim the locked $GROWTOO half.'
+              )
+            ) +
+            '</p>'
           : '') +
       (listing.status === 'failed' && listing.error && isMine
         ? '<p class="market-card-error">' + esc(listing.error) + '</p>'
@@ -1710,19 +1847,30 @@
       // and chain specifics. Identity, live status, price and the action
       // buttons above are never hidden; this is background reading.
       '<details class="market-card-trail">' +
-      '<summary class="market-card-trail-summary">Show listing details</summary>' +
+      '<summary class="market-card-trail-summary">' +
+      esc(T('app.market.showDetails', 'Show listing details')) +
+      '</summary>' +
       '<div class="market-card-trail-body">' +
       offerExplainHtml(listing) +
       careLine +
       (listing.settlement === 'adopt_stake' && canInvest
-        ? '<p class="market-card-redeem-note">Practice stake only — physical ' +
-          tip('redemption', 'redemption') +
-          ' coming later. Locked half is $GROWTOO, not a harvest delivery.</p>'
+        ? '<p class="market-card-redeem-note">' +
+          T(
+            'app.market.practiceStakeNote',
+            'Practice stake only — physical {redemption} coming later. Locked half is $GROWTOO, not a harvest delivery.',
+            { redemption: tip('redemption', T('app.market.redemptionWord', 'redemption')) }
+          ) +
+          '</p>'
         : '') +
       chainDetailsHtml(
         '<div class="grouped-list">' +
           (listing.batch
-            ? groupedRowHtml('batch', 'Batch', '<code>' + esc(listing.batch) + '</code>', false)
+            ? groupedRowHtml(
+                'batch',
+                T('app.market.rowBatch', 'Batch'),
+                '<code>' + esc(listing.batch) + '</code>',
+                false
+              )
             : '') +
           groupedRowHtml(
             'nft',
@@ -1736,24 +1884,24 @@
           ) +
           groupedRowHtml(
             'nft',
-            'Grower',
+            T('app.market.rowGrower', 'Grower'),
             '<code>' +
               esc(shortAddr(listing.sellerPubkey)) +
               '</code>' +
-              (isMine ? ' (you)' : '') +
-              (isBuyer ? ' · your investment' : ''),
+              (isMine ? ' ' + esc(T('app.market.youSuffix', '(you)')) : '') +
+              (isBuyer ? ' · ' + esc(T('app.market.yourInvestment', 'your investment')) : ''),
             false
           ) +
           (listing.listingPda
             ? groupedRowHtml(
                 'pda',
-                'Listing PDA',
+                T('app.market.rowListingPda', 'Listing PDA'),
                 '<code>' + esc(shortAddr(listing.listingPda)) + '</code>',
                 false
               )
             : '') +
           '</div>',
-        { summary: 'Chain details' }
+        { summary: T('app.market.chainDetails', 'Chain details') }
       ) +
       '</div>' +
       '</details>' +
@@ -1823,11 +1971,13 @@
       if (notice) {
         if (!uid) {
           notice.hidden = false;
-          notice.textContent = 'Sign in to use the market.';
+          notice.textContent = T('app.market.signInNotice', 'Sign in to use the market.');
         } else if (!cfg().growMint) {
           notice.hidden = false;
-          notice.textContent =
-            'Marketplace needs the $GROWTOO mint and seed collection on devnet. Offers below are read-only until then.';
+          notice.textContent = T(
+            'app.market.needsDeploy',
+            'Marketplace needs the $GROWTOO mint and seed collection on devnet. Offers below are read-only until then.'
+          );
         } else if (isGrowerUi()) {
           notice.hidden = true;
           notice.textContent = '';
@@ -1839,7 +1989,10 @@
               : '';
           notice.textContent =
             intentMarket ||
-            'Invest $GROWTOO to adopt a grower’s sealed plant. Connect your wallet when you tap Invest on an open offer.';
+            T(
+              'app.market.adopterNotice',
+              'Invest $GROWTOO to adopt a grower’s sealed plant. Connect your wallet when you tap Invest on an open offer.'
+            );
         }
       }
 
@@ -1850,15 +2003,16 @@
         const blocked = unlistableGardenTokens();
         const current = sel.value;
         sel.innerHTML =
-          '<option value="">Choose a sealed plant</option>' +
+          '<option value="">' +
+          esc(T('app.market.chooseSealed', 'Choose a sealed plant')) +
+          '</option>' +
           options
             .map(function (o, i) {
               const no = String(i + 1).padStart(4, '0');
-              const label =
-                'Seed № ' +
-                no +
-                ' — ' +
-                (o.token.name || 'Plant');
+              const label = T('app.market.seedOption', 'Seed № {no} — {name}', {
+                no: no,
+                name: o.token.name || T('app.stack.plant', 'Plant'),
+              });
               return (
                 '<option value="' +
                 esc(o.mintAddress) +
@@ -1888,7 +2042,10 @@
         sel.setAttribute('aria-disabled', hasListable ? 'false' : 'true');
         sel.classList.toggle('is-empty-disabled', !hasListable);
         if (!hasListable) {
-          sel.innerHTML = '<option value="">No plant tokens ready to list</option>';
+          sel.innerHTML =
+            '<option value="">' +
+            esc(T('app.market.noneReady', 'No plant tokens ready to list')) +
+            '</option>';
         }
 
         const hint = document.getElementById('market-list-hint');
@@ -1900,12 +2057,16 @@
         if (hint) {
           if (!options.length && blocked.length) {
             hint.hidden = false;
-            hint.textContent =
-              'Almost there — finish sealing on Tokenise (use Retry if something failed), then come back here.';
+            hint.textContent = T(
+              'app.market.hintAlmost',
+              'Almost there — finish sealing on Tokenise (use Retry if something failed), then come back here.'
+            );
           } else if (!options.length) {
             hint.hidden = false;
-            hint.textContent =
-              'Nothing sealed to list yet. Seal a stage on Tokenise first — then post it here.';
+            hint.textContent = T(
+              'app.market.hintNothingSealed',
+              'Nothing sealed to list yet. Seal a stage on Tokenise first — then post it here.'
+            );
           } else {
             hint.hidden = true;
             hint.textContent = '';
@@ -1955,18 +2116,21 @@
           : isGrowerUi()
             ? emptyNextStepHtml({
                 icon: 'market',
-                lead: 'No live offers on the board',
-                body: 'Seal a plant on Tokenise, then post it here.',
+                lead: T('app.market.emptyBoardLead', 'No live offers on the board'),
+                body: T('app.market.emptyBoardBody', 'Seal a plant on Tokenise, then post it here.'),
                 ctaId: 'market-empty-tokenise-btn',
-                ctaLabel: 'Seal a stage on Tokenise',
+                ctaLabel: T('app.market.ctaSealStage', 'Seal a stage on Tokenise'),
               })
             : emptyNextStepHtml({
                 adopter: true,
                 icon: 'market',
-                lead: 'No open offers right now',
-                body: 'When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.',
+                lead: T('app.market.emptyOpenLead', 'No open offers right now'),
+                body: T(
+                  'app.market.emptyOpenBody',
+                  'When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.'
+                ),
                 ctaId: 'market-empty-garden-btn',
-                ctaLabel: 'Open My garden',
+                ctaLabel: T('app.market.ctaOpenGarden', 'Open My garden'),
                 ghost: true,
               });
       }
@@ -1975,16 +2139,19 @@
           ? listingStackHtml(mine, uid)
           : emptyNextStepHtml({
               icon: 'market',
-              lead: 'No offers posted yet',
+              lead: T('app.market.emptyMineLead', 'No offers posted yet'),
               body: listableTokens().length
-                ? 'Pick a sealed plant above and post your ask.'
-                : 'Seal a stage on Tokenise first, then list it here.',
+                ? T('app.market.emptyMineBody', 'Pick a sealed plant above and post your ask.')
+                : T(
+                    'app.market.emptyMineBodySeal',
+                    'Seal a stage on Tokenise first, then list it here.'
+                  ),
               ctaId: listableTokens().length
                 ? 'market-empty-list-btn'
                 : 'market-empty-tokenise-btn',
               ctaLabel: listableTokens().length
-                ? 'Post an offer'
-                : 'Seal a stage on Tokenise',
+                ? T('app.market.ctaPostOffer', 'Post an offer')
+                : T('app.market.ctaSealStage', 'Seal a stage on Tokenise'),
             });
       }
       if (window.AdoptPlant && typeof AdoptPlant.renderTestFaucetPanel === 'function') {
@@ -2001,13 +2168,13 @@
 
   function flash(err) {
     console.error('Market error', err);
-    const msg = err && err.message ? err.message : 'Something went wrong.';
+    const msg = err && err.message ? err.message : T('app.wallet.generic', 'Something went wrong.');
     if (window.DnevnikNotifications) DnevnikNotifications.toast(msg, 'error');
     else alert(msg);
   }
 
   function flashOk(msg) {
-    const text = msg || 'Done.';
+    const text = msg || T('app.market.done', 'Done.');
     if (window.DnevnikNotifications) {
       DnevnikNotifications.toast(text, 'success');
       return;
@@ -2020,9 +2187,9 @@
       return AppConfirm.ask(opts);
     }
     const fallback =
-      ((opts && opts.title) || 'Confirm') +
+      ((opts && opts.title) || T('app.confirm.title', 'Confirm')) +
       '\n\n' +
-      ((opts && opts.body) || 'Continue?');
+      ((opts && opts.body) || T('app.confirm.body', 'Continue?'));
     return Promise.resolve(window.confirm(fallback));
   }
 
@@ -2047,7 +2214,7 @@
       '" id="' +
       esc(opts.ctaId || '') +
       '">' +
-      esc(opts.ctaLabel || 'Continue') +
+      esc(opts.ctaLabel || T('app.cryptoMode.continue', 'Continue')) +
       '</button>' +
       '</div>'
     );
@@ -2063,21 +2230,24 @@
           ? listing.lockedGrow
           : Math.floor(Number(listing.priceGrow || 0) / 2)
         : 0;
+    const plantName = listing.name || T('app.coach.yourPlant', 'your plant');
     const body =
       listing.settlement === 'adopt_stake'
-        ? 'An adopter staked ' +
-          listing.priceGrow +
-          ' $GROWTOO on "' +
-          (listing.name || 'your plant') +
-          '" (50% locked until monthly care).'
-        : 'An adopter invested ' +
-          listing.priceGrow +
-          ' $GROWTOO in "' +
-          (listing.name || 'your plant') +
-          '".';
+        ? T(
+            'app.market.stakeReceivedBody',
+            'An adopter staked {amount} $GROWTOO on "{plant}" (50% locked until monthly care).',
+            { amount: listing.priceGrow, plant: plantName }
+          )
+        : T('app.market.investReceivedBody', 'An adopter invested {amount} $GROWTOO in "{plant}".', {
+            amount: listing.priceGrow,
+            plant: plantName,
+          });
     await N.pushToUser(listing.uid, {
       type: 'stake_received',
-      title: listing.settlement === 'adopt_stake' ? 'New adopt stake' : 'New market investment',
+      title:
+        listing.settlement === 'adopt_stake'
+          ? T('app.notif.demo.stakeTitle', 'New adopt stake')
+          : T('app.market.newInvestment', 'New market investment'),
       body: body,
       meta: {
         listingId: listing.id,
@@ -2107,11 +2277,15 @@
       hint.hidden = false;
       hint.setAttribute('data-mode', stake ? 'adopt_stake' : 'instant');
       if (stake) {
-        hint.textContent =
-          'Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.';
+        hint.textContent = T(
+          'app.market.hintStakeMode',
+          'Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.'
+        );
       } else {
-        hint.textContent =
-          'You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.';
+        hint.textContent = T(
+          'app.market.hintInstantMode',
+          'You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.'
+        );
       }
     }
   }
@@ -2182,20 +2356,25 @@
         if (typeof claimTestFaucet !== 'function') return;
         busy = true;
         const prev = faucetBtn.textContent;
-        faucetBtn.textContent = 'Claiming…';
+        faucetBtn.textContent = T('app.market.claiming', 'Claiming…');
         faucetBtn.disabled = true;
         try {
           const result = await claimTestFaucet();
           flashOk(
-            'Test faucet queued: +' +
-              (result && result.amount ? result.amount : TEST_FAUCET_AMOUNT) +
-              ' $GROWTOO. Mint usually lands within a few minutes.'
+            T(
+              'app.market.faucetQueued',
+              'Test faucet queued: +{amount} $GROWTOO. Mint usually lands within a few minutes.',
+              { amount: result && result.amount ? result.amount : TEST_FAUCET_AMOUNT }
+            )
           );
           if (window.DnevnikNotifications) {
             DnevnikNotifications.push({
               type: 'test_faucet',
-              title: 'Test faucet claimed',
-              body: 'Queue is minting $GROWTOO to your Devnet wallet…',
+              title: T('app.notif.faucetClaimed', 'Test $GROWTOO claimed'),
+              body: T(
+                'app.market.faucetQueueBody',
+                'Queue is minting $GROWTOO to your Devnet wallet…'
+              ),
               meta: { key: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : '') },
               action: { view: 'market' },
               kind: 'info',
@@ -2231,37 +2410,46 @@
       if (investBtn) {
         let body = '';
         if (listing.settlement === 'program') {
-          body =
-            'You will receive the plant token in this transaction on Solana Devnet.';
+          body = T(
+            'app.market.confirmInvestProgram',
+            'You will receive the plant token in this transaction on Solana Devnet.'
+          );
         } else if (listing.settlement === 'adopt_stake') {
-          body =
-            'Adopt stake: full price now. 50% to the grower on settle; 50% locked until monthly care at harvest (all-or-nothing). Token arrives when settlement completes.\n\nPhysical harvest redemption is coming later — no delivery on Devnet.';
+          body = T(
+            'app.market.confirmInvestStake',
+            'Adopt stake: full price now. 50% to the grower on settle; 50% locked until monthly care at harvest (all-or-nothing). Token arrives when settlement completes.\n\nPhysical harvest redemption is coming later — no delivery on Devnet.'
+          );
         } else {
-          body =
-            'You will receive the plant token when settlement completes.\n\nPhysical harvest redemption is coming later — not available on this test network.';
+          body = T(
+            'app.market.confirmInvestLegacy',
+            'You will receive the plant token when settlement completes.\n\nPhysical harvest redemption is coming later — not available on this test network.'
+          );
         }
         confirmed = await askConfirm({
-          title:
-            'Invest ' +
-            Number(listing.priceGrow).toLocaleString('en-US') +
-            ' $GROWTOO in “' +
-            listing.name +
-            '”?',
+          title: T('app.market.confirmInvestTitle', 'Invest {amount} $GROWTOO in “{plant}”?', {
+            amount: window.I18N ? I18N.n(Number(listing.priceGrow)) : listing.priceGrow,
+            plant: listing.name,
+          }),
           body: body,
-          confirmLabel: 'Invest',
+          confirmLabel: T('app.market.confirmInvestCta', 'Invest'),
         });
       } else if (harvestBtn) {
         confirmed = await askConfirm({
-          title: 'Claim locked stake ($GROWTOO)?',
-          body:
-            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.',
-          confirmLabel: 'Claim locked stake',
+          title: T('app.market.confirmClaimTitle', 'Claim locked stake ($GROWTOO)?'),
+          body: T(
+            'app.market.confirmClaimBody',
+            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
+          ),
+          confirmLabel: T('app.market.confirmClaimCta', 'Claim locked stake'),
         });
       } else if (cancelBtn) {
         confirmed = await askConfirm({
-          title: 'Cancel this offer?',
-          body: 'The plant token returns to your wallet. Adopters will no longer see this ask.',
-          confirmLabel: 'Cancel offer',
+          title: T('app.market.confirmCancelTitle', 'Cancel this offer?'),
+          body: T(
+            'app.market.confirmCancelBody',
+            'The plant token returns to your wallet. Adopters will no longer see this ask.'
+          ),
+          confirmLabel: T('app.market.confirmCancelCta', 'Cancel offer'),
           danger: true,
         });
       }
@@ -2271,10 +2459,10 @@
       const btn = investBtn || cancelBtn || harvestBtn;
       const prevText = btn.textContent;
       btn.textContent = investBtn
-        ? 'Investing…'
+        ? T('app.market.investing', 'Investing…')
         : harvestBtn
-          ? 'Claiming…'
-          : 'Cancelling…';
+          ? T('app.market.claiming', 'Claiming…')
+          : T('app.market.cancelling', 'Cancelling…');
       btn.disabled = true;
       try {
         if (investBtn) {
@@ -2287,21 +2475,34 @@
             }
           }
           if (listing.settlement === 'program') {
-            flashOk('Investment complete. The plant token is in your wallet.');
+            flashOk(
+              T('app.market.investOkNow', 'Investment complete. The plant token is in your wallet.')
+            );
           } else {
             flashOk(
-              'Investment submitted. The plant appears in My garden when settlement finishes.'
+              T(
+                'app.market.investOkQueued',
+                'Investment submitted. The plant appears in My garden when settlement finishes.'
+              )
             );
           }
         } else if (harvestBtn) {
           await requestHarvestClaim(listing.id, harvestBtn.dataset.plantId || listing.plantId);
-          flashOk('Harvest claim queued. Locked stake settles after the next adopt queue pass.');
+          flashOk(
+            T(
+              'app.market.claimQueuedOk',
+              'Harvest claim queued. Locked stake settles after the next adopt queue pass.'
+            )
+          );
         } else {
           await cancelListing(listing);
           flashOk(
             listing.settlement === 'program'
-              ? 'Offer cancelled. The plant is back in your wallet.'
-              : 'Cancel requested. The plant returns after settlement.'
+              ? T('app.market.cancelOkNow', 'Offer cancelled. The plant is back in your wallet.')
+              : T(
+                  'app.market.cancelOkQueued',
+                  'Cancel requested. The plant returns after settlement.'
+                )
           );
         }
       } catch (err) {
@@ -2325,18 +2526,24 @@
         const price = priceEl ? parseInt(priceEl.value, 10) : 0;
         const settlement =
           settleEl && settleEl.value === 'adopt_stake' ? 'adopt_stake' : 'instant';
-        if (!mintAddress) return flash(new Error('Choose a plant token to post.'));
-        if (!price || price <= 0) return flash(new Error('Enter an invest price in $GROWTOO.'));
+        if (!mintAddress) {
+          return flash(new Error(T('app.market.needToken', 'Choose a plant token to post.')));
+        }
+        if (!price || price <= 0) {
+          return flash(new Error(T('app.market.needPrice', 'Enter an invest price in $GROWTOO.')));
+        }
         const entry = listableTokens().find(function (o) {
           return o.mintAddress === mintAddress;
         });
-        if (!entry) return flash(new Error('Asset not found or already listed.'));
+        if (!entry) {
+      return flash(new Error(T('app.market.assetGone', 'Asset not found or already listed.')));
+    }
 
         const submitBtn = form.querySelector('button[type="submit"]');
         busy = true;
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'Holding token for listing…';
+          submitBtn.textContent = T('app.market.holdingToken', 'Holding token for listing…');
         }
         try {
           const used = await createListing(entry, price, {
@@ -2353,10 +2560,19 @@
           }
           flashOk(
             used === 'adopt_stake'
-              ? 'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'
+              ? T(
+                  'app.market.postedStake',
+                  'Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.'
+                )
               : used === 'program'
-                ? 'Offer is live. The plant is locked in the program vault — adopters can invest now.'
-                : 'Offer posted. Adopters can invest once escrow confirms.'
+                ? T(
+                    'app.market.postedProgram',
+                    'Offer is live. The plant is locked in the program vault — adopters can invest now.'
+                  )
+                : T(
+                    'app.market.postedLegacy',
+                    'Offer posted. Adopters can invest once escrow confirms.'
+                  )
           );
         } catch (err) {
           flash(err);
@@ -2364,7 +2580,7 @@
           busy = false;
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Post to market';
+            submitBtn.textContent = T('app.market.postToMarket', 'Post to market');
           }
         }
       });
@@ -2439,23 +2655,35 @@
 
   async function requestHarvestClaim(listingId, plantId) {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to claim harvest.');
-    if (!isGrowerUi()) throw new Error('Only growers can claim harvest stakes.');
+    if (!user) throw new Error(T('app.market.signInHarvest', 'Sign in to claim harvest.'));
+    if (!isGrowerUi()) {
+      throw new Error(T('app.market.growerOnlyHarvest', 'Only growers can claim harvest stakes.'));
+    }
     const listing = listings.find(function (l) {
       return l.id === listingId;
     });
-    if (!listing) throw new Error('Listing not found.');
-    if (listing.uid !== user.uid) throw new Error('Not your listing.');
-    if (listing.settlement !== 'adopt_stake') throw new Error('Not an adopt-stake listing.');
-    if (listing.careStatus !== 'active') throw new Error('Care stake is not active.');
+    if (!listing) throw new Error(T('app.market.listingNotFound', 'Listing not found.'));
+    if (listing.uid !== user.uid) throw new Error(T('app.market.notYourListing', 'Not your listing.'));
+    if (listing.settlement !== 'adopt_stake') {
+      throw new Error(T('app.market.notStakeListing', 'Not an adopt-stake listing.'));
+    }
+    if (listing.careStatus !== 'active') {
+      throw new Error(T('app.market.careNotActive', 'Care stake is not active.'));
+    }
 
     const ref = firebase.firestore().collection('harvestClaims').doc(listingId);
     const existing = await ref.get();
     if (existing.exists) {
       const st = (existing.data() || {}).status;
-      if (st === 'pending') throw new Error('A harvest claim is already pending for this stake.');
+      if (st === 'pending') {
+        throw new Error(
+          T('app.market.claimAlreadyPending', 'A harvest claim is already pending for this stake.')
+        );
+      }
       if (st === 'released' || st === 'refunded') {
-        throw new Error('Harvest stake already settled for this listing.');
+        throw new Error(
+          T('app.market.claimAlreadySettled', 'Harvest stake already settled for this listing.')
+        );
       }
     }
 
@@ -2474,10 +2702,12 @@
 
   async function claimPlatformBonus() {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to claim the platform bonus.');
-    if (!isGrowerUi()) throw new Error('Only growers can claim the platform bonus.');
+    if (!user) throw new Error(T('app.market.signInBonus', 'Sign in to claim the platform bonus.'));
+    if (!isGrowerUi()) {
+      throw new Error(T('app.market.growerOnlyBonus', 'Only growers can claim the platform bonus.'));
+    }
     // UI already prompts connect; never open the wallet picker from Claim.
-    const SW = await ensureSigningWallet('claim platform monthly bonus', {
+    const SW = await ensureSigningWallet(T('app.market.purposeBonus', 'claim platform monthly bonus'), {
       autoConnect: false,
     });
     const monthKey = currentMonthKey();
@@ -2487,7 +2717,11 @@
     if (priorSnap.exists) {
       const st = (priorSnap.data() || {}).status;
       if (st === 'pending' || st === 'minted') {
-        throw new Error('You already claimed (or have a pending claim) for ' + monthKey + '.');
+        throw new Error(
+        T('app.market.bonusAlready', 'You already claimed (or have a pending claim) for {month}.', {
+          month: monthKey,
+        })
+      );
       }
     }
     await ref.set({
@@ -2504,9 +2738,15 @@
   /** Adopter Devnet faucet: +100 $GROWTOO once per UTC day. */
   async function claimTestFaucet() {
     const user = currentUser();
-    if (!user) throw new Error('Sign in to claim test $GROWTOO.');
-    if (!isAdopterUi()) throw new Error('Switch to an adopter account to use the test faucet.');
-    const SW = await ensureSigningWallet('claim test $GROWTOO faucet');
+    if (!user) throw new Error(T('app.market.signInFaucet', 'Sign in to claim test $GROWTOO.'));
+    if (!isAdopterUi()) {
+      throw new Error(
+        T('app.market.adopterOnlyFaucet', 'Switch to an adopter account to use the test faucet.')
+      );
+    }
+    const SW = await ensureSigningWallet(
+      T('app.market.purposeFaucet', 'claim test $GROWTOO faucet')
+    );
     const dayKey = currentDayKey();
     const monthKey = currentMonthKey();
     const docId = user.uid + '_faucet_' + dayKey;
@@ -2516,9 +2756,11 @@
       const st = (priorSnap.data() || {}).status;
       if (st === 'pending' || st === 'minted') {
         throw new Error(
-          'You already claimed today’s Devnet faucet (' +
-            dayKey +
-            '). Try again after UTC midnight.'
+          T(
+            'app.market.faucetAlready',
+            'You already claimed today’s Devnet faucet ({day}). Try again after UTC midnight.',
+            { day: dayKey }
+          )
         );
       }
       // failed → allow rewrite to pending

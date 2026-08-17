@@ -119,28 +119,21 @@
   }
 
   /** Prefer the on-screen nav control whose visible label matches (Journal ≠ Plants). */
-  function pickNavByLabel(labels) {
-    var wanted = (Array.isArray(labels) ? labels : [labels])
-      .map(function (l) {
-        return String(l || '')
-          .trim()
-          .toLowerCase();
-      })
-      .filter(Boolean);
-    if (!wanted.length) return null;
+  /**
+   * Find a visible nav item by its view.
+   *
+   * This used to match on the label text ("Journal"), which stopped working
+   * the moment the nav was translated — "Dnevnik" is not "journal". data-view
+   * is the same in every language, so the tour points at the right thing
+   * whatever the reader's language is.
+   */
+  function pickNavByView(view) {
     var nodes = document.querySelectorAll(
-      '.bottom-nav .nav-item[data-view], .sidebar-nav .nav-item[data-view]'
+      '.bottom-nav .nav-item[data-view="' + view + '"], ' +
+        '.sidebar-nav .nav-item[data-view="' + view + '"]'
     );
     for (var i = 0; i < nodes.length; i++) {
-      var el = nodes[i];
-      if (!isEffectivelyVisible(el)) continue;
-      var text = String(el.textContent || '')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase();
-      for (var j = 0; j < wanted.length; j++) {
-        if (text === wanted[j] || text.indexOf(wanted[j]) !== -1) return el;
-      }
+      if (isEffectivelyVisible(nodes[i])) return nodes[i];
     }
     return null;
   }
@@ -153,22 +146,22 @@
         id: 'start-strip',
         view: null,
         selectors: ['#daily-start-strip', '#btn-account'],
-        title: 'Start here',
-        body: 'After you sign in, this strip is your short path: faucet, market, then garden.',
+        title: T('app.tour.adopterFull.start_strip.title', 'Start here'),
+        body: T('app.tour.adopterFull.start_strip.body', 'After you sign in, this strip is your short path: faucet, market, then garden.'),
       },
       {
         id: 'faucet',
         view: 'market',
         selectors: ['#test-faucet-panel', '#market-adopter-guide'],
-        title: 'Claim test $GROWTOO',
-        body: 'Use the free Devnet faucet once a day. These tokens have no monetary value — they only practice investing.',
+        title: T('app.tour.adopterFull.faucet.title', 'Claim test $GROWTOO'),
+        body: T('app.tour.adopterFull.faucet.body', 'Use the free Devnet faucet once a day. These tokens have no monetary value — they only practice investing.'),
       },
       {
         id: 'market-board',
         view: 'market',
         selectors: ['#market-grid', '#market-adopter-guide', '#view-market'],
-        title: 'Browse live asks',
-        body: 'Open offers show plant · stage · ask. Tap Invest when you’re ready (wallet may prompt).',
+        title: T('app.tour.adopterFull.market_board.title', 'Browse live asks'),
+        body: T('app.tour.adopterFull.market_board.body', 'Open offers show plant · stage · ask. Tap Invest when you’re ready (wallet may prompt).'),
       },
       {
         id: 'garden-nav',
@@ -178,15 +171,15 @@
           '.sidebar-nav .nav-item[data-chain-nav]',
           '.chain-pane-toggle [data-chain-pane="adopt"]',
         ],
-        title: 'My garden',
-        body: 'After a stake settles, follow the plant here — stage progress and care unlock live on the card.',
+        title: T('app.tour.adopterFull.garden_nav.title', 'My garden'),
+        body: T('app.tour.adopterFull.garden_nav.body', 'After a stake settles, follow the plant here — stage progress and care unlock live on the card.'),
       },
       {
         id: 'garden-board',
         view: 'adopt',
         selectors: ['#adopter-summary', '#adopt-token-grid', '#adopt-market-cta'],
-        title: 'Track what you backed',
-        body: 'Adopted plants and balances show up in My garden. Explore at your pace — tap ? on a tab anytime for a shorter tour.',
+        title: T('app.tour.adopterFull.garden_board.title', 'Track what you backed'),
+        body: T('app.tour.adopterFull.garden_board.body', 'Adopted plants and balances show up in My garden. Explore at your pace — tap ? on a tab anytime for a shorter tour.'),
       },
     ];
   }
@@ -197,35 +190,35 @@
         id: 'start-strip',
         view: null,
         selectors: ['#daily-start-strip', '#btn-account'],
-        title: 'Start here',
-        body: 'Your grower path: log care in the journal first. Tokenise and Market are optional when you want them.',
+        title: T('app.tour.growerFull.start_strip.title', 'Start here'),
+        body: T('app.tour.growerFull.start_strip.body', 'Your grower path: log care in the journal first. Tokenise and Market are optional when you want them.'),
       },
       {
         id: 'journal-nav',
         view: 'plants',
         selectors: [
           function () {
-            return pickNavByLabel(['Journal']);
+      return pickNavByView('plants');
           },
           '.bottom-nav .nav-item[data-view="plants"]',
           '.sidebar-nav .nav-item[data-view="plants"]',
         ],
-        title: 'Journal',
-        body: 'This is home — your plants, Today, and the care diary (list or month). Log watering here.',
+        title: T('app.tour.growerFull.journal_nav.title', 'Journal'),
+        body: T('app.tour.growerFull.journal_nav.body', 'This is home — your plants, Today, and the care diary (list or month). Log watering here.'),
       },
       {
         id: 'plants-list',
         view: 'plants',
         selectors: ['#btn-add-plant', '#plants-list', '#view-plants'],
-        title: 'Add a plant',
-        body: 'Create a plant, then log watering, feeding, and stage changes — that trail unlocks Tokenise later.',
+        title: T('app.tour.growerFull.plants_list.title', 'Add a plant'),
+        body: T('app.tour.growerFull.plants_list.body', 'Create a plant, then log watering, feeding, and stage changes — that trail unlocks Tokenise later.'),
       },
       {
         id: 'journal-log',
         view: 'plants',
         selectors: ['#btn-add-entry', '#journal-entries', '.plants-journal-diary'],
-        title: 'Log care',
-        body: 'New entries prove real work. Quests on Tokenise look for stage, water, and feed logs.',
+        title: T('app.tour.growerFull.journal_log.title', 'Log care'),
+        body: T('app.tour.growerFull.journal_log.body', 'New entries prove real work. Quests on Tokenise look for stage, water, and feed logs.'),
       },
     ];
 
@@ -239,15 +232,15 @@
             '.sidebar-nav .nav-item[data-chain-nav]',
             '.chain-pane-toggle [data-chain-pane="adopt"]',
           ],
-          title: 'Tokenise',
-          body: 'When the journal is ready, seal a stage into a plant token on Devnet.',
+          title: T('app.tour.growerFull.tokenise_nav.title', 'Tokenise'),
+          body: T('app.tour.growerFull.tokenise_nav.body', 'When the journal is ready, seal a stage into a plant token on Devnet.'),
         },
         {
           id: 'seal-stage',
           view: 'adopt',
           selectors: ['#adopt-seed-section', '#adopt-growth-guide', '#adopt-token-grid'],
-          title: 'Seal a stage',
-          body: 'Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.',
+          title: T('app.tour.growerFull.seal_stage.title', 'Seal a stage'),
+          body: T('app.tour.growerFull.seal_stage.body', 'Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.'),
         },
         {
           id: 'market-nav',
@@ -256,15 +249,15 @@
             '.bottom-nav .nav-item[data-chain-nav]',
             '.sidebar-nav .nav-item[data-chain-nav]',
           ],
-          title: 'Market',
-          body: 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.',
+          title: T('app.tour.growerFull.market_nav.title', 'Market'),
+          body: T('app.tour.growerFull.market_nav.body', 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.'),
         },
         {
           id: 'market-list',
           view: 'market',
           selectors: ['#market-list-section', '#market-mine-grid', '#market-grid'],
-          title: 'List an offer',
-          body: 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.',
+          title: T('app.tour.growerFull.market_list.title', 'List an offer'),
+          body: T('app.tour.growerFull.market_list.body', 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.'),
         }
       );
     } else {
@@ -272,8 +265,8 @@
         id: 'chain-optional',
         view: null,
         selectors: ['#btn-account'],
-        title: 'Tokenise stays optional',
-        body: 'Seal-on-chain and Market stay out of the nav until you unlock them from Profile. The free journal works without a wallet.',
+        title: T('app.tour.growerFull.chain_optional.title', 'Tokenise stays optional'),
+        body: T('app.tour.growerFull.chain_optional.body', 'Seal-on-chain and Market stay out of the nav until you unlock them from Profile. The free journal works without a wallet.'),
       });
     }
 
@@ -286,29 +279,29 @@
         id: 'plants-heading',
         view: 'plants',
         selectors: ['#plants-list', '#btn-add-plant', '#view-plants .plants-journal-section'],
-        title: 'Your plants',
-        body: 'Each plant is a living record. Start with + New plant if the list is empty.',
+        title: T('app.tour.plants.plants_heading.title', 'Your plants'),
+        body: T('app.tour.plants.plants_heading.body', 'Each plant is a living record. Start with + New plant if the list is empty.'),
       },
       {
         id: 'add-plant',
         view: 'plants',
         selectors: ['#btn-add-plant'],
-        title: 'New plant',
-        body: 'Name, strain, and stage kick off the journal. You can change stage as the grow advances.',
+        title: T('app.tour.plants.add_plant.title', 'New plant'),
+        body: T('app.tour.plants.add_plant.body', 'Name, strain, and stage kick off the journal. You can change stage as the grow advances.'),
       },
       {
         id: 'journal',
         view: 'plants',
         selectors: ['#btn-add-entry', '#journal-entries', '.plants-journal-diary'],
-        title: 'Care journal',
-        body: 'Log watering, feeding, and stage notes. Tokenise quests read this trail before sealing.',
+        title: T('app.tour.plants.journal.title', 'Care journal'),
+        body: T('app.tour.plants.journal.body', 'Log watering, feeding, and stage notes. Tokenise quests read this trail before sealing.'),
       },
       {
         id: 'weather',
         view: 'plants',
         selectors: ['#plants-weather-widget'],
-        title: 'Weather (optional)',
-        body: 'Set a city for a 7-day forecast — handy for outdoor planning. Skip if you grow indoors.',
+        title: T('app.tour.plants.weather.title', 'Weather (optional)'),
+        body: T('app.tour.plants.weather.body', 'Set a city for a 7-day forecast — handy for outdoor planning. Skip if you grow indoors.'),
       },
     ];
   }
@@ -319,22 +312,22 @@
         id: 'seal',
         view: 'adopt',
         selectors: ['#adopt-seed-section', '#adopt-growth-guide'],
-        title: 'Seal a stage',
-        body: 'Link a journal plant and seal the current stage. Completing grower quests unlocks the mint button.',
+        title: T('app.tour.adoptGrower.seal.title', 'Seal a stage'),
+        body: T('app.tour.adoptGrower.seal.body', 'Link a journal plant and seal the current stage. Completing grower quests unlocks the mint button.'),
       },
       {
         id: 'trail',
         view: 'adopt',
         selectors: ['#adopt-growth-guide', '#adopt-seed-section'],
-        title: 'The trail ahead',
-        body: 'Stages from seed → harvest each mint a reward on Devnet when you seal them.',
+        title: T('app.tour.adoptGrower.trail.title', 'The trail ahead'),
+        body: T('app.tour.adoptGrower.trail.body', 'Stages from seed → harvest each mint a reward on Devnet when you seal them.'),
       },
       {
         id: 'sealed',
         view: 'adopt',
         selectors: ['#adopt-token-grid', '#adopt-garden-section'],
-        title: 'Sealed plants',
-        body: 'Your tokens land here. When one is ready, list it on Market.',
+        title: T('app.tour.adoptGrower.sealed.title', 'Sealed plants'),
+        body: T('app.tour.adoptGrower.sealed.body', 'Your tokens land here. When one is ready, list it on Market.'),
       },
     ];
   }
@@ -345,22 +338,22 @@
         id: 'guide',
         view: 'adopt',
         selectors: ['#adopter-guide', '#adopter-summary', '#adopt-garden-section'],
-        title: 'My garden',
-        body: 'Adopted plants and stake progress live here after Market invest settles.',
+        title: T('app.tour.adoptAdopter.guide.title', 'My garden'),
+        body: T('app.tour.adoptAdopter.guide.body', 'Adopted plants and stake progress live here after Market invest settles.'),
       },
       {
         id: 'summary',
         view: 'adopt',
         selectors: ['#adopter-summary', '#adopt-token-grid'],
-        title: 'Balances',
-        body: 'See how many plants you’ve adopted and your test $GROWTOO balance.',
+        title: T('app.tour.adoptAdopter.summary.title', 'Balances'),
+        body: T('app.tour.adoptAdopter.summary.body', 'See how many plants you’ve adopted and your test $GROWTOO balance.'),
       },
       {
         id: 'cards',
         view: 'adopt',
         selectors: ['#adopt-token-grid', '#adopt-market-cta'],
-        title: 'Plant cards',
-        body: 'Open a card for stage, care unlock, and history. Browse Market if the garden is empty.',
+        title: T('app.tour.adoptAdopter.cards.title', 'Plant cards'),
+        body: T('app.tour.adoptAdopter.cards.body', 'Open a card for stage, care unlock, and history. Browse Market if the garden is empty.'),
       },
     ];
   }
@@ -371,29 +364,29 @@
         id: 'list-form',
         view: 'market',
         selectors: ['#market-list-section', '#market-list-form'],
-        title: 'Post an ask',
-        body: 'Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.',
+        title: T('app.tour.marketGrower.list_form.title', 'Post an ask'),
+        body: T('app.tour.marketGrower.list_form.body', 'Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.'),
       },
       {
         id: 'offer-type',
         view: 'market',
         selectors: ['.market-offer-compare', '#market-list-section'],
-        title: 'Offer types',
-        body: 'Instant sale pays you in full at purchase. Adopt stake: half now, half after care months qualify.',
+        title: T('app.tour.marketGrower.offer_type.title', 'Offer types'),
+        body: T('app.tour.marketGrower.offer_type.body', 'Instant sale pays you in full at purchase. Adopt stake: half now, half after care months qualify.'),
       },
       {
         id: 'my-offers',
         view: 'market',
         selectors: ['#market-mine-grid'],
-        title: 'My offers',
-        body: 'Track active, adopted, and cancelled listings here — including harvest claim when ready.',
+        title: T('app.tour.marketGrower.my_offers.title', 'My offers'),
+        body: T('app.tour.marketGrower.my_offers.body', 'Track active, adopted, and cancelled listings here — including harvest claim when ready.'),
       },
       {
         id: 'open-board',
         view: 'market',
         selectors: ['#market-grid'],
-        title: 'Open market',
-        body: 'Other growers’ live asks. Useful to see how the board looks to adopters.',
+        title: T('app.tour.marketGrower.open_board.title', 'Open market'),
+        body: T('app.tour.marketGrower.open_board.body', 'Other growers’ live asks. Useful to see how the board looks to adopters.'),
       },
     ];
   }
@@ -404,22 +397,22 @@
         id: 'faucet',
         view: 'market',
         selectors: ['#test-faucet-panel', '#market-adopter-guide'],
-        title: 'Test faucet',
-        body: 'Claim free Devnet $GROWTOO once a day before you invest.',
+        title: T('app.tour.marketAdopter.faucet.title', 'Test faucet'),
+        body: T('app.tour.marketAdopter.faucet.body', 'Claim free Devnet $GROWTOO once a day before you invest.'),
       },
       {
         id: 'guide',
         view: 'market',
         selectors: ['#market-adopter-guide'],
-        title: 'How adopting works',
-        body: 'Instant sale vs Adopt stake, then follow the plant in My garden after settle.',
+        title: T('app.tour.marketAdopter.guide.title', 'How adopting works'),
+        body: T('app.tour.marketAdopter.guide.body', 'Instant sale vs Adopt stake, then follow the plant in My garden after settle.'),
       },
       {
         id: 'board',
         view: 'market',
         selectors: ['#market-grid'],
-        title: 'Live asks',
-        body: 'Tap Invest on a card. Connect a Devnet wallet when prompted.',
+        title: T('app.tour.marketAdopter.board.title', 'Live asks'),
+        body: T('app.tour.marketAdopter.board.body', 'Tap Invest on a card. Connect a Devnet wallet when prompted.'),
       },
     ];
   }
@@ -467,12 +460,18 @@
       '<h2 class="product-tour-title" id="product-tour-title"></h2>' +
       '<p class="product-tour-body" id="product-tour-body"></p>' +
       '<div class="product-tour-actions">' +
-      '<button type="button" class="btn btn-ghost btn-sm" id="product-tour-skip">Skip tour</button>' +
-      '<button type="button" class="btn btn-ghost btn-sm" id="product-tour-back" hidden>Back</button>' +
-      '<button type="button" class="btn btn-primary btn-sm" id="product-tour-next">Next</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="product-tour-skip"></button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" id="product-tour-back" hidden></button>' +
+      '<button type="button" class="btn btn-primary btn-sm" id="product-tour-next"></button>' +
       '</div>' +
       '</div>';
     document.body.appendChild(root);
+
+    /* Labels are written as text, not interpolated into the markup above —
+       this file has no escaping helper, and textContent needs none. */
+    document.getElementById('product-tour-skip').textContent = T('app.tour.skip', 'Skip tour');
+    document.getElementById('product-tour-back').textContent = T('app.tour.back', 'Back');
+    document.getElementById('product-tour-next').textContent = T('app.tour.next', 'Next');
 
     document.getElementById('product-tour-skip').addEventListener('click', function () {
       finish({ skipped: true });
@@ -571,13 +570,17 @@
     document.body.classList.add('product-tour-open');
 
     document.getElementById('product-tour-step').textContent =
-      'Step ' + (active.index + 1) + ' / ' + total;
+      T('app.tour.stepCounter', 'Step {n} / {total}', {
+        n: active.index + 1,
+        total: total,
+      });
     document.getElementById('product-tour-title').textContent = step.title || '';
     document.getElementById('product-tour-body').textContent = step.body || '';
     var back = document.getElementById('product-tour-back');
     var next = document.getElementById('product-tour-next');
     back.hidden = active.index === 0;
-    next.textContent = active.index >= total - 1 ? 'Finish' : 'Next';
+    next.textContent =
+      active.index >= total - 1 ? T('app.tour.finish', 'Finish') : T('app.tour.next', 'Next');
 
     writeState(active.scriptId, active.uid, {
       step: active.index,

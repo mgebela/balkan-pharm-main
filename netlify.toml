@@ -47,6 +47,20 @@
   status = 200
   force = true
 
+# ── /hr/*, /de/* → the same files, rendered in that language ─
+# One rule per language, and nothing else: the i18n runtime reads the prefix
+# off the URL, so the page, its assets and its relative links all resolve
+# from the English file. Adding a language means adding a pair here.
+[[redirects]]
+  from = "/hr/*"
+  to = "/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/de/*"
+  to = "/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/404.html"

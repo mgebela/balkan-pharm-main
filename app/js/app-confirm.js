@@ -106,17 +106,17 @@
 
     if (!ui.overlay || !ui.ok || !ui.cancel || !ui.title) {
       const fallback =
-        (opts.title ? opts.title + '\n\n' : '') + (opts.body || 'Continue?');
+        (opts.title ? opts.title + '\n\n' : '') + (opts.body || T('app.confirm.body', 'Continue?'));
       return Promise.resolve(window.confirm(fallback));
     }
 
     if (pending) finish(false);
 
     lastFocus = document.activeElement;
-    ui.title.textContent = opts.title || 'Confirm';
+    ui.title.textContent = opts.title || T('app.confirm.title', 'Confirm');
     setBody(ui, opts.body || '');
-    ui.ok.textContent = opts.confirmLabel || 'Confirm';
-    ui.cancel.textContent = opts.cancelLabel || 'Cancel';
+    ui.ok.textContent = opts.confirmLabel || T('app.confirm.ok', 'Confirm');
+    ui.cancel.textContent = opts.cancelLabel || T('app.confirm.cancel', 'Cancel');
     ui.ok.classList.toggle('btn-danger', !!opts.danger);
     ui.ok.classList.toggle('btn-primary', !opts.danger);
     if (ui.sheet) {

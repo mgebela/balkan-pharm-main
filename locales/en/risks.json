@@ -1,0 +1,37 @@
+{
+  "div": "<strong>Solana Devnet</strong> <span>Test market only. Seed NFTs &amp; $GROWTOO have <em>no monetary value</em>.</span> <a href=\"./\">Risks</a>",
+  "main-nav": {
+    "nav": "<a href=\"../index.html#adopters\" class=\"nav-link\">Adopters</a> <a href=\"../rwa-docs/\" class=\"nav-link\">Docs</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Sign in</a>"
+  },
+  "span2": "SCOPE",
+  "h1": "Risks &amp; scope",
+  "p": "Honest limits of the Devnet MVP: what adopting a plant means today, and what it does not.",
+  "div2": "<span>Read before you desk in</span> <span class=\"desk-panel-meta\">DEVNET</span>",
+  "span3": "NET",
+  "h2": "Devnet only: no monetary value",
+  "p2": "All Seed NFTs and <strong>$GROWTOO</strong> on growtoo today live on <strong>Solana Devnet</strong>. They are for product testing. They are not mainnet assets, they are not cash equivalents, and they carry <strong>no monetary value</strong>.",
+  "ask": {
+    "span": "ASK",
+    "h2": "How prices form",
+    "p": "There is no bonding curve and no price oracle. A grower (or seller) sets an ask in <strong>$GROWTOO</strong> when they list. An adopter fills that ask through the marketplace escrow. Last price on the board is the most recent listed ask (or sample depth when the live tape is empty)."
+  },
+  "span4": "TRU",
+  "h22": "Trust model (centralized MVP)",
+  "p3": "One collection authority currently controls metadata updates, stage reward minting, and escrow settlement. Stage “proof” means the operator checked that a journal advance exists, not an independent oracle, photo attestation, or IoT feed. Fabricated journal entries are a real residual risk for adopters until verification hardens.",
+  "span5": "RWA",
+  "h23": "What “adopting” means today",
+  "p4": "On Devnet, adopting means holding a test RWA and following the linked journal. It does <strong>not</strong> create a transferable legal title to physical CBD plant material, custody rights, or a guaranteed harvest payout. Redemption into a real harvest share is specified in architecture docs but is still a <strong>mock / planned</strong> path.",
+  "span6": "LAW",
+  "h24": "Regulation &amp; CBD logistics",
+  "p5": "CBD and related plant material are regulated differently by jurisdiction. Any future physical redemption would need to comply with local law, licensing, custody, shipping, and KYC/AML where required. growtoo does not currently operate a licensed fulfillment pipeline. Nothing on this site is legal, tax, or investment advice.",
+  "span7": "AUD",
+  "h25": "Audit &amp; team",
+  "p6": "The mint-queue authority is a single operational trust point. A third-party audit is planned before any mainnet launch, not claimed as done. Public code and addresses live in the open repository and <a href=\"../rwa-docs/\">architecture docs</a>.",
+  "p7": "More detail: <a href=\"../rwa-docs/\">RWA architecture</a> · <a href=\"https://github.com/mgebela/balkan-pharm-main\">GitHub</a> · <a href=\"../index.html\">Back to growtoo</a>",
+  "p8": "Solana Devnet MVP. Tokens have no monetary value. Not an offer of securities or a claim on physical CBD.",
+  "div3": "<a href=\"../privacy/\">Privacy</a> <a href=\"../terms/\">Terms</a> <a href=\"../rwa-docs/\">Docs</a> <a href=\"../index.html\">Home</a>",
+  "p9": "© growtoo. All rights reserved.",
+  "meta": {
+    "title": "Risks &amp; scope · growtoo"
+  }
+}

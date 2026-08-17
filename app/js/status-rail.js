@@ -33,7 +33,7 @@
 
     const items = steps
       .map(function (step, i) {
-        const label = esc((step && step.label) || 'Step');
+        const label = esc((step && step.label) || T('app.statusRail.step', 'Step'));
         let cls = 'status-rail-step';
         if (tone === 'fail' && i === failAt) {
           cls += ' status-rail-step--fail';
@@ -66,7 +66,10 @@
     return (
       '<div class="status-rail status-rail--' +
       tone +
-      '" role="list" aria-label="Process status">' +
+      // i18n-ignore — markup, the label itself is translated below.
+      '" role="list" aria-label="' +
+      esc(T('app.statusRail.ariaLabel', 'Process status')) +
+      '">' +
       '<ol class="status-rail-track">' +
       items +
       '</ol>' +
@@ -92,15 +95,15 @@
 
     if (settlement === 'program') {
       const steps = [
-        { key: 'sign', label: 'Sign buy' },
-        { key: 'done', label: 'Confirmed' },
+        { key: 'sign', label: T('app.statusRail.signBuy', 'Sign buy') },
+        { key: 'done', label: T('app.statusRail.confirmed', 'Confirmed') },
       ];
       if (status === 'failed') {
         return html({
           steps: steps,
           currentIndex: 0,
           tone: 'fail',
-          caption: err || 'Buy failed on Devnet.',
+          caption: err || T('app.statusRail.buyFailedOnDevnet', 'Buy failed on Devnet.'),
         });
       }
       if (status === 'sold') {
@@ -108,7 +111,7 @@
           steps: steps,
           currentIndex: 2,
           tone: 'ok',
-          caption: 'NFT is in your wallet.',
+          caption: T('app.statusRail.nftIsInYour', 'NFT is in your wallet.'),
         });
       }
       if (status === 'sale_pending' || hasConfirmedPayment(L)) {
@@ -116,21 +119,21 @@
           steps: steps,
           currentIndex: 1,
           tone: 'pending',
-          caption: 'Confirming on-chain buy…',
+          caption: T('app.statusRail.confirmingOnChainBuy', 'Confirming on-chain buy…'),
         });
       }
       return html({
         steps: steps,
         currentIndex: 0,
         tone: 'pending',
-        caption: 'Approve the buy in your wallet.',
+        caption: T('app.statusRail.approveTheBuyIn', 'Approve the buy in your wallet.'),
       });
     }
 
     const steps = [
-      { key: 'pay', label: 'Pay $GROWTOO' },
-      { key: 'settle', label: 'Settling' },
-      { key: 'nft', label: 'NFT ready' },
+      { key: 'pay', label: T('app.statusRail.payGrowtoo', 'Pay $GROWTOO') },
+      { key: 'settle', label: T('app.statusRail.settling', 'Settling') },
+      { key: 'nft', label: T('app.statusRail.nftReady', 'NFT ready') },
     ];
 
     if (status === 'failed') {
@@ -139,7 +142,7 @@
         steps: steps,
         currentIndex: paid ? 1 : 0,
         tone: 'fail',
-        caption: err || 'Investment failed. Check payment and try again.',
+        caption: err || T('app.statusRail.investmentFailedCheckPayment', 'Investment failed. Check payment and try again.'),
       });
     }
     if (status === 'sold') {
@@ -158,15 +161,15 @@
           tone: 'pending',
           caption:
             settlement === 'adopt_stake'
-              ? 'Payment seen — settling 50% to grower, locking 50%…'
-              : 'Payment seen — releasing NFT from escrow…',
+              ? T('app.statusRail.paymentSeenStake', 'Payment seen — settling 50% to grower, locking 50%…')
+              : T('app.statusRail.paymentSeenSale', 'Payment seen — releasing NFT from escrow…'),
         });
       }
       return html({
         steps: steps,
         currentIndex: 0,
         tone: 'pending',
-        caption: 'Complete $GROWTOO payment in your wallet.',
+        caption: T('app.statusRail.completeGrowtooPaymentIn', 'Complete $GROWTOO payment in your wallet.'),
       });
     }
     return '';
@@ -193,11 +196,15 @@
       careStatus === 'refunded' ||
       claimStatus === 'released' ||
       claimStatus === 'refunded';
-    const endLabel =
-      careStatus === 'refunded' || claimStatus === 'refunded' ? 'Refunded' : 'Released';
+    /* Decide on the state, not on the words: endLabel is display copy and
+       changes with the language, so the branch below tests the flag. */
+    const refunded = careStatus === 'refunded' || claimStatus === 'refunded';
+    const endLabel = refunded
+      ? T('app.statusRail.refunded', 'Refunded')
+      : T('app.statusRail.released', 'Released');
     const steps = [
-      { key: 'filed', label: 'Claimed' },
-      { key: 'queue', label: 'Queue' },
+      { key: 'filed', label: T('app.statusRail.claimed', 'Claimed') },
+      { key: 'queue', label: T('app.statusRail.queue', 'Queue') },
       { key: 'done', label: endLabel },
     ];
 
@@ -206,7 +213,7 @@
         steps: steps,
         currentIndex: 1,
         tone: 'fail',
-        caption: err || 'Claim failed — check care months and retry.',
+        caption: err || T('app.statusRail.claimFailedCheckCare', 'Claim failed — check care months and retry.'),
       });
     }
     if (settled) {
@@ -214,10 +221,9 @@
         steps: steps,
         currentIndex: 3,
         tone: 'ok',
-        caption:
-          endLabel === 'Refunded'
-            ? 'Locked $GROWTOO returned to the adopter.'
-            : 'Locked $GROWTOO released to the grower.',
+        caption: refunded
+          ? T('app.statusRail.lockedReturned', 'Locked $GROWTOO returned to the adopter.')
+          : T('app.statusRail.lockedReleased', 'Locked $GROWTOO released to the grower.'),
       });
     }
     if (claimStatus === 'pending' || src.optimisticPending) {
@@ -225,7 +231,7 @@
         steps: steps,
         currentIndex: 1,
         tone: 'pending',
-        caption: 'Queued — adopt worker validates care months next pass (~5 min).',
+        caption: T('app.statusRail.queuedAdoptWorkerValidates', 'Queued — adopt worker validates care months next pass (~5 min).'),
       });
     }
     return '';
@@ -236,8 +242,8 @@
     const L = listing || {};
     const status = String(L.status || '');
     const steps = [
-      { key: 'escrow', label: 'Escrow' },
-      { key: 'live', label: 'Live' },
+      { key: 'escrow', label: T('app.statusRail.escrow', 'Escrow') },
+      { key: 'live', label: T('app.statusRail.live', 'Live') },
       { key: 'end', label: status === 'cancelled' || status === 'cancel_requested' ? 'Cancel' : 'Sold' },
     ];
     const err = String(L.error || L.lastError || '').trim();
@@ -247,7 +253,7 @@
         steps: steps,
         currentIndex: 0,
         tone: 'fail',
-        caption: err || 'Listing failed.',
+        caption: err || T('app.statusRail.listingFailed', 'Listing failed.'),
       });
     }
     if (status === 'escrow_pending') {
@@ -255,7 +261,7 @@
         steps: steps,
         currentIndex: 0,
         tone: 'pending',
-        caption: 'Waiting for NFT in escrow…',
+        caption: T('app.statusRail.waitingForNftIn', 'Waiting for NFT in escrow…'),
       });
     }
     if (status === 'active') {
@@ -263,19 +269,19 @@
         steps: steps,
         currentIndex: 1,
         tone: 'ok',
-        caption: 'Open for investment.',
+        caption: T('app.statusRail.openForInvestment', 'Open for investment.'),
       });
     }
     if (status === 'sale_pending') {
       return html({
         steps: [
-          { key: 'escrow', label: 'Escrow' },
-          { key: 'live', label: 'Live' },
-          { key: 'settle', label: 'Settling' },
+          { key: 'escrow', label: T('app.statusRail.escrow', 'Escrow') },
+          { key: 'live', label: T('app.statusRail.live', 'Live') },
+          { key: 'settle', label: T('app.statusRail.settling', 'Settling') },
         ],
         currentIndex: 2,
         tone: 'pending',
-        caption: 'Buyer paid — settling NFT…',
+        caption: T('app.statusRail.buyerPaidSettlingNft', 'Buyer paid — settling NFT…'),
       });
     }
     if (status === 'cancel_requested') {
@@ -283,19 +289,19 @@
         steps: steps,
         currentIndex: 2,
         tone: 'pending',
-        caption: 'Returning NFT to grower…',
+        caption: T('app.statusRail.returningNftToGrower', 'Returning NFT to grower…'),
       });
     }
     if (status === 'sold') {
       return html({
         steps: [
-          { key: 'escrow', label: 'Escrow' },
-          { key: 'live', label: 'Live' },
-          { key: 'end', label: 'Sold' },
+          { key: 'escrow', label: T('app.statusRail.escrow', 'Escrow') },
+          { key: 'live', label: T('app.statusRail.live', 'Live') },
+          { key: 'end', label: T('app.statusRail.sold', 'Sold') },
         ],
         currentIndex: 3,
         tone: 'ok',
-        caption: 'Adopted by buyer.',
+        caption: T('app.statusRail.adoptedByBuyer', 'Adopted by buyer.'),
       });
     }
     if (status === 'cancelled') {
@@ -303,7 +309,7 @@
         steps: steps,
         currentIndex: 3,
         tone: 'ok',
-        caption: 'Offer cancelled.',
+        caption: T('app.statusRail.offerCancelled', 'Offer cancelled.'),
       });
     }
     return '';
@@ -314,16 +320,16 @@
     const o = opts || {};
     const mint = mintRecord || null;
     const steps = [
-      { key: 'queued', label: 'Queued' },
-      { key: 'minting', label: 'Minting' },
-      { key: 'minted', label: 'Minted' },
+      { key: 'queued', label: T('app.statusRail.queued', 'Queued') },
+      { key: 'minting', label: T('app.statusRail.minting', 'Minting') },
+      { key: 'minted', label: T('app.statusRail.minted', 'Minted') },
     ];
     if (!mint) {
       return html({
         steps: steps,
         currentIndex: 0,
         tone: 'pending',
-        caption: o.caption || 'Devnet mint requested…',
+        caption: o.caption || T('app.statusRail.mintRequested', 'Devnet mint requested…'),
       });
     }
     const st = String(mint.status || 'pending');
@@ -332,7 +338,9 @@
         steps: steps,
         currentIndex: 1,
         tone: 'fail',
-        caption: (mint.error && String(mint.error).slice(0, 160)) || 'Devnet mint failed.',
+        caption:
+          (mint.error && String(mint.error).slice(0, 160)) ||
+          T('app.statusRail.mintFailed', 'Devnet mint failed.'),
       });
     }
     if (st === 'minted' && mint.mintAddress) {
@@ -340,7 +348,7 @@
         steps: steps,
         currentIndex: 3,
         tone: 'ok',
-        caption: o.caption || 'Minted on Devnet.',
+        caption: o.caption || T('app.statusRail.mintDone', 'Minted on Devnet.'),
       });
     }
     // pending / processing
@@ -348,7 +356,7 @@
       steps: steps,
       currentIndex: st === 'pending' && !mint.signature ? 0 : 1,
       tone: 'pending',
-      caption: o.caption || 'Mint queue working on Devnet…',
+      caption: o.caption || T('app.statusRail.mintQueueWorking', 'Mint queue working on Devnet…'),
     });
   }
 

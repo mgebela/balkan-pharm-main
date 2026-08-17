@@ -6,21 +6,37 @@
   'use strict';
 
   var STORAGE_VIEW = 'dnevnik-live-journal-view';
-  var WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  var MONTHS = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
+  /* Weekday and month names come from Intl in the reader's language rather
+     than a hand-kept list: every locale then gets its own names, its own
+     abbreviations and its own capitalisation for free. Monday-first, which
+     is what growers here expect and what the grid is built around. */
+  function intlTag() {
+    return (window.I18N && window.I18N.locale) || 'en';
+  }
+
+  function weekdayNames() {
+    try {
+      var fmt = new Intl.DateTimeFormat(intlTag(), { weekday: 'short' });
+      var out = [];
+      for (var i = 0; i < 7; i++) {
+        // 2024-01-01 was a Monday.
+        out.push(fmt.format(new Date(Date.UTC(2024, 0, 1 + i))));
+      }
+      return out;
+    } catch (e) {
+      return ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    }
+  }
+
+  function monthName(monthIndex, style) {
+    try {
+      return new Intl.DateTimeFormat(intlTag(), { month: style || 'long' }).format(
+        new Date(Date.UTC(2024, monthIndex, 1))
+      );
+    } catch (e) {
+      return String(monthIndex + 1);
+    }
+  }
 
   var cursor = null; // { y, m } 0-based month
   var selectedYmd = null;
@@ -232,7 +248,15 @@
   function formatLong(ymd) {
     var p = parseYmd(ymd);
     if (!p) return ymd;
-    return p.d + ' ' + MONTHS[p.m].slice(0, 3) + ' ' + p.y;
+    try {
+      return new Intl.DateTimeFormat(intlTag(), {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      }).format(new Date(Date.UTC(p.y, p.m, p.d)));
+    } catch (e) {
+      return p.d + ' ' + monthName(p.m, 'short') + ' ' + p.y;
+    }
   }
 
   function render(host, opts) {
@@ -244,7 +268,7 @@
     var marks = buildMarks(o.entries, o.plants, o.filterIds);
     var wx = weatherByDate();
     var cells = monthCells(c.y, c.m);
-    var title = MONTHS[c.m] + ' ' + c.y;
+    var title = monthName(c.m) + ' ' + c.y;
 
     host.innerHTML =
       '<div class="journal-cal">' +
@@ -254,10 +278,12 @@
       escapeHtml(title) +
       '</strong>' +
       '<button type="button" class="journal-cal-nav-btn" data-cal-nav="1" aria-label="Next month">›</button>' +
-      '<button type="button" class="btn btn-ghost btn-sm journal-cal-today" data-cal-today>Today</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm journal-cal-today" data-cal-today>' +
+      escapeHtml(T('app.calendar.today', 'Today')) +
+      '</button>' +
       '</div>' +
       '<div class="journal-cal-weekdays" aria-hidden="true">' +
-      WEEKDAYS.map(function (w) {
+      weekdayNames().map(function (w) {
         return '<span>' + w + '</span>';
       }).join('') +
       '</div>' +
@@ -282,18 +308,27 @@
               : '';
           var dots = '';
           if (cell.logs) {
-            dots += '<i class="journal-cal-dot journal-cal-dot--log" title="Logged"></i>';
+            dots +=
+              '<i class="journal-cal-dot journal-cal-dot--log" title="' +
+              escapeHtml(T('app.calendar.logged', 'Logged')) +
+              '"></i>';
           }
           if (cell.dueWater) {
-            dots += '<i class="journal-cal-dot journal-cal-dot--water" title="Water due"></i>';
+            dots +=
+              '<i class="journal-cal-dot journal-cal-dot--water" title="' +
+              escapeHtml(T('app.calendar.waterDue', 'Water due')) +
+              '"></i>';
           }
           if (cell.dueFeed) {
-            dots += '<i class="journal-cal-dot journal-cal-dot--feed" title="Feed due"></i>';
+            dots +=
+              '<i class="journal-cal-dot journal-cal-dot--feed" title="' +
+              escapeHtml(T('app.calendar.feedDue', 'Feed due')) +
+              '"></i>';
           }
-          var label = 'Open ' + formatLong(ymd);
-          if (cell.dueWater) label += ', watering due';
-          if (cell.dueFeed) label += ', feeding due';
-          if (cell.logs) label += ', has logs';
+          var label = T('app.calendar.openDay', 'Open {date}', { date: formatLong(ymd) });
+          if (cell.dueWater) label += ', ' + T('app.calendar.wateringDue', 'watering due');
+          if (cell.dueFeed) label += ', ' + T('app.calendar.feedingDue', 'feeding due');
+          if (cell.logs) label += ', ' + T('app.calendar.hasLogs', 'has logs');
           return (
             '<button type="button" class="' +
             cls.join(' ') +
@@ -317,17 +352,27 @@
         .join('') +
       '</div>' +
       '<p class="journal-cal-legend">' +
-      '<span><i class="journal-cal-dot journal-cal-dot--log"></i> Logged</span>' +
-      '<span><i class="journal-cal-dot journal-cal-dot--water"></i> Water due</span>' +
-      '<span><i class="journal-cal-dot journal-cal-dot--feed"></i> Feed due</span>' +
-      '<span class="journal-cal-legend-wx">° from your forecast</span>' +
+      '<span><i class="journal-cal-dot journal-cal-dot--log"></i> ' +
+      escapeHtml(T('app.calendar.logged', 'Logged')) +
+      '</span>' +
+      '<span><i class="journal-cal-dot journal-cal-dot--water"></i> ' +
+      escapeHtml(T('app.calendar.waterDue', 'Water due')) +
+      '</span>' +
+      '<span><i class="journal-cal-dot journal-cal-dot--feed"></i> ' +
+      escapeHtml(T('app.calendar.feedDue', 'Feed due')) +
+      '</span>' +
+      '<span class="journal-cal-legend-wx">' +
+      escapeHtml(T('app.calendar.fromForecast', '° from your forecast')) +
+      '</span>' +
       '</p>' +
       '<div class="journal-cal-panel">' +
       '<div class="journal-cal-panel-head">' +
       '<strong>' +
       escapeHtml(formatLong(selectedYmd)) +
       '</strong>' +
-      '<button type="button" class="btn btn-primary btn-tap" data-cal-log>Log this day</button>' +
+      '<button type="button" class="btn btn-primary btn-tap" data-cal-log>' +
+      escapeHtml(T('app.calendar.logThisDay', 'Log this day')) +
+      '</button>' +
       '</div>' +
       '<p class="journal-cal-panel-hint" id="journal-cal-panel-hint"></p>' +
       '</div>' +
@@ -339,16 +384,15 @@
       var bits = [];
       if (sel.logs) {
         bits.push(
-          (sel.stackCount || 1) +
-            ' stack' +
-            (sel.stackCount === 1 ? '' : 's') +
-            ' logged'
+          T('app.calendar.stacksLogged', '{count} stacks logged', {
+            count: sel.stackCount || 1,
+          })
         );
       } else {
-        bits.push('No logs yet');
+        bits.push(T('app.calendar.noLogs', 'No logs yet'));
       }
-      if (sel.dueWater) bits.push('watering due');
-      if (sel.dueFeed) bits.push('feeding due');
+      if (sel.dueWater) bits.push(T('app.calendar.wateringDue', 'watering due'));
+      if (sel.dueFeed) bits.push(T('app.calendar.feedingDue', 'feeding due'));
       var wsel = wx[selectedYmd];
       if (wsel && wsel.temp != null) {
         bits.push(wsel.temp + '°' + (wsel.heat ? ' heat' : '') + (wsel.wet ? ' rain' : ''));

@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../terms/\" class=\"nav-link\">Uvjeti</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Prijava</a>"
+  },
+  "span2": "PRAVNO",
+  "h1": "Pravila privatnosti",
+  "p": "Zadnja izmjena: 29. srpnja 2026. Ovdje piše što growtoo prikuplja i zašto — jednostavnim jezikom. Ovo ne zamjenjuje pravni savjet.",
+  "div": "<span>Operater</span> <span class=\"desk-panel-meta\">growto.live</span>",
+  "span3": "TKO",
+  "h2": "Tko smo mi",
+  "p2": "growtoo (dnevnik uzgoja i izborne značajke na Solaninoj testnoj mreži na <strong>growto.live</strong>) vodi se za testiranje proizvoda i rane korisnike. Kontakt za pitanja o privatnosti: <a href=\"mailto:hello@growto.live\">hello@growto.live</a>.",
+  "span4": "PODA",
+  "h22": "Što prikupljamo",
+  "p3": "<strong>Račun:</strong> e-mail adresa, lozinka (kriptirana putem Firebase Autha), neobavezno ime za prikaz, vrsta profila (uzgajivač / posvojitelj) i vremena prijava.<br /> <strong>Dnevnik:</strong> zapisi o biljkama, zapisi njege, fotografije koje učitaš, bilješke i pripadajući metapodaci uzgoja.<br /> <strong>Izborno kripto:</strong> javne Solana adrese koje povežeš i aktivnost na lancu koju zrcalimo za Tokeniziraj / Tržnicu.<br /> <strong>Otprilike lokacija:</strong> grad koji upišeš radi vremenske prognoze (ne precizni GPS, osim ako sam zalijepiš koordinate u bilješke).<br /> <strong>Uređaj / korištenje:</strong> nužna pohrana u pregledniku za sesiju i postavke; neobavezna analitika samo uz tvoj pristanak.",
+  "span5": "ZAŠT",
+  "h23": "Zašto to obrađujemo",
+  "p4": "Da bismo pružili dnevnik i povezane značajke, osigurali tvoj račun, prikazali vrijeme za tvoj grad, vodili izborne tokove Devnet tržnice, poboljšali pouzdanost i ispunili zakonske obveze. Pravne osnove prema GDPR-u obično uključuju ugovor (pružanje usluge), privolu (neobavezna analitika / marketing) i legitimni interes (sigurnost, sprječavanje zlouporabe) gdje je primjenjivo.",
+  "span6": "DIJ",
+  "h24": "Izvršitelji obrade i dijeljenje",
+  "p5": "Koristimo pružatelje usluga poput <strong>Google Firebasea</strong> (autentikacija, Firestore hosting) i, ako pristaneš, <strong>Google Analyticsa</strong>. Radnje s novčanikom idu kroz novčanik koji si odabrao i javnu Solana mrežu — to je izvan naše privatne baze. Tvoje osobne podatke ne prodajemo.",
+  "span7": "ČUVA",
+  "h25": "Koliko čuvamo",
+  "p6": "Podatke računa i dnevnika čuvamo dok je račun aktivan. Brisanje računa i pripadajućih podataka dnevnika možeš zatražiti e-mailom. Sigurnosne kopije i zapisi mogu ostati ograničeno vrijeme radi sigurnosti. Zapise na Solana lancu ne možemo obrisati.",
+  "span8": "PRAV",
+  "h26": "Tvoja prava (EU/EGP)",
+  "p7": "Možeš zatražiti pristup, ispravak, brisanje, ograničenje, prenosivost ili se usprotiviti određenoj obradi. Ondje gdje se oslanjamo na privolu, možeš je povući (npr. analitiku putem postavki kolačića / brisanjem pohrane privole). Pritužbu možeš podnijeti svom nadzornom tijelu (u Hrvatskoj AZOP).",
+  "span9": "KOLA",
+  "h27": "Kolačići i lokalna pohrana",
+  "p8": "<strong>Nužno:</strong> sesija prijave, potvrda dobi, izbor kolačića, postavke dnevnika i slična pohrana bez koje aplikacija ne radi.<br /> <strong>Analitika:</strong> tek nakon što odabereš „Prihvati sve” na traci s kolačićima.",
+  "span10": "DOB",
+  "h28": "Dob",
+  "p9": "Usluga je namijenjena odraslima <strong>18+</strong>. Svjesno ne prikupljamo podatke djece. Ako misliš da je maloljetnik otvorio račun, javi nam se da ga uklonimo.",
+  "p10": "<a href=\"../terms/\">Uvjeti korištenja</a> · <a href=\"../risks/\">Rizici</a> · <a href=\"../index.html\">Natrag na growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Privatnost</a> <a href=\"../terms/\">Uvjeti</a> <a href=\"../risks/\">Rizici</a>",
+  "p11": "© growtoo. Sva prava pridržana.",
+  "meta": {
+    "title": "Pravila privatnosti · growtoo"
+  }
+}

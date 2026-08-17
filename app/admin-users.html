@@ -7,8 +7,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;650&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+  <script>
+    /* T() must exist before any app script runs, even if i18n.js fails to
+       load — app/js/* calls it for every piece of copy. i18n.js replaces
+       this stub with the real lookup. */
+    window.T = function (key, en, vars) {
+      return String(en).replace(/\{(\w+)\}/g, function (whole, name) {
+        return vars && name in vars ? vars[name] : whole;
+      });
+    };
+  </script>
+  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,app"></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
   <link rel="stylesheet" href="styles/app.css?v=20260731c" />
+  <link rel="stylesheet" href="../styles/i18n.css?v=20260817a" />
   <style>
     body {
       font-family: var(--font);
@@ -221,7 +233,8 @@
 <div class="modal" id="userModal"></div>
 
 <script src="../js/appcheck-config.js?v=20260803a"></script>
-<script type="module" src="js/admin.js?v=20260804a"></script>
+<script type="module" src="js/admin.js?v=20260817b"></script>
 
+  <div class="lang-switch-floating"><div class="nav-lang" data-i18n-switcher></div></div>
 </body>
 </html>

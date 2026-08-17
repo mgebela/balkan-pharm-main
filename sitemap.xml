@@ -1,43 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://growto.live/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/" />
   </url>
   <url>
     <loc>https://growto.live/rwa-docs/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/rwa-docs/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/rwa-docs/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/rwa-docs/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/rwa-docs/" />
   </url>
   <url>
     <loc>https://growto.live/risks/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/risks/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/risks/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/risks/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/risks/" />
   </url>
   <url>
     <loc>https://growto.live/privacy/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/privacy/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/privacy/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/privacy/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/privacy/" />
   </url>
   <url>
     <loc>https://growto.live/terms/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/terms/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/terms/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/terms/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/terms/" />
   </url>
   <url>
     <loc>https://growto.live/dnevnik/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/dnevnik/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/dnevnik/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/dnevnik/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/dnevnik/" />
   </url>
   <url>
     <loc>https://growto.live/journal/</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://growto.live/journal/" />
+    <xhtml:link rel="alternate" hreflang="hr" href="https://growto.live/hr/journal/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://growto.live/de/journal/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://growto.live/journal/" />
   </url>
   <url>
     <loc>https://journal.growto.live/</loc>
     <changefreq>daily</changefreq>
     <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://journal.growto.live/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://journal.growto.live/" />
   </url>
 </urlset>

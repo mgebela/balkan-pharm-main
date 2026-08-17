@@ -123,10 +123,22 @@
     const t = Date.parse(iso);
     if (!Number.isFinite(t)) return '';
     const sec = Math.round((Date.now() - t) / 1000);
-    if (sec < 60) return 'just now';
-    if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
-    if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
-    return Math.floor(sec / 86400) + 'd ago';
+    /* Intl words this per language; only "just now" needs a key. */
+    const tag = (window.I18N && window.I18N.locale) || 'en';
+    function rel(value, unit) {
+      try {
+        return new Intl.RelativeTimeFormat(tag, { numeric: 'auto', style: 'short' }).format(
+          -value,
+          unit
+        );
+      } catch (e) {
+        return value + ' ' + unit;
+      }
+    }
+    if (sec < 60) return T('app.notif.justNow', 'just now');
+    if (sec < 3600) return rel(Math.floor(sec / 60), 'minute');
+    if (sec < 86400) return rel(Math.floor(sec / 3600), 'hour');
+    return rel(Math.floor(sec / 86400), 'day');
   }
 
   function navigateAction(action) {
@@ -160,19 +172,33 @@
       const unread = unreadCount();
       sub.textContent = items.length
         ? unread
-          ? unread + ' unread · ' + items.length + ' total'
-          : items.length + ' notification' + (items.length === 1 ? '' : 's')
-        : 'Stay on top of logs, stakes & rewards';
+          ? T('app.notif.unreadOfTotal', '{unread} unread · {total} total', {
+              unread: unread,
+              total: items.length,
+            })
+          : T('app.notif.count', '{count} notifications', { count: items.length })
+        : T('app.notif.tagline', 'Stay on top of logs, stakes & rewards');
     }
     if (!list) return;
     if (!items.length) {
       list.innerHTML =
         '<div class="empty-state notif-empty-state">' +
-        '<p class="adopt-empty-lead">Inbox is clear</p>' +
-        '<p class="adopt-empty-body">Care reminders, stake updates, and journal confirmations show up here — so nothing slips mid-cycle.</p>' +
+        '<p class="adopt-empty-lead">' +
+        esc(T('app.notif.emptyLead', 'Inbox is clear')) +
+        '</p>' +
+        '<p class="adopt-empty-body">' +
+        esc(
+          T(
+            'app.notif.emptyBody',
+            'Care reminders, stake updates, and journal confirmations show up here — so nothing slips mid-cycle.'
+          )
+        ) +
+        '</p>' +
         '</div>' +
         '<div class="notif-panel-foot">' +
-        '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">' +
+      esc(T('app.notif.loadExamples', 'Load examples')) +
+      '</button>' +
         '</div>';
       return;
     }
@@ -188,24 +214,28 @@
             '">' +
             '<span class="notif-item-dot" aria-hidden="true"></span>' +
             '<span class="notif-item-title">' +
-            esc(n.title || 'Update') +
+            esc(n.title || T('app.notif.update', 'Update')) +
             '</span>' +
             '<span class="notif-item-body">' +
             esc(n.body || '') +
             '</span>' +
             '<span class="notif-item-meta">' +
             '<span class="notif-chip">' +
-            esc(relativeTime(n.createdAt) || 'now') +
+            esc(relativeTime(n.createdAt) || T('app.notif.now', 'now')) +
             '</span>' +
             (typeLabel ? '<span class="notif-chip">' + esc(typeLabel) + '</span>' : '') +
-            (n.meta && n.meta.demo ? '<span class="notif-chip">example</span>' : '') +
+            (n.meta && n.meta.demo
+              ? '<span class="notif-chip">' + esc(T('app.notif.example', 'example')) + '</span>'
+              : '') +
             '</span>' +
             '</button>'
           );
         })
         .join('') +
       '<div class="notif-panel-foot">' +
-      '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">Load examples</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm notif-load-examples" id="notif-load-examples">' +
+      esc(T('app.notif.loadExamples', 'Load examples')) +
+      '</button>' +
       '</div>';
   }
 
@@ -223,7 +253,12 @@
     }
     if (btn) {
       btn.classList.toggle('has-unread', count > 0);
-      btn.setAttribute('aria-label', count ? 'Inbox, ' + count + ' unread' : 'Inbox');
+      btn.setAttribute(
+        'aria-label',
+        count
+          ? T('app.notif.bellAriaUnread', 'Inbox, {count} unread', { count: count })
+          : T('app.notif.bellAria', 'Inbox')
+      );
     }
     if (panelOpen) renderPanelList();
   }
@@ -442,8 +477,10 @@
             if (to === 'minted') {
               push({
                 type: 'seed_mint',
-                title: 'Seed NFT minted',
-                body: (m.name || 'Seed') + ' is on-chain.',
+                title: T('app.notif.seedMinted', 'Seed NFT minted'),
+                body: T('app.notif.seedMintedBody', '{plant} is on-chain.', {
+                  plant: m.name || T('app.stage.seed', 'Seed'),
+                }),
                 meta: { key: 'seed:' + id + ':minted', requestId: id, mintAddress: m.mintAddress },
                 action: { view: 'adopt' },
                 kind: 'success',
@@ -452,8 +489,8 @@
             } else if (to === 'failed') {
               push({
                 type: 'seed_mint',
-                title: 'Seed mint failed',
-                body: m.error || 'Check the Tokenise queue.',
+                title: T('app.notif.seedFailed', 'Seed mint failed'),
+                body: m.error || T('app.notif.seedFailedBody', 'Check the Tokenise queue.'),
                 meta: { key: 'seed:' + id + ':failed', requestId: id },
                 action: { view: 'adopt' },
                 kind: 'error',
@@ -469,8 +506,12 @@
             if (to === 'minted') {
               push({
                 type: 'growth_mint',
-                title: 'Growth stage minted',
-                body: (g.name || 'Plant') + ' → ' + (g.stage || 'next') + (g.reward ? ' · +' + g.reward + ' $GROWTOO' : ''),
+                title: T('app.notif.growthMinted', 'Growth stage minted'),
+                body:
+                  T('app.notif.growthMintedBody', '{plant} → {stage}', {
+                    plant: g.name || T('app.stack.plant', 'Plant'),
+                    stage: g.stage || T('app.notif.nextStage', 'next'),
+                  }) + (g.reward ? ' · +' + g.reward + ' $GROWTOO' : ''),
                 meta: { key: 'growth:' + id + ':minted', requestId: id, stage: g.stage },
                 action: { view: 'adopt', plantId: g.plantId || null },
                 kind: 'success',
@@ -479,8 +520,8 @@
             } else if (to === 'failed') {
               push({
                 type: 'growth_mint',
-                title: 'Growth mint failed',
-                body: g.error || 'Journal proof or queue error.',
+                title: T('app.notif.growthFailed', 'Growth mint failed'),
+                body: g.error || T('app.notif.growthFailedBody', 'Journal proof or queue error.'),
                 meta: { key: 'growth:' + id + ':failed', requestId: id },
                 action: { view: 'adopt' },
                 kind: 'error',
@@ -509,8 +550,12 @@
                 if (to === 'released') {
                   push({
                     type: 'harvest_claim',
-                    title: 'Harvest stake released',
-                    body: 'Locked $GROWTOO for "' + (l.name || 'plant') + '" released to you.',
+                    title: T('app.notif.stakeReleased', 'Harvest stake released'),
+                    body: T(
+                      'app.notif.stakeReleasedBody',
+                      'Locked $GROWTOO for "{plant}" released to you.',
+                      { plant: l.name || T('app.notif.plantLower', 'plant') }
+                    ),
                     meta: { key: 'harvest:' + l.id + ':released', listingId: l.id },
                     action: { view: 'market', listingId: l.id },
                     kind: 'success',
@@ -519,8 +564,12 @@
                 } else if (to === 'refunded') {
                   push({
                     type: 'harvest_claim',
-                    title: 'Harvest stake refunded',
-                    body: 'Locked $GROWTOO for "' + (l.name || 'plant') + '" returned to the adopter.',
+                    title: T('app.notif.stakeRefunded', 'Harvest stake refunded'),
+                    body: T(
+                      'app.notif.stakeRefundedBody',
+                      'Locked $GROWTOO for "{plant}" returned to the adopter.',
+                      { plant: l.name || T('app.notif.plantLower', 'plant') }
+                    ),
                     meta: { key: 'harvest:' + l.id + ':refunded', listingId: l.id },
                     action: { view: 'market', listingId: l.id },
                     kind: 'info',
@@ -536,13 +585,15 @@
               if (to === 'released' || to === 'refunded') {
                 push({
                   type: 'sale_settled',
-                  title: to === 'released' ? 'Grower unlocked full stake' : 'Locked stake refunded',
-                  body:
-                    '"' +
-                    (l.name || 'Plant') +
-                    '" monthly care settled · ' +
-                    to +
-                    '.',
+                  title:
+                    to === 'released'
+                      ? T('app.notif.growerUnlocked', 'Grower unlocked full stake')
+                      : T('app.notif.lockedRefunded', 'Locked stake refunded'),
+                  body: T(
+                    'app.notif.careSettledBody',
+                    '"{plant}" monthly care settled · {status}.',
+                    { plant: l.name || T('app.stack.plant', 'Plant'), status: to }
+                  ),
                   meta: { key: 'adopter-care:' + l.id + ':' + to, listingId: l.id },
                   action: { view: 'adopt' },
                   kind: to === 'released' ? 'success' : 'info',
@@ -586,14 +637,17 @@
             if (to === 'minted') {
               push({
                 type: isFaucet ? 'test_faucet' : 'platform_bonus',
-                title: isFaucet ? 'Test $GROWTOO claimed' : 'Platform bonus minted',
-                body:
-                  '+' +
-                  (d.reward || 0) +
-                  ' $GROWTOO' +
-                  (isFaucet
-                    ? ' sent to your Devnet wallet.'
-                    : ' for ' + (d.monthKey || 'this month') + '.'),
+                title: isFaucet
+                  ? T('app.notif.faucetClaimed', 'Test $GROWTOO claimed')
+                  : T('app.notif.bonusMinted', 'Platform bonus minted'),
+                body: isFaucet
+                  ? T('app.notif.faucetBody', '+{amount} $GROWTOO sent to your Devnet wallet.', {
+                      amount: d.reward || 0,
+                    })
+                  : T('app.notif.bonusBody', '+{amount} $GROWTOO for {month}.', {
+                      amount: d.reward || 0,
+                      month: d.monthKey || T('app.notif.thisMonth', 'this month'),
+                    }),
                 meta: {
                   key: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':minted',
                   monthKey: d.monthKey,
@@ -622,12 +676,14 @@
             } else if (to === 'failed') {
               push({
                 type: isFaucet ? 'test_faucet' : 'platform_bonus',
-                title: isFaucet ? 'Test faucet failed' : 'Platform bonus failed',
+                title: isFaucet
+                  ? T('app.notif.faucetFailed', 'Test faucet failed')
+                  : T('app.notif.bonusFailed', 'Platform bonus failed'),
                 body:
                   d.error ||
                   (isFaucet
-                    ? 'Retry the faucet claim from Market.'
-                    : 'Try claiming again next month window.'),
+                    ? T('app.notif.faucetFailedBody', 'Retry the faucet claim from Market.')
+                    : T('app.notif.bonusFailedBody', 'Try claiming again next month window.')),
                 meta: {
                   key: (isFaucet ? 'faucet:' : 'platform:') + d.id + ':failed',
                   monthKey: d.monthKey,
@@ -661,8 +717,13 @@
             if (to === 'released' || to === 'refunded') {
               push({
                 type: 'harvest_claim',
-                title: to === 'released' ? 'Harvest claim released' : 'Harvest claim refunded',
-                body: 'Stake settlement finished · ' + to + '.',
+                title:
+                  to === 'released'
+                    ? T('app.notif.claimReleased', 'Harvest claim released')
+                    : T('app.notif.claimRefunded', 'Harvest claim refunded'),
+                body: T('app.notif.claimBody', 'Stake settlement finished · {status}.', {
+                  status: to,
+                }),
                 meta: { key: 'hclaim:' + d.id + ':' + to, listingId: d.listingId },
                 action: { view: 'adopt' },
                 kind: to === 'released' ? 'success' : 'info',
@@ -671,8 +732,10 @@
             } else if (to === 'failed') {
               push({
                 type: 'harvest_claim',
-                title: 'Harvest claim failed',
-                body: d.error || 'Check journal care months and retry.',
+                title: T('app.notif.claimFailed', 'Harvest claim failed'),
+                body:
+                  d.error ||
+                  T('app.notif.claimFailedBody', 'Check journal care months and retry.'),
                 meta: { key: 'hclaim:' + d.id + ':failed', listingId: d.listingId },
                 action: { view: 'adopt' },
                 kind: 'error',
@@ -688,23 +751,27 @@
     const d = detail || {};
     const kind = String(d.kind || 'care');
     const titles = {
-      watering: 'Care day counted',
-      feeding: 'Feeding counted',
-      stageLogged: 'Stage logged',
-      story_published: 'Story published',
-      claimed: 'Activity bonus minted',
+      watering: T('app.notif.rewardCareDay', 'Care day counted'),
+      feeding: T('app.daily.rewardFeeding', 'Feeding counted'),
+      stageLogged: T('app.daily.rewardStage', 'Stage logged'),
+      story_published: T('app.daily.rewardStory', 'Story published'),
+      claimed: T('app.notif.rewardBonusMinted', 'Activity bonus minted'),
     };
     const preview = d.preview || {};
     const reward = preview.reward != null ? preview.reward : d.claimed;
     const xpBit = d.xp ? '+' + d.xp + ' XP' : '';
     const tokenBit =
       d.kind === 'claimed'
-        ? '+' + (d.claimed || reward || 0) + ' $GROWTOO sent to your wallet'
-        : '~' + (reward || 0) + ' $GROWTOO this month';
+        ? T('app.notif.sentToWallet', '+{amount} $GROWTOO sent to your wallet', {
+            amount: d.claimed || reward || 0,
+          })
+        : T('app.notif.thisMonthAmount', '~{amount} $GROWTOO this month', {
+            amount: reward || 0,
+          });
     const day = new Date().toISOString().slice(0, 10);
     push({
       type: 'activity_reward',
-      title: titles[kind] || 'Grower reward',
+      title: titles[kind] || T('app.daily.rewardDefault', 'Grower reward'),
       body: [xpBit, tokenBit].filter(Boolean).join(' · '),
       meta: { key: 'activity_reward:' + kind + ':' + day, kind: kind },
       action: { view: kind === 'claimed' ? 'adopt' : 'plants' },
@@ -719,16 +786,18 @@
     // Self-progress after your own logs — toast only. Inbox stays for attention items.
     const dedup = (kind === 'week' ? 'care_week' : 'care_month') + ':' + plantId + ':' + periodKey;
     if (shouldSkipDedup(kind === 'week' ? 'care_week' : 'care_month', dedup)) return;
-    const label = kind === 'week' ? 'Weekly' : 'Monthly';
     toast(
-      (plantName || 'Plant') +
-        ' · ' +
-        label.toLowerCase() +
-        ' care ' +
-        daysHit +
-        '/' +
-        minDays +
-        ' days',
+      kind === 'week'
+        ? T('app.notif.careWeekToast', '{plant} · weekly care {hit}/{need} days', {
+            plant: plantName || T('app.stack.plant', 'Plant'),
+            hit: daysHit,
+            need: minDays,
+          })
+        : T('app.notif.careMonthToast', '{plant} · monthly care {hit}/{need} days', {
+            plant: plantName || T('app.stack.plant', 'Plant'),
+            hit: daysHit,
+            need: minDays,
+          }),
       'success'
     );
   }
@@ -761,8 +830,8 @@
       if (!isCare) return;
       push({
         type: 'care_due',
-        title: r.title || 'Care reminder',
-        body: r.message || 'A plant needs attention.',
+        title: r.title || T('app.notif.careReminder', 'Care reminder'),
+        body: r.message || T('app.notif.careReminderBody', 'A plant needs attention.'),
         meta: { key: 'care-due:' + id + ':' + day, plantId: r.plantId || null, reminderId: id },
         action: { view: 'plants', plantId: r.plantId || null, coachDraft: id },
         kind: r.severity === 'urgent' || r.kind === 'predictive' ? 'warn' : 'info',
@@ -773,22 +842,25 @@
   }
 
   /** Journal types are stored as Croatian keys; UI copy stays English. */
+  /* [dictionary key, English] — resolved in entryTypeLabel(), because this
+     table is built while the page parses, before the dictionary loads. */
   var ENTRY_TYPE_LABELS = {
-    opcenito: 'General',
-    zalijevanje: 'Watering',
-    gnojidba: 'Feeding',
-    okolis: 'Environment',
-    presadjivanje: 'Transplanting',
-    stresori: 'Stressors',
-    ostalo: 'Other',
-    faza: 'Stage',
-    podfaza: 'Sub-phase',
+    opcenito: ['app.entryType.general', 'General'],
+    zalijevanje: ['app.entryType.watering', 'Watering'],
+    gnojidba: ['app.entryType.feeding', 'Feeding'],
+    okolis: ['app.entryType.environment', 'Environment'],
+    presadjivanje: ['app.entryType.transplanting', 'Transplanting'],
+    stresori: ['app.entryType.stressors', 'Stressors'],
+    ostalo: ['app.entryType.other', 'Other'],
+    faza: ['app.entryType.stage', 'Stage'],
+    podfaza: ['app.entryType.subphase', 'Sub-phase'],
   };
 
   function entryTypeLabel(type) {
     var key = String(type || '').trim();
-    if (!key) return 'Entry';
-    return ENTRY_TYPE_LABELS[key] || key;
+    if (!key) return T('app.entryType.entry', 'Entry');
+    var row = ENTRY_TYPE_LABELS[key];
+    return row ? T(row[0], row[1]) : key;
   }
 
   /**
@@ -803,7 +875,15 @@
     const o = opts || {};
     if (o.toast === false) return;
     const typeLabel = entryTypeLabel(entry.type);
-    toast('Logged ' + typeLabel + (plantName ? ' for ' + plantName : ''), 'success');
+    toast(
+      plantName
+        ? T('app.notif.loggedForPlant', 'Logged {type} for {plant}', {
+            type: typeLabel,
+            plant: plantName,
+          })
+        : T('app.notif.logged', 'Logged {type}', { type: typeLabel }),
+      'success'
+    );
   }
 
   function bindUi() {
@@ -887,32 +967,32 @@
     const grower = [
       {
         type: 'journal_entry',
-        title: 'Journal log saved',
-        body: 'Northern Lights · Watering — Morning feed complete.',
+        title: T('app.notif.demo.journalTitle', 'Journal log saved'),
+        body: T('app.notif.demo.journalBody', 'Northern Lights · Watering — Morning feed complete.'),
         createdAt: iso(5),
         meta: { key: 'demo:journal', plantId: null, demo: true },
         action: { view: 'plants' },
       },
       {
         type: 'care_week',
-        title: 'Weekly care qualified',
-        body: 'OG Kush hit 5/5 care days · this week (grower progress).',
+        title: T('app.notif.demo.weekTitle', 'Weekly care qualified'),
+        body: T('app.notif.demo.weekBody', 'OG Kush hit 5/5 care days · this week (grower progress).'),
         createdAt: iso(25),
         meta: { key: 'demo:care_week', demo: true },
         action: { view: 'adopt' },
       },
       {
         type: 'care_month',
-        title: 'Monthly care qualified',
-        body: 'OG Kush hit 12/12 care days · harvest unlock path.',
+        title: T('app.notif.demo.monthTitle', 'Monthly care qualified'),
+        body: T('app.notif.demo.monthBody', 'OG Kush hit 12/12 care days · harvest unlock path.'),
         createdAt: iso(40),
         meta: { key: 'demo:care_month', demo: true },
         action: { view: 'adopt' },
       },
       {
         type: 'stake_received',
-        title: 'New adopt stake',
-        body: 'An adopter staked 100 $GROWTOO on "Batch B-2026-07" (50% locked until monthly care).',
+        title: T('app.notif.demo.stakeTitle', 'New adopt stake'),
+        body: T('app.notif.demo.stakeBody', 'An adopter staked 100 $GROWTOO on "Batch B-2026-07" (50% locked until monthly care).'),
         createdAt: iso(90),
         meta: { key: 'demo:stake', demo: true, priceGrow: 100 },
         action: { view: 'market' },
@@ -920,7 +1000,7 @@
       {
         type: 'seed_mint',
         title: 'Seed NFT minted',
-        body: 'Northern Lights is on-chain.',
+        body: T('app.notif.demo.seedBody', 'Northern Lights is on-chain.'),
         createdAt: iso(180),
         meta: { key: 'demo:seed', demo: true },
         action: { view: 'adopt' },
@@ -928,7 +1008,7 @@
       {
         type: 'growth_mint',
         title: 'Growth stage minted',
-        body: 'Northern Lights → vegetative · +35 $GROWTOO',
+        body: T('app.notif.demo.growthBody', 'Northern Lights → vegetative · +35 $GROWTOO'),
         createdAt: iso(200),
         meta: { key: 'demo:growth', demo: true },
         action: { view: 'adopt' },
@@ -936,7 +1016,7 @@
       {
         type: 'platform_bonus',
         title: 'Platform bonus minted',
-        body: '+18 $GROWTOO for this month (plants, weeks, flower).',
+        body: T('app.notif.demo.bonusBody', '+18 $GROWTOO for this month (plants, weeks, flower).'),
         createdAt: iso(360),
         meta: { key: 'demo:platform', demo: true },
         action: { view: 'adopt' },
@@ -944,7 +1024,7 @@
       {
         type: 'harvest_claim',
         title: 'Harvest stake released',
-        body: 'Locked $GROWTOO for "Batch B-2026-07" released to you.',
+        body: T('app.notif.demo.releasedBody', 'Locked $GROWTOO for "Batch B-2026-07" released to you.'),
         createdAt: iso(500),
         meta: { key: 'demo:harvest', demo: true },
         action: { view: 'adopt' },
@@ -953,16 +1033,16 @@
     const adopter = [
       {
         type: 'sale_settled',
-        title: 'Investment complete',
-        body: 'You adopted "Northern Lights" for 80 $GROWTOO.',
+        title: T('app.notif.demo.investTitle', 'Investment complete'),
+        body: T('app.notif.demo.investBody', 'You adopted "Northern Lights" for 80 $GROWTOO.'),
         createdAt: iso(8),
         meta: { key: 'demo:buy', demo: true },
         action: { view: 'adopt' },
       },
       {
         type: 'sale_settled',
-        title: 'Adopt stake active',
-        body: 'You hold "Batch B-2026-07". Locked half unlocks when monthly care qualifies at harvest.',
+        title: T('app.notif.demo.activeTitle', 'Adopt stake active'),
+        body: T('app.notif.demo.activeBody', 'You hold "Batch B-2026-07". Locked half unlocks when monthly care qualifies at harvest.'),
         createdAt: iso(30),
         meta: { key: 'demo:adopt_active', demo: true },
         action: { view: 'adopt' },
@@ -970,23 +1050,23 @@
       {
         type: 'sale_settled',
         title: 'Grower unlocked full stake',
-        body: '"Batch B-2026-07" monthly care settled · released.',
+        body: T('app.notif.demo.settledBody', '"Batch B-2026-07" monthly care settled · released.'),
         createdAt: iso(120),
         meta: { key: 'demo:unlock', demo: true },
         action: { view: 'adopt' },
       },
       {
         type: 'sale_settled',
-        title: 'NFT delivered',
-        body: '"OG Kush" is in your garden.',
+        title: T('app.notif.demo.deliveredTitle', 'NFT delivered'),
+        body: T('app.notif.demo.deliveredBody', '"OG Kush" is in your garden.'),
         createdAt: iso(240),
         meta: { key: 'demo:delivered', demo: true },
         action: { view: 'adopt' },
       },
       {
         type: 'system',
-        title: 'Monthly care update',
-        body: 'Grower is documenting care on your adopted plant — unlock status updates at harvest.',
+        title: T('app.notif.demo.updateTitle', 'Monthly care update'),
+        body: T('app.notif.demo.updateBody', 'Grower is documenting care on your adopted plant — unlock status updates at harvest.'),
         createdAt: iso(400),
         meta: { key: 'demo:monthly_status', demo: true },
         action: { view: 'adopt' },
@@ -1044,7 +1124,10 @@
       }
     }
     if (written && o.toast !== false) {
-      toast('Loaded ' + written + ' example notifications', 'info');
+      toast(
+        T('app.notif.examplesLoaded', 'Loaded {count} example notifications', { count: written }),
+        'info'
+      );
     }
     return written;
   }
@@ -1099,14 +1182,19 @@
 
     push({
       type: 'wallet_reconnect',
-      title: 'Reconnect your Solana wallet',
-      body:
-        'Signing out (or switching accounts) ends the browser wallet session — normal for Phantom/Solflare. Your account stays linked to ' +
-        shortPubkey(linked) +
-        '. Tap Reconnect to invest, mint, or list RWAs.',
+      title: T('app.notif.reconnectTitle', 'Reconnect your Solana wallet'),
+      body: T(
+        'app.notif.reconnectBody',
+        'Signing out (or switching accounts) ends the browser wallet session — normal for Phantom/Solflare. Your account stays linked to {pubkey}. Tap Reconnect to invest, mint, or list RWAs.',
+        { pubkey: shortPubkey(linked) }
+      ),
       action: { view: view },
       kind: 'warn',
-      toastMsg: 'Wallet session ended — reconnect ' + shortPubkey(linked) + ' to sign.',
+      toastMsg: T(
+        'app.notif.reconnectToast',
+        'Wallet session ended — reconnect {pubkey} to sign.',
+        { pubkey: shortPubkey(linked) }
+      ),
       dedupKey: 'wallet-reconnect:' + user.uid,
       meta: { key: 'wallet-reconnect:' + user.uid, pubkey: linked },
     });

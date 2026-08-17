@@ -1,0 +1,63 @@
+{
+  "brand": {
+    "poweredBy": "Powered by"
+  },
+  "cookies": {
+    "acceptAll": "Accept all",
+    "body": "We use essential storage for sign-in and your journal preferences. Optional analytics help us improve the product. See the <a href=\"{href}\">Privacy Policy</a>.",
+    "essential": "Essential only",
+    "title": "Cookies &amp; local data"
+  },
+  "cta": {
+    "browseInApp": "Browse in app →",
+    "enterAdopter": "Enter as Adopter",
+    "openJournal": "Open the journal",
+    "readDocs": "Read the docs",
+    "readFaq": "Read the FAQ first",
+    "signIn": "Sign in",
+    "startGrow": "Start a grow",
+    "verify": "Verify →"
+  },
+  "footer": {
+    "adopters": "Adopters",
+    "app": "App",
+    "copy": "© growtoo. All rights reserved.",
+    "docs": "Docs",
+    "faq": "FAQ",
+    "growers": "Growers",
+    "how": "How it works",
+    "privacy": "Privacy",
+    "risks": "Risks",
+    "stakes": "Stakes",
+    "tagline": "Grow it again — journal, coach, optional proof.",
+    "terms": "Terms"
+  },
+  "lang": {
+    "label": "Language"
+  },
+  "nav": {
+    "docs": "Docs",
+    "faq": "FAQ",
+    "journal": "Journal",
+    "market": "Market",
+    "menu": "Menu",
+    "tokenise": "Tokenise"
+  },
+  "signup": {
+    "needConsent": "Confirm you are 18+ and agree to the Terms & Privacy Policy.",
+    "needDevnet": "Confirm you understand this uses Solana’s test network (no real value).",
+    "needIntent": "Choose why you’re joining as an adopter.",
+    "needName": "Enter a display name.",
+    "needSetup": "Choose a grow setup (indoor, outdoor, or mixed).",
+    "pickRole": "Choose Grower or Adopter to continue."
+  },
+  "trust": {
+    "ageBody": "growtoo is a cannabis cultivation journal and related tools. You must be at least {age} years old to enter. Local laws still apply where you live.",
+    "ageNo": "I am under {age}",
+    "ageTitle": "Are you {age} or older?",
+    "ageYes": "I am {age}+",
+    "deniedBody": "Sorry — growtoo is only for adults {age}+. Please leave this site.",
+    "deniedTitle": "Access restricted",
+    "leave": "Leave"
+  }
+}

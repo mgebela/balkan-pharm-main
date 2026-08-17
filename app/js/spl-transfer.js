@@ -89,26 +89,37 @@
 
   function friendlyExpiredError() {
     return new Error(
-      'Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try posting again.'
+      T(
+        'app.tx.expired',
+        'Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try posting again.'
+      )
     );
   }
 
   function friendlyMissingTokenError(params) {
     if (Number(params.decimals || 0) === 0) {
       return new Error(
-        'This connected wallet does not hold that Seed NFT. Switch to the wallet that received the mint (or transfer the NFT here), then try again.'
+        T(
+          'app.tx.missingNft',
+          'This connected wallet does not hold that Seed NFT. Switch to the wallet that received the mint (or transfer the NFT here), then try again.'
+        )
       );
     }
     return new Error(
-      'This connected wallet does not have enough of that token for the transfer. Check the balance on Devnet and try again.'
+      T(
+        'app.tx.missingBalance',
+        'This connected wallet does not have enough of that token for the transfer. Check the balance on Devnet and try again.'
+      )
     );
   }
 
   function friendlyConfirmTimeoutError(signature) {
     const err = new Error(
-      'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: ' +
-        signature +
-        '. Refresh and check whether the offer/NFT already moved before trying again.'
+      T(
+        'app.tx.confirmTimeout',
+        'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: {signature}. Refresh and check whether the offer/NFT already moved before trying again.',
+        { signature: signature }
+      )
     );
     err.signature = signature;
     return err;
@@ -145,7 +156,11 @@
       const status = await readSignatureStatus(connection, signature);
       if (status) {
         if (status.err) {
-          throw new Error('Transaction failed on-chain: ' + JSON.stringify(status.err));
+          throw new Error(
+            T('app.tx.failedOnChain', 'Transaction failed on-chain: {reason}', {
+              reason: JSON.stringify(status.err),
+            })
+          );
         }
         const conf = status.confirmationStatus;
         if (conf === 'confirmed' || conf === 'finalized' || status.confirmations != null) {
@@ -226,7 +241,9 @@
      */
     async transferToken(params) {
       const SW = window.SolanaWallet;
-      if (!SW || !SW.isConnected()) throw new Error('Wallet not connected.');
+      if (!SW || !SW.isConnected()) {
+        throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+      }
 
       const web3 = await loadWeb3();
       const connection = await SW.getConnection();
@@ -289,7 +306,9 @@
     // Convenience: pay whole $GROWTOO tokens.
     async payGrow(to, wholeTokens) {
       const cfg = window.ChainConfig || {};
-      if (!cfg.growMint) throw new Error('$GROWTOO mint is not deployed yet.');
+      if (!cfg.growMint) {
+        throw new Error(T('app.tx.mintNotDeployed', '$GROWTOO mint is not deployed yet.'));
+      }
       const decimals = Number(cfg.growDecimals || 9);
       return SplTransfer.transferToken({
         mint: cfg.growMint,

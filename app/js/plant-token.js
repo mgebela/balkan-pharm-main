@@ -35,14 +35,38 @@
 
   // Lifecycle of a token. "seed" is the minted starting point; every later
   // stage is reached by minting growth, which also mints fungible GROW tokens.
+  /* `label` is the English name and also the lookup fallback; `labelKey` is
+     what stageLabel() resolves against the dictionary. The table is built
+     while the page parses, before the dictionary loads, so nothing here may
+     call T() directly. */
   const GROWTH_STAGES = [
-    { key: 'seed', label: 'Seed', emoji: '🌰', reward: 0 },
-    { key: 'germination', label: 'Germination', emoji: '🌱', reward: 10 },
-    { key: 'seedling', label: 'Seedling', emoji: '🌿', reward: 20 },
-    { key: 'vegetative', label: 'Vegetative', emoji: '☘️', reward: 35 },
-    { key: 'flowering', label: 'Flowering', emoji: '🌸', reward: 60 },
-    { key: 'harvest', label: 'Harvest', emoji: '🌼', reward: 100 },
+    { key: 'seed', label: 'Seed', labelKey: 'app.stage.seed', emoji: '🌰', reward: 0 }, // i18n-ignore
+    { key: 'germination', label: 'Germination', labelKey: 'app.stage.germination', emoji: '🌱', reward: 10 }, // i18n-ignore
+    { key: 'seedling', label: 'Seedling', labelKey: 'app.stage.seedling', emoji: '🌿', reward: 20 }, // i18n-ignore
+    { key: 'vegetative', label: 'Vegetative', labelKey: 'app.stage.vegetative', emoji: '☘️', reward: 35 }, // i18n-ignore
+    { key: 'flowering', label: 'Flowering', labelKey: 'app.stage.flowering', emoji: '🌸', reward: 60 }, // i18n-ignore
+    { key: 'harvest', label: 'Harvest', labelKey: 'app.stage.harvest', emoji: '🌼', reward: 100 }, // i18n-ignore
   ];
+
+  /** Translated name of a growth stage. Safe with a missing/odd stage. */
+  function stageLabel(stage) {
+    if (!stage) return '';
+    return stage.labelKey ? T(stage.labelKey, stage.label) : String(stage.label || '');
+  }
+
+  const TRAIL_SHORT_KEYS = [
+    ['app.trail.seed', 'Seed'],
+    ['app.trail.germination', 'Germ.'],
+    ['app.trail.seedling', 'Seedl.'],
+    ['app.trail.vegetative', 'Veget.'],
+    ['app.trail.flowering', 'Flower'],
+    ['app.trail.harvest', 'Harvest'],
+  ];
+
+  function trailShort(index) {
+    const row = TRAIL_SHORT_KEYS[index];
+    return row ? T(row[0], row[1]) : '';
+  }
 
   // Map main-app plant stages (Croatian keys) onto token stages, so a token
   // linked to a real plant can suggest the matching growth level.
@@ -348,13 +372,22 @@
       return (async function () {
         const uid = currentAuthUid();
         if (!uid) {
-          throw new Error('Sign in to your growtoo account before connecting a wallet.');
+          throw new Error(
+            T('app.token.signInBeforeWallet', 'Sign in to your growtoo account before connecting a wallet.')
+          );
         }
         if (accountUid !== uid) {
           await PlantToken.bindAccount(uid);
         }
         const SW = window.SolanaWallet;
-        if (!SW) throw new Error('Solana wallet module failed to load. Refresh the page and try again.');
+        if (!SW) {
+          throw new Error(
+            T(
+              'app.token.walletModuleFailed',
+              'Solana wallet module failed to load. Refresh the page and try again.'
+            )
+          );
+        }
         const address = await SW.connect();
         const wallet = readWallet();
         wallet.connected = true;
@@ -392,7 +425,7 @@
             wallet.linkError =
               window.WalletLink.formatError
                 ? WalletLink.formatError(linkErr)
-                : linkErr.message || 'Account link failed.';
+                : linkErr.message || T('app.token.linkFailed', 'Account link failed.');
             writeWallet(wallet);
           }
         }
@@ -421,11 +454,16 @@
       })();
     },
 
-    /** Stage index from market listing stage label. */
+    /**
+     * Stage index from a market listing's stage label.
+     *
+     * Matches on the ENGLISH label deliberately: listing documents store the
+     * raw English stage, so translating the comparison would stop matching.
+     */
     stageIndexFromLabel(label) {
       const key = String(label || '').trim().toLowerCase();
       const idx = GROWTH_STAGES.findIndex(function (s) {
-        return s.label.toLowerCase() === key || s.key === key;
+        return s.label.toLowerCase() === key || s.key === key; // i18n-ignore
       });
       return idx >= 0 ? idx : 0;
     },
@@ -459,7 +497,7 @@
       const stageIndex = PlantToken.stageIndexFromLabel(listing.stage);
       const token = {
         id: tokenId(),
-        name: String(listing.name || 'Adopted plant').trim(),
+        name: String(listing.name || T('app.token.adoptedPlant', 'Adopted plant')).trim(),
         strain: String(listing.strain || '').trim(),
         batch: String(listing.batch || '').trim(),
         plantId: listing.plantId || null,
@@ -625,7 +663,7 @@
         const now = Date.now();
         const row = {
           id: tokenId(),
-          name: String(m.name || 'Seed RWA').trim(),
+          name: String(m.name || T('app.token.seedRwa', 'Seed RWA')).trim(),
           strain: String(m.strain || '').trim(),
           batch: String(m.batch || '').trim(),
           plantId: m.plantId || null,
@@ -662,18 +700,25 @@
       const o = opts || {};
       return chainCall(() => {
         const wallet = readWallet();
-        if (!wallet.connected) throw new Error('Wallet not connected.');
+        if (!wallet.connected) {
+          throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+        }
         const name = String(o.name || '').trim();
-        if (!name) throw new Error('Seed name is required.');
+        if (!name) throw new Error(T('app.token.needSeedName', 'Seed name is required.'));
 
         const plantId = o.plantId || null;
         if (window.GrowerQuests) {
           const seedQuest = GrowerQuests.evaluateSeedQuest({ plantId: plantId });
           if (!seedQuest.ready) {
-            throw new Error(seedQuest.message || 'Link a journal plant before minting.');
+            throw new Error(
+              seedQuest.message ||
+                T('app.token.linkPlantBeforeMint', 'Link a journal plant before minting.')
+            );
           }
         } else if (!plantId) {
-          throw new Error('Link a journal plant before minting a seed token.');
+          throw new Error(
+            T('app.token.linkPlantBeforeSeed', 'Link a journal plant before minting a seed token.')
+          );
         }
 
         const now = Date.now();
@@ -726,14 +771,18 @@
             result.onchainStatus = 'queued';
           } else {
             result.onchainStatus = 'failed';
-            result.onchainError = 'Mint queue did not accept the request.';
+            result.onchainError = T(
+            'app.token.mintQueueRefused',
+            'Mint queue did not accept the request.'
+          );
           }
         } catch (err) {
           // Local token still exists; on-chain mint can be retried later.
           console.warn('Devnet seed mint request failed', err);
           result.onchainStatus = 'failed';
           result.onchainError =
-            (err && err.message) || 'Devnet mint request failed.';
+            (err && err.message) ||
+            T('app.token.mintRequestFailed', 'Devnet mint request failed.');
         }
         return result;
       });
@@ -745,17 +794,22 @@
     mintGrowth(id) {
       return chainCall(() => {
         const wallet = readWallet();
-        if (!wallet.connected) throw new Error('Wallet not connected.');
+        if (!wallet.connected) {
+          throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+        }
         const token = wallet.tokens.find((t) => t.id === id);
-        if (!token) throw new Error('Token not found.');
+        if (!token) throw new Error(T('app.token.tokenNotFound', 'Token not found.'));
         if (token.stageIndex >= GROWTH_STAGES.length - 1) {
-          throw new Error('This plant is already fully grown.');
+          throw new Error(T('app.token.alreadyGrown', 'This plant is already fully grown.'));
         }
         const nextStage = GROWTH_STAGES[token.stageIndex + 1];
         if (window.GrowerQuests) {
           const quest = GrowerQuests.evaluateGrowthQuest(token, nextStage.key);
           if (!quest.ready) {
-            throw new Error(quest.message || 'Complete grower journal quests first.');
+            throw new Error(
+            quest.message ||
+              T('app.token.completeQuests', 'Complete grower journal quests first.')
+          );
           }
         }
         token.stageIndex += 1;
@@ -786,7 +840,10 @@
           // Local stage advanced; on-chain update waits until seed NFT exists.
           result.onchainStatus = 'pending_seed';
           result.onchainError =
-            'Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.';
+            T(
+              'app.token.stageSavedLocally',
+              'Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.'
+            );
           return result;
         }
         try {
@@ -817,13 +874,17 @@
             result.onchainStatus = 'queued';
           } else {
             result.onchainStatus = 'failed';
-            result.onchainError = 'Growth mint queue did not accept the request.';
+            result.onchainError = T(
+            'app.token.growthQueueRefused',
+            'Growth mint queue did not accept the request.'
+          );
           }
         } catch (err) {
           console.warn('Devnet growth mint request failed', err);
           result.onchainStatus = 'failed';
           result.onchainError =
-            (err && err.message) || 'Devnet growth mint request failed.';
+            (err && err.message) ||
+            T('app.token.growthRequestFailed', 'Devnet growth mint request failed.');
         }
         return result;
       });
@@ -845,9 +906,9 @@
       return chainCall(() => {
         const wallet = readWallet();
         const token = wallet.tokens.find((t) => t.id === tokenId);
-        if (!token) throw new Error('Token not found.');
+        if (!token) throw new Error(T('app.token.tokenNotFound', 'Token not found.'));
         const plant = readPlants().find((p) => p && String(p.id) === String(plantId));
-        if (!plant) throw new Error('Journal plant not found.');
+        if (!plant) throw new Error(T('app.token.plantNotFound', 'Journal plant not found.'));
         token.plantId = String(plant.id);
         if (!token.strain && plant.strain) token.strain = plant.strain;
         writeWallet(wallet);
@@ -902,12 +963,15 @@
 
   function growthStepHint(stageIndex) {
     const stage = GROWTH_STAGES[stageIndex] || GROWTH_STAGES[0];
-    if (stageIndex >= GROWTH_STAGES.length - 1) return 'Trail complete · harvest sealed';
+    if (stageIndex >= GROWTH_STAGES.length - 1) {
+      return T('app.token.trailComplete', 'Trail complete · harvest sealed');
+    }
     const next = GROWTH_STAGES[stageIndex + 1];
-    return 'Next seal → ' + next.label + ' (+' + next.reward + ' $GROWTOO)';
+    return T('app.token.nextSeal', 'Next seal → {stage} (+{reward} $GROWTOO)', {
+      stage: stageLabel(next),
+      reward: next.reward,
+    });
   }
-
-  const TRAIL_SHORT = ['Seed', 'Germ.', 'Seedl.', 'Veget.', 'Flower', 'Harvest'];
 
   function renderGrowthGuide(activeStageIndex) {
     const el = document.getElementById('adopt-growth-guide');
@@ -937,9 +1001,14 @@
       if (done) {
         caption = i === 0 ? '✓' : '✓ +' + s.reward;
       } else if (isCurrent) {
-        caption = i === 0 ? 'Seed' : i === GROWTH_STAGES.length - 1 ? 'Harvest +' + s.reward : '+' + s.reward;
+        caption =
+          i === 0
+            ? T('app.stage.seed', 'Seed')
+            : i === GROWTH_STAGES.length - 1
+              ? T('app.token.harvestPlus', 'Harvest +{reward}', { reward: s.reward })
+              : '+' + s.reward;
       } else if (i === GROWTH_STAGES.length - 1) {
-        caption = 'Harvest +' + s.reward;
+        caption = T('app.token.harvestPlus', 'Harvest +{reward}', { reward: s.reward });
       } else {
         caption = '+' + s.reward;
       }
@@ -950,10 +1019,10 @@
         '" style="height:' +
         height +
         '%" title="' +
-        esc(s.label) +
+        esc(stageLabel(s)) +
         '"></div>' +
         '<span class="trail-col-label">' +
-        esc(TRAIL_SHORT[i] || s.label) +
+        esc(trailShort(i) || stageLabel(s)) +
         '</span>' +
         '<span class="trail-col-cap' +
         (isCurrent || i === GROWTH_STAGES.length - 1 ? ' trail-col-cap--accent' : '') +
@@ -965,22 +1034,48 @@
     }).join('');
 
     el.innerHTML =
-      '<p class="shell-card-eyebrow">The trail ahead</p>' +
-      '<div class="trail-chart" role="img" aria-label="Stage rewards from seed to harvest">' +
+      '<p class="shell-card-eyebrow">' +
+      esc(T('app.token.trailAhead', 'The trail ahead')) +
+      '</p>' +
+      '<div class="trail-chart" role="img" aria-label="' +
+      esc(T('app.token.trailChartAria', 'Stage rewards from seed to harvest')) +
+      '">' +
       bars +
       '</div>' +
-      '<p class="trail-foot">Each sealed stage earns $GROWTOO — up to ' +
-      maxReward +
-      ' by harvest. Test network; no monetary value.</p>';
+      '<p class="trail-foot">' +
+      esc(
+        T(
+          'app.token.trailFoot',
+          'Each sealed stage earns $GROWTOO — up to {max} by harvest. Test network; no monetary value.',
+          { max: maxReward }
+        )
+      ) +
+      '</p>';
+  }
+
+  /* ChainConfig holds these as [key, English] pairs so the copy is resolved
+     against the dictionary here, at read time, rather than when that config
+     object is built during parse. */
+  function fromConfig(name, fallbackKey, fallbackEn) {
+    const row = window.ChainConfig && window.ChainConfig[name];
+    if (Array.isArray(row)) return T(row[0], row[1]);
+    if (typeof row === 'string' && row) return row;
+    return T(fallbackKey, fallbackEn);
+  }
+
+  /* Dates and numbers follow the reader's locale, not the code's. */
+  function intlTag() {
+    return (window.I18N && I18N.intl) || 'en-GB';
   }
 
   function networkLabel() {
-    return (window.ChainConfig && window.ChainConfig.networkLabel) || 'Solana · devnet';
+    return fromConfig('networkLabel', 'app.chain.networkLabel', 'Solana · devnet');
   }
 
   function devnetNotice() {
-    return (
-      (window.ChainConfig && window.ChainConfig.devnetNotice) ||
+    return fromConfig(
+      'devnetNotice',
+      'app.chain.devnetNoticeFallback',
       'Connect a Solana wallet on the test network. Plant tokens and $GROWTOO rewards still use local simulation until full on-chain deploy.'
     );
   }
@@ -1012,21 +1107,17 @@
     );
   }
 
-  /** Collapsible mint / explorer chrome for garden cards. */
+  /** Collapsible mint / explorer chrome for garden cards. Closed until opened. */
   function chainDetailsHtml(innerHtml, opts) {
     if (!innerHtml) return '';
     const o = opts || {};
-    const advanced =
-      window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function'
-        ? GrowtooPlain.getMode() === 'advanced'
-        : false;
-    const open = o.forceOpen === true || (advanced && o.forceClosed !== true);
+    const open = o.forceOpen === true;
     return (
       '<details class="chain-details"' +
       (open ? ' open' : '') +
       '>' +
       '<summary class="chain-details-summary">' +
-      esc(o.summary || 'Chain details') +
+      esc(o.summary || T('app.market.chainDetails', 'Chain details')) +
       '</summary>' +
       '<div class="chain-details-body">' +
       innerHtml +
@@ -1110,25 +1201,38 @@
     const profile = WL.getProfile();
     const linked = profile.solanaPubkey === wallet.address;
     if (linked) {
-      return '<p class="adopt-wallet-link-status adopt-wallet-link-status--ok">Account linked to this wallet</p>';
+      return (
+        '<p class="adopt-wallet-link-status adopt-wallet-link-status--ok">' +
+        esc(T('app.token.linkedToWallet', 'Account linked to this wallet')) +
+        '</p>'
+      );
     }
     if (profile.solanaPubkey && profile.solanaPubkey !== wallet.address) {
       return (
-        '<p class="adopt-wallet-link-status adopt-wallet-link-status--warn">Account linked to a different wallet (' +
-        esc(shortAddr(profile.solanaPubkey)) +
-        ')</p>'
+        '<p class="adopt-wallet-link-status adopt-wallet-link-status--warn">' +
+        esc(
+          T('app.token.linkedToOther', 'Account linked to a different wallet ({address})', {
+            address: shortAddr(profile.solanaPubkey),
+          })
+        ) +
+        '</p>'
       );
     }
     if (wallet.linkError) {
       return (
         '<p class="adopt-wallet-link-status adopt-wallet-link-status--warn">' +
         esc(wallet.linkError) +
-        ' <button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button></p>'
+        ' <button type="button" class="btn btn-ghost btn-sm wallet-link-btn">' +
+        esc(T('app.token.linkAccount', 'Link account')) +
+        '</button></p>'
       );
     }
     return (
-      '<p class="adopt-wallet-link-status">Wallet connected. ' +
-      '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button></p>'
+      '<p class="adopt-wallet-link-status">' +
+      esc(T('app.token.walletConnected', 'Wallet connected.')) +
+      ' <button type="button" class="btn btn-ghost btn-sm wallet-link-btn">' +
+      esc(T('app.token.linkAccount', 'Link account')) +
+      '</button></p>'
     );
   }
 
@@ -1141,17 +1245,19 @@
         ? GrowerQuests.growerRankFromLocal()
         : null;
     return (
-      '<div class="grower-profile" aria-label="Grower level">' +
+      '<div class="grower-profile" aria-label="' +
+      esc(T('app.token.growerLevelAria', 'Grower level')) +
+      '">' +
       '<div class="grower-profile-row">' +
-      '<span class="grower-profile-level">Lv ' +
-      profile.level +
+      '<span class="grower-profile-level">' +
+      esc(T('app.token.levelShort', 'Lv {level}', { level: profile.level })) +
       '</span>' +
       '<strong class="grower-profile-title">' +
       esc(profile.title) +
       '</strong>' +
       '<span class="grower-profile-xp">' +
-      profile.xp +
-      ' XP</span>' +
+      esc(T('app.token.xpAmount', '{xp} XP', { xp: profile.xp })) +
+      '</span>' +
       '</div>' +
       (rank
         ? '<p class="adopt-rank-badge adopt-rank-badge--grower adopt-rank-badge--tier-' +
@@ -1160,7 +1266,14 @@
           esc(rank.label) +
           '</p>'
         : '') +
-      '<p class="grower-profile-hint">Weekly progress is private to you. Monthly care unlocks the locked adopt stake; ranks rise with care + mints.</p>' +
+      '<p class="grower-profile-hint">' +
+      esc(
+        T(
+          'app.token.growerProfileHint',
+          'Weekly progress is private to you. Monthly care unlocks the locked adopt stake; ranks rise with care + mints.'
+        )
+      ) +
+      '</p>' +
       '</div>'
     );
   }
@@ -1269,23 +1382,45 @@
     if (repair.kind === 'stub') {
       return (
         '<div class="adopt-mint-repair adopt-mint-repair--stub" role="status">' +
-        '<strong>Broken metadata stub</strong>' +
-        '<p>This mint was reminted as <a href="' +
-        esc(explorerAddressUrl(repair.mint)) +
-        '" target="_blank" rel="noopener noreferrer"><code>' +
-        esc(shortAddr(repair.mint)) +
-        '</code></a>. Use <em>Burn</em> to remove this card — hide the empty Collectible in Phantom if it still shows.</p>' +
+        '<strong>' +
+        esc(T('app.token.stubTitle', 'Broken metadata stub')) +
+        '</strong>' +
+        '<p>' +
+        T(
+          'app.token.stubBody',
+          'This mint was reminted as {link}. Use <em>Burn</em> to remove this card — hide the empty Collectible in Phantom if it still shows.',
+          {
+            link:
+              '<a href="' +
+              esc(explorerAddressUrl(repair.mint)) +
+              '" target="_blank" rel="noopener noreferrer"><code>' +
+              esc(shortAddr(repair.mint)) +
+              '</code></a>',
+          }
+        ) +
+        '</p>' +
         '</div>'
       );
     }
     return (
       '<div class="adopt-mint-repair adopt-mint-repair--ok" role="status">' +
-      '<strong>Replaces stub mint</strong>' +
-      '<p>Earlier empty-metadata NFT <a href="' +
-      esc(explorerAddressUrl(repair.stubMint)) +
-      '" target="_blank" rel="noopener noreferrer"><code>' +
-      esc(shortAddr(repair.stubMint)) +
-      '</code></a> may still sit in your wallet Collectibles — safe to hide; this card is the live one.</p>' +
+      '<strong>' +
+      esc(T('app.token.replacesStubTitle', 'Replaces stub mint')) +
+      '</strong>' +
+      '<p>' +
+      T(
+        'app.token.replacesStubBody',
+        'Earlier empty-metadata NFT {link} may still sit in your wallet Collectibles — safe to hide; this card is the live one.',
+        {
+          link:
+            '<a href="' +
+            esc(explorerAddressUrl(repair.stubMint)) +
+            '" target="_blank" rel="noopener noreferrer"><code>' +
+            esc(shortAddr(repair.stubMint)) +
+            '</code></a>',
+        }
+      ) +
+      '</p>' +
       '</div>'
     );
   }
@@ -1308,7 +1443,7 @@
       (token.adopted || isAdopterUi()) && stakeListing
         ? stakeListing.liveStage || stakeListing.stage || ''
         : '';
-    const stageBadgeLabel = liveStageLabel || stage.label;
+    const stageBadgeLabel = liveStageLabel || stageLabel(stage);
     let displayStageIndex = token.stageIndex;
     if (liveStageLabel && typeof PlantToken.stageIndexFromLabel === 'function') {
       const liveIdx = PlantToken.stageIndexFromLabel(
@@ -1341,20 +1476,28 @@
 
     const dots = GROWTH_STAGES.map((s, i) => {
       const cls = i < displayStageIndex ? 'done' : i === displayStageIndex ? 'current' : 'todo';
-      return '<span class="adopt-stage-dot adopt-stage-dot--' + cls + '" title="' + esc(s.label) + '"></span>';
+      return (
+        '<span class="adopt-stage-dot adopt-stage-dot--' +
+        cls +
+        '" title="' +
+        esc(stageLabel(s)) +
+        '"></span>'
+      );
     }).join('');
 
     const history = (token.history || [])
       .slice()
       .reverse()
       .map((h) => {
-        const date = new Date(h.ts).toLocaleString('en-GB');
+        const date = new Date(h.ts).toLocaleString(intlTag());
         const label =
           h.type === 'invest'
-            ? 'Invested / adopted'
+            ? T('app.token.investedAdopted', 'Invested / adopted')
             : h.type === 'mint'
-              ? 'Seed sealed'
-              : 'Sealed ' + (GROWTH_STAGES.find((s) => s.key === h.stage) || {}).label;
+              ? T('app.token.seedSealed', 'Seed sealed')
+              : T('app.token.sealedStage', 'Sealed {stage}', {
+                  stage: stageLabel(GROWTH_STAGES.find((s) => s.key === h.stage)),
+                });
         const amt =
           h.type === 'invest'
             ? h.amount
@@ -1365,6 +1508,7 @@
               : '';
         const real = realTxForHistoryEntry(token, h);
         const txHtml = real
+          // i18n-ignore — network name
           ? '<a href="' + esc(real.url) + '" target="_blank" rel="noopener noreferrer"><code title="' + esc(real.sig) + '">' + esc(shortTx(real.sig)) + '</code></a> · devnet'
           : '<code title="' + esc(h.tx) + '">' + esc(shortTx(h.tx)) + '</code>';
         return (
@@ -1407,19 +1551,35 @@
       '</div>' +
       '</div>' +
       (token.adopted
-        ? '<p class="adopt-token-link">Market investment' +
-          (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString('en-US') + ' $GROWTOO' : '') +
+        ? '<p class="adopt-token-link">' +
+          esc(T('app.token.marketInvestment', 'Market investment')) +
+          (token.investedGrow ? ' · ' + Number(token.investedGrow).toLocaleString(intlTag()) + ' $GROWTOO' : '') +
           '</p>' +
           investPhaseHtml(token)
         : token.plantId
-          ? '<p class="adopt-token-link">Linked journal plant</p>'
+          ? '<p class="adopt-token-link">' +
+            esc(T('app.token.linkedPlant', 'Linked journal plant')) +
+            '</p>'
           : linkPlantControlHtml(token)) +
       (isAdopterUi() || token.adopted ? '' : chainMintHtml(token)) +
       // Card-level summary — glanceable, matches what used to require opening
       // the full checklist below just to see "how close am I".
       '<div class="adopt-token-statrow">' +
-      (dayCount != null ? '<span>Day ' + dayCount + '</span><span class="sep">·</span>' : '') +
-      (questCounts ? '<span>' + questCounts.done + '/' + questCounts.total + ' quests</span>' : '') +
+      (dayCount != null
+        ? '<span>' +
+          esc(T('app.token.dayN', 'Day {count}', { count: dayCount })) +
+          '</span><span class="sep">·</span>'
+        : '') +
+      (questCounts
+        ? '<span>' +
+          esc(
+            T('app.token.questCount', '{done}/{total} quests', {
+              done: questCounts.done,
+              total: questCounts.total,
+            })
+          ) +
+          '</span>'
+        : '') +
       rankBadgeHtml(token) +
       '</div>' +
       careToolsHtml(token, next) +
@@ -1429,14 +1589,16 @@
           esc(investActionLabel(token)) +
           '</button>'
         : isMax
-          ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Fully grown</button>'
+          ? '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
+            esc(T('app.token.fullyGrown', 'Fully grown')) +
+            '</button>'
           : mintButtonHtml(token, next)) +
       '</div>' +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
       '<div class="adopt-token-stats">' +
       '<span>' +
-      (token.adopted ? 'Invested' : 'Earned') +
+      esc(token.adopted ? T('app.token.invested', 'Invested') : T('app.token.earned', 'Earned')) +
       ': <strong>' +
       (token.adopted ? Number(token.investedGrow || 0) : earned) +
       ' $GROWTOO</strong></span>' +
@@ -1447,15 +1609,14 @@
       // leads with identity + today's actions, same idea as the Progress &
       // stake details dropdown, just extended to the whole card.
       '<details class="adopt-token-trail">' +
-      '<summary class="adopt-token-trail-summary">Show grow trail</summary>' +
+      '<summary class="adopt-token-trail-summary">' +
+      esc(T('app.token.showTrail', 'Show grow trail')) +
+      '</summary>' +
       '<div class="adopt-token-trail-body">' +
       growerQuestHtml(token, next) +
       (function () {
         // Force open when there's a real claim button inside, so an
         // actionable "Claim locked stake" is never left an extra tap deep.
-        // Deliberately NOT chainDetailsHtml/.chain-details — that class is
-        // fully display:none in crypto-simple mode, which would hide a real
-        // claim action, not just collapse it.
         const stakeHtml = adoptStakeActionsHtml(token);
         const body = careWeekHtml(token) + careMonthHtml(token) + stakeHtml + redeemComingLaterHtml(token);
         if (!body) return '';
@@ -1464,7 +1625,9 @@
           '<details class="progress-details"' +
           (hasClaimAction ? ' open' : '') +
           '>' +
-          '<summary class="progress-details-summary">Progress &amp; stake details</summary>' +
+          '<summary class="progress-details-summary">' +
+          esc(T('app.token.progressDetails', 'Progress & stake details')) +
+          '</summary>' +
           '<div class="progress-details-body">' +
           body +
           '</div>' +
@@ -1489,24 +1652,33 @@
             : '') +
           groupedRowHtml(
             'card',
-            'Card id',
+            T('app.token.cardId', 'Card id'),
             '<code title="' + esc(token.id) + '">#' + esc(token.id.slice(-6)) + '</code>',
             false
           ) +
           '</div>',
         {
-          // Simple: hidden via CSS. Advanced: open so mint / explorer are visible.
-          summary: 'Chain details',
+          summary: T('app.token.chainDetails', 'Chain details'),
         }
       ) +
       '<div class="adopt-token-actions-secondary">' +
-      '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' + esc(token.id) + '">History</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm adopt-history-btn" data-id="' +
+      esc(token.id) +
+      '">' +
+      esc(T('app.token.history', 'History')) +
+      '</button>' +
       (token.plantId && !isAdopterUi()
         ? '<button type="button" class="btn btn-ghost btn-sm adopt-open-journal-btn" data-plant-id="' +
           esc(token.plantId) +
-          '">Journal</button>'
+          '">' +
+          esc(T('app.token.journal', 'Journal')) +
+          '</button>'
         : '') +
-      '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' + esc(token.id) + '">Burn</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm adopt-burn-btn" data-id="' +
+      esc(token.id) +
+      '">' +
+      esc(T('app.token.burn', 'Burn')) +
+      '</button>' +
       '</div>' + // .adopt-token-actions-secondary
       '</div>' + // .adopt-token-trail-body
       '</details>' + // .adopt-token-trail
@@ -1525,9 +1697,12 @@
     return (
       '<div class="grower-quest ' +
       cls +
+      // i18n-ignore — CSS classes
       ' grower-quest--care grower-quest--weekly">' +
       '<div class="grower-quest-head">' +
-      '<strong>Weekly progress</strong>' +
+      '<strong>' +
+      esc(T('app.token.weeklyProgress', 'Weekly progress')) +
+      '</strong>' +
       '<span>' +
       week.daysHit +
       '/' +
@@ -1538,7 +1713,14 @@
       '</div>' +
       '<p class="grower-quest-msg">' +
       esc(week.message) +
-      ' Visible to you only — harvest unlock uses monthly care.</p>' +
+      ' ' +
+      esc(
+        T(
+          'app.token.weeklyPrivate',
+          'Visible to you only — harvest unlock uses monthly care.'
+        )
+      ) +
+      '</p>' +
       '</div>'
     );
   }
@@ -1560,26 +1742,17 @@
     );
   }
 
-  /** YYYY-MM → Jul / Jul ’26 */
+  /** YYYY-MM → Jul / Jul ’26, in the reader's language. */
   function formatMonthKeyLabel(key) {
     const m = String(key || '').match(/^(\d{4})-(\d{2})$/);
     if (!m) return String(key || '');
-    const names = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    const month = names[parseInt(m[2], 10) - 1] || m[2];
     const year = parseInt(m[1], 10);
+    let month = m[2];
+    try {
+      month = new Intl.DateTimeFormat(intlTag(), { month: 'short', timeZone: 'UTC' }).format(
+        new Date(Date.UTC(year, parseInt(m[2], 10) - 1, 1))
+      );
+    } catch (e) {}
     const nowY = new Date().getUTCFullYear();
     return year === nowY ? month : month + ' ’' + String(year).slice(-2);
   }
@@ -1629,11 +1802,11 @@
         let detail = '—';
         if (qualify[key]) {
           state = 'ok';
-          detail = 'qualify';
+          detail = T('app.token.monthQualify', 'qualify');
         } else if (cur && key === cur) {
           if (!hasSync) {
             state = 'lag';
-            detail = 'sync…';
+            detail = T('app.token.monthSync', 'sync…');
           } else if (daysHit >= minDays) {
             state = 'ok';
             detail = daysHit + '/' + minDays;
@@ -1643,7 +1816,7 @@
           }
         } else if (cur && key < cur) {
           state = 'short';
-          detail = 'short';
+          detail = T('app.token.monthShort', 'short');
         }
         return (
           '<li class="adopt-unlock-tl-item adopt-unlock-tl-item--' +
@@ -1664,7 +1837,11 @@
       .join('');
 
     return (
-      '<ol class="adopt-unlock-timeline" aria-label="Care month path">' + items + '</ol>'
+      '<ol class="adopt-unlock-timeline" aria-label="' +
+      esc(T('app.token.careMonthPath', 'Care month path')) +
+      '">' +
+      items +
+      '</ol>'
     );
   }
 
@@ -1723,16 +1900,16 @@
           Date.now() - syncedAt > 2 * 60 * 60 * 1000);
 
       let statusTone = 'active';
-      let statusCopy = 'Care stake active';
+      let statusCopy = T('app.token.careStakeActive', 'Care stake active');
       if (status === 'released') {
         statusTone = 'released';
-        statusCopy = 'Unlocked — locked half paid to grower';
+        statusCopy = T('app.token.careReleased', 'Unlocked — locked half paid to grower');
       } else if (status === 'refunded') {
         statusTone = 'refunded';
-        statusCopy = 'Refunded — locked half returned to you';
+        statusCopy = T('app.token.careRefunded', 'Refunded — locked half returned to you');
       } else if (syncLag) {
         statusTone = 'lag';
-        statusCopy = 'Waiting for care sync';
+        statusCopy = T('app.token.careWaitingSync', 'Waiting for care sync');
       }
 
       const monthMeter =
@@ -1744,9 +1921,13 @@
       return (
         '<div class="adopt-unlock-panel adopt-unlock-panel--' +
         esc(statusTone) +
-        '" aria-label="Monthly care unlock">' +
+        '" aria-label="' +
+        esc(T('app.token.monthlyCareUnlock', 'Monthly care unlock')) +
+        '">' +
         '<div class="adopt-unlock-head">' +
-        '<strong>Care unlock</strong>' +
+        '<strong>' +
+        esc(T('app.token.careUnlock', 'Care unlock')) +
+        '</strong>' +
         '<span class="adopt-unlock-status">' +
         esc(statusCopy) +
         '</span>' +
@@ -1755,25 +1936,36 @@
         '<div class="adopt-unlock-grid">' +
         (stageLabel
           ? '<div class="adopt-unlock-row">' +
-            '<span class="adopt-unlock-label">Stage</span>' +
+            '<span class="adopt-unlock-label">' +
+            esc(T('app.token.stageLabel', 'Stage')) +
+            '</span>' +
             '<strong class="adopt-unlock-value">' +
             esc(String(stageLabel)) +
-            (listing.harvestReady ? ' · harvest ready' : '') +
+            (listing.harvestReady
+              ? ' · ' + esc(T('app.token.harvestReady', 'harvest ready'))
+              : '') +
             '</strong>' +
             '</div>'
           : '') +
         '<div class="adopt-unlock-row">' +
-        '<span class="adopt-unlock-label">Path</span>' +
+        '<span class="adopt-unlock-label">' +
+        esc(T('app.token.pathLabel', 'Path')) +
+        '</span>' +
         '<strong class="adopt-unlock-value">' +
-        esc(String(months)) +
-        '/' +
-        esc(String(neededLabel)) +
-        ' months qualify</strong>' +
+        esc(
+          T('app.token.monthsQualify', '{done}/{total} months qualify', {
+            done: String(months),
+            total: String(neededLabel),
+          })
+        ) +
+        '</strong>' +
         monthMeter +
         '</div>' +
         (locked
           ? '<div class="adopt-unlock-row">' +
-            '<span class="adopt-unlock-label">Locked</span>' +
+            '<span class="adopt-unlock-label">' +
+            esc(T('app.token.lockedLabel', 'Locked')) +
+            '</span>' +
             '<strong class="adopt-unlock-value">' +
             esc(String(locked)) +
             ' $GROWTOO</strong>' +
@@ -1784,14 +1976,16 @@
           ? '<div class="adopt-unlock-current">' +
             '<p>' +
             (hasMonthSync
-              ? 'This month <strong>' +
-                esc(formatMonthKeyLabel(listing.currentMonthKey)) +
-                '</strong>: ' +
-                esc(String(daysHit)) +
-                '/' +
-                esc(String(minDays)) +
-                ' care days'
-              : 'This month: waiting for care sync') +
+              ? T(
+                  'app.token.thisMonthCareDays',
+                  'This month <strong>{month}</strong>: {done}/{total} care days',
+                  {
+                    month: esc(formatMonthKeyLabel(listing.currentMonthKey)),
+                    done: esc(String(daysHit)),
+                    total: esc(String(minDays)),
+                  }
+                )
+              : esc(T('app.token.thisMonthWaiting', 'This month: waiting for care sync'))) +
             '</p>' +
             (hasMonthSync ? dayMeter : '') +
             '</div>'
@@ -1799,11 +1993,23 @@
         '<p class="adopt-unlock-foot">' +
         (status === 'active'
           ? syncLag
-            ? 'Progress updates after the adopt queue runs (about every 5 minutes).'
-            : 'All months need ≥12 care days. Locked half releases to the grower only if every month qualifies at harvest — otherwise it refunds to you.'
+            ? esc(
+                T(
+                  'app.token.progressQueueNote',
+                  'Progress updates after the adopt queue runs (about every 5 minutes).'
+                )
+              )
+            : esc(
+                T(
+                  'app.token.careRuleNote',
+                  'All months need ≥12 care days. Locked half releases to the grower only if every month qualifies at harvest — otherwise it refunds to you.'
+                )
+              )
           : status === 'released'
-            ? 'Harvest claim settled in the grower’s favor.'
-            : 'Harvest claim settled — your locked stake was returned.') +
+            ? esc(T('app.token.settledGrower', 'Harvest claim settled in the grower’s favor.'))
+            : esc(
+                T('app.token.settledRefund', 'Harvest claim settled — your locked stake was returned.')
+              )) +
         '</p>' +
         '</div>'
       );
@@ -1817,18 +2023,21 @@
     if (listing && listing.careStatus === 'active' && listing.adoptedAt) {
       const path = GrowerQuests.validateHarvestCarePath(token.plantId, listing.adoptedAt);
       pathExtra =
-        ' Stake path: ' +
-        (path.qualifyingMonthKeys || []).length +
-        '/' +
-        (path.monthKeys || []).length +
-        ' months qualify.';
+        ' ' +
+        T('app.token.stakePath', 'Stake path: {done}/{total} months qualify.', {
+          done: (path.qualifyingMonthKeys || []).length,
+          total: (path.monthKeys || []).length,
+        });
     }
     return (
       '<div class="grower-quest ' +
       cls +
+      // i18n-ignore — CSS classes
       ' grower-quest--care grower-quest--monthly">' +
       '<div class="grower-quest-head">' +
-      '<strong>Monthly care unlock</strong>' +
+      '<strong>' +
+      esc(T('app.token.monthlyCareUnlock', 'Monthly care unlock')) +
+      '</strong>' +
       '<span>' +
       month.daysHit +
       '/' +
@@ -1856,8 +2065,12 @@
     return (
       '<p class="adopt-rank-badge adopt-rank-badge--tier-' +
       esc(String(rank.tier)) +
-      '" title="Rises with stage progress and qualifying care months. Score ' +
-      esc(String(rank.score)) +
+      '" title="' +
+      esc(
+        T('app.token.rankTitle', 'Rises with stage progress and qualifying care months. Score {score}', {
+          score: String(rank.score),
+        })
+      ) +
       '">' +
       esc(rank.label) +
       '</p>'
@@ -1885,9 +2098,16 @@
       return (
         '<div class="adopt-stake-panel">' +
         claimRail +
-        '<p class="adopt-care-hint">Locked stake settled · ' +
-        esc(care) +
-        '.</p>' +
+        '<p class="adopt-care-hint">' +
+        esc(
+          T('app.token.stakeSettled', 'Locked stake settled · {status}.', {
+            status:
+              care === 'released'
+                ? T('app.token.statusReleased', 'released')
+                : T('app.token.statusRefunded', 'refunded'),
+          })
+        ) +
+        '</p>' +
         '</div>'
       );
     }
@@ -1905,32 +2125,53 @@
     let pathMsg = '';
     if (token.plantId && window.GrowerQuests && listing.adoptedAt) {
       const path = GrowerQuests.validateHarvestCarePath(token.plantId, listing.adoptedAt);
-      pathMsg =
-        (path.qualifyingMonthKeys || []).length +
-        '/' +
-        (path.monthKeys || []).length +
-        ' months qualify';
+      pathMsg = T('app.token.monthsQualify', '{done}/{total} months qualify', {
+        done: (path.qualifyingMonthKeys || []).length,
+        total: (path.monthKeys || []).length,
+      });
     }
-    const stageHint = listing.liveStage ? ' · stage ' + listing.liveStage : '';
+    const stageHint = listing.liveStage
+      ? ' · ' + T('app.token.stageHint', 'stage {stage}', { stage: listing.liveStage })
+      : '';
     return (
       '<div class="adopt-stake-panel">' +
       claimRail +
-      '<p class="adopt-care-hint">Adopt stake locked: <strong>' +
+      '<p class="adopt-care-hint">' +
+      esc(T('app.token.stakeLocked', 'Adopt stake locked:')) +
+      ' <strong>' +
       esc(String(locked)) +
       ' $GROWTOO</strong>' +
       (pathMsg ? ' · ' + esc(pathMsg) : '') +
       (stageHint ? esc(stageHint) : '') +
       '</p>' +
       (claimPending
-        ? '<p class="adopt-care-hint">Claim queued — waiting for the adopt worker.</p>'
+        ? '<p class="adopt-care-hint">' +
+          esc(T('app.token.claimQueued', 'Claim queued — waiting for the adopt worker.')) +
+          '</p>'
         : isHarvest
           ? '<button type="button" class="btn btn-primary btn-sm adopt-harvest-claim-btn" data-listing-id="' +
             esc(listing.id) +
             '" data-plant-id="' +
             esc(token.plantId || '') +
-            '">Claim locked stake ($GROWTOO)</button>' +
-            '<p class="adopt-care-hint">Settles locked $GROWTOO only — physical harvest redemption is coming later.</p>'
-          : '<p class="adopt-care-hint">Reach harvest stage to claim the locked $GROWTOO half (all months must qualify).</p>') +
+            '">' +
+            esc(T('app.token.claimLockedStake', 'Claim locked stake ($GROWTOO)')) +
+            '</button>' +
+            '<p class="adopt-care-hint">' +
+            esc(
+              T(
+                'app.token.claimSettlesNote',
+                'Settles locked $GROWTOO only — physical harvest redemption is coming later.'
+              )
+            ) +
+            '</p>'
+          : '<p class="adopt-care-hint">' +
+            esc(
+              T(
+                'app.token.reachHarvestNote',
+                'Reach harvest stage to claim the locked $GROWTOO half (all months must qualify).'
+              )
+            ) +
+            '</p>') +
       '</div>'
     );
   }
@@ -1951,9 +2192,20 @@
     if (!atHarvest && !liveHarvest) return '';
     return (
       '<div class="adopt-redeem-later" role="status">' +
-      '<strong>Redeem physical harvest</strong>' +
-      '<span>Coming later</span>' +
-      '<p>Not available on Devnet. Care unlock and locked-stake claim are the practice path today.</p>' +
+      '<strong>' +
+      esc(T('app.token.redeemHarvest', 'Redeem physical harvest')) +
+      '</strong>' +
+      '<span>' +
+      esc(T('app.token.comingLater', 'Coming later')) +
+      '</span>' +
+      '<p>' +
+      esc(
+        T(
+          'app.token.redeemNote',
+          'Not available on Devnet. Care unlock and locked-stake claim are the practice path today.'
+        )
+      ) +
+      '</p>' +
       '</div>'
     );
   }
@@ -1963,8 +2215,17 @@
       if (!nextStage) return '';
       return (
         '<div class="grower-quest grower-quest--blocked">' +
-        '<div class="grower-quest-head"><strong>Growth tracking</strong></div>' +
-        '<p class="grower-quest-msg">Stage advances are minted by the linked grower’s journal proof. Track progress here or buy later stages on the market.</p>' +
+        '<div class="grower-quest-head"><strong>' +
+        esc(T('app.token.growthTracking', 'Growth tracking')) +
+        '</strong></div>' +
+        '<p class="grower-quest-msg">' +
+        esc(
+          T(
+            'app.token.growthTrackingNote',
+            'Stage advances are minted by the linked grower’s journal proof. Track progress here or buy later stages on the market.'
+          )
+        ) +
+        '</p>' +
         '</div>'
       );
     }
@@ -2001,8 +2262,17 @@
     if (!token.plantId) {
       return (
         '<div class="adopt-care-tools">' +
-        '<div class="adopt-care-tools-head"><strong>Grower tools</strong></div>' +
-        '<p class="adopt-care-hint">Link a journal plant above to unlock watering, feeding, stage, and environment logs.</p>' +
+        '<div class="adopt-care-tools-head"><strong>' +
+        esc(T('app.token.growerTools', 'Grower tools')) +
+        '</strong></div>' +
+        '<p class="adopt-care-hint">' +
+        esc(
+          T(
+            'app.token.linkPlantToUnlock',
+            'Link a journal plant above to unlock watering, feeding, stage, and environment logs.'
+          )
+        ) +
+        '</p>' +
         '</div>'
       );
     }
@@ -2018,42 +2288,64 @@
     const xp = (window.GrowerQuests && GrowerQuests.QUEST_XP) || {};
 
     return (
-      '<div class="adopt-care-tools" aria-label="Grower tools">' +
+      '<div class="adopt-care-tools" aria-label="' +
+      esc(T('app.token.growerTools', 'Grower tools')) +
+      '">' +
       '<div class="adopt-care-tools-head">' +
-      '<strong>Grower tools</strong>' +
-      '<span>Log care here to unlock the next mint</span>' +
+      '<strong>' +
+      esc(T('app.token.growerTools', 'Grower tools')) +
+      '</strong>' +
+      '<span>' +
+      esc(T('app.token.logCareHint', 'Log care here to unlock the next mint')) +
+      '</span>' +
       '</div>' +
       '<div class="adopt-care-tools-grid">' +
-      careToolBtn(token.id, 'water', 'Water', !!(byId.watering && byId.watering.ok), {
-        xp: xp.watering,
-        title: 'Log watering for this plant',
-      }) +
-      careToolBtn(token.id, 'feed', 'Feed', !!(byId.feeding && byId.feeding.ok), {
-        xp: xp.feeding,
-        title: 'Log feeding / nutrients',
-      }) +
+      careToolBtn(
+        token.id,
+        'water',
+        T('app.token.careWater', 'Water'),
+        !!(byId.watering && byId.watering.ok),
+        {
+          xp: xp.watering,
+          title: T('app.token.careWaterTitle', 'Log watering for this plant'),
+        }
+      ) +
+      careToolBtn(
+        token.id,
+        'feed',
+        T('app.token.careFeed', 'Feed'),
+        !!(byId.feeding && byId.feeding.ok),
+        {
+          xp: xp.feeding,
+          title: T('app.token.careFeedTitle', 'Log feeding / nutrients'),
+        }
+      ) +
       careToolBtn(
         token.id,
         'stage',
-        nextStage ? 'Set stage → ' + nextStage.label : 'Set stage',
+        nextStage
+          ? T('app.token.careSetStageTo', 'Set stage → {stage}', { stage: nextStage.label })
+          : T('app.token.careSetStage', 'Set stage'),
         !!(byId.stageLogged && byId.stageLogged.ok),
         {
           xp: xp.stageLogged,
           disabled: !nextStage,
           title: nextStage
-            ? 'Update journal stage for ' + nextStage.label
-            : 'Fully grown',
+            ? T('app.token.careStageTitle', 'Update journal stage for {stage}', {
+                stage: nextStage.label,
+              })
+            : T('app.token.fullyGrown', 'Fully grown'),
         }
       ) +
       // Environment/Transplant/Stress note are occasional, not daily — reach
       // them via "All tools" (Toolbox has a dedicated section for each)
       // instead of every card carrying all 8 buttons inline.
-      careToolBtn(token.id, 'tools', 'All tools', false, {
-        title: 'Open the full Tools dashboard',
+      careToolBtn(token.id, 'tools', T('app.token.careAllTools', 'All tools'), false, {
+        title: T('app.token.careAllToolsTitle', 'Open the full Tools dashboard'),
       }) +
-      careToolBtn(token.id, 'coach', 'Ask Coach', false, {
+      careToolBtn(token.id, 'coach', T('app.token.careAskCoach', 'Ask Coach'), false, {
         primary: true,
-        title: 'Open Grower Coach for this plant',
+        title: T('app.token.careAskCoachTitle', 'Open Grower Coach for this plant'),
       }) +
       '</div></div>'
     );
@@ -2064,7 +2356,7 @@
     const token = wallet.tokens.find(function (t) {
       return t.id === tokenId;
     });
-    if (!token) throw new Error('Token not found.');
+    if (!token) throw new Error(T('app.token.notFound', 'Token not found.'));
 
     if (action === 'tools') {
       if (typeof window.showAppView === 'function') window.showAppView('toolbox');
@@ -2073,23 +2365,32 @@
     if (action === 'coach') {
       if (window.AICoach) {
         AICoach.open();
-        const name = token.name || 'my plant';
+        const name = token.name || T('app.token.myPlant', 'my plant');
         setTimeout(function () {
           AICoach.ask(
-            'Help me complete grower quests for ' +
-              name +
-              (token.plantId ? ' (plant linked)' : '') +
-              '. What should I log next?'
+            token.plantId
+              ? T(
+                  'app.token.questCoachAskLinked',
+                  'Help me complete grower quests for {name} (plant linked). What should I log next?',
+                  { name: name }
+                )
+              : T(
+                  'app.token.questCoachAsk',
+                  'Help me complete grower quests for {name}. What should I log next?',
+                  { name: name }
+                )
           );
         }, 200);
       }
       return;
     }
 
-    if (!token.plantId) throw new Error('Link a journal plant first.');
+    if (!token.plantId) throw new Error(T('app.token.linkPlantFirst', 'Link a journal plant first.'));
     const DJ = window.DnevnikJournal;
     if (!DJ || typeof DJ.addEntry !== 'function') {
-      throw new Error('Journal tools are not ready. Refresh the page.');
+      throw new Error(
+        T('app.token.journalNotReady', 'Journal tools are not ready. Refresh the page.')
+      );
     }
 
     const next =
@@ -2109,7 +2410,7 @@
       DJ.addEntry({
         plantId: token.plantId,
         type: 'zalijevanje',
-        note: 'Watering logged from Tokenise',
+        note: T('app.token.noteWatering', 'Watering logged from Tokenise'),
         meta: { source: 'tokenise-tools' },
       });
       return;
@@ -2118,26 +2419,32 @@
       DJ.addEntry({
         plantId: token.plantId,
         type: 'gnojidba',
-        note: 'Feeding logged from Tokenise',
+        note: T('app.token.noteFeeding', 'Feeding logged from Tokenise'),
         meta: { source: 'tokenise-tools' },
       });
       return;
     }
     if (action === 'stage') {
-      if (!next) throw new Error('Already at final stage.');
+      if (!next) throw new Error(T('app.token.atFinalStage', 'Already at final stage.'));
       const plantStage = stageMap[next.key];
-      if (!plantStage) throw new Error('Unknown target stage.');
+      if (!plantStage) throw new Error(T('app.token.unknownStage', 'Unknown target stage.'));
       if (typeof DJ.setPlantStage !== 'function') {
-        throw new Error('Stage update is not available.');
+        throw new Error(T('app.token.stageUnavailable', 'Stage update is not available.'));
       }
-      DJ.setPlantStage(token.plantId, plantStage, 'Stage set from Tokenise for ' + next.label);
+      DJ.setPlantStage(
+        token.plantId,
+        plantStage,
+        T('app.token.stageSetNote', 'Stage set from Tokenise for {stage}', {
+          stage: stageLabel(next),
+        })
+      );
       return;
     }
     if (action === 'environment') {
       DJ.addEntry({
         plantId: token.plantId,
         type: 'okolis',
-        note: 'Environment check logged from Tokenise',
+        note: T('app.token.noteEnvironment', 'Environment check logged from Tokenise'),
         meta: { source: 'tokenise-tools' },
       });
       return;
@@ -2146,7 +2453,7 @@
       DJ.addEntry({
         plantId: token.plantId,
         type: 'opcenito',
-        note: 'Transplant / pot-up logged from Tokenise',
+        note: T('app.token.noteTransplant', 'Transplant / pot-up logged from Tokenise'),
         meta: { source: 'tokenise-tools', tool: 'transplant' },
       });
       return;
@@ -2155,40 +2462,60 @@
       DJ.addEntry({
         plantId: token.plantId,
         type: 'opcenito',
-        note: 'Stress / pest observation logged from Tokenise',
+        note: T('app.token.noteStress', 'Stress / pest observation logged from Tokenise'),
         meta: { source: 'tokenise-tools', tool: 'stressors' },
       });
       return;
     }
-    throw new Error('Unknown care action.');
+    throw new Error(T('app.token.unknownCareAction', 'Unknown care action.'));
   }
 
   function linkPlantControlHtml(token) {
     if (isAdopterUi()) {
-      return '<p class="adopt-token-link adopt-token-link--warn">Adopted asset — growth updates from the grower / market</p>';
+      return (
+        '<p class="adopt-token-link adopt-token-link--warn">' +
+        esc(
+          T('app.token.adoptedAsset', 'Adopted asset — growth updates from the grower / market')
+        ) +
+        '</p>'
+      );
     }
     const plants = readPlants();
     if (!plants.length) {
       return (
-        '<p class="adopt-token-link adopt-token-link--warn">Not linked — add a plant in Plants &amp; journal first</p>'
+        '<p class="adopt-token-link adopt-token-link--warn">' +
+        esc(T('app.token.notLinkedNoPlants', 'Not linked — add a plant in Plants & journal first')) +
+        '</p>'
       );
     }
     const opts = plants
-      .map((p) => '<option value="' + esc(p.id) + '">' + esc(p.name || 'Plant') + '</option>')
+      .map(
+        (p) =>
+          '<option value="' +
+          esc(p.id) +
+          '">' +
+          esc(p.name || T('app.token.plantFallback', 'Plant')) +
+          '</option>'
+      )
       .join('');
     return (
       '<div class="adopt-link-plant">' +
-      '<p class="adopt-token-link adopt-token-link--warn">Not linked to a journal plant</p>' +
-      '<label class="adopt-link-plant-label">Link plant' +
+      '<p class="adopt-token-link adopt-token-link--warn">' +
+      esc(T('app.token.notLinked', 'Not linked to a journal plant')) +
+      '</p>' +
+      '<label class="adopt-link-plant-label">' +
+      esc(T('app.token.linkPlant', 'Link plant')) +
       '<select class="adopt-link-plant-select" data-token-id="' +
       esc(token.id) +
       '">' +
-      '<option value="">— choose —</option>' +
+      '<option value="">' + esc(T('app.token.chooseOption', '— choose —')) + '</option>' +
       opts +
       '</select></label>' +
       '<button type="button" class="btn btn-ghost btn-sm adopt-link-plant-btn" data-token-id="' +
       esc(token.id) +
-      '">Link</button>' +
+      '">' +
+      esc(T('app.token.link', 'Link')) +
+      '</button>' +
       '</div>'
     );
   }
@@ -2197,7 +2524,9 @@
     if (!next) return '';
     if (isAdopterUi()) {
       return (
-        '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>Awaiting grower stage mint</button>'
+        '<button type="button" class="btn btn-ghost btn-sm adopt-action-primary" disabled>' +
+        esc(T('app.token.awaitingStageMint', 'Awaiting grower stage mint')) +
+        '</button>'
       );
     }
     let ready = true;
@@ -2213,19 +2542,22 @@
         esc(token.id) +
         '" disabled' +
         title +
-        '>Log care to seal → ' +
-        esc(next.label) +
+        '>' +
+        esc(T('app.token.logCareToSeal', 'Log care to seal → {stage}', { stage: stageLabel(next) })) +
         '</button>'
       );
     }
     return (
       '<button type="button" class="btn btn-primary btn-sm adopt-mint-btn adopt-action-primary" data-id="' +
       esc(token.id) +
-      '">Seal → ' +
-      esc(next.label) +
-      ' (+' +
-      next.reward +
-      ')</button>'
+      '">' +
+      esc(
+        T('app.token.sealTo', 'Seal → {stage} (+{reward})', {
+          stage: stageLabel(next),
+          reward: next.reward,
+        })
+      ) +
+      '</button>'
     );
   }
 
@@ -2284,13 +2616,14 @@
   function investActionLabel(token) {
     const src = resolveInvestSource(token);
     const status = String(src.status || '');
-    if (status === 'failed') return 'Investment failed';
-    if (status === 'sold') return 'Adopted';
+    if (status === 'failed') return T('app.token.investFailed', 'Investment failed');
+    if (status === 'sold') return T('app.token.adopted', 'Adopted');
     if (status === 'sale_pending') {
-      if (window.StatusRail && StatusRail.hasConfirmedPayment(src)) return 'Settling…';
-      return 'Payment pending…';
+      if (window.StatusRail && StatusRail.hasConfirmedPayment(src))
+        return T('app.token.settling', 'Settling…');
+      return T('app.token.paymentPending', 'Payment pending…');
     }
-    return 'Adopted';
+    return T('app.token.adopted', 'Adopted');
   }
 
   // On-chain (devnet) mint status for a token, from the seedMints queue.
@@ -2313,8 +2646,9 @@
           : 'https://solscan.io/account/' + encodeURIComponent(mint.mintAddress) + '?cluster=devnet';
       return (
         rail +
-        '<p class="adopt-token-chain adopt-token-chain--minted">⛓ Minted on devnet: ' +
-        '<a href="' +
+        '<p class="adopt-token-chain adopt-token-chain--minted">⛓ ' +
+        esc(T('app.token.mintedOnDevnet', 'Minted on devnet:')) +
+        ' <a href="' +
         esc(explorer) +
         '" target="_blank" rel="noopener noreferrer"><code>' +
         esc(shortAddr(mint.mintAddress)) +
@@ -2322,7 +2656,9 @@
         (mint.metadataUri
           ? ' · <a href="' +
             esc(mint.metadataUri) +
-            '" target="_blank" rel="noopener noreferrer">metadata</a>'
+            '" target="_blank" rel="noopener noreferrer">' +
+            esc(T('app.token.metadata', 'metadata')) +
+            '</a>'
           : '') +
         '</p>'
       );
@@ -2333,13 +2669,26 @@
         '<div class="adopt-token-chain adopt-token-chain--failed">' +
         '<button type="button" class="btn btn-ghost btn-sm adopt-retry-mint-btn" data-token-id="' +
         esc(token.id) +
-        '">Retry mint</button>' +
-        '<p class="adopt-mint-hint">Queues a new mint to your linked wallet. Connect the same Devnet wallet you want to own the NFT.</p>' +
+        '">' +
+        esc(T('app.token.retryMint', 'Retry mint')) +
+        '</button>' +
+        '<p class="adopt-mint-hint">' +
+        esc(
+          T(
+            'app.token.retryMintHint',
+            'Queues a new mint to your linked wallet. Connect the same Devnet wallet you want to own the NFT.'
+          )
+        ) +
+        '</p>' +
         '</div>'
       );
     }
     if (rail) return rail;
-    return '<p class="adopt-token-chain adopt-token-chain--pending">⛓ Devnet mint requested…</p>';
+    return (
+      '<p class="adopt-token-chain adopt-token-chain--pending">⛓ ' +
+      esc(T('app.token.mintRequested', 'Devnet mint requested…')) +
+      '</p>'
+    );
   }
 
   function isAdopterUi() {
@@ -2364,25 +2713,36 @@
     const onchain =
       onchainGrowBalance != null ? onchainGrowBalance : null;
     const balLabel =
-      onchain != null ? onchain.toLocaleString('en-US') : growBal.toLocaleString('en-US');
-    const balMeta = onchain != null ? 'on-chain' : wallet.connected ? 'wallet' : 'connect to see';
+      onchain != null ? onchain.toLocaleString(intlTag()) : growBal.toLocaleString(intlTag());
+    const balMeta =
+      onchain != null
+        ? T('app.token.balanceOnchain', 'on-chain')
+        : wallet.connected
+          ? T('app.token.balanceWallet', 'wallet')
+          : T('app.token.balanceConnect', 'connect to see');
 
     el.innerHTML =
       '<div class="adopter-summary-inner">' +
       '<div class="adopter-summary-stat">' +
-      '<span class="adopter-summary-label">Adopted</span>' +
+      '<span class="adopter-summary-label">' +
+      esc(T('app.token.summaryAdopted', 'Adopted')) +
+      '</span>' +
       '<div class="adopter-summary-row">' +
       '<strong class="adopter-summary-value">' +
       count +
       '</strong>' +
       '<span class="adopter-summary-meta">' +
-      (count === 1 ? 'plant' : 'plants') +
+      // Bare noun — the number lives in the <strong> above, but the form of
+      // the word still follows it (1 biljka / 2 biljke / 5 biljaka).
+      esc(T('app.token.plantsUnit', 'plants', { count: count })) +
       '</span>' +
       '</div>' +
       '</div>' +
       '<div class="adopter-summary-divider" aria-hidden="true"></div>' +
       '<div class="adopter-summary-stat">' +
-      '<span class="adopter-summary-label">Balance</span>' +
+      '<span class="adopter-summary-label">' +
+      esc(T('app.token.summaryBalance', 'Balance')) +
+      '</span>' +
       '<div class="adopter-summary-row">' +
       '<strong class="adopter-summary-value">' +
       esc(balLabel) +
@@ -2394,7 +2754,7 @@
       '</div>' +
       '<div class="adopter-summary-stat adopter-summary-stat--action">' +
       '<button type="button" class="btn btn-primary btn-sm" id="adopter-summary-market-btn">' +
-      (count ? 'Adopt another' : 'Browse market') +
+      esc(count ? T('app.token.adoptAnother', 'Adopt another') : T('app.token.browseMarket', 'Browse market')) +
       '</button>' +
       '</div>' +
       '</div>';
@@ -2500,21 +2860,39 @@
         const emptyCopy =
           window.GrowtooProfile && typeof window.GrowtooProfile.adopterIntentCopy === 'function'
             ? window.GrowtooProfile.adopterIntentCopy().empty
-            : 'Browse the market and stake $GROWTOO when you are ready to support a grow.';
+            : T(
+                'app.token.adopterEmptyBody',
+                'Browse the market and stake $GROWTOO when you are ready to support a grow.'
+              );
         grid.innerHTML =
           '<div class="empty-state empty-state--next adopt-empty-adopter">' +
-          '<p class="adopt-empty-lead">No adopted plants yet</p>' +
+          '<p class="adopt-empty-lead">' +
+          esc(T('app.token.noAdoptedYet', 'No adopted plants yet')) +
+          '</p>' +
           '<p class="adopt-empty-body">' +
           esc(emptyCopy) +
           '</p>' +
-          '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">Browse market</button>' +
+          '<button type="button" class="btn btn-primary" id="adopt-empty-market-btn">' +
+          esc(T('app.token.browseMarket', 'Browse market')) +
+          '</button>' +
           '</div>';
       } else {
         grid.innerHTML =
           '<div class="empty-state empty-state--next">' +
-          '<p class="adopt-empty-lead">No sealed plants yet</p>' +
-          '<p class="adopt-empty-body">Pick a journal plant and seal the first stage to mint your RWA.</p>' +
-          '<button type="button" class="btn btn-primary" id="adopt-empty-seal-btn">Seal a stage</button>' +
+          '<p class="adopt-empty-lead">' +
+          esc(T('app.token.noSealedYet', 'No sealed plants yet')) +
+          '</p>' +
+          '<p class="adopt-empty-body">' +
+          esc(
+            T(
+              'app.token.growerEmptyBody',
+              'Pick a journal plant and seal the first stage to mint your RWA.'
+            )
+          ) +
+          '</p>' +
+          '<button type="button" class="btn btn-primary" id="adopt-empty-seal-btn">' +
+          esc(T('app.token.sealAStage', 'Seal a stage')) +
+          '</button>' +
           '</div>';
       }
       return;
@@ -2617,7 +2995,7 @@
       return {
         kind: 'seed',
         stage: GROWTH_STAGES[0],
-        label: 'Seal seed stage · +0 $GROWTOO',
+        label: T('app.token.sealSeedStage', 'Seal seed stage · +0 $GROWTOO'),
         token: null,
       };
     }
@@ -2626,7 +3004,7 @@
       return {
         kind: 'done',
         stage: GROWTH_STAGES[GROWTH_STAGES.length - 1],
-        label: 'Trail complete',
+        label: T('app.token.trailComplete', 'Trail complete'),
         token: token,
       };
     }
@@ -2641,7 +3019,10 @@
     return {
       kind: 'growth',
       stage: next,
-      label: 'Seal ' + String(next.label || '').toLowerCase() + ' stage · +' + next.reward + ' $GROWTOO',
+      label: T('app.token.sealStageAction', 'Seal {stage} stage · +{reward} $GROWTOO', {
+        stage: stageLabel(next).toLowerCase(),
+        reward: next.reward,
+      }),
       token: token,
       ready: ready,
       lockMsg: lockMsg,
@@ -2654,14 +3035,17 @@
     const plants = readPlants();
     const current = sel.value;
     sel.innerHTML =
-      '<option value="">Choose a plant from your journal</option>' +
+      '<option value="">' +
+      esc(T('app.token.choosePlantFromJournal', 'Choose a plant from your journal')) +
+      '</option>' +
       plants
         .map(function (p, i) {
           const stage = journalStageLabel(p);
           const day = plantDayCount(p);
-          const dayBit = day == null ? '' : ', day ' + day;
+          const dayBit =
+            day == null ? '' : ', ' + T('app.token.dayLower', 'day {count}', { count: day });
           const label =
-            (p.name || 'Plant') +
+            (p.name || T('app.token.plantFallback', 'Plant')) +
             ' №' +
             plantSpecimenNo(i) +
             ' — ' +
@@ -2684,10 +3068,13 @@
     const wallet = readWallet();
     if (!wallet.connected) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Connect wallet to seal';
+      submitBtn.textContent = T('app.token.connectWalletToSeal', 'Connect wallet to seal');
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = 'Tap the wallet pill in the header to connect on the test network.';
+        statusEl.textContent = T(
+          'app.token.connectWalletHint',
+          'Tap the wallet pill in the header to connect on the test network.'
+        );
       }
       return;
     }
@@ -2700,19 +3087,22 @@
     const action = sealActionForPlant(plant, wallet);
     if (!action) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Seal a stage';
+      submitBtn.textContent = T('app.token.sealAStage', 'Seal a stage');
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = 'Pick a plant from your journal.';
+        statusEl.textContent = T('app.token.pickPlantFirst', 'Pick a plant from your journal.');
       }
       return;
     }
     if (action.kind === 'done') {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Trail complete · harvest sealed';
+      submitBtn.textContent = T('app.token.trailCompleteSealed', 'Trail complete · harvest sealed');
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = 'This plant’s trail is fully sealed. List it on Market when you are ready.';
+        statusEl.textContent = T(
+          'app.token.trailSealedHint',
+          'This plant’s trail is fully sealed. List it on Market when you are ready.'
+        );
       }
       return;
     }
@@ -2721,7 +3111,9 @@
       submitBtn.textContent = action.label;
       if (statusEl) {
         statusEl.hidden = false;
-        statusEl.textContent = action.lockMsg || 'Log more care before sealing the next stage.';
+        statusEl.textContent =
+          action.lockMsg ||
+          T('app.token.logMoreCare', 'Log more care before sealing the next stage.');
       }
       return;
     }
@@ -2764,31 +3156,47 @@
     let body =
       '<div class="test-faucet-card">' +
       '<div class="test-faucet-copy">' +
-      '<strong>Test-network faucet</strong>' +
-      '<p>Claim <strong>' +
-      esc(String(amount)) +
-      ' $GROWTOO</strong> once per UTC day to your connected wallet — enough to try Invest / adopt stake.</p>' +
+      '<strong>' +
+      esc(T('app.faucet.title', 'Test-network faucet')) +
+      '</strong>' +
+      '<p>' +
+      T(
+        'app.faucet.body',
+        'Claim <strong>{amount} $GROWTOO</strong> once per UTC day to your connected wallet — enough to try Invest / adopt stake.',
+        { amount: esc(String(amount)) }
+      ) +
+      '</p>' +
       '</div>';
 
     if (status && status.status === 'minted') {
       body +=
-        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed today: <strong>+' +
-        esc(String(status.reward || amount)) +
-        ' $GROWTOO</strong>. Next claim after UTC midnight.</p>';
+        '<p class="adopt-token-chain adopt-token-chain--ok">' +
+        T(
+          'app.faucet.claimedToday',
+          'Claimed today: <strong>+{amount} $GROWTOO</strong>. Next claim after UTC midnight.',
+          { amount: esc(String(status.reward || amount)) }
+        ) +
+        '</p>';
     } else if (status && status.status === 'pending') {
       body +=
-        '<p class="market-hint">Faucet pending in the rewards queue… usually within a few minutes.</p>';
+        '<p class="market-hint">' +
+        esc(
+          T('app.faucet.pending', 'Faucet pending in the rewards queue… usually within a few minutes.')
+        ) +
+        '</p>';
     } else if (status && status.status === 'failed') {
       body +=
         '<p class="market-card-error">' +
-        esc(status.error || 'Claim failed') +
+        esc(status.error || T('app.faucet.claimFailed', 'Claim failed')) +
         '</p>' +
-        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">Retry faucet</button>';
+        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">' +
+        esc(T('app.faucet.retry', 'Retry faucet')) +
+        '</button>';
     } else {
       body +=
-        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">Claim ' +
-        esc(String(amount)) +
-        ' $GROWTOO</button>';
+        '<button type="button" class="btn btn-primary btn-sm" id="test-faucet-claim-btn">' +
+        esc(T('app.faucet.claim', 'Claim {amount} $GROWTOO', { amount: String(amount) })) +
+        '</button>';
     }
     body += '</div>';
     el.innerHTML = body;
@@ -2822,12 +3230,25 @@
         : null;
     const canSign = signingWalletReady();
     let body =
-      '<p class="market-hint">Monthly activity bonus — up to <strong>50 $GROWTOO</strong> for watering/feeding days, published stories, and 5-day care weeks. Distinct UTC days count (not extra logs the same day). Claim once per month to your Devnet wallet; spend later on the market. Test network only.</p>' +
+      '<p class="market-hint">' +
+      T(
+        'app.bonus.intro',
+        'Monthly activity bonus — up to <strong>50 $GROWTOO</strong> for watering/feeding days, published stories, and 5-day care weeks. Distinct UTC days count (not extra logs the same day). Claim once per month to your Devnet wallet; spend later on the market. Test network only.'
+      ) +
+      '</p>' +
       '<details class="platform-bonus-disclosure">' +
-      '<summary>How is this calculated?</summary>' +
-      '<p>+1 per care day (max 20), +1 per feeding day (max 8), +5 per published story (max 2), +3 per week with 5+ care days (max 4), plus small extras for new plants and sealed stages — capped at 50 for ' +
-      esc(monthKey) +
-      '.</p>' +
+      '<summary>' +
+      esc(T('app.bonus.howSummary', 'How is this calculated?')) +
+      '</summary>' +
+      '<p>' +
+      esc(
+        T(
+          'app.bonus.howBody',
+          '+1 per care day (max 20), +1 per feeding day (max 8), +5 per published story (max 2), +3 per week with 5+ care days (max 4), plus small extras for new plants and sealed stages — capped at 50 for {month}.',
+          { month: monthKey }
+        )
+      ) +
+      '</p>' +
       '</details>';
     if (
       window.GrowerQuests &&
@@ -2841,43 +3262,72 @@
       const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
       const care = preview.activity && preview.activity.careDays != null ? preview.activity.careDays : 0;
       body +=
-        '<p class="market-hint">This month so far: <strong>' +
-        esc(String(preview.reward)) +
-        ' $GROWTOO</strong> from ' +
-        esc(String(care)) +
-        ' care days.</p>';
+        '<p class="market-hint">' +
+        T(
+          'app.bonus.thisMonthSoFar',
+          'This month so far: <strong>{amount} $GROWTOO</strong> from {days} care days.',
+          { amount: esc(String(preview.reward)), days: esc(String(care)) }
+        ) +
+        '</p>';
     }
     if (status && status.status === 'minted') {
       body +=
-        '<p class="adopt-token-chain adopt-token-chain--ok">Claimed this month: <strong>' +
-        esc(String(status.reward || 0)) +
-        ' $GROWTOO</strong>. Next claim opens next calendar month.</p>';
+        '<p class="adopt-token-chain adopt-token-chain--ok">' +
+        T(
+          'app.bonus.claimedThisMonth',
+          'Claimed this month: <strong>{amount} $GROWTOO</strong>. Next claim opens next calendar month.',
+          { amount: esc(String(status.reward || 0)) }
+        ) +
+        '</p>';
     } else if (status && status.status === 'pending') {
       body +=
-        '<p class="market-hint">Claim pending in the platform rewards queue… Estimated reward: <strong>' +
-        esc(String(status.reward || '…')) +
-        ' $GROWTOO</strong></p>';
+        '<p class="market-hint">' +
+        T(
+          'app.bonus.pending',
+          'Claim pending in the platform rewards queue… Estimated reward: <strong>{amount} $GROWTOO</strong>',
+          { amount: esc(String(status.reward || '…')) }
+        ) +
+        '</p>';
     } else if (status && status.status === 'failed') {
       body +=
         '<p class="market-card-error">' +
-        esc(status.error || 'Claim failed') +
+        esc(status.error || T('app.faucet.claimFailed', 'Claim failed')) +
         '</p>';
       if (canSign) {
         body +=
-          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Retry claim</button>';
+          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">' +
+          esc(T('app.bonus.retryClaim', 'Retry claim')) +
+          '</button>';
       } else {
         body +=
-          '<p class="market-hint">Reconnect Phantom or Solflare, then retry.</p>' +
-          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">Connect wallet to retry</button>';
+          '<p class="market-hint">' +
+          esc(T('app.bonus.reconnectHint', 'Reconnect Phantom or Solflare, then retry.')) +
+          '</p>' +
+          '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">' +
+          esc(T('app.bonus.connectToRetry', 'Connect wallet to retry')) +
+          '</button>';
       }
     } else if (!canSign) {
       body +=
-        '<p class="market-hint">Bonus is ready to claim — connect a Devnet wallet first so we know where to send the $GROWTOO. Your journal stays free without one.</p>' +
-        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">Connect wallet to claim</button>';
+        '<p class="market-hint">' +
+        esc(
+          T(
+            'app.bonus.readyConnect',
+            'Bonus is ready to claim — connect a Devnet wallet first so we know where to send the $GROWTOO. Your journal stays free without one.'
+          )
+        ) +
+        '</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-connect-btn">' +
+        esc(T('app.bonus.connectToClaim', 'Connect wallet to claim')) +
+        '</button>';
     } else {
       body +=
-        '<p class="market-hint">You have an unclaimed monthly bonus available.</p>' +
-        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">Claim this month’s bonus</button>';
+        '<p class="market-hint">' +
+        esc(T('app.bonus.unclaimed', 'You have an unclaimed monthly bonus available.')) +
+        '</p>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="platform-bonus-claim-btn">' +
+        esc(T('app.bonus.claimThisMonth', 'Claim this month’s bonus')) +
+        '</button>';
     }
     el.innerHTML = body;
   }
@@ -2936,9 +3386,9 @@
     if (window.WalletLink && typeof window.WalletLink.formatError === 'function') {
       return WalletLink.formatError(err);
     }
-    if (!err) return 'Something went wrong.';
+    if (!err) return T('app.wallet.genericError', 'Something went wrong.');
     if (typeof err === 'string') return err;
-    return err.message || 'Something went wrong.';
+    return err.message || T('app.wallet.genericError', 'Something went wrong.');
   }
 
   function flashError(err) {
@@ -2946,11 +3396,15 @@
     console.error('Wallet UI error', err);
     if (err && err.code === 'WALLET_NOT_FOUND' && window.ChainConfig && window.ChainConfig.walletDownloadUrl) {
       askConfirm({
-        title: 'Wallet not found',
+        title: T('app.wallet.notFoundTitle', 'Wallet not found'),
         body:
           msg +
-          '\n\nIf a wallet is installed, unlock it, allow growto.live, then refresh this page.',
-        confirmLabel: 'Browse wallets',
+          '\n\n' +
+          T(
+            'app.wallet.notFoundBody',
+            'If a wallet is installed, unlock it, allow growto.live, then refresh this page.'
+          ),
+        confirmLabel: T('app.wallet.browseWallets', 'Browse wallets'),
       }).then(function (ok) {
         if (ok) {
           window.open(window.ChainConfig.walletDownloadUrl, '_blank', 'noopener,noreferrer');
@@ -2963,13 +3417,15 @@
   }
 
   function flashOk(msg) {
-    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg || 'Done.', 'success');
-    else alert(msg || 'Done.');
+    const text = msg || T('app.wallet.done', 'Done.');
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(text, 'success');
+    else alert(text);
   }
 
   function flashWarn(msg) {
-    if (window.DnevnikNotifications) DnevnikNotifications.toast(msg || 'Check status.', 'warn');
-    else alert(msg || 'Check status.');
+    const text = msg || T('app.wallet.checkStatus', 'Check status.');
+    if (window.DnevnikNotifications) DnevnikNotifications.toast(text, 'warn');
+    else alert(text);
   }
 
   function sealOutcomeFlash(result) {
@@ -2977,20 +3433,30 @@
     if (status === 'queued' || status === 'skipped' || !status) {
       flashOk(
         status === 'queued'
-          ? 'Stage sealed. Mint queued on Devnet — watch the card until it shows Minted.'
-          : 'Stage sealed.'
+          ? T(
+              'app.token.sealedQueued',
+              'Stage sealed. Mint queued on Devnet — watch the card until it shows Minted.'
+            )
+          : T('app.token.sealedOk', 'Stage sealed.')
       );
       return;
     }
     if (status === 'pending_seed') {
       flashWarn(
         (result && result.onchainError) ||
-          'Stage saved locally. On-chain mint waits for the seed NFT — use Retry if needed.'
+          T(
+            'app.token.sealedPendingSeed',
+            'Stage saved locally. On-chain mint waits for the seed NFT — use Retry if needed.'
+          )
       );
       return;
     }
     flashWarn(
-      'Saved in your garden, but the Devnet mint did not queue. Use Retry mint on the card. ' +
+      T(
+        'app.token.sealedMintNotQueued',
+        'Saved in your garden, but the Devnet mint did not queue. Use Retry mint on the card.'
+      ) +
+        ' ' +
         ((result && result.onchainError) || '')
     );
   }
@@ -3000,9 +3466,9 @@
       return AppConfirm.ask(opts);
     }
     const fallback =
-      ((opts && opts.title) || 'Confirm') +
+      ((opts && opts.title) || T('app.wallet.confirm', 'Confirm')) +
       '\n\n' +
-      ((opts && opts.body) || 'Continue?');
+      ((opts && opts.body) || T('app.wallet.continueQ', 'Continue?'));
     return Promise.resolve(window.confirm(fallback));
   }
 
@@ -3010,12 +3476,14 @@
     if (busy) return;
     const wallet = readWallet();
     if (!wallet.connected || !wallet.address) {
-      flashError(new Error('Connect a wallet before linking your account.'));
+      flashError(
+        new Error(T('app.wallet.connectBeforeLink', 'Connect a wallet before linking your account.'))
+      );
       return;
     }
     setBusy(true);
     const original = btn ? btn.textContent : '';
-    if (btn) btn.textContent = 'Linking…';
+    if (btn) btn.textContent = T('app.wallet.linking', 'Linking…');
     try {
       if (window.WalletLink) {
         await WalletLink.linkWallet(wallet.address, { force: false });
@@ -3027,7 +3495,7 @@
     } catch (err) {
       flashError(err);
     } finally {
-      if (btn) btn.textContent = original || 'Link account';
+      if (btn) btn.textContent = original || T('app.wallet.linkAccount', 'Link account');
       setBusy(false);
     }
   }
@@ -3047,7 +3515,7 @@
       return;
     }
     const original = btn ? btn.textContent : '';
-    if (btn) btn.textContent = 'Choose wallet…';
+    if (btn) btn.textContent = T('app.wallet.chooseWallet', 'Choose wallet…');
     // Do not set global busy while the picker is open — Solflare may stay
     // pending until the user approves, cancels, or the timeout fires.
     try {
@@ -3070,11 +3538,16 @@
       if (wallet && wallet.linkError) {
         const soft = /cancel|signature cancelled/i.test(String(wallet.linkError));
         const msg =
-          'Wallet connected.\n\n' +
+          T('app.wallet.connected', 'Wallet connected.') +
+          '\n\n' +
           wallet.linkError +
+          '\n\n' +
           (soft
-            ? '\n\nSolflare stays connected — tap Link account and approve the signature (no new connect popup).'
-            : '\n\nUse "Link account" to try again.');
+            ? T(
+                'app.wallet.softLinkHint',
+                'Solflare stays connected — tap Link account and approve the signature (no new connect popup).'
+              )
+            : T('app.wallet.hardLinkHint', 'Use "Link account" to try again.'));
         if (window.DnevnikNotifications) {
           DnevnikNotifications.toast(wallet.linkError, soft ? 'warn' : 'error');
         } else {
@@ -3087,7 +3560,7 @@
         flashError(err);
       }
     } finally {
-      if (btn) btn.textContent = original || 'Connect wallet';
+      if (btn) btn.textContent = original || T('app.wallet.connect', 'Connect wallet');
       setBusy(false);
     }
   }
@@ -3120,29 +3593,41 @@
     const wallet = readWallet();
     const watchBadge =
       wallet.connected && isWatchOnlyProvider(wallet.provider)
-        ? '<span class="wallet-link-badge wallet-link-badge--muted">Watch-only</span>'
+        ? '<span class="wallet-link-badge wallet-link-badge--muted">' +
+          esc(T('app.wallet.watchOnly', 'Watch-only')) +
+          '</span>'
         : '';
     // Link is a post-connect step — never show it as a third "Connect" CTA when disconnected.
     if (!wallet.connected) return '';
     if (!profile.solanaPubkey) {
       return (
         watchBadge +
-        '<span class="wallet-link-badge wallet-link-badge--warn">Not linked</span>' +
-        '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">Link account</button>'
+        '<span class="wallet-link-badge wallet-link-badge--warn">' +
+        esc(T('app.wallet.notLinked', 'Not linked')) +
+        '</span>' +
+        '<button type="button" class="btn btn-ghost btn-sm wallet-link-btn">' +
+        esc(T('app.wallet.linkAccount', 'Link account')) +
+        '</button>'
       );
     }
     const linkedUnverified =
       profile.walletVerified !== true ||
       isWatchOnlyProvider(profile.walletProvider) ||
       profile.walletProvider === 'watch-only';
-    const linkedLabel = linkedUnverified ? 'Linked · unverified' : 'Account linked';
+    const linkedLabel = linkedUnverified
+      ? T('app.wallet.linkedUnverified', 'Linked · unverified')
+      : T('app.wallet.accountLinked', 'Account linked');
     if (wallet.connected && wallet.address === profile.solanaPubkey) {
       return watchBadge + '<span class="wallet-link-badge wallet-link-badge--ok">' + linkedLabel + '</span>';
     }
     return (
       watchBadge +
-      '<span class="wallet-link-badge wallet-link-badge--ok">Linked · ' +
-      esc(shortAddr(profile.solanaPubkey)) +
+      '<span class="wallet-link-badge wallet-link-badge--ok">' +
+      esc(
+        T('app.wallet.linkedTo', 'Linked · {address}', {
+          address: shortAddr(profile.solanaPubkey),
+        })
+      ) +
       '</span>'
     );
   }
@@ -3165,7 +3650,10 @@
     syncWalletFromSolana();
     const wallet = readWallet();
     const compact = variant === 'compact';
-    const profileHint = 'Each growtoo account links its own Solana wallet.';
+    const profileHint = T(
+      'app.wallet.profileHint',
+      'Each growtoo account links its own Solana wallet.'
+    );
     const linkedPubkey =
       window.WalletLink && WalletLink.getProfile
         ? String(WalletLink.getProfile().solanaPubkey || '')
@@ -3173,16 +3661,26 @@
 
     if (!wallet.connected) {
       const linkedHint = linkedPubkey
-        ? '<p class="wallet-controls-meta">Linked to this account: ' +
-          esc(shortAddr(linkedPubkey)) +
-          ' — reconnect to sign.</p>'
+        ? '<p class="wallet-controls-meta">' +
+          esc(
+            T('app.wallet.linkedReconnect', 'Linked to this account: {address} — reconnect to sign.', {
+              address: shortAddr(linkedPubkey),
+            })
+          ) +
+          '</p>'
         : '';
     if (compact) {
       return (
         '<div class="wallet-controls wallet-controls--compact">' +
-        '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="Connect Devnet wallet" aria-label="Connect wallet">' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--off wallet-status-connect" title="' +
+        esc(T('app.wallet.connectDevnetTitle', 'Connect Devnet wallet')) +
+        '" aria-label="' +
+        esc(T('app.wallet.connect', 'Connect wallet')) +
+        '">' +
         '<span class="wallet-status-dot wallet-status-dot--off" aria-hidden="true"></span>' +
-        '<span class="wallet-status-addr">Connect</span>' +
+        '<span class="wallet-status-addr">' +
+        esc(T('app.wallet.connectShort', 'Connect')) +
+        '</span>' +
         '</button>' +
         '</div>'
       );
@@ -3190,14 +3688,20 @@
       return (
         '<div class="wallet-controls wallet-controls--panel">' +
         '<div class="wallet-controls-copy">' +
-        '<h3>Connect wallet for this account</h3>' +
+        '<h3>' +
+        esc(T('app.wallet.connectForAccount', 'Connect wallet for this account')) +
+        '</h3>' +
         '<p>' + esc(devnetNotice()) + '</p>' +
         '<p class="wallet-controls-hint">' + esc(profileHint) + '</p>' +
         linkedHint +
         walletLinkBadgeHtml() +
         '</div>' +
         '<button type="button" class="btn btn-primary wallet-connect-btn">' +
-        (linkedPubkey ? 'Reconnect wallet' : 'Connect wallet') +
+        esc(
+          linkedPubkey
+            ? T('app.wallet.reconnect', 'Reconnect wallet')
+            : T('app.wallet.connect', 'Connect wallet')
+        ) +
         '</button>' +
         '</div>'
       );
@@ -3206,7 +3710,11 @@
     if (compact) {
       return (
         '<div class="wallet-controls wallet-controls--compact">' +
-        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="Connected — tap to disconnect" aria-label="Wallet connected, tap to disconnect">' +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="' +
+        esc(T('app.wallet.connectedTapDisconnect', 'Connected — tap to disconnect')) +
+        '" aria-label="' +
+        esc(T('app.wallet.connectedTapDisconnectAria', 'Wallet connected, tap to disconnect')) +
+        '">' +
         '<span class="wallet-status-dot" aria-hidden="true"></span>' +
         '<span class="wallet-status-addr">' +
         esc(shortAddr(wallet.address)) +
@@ -3220,21 +3728,29 @@
       wallet.address
         ? '<a class="adopt-wallet-explorer wallet-explorer-link" href="' +
           esc(explorerAddressUrl(wallet.address)) +
-          '" target="_blank" rel="noopener noreferrer" title="View on Solscan">Solscan ↗</a>'
+          '" target="_blank" rel="noopener noreferrer" title="' +
+          esc(T('app.wallet.viewOnSolscan', 'View on Solscan')) +
+          '">Solscan ↗</a>'
         : '';
 
     return (
       '<div class="wallet-controls wallet-controls--panel wallet-controls--connected">' +
       '<div class="wallet-controls-copy">' +
-      '<h3>Solana wallet</h3>' +
+      '<h3>' +
+      esc(T('app.wallet.solanaWallet', 'Solana wallet')) +
+      '</h3>' +
       '<p class="wallet-controls-addr" title="' + esc(wallet.address) + '">' + esc(wallet.address) + '</p>' +
-      '<p class="wallet-controls-meta">Network: ' + esc(networkLabel()) + '</p>' +
+      '<p class="wallet-controls-meta">' +
+      esc(T('app.wallet.network', 'Network: {name}', { name: networkLabel() })) +
+      '</p>' +
       walletLinkBadgeHtml() +
       linkStatusHtml(wallet) +
       '</div>' +
       '<div class="wallet-controls-actions">' +
       explorer +
-      '<button type="button" class="btn btn-ghost wallet-disconnect-btn">Disconnect wallet</button>' +
+      '<button type="button" class="btn btn-ghost wallet-disconnect-btn">' +
+      esc(T('app.wallet.disconnect', 'Disconnect wallet')) +
+      '</button>' +
       '</div></div>'
     );
   }
@@ -3274,9 +3790,11 @@
         if (wallet.connected) {
           if (
             window.confirm(
-              'Disconnect ' +
-                shortAddr(wallet.address) +
-                ' from this account?\n\nYou can reconnect anytime from this pill.'
+              T(
+                'app.wallet.disconnectConfirm',
+                'Disconnect {address} from this account?\n\nYou can reconnect anytime from this pill.',
+                { address: shortAddr(wallet.address) }
+              )
             )
           ) {
             await handleWalletDisconnect(statusToggle);
@@ -3499,16 +4017,18 @@
           return t.id === tokenId;
         });
         if (!token || !token.mintRequestId || !window.SeedChain) {
-          flashError(new Error('Mint request not found for this token.'));
+          flashError(new Error(T('app.token.mintRequestMissing', 'Mint request not found for this token.')));
           return;
         }
         if (!token.plantId) {
-          flashError(new Error('Link a journal plant before retrying the mint.'));
+          flashError(
+            new Error(T('app.token.linkBeforeRetry', 'Link a journal plant before retrying the mint.'))
+          );
           return;
         }
         setBusy(true);
         const original = retryMintBtn.textContent;
-        retryMintBtn.textContent = 'Retrying…';
+        retryMintBtn.textContent = T('app.token.retrying', 'Retrying…');
         retryMintBtn.disabled = true;
         try {
           const newId = await SeedChain.retrySeedMint(token.mintRequestId, {
@@ -3517,14 +4037,22 @@
             batch: token.batch,
             plantId: token.plantId,
           });
-          if (!newId) throw new Error('Could not file a new mint request. Sign in and try again.');
+          if (!newId)
+            throw new Error(
+              T('app.token.mintRequestFailed', 'Could not file a new mint request. Sign in and try again.')
+            );
           mutate(function (w) {
             const stored = w.tokens.find(function (t) {
               return t.id === tokenId;
             });
             if (stored) stored.mintRequestId = newId;
           });
-          flashOk('Mint queued again. Keep this wallet connected until it shows “Minted on devnet”.');
+          flashOk(
+            T(
+              'app.token.mintQueuedAgain',
+              'Mint queued again. Keep this wallet connected until it shows “Minted on devnet”.'
+            )
+          );
           render();
         } catch (err) {
           flashError(err);
@@ -3541,27 +4069,31 @@
         if (busy || harvestBtn.disabled) return;
         const listingId = harvestBtn.dataset.listingId;
         if (!listingId || !window.Market || typeof Market.requestHarvestClaim !== 'function') {
-          flashError(new Error('Harvest claim is not available.'));
+          flashError(new Error(T('app.token.harvestClaimUnavailable', 'Harvest claim is not available.')));
           return;
         }
         const claimOk = await askConfirm({
-          title: 'Claim locked stake ($GROWTOO)?',
-          body:
-            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.',
-          confirmLabel: 'Claim locked stake',
+          title: T('app.token.claimStakeTitle', 'Claim locked stake ($GROWTOO)?'),
+          body: T(
+            'app.token.claimStakeBody',
+            'If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.'
+          ),
+          confirmLabel: T('app.token.claimStakeConfirm', 'Claim locked stake'),
         });
         if (!claimOk) return;
         setBusy(true);
         const original = harvestBtn.textContent;
-        harvestBtn.textContent = 'Claiming…';
+        harvestBtn.textContent = T('app.token.claiming', 'Claiming…');
         try {
           await Market.requestHarvestClaim(listingId, harvestBtn.dataset.plantId || null);
-          flashOk('Harvest claim submitted. Queue will settle release or refund.');
+          flashOk(
+            T('app.token.harvestClaimSubmitted', 'Harvest claim submitted. Queue will settle release or refund.')
+          );
           if (window.DnevnikNotifications) {
             DnevnikNotifications.push({
               type: 'harvest_claim',
-              title: 'Harvest claim filed',
-              body: 'Waiting for monthly care proof settle.',
+              title: T('app.token.harvestClaimFiled', 'Harvest claim filed'),
+              body: T('app.token.harvestClaimWaiting', 'Waiting for monthly care proof settle.'),
               meta: { key: 'hclaim-pending:' + listingId, listingId: listingId },
               action: { view: 'adopt' },
               kind: 'info',
@@ -3583,10 +4115,12 @@
       if (platformConnectBtn) {
         if (busy || platformConnectBtn.disabled) return;
         const ok = await askConfirm({
-          title: 'Connect wallet to claim?',
-          body:
-            'Your monthly bonus is paid in test $GROWTOO on Solana Devnet. Next you’ll pick Phantom or Solflare so we can send it to that address.\n\nYour journal stays free without a wallet — this step is only for the bonus.',
-          confirmLabel: 'Connect wallet',
+          title: T('app.bonus.connectTitle', 'Connect wallet to claim?'),
+          body: T(
+            'app.bonus.connectBody',
+            'Your monthly bonus is paid in test $GROWTOO on Solana Devnet. Next you’ll pick Phantom or Solflare so we can send it to that address.\n\nYour journal stays free without a wallet — this step is only for the bonus.'
+          ),
+          confirmLabel: T('app.wallet.connect', 'Connect wallet'),
         });
         if (!ok) return;
         await handleWalletConnect(platformConnectBtn);
@@ -3598,27 +4132,29 @@
       if (platformBtn) {
         if (busy || platformBtn.disabled) return;
         if (!window.Market || typeof Market.claimPlatformBonus !== 'function') {
-          flashError(new Error('Platform bonus is not available.'));
+          flashError(new Error(T('app.bonus.unavailable', 'Platform bonus is not available.')));
           return;
         }
         if (!signingWalletReady()) {
           flashError(
-            new Error('Connect Phantom or Solflare first, then claim the bonus.')
+            new Error(
+              T('app.bonus.connectFirst', 'Connect Phantom or Solflare first, then claim the bonus.')
+            )
           );
           renderPlatformBonusPanel();
           return;
         }
         setBusy(true);
         const original = platformBtn.textContent;
-        platformBtn.textContent = 'Claiming…';
+        platformBtn.textContent = T('app.token.claiming', 'Claiming…');
         try {
           await Market.claimPlatformBonus();
-          flashOk('Platform bonus requested for this month.');
+          flashOk(T('app.bonus.requested', 'Platform bonus requested for this month.'));
           if (window.DnevnikNotifications) {
             DnevnikNotifications.push({
               type: 'platform_bonus',
-              title: 'Platform bonus claimed',
-              body: 'Queue will mint $GROWTOO when scored.',
+              title: T('app.bonus.claimedTitle', 'Platform bonus claimed'),
+              body: T('app.bonus.claimedBody', 'Queue will mint $GROWTOO when scored.'),
               meta: { key: 'platform-pending:' + (Market.currentMonthKey ? Market.currentMonthKey() : '') },
               action: { view: 'adopt' },
               kind: 'info',
@@ -3640,24 +4176,26 @@
       if (faucetBtn) {
         if (busy || faucetBtn.disabled) return;
         if (!window.Market || typeof Market.claimTestFaucet !== 'function') {
-          flashError(new Error('Test faucet is not available.'));
+          flashError(new Error(T('app.faucet.unavailable', 'Test faucet is not available.')));
           return;
         }
         setBusy(true);
         const original = faucetBtn.textContent;
-        faucetBtn.textContent = 'Claiming…';
+        faucetBtn.textContent = T('app.token.claiming', 'Claiming…');
         try {
           const result = await Market.claimTestFaucet();
           flashOk(
-            'Test faucet queued: +' +
-              (result && result.amount ? result.amount : 100) +
-              ' $GROWTOO. Mint usually lands within a few minutes.'
+            T(
+              'app.faucet.queued',
+              'Test faucet queued: +{amount} $GROWTOO. Mint usually lands within a few minutes.',
+              { amount: result && result.amount ? result.amount : 100 }
+            )
           );
           if (window.DnevnikNotifications) {
             DnevnikNotifications.push({
               type: 'test_faucet',
-              title: 'Test faucet claimed',
-              body: 'Queue is minting $GROWTOO to your Devnet wallet…',
+              title: T('app.faucet.claimedTitle', 'Test faucet claimed'),
+              body: T('app.faucet.claimedBody', 'Queue is minting $GROWTOO to your Devnet wallet…'),
               meta: { key: 'faucet-pending:' + (result && result.dayKey ? result.dayKey : '') },
               action: { view: 'market' },
               kind: 'info',
@@ -3750,13 +4288,22 @@
         const burnOk = await askConfirm({
           title:
             repair && repair.kind === 'stub'
-              ? 'Remove stub mint from garden?'
-              : 'Burn this token?',
+              ? T('app.token.removeStubTitle', 'Remove stub mint from garden?')
+              : T('app.token.burnTitle', 'Burn this token?'),
           body:
             repair && repair.kind === 'stub'
-              ? 'Removes this card from your garden. Does not burn the on-chain NFT — hide the empty Collectible in Phantom if it still appears.'
-              : 'Removes this plant from your garden. This cannot be undone.',
-          confirmLabel: repair && repair.kind === 'stub' ? 'Remove stub' : 'Burn',
+              ? T(
+                  'app.token.removeStubBody',
+                  'Removes this card from your garden. Does not burn the on-chain NFT — hide the empty Collectible in Phantom if it still appears.'
+                )
+              : T(
+                  'app.token.burnBody',
+                  'Removes this plant from your garden. This cannot be undone.'
+                ),
+          confirmLabel:
+            repair && repair.kind === 'stub'
+              ? T('app.token.removeStub', 'Remove stub')
+              : T('app.token.burn', 'Burn'),
           danger: true,
         });
         if (!burnOk) return;
@@ -3827,17 +4374,17 @@
         const plantSelect = document.getElementById('adopt-seed-plant');
         const plantId = plantSelect ? plantSelect.value : '';
         if (!plantId) {
-          flashError(new Error('Choose a journal plant to seal.'));
+          flashError(new Error(T('app.token.chooseToSeal', 'Choose a journal plant to seal.')));
           return;
         }
         const plant = readPlants().find((p) => p.id === plantId);
         if (!plant) {
-          flashError(new Error('Plant not found in your journal.'));
+          flashError(new Error(T('app.token.plantNotInJournal', 'Plant not found in your journal.')));
           return;
         }
         const wallet = readWallet();
         if (!wallet.connected) {
-          flashError(new Error('Connect a wallet first (header pill).'));
+          flashError(new Error(T('app.token.connectFirstPill', 'Connect a wallet first (header pill).')));
           return;
         }
         const action = sealActionForPlant(plant, wallet);
@@ -3846,16 +4393,19 @@
         setBusy(true);
         if (submitBtn) {
           submitBtn.classList.add('is-sealing');
-          submitBtn.textContent = 'Sealing…';
+          submitBtn.textContent = T('app.token.sealing', 'Sealing…');
         }
         try {
           if (!action || action.kind === 'done') {
-            throw new Error('This plant’s trail is already fully sealed.');
+            throw new Error(T('app.token.alreadySealed', 'This plant’s trail is already fully sealed.'));
           }
           let sealResult = null;
           if (action.kind === 'seed') {
             const name = String(plant.name || '').trim().slice(0, 32);
-            if (!name) throw new Error('Plant needs a name in the journal before sealing.');
+            if (!name)
+              throw new Error(
+                T('app.token.needsName', 'Plant needs a name in the journal before sealing.')
+              );
             sealResult = await PlantToken.importSeed({
               name: name,
               strain: plant.strain || '',
@@ -3864,11 +4414,14 @@
             });
           } else if (action.kind === 'growth' && action.token) {
             if (action.ready === false) {
-              throw new Error(action.lockMsg || 'Log more care before sealing the next stage.');
+              throw new Error(
+                action.lockMsg ||
+                  T('app.token.logMoreCare', 'Log more care before sealing the next stage.')
+              );
             }
             sealResult = await PlantToken.mintGrowth(action.token.id);
           } else {
-            throw new Error('Nothing to seal for this plant.');
+            throw new Error(T('app.token.nothingToSeal', 'Nothing to seal for this plant.'));
           }
           if (submitBtn) {
             submitBtn.classList.remove('is-sealing');
@@ -3889,7 +4442,7 @@
           flashError(err);
           if (submitBtn) submitBtn.classList.remove('is-sealing');
         } finally {
-          if (submitBtn) submitBtn.textContent = originalLabel || 'Seal stage';
+          if (submitBtn) submitBtn.textContent = originalLabel || T('app.token.sealStage', 'Seal stage');
           setBusy(false);
           syncSealStageCta();
         }
@@ -3974,17 +4527,29 @@
       const maxStage = GROWTH_STAGES.length - 1;
       const M = window.MetricUI;
       const adopter = isAdopterUi();
-      const panelTitle = adopter ? 'My garden' : 'Tokenise';
-      const openLabel = adopter ? 'Open garden' : 'Open Tokenise';
-      const emptyCta = adopter ? 'Browse market' : 'Mint a seed';
+      const panelTitle = adopter
+        ? T('app.token.myGarden', 'My garden')
+        : T('app.token.tokenise', 'Tokenise');
+      const openLabel = adopter
+        ? T('app.token.openGarden', 'Open garden')
+        : T('app.token.openTokenise', 'Open Tokenise');
+      const emptyCta = adopter
+        ? T('app.token.browseMarket', 'Browse market')
+        : T('app.token.mintASeed', 'Mint a seed');
       const intentCopy =
         adopter && window.GrowtooProfile && typeof window.GrowtooProfile.adopterIntentCopy === 'function'
           ? window.GrowtooProfile.adopterIntentCopy()
           : null;
       const emptyCopy = adopter
         ? (intentCopy && intentCopy.empty) ||
-          'Adopt your first plant from the market and track growth & $GROWTOO here.'
-        : 'Mint your first seed to start the growth cycle and earn rewards at each stage.';
+          T(
+            'app.token.dashAdopterEmpty',
+            'Adopt your first plant from the market and track growth & $GROWTOO here.'
+          )
+        : T(
+            'app.token.dashGrowerEmpty',
+            'Mint your first seed to start the growth cycle and earn rewards at each stage.'
+          );
 
       if (!wallet.connected) {
         container.innerHTML =
@@ -4001,12 +4566,18 @@
           esc(
             adopter
               ? (intentCopy && intentCopy.empty) ||
-                  'Browse the market and connect your wallet when you are ready to stake $GROWTOO.'
-              : 'Open Tokenise to mint seeds. Connect your wallet when you are ready to sign.'
+                  T(
+                    'app.token.dashAdopterConnect',
+                    'Browse the market and connect your wallet when you are ready to stake $GROWTOO.'
+                  )
+              : T(
+                  'app.token.dashGrowerConnect',
+                  'Open Tokenise to mint seeds. Connect your wallet when you are ready to sign.'
+                )
           ) +
           '</p>' +
           '<button type="button" class="btn btn-primary" id="dashboard-adopt-open">' +
-          esc(adopter ? 'Browse market' : openLabel) +
+          esc(adopter ? T('app.token.browseMarket', 'Browse market') : openLabel) +
           '</button>' +
           '</div></div></div>';
       } else if (!wallet.tokens.length) {
@@ -4018,15 +4589,19 @@
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
-                label: '$GROWTOO balance',
-                value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
-                meta: M.row('Wallet', esc(shortAddr(wallet.address)), 'metric-dot--teal'),
+                label: T('app.token.growBalance', '$GROWTOO balance'),
+                value: Number(wallet.growthBalance || 0).toLocaleString(intlTag()),
+                meta: M.row(
+                  T('app.token.walletLabel', 'Wallet'),
+                  esc(shortAddr(wallet.address)),
+                  'metric-dot--teal'
+                ),
                 modifier: 'amber',
               }) +
               M.card({
-                label: 'Plant tokens',
+                label: T('app.token.plantTokens', 'Plant tokens'),
                 value: '0',
-                meta: M.row('Next step', esc(emptyCta), 'metric-dot--blue'),
+                meta: M.row(T('app.token.nextStep', 'Next step'), esc(emptyCta), 'metric-dot--blue'),
                 modifier: 'blue',
               }) +
               '</div>'
@@ -4067,32 +4642,44 @@
 
         const more =
           wallet.tokens.length > 3
-            ? '<p class="dashboard-adopt-more">+' + (wallet.tokens.length - 3) + ' more in your garden</p>'
+            ? '<p class="dashboard-adopt-more">' +
+              esc(
+                T('app.token.moreInGarden', '+{count} more in your garden', {
+                  count: wallet.tokens.length - 3,
+                })
+              ) +
+              '</p>'
             : '';
 
         container.innerHTML =
           '<div class="metric-panel metric-panel--adopt">' +
           '<header class="metric-panel-head"><h2 class="metric-panel-title">' +
           esc(panelTitle) +
-          ' · Token garden</h2></header>' +
+          ' · ' +
+          esc(T('app.token.tokenGarden', 'Token garden')) +
+          '</h2></header>' +
           (M
             ? '<div class="metric-cards metric-cards--compact">' +
               M.card({
-                label: '$GROWTOO balance',
-                value: Number(wallet.growthBalance || 0).toLocaleString('en-US'),
-                meta: M.row('Top plant', esc(top.name), 'metric-dot--amber'),
+                label: T('app.token.growBalance', '$GROWTOO balance'),
+                value: Number(wallet.growthBalance || 0).toLocaleString(intlTag()),
+                meta: M.row(
+                  T('app.token.topPlant', 'Top plant'),
+                  esc(top.name),
+                  'metric-dot--amber'
+                ),
                 modifier: 'amber',
               }) +
               M.card({
-                label: 'Plant tokens',
+                label: T('app.token.plantTokens', 'Plant tokens'),
                 value: String(wallet.tokens.length),
-                meta: M.row('Growing', growing, 'metric-dot--teal'),
+                meta: M.row(T('app.token.growing', 'Growing'), growing, 'metric-dot--teal'),
                 modifier: 'teal',
               }) +
               M.card({
-                label: 'Lead grow',
+                label: T('app.token.leadGrow', 'Lead grow'),
                 value: pct + '%',
-                meta: M.row(esc(stage.label), esc(top.strain || '—'), 'metric-dot--violet'),
+                meta: M.row(esc(stageLabel(stage)), esc(top.strain || '—'), 'metric-dot--violet'),
                 modifier: 'violet',
               }) +
               '</div>'
@@ -4102,11 +4689,15 @@
           buildPlantGrowSvg(top.stageIndex, { hero: true, animate: true }) +
           '<div class="dashboard-adopt-feature-meta">' +
           '<strong>' + esc(top.name) + '</strong>' +
-          '<span>' + esc(stage.label) + ' · ' + pct + '% grown</span>' +
+          '<span>' +
+          esc(T('app.token.percentGrown', '{stage} · {pct}% grown', { stage: stageLabel(stage), pct: pct })) +
+          '</span>' +
           '</div></div>' +
           '<div class="dashboard-adopt-preview">' + preview + '</div>' +
           more +
-          '<button type="button" class="btn btn-ghost" id="dashboard-adopt-open">Open token garden →</button>' +
+          '<button type="button" class="btn btn-ghost" id="dashboard-adopt-open">' +
+          esc(T('app.token.openTokenGarden', 'Open token garden →')) +
+          '</button>' +
           '</div></div>';
       }
 

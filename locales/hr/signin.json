@@ -1,0 +1,97 @@
+{
+  "login-form": {
+    "p": "Privatni dnevnik",
+    "label": "E-mail",
+    "label2": "Lozinka",
+    "div": "ili",
+    "div2": "<a href=\"../index.html\">← Natrag na početnu</a>"
+  },
+  "auth-title": {
+    "h1": "Prijava u growtoo"
+  },
+  "auth-lead": {
+    "p": "Dobrodošao natrag. Tvoj radni prostor uzgajivača ili posvojitelja otvara se sam."
+  },
+  "tab-signin": {
+    "button": "Prijava"
+  },
+  "tab-signup": {
+    "button": "Otvori račun"
+  },
+  "pick-grower": {
+    "button": "<strong>Uzgajivač</strong> <span>Prvo besplatan dnevnik. Dokaz na lancu kad ti zatreba.</span>"
+  },
+  "pick-adopter": {
+    "button": "<strong>Posvojitelj</strong> <span>Prati trag prave biljke. Kripto je izborno dok ne uložiš.</span>"
+  },
+  "field-display-name": {
+    "label": "Ime za prikaz"
+  },
+  "password-toggle": {
+    "button": "Prikaži"
+  },
+  "password-hint": {
+    "p": "Najmanje 8 znakova. Koristi jedinstvenu lozinku koju ne koristiš drugdje."
+  },
+  "signup-grower-fields": {
+    "p": "Postavke uzgajivača",
+    "label": "Način uzgoja",
+    "p2": "Postavlja zadane vrijednosti biljaka i savjetovanje.",
+    "label2": "Grad <span style=\"font-weight:500;color:var(--text-muted)\">(neobavezno)</span>",
+    "p3": "Koristi se samo za vremensku prognozu na Biljkama — preskoči ako uzgajaš unutra.",
+    "label3": "Stil uzgoja <span style=\"font-weight:500;color:var(--text-muted)\">(neobavezno)</span>"
+  },
+  "grow-setup-choices": {
+    "button": "<strong>Unutra</strong> <span>Šatori i sobe</span>",
+    "button2": "<strong>Vani</strong> <span>Polje i vrt</span>",
+    "button3": "<strong>Mješovito</strong> <span>Oboje</span>"
+  },
+  "field-profile-photo": {
+    "label": "Profilna slika / logo <span style=\"font-weight:500;color:var(--text-muted)\">(neobavezno)</span>",
+    "p": "Prikazuje se na tvom računu — kvadratni izrez najbolje prolazi. JPEG ili PNG."
+  },
+  "profile-photo-clear": {
+    "button": "Ukloni"
+  },
+  "signup-adopter-fields": {
+    "p": "Postavke posvojitelja",
+    "label": "Zašto si ovdje",
+    "span": "Razumijem da ovo koristi Solaninu javnu testnu mrežu (Devnet) — imovina nema novčanu vrijednost."
+  },
+  "adopter-intent-choices": {
+    "button": "<strong>Podupri uzgajivače</strong> <span>Prati trag njege prave biljke</span>",
+    "button2": "<strong>Skupi vrt</strong> <span>Posvoji tokene biljaka i prati faze</span>",
+    "button3": "<strong>Nauči kako ide</strong> <span>Vježbaj uloge na testnoj imovini (bez prave vrijednosti)</span>"
+  },
+  "field-accept-consent": {
+    "span": "Imam <strong>18+</strong> i prihvaćam <a href=\"../terms/\" target=\"_blank\" rel=\"noopener noreferrer\">Uvjete</a> i <a href=\"../privacy/\" target=\"_blank\" rel=\"noopener noreferrer\">Pravila privatnosti</a>."
+  },
+  "submit-btn": {
+    "button": "Prijava"
+  },
+  "google-auth-label": {
+    "span": "Nastavi s Googleom"
+  },
+  "meta": {
+    "title": "Prijava · growtoo"
+  },
+  "mode": {
+    "growerCta": "Pokreni dnevnik besplatno",
+    "growerLead": "Zapisuj zalijevanje, prihranu i faze. Dokaz na lancu je izboran — nikad nije uvjet za početak.",
+    "adopterLead": "Prati trag iz dnevnika biljke. Ulozi na testnoj mreži su izborni i nemaju novčanu vrijednost.",
+    "signupTitle": "Otvori svoj račun",
+    "signupLead": "Uzgajivači kreću od dnevnika. Posvojitelji prate biljku. Odaberi svoj stol.",
+    "googleSignup": "Registriraj se Googleom"
+  },
+  "field": {
+    "namePlaceholder": "Kako se prikazuješ u growtoou",
+    "emailPlaceholder": "ti@email.com",
+    "cityPlaceholder": "npr. Zagreb",
+    "stylePlaceholder": "npr. autoflower, 4 šatora"
+  },
+  "aria": {
+    "authMode": "Način prijave",
+    "growSetup": "Način uzgoja",
+    "adopterIntent": "Namjera posvojitelja"
+  }
+}

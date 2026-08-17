@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../privacy/\" class=\"nav-link\">Privatnost</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Prijava</a>"
+  },
+  "span2": "PRAVNO",
+  "h1": "Uvjeti korištenja",
+  "p": "Zadnja izmjena: 29. srpnja 2026. Otvaranjem računa ili korištenjem growtooa prihvaćaš ove uvjete. Ovo je nacrt za rani pristup / Devnet MVP — prije komercijalnog oslanjanja neka ih pregleda pravnik.",
+  "div": "<span>Sporazum</span> <span class=\"desk-panel-meta\">18+</span>",
+  "span3": "DOB",
+  "h2": "Tko smije koristiti",
+  "p2": "Moraš imati najmanje <strong>18 godina</strong> i zakonsko pravo koristiti informacijske usluge vezane uz uzgoj ondje gdje živiš. Za usklađenost s lokalnim zakonom odgovoran si sam. growtoo ne potiče nezakonite radnje.",
+  "span4": "USL",
+  "h22": "Usluga",
+  "p3": "growtoo pruža digitalni dnevnik uzgoja i izborne Solana <strong>Devnet</strong> značajke (tokeni biljaka, testni $GROWTOO, tokovi tržnice). Dnevnik se može koristiti bez novčanika. Devnet imovina <strong>nema novčanu vrijednost</strong>. Vidi <a href=\"../risks/\">Rizike i opseg</a>.",
+  "span5": "RAČ",
+  "h23": "Računi",
+  "p4": "Čuvaj svoje pristupne podatke. Odgovoran si za aktivnost na svom računu. Račune možemo suspendirati zbog zlouporabe, prijevare ili rizika za druge korisnike. Za puni pristup može biti potrebna potvrda e-maila.",
+  "span6": "SADR",
+  "h24": "Tvoj sadržaj",
+  "p5": "Zadržavaš prava na sadržaj dnevnika koji stvoriš. Daješ nam licenciju da ga smjestimo, prikazujemo i obrađujemo radi rada usluge (uključujući izborne značajke dijeljenja koje sam uključiš). Ne postavljaj nezakonit sadržaj, sadržaj koji krši tuđa prava ni štetan sadržaj. Ne izmišljaj zapise kako bi zavarao posvojitelje na tržnici.",
+  "span7": "LANC",
+  "h25": "Blockchain i novčanici",
+  "p6": "Povezivanje novčanika i transakcije na lancu nepovratne su mrežne radnje koje sam odobravaš. Ne čuvamo tvoje ključeve. Tokeni testne mreže služe isključivo za eksperimentiranje i nisu vrijednosni papiri, novac ni potraživanje nad fizičkom berbom, osim ako budući licencirani proizvod izričito ne kaže drukčije.",
+  "span8": "ODR",
+  "h26": "Odricanje od odgovornosti",
+  "p7": "Usluga se pruža „takva kakva jest”. Savjeti o uzgoju (uključujući savjetnika) informativni su i nisu agronomski, medicinski ni pravni savjet. Ne jamčimo dostupnost, trajnost podataka ni ishode na tržnici. U najvećoj mjeri dopuštenoj zakonom ne odgovaramo za neizravnu ili posljedičnu štetu.",
+  "span9": "PRAV",
+  "h27": "Mjerodavno pravo",
+  "p8": "Na ove uvjete primjenjuje se pravo Republike Hrvatske i zaštita potrošača Europske unije koja se na tebe obvezno primjenjuje, ne dirajući u prava kojih se ne možeš odreći. Sporove prvo pokreni na <a href=\"mailto:hello@growto.live\">hello@growto.live</a>.",
+  "span10": "IZMJ",
+  "h28": "Izmjene",
+  "p9": "Ove uvjete možemo mijenjati kako proizvod raste. Nastavak korištenja nakon objavljene izmjene znači prihvaćanje izmijenjenih uvjeta za ubuduće. Značajne izmjene možemo istaknuti i u aplikaciji ili e-mailom.",
+  "p10": "<a href=\"../privacy/\">Pravila privatnosti</a> · <a href=\"../risks/\">Rizici</a> · <a href=\"../index.html\">Natrag na growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Privatnost</a> <a href=\"../terms/\">Uvjeti</a> <a href=\"../risks/\">Rizici</a>",
+  "p11": "© growtoo. Sva prava pridržana.",
+  "meta": {
+    "title": "Uvjeti korištenja · growtoo"
+  }
+}

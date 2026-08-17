@@ -395,7 +395,7 @@ body:has(.devnet-banner) .header {
   min-height: 48px;
   min-width: 48px;
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: var(--radius-control);
   font-weight: 650;
   font-size: 0.95rem;
   letter-spacing: 0.01em;
@@ -404,7 +404,7 @@ body:has(.devnet-banner) .header {
   border: 1px solid transparent;
   box-shadow: none;
   cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background-color 0.15s var(--ease-control), border-color 0.15s var(--ease-control), color 0.15s var(--ease-control), box-shadow 0.15s var(--ease-control);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -421,13 +421,15 @@ body:has(.devnet-banner) .header {
 .btn-primary {
   background: var(--brass);
   color: var(--brass-ink);
-  border-color: var(--brass);
+  border-color: transparent;
+  box-shadow: var(--fill-sheen), var(--fill-lift);
 }
 
 .btn-primary:hover {
   background: var(--brass-hover);
   color: var(--brass-ink);
-  border-color: var(--brass-hover);
+  border-color: transparent;
+  box-shadow: var(--fill-sheen), 0 2px 8px rgb(var(--brass-rgb) / 0.28);
 }
 
 .btn-primary:active {
@@ -522,7 +524,7 @@ body:has(.devnet-banner) .header {
   padding: 0.4rem 0.75rem;
   font-size: 0.82rem;
   min-height: 36px;
-  border-radius: 3px;
+  border-radius: var(--radius-control);
 }
 
 /* TERTIARY — gold caps (verify) + sage quiet links */
@@ -2519,9 +2521,10 @@ body:has(.devnet-banner) .header {
   text-transform: uppercase;
   color: var(--accent-bright);
   background: rgb(var(--alert-rgb) / 0.1);
-  border: 1px solid rgb(var(--alert-rgb) / 0.35);
+  border: 0;
+  box-shadow: var(--chip-hairline);
   padding: 0.35rem 0.75rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   margin-bottom: 1rem;
 }
 
@@ -2561,9 +2564,10 @@ body:has(.devnet-banner) .header {
   text-transform: uppercase;
   color: var(--accent-warm);
   background: rgb(var(--brass-mid-rgb) / 0.12);
-  border: 1px solid rgb(var(--brass-mid-rgb) / 0.4);
+  border: 0;
+  box-shadow: var(--chip-hairline);
   padding: 0.2rem 0.5rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .feature-badge--live,
@@ -2581,8 +2585,9 @@ body:has(.devnet-banner) .header {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid rgb(var(--alert-rgb) / 0.45);
+  border-radius: var(--radius-pill);
+  border: 0;
+  box-shadow: var(--chip-hairline);
   margin-left: 0.35rem;
 }
 
@@ -2691,9 +2696,10 @@ body:has(.devnet-banner) .header {
   font-weight: 600;
   color: var(--text-muted);
   background: var(--surface);
-  border: 1px solid var(--border);
+  border: 0;
+  box-shadow: var(--chip-hairline);
   padding: 0.45rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .chip--green {
@@ -2810,9 +2816,10 @@ body:has(.devnet-banner) .header {
   text-transform: uppercase;
   color: var(--accent-warm);
   background: rgb(var(--brass-mid-rgb) / 0.12);
-  border: 1px solid rgb(var(--brass-mid-rgb) / 0.4);
+  border: 0;
+  box-shadow: var(--chip-hairline);
   padding: 0.2rem 0.55rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   margin-left: 0.4rem;
 }
 
@@ -5633,7 +5640,7 @@ body:has(.devnet-banner) .header {
 }
 
 .hero--catalog .btn-primary {
-  border-radius: 3px;
+  border-radius: var(--radius-control);
 }
 
 /* quiet tertiary link styles owned by .btn-link--quiet */

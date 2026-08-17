@@ -24,20 +24,31 @@
     sale_pending: true,
   };
 
+  /* [dictionary key, English] — resolved at render time, since this table
+     is built while the page parses, before the dictionary lands. */
   var STATUS_LABELS = {
-    active: 'Open',
-    escrow_pending: 'Activating',
-    sale_pending: 'Settling',
+    active: ['landing.board.statusOpen', 'Open'],
+    escrow_pending: ['landing.board.statusActivating', 'Activating'],
+    sale_pending: ['landing.board.statusSettling', 'Settling'],
   };
 
-  /** Labeled sample depth when Firestore has no open contracts. */
+  function statusLabel(status) {
+    var row = STATUS_LABELS[status];
+    return row ? T(row[0], row[1]) : '';
+  }
+
+  /* Labeled sample depth when Firestore has no open contracts.
+     i18n-ignore for the whole table: these rows stand in for Firestore
+     documents, and real listings carry the same raw English values in the
+     same fields. Translating the sample would make it diverge from what a
+     live row looks like. Strain names are cultivar names either way. */
   var DEMO_TAPE = [
     {
       id: 'demo-seed-auto',
-      name: 'CBD Auto · Seed',
-      strain: 'CBD Auto',
+      name: 'CBD Auto · Seed', // i18n-ignore
+      strain: 'CBD Auto', // i18n-ignore
       batch: '2026-07-A',
-      stage: 'Germination',
+      stage: 'Germination', // i18n-ignore
       assetType: 'seed',
       status: 'active',
       priceGrow: 120,
@@ -45,10 +56,10 @@
     },
     {
       id: 'demo-seed-haze',
-      name: 'Haze Lite · Seed',
-      strain: 'Haze Lite',
+      name: 'Haze Lite · Seed', // i18n-ignore
+      strain: 'Haze Lite', // i18n-ignore
       batch: '2026-07-B',
-      stage: 'Seedling',
+      stage: 'Seedling', // i18n-ignore
       assetType: 'seed',
       status: 'active',
       priceGrow: 180,
@@ -56,10 +67,10 @@
     },
     {
       id: 'demo-flower-auto',
-      name: 'CBD Auto · Flower',
-      strain: 'CBD Auto',
+      name: 'CBD Auto · Flower', // i18n-ignore
+      strain: 'CBD Auto', // i18n-ignore
       batch: '2026-06-C',
-      stage: 'Flowering',
+      stage: 'Flowering', // i18n-ignore
       assetType: 'flower',
       status: 'active',
       priceGrow: 420,
@@ -67,10 +78,10 @@
     },
     {
       id: 'demo-staked',
-      name: 'Outdoor Mix · Staked',
-      strain: 'Outdoor Mix',
+      name: 'Outdoor Mix · Staked', // i18n-ignore
+      strain: 'Outdoor Mix', // i18n-ignore
       batch: '2026-05-D',
-      stage: 'Vegetative',
+      stage: 'Vegetative', // i18n-ignore
       assetType: 'seed',
       status: 'sold',
       priceGrow: 250,
@@ -133,19 +144,26 @@
     if (listing.strain) bits.push(listing.strain);
     if (listing.batch) bits.push('B' + listing.batch);
     if (listing.stage) bits.push(listing.stage);
-    return bits.join(' · ') || 'Devnet RWA';
+    return bits.join(' · ') || T('landing.board.devnetRwa', 'Devnet RWA');
   }
 
   function rowHtml(listing, index) {
     var asset = listing.assetType === 'flower' ? 'FLWR' : 'SEED';
     var isDemo = !!listing.demo;
-    var status = isDemo ? 'Sample' : STATUS_LABELS[listing.status] || listing.status || '';
+    var status = isDemo
+      ? T('landing.board.sample', 'Sample')
+      : statusLabel(listing.status) || listing.status || '';
     var statusKey = isDemo ? 'demo' : listing.status || '';
     var price = formatPrice(listing.priceGrow);
     var sym = symbolFrom(listing);
     var delay = Math.min(index * 45, 360);
     var canInvest = !isDemo && listing.status === 'active';
-    var actionLabel = isDemo ? 'List a plant' : canInvest ? 'Invest' : status || 'View';
+    var actionLabel = isDemo
+      ? T('landing.board.listPlant', 'List a plant')
+      : canInvest
+        ? T('landing.board.invest', 'Invest')
+        : status || T('landing.board.view', 'View');
+    // i18n-ignore — CSS classes.
     var actionClass = canInvest
       ? 'btn btn-primary btn-sm market-row-action'
       : 'btn btn-ghost btn-sm market-row-action';
@@ -154,7 +172,7 @@
       : 'dnevnik/?mode=signup&type=adopter';
     var title = listing.strain
       ? listing.strain + (listing.batch ? ' · B' + listing.batch : '')
-      : listing.name || 'RWA offer';
+      : listing.name || T('landing.board.rwaOffer', 'RWA offer');
 
     return (
       '<article class="landing-market-card market-row market-row--' +
@@ -189,7 +207,9 @@
           esc(shortAddr(listing.mintAddress)) +
           '</code></a>'
         : isDemo
-          ? ' <span class="landing-market-demo-note">illustrative ask</span>'
+          ? ' <span class="landing-market-demo-note">' +
+        esc(T('landing.board.illustrative', 'illustrative ask')) +
+        '</span>'
           : '') +
       '</p>' +
       '</div>' +
@@ -206,6 +226,7 @@
       '<span class="landing-market-price">' +
       esc(price) +
       '</span>' +
+      // i18n-ignore — ticker symbol.
       '<span class="market-row-unit">$GROWTOO</span>' +
       '</div>' +
       '<a class="' +
@@ -232,7 +253,11 @@
           esc(formatPrice(listing.priceGrow)) +
           '</em>' +
           '<span class="market-ticker-tag">' +
-          esc(listing.demo ? 'DEMO' : STATUS_LABELS[listing.status] || 'Open') +
+          esc(
+        listing.demo
+          ? T('landing.board.demo', 'DEMO')
+          : statusLabel(listing.status) || T('landing.board.statusOpen', 'Open')
+      ) +
           '</span>' +
           '</span>'
         );
@@ -242,10 +267,14 @@
   }
 
   function settlementLabel(listing) {
-    if (listing.settlement === 'adopt_stake') return 'Adopt stake';
-    if (listing.settlement === 'program' || listing.settlement === 'instant') return 'Instant sale';
-    if (listing.settlement === 'legacy') return 'Instant sale';
-    return listing.offerType === 'adopt_stake' ? 'Adopt stake' : 'Open ask';
+    var adoptStake = T('landing.board.adoptStake', 'Adopt stake');
+    var instantSale = T('landing.board.instantSale', 'Instant sale');
+    if (listing.settlement === 'adopt_stake') return adoptStake;
+    if (listing.settlement === 'program' || listing.settlement === 'instant') return instantSale;
+    if (listing.settlement === 'legacy') return instantSale;
+    return listing.offerType === 'adopt_stake'
+      ? adoptStake
+      : T('landing.board.openAsk', 'Open ask');
   }
 
   function stakeRowHtml(listing, index) {
@@ -276,7 +305,7 @@
       '<a class="stakes-row-link" href="' +
       href +
       '">' +
-      (isDemo ? 'List →' : 'Adopt →') +
+      (isDemo ? T('landing.board.listCta', 'List →') : T('landing.board.adoptCta', 'Adopt →')) +
       '</a>' +
       '</li>'
     );
@@ -287,7 +316,14 @@
     if (!el) return;
     if (!stakedList.length) {
       el.innerHTML =
-        '<p class="stakes-bars-empty">No settled stakes yet. When adopters back a plant, bars appear here.</p>';
+        '<p class="stakes-bars-empty">' +
+      esc(
+        T(
+          'landing.board.noStakes',
+          'No settled stakes yet. When adopters back a plant, bars appear here.'
+        )
+      ) +
+      '</p>';
       return;
     }
     var max = Math.max.apply(
@@ -306,7 +342,7 @@
           Math.min(i * 50, 400) +
           'ms">' +
           '<span class="stakes-bar-label">' +
-          esc(listing.name || 'Stake') +
+          esc(listing.name || T('landing.board.stake', 'Stake')) +
           '</span>' +
           '<span class="stakes-bar-track"><span class="stakes-bar-fill" style="width:' +
           pct +
@@ -355,10 +391,10 @@
     if (openEmpty) openEmpty.hidden = open.length > 0;
     if (openMeta) {
       openMeta.textContent = isDemo
-        ? 'Sample depth · not live asks'
+        ? T('landing.board.sampleDepth', 'Sample depth · not live asks')
         : open.length
-          ? open.length + (open.length === 1 ? ' open offer' : ' open offers')
-          : 'Board clear';
+          ? T('landing.board.openOffers', '{count} open offers', { count: open.length })
+          : T('landing.board.clear', 'Board clear');
     }
 
     var askVolume = sumPrice(
@@ -390,8 +426,10 @@
     var updated = document.getElementById('stakes-updated');
     if (updated) {
       updated.textContent = isDemo
-        ? 'Preview mix · seed the board from Tokenise + Market'
-        : 'Last print ' + formatClock(new Date()) + ' · test network';
+        ? T('landing.board.previewMix', 'Preview mix · seed the board from Tokenise + Market')
+        : T('landing.board.lastPrintNet', 'Last print {time} · test network', {
+            time: formatClock(new Date()),
+          });
     }
   }
 
@@ -427,14 +465,14 @@
     if (volEl) volEl.textContent = formatPrice(askVolume) + ' $GROWTOO';
     if (stakedCountEl) {
       stakedCountEl.textContent =
-        String(stakedList.length) + (stakedList.length === 1 ? ' contract' : ' contracts');
+        T('landing.board.contracts', '{count} contracts', { count: stakedList.length });
     }
     if (stakedValueEl) stakedValueEl.textContent = formatPrice(stakedValue) + ' $GROWTOO';
     if (totalEl) totalEl.textContent = formatPrice(totalValue) + ' $GROWTOO';
     if (clockEl) {
       clockEl.textContent = isDemo
-        ? 'Sample depth · not live asks'
-        : 'Last print ' + formatClock(new Date());
+        ? T('landing.board.sampleDepth', 'Sample depth · not live asks')
+        : T('landing.board.lastPrint', 'Last print {time}', { time: formatClock(new Date()) });
     }
   }
 
@@ -458,17 +496,28 @@
     var lead = document.getElementById('market-lead');
     var session = document.querySelector('#landing-market-board .market-stat-value--live');
     if (show) {
-      if (headline) headline.textContent = 'This is what trading will look like';
+      if (headline) {
+        headline.textContent = T(
+          'landing.board.headlinePreview',
+          'This is what trading will look like'
+        );
+      }
       if (lead) {
-        lead.textContent =
-          'The board is warming up — early contracts are being seeded now. Here\'s a preview of how Seed and Growth RWAs will trade once live.';
+        lead.textContent = T(
+          'landing.board.leadPreview',
+          'The board is warming up — early contracts are being seeded now. Here\'s a preview of how Seed and Growth RWAs will trade once live.'
+        );
       }
       if (session) session.textContent = 'PREVIEW';
     } else {
-      if (headline) headline.textContent = 'Live contracts from real growers';
+      if (headline) {
+        headline.textContent = T('landing.board.headlineLive', 'Live contracts from real growers');
+      }
       if (lead) {
-        lead.textContent =
-          'Open Seed and growth contracts — seller-set asks in $GROWTOO, settled through marketplace escrow.';
+        lead.textContent = T(
+          'landing.board.leadLive',
+          'Open Seed and growth contracts — seller-set asks in $GROWTOO, settled through marketplace escrow.'
+        );
       }
       if (session) session.textContent = 'OPEN';
     }
@@ -521,14 +570,17 @@
     var clockEl = document.getElementById('landing-market-updated');
     if (loading) loading.hidden = true;
     if (empty) empty.hidden = true;
-    if (clockEl) clockEl.textContent = 'Feed offline · showing sample';
+    if (clockEl) {
+      clockEl.textContent = T('landing.board.offline', 'Feed offline · showing sample');
+    }
+    // i18n-ignore — console diagnostic.
     console.warn(msg || 'Could not load market offers.');
     showDemoTape();
   }
 
   function load() {
     if (!window.firebase || !firebase.firestore) {
-      showError('Market temporarily unavailable.');
+      showError(T('landing.board.unavailable', 'Market temporarily unavailable.'));
       return;
     }
 
@@ -562,7 +614,7 @@
       })
       .catch(function (err) {
         console.warn('landing market failed', err);
-        showError('Could not load market offers. Try again later.');
+        showError(T('landing.board.loadFailed', 'Could not load market offers. Try again later.'));
       });
   }
 

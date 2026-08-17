@@ -37,12 +37,14 @@
     allowAutoMint: false,
   };
 
+  /* [dictionary key, English] — resolved in stageLabel(), because this
+     table is built while the page parses, before the dictionary loads. */
   var STAGE_LABELS = {
-    klijanje: 'Germination',
-    sadnica: 'Seedling',
-    vegetativna: 'Vegetative',
-    cvjetanje: 'Flowering',
-    susenje: 'Drying',
+    klijanje: ['app.stage.germination', 'Germination'],
+    sadnica: ['app.stage.seedling', 'Seedling'],
+    vegetativna: ['app.stage.vegetative', 'Vegetative'],
+    cvjetanje: ['app.stage.flowering', 'Flowering'],
+    susenje: ['app.stage.dryingShort', 'Drying'],
   };
 
   /** Rough stage-duration norms (days) for common auto/CBD grows — advisory only. */
@@ -114,12 +116,17 @@
     return 'draft';
   }
 
+  function stageLabel(stageKey) {
+    var row = STAGE_LABELS[stageKey];
+    return row ? T(row[0], row[1]) : stageKey || '';
+  }
+
   function actionClassLabel(actionType) {
     var cls = ACTION_CLASS[actionType] || 'draft';
-    if (cls === 'automatic') return 'Always on';
-    if (cls === 'draft') return 'Draft & confirm';
-    if (cls === 'high_stakes') return 'Needs your approval';
-    return 'Advisory only';
+    if (cls === 'automatic') return T('app.coach.classAlwaysOn', 'Always on');
+    if (cls === 'draft') return T('app.coach.classDraft', 'Draft & confirm');
+    if (cls === 'high_stakes') return T('app.coach.classApproval', 'Needs your approval');
+    return T('app.coach.classAdvisory', 'Advisory only');
   }
 
   function getActivityLog() {
@@ -281,21 +288,21 @@
       out.push({
         tone: 'warn',
         text:
-          'Heat warning — ' +
-          Math.round(hottest.t) +
-          '° on ' +
-          hottest.label +
-          '. Water early morning or after sunset, never in full midday sun.',
+          T(
+            'app.coach.wxHeatWarning',
+            'Heat warning — {temp}° on {day}. Water early morning or after sunset, never in full midday sun.',
+            { temp: Math.round(hottest.t), day: hottest.label }
+          ),
       });
     } else if (hottest && hottest.t >= 26) {
       out.push({
         tone: 'info',
         text:
-          'Warm spell up to ' +
-          Math.round(hottest.t) +
-          '° (' +
-          hottest.label +
-          '). Check soil moisture a finger deep before watering.',
+          T(
+            'app.coach.wxWarmSpell',
+            'Warm spell up to {temp}° ({day}). Check soil moisture a finger deep before watering.',
+            { temp: Math.round(hottest.t), day: hottest.label }
+          ),
       });
     }
 
@@ -303,16 +310,19 @@
       out.push({
         tone: 'info',
         text:
-          'Rain likely ' +
-          wettest.label +
-          ' (' +
-          Math.round(wettest.r) +
-          '%). Hold off watering and feeding — nutrients wash straight through.',
+          T(
+            'app.coach.wxRain',
+            'Rain likely {day} ({chance}%). Hold off watering and feeding — nutrients wash straight through.',
+            { day: wettest.label, chance: Math.round(wettest.r) }
+          ),
       });
     } else if (dryRun && days.length > 1) {
       out.push({
         tone: 'info',
-        text: 'No real rain in the forecast. Outdoor pots dry out fastest — check them daily.',
+        text: T(
+          'app.coach.wxNoRain',
+          'No real rain in the forecast. Outdoor pots dry out fastest — check them daily.'
+        ),
       });
     }
 
@@ -320,11 +330,11 @@
       out.push({
         tone: 'warn',
         text:
-          'Cold night — down to ' +
-          Math.round(coldest.t) +
-          '° on ' +
-          coldest.label +
-          '. Move sensitive pots under cover or indoors.',
+          T(
+            'app.coach.wxColdNight',
+            'Cold night — down to {temp}° on {day}. Move sensitive pots under cover or indoors.',
+            { temp: Math.round(coldest.t), day: coldest.label }
+          ),
       });
     }
 
@@ -332,11 +342,11 @@
       out.push({
         tone: 'info',
         text:
-          'Wide day/night swing (' +
-          Math.round(coldest.t) +
-          '–' +
-          Math.round(hottest.t) +
-          '°). Expect slower growth; avoid heavy feeding until it settles.',
+          T(
+            'app.coach.wxSwing',
+            'Wide day/night swing ({low}–{high}°). Expect slower growth; avoid heavy feeding until it settles.',
+            { low: Math.round(coldest.t), high: Math.round(hottest.t) }
+          ),
       });
     }
 
@@ -350,7 +360,7 @@
 
     (plants || []).forEach(function (plant) {
       if (!plant || !plant.id) return;
-      var name = plant.name || 'Plant';
+      var name = plant.name || T('app.stack.plant', 'Plant');
       var interval = typicalWateringIntervalDays(plant.id, entries);
       var waterDates = careDatesMs(plant.id, entries, ['zalijevanje']);
       var lastWater = waterDates[0] || 0;
@@ -365,27 +375,23 @@
             plantId: plant.id,
             severity: 'urgent',
             kind: 'predictive',
-            title: 'Heat + watering pace',
-            message:
-              'Warm spell around ' +
-              heat.label +
-              ' (~' +
-              Math.round(heat.temp) +
-              '°C). ' +
-              name +
-              ' is already ' +
-              daysSince +
-              ' day' +
-              (daysSince === 1 ? '' : 's') +
-              ' since water — your usual gap is about ' +
-              interval +
-              ' day' +
-              (interval === 1 ? '' : 's') +
-              '. Worth watering today.',
-            prompt:
-              'Heat is coming and "' +
-              name +
-              '" is past my usual watering pace. Should I water today, and what should I watch for?',
+            title: T('app.coach.heatPaceTitle', 'Heat + watering pace'),
+            message: T(
+              'app.coach.heatPaceMessage',
+              'Warm spell around {day} (~{temp}°C). {plant} is already {since} since water — your usual gap is about {gap}. Worth watering today.',
+              {
+                day: heat.label,
+                temp: Math.round(heat.temp),
+                plant: name,
+                since: T('app.coach.days', '{count} days', { count: daysSince }),
+                gap: T('app.coach.days', '{count} days', { count: interval }),
+              }
+            ),
+            prompt: T(
+              'app.coach.heatPacePrompt',
+              'Heat is coming and "{plant}" is past my usual watering pace. Should I water today, and what should I watch for?',
+              { plant: name }
+            ),
           });
         }
       } else if (heat && daysSince != null && daysSince >= 2 && heat.offsetDays <= 1) {
@@ -394,17 +400,22 @@
           plantId: plant.id,
           severity: 'urgent',
           kind: 'predictive',
-          title: 'Heat check',
-          message:
-            name +
-            ': ~' +
-            Math.round(heat.temp) +
-            '°C coming ' +
-            heat.label +
-            ', and watering was ' +
-            daysSince +
-            ' days ago. Check moisture today.',
-          prompt: 'Help me decide if "' + name + '" needs water before the heat.',
+          title: T('app.coach.heatCheckTitle', 'Heat check'),
+          message: T(
+            'app.coach.heatCheckMessage',
+            '{plant}: ~{temp}°C coming {day}, and watering was {days} ago. Check moisture today.',
+            {
+              plant: name,
+              temp: Math.round(heat.temp),
+              day: heat.label,
+              days: T('app.coach.days', '{count} days', { count: daysSince }),
+            }
+          ),
+          prompt: T(
+            'app.coach.heatCheckPrompt',
+            'Help me decide if "{plant}" needs water before the heat.',
+            { plant: name }
+          ),
         });
       }
 
@@ -421,24 +432,26 @@
               plantId: plant.id,
               severity: 'info',
               kind: 'advisory',
-              title: 'Stage pace check',
-              message:
-                name +
-                ' has been in ' +
-                (STAGE_LABELS[stage] || stage) +
-                ' for ' +
-                daysIn +
-                ' days. Many similar grows move on around day ' +
-                norm.typical +
-                ' — take a look when you can (your call).',
-              prompt:
-                'Plant "' +
-                name +
-                '" has been in ' +
-                (STAGE_LABELS[stage] || stage) +
-                ' for ' +
-                daysIn +
-                ' days. What signs should I check before changing stage?',
+              title: T('app.coach.stagePaceTitle', 'Stage pace check'),
+              message: T(
+                'app.coach.stagePaceMessage',
+                '{plant} has been in {stage} for {days}. Many similar grows move on around day {typical} — take a look when you can (your call).',
+                {
+                  plant: name,
+                  stage: stageLabel(stage),
+                  days: T('app.coach.days', '{count} days', { count: daysIn }),
+                  typical: norm.typical,
+                }
+              ),
+              prompt: T(
+                'app.coach.stagePacePrompt',
+                'Plant "{plant}" has been in {stage} for {days}. What signs should I check before changing stage?',
+                {
+                  plant: name,
+                  stage: stageLabel(stage),
+                  days: T('app.coach.days', '{count} days', { count: daysIn }),
+                }
+              ),
             });
           }
         }
@@ -451,7 +464,7 @@
   function narrateAfterEntry(entry, plant) {
     if (!entry || !entry.id) return null;
     var type = entry.type || '';
-    var name = (plant && plant.name) || 'your plant';
+    var name = (plant && plant.name) || T('app.coach.yourPlant', 'your plant');
     var weather = readWeatherCache();
     var heat = upcomingHeat(weather);
     var note = '';
@@ -460,29 +473,32 @@
       var interval = plant ? typicalWateringIntervalDays(plant.id, readJson('dnevnik-live-entries', [])) : null;
       var nextDays = interval != null ? interval : 2;
       if (heat && heat.offsetDays <= 2) {
-        note =
-          'Noted — with ~' +
-          Math.round(heat.temp) +
-          '°C around ' +
-          heat.label +
-          ', check moisture sooner than usual (often within a day).';
+        note = T(
+          'app.coach.noteWaterHeat',
+          'Noted — with ~{temp}°C around {day}, check moisture sooner than usual (often within a day).',
+          { temp: Math.round(heat.temp), day: heat.label }
+        );
       } else {
-        note =
-          'Noted — next watering often lands around ' +
-          nextDays +
-          ' day' +
-          (nextDays === 1 ? '' : 's') +
-          ' for ' +
-          name +
-          ', depending on pot size and heat.';
+        note = T(
+          'app.coach.noteWaterNext',
+          'Noted — next watering often lands around {days} for {plant}, depending on pot size and heat.',
+          {
+            days: T('app.coach.days', '{count} days', { count: nextDays }),
+            plant: name,
+          }
+        );
       }
     } else if (type === 'gnojidba') {
-      note =
-        'Feeding logged for ' +
-        name +
-        '. Watch leaf colour over the next few days — yellowing needs a human look, not an auto-fix.';
+      note = T(
+        'app.coach.noteFeeding',
+        'Feeding logged for {plant}. Watch leaf colour over the next few days — yellowing needs a human look, not an auto-fix.',
+        { plant: name }
+      );
     } else if (type === 'faza' || type === 'podfaza') {
-      note = 'Stage update recorded. Keep logging care so the trail stays clear.';
+      note = T(
+        'app.coach.noteStage',
+        'Stage update recorded. Keep logging care so the trail stays clear.'
+      );
     } else {
       return null;
     }
@@ -493,10 +509,10 @@
       tier: 'automatic',
       title:
         type === 'zalijevanje'
-          ? 'Logged a watering note'
+          ? T('app.coach.loggedWatering', 'Logged a watering note')
           : type === 'gnojidba'
-            ? 'Logged a feeding note'
-            : 'Logged a journal note',
+            ? T('app.coach.loggedFeeding', 'Logged a feeding note')
+            : T('app.coach.loggedJournal', 'Logged a journal note'),
       body: note,
       plantId: plant && plant.id,
       entryId: entry.id,
@@ -509,7 +525,10 @@
     var list = plants || [];
     var ents = entries || [];
     if (!list.length) {
-      return 'Add a plant when you are ready — Coach will help keep the care trail tidy.';
+      return T(
+        'app.coach.briefEmpty',
+        'Add a plant when you are ready — Coach will help keep the care trail tidy.'
+      );
     }
     var nudges = buildPredictiveNudges(list, ents);
     if (nudges.length) {
@@ -526,33 +545,29 @@
     });
     var daysSince = waterDates[0] ? Math.floor((Date.now() - waterDates[0]) / 86400000) : null;
     var top = list[0];
-    var stage = STAGE_LABELS[top.stage] || top.stage || 'growing';
+    var stage = stageLabel(top.stage) || T('app.coach.growing', 'growing');
     if (daysSince == null) {
-      return (
-        list.length +
-        ' plant' +
-        (list.length === 1 ? '' : 's') +
-        ' in the journal. Log a watering when you can — Coach uses that pace for weather tips.'
+      return T(
+        'app.coach.briefNoWater',
+        '{plants} in the journal. Log a watering when you can — Coach uses that pace for weather tips.',
+        { plants: T('app.coach.plants', '{count} plants', { count: list.length }) }
       );
     }
     if (daysSince === 0) {
-      return (
-        'Looking steady — watering logged today. ' +
-        (top.name || 'Lead plant') +
-        ' is in ' +
-        stage +
-        '.'
+      return T(
+        'app.coach.briefSteady',
+        'Looking steady — watering logged today. {plant} is in {stage}.',
+        { plant: top.name || T('app.coach.leadPlant', 'Lead plant'), stage: stage }
       );
     }
-    return (
-      (top.name || 'Your grow') +
-      ' · ' +
-      stage +
-      '. Last watering ' +
-      daysSince +
-      ' day' +
-      (daysSince === 1 ? '' : 's') +
-      ' ago across the garden.'
+    return T(
+      'app.coach.briefLastWater',
+      '{plant} · {stage}. Last watering {days} ago across the garden.',
+      {
+        plant: top.name || T('app.coach.yourGrow', 'Your grow'),
+        stage: stage,
+        days: T('app.coach.days', '{count} days', { count: daysSince }),
+      }
     );
   }
 
@@ -567,7 +582,10 @@
     var list = plants || [];
     var ents = entries || [];
     if (!list.length) {
-      return 'Add a plant when you are ready — Coach will keep the care trail tidy.';
+      return T(
+        'app.coach.railEmpty',
+        'Add a plant when you are ready — Coach will keep the care trail tidy.'
+      );
     }
     var nudges = buildPredictiveNudges(list, ents);
     if (nudges.length) {
@@ -580,45 +598,73 @@
         }
       }
       var plant = plantIdx >= 0 ? list[plantIdx] : null;
-      var name = (plant && plant.name) || 'Plant';
+      var name = (plant && plant.name) || T('app.stack.plant', 'Plant');
       var no = plantIdx >= 0 ? ' №' + specimenNo(plantIdx) : '';
       if (n.id && String(n.id).indexOf('predict-heat-water') === 0) {
         var heat = upcomingHeat(readWeatherCache());
-        var heatBit = heat ? ' — heat wave ' + heat.label : '';
-        return name + no + ' is due for watering' + heatBit;
+        return heat
+          ? T('app.coach.railDueHeat', '{plant} is due for watering — heat wave {day}', {
+              plant: name + no,
+              day: heat.label,
+            })
+          : T('app.coach.railDue', '{plant} is due for watering', { plant: name + no });
       }
       if (n.id && String(n.id).indexOf('stage-pace') === 0) {
-        return name + no + ' may be ready to move stage — take a look when you can.';
+        return T(
+          'app.coach.railStage',
+          '{plant} may be ready to move stage — take a look when you can.',
+          { plant: name + no }
+        );
       }
       return n.message;
     }
     var top = list[0];
     var waterDates = careDatesMs(top.id, ents, ['zalijevanje']);
     var daysSince = waterDates[0] ? Math.floor((Date.now() - waterDates[0]) / 86400000) : null;
-    var label = (top.name || 'Plant') + ' №' + specimenNo(0);
+    var label = (top.name || T('app.stack.plant', 'Plant')) + ' №' + specimenNo(0);
     if (daysSince == null) {
-      return label + ' is waiting for a first watering.';
+      return T('app.coach.railFirstWater', '{plant} is waiting for a first watering.', {
+        plant: label,
+      });
     }
     if (daysSince === 0) {
-      return label + ' looks steady — watering logged today.';
+      return T('app.coach.railSteady', '{plant} looks steady — watering logged today.', {
+        plant: label,
+      });
     }
     if (daysSince >= 2) {
-      return label + ' is due for watering — last care ' + daysSince + ' days ago.';
+      return T('app.coach.railOverdue', '{plant} is due for watering — last care {days} ago.', {
+        plant: label,
+        days: T('app.coach.days', '{count} days', { count: daysSince }),
+      });
     }
-    return label + ' · last watering yesterday.';
+    return T('app.coach.railYesterday', '{plant} · last watering yesterday.', { plant: label });
   }
 
   function relativeTime(iso) {
     var t = Date.parse(iso || '');
     if (!Number.isFinite(t)) return '';
     var sec = Math.round((Date.now() - t) / 1000);
-    if (sec < 60) return 'just now';
-    if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
-    if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
-    if (sec < 172800) return 'yesterday';
-    if (sec < 604800) return Math.floor(sec / 86400) + 'd ago';
+    /* Intl.RelativeTimeFormat words this per language — "5 min ago",
+       "vor 5 Min.", "prije 5 min" — so there is nothing to translate here
+       beyond the "just now" case. */
+    var tag = (window.I18N && window.I18N.locale) || 'en';
+    function rel(value, unit) {
+      try {
+        return new Intl.RelativeTimeFormat(tag, { numeric: 'auto', style: 'short' }).format(
+          -value,
+          unit
+        );
+      } catch (e) {
+        return value + ' ' + unit;
+      }
+    }
+    if (sec < 60) return T('app.coach.justNow', 'just now');
+    if (sec < 3600) return rel(Math.floor(sec / 60), 'minute');
+    if (sec < 86400) return rel(Math.floor(sec / 3600), 'hour');
+    if (sec < 604800) return rel(Math.floor(sec / 86400), 'day');
     try {
-      return new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+      return new Intl.DateTimeFormat(tag, { day: 'numeric', month: 'short' }).format(new Date(t));
     } catch (e) {
       return '';
     }
@@ -704,7 +750,10 @@
     var o = opts || {};
     var right = '';
     if (o.kind === 'always') {
-      right = '<span class="coach-settings-always">always on</span>';
+      right =
+        '<span class="coach-settings-always">' +
+        T('app.coach.alwaysOnBadge', 'always on') +
+        '</span>';
     } else if (o.kind === 'toggle') {
       right =
         '<label class="coach-toggle">' +
@@ -738,7 +787,12 @@
     var list = getActivityLog().slice(0, limit || 12);
     if (!list.length) {
       return (
-        '<p class="coach-activity-empty">No coach actions yet. Reminders, drafts, and confirmations will show up here.</p>'
+        '<p class="coach-activity-empty">' +
+        T(
+          'app.coach.activityEmpty',
+          'No coach actions yet. Reminders, drafts, and confirmations will show up here.'
+        ) +
+        '</p>'
       );
     }
     return (
@@ -746,7 +800,7 @@
       list
         .map(function (row) {
           var pending = String(row.status || '') === 'pending';
-          var title = row.title || row.kind || 'Action';
+          var title = row.title || row.kind || T('app.coach.action', 'Action');
           if (row.body && pending) title = row.body;
           else if (row.body && !pending && row.kind === 'draft') title = row.title || row.body;
           return (
@@ -781,57 +835,73 @@
       iconSvg('gear') +
       '</span>' +
       '<div>' +
-      '<h3 class="coach-settings-title">Coach settings</h3>' +
-      '<p class="coach-settings-sub">Choose what your coach can do on its own.</p>' +
+      '<h3 class="coach-settings-title">' +
+      T('app.coach.settingsTitle', 'Coach settings') +
+      '</h3>' +
+      '<p class="coach-settings-sub">' +
+      T('app.coach.settingsSub', 'Choose what your coach can do on its own.') +
+      '</p>' +
       '</div></div>' +
       '</header>' +
       '<section class="coach-settings-section">' +
-      '<h4 class="coach-settings-section-label">Always on</h4>' +
+      '<h4 class="coach-settings-section-label">' +
+      T('app.coach.classAlwaysOn', 'Always on') +
+      '</h4>' +
       settingsRowHtml({
         kind: 'always',
         icon: 'bell',
-        label: 'Watering & feeding reminders',
+        label: T('app.coach.setReminders', 'Watering & feeding reminders'),
       }) +
       settingsRowHtml({
         kind: 'always',
         icon: 'calendar',
-        label: 'Weather-based care nudges',
+        label: T('app.coach.setWeatherNudges', 'Weather-based care nudges'),
       }) +
       '</section>' +
       '<section class="coach-settings-section">' +
-      '<h4 class="coach-settings-section-label">Draft &amp; confirm</h4>' +
-      '<p class="coach-settings-section-hint">Coach prepares it, you approve with one tap.</p>' +
+      '<h4 class="coach-settings-section-label">' +
+      T('app.coach.classDraft', 'Draft & confirm') +
+      '</h4>' +
+      '<p class="coach-settings-section-hint">' +
+      T('app.coach.draftHint', 'Coach prepares it, you approve with one tap.') +
+      '</p>' +
       settingsRowHtml({
         kind: 'toggle',
         icon: 'doc',
-        label: 'Draft journal entries',
+        label: T('app.coach.setDraftEntries', 'Draft journal entries'),
         key: 'draftEntries',
         on: !!p.draftEntries,
       }) +
       settingsRowHtml({
         kind: 'toggle',
         icon: 'sync',
-        label: 'Suggest stage transitions',
+        label: T('app.coach.setSuggestStages', 'Suggest stage transitions'),
         key: 'suggestStages',
         on: !!p.suggestStages,
       }) +
       '</section>' +
       '<section class="coach-settings-section">' +
-      '<h4 class="coach-settings-section-label">Needs your approval</h4>' +
-      '<p class="coach-settings-section-hint">Always requires your confirmation.</p>' +
+      '<h4 class="coach-settings-section-label">' +
+      T('app.coach.classApproval', 'Needs your approval') +
+      '</h4>' +
+      '<p class="coach-settings-section-hint">' +
+      T('app.coach.approvalHint', 'Always requires your confirmation.') +
+      '</p>' +
       settingsRowHtml({
         kind: 'lock',
         icon: 'upload',
-        label: 'Mint or list on market',
+        label: T('app.coach.setMintList', 'Mint or list on market'),
       }) +
       settingsRowHtml({
         kind: 'lock',
         icon: 'edit',
-        label: 'Edit or delete entries',
+        label: T('app.coach.setEditDelete', 'Edit or delete entries'),
       }) +
       '</section>' +
       '<section class="coach-settings-section coach-settings-section--activity">' +
-      '<h4 class="coach-settings-section-label">Coach activity</h4>' +
+      '<h4 class="coach-settings-section-label">' +
+      T('app.coach.activityTitle', 'Coach activity') +
+      '</h4>' +
       activityLogHtml(12) +
       '</section>' +
       '</div>'

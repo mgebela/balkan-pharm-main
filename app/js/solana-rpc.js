@@ -71,7 +71,10 @@
           return null;
         });
         if (!res.ok || isRateLimited(res, json)) {
+          // Transport diagnostics; callers wrap these in grower-facing
+          // wording before anything reaches the screen.
           lastErr = new Error(
+            // i18n-ignore
             'RPC ' + res.status + ' from ' + url + (json && json.error ? ': ' + json.error.message : '')
           );
           continue;
@@ -88,6 +91,7 @@
         lastErr = err;
       }
     }
+    // i18n-ignore — same: a diagnostic, not copy.
     throw lastErr || new Error('All Solana RPC endpoints failed for ' + method);
   }
 

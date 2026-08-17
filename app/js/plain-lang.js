@@ -4,31 +4,34 @@
 (function () {
   'use strict';
 
+  /* term → [dictionary key, English]. Resolved in lookup() rather than
+     here: this object is built while the page parses, before the dictionary
+     has loaded, so translating at this point would freeze in English. */
   var TERMS = {
-    escrow:
-      'A temporary hold: your plant token sits safely with the market until someone invests or you cancel — like a middle shelf, not a permanent transfer.',
-    settlement:
-      'When the deal finishes: payment is confirmed and the plant token moves to the adopter (or returns to you if you cancel).',
-    settle:
-      'When the deal finishes: payment is confirmed and the plant token moves to the adopter (or returns to you if you cancel).',
-    rwa:
-      '“Real-world asset” token — here it just means a plant token linked to a real journal trail on the test network. Not a stock or cash.',
-    'plant token':
-      'A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.',
-    'adopt stake':
-      'Half now, half unlocks as the grower keeps logging care through harvest.',
-    'instant sale':
-      'Full price to the grower at purchase. Done — no care lock.',
-    redemption:
-      'Turning a harvest-stage token into a real harvest share. Coming later — not available on Devnet. Claim locked stake only unlocks escrowed $GROWTOO.',
-    'bonding curve':
-      'An automatic price formula some crypto projects use. growtoo does not use one — growers set their own ask price.',
-    'collection authority':
-      'The operator key that currently updates token metadata and settles Devnet deals. A centralized MVP trust point — see Risks.',
-    '$growtoo':
-      'Test-network reward tokens with no monetary value. Used to practice investing and stage rewards on Devnet.',
-    growtoo:
-      'Test-network reward tokens with no monetary value. Used to practice investing and stage rewards on Devnet.',
+    escrow: ['app.plainLang.escrow',
+      'A temporary hold: your plant token sits safely with the market until someone invests or you cancel — like a middle shelf, not a permanent transfer.'],
+    settlement: ['app.plainLang.settlement',
+      'When the deal finishes: payment is confirmed and the plant token moves to the adopter (or returns to you if you cancel).'],
+    settle: ['app.plainLang.settlement',
+      'When the deal finishes: payment is confirmed and the plant token moves to the adopter (or returns to you if you cancel).'],
+    rwa: ['app.plainLang.rwa',
+      '“Real-world asset” token — here it just means a plant token linked to a real journal trail on the test network. Not a stock or cash.'],
+    'plant token': ['app.plainLang.plantToken',
+      'A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.'],
+    'adopt stake': ['app.plainLang.adoptStake',
+      'Half now, half unlocks as the grower keeps logging care through harvest.'],
+    'instant sale': ['app.plainLang.instantSale',
+      'Full price to the grower at purchase. Done — no care lock.'],
+    redemption: ['app.plainLang.redemption',
+      'Turning a harvest-stage token into a real harvest share. Coming later — not available on Devnet. Claim locked stake only unlocks escrowed $GROWTOO.'],
+    'bonding curve': ['app.plainLang.bondingCurve',
+      'An automatic price formula some crypto projects use. growtoo does not use one — growers set their own ask price.'],
+    'collection authority': ['app.plainLang.collectionAuthority',
+      'The operator key that currently updates token metadata and settles Devnet deals. A centralized MVP trust point — see Risks.'],
+    '$growtoo': ['app.plainLang.growtoo',
+      'Test-network reward tokens with no monetary value. Used to practice investing and stage rewards on Devnet.'],
+    growtoo: ['app.plainLang.growtoo',
+      'Test-network reward tokens with no monetary value. Used to practice investing and stage rewards on Devnet.'],
   };
 
   function esc(s) {
@@ -41,7 +44,8 @@
     var key = String(term || '')
       .trim()
       .toLowerCase();
-    return TERMS[key] || '';
+    var row = TERMS[key];
+    return row ? T(row[0], row[1]) : '';
   }
 
   function tipHtml(term, label) {
@@ -51,9 +55,9 @@
     return (
       '<span class="plain-tip">' +
       esc(shown) +
-      '<button type="button" class="plain-tip-btn" aria-label="What does ' +
-      esc(shown) +
-      ' mean?" data-plain-tip="' +
+      '<button type="button" class="plain-tip-btn" aria-label="' +
+      esc(T('app.plainLang.whatDoes', 'What does {term} mean?', { term: shown })) +
+      '" data-plain-tip="' +
       esc(term) +
       '">?</button>' +
       '<span class="plain-tip-bubble" role="tooltip" hidden>' +
@@ -85,90 +89,6 @@
       });
       tip.hidden = !open;
     });
-  }
-
-  /** Single Advanced/Simple setting for Market, Tokenise, and Profile — do not fork. */
-  var MODE_KEY = 'growtoo-crypto-mode';
-
-  function getMode() {
-    try {
-      var m = localStorage.getItem(MODE_KEY);
-      if (m === 'advanced') return 'advanced';
-    } catch (e) {
-      // ignore
-    }
-    return 'simple';
-  }
-
-  function setMode(mode) {
-    var next = mode === 'advanced' ? 'advanced' : 'simple';
-    try {
-      localStorage.setItem(MODE_KEY, next);
-    } catch (e) {
-      // ignore
-    }
-    applyMode();
-    return next;
-  }
-
-  function applyMode() {
-    var mode = getMode();
-    document.body.classList.toggle('crypto-simple', mode === 'simple');
-    document.body.classList.toggle('crypto-advanced', mode === 'advanced');
-    document.querySelectorAll('[data-crypto-mode-label]').forEach(function (el) {
-      el.textContent = mode === 'simple' ? 'Simple' : 'Advanced';
-    });
-    document.querySelectorAll('[data-crypto-mode-segmented]').forEach(function (group) {
-      group.setAttribute('data-active', mode);
-    });
-    document.querySelectorAll('[data-crypto-mode-btn]').forEach(function (btn) {
-      var value = btn.getAttribute('data-crypto-mode-btn');
-      if (value === 'simple' || value === 'advanced') {
-        // Segmented control: both options stay visible, one is checked.
-        btn.setAttribute('aria-checked', value === mode ? 'true' : 'false');
-        return;
-      }
-      // Legacy single toggle button (label swaps to name the other mode).
-      btn.setAttribute('aria-pressed', mode === 'advanced' ? 'true' : 'false');
-      btn.textContent = mode === 'simple' ? 'Show advanced details' : 'Use simple view';
-    });
-    // Refresh cards so Chain details match mode (hidden in Simple, open in Advanced).
-    try {
-      if (window.Market && typeof Market.render === 'function') Market.render();
-    } catch (e) {
-      /* ignore */
-    }
-    try {
-      if (window.AdoptPlant && typeof AdoptPlant.render === 'function') AdoptPlant.render();
-    } catch (e2) {
-      /* ignore */
-    }
-    try {
-      if (typeof window.renderAccountProfile === 'function') window.renderAccountProfile();
-      else {
-        var overlay = document.getElementById('more-nav-overlay');
-        if (overlay && !overlay.hidden && window.DnevnikProfile) {
-          /* profile re-renders on next open */
-        }
-      }
-    } catch (e3) {
-      /* ignore */
-    }
-  }
-
-  function bindModeToggle() {
-    document.addEventListener('click', function (e) {
-      var btn = e.target.closest('[data-crypto-mode-btn]');
-      if (!btn) return;
-      e.preventDefault();
-      var value = btn.getAttribute('data-crypto-mode-btn');
-      if (value === 'simple' || value === 'advanced') {
-        if (value !== getMode()) setMode(value);
-        return;
-      }
-      setMode(getMode() === 'simple' ? 'advanced' : 'simple');
-    });
-    applyMode();
   }
 
   /** Thin-stroke empty-state glyphs, matching the nav/grouped-row icon language. */
@@ -207,7 +127,7 @@
           '" id="' +
           esc(o.ctaId) +
           '">' +
-          esc(o.ctaLabel || 'Continue') +
+          esc(o.ctaLabel || T('app.cryptoMode.continue', 'Continue')) +
           '</button>'
         : '') +
       '</div>'
@@ -233,11 +153,9 @@
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       bindTips(document.body);
-      bindModeToggle();
     });
   } else {
     bindTips(document.body);
-    bindModeToggle();
   }
 
   window.GrowtooPlain = {
@@ -245,9 +163,6 @@
     tipHtml: tipHtml,
     lookup: lookup,
     bindTips: bindTips,
-    getMode: getMode,
-    setMode: setMode,
-    applyMode: applyMode,
     emptyStateHtml: emptyStateHtml,
     totalGrowRewards: totalGrowRewards,
     remainingGrowRewards: remainingGrowRewards,

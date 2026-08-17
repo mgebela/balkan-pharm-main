@@ -1,0 +1,1877 @@
+{
+  "app-boot-line": {
+    "p": "Dein Journal wird geöffnet…"
+  },
+  "app-boot-stalled": {
+    "p": "Das dauert länger als es sollte — vielleicht ist die Verbindung abgebrochen oder ein Skript wurde nicht geladen. Deine Journaleinträge sind sicher.",
+    "a": "Zurück zur Anmeldung"
+  },
+  "app-boot-retry": {
+    "button": "Nochmal versuchen"
+  },
+  "span2": "Journal",
+  "span3": "Storys",
+  "sidebar-log-btn": {
+    "span": "Notiz"
+  },
+  "sidebar-coach-btn": {
+    "span": "Coach"
+  },
+  "span4": "Markt",
+  "span5": "Admin",
+  "span6": "Journal",
+  "bottom-nav-log": {
+    "span": "Notiz"
+  },
+  "bottom-nav-coach": {
+    "span": "Coach"
+  },
+  "span7": "Markt",
+  "more-nav-title": {
+    "strong": "Profil"
+  },
+  "more-nav-overlay": {
+    "a": "<span class=\"more-nav-copy\"> <strong>Markt</strong> <span>Aktuelle Pflanzenangebote ansehen</span> </span>",
+    "a2": "<span class=\"more-nav-copy\"> <strong>Mein Garten</strong> <span>Adoptierte Pflanzen &amp; Einsätze</span> </span>",
+    "a3": "<span class=\"more-nav-copy\"> <strong>Journal</strong> <span>Pflanzen &amp; Pflegeprotokolle</span> </span>",
+    "a4": "<span class=\"more-nav-copy\"> <strong>Storys</strong> <span>Öffentliche Tipps, Pflanzenbilder &amp; Feldnotizen</span> </span>",
+    "a5": "<span class=\"more-nav-copy\"> <strong>Tokenisieren</strong> <span>Phasen im Devnet versiegeln</span> </span>",
+    "a6": "<span class=\"more-nav-copy\"> <strong>Markt</strong> <span>Versiegelte Pflanzen einstellen</span> </span>",
+    "span": "<strong>Darstellung</strong> <span>Dunkel ist growtoos Standard</span>",
+    "span2": "<strong>Admin</strong> <span>Plattform-Steuerung</span>",
+    "span3": "<strong>Darstellung</strong> <span>Dunkel ist growtoos Standard</span>",
+    "button": "Hell",
+    "button2": "Dunkel",
+    "button3": "Auto",
+    "a7": "<span class=\"more-nav-copy\"> <strong>Datenschutzerklärung</strong> <span>Wie wir mit deinen Daten umgehen</span> </span>",
+    "a8": "<span class=\"more-nav-copy\"> <strong>Nutzungsbedingungen</strong> <span>Regeln für die Nutzung von growtoo</span> </span>"
+  },
+  "more-nav-coach": {
+    "span": "<strong>Coach</strong> <span>Frag, was zu notieren, zu pflegen oder bei adoptierten Pflanzen zu prüfen ist</span>"
+  },
+  "btn-unlock-chain": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Tokenisieren &amp; Markt freischalten</strong> <span>Optionaler On-Chain-Weg — Phasen versiegeln &amp; Angebote einstellen</span> </span>"
+  },
+  "btn-logout-sheet": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Abmelden</strong> <span>Diese Sitzung beenden</span> </span>"
+  },
+  "log-sheet-title": {
+    "strong": "Pflege notieren"
+  },
+  "log-sheet-plant": {
+    "p": "Pflanzen"
+  },
+  "log-sheet-hint": {
+    "p": "Zeilen antippen zum Auswählen. Gleiche Sorten lassen sich zusammen notieren."
+  },
+  "log-sheet-add": {
+    "button": "Pflanze hinzufügen"
+  },
+  "log-sheet-water": {
+    "button": "Gießen notieren"
+  },
+  "log-sheet-feed": {
+    "button": "Düngen notieren"
+  },
+  "log-sheet-full": {
+    "button": "Vollständiger Journaleintrag"
+  },
+  "h1": "Journal",
+  "profile-type-badge": {
+    "span": "Grower"
+  },
+  "btn-account": {
+    "button": "<span class=\"header-avatar-mark\" aria-hidden=\"true\">G</span>"
+  },
+  "btn-logout": {
+    "button": "Abmelden"
+  },
+  "daily-start-kicker": {
+    "p": "Hier starten"
+  },
+  "notif-panel": {
+    "div": "<strong id=\"notif-panel-title\">Posteingang</strong> <span class=\"notif-panel-sub\" id=\"notif-panel-sub\"></span>"
+  },
+  "notif-mark-all": {
+    "button": "Als gelesen markieren"
+  },
+  "dashboard-seals-section": {
+    "h2": "Deine Pflanzen"
+  },
+  "dashboard-charts-section": {
+    "h2": "Überblick aus den Tools"
+  },
+  "view-dashboard": {
+    "h2": "Neueste Notizen"
+  },
+  "plants-weather-widget": {
+    "h3": "Wettervorhersage",
+    "p": "3 Tage · für die Grow-Planung"
+  },
+  "plants-weather-refresh": {
+    "button": "Aktualisieren"
+  },
+  "plants-weather": {
+    "div": "Vorhersage wird geladen…"
+  },
+  "dashboard-today-card": {
+    "p": "Heute"
+  },
+  "activity-reward-card": {
+    "p": "$GROWTOO diesen Monat"
+  },
+  "view-plants": {
+    "h2": "Meine Pflanzen",
+    "h22": "Journal"
+  },
+  "plants-open-stories": {
+    "button": "Story schreiben"
+  },
+  "btn-add-plant": {
+    "button": "+ Neue Pflanze"
+  },
+  "journal-view-toggle": {
+    "button": "Liste",
+    "button2": "Monat"
+  },
+  "journal-plant-filter": {
+    "option": "Alle Pflanzen"
+  },
+  "btn-add-entry": {
+    "button": "+ Neuer Eintrag",
+    "button2": "+ Neuer Eintrag für diese Pflanze"
+  },
+  "view-adopt": {
+    "button": "Tokenisieren",
+    "button2": "Markt",
+    "button3": "Einfach",
+    "button4": "Erweitert"
+  },
+  "adopter-guide": {
+    "h3": "So adoptierst du eine Pflanze",
+    "strong": "Den Markt durchsehen",
+    "p": "Offene Angebote sind versiegelte Pflanzen-Token mit einer Journalspur dahinter.",
+    "strong2": "Testnetz-Wallet verbinden",
+    "p2": "Phantom oder Solflare im Devnet — tippe auf die Wallet-Pille im Header, wenn du investieren willst.",
+    "strong3": "Mit $GROWTOO unterstützen",
+    "p3": "Beim Sofortkauf geht das Pflanzen-Token sofort an dich. Adopter-Einsatz: die Hälfte jetzt, die andere Hälfte wird frei, während der Grower die Pflege weiter dokumentiert.",
+    "strong4": "Fortschritt hier verfolgen",
+    "p4": "Adoptierte Pflanzen landen in diesem Garten. Verfolge Phasen und den monatlichen Freigabestatus.",
+    "p5": "Nur Testnetz — $GROWTOO hat keinen Geldwert. Du lernst den Vertrauensablauf, bevor es um echte Einsätze geht."
+  },
+  "adopter-guide-market": {
+    "button": "Markt ansehen"
+  },
+  "adopter-guide-wallet": {
+    "button": "Wallet verbinden"
+  },
+  "adopt-seed-section": {
+    "p": "Phase versiegeln"
+  },
+  "adopt-seed-form": {
+    "label": "Pflanze aus deinem Journal",
+    "p": "Sorte, Charge und Daten kommen aus dem Journal — nichts noch einmal eintragen."
+  },
+  "adopt-seed-plant": {
+    "option": "Wähle eine Pflanze aus deinem Journal"
+  },
+  "seal-stage-submit": {
+    "button": "Samenphase versiegeln · +0 $GROWTOO"
+  },
+  "platform-bonus-section": {
+    "h2": "Aktivitätsbonus",
+    "p": "Test-$GROWTOO für Gießen, Düngen, veröffentlichte Storys und Wochen mit 5 Pflegetagen — einmal pro Kalendermonat auf deine Devnet-Wallet abrufbar. Gezählt werden verschiedene Tage, nicht mehrere Einträge am selben Tag. Die Token kannst du später auf dem Markt nutzen (nur Testnetz). Nur für Grower."
+  },
+  "adopt-garden-section": {
+    "h2": "Versiegelte Pflanzen",
+    "h22": "Meine adoptierten Pflanzen"
+  },
+  "adopt-market-cta": {
+    "h2": "Bereit zu adoptieren?",
+    "p": "Sieh dir offene Angebote an und setze $GROWTOO ein. Abgewickelte Pflanzen erscheinen oben unter Meine adoptierten Pflanzen."
+  },
+  "adopt-open-market": {
+    "button": "Markt öffnen"
+  },
+  "view-market": {
+    "button": "Tokenisieren",
+    "button2": "Markt",
+    "button3": "Einfach",
+    "button4": "Erweitert",
+    "h2": "Meine Angebote",
+    "p": "Deine eingestellten Verträge: aktiv, adoptiert oder storniert.",
+    "h22": "<span class=\"adopter-only\">Pflanzen, die du adoptieren kannst</span> <span class=\"grower-only\">Offener Markt</span>"
+  },
+  "market-adopter-guide": {
+    "h3": "Adoptieren auf dieser Tafel",
+    "li": "<strong>Offener Markt</strong> zeigt aktuelle Grower-Angebote, in die du investieren kannst.",
+    "li2": "Tippe auf einer Karte auf <strong>Investieren</strong> — verbinde bei Bedarf die Wallet und bestätige die Ausgabe in $GROWTOO.",
+    "li3": "<strong>Sofortkauf</strong>: voller Preis beim Kauf an den Grower. Fertig.",
+    "li4": "<strong>Adopter-Einsatz</strong>: die Hälfte jetzt, die andere Hälfte wird frei, während der Grower die Pflege weiter dokumentiert.",
+    "li5": "Nach der Abwicklung verfolgst du die Pflanze unter <strong>Mein Garten</strong>.",
+    "span": "Ein Token in der Erntephase in einen echten Ernteanteil umwandeln. Kommt später — im Devnet nicht verfügbar. Der Abruf des gesperrten Einsatzes gibt nur die im Escrow liegenden $GROWTOO frei."
+  },
+  "market-list-section": {
+    "p": "Versiegelte Pflanze einstellen"
+  },
+  "market-list-form": {
+    "label": "Asset",
+    "legend": "Wie der Adopter dich bezahlt",
+    "span": "Sofortkauf",
+    "span2": "Voller Preis beim Kauf an dich. Fertig.",
+    "span3": "Adopter-Einsatz",
+    "span4": "Die Hälfte jetzt, die andere Hälfte wird frei, während du die Pflege weiter dokumentierst.",
+    "label2": "Preisvorstellung",
+    "button": "Auf dem Markt einstellen"
+  },
+  "market-asset-select": {
+    "option": "Versiegelte Pflanze wählen"
+  },
+  "market-go-tokenise": {
+    "button": "Phase unter Tokenisieren versiegeln"
+  },
+  "market-settlement-select": {
+    "option": "Sofortkauf",
+    "option2": "Adopter-Einsatz"
+  },
+  "market-stake-hint": {
+    "p": "Du bekommst beim Kauf den vollen Preis. Das Einstellen sperrt das NFT im On-Chain-Programmtresor — das Angebot geht sofort live."
+  },
+  "market-redemption-note": {
+    "p": "Physische Ernte-Einlösung — kommt später",
+    "p2": "Devnet-Übung: investieren → Pflegespur → <strong>Gesperrten Einsatz abrufen ($GROWTOO)</strong>. In diesem Testnetz gibt es keine physische Lieferung. $GROWTOO hat keinen Geldwert."
+  },
+  "market-open-hint": {
+    "p": "<span class=\"adopter-only\">Aktuelle Angebote von Growern. Unterstütze eine Pflanze mit $GROWTOO, wenn du so weit bist — und verfolge sie dann in Mein Garten.</span> <span class=\"grower-only\">Öffentliche Tafel: offene Angebote anderer Grower (deine stehen unter Meine Angebote).</span>"
+  },
+  "view-growlog": {
+    "h3": "Fotos aus dem Grow-Log",
+    "h32": "Sorte",
+    "h33": "Wachstumsphasen",
+    "h34": "Umgebung",
+    "h35": "Spur vom Samen zur Ernte",
+    "p": "Journaleinträge und Fotos der Reihe nach — die Dokumentationsspur dieser Pflanze.",
+    "h36": "Neueste Fotos"
+  },
+  "growlog-view-all": {
+    "button": "Alle Fotos ansehen"
+  },
+  "growlog-back": {
+    "button": "← Zurück zu den Pflanzen"
+  },
+  "btn-edit-plant": {
+    "button": "✎ Pflanze bearbeiten"
+  },
+  "btn-coach-growlog": {
+    "button": "Coach"
+  },
+  "view-blog": {
+    "h2": "Storys",
+    "p": "Teile Tipps, Pflanzenbilder, Probleme, Grower-Besuche und Produkte von deinen Pflanzen im öffentlichen Journal.",
+    "h3": "Deine Storys"
+  },
+  "blog-new": {
+    "button": "+ Story schreiben"
+  },
+  "blog-composer-title": {
+    "h3": "Story schreiben"
+  },
+  "blog-composer": {
+    "p": "Titel, Kategorie, Text und optional ein Titelbild. Veröffentliche, wenn du so weit bist."
+  },
+  "blog-form": {
+    "span": "Foto hinzufügen"
+  },
+  "blog-cover-clear": {
+    "button": "Foto entfernen"
+  },
+  "blog-save-draft": {
+    "button": "Entwurf speichern"
+  },
+  "blog-unpublish": {
+    "button": "Zurückziehen"
+  },
+  "blog-publish": {
+    "button": "Veröffentlichen"
+  },
+  "toolbox-journal-bridge": {
+    "p": "Messwerte bleiben hier für die Diagramme. Jedes Hinzufügen schreibt zusätzlich eine passende Notiz in die <strong>Journal</strong>-Spur dieser Pflanze — eine einzige Pflegegeschichte."
+  },
+  "view-toolbox": {
+    "h3": "Gießen",
+    "p": "Notiere, wann du gegossen hast.",
+    "h32": "Düngen",
+    "p2": "Nährstoffe und Dosen verfolgen.",
+    "h33": "Umgebung",
+    "p3": "Temperatur, Luftfeuchte, pH.",
+    "h34": "Umtopfen",
+    "p4": "Details zum Umtopfen notieren.",
+    "h35": "Stressfaktoren",
+    "p5": "Stressbedingungen und Schädlinge festhalten.",
+    "h36": "Bodenfeuchte",
+    "p6": "Bodenfeuchtesensor live (Gewächshaus).",
+    "h37": "Diagramme",
+    "p7": "Wachstum und Messwerte darstellen."
+  },
+  "toolbox-panel-watering": {
+    "h3": "Gießen",
+    "h4": "Diagramm: Menge nach Datum"
+  },
+  "tool-watering-value2": {
+    "option": "-- Pflanze wählen --"
+  },
+  "toolbox-form-watering": {
+    "button": "Hinzufügen"
+  },
+  "toolbox-panel-feeding": {
+    "h3": "Düngen",
+    "h4": "Düngeverlauf"
+  },
+  "tool-feeding-plant": {
+    "option": "-- Pflanze wählen --"
+  },
+  "toolbox-form-feeding": {
+    "button": "Hinzufügen"
+  },
+  "toolbox-panel-environment": {
+    "h3": "Umgebung",
+    "h4": "Diagramm: Temperatur, Luftfeuchte und pH"
+  },
+  "tool-environment-plant": {
+    "option": "-- Pflanze wählen --"
+  },
+  "toolbox-form-environment": {
+    "button": "Hinzufügen"
+  },
+  "toolbox-panel-transplant": {
+    "h3": "Umtopfen"
+  },
+  "tool-transplant-plant": {
+    "option": "-- Pflanze wählen --"
+  },
+  "toolbox-form-transplant": {
+    "button": "Hinzufügen"
+  },
+  "toolbox-panel-stressors": {
+    "h3": "Stressfaktoren"
+  },
+  "tool-stressors-plant": {
+    "option": "-- Pflanze wählen --"
+  },
+  "toolbox-form-stressors": {
+    "button": "Hinzufügen"
+  },
+  "toolbox-panel-soil": {
+    "h3": "Bodenfeuchte",
+    "a": "↗ Ganzes Fenster",
+    "p": "Sensordaten · Quelle <a href=\"http://164.92.208.95/latest.json\" target=\"_blank\" rel=\"noreferrer\">164.92.208.95</a> · aktualisiert alle 2 s"
+  },
+  "toolbox-panel-graphs": {
+    "h3": "Überblick über alle Diagramme",
+    "h4": "Gießen",
+    "h42": "Umgebung (Temperatur, Luftfeuchte, pH)"
+  },
+  "tool-graphs-plant": {
+    "option": "Alle Pflanzen"
+  },
+  "view-danas": {
+    "div": "<span class=\"danas-title\">Pflanzen gießen</span> <span class=\"danas-desc\">3 Pflanzen brauchen Wasser</span>",
+    "div2": "<span class=\"danas-title\">Feuchte prüfen</span> <span class=\"danas-desc\">Die Erde in den Töpfen prüfen</span>",
+    "div3": "<span class=\"danas-title\">Notiz hinzufügen</span> <span class=\"danas-desc\">Halte Änderungen fest</span>"
+  },
+  "view-admin": {
+    "h2": "Admin-Panel"
+  },
+  "admin-users": {
+    "h3": "Nutzer",
+    "p": "Nutzer verwalten"
+  },
+  "admin-plants": {
+    "h3": "Pflanzen",
+    "p": "Pflanzen ansehen und bearbeiten"
+  },
+  "admin-entries": {
+    "h3": "Journal",
+    "p": "Einträge verwalten"
+  },
+  "admin-tenant": {
+    "h3": "Mandanten",
+    "p": "Mandanten ansehen"
+  },
+  "admin-system": {
+    "h3": "Einstellungen",
+    "p": "Systemeinstellungen"
+  },
+  "admin-user-report": {
+    "h3": "Anmeldungen verfolgen",
+    "p": "Wer sich wann in der App angemeldet hat, täglich oder wöchentlich.",
+    "button": "Heute",
+    "button2": "7 Tage",
+    "p2": "Öffne das Admin-Panel, um den Bericht zu laden."
+  },
+  "admin-report-refresh": {
+    "button": "↻ Aktualisieren"
+  },
+  "admin-sharing-section": {
+    "h3": "Pflanzen und Tools teilen",
+    "p": "Wähle einen Nutzer und was geteilt wird. Der Zugriff ist nur lesend."
+  },
+  "modal-plant-title": {
+    "h2": "Neue Pflanze"
+  },
+  "plant-wizard-progress": {
+    "div": "<span class=\"plant-wizard-step is-active\" data-wizard-label=\"1\">1 · Basis</span> <span class=\"plant-wizard-step\" data-wizard-label=\"2\">2 · Details</span>"
+  },
+  "plant-stage": {
+    "option": "Keimung",
+    "option2": "Sämling",
+    "option3": "Vegetative Phase",
+    "option4": "Blüte",
+    "option5": "Trocknung"
+  },
+  "plant-form-create": {
+    "p": "Jetzt speichern oder als Nächstes optionale Details ergänzen — Foto, Umgebung, Notizen."
+  },
+  "plant-form-step": {
+    "p": "Optional — jederzeit überspringen und später auf der Pflanzenseite bearbeiten."
+  },
+  "plant-environment-type": {
+    "option": "Indoor",
+    "option2": "Outdoor"
+  },
+  "plant-subphase": {
+    "option": "Nicht gewählt",
+    "option2": "1,5 dl",
+    "option3": "5 L",
+    "option4": "30 L",
+    "option5": "Im Freiland"
+  },
+  "plant-subphase-actions": {
+    "p": "Optionale Umtopf-Kürzel — sie ändern nur die Felder oben; zum Übernehmen auf <strong>Speichern</strong> tippen.",
+    "p2": "Vom Topf kannst du auf eine größere Größe wechseln oder nach draußen umziehen und dann bei Bedarf den Standort im Freiland eintragen."
+  },
+  "plant-btn-next": {
+    "button": "Nächste Topfgröße setzen"
+  },
+  "plant-btn-to": {
+    "button": "Outdoor / Freiland setzen"
+  },
+  "plant-form-advanced": {
+    "p": "Wenn du die <strong>Phase änderst</strong> und speicherst, wird ein Journaleintrag mit dem Übergangsdatum (unten) und dem Foto aus diesem Formular angelegt, sofern eines hochgeladen wurde."
+  },
+  "plant-mint-toggle": {
+    "span": "Das zusätzlich on-chain versiegeln (optional) <span class=\"field-hint plant-mint-toggle-hint\"> Erstellt ein Testnetz-Pflanzen-Token, das mit dieser Journalpflanze verknüpft ist. Erfordert eine verbundene Devnet-Wallet. Die Phasen-Belohnungen können bis zur Ernte insgesamt <strong>225 $GROWTOO</strong> erreichen. </span>"
+  },
+  "form-plant": {
+    "button": "Abbrechen"
+  },
+  "plant-form-back": {
+    "button": "Zurück"
+  },
+  "plant-form-next": {
+    "button": "Details ergänzen"
+  },
+  "plant-form-submit": {
+    "button": "Pflanze speichern"
+  },
+  "modal-entry": {
+    "h2": "Neuer Eintrag"
+  },
+  "entry-plants-multi": {
+    "p": "Pflanzen",
+    "p2": "Zeilen derselben Sorte können sich einen Eintrag teilen."
+  },
+  "entry-type": {
+    "option": "Allgemein",
+    "option2": "Gießen",
+    "option3": "Düngen",
+    "option4": "Umgebung",
+    "option5": "Umtopfen",
+    "option6": "Stressfaktoren",
+    "option7": "Phase / Meilenstein",
+    "option8": "Sonstiges"
+  },
+  "entry-extra-presadjivanje": {
+    "h4": "Umtopfen"
+  },
+  "entry-extra-stresori": {
+    "h4": "Stressfaktoren"
+  },
+  "entry-extra-faza": {
+    "h4": "Phase / Meilenstein",
+    "p": "Aktualisiert die Standorte im Profil der gewählten Pflanze (Outdoor-Grow)."
+  },
+  "form-entry": {
+    "span": "(optional)",
+    "button": "Abbrechen",
+    "button2": "Speichern"
+  },
+  "entry-photo-camera": {
+    "button": "Foto aufnehmen"
+  },
+  "daily-status-overlay": {
+    "p": "Tagesstatus",
+    "p2": "Nächster Schritt"
+  },
+  "daily-status-title": {
+    "h2": "Während du weg warst"
+  },
+  "daily-status-next": {
+    "button": "Weiter"
+  },
+  "daily-status-continue": {
+    "button": "Schließen"
+  },
+  "reward-earn-overlay": {
+    "p": "Belohnung",
+    "p2": "Diesen Monat"
+  },
+  "reward-earn-title": {
+    "h2": "Pflegetag gezählt"
+  },
+  "reward-earn-next": {
+    "button": "Weiter"
+  },
+  "reward-earn-continue": {
+    "button": "Schließen"
+  },
+  "app-confirm-title": {
+    "h2": "Bestätigen"
+  },
+  "app-confirm-cancel": {
+    "button": "Abbrechen"
+  },
+  "app-confirm-ok": {
+    "button": "Bestätigen"
+  },
+  "meta": {
+    "title": "growtoo · Grow-Journal"
+  },
+  "confirm": {
+    "title": "Bestätigen",
+    "ok": "Bestätigen",
+    "cancel": "Abbrechen",
+    "body": "Fortfahren?"
+  },
+  "cryptoMode": {
+    "simple": "Einfach",
+    "advanced": "Erweitert",
+    "showAdvanced": "Erweiterte Details zeigen",
+    "useSimple": "Zur einfachen Ansicht",
+    "continue": "Weiter"
+  },
+  "plainLang": {
+    "escrow": "Eine vorübergehende Verwahrung: Dein Pflanzen-Token liegt sicher beim Markt, bis jemand investiert oder du abbrichst — wie ein Zwischenregal, keine endgültige Übertragung.",
+    "settlement": "Wenn das Geschäft abschließt: Die Zahlung ist bestätigt und das Pflanzen-Token geht an den Adopter (oder zurück an dich, wenn du abbrichst).",
+    "rwa": "Ein „Real-World-Asset“-Token — hier einfach ein Pflanzen-Token, das mit einer echten Journalspur im Testnetz verknüpft ist. Keine Aktie und kein Bargeld.",
+    "plantToken": "Ein digitales Zertifikat im Solana-Testnetz, verknüpft mit einer Journalpflanze. Optional — dein Journal funktioniert auch ohne.",
+    "adoptStake": "Die Hälfte jetzt, die andere Hälfte wird frei, während der Grower die Pflege bis zur Ernte dokumentiert.",
+    "instantSale": "Voller Preis beim Kauf an den Grower. Fertig — keine Pflegebindung.",
+    "redemption": "Ein Token in der Erntephase in einen echten Ernteanteil umwandeln. Kommt später — im Devnet nicht verfügbar. Der Abruf des gesperrten Einsatzes gibt nur die im Escrow liegenden $GROWTOO frei.",
+    "bondingCurve": "Eine automatische Preisformel, die manche Krypto-Projekte nutzen. growtoo verwendet keine — Grower setzen ihren Preis selbst.",
+    "collectionAuthority": "Der Betreiberschlüssel, der derzeit Token-Metadaten aktualisiert und Devnet-Geschäfte abwickelt. Ein zentraler Vertrauenspunkt im MVP — siehe Risiken.",
+    "growtoo": "Testnetz-Belohnungstoken ohne Geldwert. Zum Üben von Investitionen und Phasen-Belohnungen im Devnet.",
+    "whatDoes": "Was bedeutet {term}?"
+  },
+  "seedChain": {
+    "needPlant": "Verknüpfe eine Journalpflanze, bevor du ein Seed-RWA mintest.",
+    "needPlantRetry": "Verknüpfe eine Journalpflanze, bevor du den Seed-Mint erneut versuchst.",
+    "notMinted": "Das Seed-NFT ist im Devnet noch nicht gemintet.",
+    "growthNeedsPlant": "Der Growth-Mint braucht eine verknüpfte Journalpflanze."
+  },
+  "statusRail": {
+    "step": "Schritt",
+    "ariaLabel": "Status des Vorgangs",
+    "signBuy": "Kauf signieren",
+    "confirmed": "Bestätigt",
+    "buyFailedOnDevnet": "Kauf im Devnet fehlgeschlagen.",
+    "nftIsInYour": "Das NFT liegt in deiner Wallet.",
+    "confirmingOnChainBuy": "On-Chain-Kauf wird bestätigt…",
+    "approveTheBuyIn": "Bestätige den Kauf in deiner Wallet.",
+    "payGrowtoo": "$GROWTOO zahlen",
+    "settling": "Abwicklung",
+    "nftReady": "NFT bereit",
+    "investmentFailedCheckPayment": "Investition fehlgeschlagen. Prüfe die Zahlung und versuch es erneut.",
+    "completeGrowtooPaymentIn": "Schließe die $GROWTOO-Zahlung in deiner Wallet ab.",
+    "paymentSeenStake": "Zahlung erkannt — 50 % gehen an den Grower, 50 % werden gesperrt…",
+    "paymentSeenSale": "Zahlung erkannt — NFT wird aus dem Escrow freigegeben…",
+    "claimed": "Beantragt",
+    "queue": "Warteschlange",
+    "released": "Freigegeben",
+    "refunded": "Erstattet",
+    "claimFailedCheckCare": "Antrag fehlgeschlagen — prüfe die Pflegemonate und versuch es erneut.",
+    "lockedReturned": "Die gesperrten $GROWTOO gingen zurück an den Adopter.",
+    "lockedReleased": "Die gesperrten $GROWTOO wurden an den Grower freigegeben.",
+    "queuedAdoptWorkerValidates": "In der Warteschlange — der Adopt-Worker prüft die Pflegemonate beim nächsten Durchlauf (~5 Min).",
+    "escrow": "Escrow",
+    "live": "Live",
+    "sold": "Verkauft",
+    "listingFailed": "Einstellen fehlgeschlagen.",
+    "waitingForNftIn": "Warte auf das NFT im Escrow…",
+    "openForInvestment": "Offen für Investitionen.",
+    "buyerPaidSettlingNft": "Käufer hat gezahlt — NFT wird abgewickelt…",
+    "returningNftToGrower": "NFT geht zurück an den Grower…",
+    "adoptedByBuyer": "Vom Käufer adoptiert.",
+    "offerCancelled": "Angebot storniert.",
+    "queued": "In der Warteschlange",
+    "minting": "Wird gemintet",
+    "minted": "Gemintet",
+    "mintRequested": "Devnet-Mint angefordert…",
+    "mintFailed": "Devnet-Mint fehlgeschlagen.",
+    "mintDone": "Im Devnet gemintet.",
+    "mintQueueWorking": "Die Mint-Warteschlange arbeitet im Devnet…"
+  },
+  "daily": {
+    "awayMinutes_one": "etwa eine Minute",
+    "awayHours_one": "1 Stunde",
+    "awayHours_other": "{count} Stunden",
+    "awayDays_one": "1 Tag",
+    "awayDays_other": "{count} Tage",
+    "inboxUpdates_one": "1 neue Nachricht",
+    "inboxUpdates_other": "{count} neue Nachrichten",
+    "unread_one": "1 ungelesen",
+    "unread_other": "{count} ungelesen",
+    "journalLogs_one": "1 Journaleintrag seit dem letzten Besuch",
+    "journalLogs_other": "{count} Journaleinträge seit dem letzten Besuch",
+    "plantsUpdated_one": "1 Pflanze hat die Phase gewechselt",
+    "plantsUpdated_other": "{count} Pflanzen aktualisiert",
+    "careDays_one": "1 Pflegetag diesen Monat",
+    "careDays_other": "{count} Pflegetage diesen Monat",
+    "stakeMany_one": "1 neuer Adopter-Einsatz auf deine Angebote",
+    "stakeMany_other": "{count} neue Adopter-Einsätze auf deine Angebote",
+    "careSynced_one": "Pflegefortschritt bei 1 Einsatz abgeglichen",
+    "careSynced_other": "Pflegefortschritt bei {count} Einsätzen abgeglichen",
+    "harvestSettled_one": "1 Ernte-Einsatz abgewickelt",
+    "harvestSettled_other": "{count} Ernte-Einsätze abgewickelt",
+    "adoptedUpdated_one": "1 adoptierte Pflanze hat die Phase gewechselt",
+    "adoptedUpdated_other": "{count} adoptierte Pflanzen aktualisiert",
+    "stakesLanded_one": "1 neuer Einsatz ist in deinem Garten gelandet",
+    "stakesLanded_other": "{count} neue Einsätze sind in deinem Garten gelandet",
+    "careProgressed_one": "Pflege bei 1 deiner Einsätze vorangekommen",
+    "careProgressed_other": "Pflege bei {count} deiner Einsätze vorangekommen",
+    "newOffers_one": "1 neues Angebot auf dem Markt",
+    "newOffers_other": "{count} neue Angebote auf dem Markt",
+    "awayShort": "kurz",
+    "awayMinute": "etwa eine Minute",
+    "awayFor": "{time} weg gewesen.",
+    "xpGain": "+{count} Grower-XP",
+    "bonusClaimed": "{amount} $GROWTOO abgeholt",
+    "bonusPending": "Abholung läuft · ~{amount} $GROWTOO",
+    "bonusReady": "~{amount} $GROWTOO bereit zum Abholen",
+    "harvestReady": "Ein Einsatz ist erntereif — der Grower kann die gesperrten $GROWTOO abrufen",
+    "startHere": "Hier starten",
+    "adopterLead": "Hol dir Test-$GROWTOO und investiere dann in ein aktuelles Pflanzenangebot.",
+    "growerLead": "Notiere Gießen oder Düngen und verdiene $GROWTOO. Den Monat holst du unter Tokenisieren ab.",
+    "ctaFaucet": "Faucet öffnen",
+    "ctaMarket": "Markt ansehen",
+    "ctaGarden": "Mein Garten",
+    "ctaJournal": "Journal öffnen",
+    "ctaTokenise": "Tokenisieren",
+    "ctaMarketShort": "Markt",
+    "ctaClaim": "Unter Tokenisieren abholen",
+    "ctaContinue": "Weiter",
+    "bonusKicker": "Aktivitätsbonus",
+    "bonusLead": "Etwa {amount} $GROWTOO aus dem Gießen, Düngen und den Storys dieses Monats. Unter Tokenisieren abholen.",
+    "titleAway": "Während du weg warst",
+    "titleWelcome": "Willkommen bei growtoo",
+    "titleStatus": "Tagesstatus",
+    "firstPath": "Hier ist dein Weg für die erste Minute.",
+    "noGains": "Noch nichts Neues — wähl unten einen nächsten Schritt.",
+    "rewardWatering": "Gießen gezählt",
+    "rewardFeeding": "Düngen gezählt",
+    "rewardStage": "Phase notiert",
+    "rewardStory": "Story veröffentlicht",
+    "rewardClaimed": "Bonus gemintet",
+    "rewardDefault": "Grower-Belohnung",
+    "sentToWallet": "+{amount} $GROWTOO an deine Devnet-Wallet gesendet",
+    "whenYouClaim": "~{amount} $GROWTOO bei der Abholung",
+    "weekUnlocked": "5-Tage-Woche freigeschaltet · extra $GROWTOO bei der Abholung diesen Monat",
+    "rewardLeadClaimed": "Der Aktivitätsbonus ist in deiner Wallet gelandet (Testnetz).",
+    "rewardLeadLogged": "Für heute gezählt. Weitere Einträge heute bringen keine zusätzlichen Token.",
+    "stakeOne": "Jemand hat eine deiner Pflanzen adoptiert",
+    "awayMinutes": "{count} Minuten"
+  },
+  "stage": {
+    "germination": "Keimung",
+    "seedling": "Sämling",
+    "vegetative": "Vegetative Phase",
+    "flowering": "Blüte",
+    "drying": "Trocknung / Ernte",
+    "seed": "Samen",
+    "harvest": "Ernte",
+    "growing": "Wächst",
+    "dryingShort": "Trocknung"
+  },
+  "quests": {
+    "linkPlant": "Journalpflanze verknüpfen",
+    "linkPlantHint": "Aus Adoptieren minten/verknüpfen, mit einer Pflanze aus Pflanzen & Journal",
+    "stageLogged": "Wachstumsphase im Journal notieren",
+    "stageLoggedHint": "Pflanzenphase ändern oder einen Eintrag Phase (Übergang) anlegen",
+    "watering": "Gießen für diese Phase notieren",
+    "wateringHint": "Einen Gieß-Eintrag anlegen oder Tools → Gießen für diese Pflanze",
+    "feeding": "Düngen / Nährstoffe notieren",
+    "feedingOptional": "Düngen notieren (optional bei der Keimung)",
+    "feedingHint": "Einen Dünge-Eintrag anlegen oder Tools → Düngen für diese Pflanze",
+    "proofComplete": "Journal-Nachweis vollständig — bereit zum Minten.",
+    "proofMissing": "Erledige zuerst die Grower-Aufgaben: {list}",
+    "choosePlant": "Journalpflanze auswählen",
+    "choosePlantHint": "Ein RWA-Samen muss an eine echte Pflanze in deinem Journal gebunden sein",
+    "seedReady": "Pflanze verknüpft — bereit, den Samen zu minten.",
+    "weekStrong": "Starke Woche — {hit}/{need} Pflegetage (Grower-Fortschritt).",
+    "weekProgress": "Wochenfortschritt: {hit}/{need} Pflegetage (nur Grower).",
+    "monthQualifies": "Der Monat qualifiziert für die Ernte-Freigabe ({hit}/{need} Tage).",
+    "monthProgress": "Notiere an {need} verschiedenen Tagen diesen Monat Pflege ({hit}/{need}).",
+    "head": "Grower-Aufgaben",
+    "headReady": "Nächster Schritt · Aufgaben erfüllt"
+  },
+  "rank": {
+    "new": "Neuer Grower",
+    "active": "Aktiver Grower",
+    "dedicated": "Engagierter Grower",
+    "seasoned": "Erfahrener Grower",
+    "master": "Meister-Grower",
+    "eliteCultivator": "Elite-Züchter",
+    "label": "Grower-Rang {tier} · {title}",
+    "chip": "Rang {tier}",
+    "aria": "Grower-Rang {tier}, {title}, {xp} XP. Profil öffnen."
+  },
+  "plantRank": {
+    "sprout": "Keimling",
+    "rising": "Im Aufstieg",
+    "proven": "Bewährt",
+    "elite": "Elite",
+    "legendary": "Legendär",
+    "label": "Pflegestufe {tier} · {title}"
+  },
+  "chain": {
+    "networkLabel": "Solana · Devnet",
+    "walletName": "Solana-Wallet",
+    "devnetNotice": "Verbinde eine Solana-Wallet im Testnetz (Devnet). Seed-NFTs werden über die Cloud-Warteschlange gemintet; $GROWTOO-Belohnungen werden on-chain abgewickelt. Nur Testwerte.",
+    "devnetNoticeFallback": "Verbinde eine Solana-Wallet im Testnetz. Pflanzen-Token und $GROWTOO-Belohnungen laufen bis zum vollständigen On-Chain-Deploy noch über eine lokale Simulation."
+  },
+  "tx": {
+    "expired": "Die Bestätigung in der Wallet hat zu lange gedauert, die Solana-Transaktion ist abgelaufen. Bestätige innerhalb einer Minute und stelle es dann erneut ein.",
+    "missingNft": "Diese verbundene Wallet hält dieses Seed-NFT nicht. Wechsle zu der Wallet, die den Mint erhalten hat (oder übertrage das NFT hierher), und versuch es erneut.",
+    "missingBalance": "Diese verbundene Wallet hat nicht genug von diesem Token für die Übertragung. Prüfe den Stand im Devnet und versuch es erneut.",
+    "confirmTimeout": "Die Transaktion wurde gesendet, aber die Bestätigung lief am öffentlichen Devnet-RPC ab. Signatur: {signature}. Lade neu und prüfe, ob Angebot/NFT sich bereits bewegt hat, bevor du es erneut versuchst.",
+    "failedOnChain": "Transaktion on-chain fehlgeschlagen: {reason}",
+    "walletNotConnected": "Wallet nicht verbunden.",
+    "mintNotDeployed": "Der $GROWTOO-Mint ist noch nicht deployt."
+  },
+  "admin": {
+    "readOnly": "Nur-Lese-Ansicht der Superadmin-Datenbank — Bearbeiten ist nicht erlaubt.",
+    "view": "Ansehen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "thisUser": "diesen Nutzer",
+    "thisRecord": "diesen Eintrag",
+    "confirmDelete": "{label} löschen?",
+    "deleteWarning": "Das lässt sich mit den Admin-Tools nicht rückgängig machen.",
+    "roleLimited": "Die Rollen Admin / Superadmin sind auf supadmin@dnevnik.live und admin@dnevnik.live beschränkt.",
+    "allPlants": "Alle Pflanzen",
+    "allPlantsHint": "Die gesamte Pflanzendatenbank ansehen",
+    "tools": "Tools",
+    "toolsHint": "Daten aus den Tools",
+    "journalHint": "Notizen und Einträge",
+    "loadingReport": "Bericht wird geladen…",
+    "loginsToday": "Anmeldungen heute",
+    "loginsWeek": "Anmeldungen in den letzten 7 Tagen",
+    "uniqueUsers": "Eindeutige Nutzer",
+    "inSummary": "In der Übersicht",
+    "noLogins": "Keine Anmeldungen im gewählten Zeitraum.",
+    "summaryByUser": "Übersicht nach Nutzer",
+    "colEmail": "E-Mail",
+    "colRole": "Rolle",
+    "colLogins": "Anmeldungen",
+    "colLastLogin": "Letzte Anmeldung",
+    "individualLogins": "Einzelne Anmeldungen",
+    "noRecorded": "Keine erfassten Anmeldungen für diesen Zeitraum. Anmeldungen werden ab der nächsten Nutzeranmeldung erfasst.",
+    "noPlantsInDb": "Du hast keine Pflanzen in der Datenbank — füge sie unter Pflanzen & Journal hinzu.",
+    "remove": "Entfernen",
+    "noAccessYet": "Noch kein Zugriff erteilt.",
+    "newAccess": "Neuer Zugriff",
+    "user": "Nutzer",
+    "selectUser": "— Nutzer wählen —",
+    "saveAccess": "Zugriff speichern",
+    "activeAccess": "Aktiver Zugriff",
+    "needPlantSelection": "Wähle mindestens eine Pflanze oder aktiviere „Alle Pflanzen“.",
+    "accessSaved": "Zugriff gespeichert.",
+    "saveFailed": "Speichern fehlgeschlagen. Prüfe deine Firestore-Regeln.",
+    "confirmRevoke": "Zugriff für diesen Nutzer entfernen?",
+    "removeFailed": "Entfernen fehlgeschlagen.",
+    "plantCount_one": "1 Pflanze",
+    "plantCount_other": "{count} Pflanzen",
+    "accessDenied": "Zugriff verweigert — du hast keine Admin-Rechte."
+  },
+  "stack": {
+    "plant": "Pflanze",
+    "plants": "Pflanzen",
+    "tapToOpen": "Zum Öffnen des Stapels tippen",
+    "countTitle_one": "1 Pflanze in diesem Stapel",
+    "countTitle_other": "{count} Pflanzen in diesem Stapel"
+  },
+  "escrow": {
+    "expired": "Die Bestätigung in der Wallet hat zu lange gedauert, die Solana-Transaktion ist abgelaufen. Bestätige innerhalb einer Minute und versuch es erneut.",
+    "missingNft": "Diese verbundene Wallet hält dieses NFT nicht. Wechsle zu der Wallet, die den Mint erhalten hat, oder storniere ein bestehendes Escrow-Angebot, falls das NFT bereits im Markttresor liegt.",
+    "notActive": "Dieses On-Chain-Angebot ist nicht aktiv. Lade den Markt neu und versuch es erneut.",
+    "sellerMismatch": "Die verbundene Wallet ist nicht der Verkäufer dieses Angebots.",
+    "needsTokenAccount": "Deine Wallet braucht noch ein gedecktes $GROWTOO-Token-Konto im Devnet. Hol dir den Adopter-Testfaucet auf dem Markt und versuch das Investieren dann erneut.",
+    "insufficient": "Nicht genug $GROWTOO in dieser Wallet für diesen Preis im Devnet. Lade auf und versuch es erneut.",
+    "confirmTimeout": "Die Transaktion wurde gesendet, aber die Bestätigung lief am öffentlichen Devnet-RPC ab. Signatur: {signature}. Lade neu und prüfe, ob NFT/Angebot sich bereits bewegt hat, bevor du es erneut versuchst.",
+    "alreadyLocked": "Dieses NFT liegt bereits im Escrow-Tresor des Markts. Storniere das Angebot (oder warte die Abwicklung ab), bevor du erneut einstellst.",
+    "missingNftShort": "Diese verbundene Wallet hält dieses NFT nicht (MissingNft). Verbinde die Wallet, der es gehört, und versuch es erneut.",
+    "noGrowtoo": "Diese Wallet hat im Devnet noch keine $GROWTOO. Hol dir den Testfaucet auf dem Markt (Adopter) und investiere dann erneut.",
+    "needMore": "Nicht genug $GROWTOO für dieses Angebot. Nötig {need}, in der Wallet {have} im Devnet."
+  },
+  "wallet": {
+    "signNoResponse": "Die Wallet hat auf die Signaturanfrage nicht reagiert. Entsperre die Erweiterung und versuch es erneut.",
+    "signInFirst": "Melde dich in deinem growtoo-Konto an, bevor du eine Wallet verknüpfst.",
+    "linkTimeout": "Beim Wallet-Verknüpfungsdienst ist die Zeit abgelaufen. Versuch es erneut.",
+    "linkFailed": "Wallet-Verknüpfung fehlgeschlagen ({status})",
+    "generic": "Da ist etwas schiefgelaufen.",
+    "signatureCancelled": "Signatur in der Wallet abgebrochen. Tippe auf Konto verknüpfen und bestätige die Nachricht, um abzuschließen.",
+    "saveFailed": "Die Wallet-Verknüpfung konnte nicht gespeichert werden. Lade neu und versuch es erneut, oder wende dich an den Support.",
+    "notFound": "Keine Solana-Wallet gefunden. Installiere Phantom, Solflare oder eine andere Wallet und lade neu.",
+    "genericConsole": "Da ist etwas schiefgelaufen. Öffne die Browser-Konsole (F12) für Details.",
+    "profileTimeout": "Beim Laden deines Profils ist bei Firestore die Zeit abgelaufen. Prüfe deine Verbindung und versuch es erneut.",
+    "invalidAddress": "Ungültige Solana-Wallet-Adresse.",
+    "alreadyLinked": "Mit diesem Konto ist bereits eine andere Wallet verknüpft. Trenne sie und wende dich für eine Änderung an den Support.",
+    "timedOut": "Zeitüberschreitung bei der Anfrage.",
+    "emptySignature": "Die Wallet hat eine leere Signatur zurückgegeben.",
+    "badSignatureFormat": "Das Signaturformat der Wallet wurde nicht erkannt.",
+    "genericName": "Wallet",
+    "genericNameLower": "Wallet",
+    "pickerTitle": "Wallet verbinden",
+    "pickerLede": "Wähle Phantom oder Solflare (Devnet).",
+    "close": "Schließen",
+    "install": "Installieren",
+    "openApp": "App öffnen",
+    "notInstalled": "Nicht installiert",
+    "noExtension": "Keine Wallet-Erweiterung in diesem Browser.",
+    "phoneHint": "Öffne diese Seite auf dem Handy im In-App-Browser von Phantom oder Solflare.",
+    "installHint": "Installiere Phantom oder Solflare und lade diese Seite neu.",
+    "manualToggle": "Adresse manuell eingeben (nur beobachten)",
+    "manualLabel": "Solana-Adresse",
+    "manualNote": "Nur-Beobachten kann nicht minten oder signieren. Besser Phantom/Solflare.",
+    "useAddress": "Diese Adresse verwenden",
+    "footNeedWallet": "Brauchst du eine Wallet? <a href=\"https://solana.com/solutions/wallets\" target=\"_blank\" rel=\"noopener noreferrer\">Solana-Wallets ansehen</a>",
+    "connecting": "Verbinde…",
+    "approveIn": "Bestätige die Verbindung in {wallet}…",
+    "connectionFailed": "Verbindung fehlgeschlagen.",
+    "connectFailed": "Wallet-Verbindung fehlgeschlagen.",
+    "connectFailedUnlock": "Wallet-Verbindung fehlgeschlagen. Entsperre die Wallet-Erweiterung und versuch es erneut.",
+    "connectCancelled": "Verbindung in {wallet} abgebrochen.",
+    "selectionCancelled": "Wallet-Auswahl abgebrochen.",
+    "notFoundShort": "Wallet nicht gefunden.",
+    "installRefresh": "Installiere die Wallet, lade neu und verbinde erneut.",
+    "invalidAddressShort": "Ungültige Adresse.",
+    "libraryTimeout": "Das Laden der Wallet-Bibliothek ist abgelaufen.",
+    "notAvailable": "{wallet} ist in diesem Browser-Tab nicht verfügbar.",
+    "openInApp": "Öffne diese Seite im In-App-Browser von {wallet} und verbinde erneut.",
+    "installExtension": "Installiere die {wallet}-Erweiterung, lade die Seite neu und verbinde erneut.",
+    "installFirst": "Installiere zuerst {wallet}.",
+    "noConnect": "{wallet} ist installiert, unterstützt aber connect() nicht.",
+    "noConnectShort": "{wallet} unterstützt connect nicht.",
+    "noAccount": "{wallet} hat sich verbunden, aber kein Konto zurückgegeben.",
+    "noAccountAvailable": "Wallet-Konto nicht verfügbar.",
+    "noPublicKey": "{wallet} hat sich verbunden, aber keinen Public Key zurückgegeben.",
+    "noSignMessage": "{wallet} unterstützt signMessage nicht.",
+    "noSignTransaction": "{wallet} unterstützt signTransaction nicht.",
+    "noSignAll": "{wallet} unterstützt signAllTransactions nicht.",
+    "noResponseUnlock": "{wallet} hat nicht innerhalb von {seconds} s reagiert. Entsperre {wallet}, erlaube das Popup und versuch es erneut.",
+    "noResponseExtension": "{wallet} hat nicht innerhalb von {seconds} s reagiert. Entsperre die Erweiterung und versuch es erneut.",
+    "noResponsePopup": "{wallet} hat nicht reagiert. Entsperre die Erweiterung, klick auf das {wallet}-Symbol in der Leiste, falls ein Popup blockiert wurde, und versuch es erneut.",
+    "addressLength": "Gib eine gültige Solana-Adresse ein (32–44 Zeichen, base58).",
+    "addressChars": "Diese Adresse enthält ungültige Zeichen.",
+    "addressNotKey": "Diese Adresse ist kein gültiger Solana-Public-Key. Füge die vollständige Adresse ein (meist 43–44 Zeichen).",
+    "addressNotKeyCheck": "Diese Adresse ist kein gültiger Solana-Public-Key. Prüfe, ob du die vollständige Adresse eingefügt hast (meist 43–44 Zeichen).",
+    "watchOnlyCannotSign": "Eine Nur-Beobachten-Adresse kann nicht signieren. Installiere Phantom oder Solflare, um zu minten oder zu übertragen."
+  },
+  "calendar": {
+    "today": "Heute",
+    "logged": "Notiert",
+    "waterDue": "Gießen fällig",
+    "feedDue": "Düngen fällig",
+    "wateringDue": "Gießen fällig",
+    "feedingDue": "Düngen fällig",
+    "hasLogs": "hat Einträge",
+    "openDay": "{date} öffnen",
+    "fromForecast": "° aus deiner Vorhersage",
+    "logThisDay": "Diesen Tag notieren",
+    "noLogs": "Noch keine Einträge",
+    "stacksLogged_one": "1 Stapel notiert",
+    "stacksLogged_other": "{count} Stapel notiert",
+    "noLogsToday": "Keine Einträge an diesem Tag."
+  },
+  "art": {
+    "stageAria": "Phase: {stage}"
+  },
+  "camera": {
+    "title": "Pflanzenkamera",
+    "frameHint": "Pflanze ins Bild holen, dann auslösen",
+    "reviewHint": "Als Journaleintrag speichern oder an den Coach senden",
+    "close": "Schließen",
+    "closeAria": "Kamera schließen",
+    "flip": "Wechseln",
+    "flipAria": "Kamera wechseln",
+    "gallery": "Galerie",
+    "shutterAria": "Foto aufnehmen",
+    "shotAlt": "Aufgenommenes Pflanzenfoto",
+    "retake": "Neu aufnehmen",
+    "logToJournal": "Ins Journal notieren",
+    "askCoach": "Coach fragen",
+    "preparing": "Foto wird vorbereitet…",
+    "starting": "Kamera wird gestartet…",
+    "saving": "Foto wird gespeichert…",
+    "readFailed": "Das Bild konnte nicht gelesen werden.",
+    "processFailed": "Das Bild konnte nicht verarbeitet werden.",
+    "encodeFailed": "Das Bild konnte nicht kodiert werden.",
+    "tooLarge": "Das Foto ist noch zu groß. Versuch es erneut.",
+    "loadFailed": "Dieses Bild konnte nicht geladen werden.",
+    "unsupported": "Kamera hier nicht unterstützt — nutze die Galerie.",
+    "blocked": "Kamerazugriff blockiert — nutze die Galerie oder erlaube die Kamera für growto.live.",
+    "notFound": "Keine Kamera gefunden — nutze die Galerie.",
+    "openFailed": "Kamera konnte nicht geöffnet werden — nutze die Galerie.",
+    "notReady": "Kamera ist nicht bereit.",
+    "waitPreview": "Warte auf die Vorschau und versuch es erneut.",
+    "captureFailed": "Das Bild konnte nicht erfasst werden.",
+    "captureGeneric": "Aufnahme fehlgeschlagen.",
+    "openPhotoFailed": "Dieses Foto konnte nicht geöffnet werden.",
+    "usePhotoFailed": "Das Foto konnte nicht verwendet werden.",
+    "saveLogFailed": "Der Foto-Eintrag konnte nicht gespeichert werden.",
+    "needPlant": "Füge zuerst eine Pflanze im Journal hinzu, dann notiere ein Foto.",
+    "photoNote": "Foto-Eintrag aus der Pflanzenkamera",
+    "coachPrompt": "Sieh dir dieses Pflanzenfoto an und hilf mir einzuschätzen, was zu sehen ist. Benenne, was sichtbar ist, und schlage dann den nächsten Journaleintrag vor, falls nötig."
+  },
+  "blog": {
+    "catTip": "Tipps & Tricks",
+    "catLook": "Blick auf meine Pflanzen",
+    "catProblem": "Pflanzenproblem",
+    "catVisit": "Besuch bei anderen Growern",
+    "catProduct": "Aus meinen Pflanzen gemacht",
+    "catDaybook": "Feldnotiz",
+    "newStory": "Neue Story",
+    "editStory": "Story bearbeiten",
+    "noPlantLink": "Keine Pflanze verknüpft",
+    "needTitle": "Gib einen Titel ein.",
+    "needBody": "Schreib einen kurzen Text.",
+    "needSlug": "Der Slug braucht mindestens 3 Zeichen.",
+    "needCategory": "Wähle eine Kategorie.",
+    "signInToPublish": "Melde dich an, um Storys zu veröffentlichen.",
+    "signInToManage": "Melde dich an, um Storys zu verwalten.",
+    "saving": "Wird gespeichert…",
+    "loading": "Wird geladen…",
+    "publishedMsg": "Veröffentlicht — in Kürze im öffentlichen Journal sichtbar.",
+    "unpublishedMsg": "Zurückgezogen — aus dem öffentlichen Journal entfernt.",
+    "draftSaved": "Entwurf gespeichert.",
+    "saveFailed": "Die Story konnte nicht gespeichert werden.",
+    "empty": "Noch keine Storys. Teile einen Tipp, ein Pflanzenbild oder ein gelöstes Problem.",
+    "untitled": "Ohne Titel",
+    "viewLive": "Live ansehen",
+    "loadFailed": "Storys konnten nicht geladen werden. Prüfe die Firestore-Regeln / die Verbindung.",
+    "published": "Veröffentlicht",
+    "unpublished": "Zurückgezogen",
+    "confirmDelete": "Diese Story löschen?",
+    "deleted": "Story gelöscht",
+    "photoFormat": "Nimm ein JPG- oder PNG-Foto.",
+    "photoLarge": "Das Foto ist groß — ein kleineres Bild lädt schneller.",
+    "saveFirst": "Speichere zuerst die Story.",
+    "profileLive": "Öffentliches Profil aktiv unter {link}. Verwalten kannst du es im Konto.",
+    "profileDisabledHint": "Aktiviere im Konto ein <strong>öffentliches Grower-Profil</strong> (Slug + Bio), damit veröffentlichte Storys deinen Namen auf <a href=\"https://journal.growto.live/\" target=\"_blank\" rel=\"noopener\">journal.growto.live</a> zeigen.",
+    "publicProfileTitle": "Öffentliches Journal-Profil",
+    "publicProfileHint": "Nötig, um Storys auf growto.live/journal zu veröffentlichen.",
+    "enablePublicProfile": "Öffentliches Profil aktivieren",
+    "slugLabel": "Profil-URL-Slug",
+    "slugPlaceholder": "z. B. luka-berlin",
+    "bioLabel": "Kurze Bio",
+    "bioPlaceholder": "Wo du growst, was du teilst…",
+    "savePublicProfile": "Öffentliches Profil speichern",
+    "preview": "Vorschau",
+    "slugTooShort": "Wähle einen Slug mit mindestens 3 Zeichen.",
+    "profileSavedAttribution": "Öffentliches Profil gespeichert. Storys werden journal.growto.live/g/{slug} zugeordnet",
+    "profileDisabled": "Öffentliches Profil deaktiviert.",
+    "profileSaved": "Öffentliches Profil gespeichert",
+    "couldNotSave": "Konnte nicht gespeichert werden.",
+    "profileSaveFailed": "Öffentliches Profil konnte nicht gespeichert werden"
+  },
+  "entryType": {
+    "general": "Allgemein",
+    "watering": "Gießen",
+    "feeding": "Düngen",
+    "environment": "Umgebung",
+    "transplanting": "Umtopfen",
+    "stressors": "Stressfaktoren",
+    "other": "Sonstiges",
+    "stage": "Phase",
+    "subphase": "Unterphase",
+    "entry": "Eintrag",
+    "stageTransition": "Phase (Übergang)",
+    "subphasePot": "Unterphase (Topf / Freiland)"
+  },
+  "coach": {
+    "classAlwaysOn": "Immer an",
+    "classDraft": "Entwurf & Bestätigung",
+    "classApproval": "Braucht deine Zustimmung",
+    "classAdvisory": "Nur Hinweis",
+    "alwaysOnBadge": "immer an",
+    "settingsTitle": "Coach-Einstellungen",
+    "settingsSub": "Wähle, was dein Coach eigenständig darf.",
+    "draftHint": "Der Coach bereitet vor, du bestätigst mit einem Tipp.",
+    "approvalHint": "Verlangt immer deine Bestätigung.",
+    "setReminders": "Erinnerungen zum Gießen & Düngen",
+    "setWeatherNudges": "Wetterbasierte Pflegehinweise",
+    "setDraftEntries": "Journaleinträge entwerfen",
+    "setSuggestStages": "Phasenwechsel vorschlagen",
+    "setMintList": "Minten oder auf dem Markt einstellen",
+    "setEditDelete": "Einträge bearbeiten oder löschen",
+    "activityTitle": "Coach-Aktivität",
+    "activityEmpty": "Noch keine Coach-Aktionen. Erinnerungen, Entwürfe und Bestätigungen erscheinen hier.",
+    "action": "Aktion",
+    "growing": "Wachstum",
+    "justNow": "gerade eben",
+    "leadPlant": "Leitpflanze",
+    "yourGrow": "Dein Grow",
+    "yourPlant": "deine Pflanze",
+    "wxHeatWarning": "Hitzewarnung — {temp}° am {day}. Gieß früh morgens oder nach Sonnenuntergang, nie in der Mittagssonne.",
+    "wxWarmSpell": "Warm bis {temp}° ({day}). Prüfe die Bodenfeuchte fingertief, bevor du gießt.",
+    "wxRain": "Regen wahrscheinlich {day} ({chance}%). Verschieb Gießen und Düngen — die Nährstoffe werden ausgewaschen.",
+    "wxNoRain": "Kein echter Regen in der Vorhersage. Outdoor-Töpfe trocknen am schnellsten — prüf sie täglich.",
+    "wxColdNight": "Kalte Nacht — bis {temp}° am {day}. Empfindliche Töpfe unter Schutz oder nach innen stellen.",
+    "wxSwing": "Große Tag/Nacht-Spanne ({low}–{high}°). Rechne mit langsamerem Wachstum; vermeide starkes Düngen, bis es sich einspielt.",
+    "heatPaceTitle": "Hitze & Gießrhythmus",
+    "heatPaceMessage": "Warm um {day} (~{temp}°C). {plant} ist schon {since} ohne Wasser — dein üblicher Abstand liegt bei {gap}. Heute gießen lohnt sich.",
+    "heatPacePrompt": "Es wird heiß und „{plant}“ ist über meinen üblichen Gießrhythmus hinaus. Soll ich heute gießen, und worauf soll ich achten?",
+    "heatCheckTitle": "Hitze-Check",
+    "heatCheckMessage": "{plant}: ~{temp}°C kommen {day}, und gegossen wurde vor {days}. Prüf heute die Feuchte.",
+    "heatCheckPrompt": "Hilf mir zu entscheiden, ob „{plant}“ vor der Hitze Wasser braucht.",
+    "stagePaceTitle": "Phasen-Check",
+    "stagePaceMessage": "{plant} ist seit {days} in {stage}. Viele ähnliche Grows wechseln um Tag {typical} — schau mal drüber (deine Entscheidung).",
+    "stagePacePrompt": "Die Pflanze „{plant}“ ist seit {days} in {stage}. Welche Anzeichen soll ich vor einem Phasenwechsel prüfen?",
+    "noteWaterHeat": "Notiert — bei ~{temp}°C um {day} prüf die Feuchte früher als sonst (oft schon am nächsten Tag).",
+    "noteWaterNext": "Notiert — das nächste Gießen liegt für {plant} meist bei {days}, je nach Topfgröße und Hitze.",
+    "noteFeeding": "Düngen für {plant} notiert. Beobachte die Blattfarbe in den nächsten Tagen — Vergilben braucht einen menschlichen Blick, keine Automatik.",
+    "noteStage": "Phasenwechsel notiert. Dokumentier die Pflege weiter, damit die Spur klar bleibt.",
+    "loggedWatering": "Gieß-Notiz hinzugefügt",
+    "loggedFeeding": "Dünge-Notiz hinzugefügt",
+    "loggedJournal": "Journal-Notiz hinzugefügt",
+    "briefEmpty": "Füge eine Pflanze hinzu, wenn du magst — der Coach hält die Pflegespur ordentlich.",
+    "briefSteady": "Sieht stabil aus — Gießen heute notiert. {plant} ist in {stage}.",
+    "briefLastWater": "{plant} · {stage}. Letztes Gießen vor {days}, im ganzen Garten.",
+    "railEmpty": "Füge eine Pflanze hinzu, wenn du magst — der Coach hält die Pflegespur ordentlich.",
+    "railDue": "{plant} ist zum Gießen fällig",
+    "railDueHeat": "{plant} ist zum Gießen fällig — Hitzewelle {day}",
+    "railStage": "{plant} ist vielleicht bereit für einen Phasenwechsel — schau mal drüber.",
+    "railFirstWater": "{plant} wartet auf das erste Gießen.",
+    "railSteady": "{plant} sieht stabil aus — Gießen heute notiert.",
+    "railOverdue": "{plant} ist zum Gießen fällig — letzte Pflege vor {days}.",
+    "railYesterday": "{plant} · letztes Gießen gestern.",
+    "days_one": "1 Tag",
+    "days_other": "{count} Tage",
+    "plants_one": "1 Pflanze",
+    "plants_other": "{count} Pflanzen",
+    "briefNoWater": "{plants} im Journal. Notiere ein Gießen, wenn du kannst — daraus leitet der Coach seine Wetterhinweise ab.",
+    "askForecast": "Was sollte ich laut Vorhersage in den nächsten Tagen beim Gießen und Düngen ändern?",
+    "askForecastCity": "Was sollte ich laut Vorhersage für {city} in den nächsten Tagen beim Gießen und Düngen ändern?",
+    "askPlantNext": "Was ist der nächste Schritt für „{plant}“ in Phase {stage}? Bitte auch Tipps zur Tokenisierung.",
+    "loggedVia": "Über Grower Coach erfasst",
+    "noteVia": "{note} (über Grower Coach)",
+    "stageUnknown": "unbekannt"
+  },
+  "notif": {
+    "justNow": "gerade eben",
+    "now": "jetzt",
+    "update": "Update",
+    "example": "Beispiel",
+    "tagline": "Bleib bei Einträgen, Einsätzen & Belohnungen auf dem Stand",
+    "emptyLead": "Posteingang ist leer",
+    "emptyBody": "Pflegeerinnerungen, Einsatz-Updates und Journal-Bestätigungen erscheinen hier — damit mitten im Zyklus nichts durchrutscht.",
+    "loadExamples": "Beispiele laden",
+    "bellAria": "Posteingang",
+    "unreadOfTotal": "{unread} ungelesen · {total} insgesamt",
+    "plantLower": "Pflanze",
+    "thisMonth": "diesen Monat",
+    "nextStage": "nächste",
+    "seedMinted": "Seed-NFT gemintet",
+    "seedMintedBody": "{plant} ist on-chain.",
+    "seedFailed": "Seed-Mint fehlgeschlagen",
+    "seedFailedBody": "Prüf die Warteschlange unter Tokenisieren.",
+    "growthMinted": "Wachstumsphase gemintet",
+    "growthMintedBody": "{plant} → {stage}",
+    "growthFailed": "Growth-Mint fehlgeschlagen",
+    "growthFailedBody": "Fehler beim Journal-Nachweis oder in der Warteschlange.",
+    "stakeReleased": "Ernte-Einsatz freigegeben",
+    "stakeReleasedBody": "Die gesperrten $GROWTOO für „{plant}“ wurden an dich freigegeben.",
+    "stakeRefunded": "Ernte-Einsatz erstattet",
+    "stakeRefundedBody": "Die gesperrten $GROWTOO für „{plant}“ gingen zurück an den Adopter.",
+    "growerUnlocked": "Grower hat den ganzen Einsatz freigeschaltet",
+    "lockedRefunded": "Gesperrter Einsatz erstattet",
+    "careSettledBody": "„{plant}“ — monatliche Pflege abgewickelt · {status}.",
+    "faucetClaimed": "Test-$GROWTOO abgeholt",
+    "faucetBody": "+{amount} $GROWTOO an deine Devnet-Wallet gesendet.",
+    "bonusMinted": "Plattform-Bonus gemintet",
+    "bonusBody": "+{amount} $GROWTOO für {month}.",
+    "faucetFailed": "Test-Faucet fehlgeschlagen",
+    "faucetFailedBody": "Versuch die Faucet-Abholung erneut über den Markt.",
+    "bonusFailed": "Plattform-Bonus fehlgeschlagen",
+    "bonusFailedBody": "Versuch es im nächsten Monatsfenster erneut.",
+    "claimReleased": "Ernte-Anspruch freigegeben",
+    "claimRefunded": "Ernte-Anspruch erstattet",
+    "claimBody": "Abwicklung des Einsatzes beendet · {status}.",
+    "claimFailed": "Ernte-Anspruch fehlgeschlagen",
+    "claimFailedBody": "Prüf die Pflegemonate im Journal und versuch es erneut.",
+    "rewardCareDay": "Pflegetag gezählt",
+    "rewardBonusMinted": "Aktivitätsbonus gemintet",
+    "sentToWallet": "+{amount} $GROWTOO an deine Wallet gesendet",
+    "thisMonthAmount": "~{amount} $GROWTOO diesen Monat",
+    "careWeekToast": "{plant} · Wochenpflege {hit}/{need} Tage",
+    "careMonthToast": "{plant} · Monatspflege {hit}/{need} Tage",
+    "careReminder": "Pflegeerinnerung",
+    "careReminderBody": "Eine Pflanze braucht Aufmerksamkeit.",
+    "logged": "{type} notiert",
+    "loggedForPlant": "{type} für {plant} notiert",
+    "reconnectTitle": "Verbinde deine Solana-Wallet erneut",
+    "reconnectBody": "Abmelden (oder ein Kontowechsel) beendet die Wallet-Sitzung im Browser — bei Phantom/Solflare normal. Dein Konto bleibt mit {pubkey} verknüpft. Tippe auf Neu verbinden, um zu investieren, zu minten oder RWAs einzustellen.",
+    "reconnectToast": "Wallet-Sitzung beendet — verbinde {pubkey} erneut, um zu signieren.",
+    "count_one": "1 Benachrichtigung",
+    "count_other": "{count} Benachrichtigungen",
+    "bellAriaUnread_one": "Posteingang, 1 ungelesen",
+    "bellAriaUnread_other": "Posteingang, {count} ungelesen",
+    "examplesLoaded_one": "1 Beispiel-Benachrichtigung geladen",
+    "examplesLoaded_other": "{count} Beispiel-Benachrichtigungen geladen",
+    "demo": {
+      "journalTitle": "Journaleintrag gespeichert",
+      "journalBody": "Northern Lights · Gießen — Morgenfütterung erledigt.",
+      "weekTitle": "Wochenpflege erfüllt",
+      "weekBody": "OG Kush hat 5/5 Pflegetage erreicht · diese Woche (Grower-Fortschritt).",
+      "monthTitle": "Monatspflege erfüllt",
+      "monthBody": "OG Kush hat 12/12 Pflegetage erreicht · Weg zur Ernte-Freigabe.",
+      "stakeTitle": "Neuer Adopter-Einsatz",
+      "stakeBody": "Ein Adopter hat 100 $GROWTOO auf „Batch B-2026-07“ gesetzt (50 % gesperrt bis zur Monatspflege).",
+      "seedBody": "Northern Lights ist on-chain.",
+      "growthBody": "Northern Lights → vegetativ · +35 $GROWTOO",
+      "bonusBody": "+18 $GROWTOO für diesen Monat (Pflanzen, Wochen, Blüte).",
+      "releasedBody": "Die gesperrten $GROWTOO für „Batch B-2026-07“ wurden an dich freigegeben.",
+      "investTitle": "Investition abgeschlossen",
+      "investBody": "Du hast „Northern Lights“ für 80 $GROWTOO adoptiert.",
+      "activeTitle": "Adopter-Einsatz aktiv",
+      "activeBody": "Du hältst „Batch B-2026-07“. Die gesperrte Hälfte wird frei, wenn die Monatspflege bei der Ernte erfüllt ist.",
+      "settledBody": "„Batch B-2026-07“ — monatliche Pflege abgewickelt · freigegeben.",
+      "deliveredTitle": "NFT geliefert",
+      "deliveredBody": "„OG Kush“ ist in deinem Garten.",
+      "updateTitle": "Monatliches Pflege-Update",
+      "updateBody": "Der Grower dokumentiert die Pflege deiner adoptierten Pflanze — der Freigabestatus wird bei der Ernte aktualisiert."
+    }
+  },
+  "tour": {
+    "skip": "Tour überspringen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "stepCounter": "Schritt {n} / {total}",
+    "adopterFull": {
+      "start_strip": {
+        "title": "Hier starten",
+        "body": "Nach der Anmeldung ist dieser Streifen dein kurzer Weg: Faucet, Markt, dann Garten."
+      },
+      "faucet": {
+        "title": "Test-$GROWTOO abholen",
+        "body": "Nutze den kostenlosen Devnet-Faucet einmal am Tag. Diese Token haben keinen Geldwert — sie dienen nur zum Üben."
+      },
+      "market_board": {
+        "title": "Aktuelle Angebote ansehen",
+        "body": "Offene Angebote zeigen Pflanze · Phase · Preis. Tippe auf Investieren, wenn du bereit bist (die Wallet fragt ggf. nach)."
+      },
+      "garden_nav": {
+        "title": "Mein Garten",
+        "body": "Nach der Abwicklung verfolgst du die Pflanze hier — Phasenfortschritt und Pflege-Freigabe stehen auf der Karte."
+      },
+      "garden_board": {
+        "title": "Verfolge, was du unterstützt hast",
+        "body": "Adoptierte Pflanzen und Guthaben erscheinen in Mein Garten. Erkunde in deinem Tempo — tippe jederzeit auf ? in einem Tab für eine kürzere Tour."
+      }
+    },
+    "growerFull": {
+      "start_strip": {
+        "title": "Hier starten",
+        "body": "Dein Grower-Weg: Notiere zuerst die Pflege im Journal. Tokenisieren und Markt sind optional, wenn du willst."
+      },
+      "journal_nav": {
+        "title": "Journal",
+        "body": "Das ist die Startseite — deine Pflanzen, Heute und das Pflegetagebuch (Liste oder Monat). Gießen notierst du hier."
+      },
+      "plants_list": {
+        "title": "Pflanze hinzufügen",
+        "body": "Leg eine Pflanze an und notiere dann Gießen, Düngen und Phasenwechsel — diese Spur schaltet später Tokenisieren frei."
+      },
+      "journal_log": {
+        "title": "Pflege notieren",
+        "body": "Neue Einträge belegen echte Arbeit. Die Aufgaben unter Tokenisieren suchen Einträge zu Phase, Wasser und Dünger."
+      },
+      "tokenise_nav": {
+        "title": "Tokenisieren",
+        "body": "Wenn das Journal bereit ist, versiegle eine Phase in ein Pflanzen-Token im Devnet."
+      },
+      "seal_stage": {
+        "title": "Phase versiegeln",
+        "body": "Wähle eine Journalpflanze und versiegle die nächste Phase. Die Mint-Warteschlange mintet / aktualisiert das NFT im Devnet."
+      },
+      "market_nav": {
+        "title": "Markt",
+        "body": "Stelle eine versiegelte Pflanze als Angebot ein — Sofortkauf oder Adopter-Einsatz — damit Adopter sie mit $GROWTOO unterstützen."
+      },
+      "market_list": {
+        "title": "Angebot einstellen",
+        "body": "Wähl die versiegelte Pflanze, setze Preis und Angebotsart, dann einstellen. Deine Angebote stehen unter Meine Angebote."
+      },
+      "chain_optional": {
+        "title": "Tokenisieren bleibt optional",
+        "body": "On-Chain-Versiegeln und Markt bleiben aus der Navigation, bis du sie im Profil freischaltest. Das kostenlose Journal läuft ohne Wallet."
+      }
+    },
+    "plants": {
+      "add_plant": {
+        "title": "Neue Pflanze",
+        "body": "Name, Sorte und Phase starten das Journal. Die Phase kannst du im Verlauf des Grows ändern."
+      },
+      "journal": {
+        "title": "Pflegetagebuch",
+        "body": "Notiere Gießen, Düngen und Phasennotizen. Die Aufgaben unter Tokenisieren lesen diese Spur vor dem Versiegeln."
+      },
+      "plants_heading": {
+        "title": "Deine Pflanzen",
+        "body": "Jede Pflanze ist ein lebendiger Datensatz. Ist die Liste leer, fang mit + Neue Pflanze an."
+      },
+      "weather": {
+        "title": "Wetter (optional)",
+        "body": "Setz eine Stadt für die 7-Tage-Vorhersage — praktisch für die Outdoor-Planung. Überspring es, wenn du indoor growst."
+      }
+    },
+    "adoptGrower": {
+      "seal": {
+        "title": "Phase versiegeln",
+        "body": "Verknüpfe eine Journalpflanze und versiegle die aktuelle Phase. Erledigte Grower-Aufgaben schalten den Mint-Button frei."
+      },
+      "trail": {
+        "title": "Die Spur voraus",
+        "body": "Jede Phase vom Samen bis zur Ernte mintet beim Versiegeln eine Belohnung im Devnet."
+      },
+      "sealed": {
+        "title": "Versiegelte Pflanzen",
+        "body": "Deine Token landen hier. Ist eins bereit, stell es auf dem Markt ein."
+      }
+    },
+    "adoptAdopter": {
+      "guide": {
+        "title": "Mein Garten",
+        "body": "Adoptierte Pflanzen und Einsatz-Fortschritt leben hier, sobald eine Markt-Investition abgewickelt ist."
+      },
+      "summary": {
+        "title": "Guthaben",
+        "body": "Sieh, wie viele Pflanzen du adoptiert hast, und deinen Test-$GROWTOO-Stand."
+      },
+      "cards": {
+        "title": "Pflanzenkarten",
+        "body": "Öffne eine Karte für Phase, Pflege-Freigabe und Verlauf. Ist der Garten leer, sieh dir den Markt an."
+      }
+    },
+    "marketGrower": {
+      "list_form": {
+        "title": "Angebot einstellen",
+        "body": "Wähl eine versiegelte Pflanze, entscheide dich für Sofortkauf oder Adopter-Einsatz, setz den $GROWTOO-Preis und stell es ein."
+      },
+      "offer_type": {
+        "title": "Angebotsarten",
+        "body": "Beim Sofortkauf wirst du beim Kauf voll bezahlt. Adopter-Einsatz: die Hälfte jetzt, die andere, wenn die Pflegemonate erfüllt sind."
+      },
+      "my_offers": {
+        "title": "Meine Angebote",
+        "body": "Verfolge hier aktive, adoptierte und storniere Angebote — inklusive Ernte-Anspruch, sobald er bereit ist."
+      },
+      "open_board": {
+        "title": "Offener Markt",
+        "body": "Aktuelle Angebote anderer Grower. Nützlich, um zu sehen, wie die Tafel für Adopter aussieht."
+      }
+    },
+    "marketAdopter": {
+      "faucet": {
+        "title": "Test-Faucet",
+        "body": "Hol dir einmal täglich kostenlose Devnet-$GROWTOO, bevor du investierst."
+      },
+      "guide": {
+        "title": "So funktioniert Adoptieren",
+        "body": "Sofortkauf oder Adopter-Einsatz, dann verfolgst du die Pflanze nach der Abwicklung in Mein Garten."
+      },
+      "board": {
+        "title": "Aktuelle Angebote",
+        "body": "Tippe auf einer Karte auf Investieren. Verbinde die Devnet-Wallet, wenn du gefragt wirst."
+      }
+    }
+  },
+  "market": {
+    "offer": "Angebot",
+    "aPlant": "eine Pflanze",
+    "settlementPending": "Abwicklung läuft",
+    "settlementPendingBody": "Cloud-Worker aktivieren Escrow automatisch und wickeln Käufe/Storni etwa alle 5 Minuten ab. „Jetzt erneut“ stößt beides an.",
+    "retryNow": "Jetzt erneut",
+    "retrying": "Wird wiederholt…",
+    "retrySent": "Wiederholung an Escrow- und Abwicklungs-Worker gesendet. Der Status sollte sich innerhalb einer Minute aktualisieren, wenn die Chain bestätigt.",
+    "stuckActivating": "Escrow wird aktiviert…",
+    "stuckSettling": "Investition wird abgewickelt…",
+    "stuckCancelling": "Wird storniert…",
+    "statusPreparing": "Angebot wird vorbereitet…",
+    "statusActive": "Offen für Investitionen",
+    "statusSold": "Adoptiert",
+    "statusCancelled": "Storniert",
+    "statusFailed": "Fehlgeschlagen",
+    "reasonUnconfirmed": "Mint im Devnet noch nicht bestätigt",
+    "reasonFailed": "Mint fehlgeschlagen — im Tokenisieren erneut versuchen",
+    "reasonPending": "Mint noch in der Warteschlange",
+    "reasonListed": "Bereits eingestellt",
+    "reasonNoMint": "Noch kein Devnet-Mint — Tokenisieren öffnen",
+    "nftInVault": "Dieses NFT liegt bereits im On-Chain-Markttresor. Storniere zuerst dieses Angebot und stelle dann erneut ein.",
+    "nftInEscrow": "Dieses NFT liegt bereits im Hot-Wallet-Escrow. Lade den Markt neu — es wird vielleicht noch aktiviert.",
+    "ownerHint": "On-Chain-Eigentümer ist {owner}, verbunden hast du aber {connected}.",
+    "walletMissingNft": "Diese verbundene Wallet hält dieses NFT nicht.",
+    "walletMissingNftHint": "Öffne Tokenisieren, bestätige „Im Devnet gemintet“, verbinde die Wallet, die den Mint erhalten hat (oder wiederhole den Mint), und stelle dann erneut ein.",
+    "walletMissingNftOwning": "Diese verbundene Wallet hält dieses NFT nicht. Bestätige den Mint unter Tokenisieren und verbinde dann die Wallet, der es gehört.",
+    "walletModuleFailed": "Das Solana-Wallet-Modul wurde nicht geladen. Lade neu und versuch es erneut.",
+    "purposeSign": "Signieren",
+    "purposePost": "ein Angebot einstellen (das Pflanzen-Token halten)",
+    "purposeInvest": "investieren ($GROWTOO-Zahlung)",
+    "purposeCancel": "ein Angebot stornieren (NFT zurückholen)",
+    "purposeBonus": "den monatlichen Plattform-Bonus abholen",
+    "purposeFaucet": "den Test-$GROWTOO-Faucet abholen",
+    "reconnectToSign": "Verbinde die Wallet-Erweiterung erneut, um {purpose} zu können. Das Konto ist verknüpft, aber Phantom/Solflare ist in diesem Tab nicht angemeldet.",
+    "watchOnlyCannot": "Nur-Beobachten-Wallets können nicht {purpose}. Verbinde Phantom oder Solflare.",
+    "connectFirstTo": "Verbinde zuerst Phantom oder Solflare, um {purpose} zu können.",
+    "signInToPost": "Melde dich an, um ein Pflanzenangebot einzustellen.",
+    "growerOnlyPost": "Nur Grower-Konten können Pflanzenangebote einstellen.",
+    "signInToInvest": "Melde dich an, um zu investieren.",
+    "adopterOnlyInvest": "Wechsle zu einem Adopter-Konto, um in Pflanzenangebote zu investieren.",
+    "offerGone": "Das Angebot existiert nicht mehr.",
+    "offerClosed": "Dieses Angebot ist nicht mehr offen für Investitionen.",
+    "paymentReviewTitle": "Zahlung muss geprüft werden",
+    "paymentReviewBody": "Deine Zahlung von {amount} $GROWTOO für „{plant}“ wurde dem Angebot nicht zugeordnet. Behalte diese Referenz: {signature}",
+    "investDoneTitle": "Investition abgeschlossen",
+    "investDoneBody": "Du hast „{plant}“ für {amount} $GROWTOO adoptiert.",
+    "investSentTitle": "Investition eingereicht",
+    "investSentBody": "{amount} $GROWTOO für „{plant}“ gezahlt. Das NFT wird über die Warteschlange abgewickelt.",
+    "activatedListings_one": "1 Angebot aktiviert. Lade neu, wenn der Status hinterherhängt.",
+    "activatedListings_other": "{count} Angebote aktiviert. Lade neu, wenn der Status hinterherhängt.",
+    "settledCounts": "Abgewickelt: {sold} Verkäufe und {cancelled} Storni. Lade neu, wenn der Status hinterherhängt.",
+    "badgeFlower": "Blüte",
+    "badgeSeed": "Samen",
+    "badgeFlowerToken": "Blüten-Token",
+    "badgeSeedToken": "Samen-Token",
+    "badgeAdoptStake": "Adopter-Einsatz",
+    "badgeInstantSale": "Sofortkauf",
+    "stakeBadgeTitle": "Du zahlst jetzt den vollen Preis. Die Hälfte geht bei der Abwicklung an den Grower, die Hälfte bleibt bis zur Erntepflege gesperrt.",
+    "instantBadgeTitle": "Voller Preis an den Grower; das Pflanzen-Token wechselt beim Kauf.",
+    "chainDetails": "Chain-Details",
+    "settleWord": "Abwicklung",
+    "escrowWord": "Escrow",
+    "redemptionWord": "Einlösung",
+    "explainStake": "Du zahlst jetzt <strong>{total}</strong> · <strong>{immediate}</strong> an den Grower bei der {settle} · <strong>{locked}</strong> gesperrt bis zur Erntepflege. Token nach der Abwicklung.",
+    "explainInstant": "Du zahlst <strong>{total} $GROWTOO</strong> und erhältst in diesem Ablauf das Pflanzen-Token.",
+    "journalEmpty": "Die Journalspur ist verknüpft — nach dem Adoptieren öffnen, um die Pflegeeinträge zu verfolgen.",
+    "priceStakeSale": "Einsatz / Verkauf",
+    "priceWasListed": "War eingestellt für",
+    "priceAsk": "Preisvorstellung",
+    "investStake": "Adoptieren · Einsatz",
+    "investBuy": "Adoptieren · Kauf",
+    "careEscrowLabel": "Pflege-{escrow}",
+    "showDetails": "Angebotsdetails zeigen",
+    "practiceStakeNote": "Nur ein Übungs-Einsatz — die physische {redemption} kommt später. Die gesperrte Hälfte sind $GROWTOO, keine Erntelieferung.",
+    "rowBatch": "Charge",
+    "rowGrower": "Grower",
+    "rowListingPda": "Listing-PDA",
+    "youSuffix": "(du)",
+    "yourInvestment": "deine Investition",
+    "cancelBtn": "Stornieren",
+    "claimLockedBtn": "Gesperrten Einsatz abrufen ($GROWTOO)",
+    "redemptionLater": "Physische Ernte-Einlösung — kommt später. Dieser Antrag wickelt nur die gesperrten $GROWTOO ab.",
+    "claimQueued": "Antrag in der Warteschlange — wartet auf den Adopt-Worker (~5 Min).",
+    "reachHarvest": "Erreiche im Journal die Erntephase, um die gesperrte $GROWTOO-Hälfte abzurufen.",
+    "signInNotice": "Melde dich an, um den Markt zu nutzen.",
+    "needsDeploy": "Der Markt braucht den $GROWTOO-Mint und die Seed-Collection im Devnet. Bis dahin sind die Angebote unten nur lesbar.",
+    "adopterNotice": "Investiere $GROWTOO, um eine versiegelte Pflanze eines Growers zu adoptieren. Die Wallet verbindest du, wenn du bei einem offenen Angebot auf Investieren tippst.",
+    "chooseSealed": "Versiegelte Pflanze wählen",
+    "seedOption": "Samen № {no} — {name}",
+    "noneReady": "Keine Pflanzen-Token bereit zum Einstellen",
+    "hintAlmost": "Fast fertig — schließ das Versiegeln unter Tokenisieren ab (bei Fehlern „Jetzt erneut“), und komm dann zurück.",
+    "hintNothingSealed": "Noch nichts Versiegeltes zum Einstellen. Versiegle zuerst eine Phase unter Tokenisieren — und stell sie dann hier ein.",
+    "emptyBoardLead": "Keine aktuellen Angebote auf der Tafel",
+    "emptyBoardBody": "Versiegle eine Pflanze unter Tokenisieren und stell sie dann hier ein.",
+    "ctaSealStage": "Phase unter Tokenisieren versiegeln",
+    "emptyOpenLead": "Gerade keine offenen Angebote",
+    "emptyOpenBody": "Sobald ein Grower ein Angebot einstellt, erscheint es hier mit Investieren. Richte bis dahin unter Mein Garten deine Wallet ein.",
+    "ctaOpenGarden": "Mein Garten öffnen",
+    "emptyMineLead": "Noch keine Angebote eingestellt",
+    "emptyMineBody": "Wähl oben eine versiegelte Pflanze und stell dein Angebot ein.",
+    "emptyMineBodySeal": "Versiegle zuerst eine Phase unter Tokenisieren und stell sie dann hier ein.",
+    "ctaPostOffer": "Angebot einstellen",
+    "stakeReceivedBody": "Ein Adopter hat {amount} $GROWTOO auf „{plant}“ gesetzt (50 % gesperrt bis zur Monatspflege).",
+    "investReceivedBody": "Ein Adopter hat {amount} $GROWTOO in „{plant}“ investiert.",
+    "newInvestment": "Neue Marktinvestition",
+    "hintStakeMode": "Der Adopter zahlt jetzt den vollen Preis. Die Hälfte erreicht dich bei der Abwicklung; die andere wird frei, während du die Pflege bis zur Ernte dokumentierst.",
+    "hintInstantMode": "Du bekommst beim Kauf den vollen Preis. Das Einstellen sperrt das NFT im On-Chain-Programmtresor — das Angebot geht sofort live.",
+    "done": "Fertig.",
+    "claiming": "Wird abgeholt…",
+    "investing": "Investiere…",
+    "cancelling": "Storniere…",
+    "holdingToken": "Token wird für das Angebot gehalten…",
+    "postToMarket": "Auf dem Markt einstellen",
+    "faucetQueued": "Test-Faucet in der Warteschlange: +{amount} $GROWTOO. Der Mint kommt meist innerhalb weniger Minuten.",
+    "faucetQueueBody": "Die Warteschlange mintet $GROWTOO auf deine Devnet-Wallet…",
+    "faucetAlready": "Du hast den heutigen Devnet-Faucet schon abgeholt ({day}). Versuch es nach UTC-Mitternacht erneut.",
+    "confirmInvestProgram": "Du erhältst das Pflanzen-Token in dieser Transaktion im Solana-Devnet.",
+    "confirmInvestStake": "Adopter-Einsatz: voller Preis jetzt. 50 % an den Grower bei der Abwicklung; 50 % gesperrt bis zur Monatspflege bei der Ernte (alles oder nichts). Das Token kommt, sobald die Abwicklung fertig ist.\n\nDie physische Ernte-Einlösung kommt später — im Devnet gibt es keine Lieferung.",
+    "confirmInvestLegacy": "Du erhältst das Pflanzen-Token, sobald die Abwicklung fertig ist.\n\nDie physische Ernte-Einlösung kommt später — in diesem Testnetz nicht verfügbar.",
+    "confirmInvestTitle": "{amount} $GROWTOO in „{plant}“ investieren?",
+    "confirmInvestCta": "Investieren",
+    "confirmClaimTitle": "Gesperrten Einsatz abrufen ($GROWTOO)?",
+    "confirmClaimBody": "Wenn jeder Pflegemonat die Bedingungen erfüllt (je ≥12 Pflegetage), werden die gesperrten 50 % an dich freigegeben. Andernfalls gehen sie zurück an den Adopter (alles oder nichts).\n\nDas ist keine physische Ernte-Einlösung — die kommt später.",
+    "confirmClaimCta": "Gesperrten Einsatz abrufen",
+    "confirmCancelTitle": "Dieses Angebot stornieren?",
+    "confirmCancelBody": "Das Pflanzen-Token geht zurück in deine Wallet. Adopter sehen dieses Angebot nicht mehr.",
+    "confirmCancelCta": "Angebot stornieren",
+    "investOkNow": "Investition abgeschlossen. Das Pflanzen-Token liegt in deiner Wallet.",
+    "investOkQueued": "Investition eingereicht. Die Pflanze erscheint in Mein Garten, sobald die Abwicklung fertig ist.",
+    "claimQueuedOk": "Ernte-Antrag in der Warteschlange. Der gesperrte Einsatz wird beim nächsten Durchlauf abgewickelt.",
+    "cancelOkNow": "Angebot storniert. Die Pflanze ist zurück in deiner Wallet.",
+    "cancelOkQueued": "Storno angefordert. Die Pflanze kommt nach der Abwicklung zurück.",
+    "postedStake": "Adopter-Einsatz-Angebot eingestellt. 50 % werden bei der Abwicklung frei; 50 % bleiben bis zur monatlichen Erntepflege gesperrt.",
+    "postedProgram": "Das Angebot ist live. Die Pflanze liegt im Programmtresor — Adopter können sofort investieren.",
+    "postedLegacy": "Angebot eingestellt. Adopter können investieren, sobald der Escrow bestätigt.",
+    "needToken": "Wähl ein Pflanzen-Token zum Einstellen.",
+    "needPrice": "Gib einen Investitionspreis in $GROWTOO ein.",
+    "assetGone": "Der Wert wurde nicht gefunden oder ist bereits eingestellt.",
+    "signInHarvest": "Melde dich an, um die Ernte abzurufen.",
+    "growerOnlyHarvest": "Nur Grower können Ernte-Einsätze abrufen.",
+    "listingNotFound": "Angebot nicht gefunden.",
+    "notYourListing": "Nicht dein Angebot.",
+    "notStakeListing": "Kein Adopter-Einsatz-Angebot.",
+    "careNotActive": "Der Pflege-Einsatz ist nicht aktiv.",
+    "claimAlreadyPending": "Für diesen Einsatz läuft bereits ein Ernte-Antrag.",
+    "claimAlreadySettled": "Der Ernte-Einsatz für dieses Angebot ist bereits abgewickelt.",
+    "signInBonus": "Melde dich an, um den Plattform-Bonus abzuholen.",
+    "growerOnlyBonus": "Nur Grower können den Plattform-Bonus abholen.",
+    "bonusAlready": "Für {month} hast du bereits abgeholt (oder ein Antrag läuft).",
+    "signInFaucet": "Melde dich an, um Test-$GROWTOO abzuholen.",
+    "adopterOnlyFaucet": "Wechsle zu einem Adopter-Konto, um den Test-Faucet zu nutzen.",
+    "ctaOpenMarket": "Markt öffnen",
+    "ctaBrowseMarket": "Markt ansehen"
+  },
+  "trail": {
+    "seed": "Samen",
+    "germination": "Keim.",
+    "seedling": "Säml.",
+    "vegetative": "Veget.",
+    "flowering": "Blüte",
+    "harvest": "Ernte"
+  },
+  "token": {
+    "signInBeforeWallet": "Melde dich in deinem growtoo-Konto an, bevor du eine Wallet verbindest.",
+    "walletModuleFailed": "Das Solana-Wallet-Modul wurde nicht geladen. Lade die Seite neu und versuch es erneut.",
+    "linkFailed": "Konto-Verknüpfung fehlgeschlagen.",
+    "linkedToWallet": "Konto mit dieser Wallet verknüpft",
+    "linkedToOther": "Konto ist mit einer anderen Wallet verknüpft ({address})",
+    "linkAccount": "Konto verknüpfen",
+    "walletConnected": "Wallet verbunden.",
+    "adoptedPlant": "Adoptierte Pflanze",
+    "seedRwa": "Seed-RWA",
+    "needSeedName": "Ein Samenname ist erforderlich.",
+    "linkPlantBeforeMint": "Verknüpfe eine Journalpflanze, bevor du mintest.",
+    "linkPlantBeforeSeed": "Verknüpfe eine Journalpflanze, bevor du ein Samen-Token mintest.",
+    "tokenNotFound": "Token nicht gefunden.",
+    "plantNotFound": "Journalpflanze nicht gefunden.",
+    "alreadyGrown": "Diese Pflanze ist schon voll ausgewachsen.",
+    "completeQuests": "Erledige zuerst die Grower-Journal-Aufgaben.",
+    "mintQueueRefused": "Die Mint-Warteschlange hat die Anfrage nicht angenommen.",
+    "mintRequestFailed": "Die Devnet-Mint-Anfrage ist fehlgeschlagen.",
+    "growthQueueRefused": "Die Growth-Mint-Warteschlange hat die Anfrage nicht angenommen.",
+    "growthRequestFailed": "Die Devnet-Growth-Mint-Anfrage ist fehlgeschlagen.",
+    "stageSavedLocally": "Die Phase wurde lokal gespeichert. Der On-Chain-Mint wartet, bis das Seed-NFT gemintet ist — nutze bei Bedarf „Jetzt erneut“.",
+    "trailComplete": "Spur vollständig · Ernte versiegelt",
+    "nextSeal": "Nächste Versiegelung → {stage} (+{reward} $GROWTOO)",
+    "harvestPlus": "Ernte +{reward}",
+    "trailAhead": "Die Spur voraus",
+    "trailChartAria": "Belohnungen je Phase vom Samen bis zur Ernte",
+    "trailFoot": "Jede versiegelte Phase bringt $GROWTOO — bis {max} bis zur Ernte. Testnetz; kein Geldwert.",
+    "sealedStage": "Versiegelt: {stage}",
+    "logCareToSeal": "Pflege notieren zum Versiegeln → {stage}",
+    "sealTo": "Versiegeln → {stage} (+{reward})",
+    "sealStageAction": "Phase {stage} versiegeln · +{reward} $GROWTOO",
+    "stageSetNote": "Phase über Tokenisieren gesetzt für {stage}",
+    "percentGrown": "{stage} · {pct} % gewachsen",
+    "growerLevelAria": "Grower-Level",
+    "levelShort": "Lv {level}",
+    "xpAmount": "{xp} XP",
+    "growerProfileHint": "Den Wochenfortschritt siehst nur du. Die Monatspflege schaltet den gesperrten Adopter-Einsatz frei; der Rang steigt mit Pflege und Mints.",
+    "stubTitle": "Defekter Metadaten-Stub",
+    "stubBody": "Dieser Mint wurde als {link} neu gemintet. Nutze <em>Burn</em>, um diese Karte zu entfernen — blende das leere Collectible in Phantom aus, falls es noch erscheint.",
+    "replacesStubTitle": "Ersetzt defekten Mint",
+    "replacesStubBody": "Das älteres NFT mit leeren Metadaten {link} liegt vielleicht noch in den Collectibles deiner Wallet — kann ausgeblendet werden; diese Karte ist die aktuelle."
+  },
+  "role": {
+    "grower": "Grower",
+    "adopter": "Adopter"
+  },
+  "nav": {
+    "garden": "Garten",
+    "stories": "Storys",
+    "growlog": "Grow-Log",
+    "measurements": "Messwerte",
+    "admin": "Admin-Panel",
+    "today": "Heute",
+    "myGarden": "Mein Garten"
+  },
+  "weather": {
+    "today": "Heute",
+    "coachHead": "Coach · was das für deinen Grow bedeutet",
+    "askCoach": "Coach zum Wetter fragen",
+    "dayCount_one": "1 Tag · für die Grow-Planung",
+    "dayCount_other": "{count} Tage · für die Grow-Planung",
+    "loading": "Vorhersage wird geladen…",
+    "unavailable": "Vorhersage nicht verfügbar: {reason}",
+    "unknownCity": "Unbekannte Stadt",
+    "noData": "Keine Vorhersagedaten verfügbar.",
+    "addCity": "Trag oben eine Stadt ein für eine {days}-Tage-Vorhersage. Optional — überspring es, wenn du indoor growst.",
+    "loadFailed": "Die Vorhersage konnte nicht geladen werden. Prüfe Verbindung und Städtenamen.",
+    "swipeHint": "Für alle {days} Tage wischen →"
+  },
+  "report": {
+    "todayPrefix": "Heute · {date}"
+  },
+  "bonus": {
+    "claimed": "<strong>{amount} $GROWTOO</strong> diesen Monat abgeholt.",
+    "startHint": "Notiere Gießen oder Düngen, um den Monatsbonus zu starten.",
+    "about": "Etwa <strong>{amount} $GROWTOO</strong>, wenn du jetzt abholst (max. {cap}).",
+    "careDays": "Pflegetage (Wasser oder Dünger)",
+    "feedingDays": "Düngetage",
+    "storiesPublished": "Veröffentlichte Storys",
+    "qualifyingWeeks": "Wochen mit 5+ Pflegetagen",
+    "alreadyCounted": "Heute ist schon gezählt. Weitere Einträge heute bringen keine zusätzlichen Token.",
+    "addCareDay": "Notiere heute Gießen oder Düngen, um einen Pflegetag hinzuzufügen.",
+    "inQueue": "Der Antrag ist in der Belohnungs-Warteschlange."
+  },
+  "today": {
+    "quiet": "Im Garten ist es ruhig — notiere ein Gießen, damit die Spur warm bleibt.",
+    "logWatering": "Gießen notieren",
+    "logFeeding": "Düngen notieren",
+    "writeStory": "Story schreiben",
+    "askCoach": "Coach fragen",
+    "firstPlant": "Füge deine erste Pflanze hinzu — der Coach hält die Pflegespur ab dann ordentlich.",
+    "addPlant": "Pflanze hinzufügen"
+  },
+  "signInFirst": "Melde dich zuerst an.",
+  "sync": {
+    "tooLarge": "Auf diesem Gerät gespeichert, aber zu groß für die Cloud-Sicherung ({used} KB von {budget} KB). Fotos brauchen den meisten Platz — entferne ein großes, damit die Sicherung weiterläuft.",
+    "rejected": "Auf diesem Gerät gespeichert, aber die Cloud-Sicherung wurde abgelehnt ({reason}). Sie versucht es nach deiner nächsten Änderung erneut.",
+    "unknownError": "unbekannter Fehler",
+    "keepsFailing": "Auf diesem Gerät gespeichert, aber die Cloud-Sicherung schlägt weiter fehl. Prüfe deine Verbindung — sie versucht es nach deiner nächsten Änderung erneut."
+  },
+  "readOnly": {
+    "generic": "Die Ansicht ist nur lesend — Bearbeiten ist nicht erlaubt.",
+    "sharedPlant": "Diese Pflanze kommt aus der geteilten Superadmin-Bibliothek — du kannst sie ansehen, aber nicht bearbeiten.",
+    "sharedEntry": "Dieser Eintrag kommt aus einer geteilten Bibliothek — er lässt sich nicht bearbeiten.",
+    "hybrid": "Deine eigenen Pflanzen und Einträge kannst du bearbeiten. Pflanzen aus der geteilten Superadmin-Bibliothek sind nur zur Ansicht.",
+    "database": "Nur-Lese-Ansicht der Datenbank — Pflanzen, Journal und Tools ohne Bearbeiten.",
+    "wholeDb": "Nur-Lese-Ansicht der gesamten Superadmin-Datenbank — Pflanzen lassen sich nicht bearbeiten.",
+    "sharedPlants": "Nur-Lese-Ansicht geteilter Pflanzen — Bearbeiten ist nicht erlaubt.",
+    "hybridPlants": "Eigene Pflanzen und Einträge kannst du anlegen und bearbeiten. Pflanzen aus der geteilten Superadmin-Bibliothek sind nur zur Ansicht."
+  },
+  "intent": {
+    "collect": {
+      "hero": "Sammle adoptierte Pflanzen und verfolge jede Wachstumsphase in deinem Garten.",
+      "empty": "Sieh dir den Markt an, adoptiere deine erste Pflanze und bau deine Sammlung auf.",
+      "market": "Finde offene Pflanzenangebote und unterstütze sie mit $GROWTOO, wenn du bereit bist.",
+      "strip": "Hol dir Test-$GROWTOO, sieh dir den Markt an und sammle deine erste Pflanze.",
+      "label": "Einen Garten sammeln"
+    },
+    "earn": {
+      "hero": "Übe Einsätze und Ernte-Freigaben mit Testwerten — ohne Geldwert.",
+      "empty": "Unterstütze ein offenes Angebot, um Wachstum und Erntepflege im Testnetz zu verfolgen.",
+      "market": "Investiere Test-$GROWTOO in Grower-Angebote — verfolge die monatliche Freigabe bis zur Ernte.",
+      "strip": "Hol dir Test-$GROWTOO, setze auf ein aktuelles Angebot und verfolge die monatliche Freigabe in Mein Garten.",
+      "label": "Einsätze üben"
+    },
+    "support": {
+      "hero": "Folge der Journalspur einer echten Pflanze. Die Unterstützung mit $GROWTOO ist optional.",
+      "empty": "Sieh dir den Markt an und unterstütze einen Grow mit $GROWTOO, wenn du bereit bist.",
+      "market": "Investiere $GROWTOO, um das Pflanzen-Token eines Growers zu adoptieren. Die Wallet verbindest du beim Tippen auf Investieren.",
+      "strip": "Hol dir Test-$GROWTOO und investiere dann in ein aktuelles Pflanzenangebot.",
+      "label": "Grower unterstützen"
+    }
+  },
+  "account": {
+    "member": "growtoo-Mitglied",
+    "focus": "Fokus",
+    "wallet": "Wallet",
+    "notLinked": "Nicht verknüpft",
+    "view": "Ansicht",
+    "adopted": "Adoptiert",
+    "setup": "Setup",
+    "rankXp": "Rang · XP",
+    "outdoor": "Outdoor",
+    "indoor": "Indoor",
+    "updateLogo": "Logo / Foto ändern",
+    "removePhoto": "Foto entfernen",
+    "uploading": "Wird hochgeladen…",
+    "imageBad": "Das Bild ist zu groß oder unlesbar.",
+    "logoSaved": "Logo gespeichert.",
+    "photoFailed": "Das Foto konnte nicht gespeichert werden.",
+    "notVerified": "E-Mail noch nicht bestätigt — der Coach bleibt bei den lokalen Helfern, bis du bestätigst.",
+    "verifyHint": "Such nach <em>Bestätige deine E-Mail · growtoo</em> (prüfe auch Spam / Werbung).",
+    "resendVerify": "Bestätigung erneut senden",
+    "alreadyConfirmed": "Ich habe schon bestätigt",
+    "sending": "Wird gesendet…",
+    "alreadyVerified": "Schon bestätigt — wird aktualisiert…",
+    "sentTo": "An {email} gesendet. Prüfe Posteingang und Spam auf „Bestätige deine E-Mail · growtoo“.",
+    "yourInbox": "deinen Posteingang",
+    "tooManySends": "Zu viele Sendungen — warte ein paar Minuten und versuch es erneut.",
+    "verifySendFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden.",
+    "advancedHint": "Die erweiterte Ansicht zeigt Mint-Adressen, Explorer-Links und Listing-PDAs auf den Karten.",
+    "simpleHint": "Die einfache Ansicht verbirgt Mint-Adressen und Chain-IDs — nur Pflanze · Phase · Preis.",
+    "detailLevel": "Detailgrad",
+    "replayTour": "Tour wiederholen",
+    "checking": "Wird geprüft…",
+    "verified": "E-Mail bestätigt — Coach freigeschaltet.",
+    "stillUnverified": "Noch nicht bestätigt. Öffne den Link in der growtoo-E-Mail und tippe erneut.",
+    "refreshFailed": "Der Bestätigungsstatus konnte nicht aktualisiert werden."
+  },
+  "pot": {
+    "p15dcl": "1,5 dl",
+    "p5l": "5 l",
+    "p30l": "30 l",
+    "p10dcl": "10 dl",
+    "p15l": "1,5 l",
+    "field": "Im Freiland"
+  },
+  "unlock": {
+    "title": "Tokenisieren & Markt freischalten?",
+    "body": "Das ergänzt optionale On-Chain-Werkzeuge: Phasen im Devnet versiegeln und Angebote einstellen. Dein Journal bleibt kostenlos und läuft ohne Wallet.",
+    "confirm": "Freischalten",
+    "cancel": "Nicht jetzt",
+    "fallback": "Tokenisieren & Markt freischalten?\n\nOptionale On-Chain-Werkzeuge. Dein Journal bleibt ohne Wallet kostenlos."
+  },
+  "docTitle": {
+    "adopter": "growtoo – Adoptieren & verfolgen",
+    "grower": "growtoo – Grow-Journal"
+  },
+  "entry": {
+    "saveFullStorage": "Der Eintrag konnte nicht gespeichert werden (Speicher voll oder blockiert). Kürze die Notiz oder entferne alte Fotos.",
+    "saveFailedStorage": "Der Eintrag konnte nicht gespeichert werden. Der lokale Speicher ist vielleicht voll.",
+    "saveRetry": "Der Eintrag wurde nicht gespeichert. Versuch es erneut.",
+    "viaTools": "über die Tools",
+    "measurement": "Messwert",
+    "logFailed": "Der Eintrag konnte nicht notiert werden.",
+    "watered": "Gegossen",
+    "stageTransitionLabel": "Phasenwechsel",
+    "fieldLocationLabel": "Standort im Freiland",
+    "plantingLocationLabel": "Pflanzstandort",
+    "to": "Nach: {stage}",
+    "from": "Von: {stage}",
+    "choosePlantFirst": "Wähle eine Pflanze, bevor du den Eintrag speicherst.",
+    "coachLabel": "Coach",
+    "delete": "Löschen",
+    "deleteAria": "Eintrag löschen",
+    "deleteBody": "Diesen Eintrag aus deiner Grow-Spur entfernen?\n\nDu kannst es einige Sekunden lang rückgängig machen.",
+    "deleteConfirm": "Eintrag löschen",
+    "deleteFallback": "Diesen Journaleintrag löschen?\n\nDeine Grow-Spur zählt — du kannst es einige Sekunden lang rückgängig machen.",
+    "deleteTitle": "Journaleintrag löschen?",
+    "deletedUndo": "Eintrag gelöscht — Rückgängig möglich",
+    "humidity": "Luftfeuchte: {value}",
+    "pests": "Schädlinge: {value}",
+    "plantAge": "Alter der Pflanze: {value}",
+    "plantCondition": "Zustand der Pflanze: {value}",
+    "restored": "Eintrag wiederhergestellt",
+    "saveFailed": "Journaleintrag konnte nicht gespeichert werden.",
+    "soilQuality": "Bodenqualität: {value}",
+    "stressorsLabel": "Stressfaktoren",
+    "subphaseTransitionLabel": "Unterphasen-Wechsel",
+    "temperature": "Temperatur: {value}",
+    "transplantingLabel": "Umtopfen",
+    "vpd": "VPD: {value}",
+    "loggedForPlants_one": "{type} für 1 Pflanze erfasst",
+    "loggedForPlants_other": "{type} für {count} Pflanzen erfasst"
+  },
+  "coachBrief": {
+    "nothingUrgent": "Nichts Dringendes",
+    "keepLogging": "Dokumentier die Pflege weiter — der Coach nutzt deinen Rhythmus und die Vorhersage für den nächsten Hinweis.",
+    "reminder": "Erinnerung",
+    "draftLog": "Eintrag entwerfen",
+    "askFirst": "Erst fragen",
+    "openCoach": "Coach öffnen",
+    "label": "Coach"
+  },
+  "plants": {
+    "logCare": "Pflege notieren",
+    "logCareOn": "Pflege notieren · {date}",
+    "rowsTapForAll": " Zeilen · für alle tippen",
+    "selectedCount_one": "Pflanzen · 1 ausgewählt",
+    "selectedCount_other": "Pflanzen · {count} ausgewählt",
+    "noWateringYet": "noch nicht gegossen",
+    "wateredToday": "heute gegossen",
+    "daysSinceWater": "{count} T seit dem Gießen",
+    "newPlant": "+ Neue Pflanze",
+    "noWateringLog": "Noch kein Gieß-Eintrag",
+    "deleteTitle": "Diese Pflanze löschen?",
+    "deleteConfirm": "Pflanze löschen",
+    "restored": "Pflanze wiederhergestellt",
+    "emptyLead": "Noch keine Pflanzen",
+    "emptyBody": "Füge deine erste Pflanze hinzu, um ein Grow-Journal zu starten.",
+    "deletedUndo": "Pflanze gelöscht — Rückgängig möglich",
+    "updated": "Pflanze aktualisiert",
+    "added": "Pflanze hinzugefügt — {name}",
+    "mintUnavailable": "Minten ist noch nicht verfügbar.",
+    "connectWalletFirst": "Verbinde zuerst eine Devnet-Wallet und minte dann unter Tokenisieren.",
+    "mintStarted": "Der Mint des Pflanzen-Tokens für {name} wurde gestartet",
+    "deleteBody": "„{name}“ und ihre Journalspur löschen?\n\nDeine Grow-Historie ist ein Beleg — du kannst es einige Sekunden lang rückgängig machen.",
+    "deleteBodyShort": "„{name}“ und ihre Journalspur löschen?\n\nDu kannst es einige Sekunden lang rückgängig machen.",
+    "mintNotStarted": "Die Pflanze wurde gespeichert, aber der On-Chain-Mint startete nicht. Versuch es unter Tokenisieren → erweitert.",
+    "nameRequired": "Der Name der Pflanze ist erforderlich.",
+    "notFound": "Pflanze nicht gefunden.",
+    "wateredOn": "Gegossen {date}"
+  },
+  "growlog": {
+    "dayWeek": "Tag {day} (Woche {week})",
+    "updated": "Aktualisiert {when}",
+    "publicViews_one": "1 öffentliche Ansicht",
+    "publicViews_other": "{count} öffentliche Ansichten",
+    "noTransitions": "Noch keine Übergänge erfasst. Ändere die Phase unter „Pflanze bearbeiten“ — ein Journaleintrag wird angelegt.",
+    "startStage": "Start: {stage}",
+    "subphases": "Unterphasen (Töpfe)",
+    "stageHistory": "Verlauf der Phasenwechsel",
+    "subphaseHistory": "Verlauf der Unterphasen (Töpfe / Freiland)",
+    "wkGrow": " Wo. Grow",
+    "photoHint": "Die Fotos stehen in der Seitenleiste und unten bei den neuesten Fotos.",
+    "tokenRemaining": "On-Chain-Pflanzen-Token verknüpft — diese Pflanze kann bis zur Ernte noch bis zu <strong>{remaining} $GROWTOO</strong> an Phasen-Belohnungen verdienen (max. {total} über alle Phasen).",
+    "tokenDone": "On-Chain-Pflanzen-Token verknüpft — die Erntephase ist abgeschlossen. Die Phasen-Belohnungen dieses Tokens sind ausgeschöpft.",
+    "tokenOptional": "Wenn du ein optionales Pflanzen-Token mintest, können die Phasen-Belohnungen bis zur Ernte höchstens <strong>{total} $GROWTOO</strong> erreichen (nur Testnetz).",
+    "noEntries": "Keine Einträge in der Zeitleiste. Füge Notizen im Journal hinzu.",
+    "noPhotos": "Keine Fotos",
+    "editPlant": "Pflanze bearbeiten",
+    "fieldLabel": "Freiland:",
+    "ofLight": "{hours} Licht",
+    "plantingLabel": "Pflanzung:",
+    "weeks_one": "1 Woche",
+    "weeks_other": "{count} Wochen"
+  },
+  "garden": {
+    "emptyTitle": "Noch keine adoptierten Pflanzen",
+    "emptyBody": "Sieh dir die offenen Angebote auf dem Markt an und investiere Test-$GROWTOO, wenn du bereit bist."
+  },
+  "metric": {
+    "growBalance": "$GROWTOO-Stand",
+    "gardenProgress": "Garten-Fortschritt",
+    "solanaWallet": "Solana-Wallet",
+    "growOverview": "Grow-Überblick",
+    "journalActivity": "Journal-Aktivität",
+    "activeStages": "Aktive Phasen",
+    "tokenPortfolio": "Token-Portfolio",
+    "plantTokens": "Pflanzen-Token",
+    "stillGrowing": "Wachsen noch",
+    "harvested": "Geerntet",
+    "inGrowth": "Im Wachstum",
+    "network": "Netzwerk",
+    "testNetwork": "Testnetz",
+    "account": "Konto",
+    "linked": "Verknüpft",
+    "individualPlants": "Einzelne Pflanzen",
+    "plantsInBatch": "Pflanzen in der Charge",
+    "last7Days": "Letzte 7 Tage",
+    "plantProfiles": "Pflanzenprofile",
+    "noPlants": "Keine Pflanzen",
+    "action": "Aktion",
+    "followTrails": "Pflanzenspuren folgen",
+    "profile": "Profil",
+    "browse": "Ansehen",
+    "nextStep": "Nächster Schritt",
+    "readyToSign": "Bereit zum Signieren",
+    "optionalTokenise": "Optional — für Tokenisieren"
+  },
+  "photo": {
+    "noDimensions": "Die Bildmaße konnten nicht gelesen werden.",
+    "stillTooLarge": "Das Foto ist auch nach der Komprimierung zu groß. Versuch ein kleineres Bild.",
+    "loadFailed": "Dieses Bild konnte nicht geladen werden. Versuch JPG oder PNG.",
+    "uploadWarning": "Das Foto wurde auf diesem Gerät gespeichert, konnte aber nicht hochgeladen werden ({reason}). Es zählt zur Größe deiner Cloud-Sicherung.",
+    "unknownReason": "unbekannt",
+    "formatUnsupported": "Nimm ein JPG- oder PNG-Foto (manche Handy-Formate wie HEIC werden nicht unterstützt).",
+    "couldNotLoad": "Das Foto konnte nicht geladen werden.",
+    "preparing": "Foto wird vorbereitet…",
+    "readFailed": "Foto konnte nicht geladen werden."
+  },
+  "toast": {
+    "undo": "Rückgängig"
+  },
+  "env": {
+    "outdoor": "outdoor",
+    "indoor": "indoor"
+  },
+  "dash": {
+    "noEntriesLead": "Noch keine Einträge",
+    "noEntriesBody": "Füge eine Pflanze hinzu und starte dein Journal."
+  },
+  "form": {
+    "save": "Speichern",
+    "savePlant": "Pflanze speichern",
+    "editPlant": "Pflanze bearbeiten",
+    "newPlant": "Neue Pflanze",
+    "selectPlant": "-- Pflanze wählen --",
+    "allPlants": "Alle Pflanzen"
+  },
+  "note": {
+    "growStarted": "Grow gestartet — Phase: {stage}",
+    "subphase": "Unterphase: {value}",
+    "stageTransition": "Phasenwechsel: {from} → {to}",
+    "fieldLocation": "Standort im Freiland: {value}.",
+    "plantingLocation": "Pflanzstandort: {value}.",
+    "subphaseTransition": "Unterphasen-Wechsel: {from} → {to}"
+  },
+  "journal": {
+    "newEntry": "+ Neuer Eintrag",
+    "emptyBody": "Notiere Gießen, Düngen oder eine Notiz, um die Spur zu starten."
+  },
+  "activity": {
+    "claimOnTokenise": "Im Tokenisieren einlösen"
+  },
+  "dashboard": {
+    "chartEnvironment": "Umgebung (Temperatur, Luftfeuchte, pH)",
+    "chartWatering": "Gießen"
+  },
+  "media": {
+    "loadError": "Fehler beim Laden.",
+    "photoAlt": "Foto",
+    "remove": "Entfernen"
+  },
+  "tools": {
+    "ageShort": "Alter: {value}",
+    "allPlants": "Alle Pflanzen",
+    "chartEmpty": "Keine Daten für das Diagramm.",
+    "conditionShort": "Zustand: {value}",
+    "deleteConfirm": "Diesen Werkzeug-Eintrag löschen?\n\nDu kannst es einige Sekunden lang rückgängig machen.",
+    "deletedUndo": "Werkzeug-Eintrag gelöscht — Rückgängig möglich",
+    "environmentReading": "Umgebungsmessung",
+    "listEmpty": "Noch keine Einträge. Füge den ersten hinzu.",
+    "mirrorFailed": "In den Werkzeugen gespeichert, aber die Journalspur wurde nicht aktualisiert.",
+    "noteVia": "{note} (über Werkzeuge)",
+    "plantFallback": "Pflanze",
+    "plantLabel": "Pflanze: {name}",
+    "selectPlant": "-- Pflanze wählen --",
+    "soilShort": "Boden: {value}",
+    "stressorNote": "Notiz zu Stressfaktoren",
+    "tempShort": "Temp: {value}",
+    "transplant": "Umtopfen",
+    "wateringLogged": "Gießen über Werkzeuge erfasst"
+  },
+  "video": {
+    "formatUnsupported": "Nutze ein MP4- oder WebM-Video (dieser Dateityp wird hier nicht unterstützt).",
+    "tooLarge": "Video zu groß (max. {mb} MB für lokalen Speicher)."
+  },
+  "write": {
+    "cannotAddEntry": "Für diese Pflanze kann kein Eintrag hinzugefügt werden.",
+    "cannotEditPlant": "Diese Pflanze kann nicht bearbeitet werden.",
+    "disabled": "Für dieses Konto ist das Schreiben deaktiviert."
+  }
+}

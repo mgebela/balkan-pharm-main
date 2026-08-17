@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../terms/\" class=\"nav-link\">Terms</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Sign in</a>"
+  },
+  "span2": "LEGAL",
+  "h1": "Privacy Policy",
+  "p": "Last updated: 29 July 2026. This explains what growtoo collects and why — in plain language. It is not a substitute for legal advice.",
+  "div": "<span>Operator</span> <span class=\"desk-panel-meta\">growto.live</span>",
+  "span3": "WHO",
+  "h2": "Who we are",
+  "p2": "growtoo (the grow journal and optional Solana test-network features on <strong>growto.live</strong>) is operated for product testing and early users. Contact for privacy questions: <a href=\"mailto:hello@growto.live\">hello@growto.live</a>.",
+  "span4": "DATA",
+  "h22": "What we collect",
+  "p3": "<strong>Account:</strong> email address, password (hashed by Firebase Auth), optional display name, profile type (Grower / Adopter), and sign-in timestamps.<br /> <strong>Journal:</strong> plant records, care logs, photos you upload, notes, and related grow metadata.<br /> <strong>Optional crypto:</strong> Solana public addresses you connect or link, and on-chain activity we mirror for Tokenise / Market.<br /> <strong>Location-ish:</strong> a home city you enter for weather forecasts (not precise GPS unless you paste coordinates into notes).<br /> <strong>Device / usage:</strong> essential browser storage for session and preferences; optional analytics only if you consent.",
+  "span5": "WHY",
+  "h23": "Why we process it",
+  "p4": "To provide the journal and related features, secure your account, show weather for your city, operate optional Devnet marketplace flows, improve reliability, and meet legal obligations. Legal bases under GDPR typically include contract (providing the service), consent (optional analytics / marketing), and legitimate interests (security, abuse prevention) where appropriate.",
+  "span6": "SHARE",
+  "h24": "Processors &amp; sharing",
+  "p5": "We use service providers such as <strong>Google Firebase</strong> (Authentication, Firestore hosting) and, if you opt in, <strong>Google Analytics</strong>. Wallet interactions go through your chosen wallet and the public Solana network — those are outside our private database. We do not sell your personal data.",
+  "span7": "KEEP",
+  "h25": "Retention",
+  "p6": "We keep account and journal data while your account is active. You may request deletion of your account and associated journal data by emailing us. Backups and logs may persist for a limited period for security. On-chain records on Solana cannot be erased by us.",
+  "span8": "RIGHTS",
+  "h26": "Your rights (EU/EEA)",
+  "p7": "You may request access, correction, deletion, restriction, portability, or object to certain processing. Where we rely on consent, you can withdraw it (e.g. analytics via cookie settings / clearing consent storage). You may lodge a complaint with your local supervisory authority.",
+  "span9": "COOKIE",
+  "h27": "Cookies &amp; local storage",
+  "p8": "<strong>Essential:</strong> sign-in session, age confirmation, cookie-choice, journal preferences, and similar storage required for the app to work.<br /> <strong>Analytics:</strong> only after you choose “Accept all” on the cookie banner.",
+  "span10": "KIDS",
+  "h28": "Age",
+  "p9": "The service is intended for adults <strong>18+</strong>. We do not knowingly collect data from children. If you believe a minor created an account, contact us to remove it.",
+  "p10": "<a href=\"../terms/\">Terms of Service</a> · <a href=\"../risks/\">Risks</a> · <a href=\"../index.html\">Back to growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Privacy</a> <a href=\"../terms/\">Terms</a> <a href=\"../risks/\">Risks</a>",
+  "p11": "© growtoo. All rights reserved.",
+  "meta": {
+    "title": "Privacy Policy · growtoo"
+  }
+}

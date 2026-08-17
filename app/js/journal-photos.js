@@ -47,10 +47,14 @@
     return typeof value === 'string' && /^https?:\/\//i.test(value);
   }
 
+  /* The error strings below never reach a grower — they are returned to the
+     caller, which logs them with console.warn and shows the photo inline
+     anyway. i18n-ignore keeps them out of the translation worklist. */
+
   /** data:image/jpeg;base64,… → Blob, without a fetch() round trip. */
   function dataUrlToBlob(dataUrl) {
     var match = /^data:([^;,]*)(;base64)?,([\s\S]*)$/.exec(String(dataUrl || ''));
-    if (!match) throw new Error('Not a data URL');
+    if (!match) throw new Error('Not a data URL'); // i18n-ignore
     var mime = match[1] || 'image/jpeg';
     var isBase64 = !!match[2];
     var payload = match[3] || '';
@@ -92,12 +96,13 @@
       return {
         url: dataUrl,
         inline: true,
-        error: !uid ? 'Not signed in' : 'Storage unavailable',
+        error: !uid ? 'Not signed in' : 'Storage unavailable', // i18n-ignore
       };
     }
     try {
       var blob = dataUrlToBlob(dataUrl);
       if (blob.size > MAX_UPLOAD_BYTES) {
+        // i18n-ignore
         return { url: dataUrl, inline: true, error: 'Photo is too large to upload' };
       }
       var ref = st.ref(photoPath(uid, kind));
@@ -112,7 +117,7 @@
       return {
         url: dataUrl,
         inline: true,
-        error: (err && (err.code || err.message)) || 'Upload failed',
+        error: (err && (err.code || err.message)) || 'Upload failed', // i18n-ignore
       };
     }
   }

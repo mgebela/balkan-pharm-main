@@ -19,13 +19,15 @@
     harvest: 'harvest',
   };
 
+  /* [dictionary key, English] — resolved in stageLabel(), because this
+     table is built while the page parses, before the dictionary lands. */
   var STAGE_LABEL = {
-    seed: 'Seed',
-    germination: 'Germination',
-    seedling: 'Seedling',
-    vegetative: 'Vegetative',
-    flowering: 'Flowering',
-    harvest: 'Harvest',
+    seed: ['app.stage.seed', 'Seed'],
+    germination: ['app.stage.germination', 'Germination'],
+    seedling: ['app.stage.seedling', 'Seedling'],
+    vegetative: ['app.stage.vegetative', 'Vegetative'],
+    flowering: ['app.stage.flowering', 'Flowering'],
+    harvest: ['app.stage.harvest', 'Harvest'],
   };
 
   function esc(s) {
@@ -49,7 +51,9 @@
   }
 
   function stageLabel(bucket) {
-    return STAGE_LABEL[bucket] || bucket || 'Growing';
+    var row = STAGE_LABEL[bucket];
+    if (row) return T(row[0], row[1]);
+    return bucket || T('app.stage.growing', 'Growing');
   }
 
   /** Strip "· Row 12" / "· Cohort 3" / "· Plant 1" suffixes for grouping. */
@@ -110,8 +114,8 @@
       if (!map[key]) {
         map[key] = {
           key: key,
-          strain: String(strain || displayStem(name) || 'Plant').trim(),
-          name: displayStem(name) || String(strain || 'Plant').trim(),
+          strain: String(strain || displayStem(name) || T('app.stack.plant', 'Plant')).trim(),
+          name: displayStem(name) || String(strain || T('app.stack.plant', 'Plant')).trim(),
           stage: stageBucket(stage),
           size: 0,
           members: [],
@@ -179,10 +183,10 @@
       '<div class="plant-stack-copy">' +
       '<div class="plant-stack-title-row">' +
       '<h3 class="plant-stack-title">' +
-      esc(group.name || group.strain || 'Plants') +
+      esc(group.name || group.strain || T('app.stack.plants', 'Plants')) +
       '</h3>' +
       '<span class="plant-stack-count" title="' +
-      esc(String(plants) + ' plants in this stack') +
+      esc(T('app.stack.countTitle', '{count} plants in this stack', { count: plants })) +
       '">×' +
       esc(String(plants)) +
       '</span>' +
@@ -190,7 +194,9 @@
       '<p class="plant-stack-meta">' +
       meta +
       '</p>' +
-      '<p class="plant-stack-hint">Tap to open stack</p>' +
+      '<p class="plant-stack-hint">' +
+      esc(T('app.stack.tapToOpen', 'Tap to open stack')) +
+      '</p>' +
       '</div>' +
       '</summary>' +
       '<div class="plant-stack-members">' +

@@ -1,0 +1,1906 @@
+{
+  "app-boot-line": {
+    "p": "Otvaram tvoj dnevnik…"
+  },
+  "app-boot-stalled": {
+    "p": "Ovo traje dulje nego što bi trebalo — možda je pukla veza ili se skripta nije učitala. Tvoji unosi u dnevnik su sigurni.",
+    "a": "Natrag na prijavu"
+  },
+  "app-boot-retry": {
+    "button": "Pokušaj ponovno"
+  },
+  "span2": "Dnevnik",
+  "span3": "Priče",
+  "sidebar-log-btn": {
+    "span": "Zapis"
+  },
+  "sidebar-coach-btn": {
+    "span": "Savjetnik"
+  },
+  "span4": "Tržnica",
+  "span5": "Admin",
+  "span6": "Dnevnik",
+  "bottom-nav-log": {
+    "span": "Zapis"
+  },
+  "bottom-nav-coach": {
+    "span": "Savjetnik"
+  },
+  "span7": "Tržnica",
+  "more-nav-title": {
+    "strong": "Profil"
+  },
+  "more-nav-overlay": {
+    "a": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Pregledaj aktualne ponude biljaka</span> </span>",
+    "a2": "<span class=\"more-nav-copy\"> <strong>Moj vrt</strong> <span>Posvojene biljke i ulozi</span> </span>",
+    "a3": "<span class=\"more-nav-copy\"> <strong>Dnevnik</strong> <span>Biljke i zapisi njege</span> </span>",
+    "a4": "<span class=\"more-nav-copy\"> <strong>Priče</strong> <span>Javni savjeti, izgled biljaka i bilješke s terena</span> </span>",
+    "a5": "<span class=\"more-nav-copy\"> <strong>Tokeniziraj</strong> <span>Zapečati faze na Devnetu</span> </span>",
+    "a6": "<span class=\"more-nav-copy\"> <strong>Tržnica</strong> <span>Objavi zapečaćene biljke</span> </span>",
+    "span": "<strong>Izgled</strong> <span>Tamno je growtoo zadano</span>",
+    "span2": "<strong>Admin</strong> <span>Upravljanje platformom</span>",
+    "span3": "<strong>Izgled</strong> <span>Tamno je growtoo zadano</span>",
+    "button": "Svijetlo",
+    "button2": "Tamno",
+    "button3": "Automatski",
+    "a7": "<span class=\"more-nav-copy\"> <strong>Pravila privatnosti</strong> <span>Kako postupamo s tvojim podacima</span> </span>",
+    "a8": "<span class=\"more-nav-copy\"> <strong>Uvjeti korištenja</strong> <span>Pravila za korištenje growtooa</span> </span>"
+  },
+  "more-nav-coach": {
+    "span": "<strong>Savjetnik</strong> <span>Pitaj što zapisati, kako njegovati ili što provjeriti na posvojenim biljkama</span>"
+  },
+  "btn-unlock-chain": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Otključaj Tokeniziraj i Tržnicu</strong> <span>Izborni put na lancu — pečati faze i objavljuj ponude</span> </span>"
+  },
+  "btn-logout-sheet": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Odjava</strong> <span>Završi ovu sesiju</span> </span>"
+  },
+  "log-sheet-title": {
+    "strong": "Zapiši njegu"
+  },
+  "log-sheet-plant": {
+    "p": "Biljke"
+  },
+  "log-sheet-hint": {
+    "p": "Dodirni redove za odabir. Iste sorte mogu se zapisati zajedno."
+  },
+  "log-sheet-add": {
+    "button": "Dodaj biljku"
+  },
+  "log-sheet-water": {
+    "button": "Zapiši zalijevanje"
+  },
+  "log-sheet-feed": {
+    "button": "Zapiši prihranu"
+  },
+  "log-sheet-full": {
+    "button": "Puni unos u dnevnik"
+  },
+  "h1": "Dnevnik",
+  "profile-type-badge": {
+    "span": "Uzgajivač"
+  },
+  "btn-account": {
+    "button": "<span class=\"header-avatar-mark\" aria-hidden=\"true\">U</span>"
+  },
+  "btn-logout": {
+    "button": "Odjava"
+  },
+  "daily-start-kicker": {
+    "p": "Kreni odavde"
+  },
+  "notif-panel": {
+    "div": "<strong id=\"notif-panel-title\">Obavijesti</strong> <span class=\"notif-panel-sub\" id=\"notif-panel-sub\"></span>"
+  },
+  "notif-mark-all": {
+    "button": "Označi pročitanim"
+  },
+  "dashboard-seals-section": {
+    "h2": "Tvoje biljke"
+  },
+  "dashboard-charts-section": {
+    "h2": "Pregled iz Alata"
+  },
+  "view-dashboard": {
+    "h2": "Nedavne bilješke"
+  },
+  "plants-weather-widget": {
+    "h3": "Vremenska prognoza",
+    "p": "3 dana · za planiranje uzgoja"
+  },
+  "plants-weather-refresh": {
+    "button": "Osvježi"
+  },
+  "plants-weather": {
+    "div": "Učitavam prognozu…"
+  },
+  "dashboard-today-card": {
+    "p": "Danas"
+  },
+  "activity-reward-card": {
+    "p": "$GROWTOO ovog mjeseca"
+  },
+  "view-plants": {
+    "h2": "Moje biljke",
+    "h22": "Dnevnik"
+  },
+  "plants-open-stories": {
+    "button": "Napiši priču"
+  },
+  "btn-add-plant": {
+    "button": "+ Nova biljka"
+  },
+  "journal-view-toggle": {
+    "button": "Popis",
+    "button2": "Mjesec"
+  },
+  "journal-plant-filter": {
+    "option": "Sve biljke"
+  },
+  "btn-add-entry": {
+    "button": "+ Novi unos",
+    "button2": "+ Novi unos za ovu biljku"
+  },
+  "view-adopt": {
+    "button": "Tokeniziraj",
+    "button2": "Tržnica",
+    "button3": "Jednostavno",
+    "button4": "Napredno"
+  },
+  "adopter-guide": {
+    "h3": "Kako posvojiti biljku",
+    "strong": "Pregledaj tržnicu",
+    "p": "Otvorene ponude su zapečaćeni tokeni biljaka iza kojih stoji trag iz dnevnika.",
+    "strong2": "Poveži novčanik testne mreže",
+    "p2": "Phantom ili Solflare na Devnetu — dodirni pilulu novčanika u zaglavlju kad si spreman uložiti.",
+    "strong3": "Podupri s $GROWTOO",
+    "p3": "Trenutna prodaja odmah prebacuje token biljke na tebe. Ulog posvajanja: pola sad, pola se otključava dok uzgajivač nastavlja zapisivati njegu.",
+    "strong4": "Prati napredak ovdje",
+    "p4": "Posvojene biljke slijeću u ovaj vrt. Prati faze i mjesečni status otključavanja.",
+    "p5": "Samo testna mreža — $GROWTOO nema novčanu vrijednost. Učiš kako povjerenje teče prije nego što ulozi postanu stvarni."
+  },
+  "adopter-guide-market": {
+    "button": "Pregledaj tržnicu"
+  },
+  "adopter-guide-wallet": {
+    "button": "Poveži novčanik"
+  },
+  "adopt-seed-section": {
+    "p": "Zapečati fazu"
+  },
+  "adopt-seed-form": {
+    "label": "Biljka iz tvog dnevnika",
+    "p": "Sorta, serija i datumi dolaze iz dnevnika — ništa se ne upisuje ponovno."
+  },
+  "adopt-seed-plant": {
+    "option": "Odaberi biljku iz svog dnevnika"
+  },
+  "seal-stage-submit": {
+    "button": "Zapečati fazu sjemena · +0 $GROWTOO"
+  },
+  "platform-bonus-section": {
+    "h2": "Bonus za aktivnost",
+    "p": "Testni $GROWTOO za zalijevanje, prihranu, objavljene priče i tjedne s 5 dana njege — preuzima se jednom po kalendarskom mjesecu na tvoj Devnet novčanik. Broje se različiti dani, ne dodatni zapisi istog dana. Tokene poslije koristi na tržnici (samo testna mreža). Samo za uzgajivače."
+  },
+  "adopt-garden-section": {
+    "h2": "Zapečaćene biljke",
+    "h22": "Moje posvojene biljke"
+  },
+  "adopt-market-cta": {
+    "h2": "Spreman posvojiti?",
+    "p": "Pregledaj otvorene ponude i uloži $GROWTOO. Namirene biljke pojavljuju se gore pod Moje posvojene biljke."
+  },
+  "adopt-open-market": {
+    "button": "Otvori tržnicu"
+  },
+  "view-market": {
+    "button": "Tokeniziraj",
+    "button2": "Tržnica",
+    "button3": "Jednostavno",
+    "button4": "Napredno",
+    "h2": "Moje ponude",
+    "p": "Tvoji objavljeni ugovori: aktivni, posvojeni ili otkazani.",
+    "h22": "<span class=\"adopter-only\">Biljke koje možeš posvojiti</span> <span class=\"grower-only\">Otvorena tržnica</span>"
+  },
+  "market-adopter-guide": {
+    "h3": "Posvajanje na ovoj ploči",
+    "li": "<strong>Otvorena tržnica</strong> prikazuje aktualne ponude uzgajivača u koje možeš uložiti.",
+    "li2": "Dodirni <strong>Uloži</strong> na kartici — poveži novčanik ako te pita, pa potvrdi trošak u $GROWTOO.",
+    "li3": "<strong>Trenutna prodaja</strong>: puna cijena uzgajivaču pri kupnji. Gotovo.",
+    "li4": "<strong>Ulog posvajanja</strong>: pola sad, pola se otključava dok uzgajivač nastavlja zapisivati njegu.",
+    "li5": "Nakon namire biljku prati pod <strong>Moj vrt</strong>.",
+    "span": "Pretvaranje tokena u fazi berbe u stvarni udio u berbi. Dolazi poslije — nije dostupno na Devnetu. Preuzimanje zaključanog uloga otključava samo $GROWTOO iz escrowa."
+  },
+  "market-list-section": {
+    "p": "Objavi zapečaćenu biljku"
+  },
+  "market-list-form": {
+    "label": "Imovina",
+    "legend": "Kako ti posvojitelj plaća",
+    "span": "Trenutna prodaja",
+    "span2": "Puna cijena tebi pri kupnji. Gotovo.",
+    "span3": "Ulog posvajanja",
+    "span4": "Pola sad, pola se otključava dok nastavljaš zapisivati njegu.",
+    "label2": "Tražena cijena",
+    "button": "Objavi na tržnicu"
+  },
+  "market-asset-select": {
+    "option": "Odaberi zapečaćenu biljku"
+  },
+  "market-go-tokenise": {
+    "button": "Zapečati fazu u Tokeniziraj"
+  },
+  "market-settlement-select": {
+    "option": "Trenutna prodaja",
+    "option2": "Ulog posvajanja"
+  },
+  "market-stake-hint": {
+    "p": "Punu traženu cijenu dobivaš pri kupnji. Objava zaključava NFT u trezoru programa na lancu — ponuda odmah ide uživo."
+  },
+  "market-redemption-note": {
+    "p": "Fizički otkup berbe — dolazi poslije",
+    "p2": "Vježba na Devnetu: uloži → trag njege → <strong>Preuzmi zaključani ulog ($GROWTOO)</strong>. Na ovoj testnoj mreži nema fizičke isporuke. $GROWTOO nema novčanu vrijednost."
+  },
+  "market-open-hint": {
+    "p": "<span class=\"adopter-only\">Aktualne ponude uzgajivača. Podupri biljku s $GROWTOO kad budeš spreman — pa je prati u Mom vrtu.</span> <span class=\"grower-only\">Javna ploča: otvorene ponude drugih uzgajivača (tvoje su pod Moje ponude).</span>"
+  },
+  "view-growlog": {
+    "h3": "Fotografije iz dnevnika",
+    "h32": "Sorta",
+    "h33": "Faze rasta",
+    "h34": "Okoliš",
+    "h35": "Trag od sjemena do berbe",
+    "p": "Unosi i fotografije redom — dokumentacijski trag ove biljke.",
+    "h36": "Nedavne fotografije"
+  },
+  "growlog-view-all": {
+    "button": "Prikaži sve fotografije"
+  },
+  "growlog-back": {
+    "button": "← Natrag na biljke"
+  },
+  "btn-edit-plant": {
+    "button": "✎ Uredi biljku"
+  },
+  "btn-coach-growlog": {
+    "button": "Savjetnik"
+  },
+  "view-blog": {
+    "h2": "Priče",
+    "p": "Podijeli savjete, izgled biljaka, probleme, posjete uzgajivačima i proizvode sa svojih biljaka u javnom dnevniku.",
+    "h3": "Tvoje priče"
+  },
+  "blog-new": {
+    "button": "+ Napiši priču"
+  },
+  "blog-composer-title": {
+    "h3": "Napiši priču"
+  },
+  "blog-composer": {
+    "p": "Naslov, kategorija, tekst i neobavezna naslovna fotografija. Objavi kad si spreman."
+  },
+  "blog-form": {
+    "span": "Dodaj fotografiju"
+  },
+  "blog-cover-clear": {
+    "button": "Ukloni fotografiju"
+  },
+  "blog-save-draft": {
+    "button": "Spremi skicu"
+  },
+  "blog-unpublish": {
+    "button": "Povuci objavu"
+  },
+  "blog-publish": {
+    "button": "Objavi"
+  },
+  "toolbox-journal-bridge": {
+    "p": "Mjerenja ostaju ovdje radi grafikona. Svako Dodaj ujedno upisuje odgovarajuću bilješku u <strong>Dnevnik</strong> te biljke — jedna priča o njezi."
+  },
+  "view-toolbox": {
+    "h3": "Zalijevanje",
+    "p": "Zapiši kad si zalio biljku.",
+    "h32": "Prihrana",
+    "p2": "Prati hranjiva i doze.",
+    "h33": "Okoliš",
+    "p3": "Temperatura, vlaga, pH.",
+    "h34": "Presađivanje",
+    "p4": "Zapiši detalje presađivanja.",
+    "h35": "Stresori",
+    "p5": "Zabilježi stresne uvjete i nametnike.",
+    "h36": "Vlaga tla",
+    "p6": "Senzor vlage tla uživo (staklenik).",
+    "h37": "Grafikoni",
+    "p7": "Prikaži rast i mjerenja."
+  },
+  "toolbox-panel-watering": {
+    "h3": "Zalijevanje",
+    "h4": "Grafikon: količina po datumu"
+  },
+  "tool-watering-value2": {
+    "option": "-- Odaberi biljku --"
+  },
+  "toolbox-form-watering": {
+    "button": "Dodaj"
+  },
+  "toolbox-panel-feeding": {
+    "h3": "Prihrana",
+    "h4": "Povijest prihrane"
+  },
+  "tool-feeding-plant": {
+    "option": "-- Odaberi biljku --"
+  },
+  "toolbox-form-feeding": {
+    "button": "Dodaj"
+  },
+  "toolbox-panel-environment": {
+    "h3": "Okoliš",
+    "h4": "Grafikon: temperatura, vlaga i pH"
+  },
+  "tool-environment-plant": {
+    "option": "-- Odaberi biljku --"
+  },
+  "toolbox-form-environment": {
+    "button": "Dodaj"
+  },
+  "toolbox-panel-transplant": {
+    "h3": "Presađivanje"
+  },
+  "tool-transplant-plant": {
+    "option": "-- Odaberi biljku --"
+  },
+  "toolbox-form-transplant": {
+    "button": "Dodaj"
+  },
+  "toolbox-panel-stressors": {
+    "h3": "Stresori"
+  },
+  "tool-stressors-plant": {
+    "option": "-- Odaberi biljku --"
+  },
+  "toolbox-form-stressors": {
+    "button": "Dodaj"
+  },
+  "toolbox-panel-soil": {
+    "h3": "Vlaga tla",
+    "a": "↗ Cijeli prozor",
+    "p": "Podaci senzora · izvor <a href=\"http://164.92.208.95/latest.json\" target=\"_blank\" rel=\"noreferrer\">164.92.208.95</a> · osvježava se svake 2 s"
+  },
+  "toolbox-panel-graphs": {
+    "h3": "Pregled svih grafikona",
+    "h4": "Zalijevanje",
+    "h42": "Okoliš (temperatura, vlaga, pH)"
+  },
+  "tool-graphs-plant": {
+    "option": "Sve biljke"
+  },
+  "view-danas": {
+    "div": "<span class=\"danas-title\">Zalij biljke</span> <span class=\"danas-desc\">3 biljke trebaju zalijevanje</span>",
+    "div2": "<span class=\"danas-title\">Provjeri vlagu</span> <span class=\"danas-desc\">Provjeri tlo u posudama</span>",
+    "div3": "<span class=\"danas-title\">Dodaj bilješku</span> <span class=\"danas-desc\">Zapiši sve promjene</span>"
+  },
+  "view-admin": {
+    "h2": "Administracija"
+  },
+  "admin-users": {
+    "h3": "Korisnici",
+    "p": "Upravljaj korisnicima"
+  },
+  "admin-plants": {
+    "h3": "Biljke",
+    "p": "Pregledaj i uredi biljke"
+  },
+  "admin-entries": {
+    "h3": "Dnevnik",
+    "p": "Upravljaj unosima"
+  },
+  "admin-tenant": {
+    "h3": "Najmoprimci",
+    "p": "Pregledaj najmoprimce"
+  },
+  "admin-system": {
+    "h3": "Postavke",
+    "p": "Postavke sustava"
+  },
+  "admin-user-report": {
+    "h3": "Praćenje prijava",
+    "p": "Tko se prijavio u aplikaciju i kada, dnevno ili tjedno.",
+    "button": "Danas",
+    "button2": "7 dana",
+    "p2": "Otvori administraciju da učitaš izvještaj."
+  },
+  "admin-report-refresh": {
+    "button": "↻ Osvježi"
+  },
+  "admin-sharing-section": {
+    "h3": "Dijeli biljke i alate",
+    "p": "Odaberi korisnika i što dijeliš. Pristup je samo za čitanje."
+  },
+  "modal-plant-title": {
+    "h2": "Nova biljka"
+  },
+  "plant-wizard-progress": {
+    "div": "<span class=\"plant-wizard-step is-active\" data-wizard-label=\"1\">1 · Osnovno</span> <span class=\"plant-wizard-step\" data-wizard-label=\"2\">2 · Detalji</span>"
+  },
+  "plant-stage": {
+    "option": "Klijanje",
+    "option2": "Sadnica",
+    "option3": "Vegetativna faza",
+    "option4": "Cvatnja",
+    "option5": "Sušenje"
+  },
+  "plant-form-create": {
+    "p": "Spremi odmah ili dodaj neobavezne detalje — fotografiju, okoliš, bilješke."
+  },
+  "plant-form-step": {
+    "p": "Neobavezno — preskoči kad želiš i uredi poslije sa stranice biljke."
+  },
+  "plant-environment-type": {
+    "option": "Unutra",
+    "option2": "Vani"
+  },
+  "plant-subphase": {
+    "option": "Nije odabrano",
+    "option2": "1,5 dcl",
+    "option3": "5 L",
+    "option4": "30 L",
+    "option5": "Na polju"
+  },
+  "plant-subphase-actions": {
+    "p": "Neobavezne prečice za presađivanje — mijenjaju samo polja iznad; dodirni <strong>Spremi</strong> za primjenu.",
+    "p2": "Iz posude možeš skočiti na veću ili preseliti van, pa po potrebi ispuniti lokaciju na polju."
+  },
+  "plant-btn-next": {
+    "button": "Postavi sljedeću veličinu posude"
+  },
+  "plant-btn-to": {
+    "button": "Postavi vanjski uzgoj / polje"
+  },
+  "plant-form-advanced": {
+    "p": "Kad <strong>promijeniš fazu</strong> i spremiš, u dnevnik se dodaje unos s datumom prijelaza (ispod) i fotografijom iz ovog obrasca ako je učitana."
+  },
+  "plant-mint-toggle": {
+    "span": "Zapečati ovo i na lancu (izborno) <span class=\"field-hint plant-mint-toggle-hint\"> Stvara token biljke na testnoj mreži povezan s ovom biljkom iz dnevnika. Traži povezan Devnet novčanik. Nagrade za faze mogu do berbe iznositi do <strong>225 $GROWTOO</strong>. </span>"
+  },
+  "form-plant": {
+    "button": "Odustani"
+  },
+  "plant-form-back": {
+    "button": "Natrag"
+  },
+  "plant-form-next": {
+    "button": "Dodaj detalje"
+  },
+  "plant-form-submit": {
+    "button": "Spremi biljku"
+  },
+  "modal-entry": {
+    "h2": "Novi unos"
+  },
+  "entry-plants-multi": {
+    "p": "Biljke",
+    "p2": "Redovi iste sorte mogu dijeliti jedan unos."
+  },
+  "entry-type": {
+    "option": "Općenito",
+    "option2": "Zalijevanje",
+    "option3": "Prihrana",
+    "option4": "Okoliš",
+    "option5": "Presađivanje",
+    "option6": "Stresori",
+    "option7": "Faza / prekretnica",
+    "option8": "Ostalo"
+  },
+  "entry-extra-presadjivanje": {
+    "h4": "Presađivanje"
+  },
+  "entry-extra-stresori": {
+    "h4": "Stresori"
+  },
+  "entry-extra-faza": {
+    "h4": "Faza / prekretnica",
+    "p": "Ažurira lokacije na profilu odabrane biljke (vanjski uzgoj)."
+  },
+  "form-entry": {
+    "span": "(neobavezno)",
+    "button": "Odustani",
+    "button2": "Spremi"
+  },
+  "entry-photo-camera": {
+    "button": "Slikaj"
+  },
+  "daily-status-overlay": {
+    "p": "Dnevni status",
+    "p2": "Sljedeći korak"
+  },
+  "daily-status-title": {
+    "h2": "Dok te nije bilo"
+  },
+  "daily-status-next": {
+    "button": "Nastavi"
+  },
+  "daily-status-continue": {
+    "button": "Zatvori"
+  },
+  "reward-earn-overlay": {
+    "p": "Nagrada",
+    "p2": "Ovaj mjesec"
+  },
+  "reward-earn-title": {
+    "h2": "Dan njege je zabilježen"
+  },
+  "reward-earn-next": {
+    "button": "Nastavi"
+  },
+  "reward-earn-continue": {
+    "button": "Zatvori"
+  },
+  "app-confirm-title": {
+    "h2": "Potvrdi"
+  },
+  "app-confirm-cancel": {
+    "button": "Odustani"
+  },
+  "app-confirm-ok": {
+    "button": "Potvrdi"
+  },
+  "meta": {
+    "title": "growtoo · Dnevnik uzgoja"
+  },
+  "confirm": {
+    "title": "Potvrdi",
+    "ok": "Potvrdi",
+    "cancel": "Odustani",
+    "body": "Nastaviti?"
+  },
+  "cryptoMode": {
+    "simple": "Jednostavno",
+    "advanced": "Napredno",
+    "showAdvanced": "Prikaži napredne detalje",
+    "useSimple": "Vrati jednostavni prikaz",
+    "continue": "Nastavi"
+  },
+  "plainLang": {
+    "escrow": "Privremeno zadržavanje: token tvoje biljke sigurno stoji kod tržnice dok netko ne uloži ili dok ne otkažeš — kao međupolica, ne trajni prijenos.",
+    "settlement": "Kad se posao dovrši: plaćanje je potvrđeno i token biljke prelazi posvojitelju (ili se vraća tebi ako otkažeš).",
+    "rwa": "Token „stvarne imovine” — ovdje jednostavno znači token biljke povezan sa stvarnim tragom u dnevniku na testnoj mreži. Nije dionica ni novac.",
+    "plantToken": "Digitalna potvrda na Solaninoj testnoj mreži povezana s jednom biljkom iz dnevnika. Izborno — dnevnik radi i bez toga.",
+    "adoptStake": "Pola sad, pola se otključava dok uzgajivač zapisuje njegu do berbe.",
+    "instantSale": "Puna cijena uzgajivaču pri kupnji. Gotovo — bez zaključavanja uz njegu.",
+    "redemption": "Pretvaranje tokena u fazi berbe u stvarni udio u berbi. Dolazi poslije — nije dostupno na Devnetu. Preuzimanje zaključanog uloga otključava samo $GROWTOO iz escrowa.",
+    "bondingCurve": "Automatska formula cijene koju koriste neki kripto projekti. growtoo je ne koristi — uzgajivači sami postavljaju traženu cijenu.",
+    "collectionAuthority": "Operaterski ključ koji trenutno ažurira metapodatke tokena i namiruje Devnet poslove. Centralizirana točka povjerenja u MVP-u — vidi Rizike.",
+    "growtoo": "Nagradni tokeni testne mreže bez novčane vrijednosti. Služe za vježbanje ulaganja i nagrada za faze na Devnetu.",
+    "whatDoes": "Što znači {term}?"
+  },
+  "seedChain": {
+    "needPlant": "Poveži biljku iz dnevnika prije kovanja seed RWA.",
+    "needPlantRetry": "Poveži biljku iz dnevnika prije ponovnog pokušaja kovanja sjemena.",
+    "notMinted": "Seed NFT još nije iskovan na devnetu.",
+    "growthNeedsPlant": "Kovanje rasta traži povezanu biljku iz dnevnika."
+  },
+  "statusRail": {
+    "step": "Korak",
+    "ariaLabel": "Status postupka",
+    "signBuy": "Potpiši kupnju",
+    "confirmed": "Potvrđeno",
+    "buyFailedOnDevnet": "Kupnja nije uspjela na Devnetu.",
+    "nftIsInYour": "NFT je u tvom novčaniku.",
+    "confirmingOnChainBuy": "Potvrđujem kupnju na lancu…",
+    "approveTheBuyIn": "Odobri kupnju u svom novčaniku.",
+    "payGrowtoo": "Plati $GROWTOO",
+    "settling": "Namira",
+    "nftReady": "NFT spreman",
+    "investmentFailedCheckPayment": "Ulaganje nije uspjelo. Provjeri plaćanje i pokušaj ponovno.",
+    "completeGrowtooPaymentIn": "Dovrši plaćanje u $GROWTOO u svom novčaniku.",
+    "paymentSeenStake": "Plaćanje vidljivo — namirujem 50 % uzgajivaču, zaključavam 50 %…",
+    "paymentSeenSale": "Plaćanje vidljivo — otpuštam NFT iz escrowa…",
+    "claimed": "Zatraženo",
+    "queue": "Red",
+    "released": "Otpušteno",
+    "refunded": "Vraćeno",
+    "claimFailedCheckCare": "Zahtjev nije uspio — provjeri mjesece njege i pokušaj ponovno.",
+    "lockedReturned": "Zaključani $GROWTOO vraćen je posvojitelju.",
+    "lockedReleased": "Zaključani $GROWTOO otpušten je uzgajivaču.",
+    "queuedAdoptWorkerValidates": "U redu — radnik za posvajanje provjerava mjesece njege u sljedećem prolazu (~5 min).",
+    "escrow": "Escrow",
+    "live": "Objavljeno",
+    "sold": "Prodano",
+    "listingFailed": "Objava nije uspjela.",
+    "waitingForNftIn": "Čekam NFT u escrowu…",
+    "openForInvestment": "Otvoreno za ulaganje.",
+    "buyerPaidSettlingNft": "Kupac je platio — namirujem NFT…",
+    "returningNftToGrower": "Vraćam NFT uzgajivaču…",
+    "adoptedByBuyer": "Posvojeno.",
+    "offerCancelled": "Ponuda otkazana.",
+    "queued": "U redu",
+    "minting": "Kujem",
+    "minted": "Iskovano",
+    "mintRequested": "Kovanje na Devnetu zatraženo…",
+    "mintFailed": "Kovanje na Devnetu nije uspjelo.",
+    "mintDone": "Iskovano na Devnetu.",
+    "mintQueueWorking": "Red za kovanje radi na Devnetu…"
+  },
+  "daily": {
+    "awayMinutes_one": "otprilike minutu",
+    "awayMinutes_few": "{count} minute",
+    "awayMinutes_other": "{count} minuta",
+    "awayHours_one": "1 sat",
+    "awayHours_few": "{count} sata",
+    "awayHours_other": "{count} sati",
+    "awayDays_one": "1 dan",
+    "awayDays_few": "{count} dana",
+    "awayDays_other": "{count} dana",
+    "inboxUpdates_one": "1 nova obavijest",
+    "inboxUpdates_few": "{count} nove obavijesti",
+    "inboxUpdates_other": "{count} novih obavijesti",
+    "unread_one": "1 nepročitana",
+    "unread_few": "{count} nepročitane",
+    "unread_other": "{count} nepročitanih",
+    "journalLogs_one": "1 zapis u dnevniku od zadnjeg posjeta",
+    "journalLogs_few": "{count} zapisa u dnevniku od zadnjeg posjeta",
+    "journalLogs_other": "{count} zapisa u dnevniku od zadnjeg posjeta",
+    "plantsUpdated_one": "1 biljka je pomaknula fazu",
+    "plantsUpdated_few": "{count} biljke ažurirane",
+    "plantsUpdated_other": "{count} biljaka ažurirano",
+    "careDays_one": "1 dan njege ovaj mjesec",
+    "careDays_few": "{count} dana njege ovaj mjesec",
+    "careDays_other": "{count} dana njege ovaj mjesec",
+    "stakeMany_one": "1 novi ulog posvajanja na tvojim ponudama",
+    "stakeMany_few": "{count} nova uloga posvajanja na tvojim ponudama",
+    "stakeMany_other": "{count} novih uloga posvajanja na tvojim ponudama",
+    "careSynced_one": "Napredak njege usklađen na 1 ulogu",
+    "careSynced_few": "Napredak njege usklađen na {count} uloga",
+    "careSynced_other": "Napredak njege usklađen na {count} uloga",
+    "harvestSettled_one": "1 ulog berbe je namiren",
+    "harvestSettled_few": "{count} uloga berbe namireno",
+    "harvestSettled_other": "{count} uloga berbe namireno",
+    "adoptedUpdated_one": "1 posvojena biljka pomaknula je fazu",
+    "adoptedUpdated_few": "{count} posvojene biljke ažurirane",
+    "adoptedUpdated_other": "{count} posvojenih biljaka ažurirano",
+    "stakesLanded_one": "1 novi ulog stigao je u tvoj vrt",
+    "stakesLanded_few": "{count} nova uloga stigla su u tvoj vrt",
+    "stakesLanded_other": "{count} novih uloga stiglo je u tvoj vrt",
+    "careProgressed_one": "Njega je napredovala na 1 tvom ulogu",
+    "careProgressed_few": "Njega je napredovala na {count} tvoja uloga",
+    "careProgressed_other": "Njega je napredovala na {count} tvojih uloga",
+    "newOffers_one": "1 nova ponuda na tržnici",
+    "newOffers_few": "{count} nove ponude na tržnici",
+    "newOffers_other": "{count} novih ponuda na tržnici",
+    "awayShort": "kratko",
+    "awayMinute": "otprilike minutu",
+    "awayFor": "Nisi bio {time}.",
+    "xpGain": "+{count} XP uzgajivača",
+    "bonusClaimed": "preuzeto {amount} $GROWTOO",
+    "bonusPending": "preuzimanje u tijeku · ~{amount} $GROWTOO",
+    "bonusReady": "~{amount} $GROWTOO spremno za preuzimanje",
+    "harvestReady": "Ulog je spreman za berbu — uzgajivač može preuzeti zaključani $GROWTOO",
+    "startHere": "Kreni odavde",
+    "adopterLead": "Preuzmi testni $GROWTOO, pa uloži u aktualnu ponudu biljke.",
+    "growerLead": "Zapiši zalijevanje ili prihranu i zaradi $GROWTOO. Preuzmi mjesec u Tokeniziraj.",
+    "ctaFaucet": "Otvori slavinu",
+    "ctaMarket": "Pregledaj tržnicu",
+    "ctaGarden": "Moj vrt",
+    "ctaJournal": "Otvori dnevnik",
+    "ctaTokenise": "Tokeniziraj",
+    "ctaMarketShort": "Tržnica",
+    "ctaClaim": "Preuzmi u Tokeniziraj",
+    "ctaContinue": "Nastavi",
+    "bonusKicker": "Bonus za aktivnost",
+    "bonusLead": "Otprilike {amount} $GROWTOO od ovomjesečnog zalijevanja, prihrane i priča. Preuzmi u Tokeniziraj.",
+    "titleAway": "Dok te nije bilo",
+    "titleWelcome": "Dobrodošao u growtoo",
+    "titleStatus": "Dnevni status",
+    "firstPath": "Evo tvoje putanje za prvu minutu.",
+    "noGains": "Još nema novosti — odaberi sljedeći korak ispod.",
+    "rewardWatering": "Zalijevanje zabilježeno",
+    "rewardFeeding": "Prihrana zabilježena",
+    "rewardStage": "Faza zapisana",
+    "rewardStory": "Priča objavljena",
+    "rewardClaimed": "Bonus iskovan",
+    "rewardDefault": "Nagrada uzgajivaču",
+    "sentToWallet": "+{amount} $GROWTOO poslano na tvoj Devnet novčanik",
+    "whenYouClaim": "~{amount} $GROWTOO kad preuzmeš",
+    "weekUnlocked": "Otključan tjedan s 5 dana · dodatni $GROWTOO na ovomjesečno preuzimanje",
+    "rewardLeadClaimed": "Bonus za aktivnost stigao je u tvoj novčanik (testna mreža).",
+    "rewardLeadLogged": "Zabilježeno za danas. Dodatni zapisi danas ne donose više tokena.",
+    "stakeOne": "Netko je posvojio jednu od tvojih biljaka"
+  },
+  "stage": {
+    "germination": "Klijanje",
+    "seedling": "Sadnica",
+    "vegetative": "Vegetativna faza",
+    "flowering": "Cvatnja",
+    "drying": "Sušenje / berba",
+    "seed": "Sjeme",
+    "harvest": "Berba",
+    "growing": "Raste",
+    "dryingShort": "Sušenje"
+  },
+  "quests": {
+    "linkPlant": "Poveži biljku iz dnevnika",
+    "linkPlantHint": "Kuj/poveži iz Posvajanja s biljkom iz Biljke i dnevnik",
+    "stageLogged": "Zapiši fazu rasta u dnevnik",
+    "stageLoggedHint": "Promijeni fazu biljke ili dodaj unos Faza (prijelaz)",
+    "watering": "Zapiši zalijevanje za ovu fazu",
+    "wateringHint": "Dodaj unos Zalijevanje ili Alati → Zalijevanje za ovu biljku",
+    "feeding": "Zapiši prihranu / hranjiva",
+    "feedingOptional": "Zapiši prihranu (neobavezno za klijanje)",
+    "feedingHint": "Dodaj unos Prihrana ili Alati → Prihrana za ovu biljku",
+    "proofComplete": "Dokaz iz dnevnika je potpun — spremno za kovanje.",
+    "proofMissing": "Prvo dovrši zadatke uzgajivača: {list}",
+    "choosePlant": "Odaberi biljku iz dnevnika",
+    "choosePlantHint": "RWA sjeme mora biti vezano uz stvarnu biljku u tvom dnevniku",
+    "seedReady": "Biljka povezana — spremno za kovanje sjemena.",
+    "weekStrong": "Jak tjedan — {hit}/{need} dana njege (napredak uzgajivača).",
+    "weekProgress": "Tjedni napredak: {hit}/{need} dana njege (samo uzgajivač).",
+    "monthQualifies": "Mjesec ispunjava uvjete za otključavanje berbe ({hit}/{need} dana).",
+    "monthProgress": "Zapiši njegu {need} različitih dana ovaj mjesec ({hit}/{need}).",
+    "head": "Zadaci uzgajivača",
+    "headReady": "Sljedeći korak · zadaci ispunjeni"
+  },
+  "rank": {
+    "new": "Novi uzgajivač",
+    "active": "Aktivni uzgajivač",
+    "dedicated": "Predani uzgajivač",
+    "seasoned": "Iskusni uzgajivač",
+    "master": "Majstor uzgajivač",
+    "eliteCultivator": "Elitni uzgajivač",
+    "label": "Rang uzgajivača {tier} · {title}",
+    "chip": "Rang {tier}",
+    "aria": "Rang uzgajivača {tier}, {title}, {xp} XP. Otvori profil."
+  },
+  "plantRank": {
+    "sprout": "Klica",
+    "rising": "U usponu",
+    "proven": "Dokazana",
+    "elite": "Elitna",
+    "legendary": "Legendarna",
+    "label": "Razina njege {tier} · {title}"
+  },
+  "chain": {
+    "networkLabel": "Solana · devnet",
+    "walletName": "Solana novčanik",
+    "devnetNotice": "Poveži Solana novčanik na testnoj mreži (Devnet). Seed NFT-ovi kuju se preko reda u oblaku; $GROWTOO nagrade namiruju se na lancu. Samo testna imovina.",
+    "devnetNoticeFallback": "Poveži Solana novčanik na testnoj mreži. Tokeni biljaka i $GROWTOO nagrade još koriste lokalnu simulaciju do potpune objave na lancu."
+  },
+  "tx": {
+    "expired": "Odobrenje u novčaniku trajalo je predugo pa je Solana transakcija istekla. Odobri unutar otprilike minute, pa pokušaj objaviti ponovno.",
+    "missingNft": "Ovaj povezani novčanik ne drži taj Seed NFT. Prebaci se na novčanik koji je primio kovanje (ili prenesi NFT ovamo) pa pokušaj ponovno.",
+    "missingBalance": "Ovaj povezani novčanik nema dovoljno tog tokena za prijenos. Provjeri stanje na Devnetu pa pokušaj ponovno.",
+    "confirmTimeout": "Transakcija je poslana, ali je potvrda istekla na javnom Devnet RPC-u. Potpis: {signature}. Osvježi i provjeri je li se ponuda/NFT već pomaknuo prije novog pokušaja.",
+    "failedOnChain": "Transakcija nije uspjela na lancu: {reason}",
+    "walletNotConnected": "Novčanik nije povezan.",
+    "mintNotDeployed": "$GROWTOO mint još nije objavljen."
+  },
+  "admin": {
+    "readOnly": "Pregled baze superadmina samo za čitanje — uređivanje nije dopušteno.",
+    "view": "Pogledaj",
+    "edit": "Uredi",
+    "delete": "Obriši",
+    "thisUser": "ovog korisnika",
+    "thisRecord": "ovaj zapis",
+    "confirmDelete": "Obrisati {label}?",
+    "deleteWarning": "Ovo se ne može poništiti iz admin alata.",
+    "roleLimited": "Uloge admin / superadmin ograničene su na supadmin@dnevnik.live i admin@dnevnik.live.",
+    "allPlants": "Sve biljke",
+    "allPlantsHint": "Pregled cijele baze biljaka",
+    "tools": "Alati",
+    "toolsHint": "Podaci iz Alata",
+    "journalHint": "Bilješke i unosi",
+    "loadingReport": "Učitavam izvještaj…",
+    "loginsToday": "Prijave danas",
+    "loginsWeek": "Prijave u zadnjih 7 dana",
+    "uniqueUsers": "Različitih korisnika",
+    "inSummary": "U sažetku",
+    "noLogins": "Nema prijava u odabranom razdoblju.",
+    "summaryByUser": "Sažetak po korisniku",
+    "colEmail": "E-mail",
+    "colRole": "Uloga",
+    "colLogins": "Prijave",
+    "colLastLogin": "Zadnja prijava",
+    "individualLogins": "Pojedinačne prijave",
+    "noRecorded": "Nema zabilježenih prijava za ovo razdoblje. Prijave se bilježe od sljedeće prijave korisnika.",
+    "noPlantsInDb": "Nemaš biljaka u bazi — dodaj ih u Biljke i dnevnik.",
+    "remove": "Ukloni",
+    "noAccessYet": "Još nije dan nijedan pristup.",
+    "newAccess": "Novi pristup",
+    "user": "Korisnik",
+    "selectUser": "— odaberi korisnika —",
+    "saveAccess": "Spremi pristup",
+    "activeAccess": "Aktivni pristup",
+    "needPlantSelection": "Odaberi barem jednu biljku ili uključi „Sve biljke\".",
+    "accessSaved": "Pristup spremljen.",
+    "saveFailed": "Spremanje nije uspjelo. Provjeri svoja Firestore pravila.",
+    "confirmRevoke": "Ukloniti pristup ovom korisniku?",
+    "removeFailed": "Uklanjanje nije uspjelo.",
+    "plantCount_one": "1 biljka",
+    "plantCount_few": "{count} biljke",
+    "plantCount_other": "{count} biljaka",
+    "accessDenied": "Pristup odbijen — nemaš admin ovlasti."
+  },
+  "stack": {
+    "plant": "Biljka",
+    "plants": "Biljke",
+    "tapToOpen": "Dodirni za otvaranje skupine",
+    "countTitle_one": "1 biljka u ovoj skupini",
+    "countTitle_few": "{count} biljke u ovoj skupini",
+    "countTitle_other": "{count} biljaka u ovoj skupini"
+  },
+  "escrow": {
+    "expired": "Odobrenje u novčaniku trajalo je predugo pa je Solana transakcija istekla. Odobri unutar otprilike minute pa pokušaj ponovno.",
+    "missingNft": "Ovaj povezani novčanik ne drži taj NFT. Prebaci se na novčanik koji je primio kovanje ili otkaži postojeću escrow ponudu ako je NFT već zaključan u trezoru tržnice.",
+    "notActive": "Ta ponuda na lancu nije aktivna. Osvježi tržnicu pa pokušaj ponovno.",
+    "sellerMismatch": "Povezani novčanik nije prodavatelj na ovoj ponudi.",
+    "needsTokenAccount": "Tvoj novčanik još treba $GROWTOO token račun s pokrićem na Devnetu. Preuzmi testnu slavinu za posvojitelje na Tržnici pa ponovno pokušaj uložiti.",
+    "insufficient": "Nema dovoljno $GROWTOO u ovom novčaniku za tu traženu cijenu na Devnetu. Nadopuni pa pokušaj ponovno.",
+    "confirmTimeout": "Transakcija je poslana, ali je potvrda istekla na javnom Devnet RPC-u. Potpis: {signature}. Osvježi i provjeri je li se NFT / ponuda već pomaknuo prije novog pokušaja.",
+    "alreadyLocked": "Ovaj NFT već je zaključan u escrow trezoru tržnice. Otkaži tu ponudu (ili pričekaj namiru) prije nove objave.",
+    "missingNftShort": "Ovaj povezani novčanik ne drži taj NFT (MissingNft). Poveži novčanik koji ga posjeduje pa pokušaj ponovno.",
+    "noGrowtoo": "Ovaj novčanik još nema $GROWTOO na Devnetu. Preuzmi testnu slavinu na Tržnici (posvojitelj) pa ponovno uloži.",
+    "needMore": "Nema dovoljno $GROWTOO za ovu ponudu. Treba {need}, novčanik ima {have} na Devnetu."
+  },
+  "wallet": {
+    "signNoResponse": "Novčanik nije odgovorio na zahtjev za potpis. Otključaj proširenje pa pokušaj ponovno.",
+    "signInFirst": "Prijavi se u svoj growtoo račun prije povezivanja novčanika.",
+    "linkTimeout": "Servisu za povezivanje novčanika isteklo je vrijeme. Pokušaj ponovno.",
+    "linkFailed": "Povezivanje novčanika nije uspjelo ({status})",
+    "generic": "Nešto je pošlo po zlu.",
+    "signatureCancelled": "Potpis je otkazan u novčaniku. Dodirni Poveži račun i odobri poruku da dovršiš.",
+    "saveFailed": "Povezivanje novčanika nije spremljeno. Osvježi i pokušaj ponovno ili se javi podršci.",
+    "notFound": "Nije pronađen nijedan Solana novčanik. Instaliraj Phantom, Solflare ili drugi novčanik pa osvježi.",
+    "genericConsole": "Nešto je pošlo po zlu. Otvori konzolu preglednika (F12) za detalje.",
+    "profileTimeout": "Firestoreu je isteklo vrijeme pri učitavanju tvog profila. Provjeri vezu pa pokušaj ponovno.",
+    "invalidAddress": "Neispravna adresa Solana novčanika.",
+    "alreadyLinked": "Na ovaj račun već je povezan drugi novčanik. Odspoji ga i javi se podršci za promjenu.",
+    "timedOut": "Zahtjevu je isteklo vrijeme.",
+    "emptySignature": "Novčanik je vratio prazan potpis.",
+    "badSignatureFormat": "Format potpisa novčanika nije prepoznat.",
+    "genericName": "Novčanik",
+    "genericNameLower": "novčaniku",
+    "pickerTitle": "Poveži novčanik",
+    "pickerLede": "Odaberi Phantom ili Solflare (Devnet).",
+    "close": "Zatvori",
+    "install": "Instaliraj",
+    "openApp": "Otvori aplikaciju",
+    "notInstalled": "Nije instalirano",
+    "noExtension": "U ovom pregledniku nema proširenja za novčanik.",
+    "phoneHint": "Na mobitelu otvori ovu stranicu unutar Phantomovog ili Solflareovog ugrađenog preglednika.",
+    "installHint": "Instaliraj Phantom ili Solflare pa osvježi ovu stranicu.",
+    "manualToggle": "Ručno upiši adresu (samo za praćenje)",
+    "manualLabel": "Solana adresa",
+    "manualNote": "Praćenje ne može kovati ni potpisivati. Bolje Phantom/Solflare.",
+    "useAddress": "Koristi ovu adresu",
+    "footNeedWallet": "Trebaš novčanik? <a href=\"https://solana.com/solutions/wallets\" target=\"_blank\" rel=\"noopener noreferrer\">Pregledaj Solana novčanike</a>",
+    "connecting": "Povezujem…",
+    "approveIn": "Odobri povezivanje u {wallet}…",
+    "connectionFailed": "Povezivanje nije uspjelo.",
+    "connectFailed": "Povezivanje novčanika nije uspjelo.",
+    "connectFailedUnlock": "Povezivanje novčanika nije uspjelo. Otključaj proširenje novčanika pa pokušaj ponovno.",
+    "connectCancelled": "Povezivanje otkazano u {wallet}.",
+    "selectionCancelled": "Odabir novčanika otkazan.",
+    "notFoundShort": "Novčanik nije pronađen.",
+    "installRefresh": "Instaliraj novčanik, osvježi pa se poveži ponovno.",
+    "invalidAddressShort": "Neispravna adresa.",
+    "libraryTimeout": "Učitavanje knjižnice novčanika je isteklo.",
+    "notAvailable": "{wallet} nije dostupan u ovoj kartici preglednika.",
+    "openInApp": "Otvori ovu stranicu unutar ugrađenog preglednika {wallet} pa se poveži ponovno.",
+    "installExtension": "Instaliraj proširenje {wallet}, osvježi stranicu pa se poveži ponovno.",
+    "installFirst": "Prvo instaliraj {wallet}.",
+    "noConnect": "{wallet} je instaliran, ali ne podržava connect().",
+    "noConnectShort": "{wallet} ne podržava connect.",
+    "noAccount": "{wallet} se povezao, ali nije vratio račun.",
+    "noAccountAvailable": "Račun novčanika nije dostupan.",
+    "noPublicKey": "{wallet} se povezao, ali nije vratio javni ključ.",
+    "noSignMessage": "{wallet} ne podržava signMessage.",
+    "noSignTransaction": "{wallet} ne podržava signTransaction.",
+    "noSignAll": "{wallet} ne podržava signAllTransactions.",
+    "noResponseUnlock": "{wallet} nije odgovorio unutar {seconds} s. Otključaj {wallet}, dopusti iskočni prozor pa pokušaj ponovno.",
+    "noResponseExtension": "{wallet} nije odgovorio unutar {seconds} s. Otključaj proširenje pa pokušaj ponovno.",
+    "noResponsePopup": "{wallet} nije odgovorio. Otključaj proširenje, klikni ikonu {wallet} u alatnoj traci ako je iskočni prozor blokiran, pa pokušaj ponovno.",
+    "addressLength": "Upiši ispravnu Solana adresu (32–44 znaka, base58).",
+    "addressChars": "Ta adresa sadrži neispravne znakove.",
+    "addressNotKey": "Ta adresa nije ispravan Solana javni ključ. Zalijepi cijelu adresu (obično 43–44 znaka).",
+    "addressNotKeyCheck": "Ta adresa nije ispravan Solana javni ključ. Provjeri jesi li zalijepio cijelu adresu (obično 43–44 znaka).",
+    "watchOnlyCannotSign": "Adresa samo za praćenje ne može potpisivati. Instaliraj Phantom ili Solflare za kovanje ili prijenos."
+  },
+  "calendar": {
+    "today": "Danas",
+    "logged": "Zapisano",
+    "waterDue": "Zalijevanje na redu",
+    "feedDue": "Prihrana na redu",
+    "wateringDue": "zalijevanje na redu",
+    "feedingDue": "prihrana na redu",
+    "hasLogs": "ima zapisa",
+    "openDay": "Otvori {date}",
+    "fromForecast": "° iz tvoje prognoze",
+    "logThisDay": "Zapiši ovaj dan",
+    "noLogs": "Još nema zapisa",
+    "stacksLogged_one": "1 skupina zapisana",
+    "stacksLogged_few": "{count} skupine zapisane",
+    "stacksLogged_other": "{count} skupina zapisano",
+    "noLogsToday": "Nema zapisa za ovaj dan."
+  },
+  "art": {
+    "stageAria": "faza: {stage}"
+  },
+  "camera": {
+    "title": "Kamera za biljke",
+    "frameHint": "Uhvati biljku u kadar, pa snimi",
+    "reviewHint": "Spremi zapis u dnevnik ili pošalji savjetniku",
+    "close": "Zatvori",
+    "closeAria": "Zatvori kameru",
+    "flip": "Okreni",
+    "flipAria": "Okreni kameru",
+    "gallery": "Galerija",
+    "shutterAria": "Snimi fotografiju",
+    "shotAlt": "Snimljena fotografija biljke",
+    "retake": "Ponovi snimku",
+    "logToJournal": "Zapiši u dnevnik",
+    "askCoach": "Pitaj savjetnika",
+    "preparing": "Pripremam fotografiju…",
+    "starting": "Pokrećem kameru…",
+    "saving": "Spremam fotografiju…",
+    "readFailed": "Nije moguće pročitati sliku.",
+    "processFailed": "Nije moguće obraditi sliku.",
+    "encodeFailed": "Nije moguće kodirati sliku.",
+    "tooLarge": "Fotografija je još prevelika. Pokušaj ponovno.",
+    "loadFailed": "Nije moguće učitati tu sliku.",
+    "unsupported": "Kamera nije podržana ovdje — koristi Galeriju.",
+    "blocked": "Dopuštenje za kameru je blokirano — koristi Galeriju ili dopusti kameru za growto.live.",
+    "notFound": "Kamera nije pronađena — koristi Galeriju.",
+    "openFailed": "Nije moguće otvoriti kameru — koristi Galeriju.",
+    "notReady": "Kamera nije spremna.",
+    "waitPreview": "Pričekaj pretpregled pa pokušaj ponovno.",
+    "captureFailed": "Nije moguće uhvatiti kadar.",
+    "captureGeneric": "Snimanje nije uspjelo.",
+    "openPhotoFailed": "Nije moguće otvoriti tu fotografiju.",
+    "usePhotoFailed": "Nije moguće upotrijebiti fotografiju.",
+    "saveLogFailed": "Nije moguće spremiti zapis s fotografijom.",
+    "needPlant": "Prvo dodaj biljku u dnevnik, pa zapiši fotografiju.",
+    "photoNote": "Zapis s fotografijom iz kamere za biljke",
+    "coachPrompt": "Pogledaj ovu fotografiju biljke i pomozi mi utvrditi što vidiš. Navedi što je vidljivo, pa predloži sljedeći zapis u dnevnik ako treba."
+  },
+  "blog": {
+    "catTip": "Savjeti i trikovi",
+    "catLook": "Gledam svoje biljke",
+    "catProblem": "Problem s biljkom",
+    "catVisit": "Posjet drugim uzgajivačima",
+    "catProduct": "Napravljeno od mojih biljaka",
+    "catDaybook": "Bilješka s terena",
+    "newStory": "Nova priča",
+    "editStory": "Uredi priču",
+    "noPlantLink": "Bez veze s biljkom",
+    "needTitle": "Dodaj naslov.",
+    "needBody": "Napiši kratak tekst.",
+    "needSlug": "Slug treba najmanje 3 znaka.",
+    "needCategory": "Odaberi kategoriju.",
+    "signInToPublish": "Prijavi se za objavljivanje priča.",
+    "signInToManage": "Prijavi se za upravljanje pričama.",
+    "saving": "Spremam…",
+    "loading": "Učitavam…",
+    "publishedMsg": "Objavljeno — uskoro će biti vidljivo u javnom dnevniku.",
+    "unpublishedMsg": "Objava povučena — uklonjeno iz javnog dnevnika.",
+    "draftSaved": "Skica spremljena.",
+    "saveFailed": "Nije moguće spremiti priču.",
+    "empty": "Još nema priča. Podijeli savjet, izgled biljke ili problem koji si riješio.",
+    "untitled": "Bez naslova",
+    "viewLive": "Pogledaj objavu",
+    "loadFailed": "Nije moguće učitati priče. Provjeri Firestore pravila / vezu.",
+    "published": "Objavljeno",
+    "unpublished": "Objava povučena",
+    "confirmDelete": "Obrisati ovu priču?",
+    "deleted": "Priča obrisana",
+    "photoFormat": "Koristi JPG ili PNG fotografiju.",
+    "photoLarge": "Fotografija je velika — razmisli o manjoj slici za brže učitavanje.",
+    "saveFirst": "Prvo spremi priču.",
+    "profileLive": "Javni profil je aktivan na {link}. Uredi ga u Računu.",
+    "profileDisabledHint": "Uključi <strong>javni profil uzgajivača</strong> u Računu (slug + opis) da objavljene priče prikazuju tvoje ime na <a href=\"https://journal.growto.live/\" target=\"_blank\" rel=\"noopener\">journal.growto.live</a>.",
+    "publicProfileTitle": "Javni profil u dnevniku",
+    "publicProfileHint": "Potrebno za objavljivanje priča na growto.live/journal.",
+    "enablePublicProfile": "Uključi javni profil",
+    "slugLabel": "Slug profila (URL)",
+    "slugPlaceholder": "npr. luka-zagreb",
+    "bioLabel": "Kratki opis",
+    "bioPlaceholder": "Gdje uzgajaš, što dijeliš…",
+    "savePublicProfile": "Spremi javni profil",
+    "preview": "Pretpregled",
+    "slugTooShort": "Odaberi slug od najmanje 3 znaka.",
+    "profileSavedAttribution": "Javni profil spremljen. Priče će se pripisivati na journal.growto.live/g/{slug}",
+    "profileDisabled": "Javni profil isključen.",
+    "profileSaved": "Javni profil spremljen",
+    "couldNotSave": "Nije moguće spremiti.",
+    "profileSaveFailed": "Nije moguće spremiti javni profil"
+  },
+  "entryType": {
+    "general": "Općenito",
+    "watering": "Zalijevanje",
+    "feeding": "Prihrana",
+    "environment": "Okoliš",
+    "transplanting": "Presađivanje",
+    "stressors": "Stresori",
+    "other": "Ostalo",
+    "stage": "Faza",
+    "subphase": "Podfaza",
+    "entry": "Unos",
+    "stageTransition": "Faza (prijelaz)",
+    "subphasePot": "Podfaza (posuda / polje)"
+  },
+  "coach": {
+    "classAlwaysOn": "Uvijek uključeno",
+    "classDraft": "Skica i potvrda",
+    "classApproval": "Traži tvoje odobrenje",
+    "classAdvisory": "Samo savjet",
+    "alwaysOnBadge": "uvijek uključeno",
+    "settingsTitle": "Postavke savjetnika",
+    "settingsSub": "Odaberi što savjetnik smije sam.",
+    "draftHint": "Savjetnik pripremi, ti odobriš jednim dodirom.",
+    "approvalHint": "Uvijek traži tvoju potvrdu.",
+    "setReminders": "Podsjetnici za zalijevanje i prihranu",
+    "setWeatherNudges": "Poticaji za njegu prema vremenu",
+    "setDraftEntries": "Skiciraj unose u dnevnik",
+    "setSuggestStages": "Predloži prijelaze faza",
+    "setMintList": "Kovanje ili objava na tržnici",
+    "setEditDelete": "Uređivanje ili brisanje unosa",
+    "activityTitle": "Aktivnost savjetnika",
+    "activityEmpty": "Još nema radnji savjetnika. Podsjetnici, skice i potvrde pojavljuju se ovdje.",
+    "action": "Radnja",
+    "growing": "raste",
+    "justNow": "upravo sad",
+    "leadPlant": "Glavna biljka",
+    "yourGrow": "Tvoj uzgoj",
+    "yourPlant": "tvoja biljka",
+    "wxHeatWarning": "Upozorenje na vrućinu — {temp}° u {day}. Zalij rano ujutro ili nakon zalaska, nikad na punom podnevnom suncu.",
+    "wxWarmSpell": "Toplo do {temp}° ({day}). Provjeri vlagu tla prstom u dubinu prije zalijevanja.",
+    "wxRain": "Kiša vjerojatna {day} ({chance}%). Odgodi zalijevanje i prihranu — hranjiva se isperu.",
+    "wxNoRain": "U prognozi nema prave kiše. Vanjske posude se najbrže suše — provjeravaj ih svaki dan.",
+    "wxColdNight": "Hladna noć — do {temp}° u {day}. Osjetljive posude pomakni pod zaklon ili unutra.",
+    "wxSwing": "Velika razlika dan/noć ({low}–{high}°). Očekuj sporiji rast; izbjegavaj jaku prihranu dok se ne slegne.",
+    "heatPaceTitle": "Vrućina i ritam zalijevanja",
+    "heatPaceMessage": "Toplo oko {day} (~{temp}°C). {plant} je već {since} bez vode — tvoj uobičajeni razmak je oko {gap}. Vrijedi zaliti danas.",
+    "heatPacePrompt": "Dolazi vrućina, a „{plant}” je prošla moj uobičajeni ritam zalijevanja. Da zalijem danas i na što da pazim?",
+    "heatCheckTitle": "Provjera zbog vrućine",
+    "heatCheckMessage": "{plant}: ~{temp}°C dolazi {day}, a zalijevanje je bilo {days} prije. Provjeri vlagu danas.",
+    "heatCheckPrompt": "Pomozi mi odlučiti treba li „{plant}” vodu prije vrućine.",
+    "stagePaceTitle": "Provjera ritma faze",
+    "stagePaceMessage": "{plant} je u fazi {stage} već {days}. Mnogi slični uzgoji idu dalje oko {typical}. dana — pogledaj kad možeš (tvoja odluka).",
+    "stagePacePrompt": "Biljka „{plant}” je u fazi {stage} već {days}. Koje znakove da provjerim prije promjene faze?",
+    "noteWaterHeat": "Zabilježeno — uz ~{temp}°C oko {day}, provjeri vlagu prije nego inače (često unutar dana).",
+    "noteWaterNext": "Zabilježeno — sljedeće zalijevanje obično dođe za {days} za {plant}, ovisno o posudi i vrućini.",
+    "noteFeeding": "Prihrana zapisana za {plant}. Prati boju lista sljedećih dana — žućenje treba ljudsko oko, ne automatski popravak.",
+    "noteStage": "Promjena faze zabilježena. Nastavi zapisivati njegu da trag ostane jasan.",
+    "loggedWatering": "Zapisana bilješka o zalijevanju",
+    "loggedFeeding": "Zapisana bilješka o prihrani",
+    "loggedJournal": "Zapisana bilješka u dnevnik",
+    "briefEmpty": "Dodaj biljku kad budeš spreman — savjetnik će pomoći držati trag njege urednim.",
+    "briefSteady": "Izgleda stabilno — zalijevanje zapisano danas. {plant} je u fazi {stage}.",
+    "briefLastWater": "{plant} · {stage}. Zadnje zalijevanje {days} prije, u cijelom vrtu.",
+    "railEmpty": "Dodaj biljku kad budeš spreman — savjetnik će držati trag njege urednim.",
+    "railDue": "{plant} je na redu za zalijevanje",
+    "railDueHeat": "{plant} je na redu za zalijevanje — toplinski val {day}",
+    "railStage": "{plant} je možda spremna za promjenu faze — pogledaj kad možeš.",
+    "railFirstWater": "{plant} čeka prvo zalijevanje.",
+    "railSteady": "{plant} izgleda stabilno — zalijevanje zapisano danas.",
+    "railOverdue": "{plant} je na redu za zalijevanje — zadnja njega {days} prije.",
+    "railYesterday": "{plant} · zadnje zalijevanje jučer.",
+    "days_one": "1 dan",
+    "days_few": "{count} dana",
+    "days_other": "{count} dana",
+    "plants_one": "1 biljka",
+    "plants_few": "{count} biljke",
+    "plants_other": "{count} biljaka",
+    "briefNoWater": "{plants} u dnevniku. Zapiši zalijevanje kad možeš — savjetnik po tom ritmu daje savjete o vremenu.",
+    "askForecast": "Prema prognozi, što bih trebao promijeniti u zalijevanju i prihrani u sljedećih nekoliko dana?",
+    "askForecastCity": "Prema prognozi za {city}, što bih trebao promijeniti u zalijevanju i prihrani u sljedećih nekoliko dana?",
+    "askPlantNext": "Što dalje s biljkom „{plant}“ u fazi {stage}? Uključi savjete za tokenizaciju.",
+    "loggedVia": "Zapisano preko Grower Coacha",
+    "noteVia": "{note} (preko Grower Coacha)",
+    "stageUnknown": "nepoznato"
+  },
+  "notif": {
+    "justNow": "upravo sad",
+    "now": "sad",
+    "update": "Novost",
+    "example": "primjer",
+    "tagline": "Budi u toku sa zapisima, ulozima i nagradama",
+    "emptyLead": "Sandučić je čist",
+    "emptyBody": "Podsjetnici za njegu, novosti o ulozima i potvrde iz dnevnika pojavljuju se ovdje — da ništa ne isklizne u sredini ciklusa.",
+    "loadExamples": "Učitaj primjere",
+    "bellAria": "Sandučić",
+    "unreadOfTotal": "{unread} nepročitano · {total} ukupno",
+    "plantLower": "biljka",
+    "thisMonth": "ovaj mjesec",
+    "nextStage": "sljedeća",
+    "seedMinted": "Seed NFT iskovan",
+    "seedMintedBody": "{plant} je na lancu.",
+    "seedFailed": "Kovanje sjemena nije uspjelo",
+    "seedFailedBody": "Provjeri red u Tokeniziraj.",
+    "growthMinted": "Faza rasta iskovana",
+    "growthMintedBody": "{plant} → {stage}",
+    "growthFailed": "Kovanje rasta nije uspjelo",
+    "growthFailedBody": "Greška u dokazu iz dnevnika ili u redu.",
+    "stakeReleased": "Ulog berbe otpušten",
+    "stakeReleasedBody": "Zaključani $GROWTOO za „{plant}” otpušten je tebi.",
+    "stakeRefunded": "Ulog berbe vraćen",
+    "stakeRefundedBody": "Zaključani $GROWTOO za „{plant}” vraćen je posvojitelju.",
+    "growerUnlocked": "Uzgajivač je otključao cijeli ulog",
+    "lockedRefunded": "Zaključani ulog vraćen",
+    "careSettledBody": "„{plant}” — mjesečna njega namirena · {status}.",
+    "faucetClaimed": "Testni $GROWTOO preuzet",
+    "faucetBody": "+{amount} $GROWTOO poslano na tvoj Devnet novčanik.",
+    "bonusMinted": "Bonus platforme iskovan",
+    "bonusBody": "+{amount} $GROWTOO za {month}.",
+    "faucetFailed": "Testna slavina nije uspjela",
+    "faucetFailedBody": "Pokušaj preuzeti slavinu ponovno s Tržnice.",
+    "bonusFailed": "Bonus platforme nije uspio",
+    "bonusFailedBody": "Pokušaj ponovno u sljedećem mjesečnom prozoru.",
+    "claimReleased": "Zahtjev za berbu otpušten",
+    "claimRefunded": "Zahtjev za berbu vraćen",
+    "claimBody": "Namira uloga završena · {status}.",
+    "claimFailed": "Zahtjev za berbu nije uspio",
+    "claimFailedBody": "Provjeri mjesece njege u dnevniku i pokušaj ponovno.",
+    "rewardCareDay": "Dan njege zabilježen",
+    "rewardBonusMinted": "Bonus za aktivnost iskovan",
+    "sentToWallet": "+{amount} $GROWTOO poslano u tvoj novčanik",
+    "thisMonthAmount": "~{amount} $GROWTOO ovaj mjesec",
+    "careWeekToast": "{plant} · tjedna njega {hit}/{need} dana",
+    "careMonthToast": "{plant} · mjesečna njega {hit}/{need} dana",
+    "careReminder": "Podsjetnik za njegu",
+    "careReminderBody": "Biljka traži pozornost.",
+    "logged": "Zapisano: {type}",
+    "loggedForPlant": "Zapisano: {type} za {plant}",
+    "reconnectTitle": "Ponovno poveži svoj Solana novčanik",
+    "reconnectBody": "Odjava (ili promjena računa) prekida sesiju novčanika u pregledniku — to je normalno za Phantom/Solflare. Tvoj račun ostaje povezan s {pubkey}. Dodirni Poveži ponovno za ulaganje, kovanje ili objavu RWA-ova.",
+    "reconnectToast": "Sesija novčanika je završila — ponovno poveži {pubkey} za potpisivanje.",
+    "count_one": "1 obavijest",
+    "count_few": "{count} obavijesti",
+    "count_other": "{count} obavijesti",
+    "bellAriaUnread_one": "Sandučić, 1 nepročitana",
+    "bellAriaUnread_few": "Sandučić, {count} nepročitane",
+    "bellAriaUnread_other": "Sandučić, {count} nepročitanih",
+    "examplesLoaded_one": "Učitana 1 primjer obavijesti",
+    "examplesLoaded_few": "Učitane {count} primjer obavijesti",
+    "examplesLoaded_other": "Učitano {count} primjer obavijesti",
+    "demo": {
+      "journalTitle": "Zapis u dnevnik spremljen",
+      "journalBody": "Northern Lights · Zalijevanje — jutarnja prihrana obavljena.",
+      "weekTitle": "Tjedna njega ispunjena",
+      "weekBody": "OG Kush je ostvario 5/5 dana njege · ovaj tjedan (napredak uzgajivača).",
+      "monthTitle": "Mjesečna njega ispunjena",
+      "monthBody": "OG Kush je ostvario 12/12 dana njege · put do otključavanja berbe.",
+      "stakeTitle": "Novi ulog posvajanja",
+      "stakeBody": "Posvojitelj je uložio 100 $GROWTOO na „Batch B-2026-07” (50 % zaključano do mjesečne njege).",
+      "seedBody": "Northern Lights je na lancu.",
+      "growthBody": "Northern Lights → vegetativna · +35 $GROWTOO",
+      "bonusBody": "+18 $GROWTOO za ovaj mjesec (biljke, tjedni, cvijet).",
+      "releasedBody": "Zaključani $GROWTOO za „Batch B-2026-07” otpušten je tebi.",
+      "investTitle": "Ulaganje dovršeno",
+      "investBody": "Posvojio si „Northern Lights” za 80 $GROWTOO.",
+      "activeTitle": "Ulog posvajanja aktivan",
+      "activeBody": "Držiš „Batch B-2026-07”. Zaključana polovica otključava se kad mjesečna njega ispuni uvjete pri berbi.",
+      "settledBody": "„Batch B-2026-07” — mjesečna njega namirena · otpušteno.",
+      "deliveredTitle": "NFT dostavljen",
+      "deliveredBody": "„OG Kush” je u tvom vrtu.",
+      "updateTitle": "Mjesečna novost o njezi",
+      "updateBody": "Uzgajivač dokumentira njegu tvoje posvojene biljke — status otključavanja ažurira se pri berbi."
+    }
+  },
+  "tour": {
+    "skip": "Preskoči vodič",
+    "back": "Natrag",
+    "next": "Dalje",
+    "finish": "Završi",
+    "stepCounter": "Korak {n} / {total}",
+    "adopterFull": {
+      "start_strip": {
+        "title": "Kreni odavde",
+        "body": "Nakon prijave ova traka je tvoj kratki put: slavina, tržnica, pa vrt."
+      },
+      "faucet": {
+        "title": "Preuzmi testni $GROWTOO",
+        "body": "Koristi besplatnu Devnet slavinu jednom dnevno. Ti tokeni nemaju novčanu vrijednost — služe samo za vježbanje ulaganja."
+      },
+      "market_board": {
+        "title": "Pregledaj aktualne ponude",
+        "body": "Otvorene ponude prikazuju biljku · fazu · cijenu. Dodirni Uloži kad si spreman (novčanik može zatražiti potvrdu)."
+      },
+      "garden_nav": {
+        "title": "Moj vrt",
+        "body": "Nakon namire uloga prati biljku ovdje — napredak faze i otključavanje njege vidiš na kartici."
+      },
+      "garden_board": {
+        "title": "Prati što si podupro",
+        "body": "Posvojene biljke i stanja pojavljuju se u Mom vrtu. Istraži svojim tempom — dodirni ? na kartici za kraći vodič."
+      }
+    },
+    "growerFull": {
+      "start_strip": {
+        "title": "Kreni odavde",
+        "body": "Tvoj put uzgajivača: prvo zapisuj njegu u dnevnik. Tokeniziraj i Tržnica su izborni, kad ih poželiš."
+      },
+      "journal_nav": {
+        "title": "Dnevnik",
+        "body": "Ovo je početna — tvoje biljke, Danas i dnevnik njege (popis ili mjesec). Zalijevanje zapisuješ ovdje."
+      },
+      "plants_list": {
+        "title": "Dodaj biljku",
+        "body": "Stvori biljku, pa zapisuj zalijevanje, prihranu i promjene faza — taj trag poslije otključava Tokeniziraj."
+      },
+      "journal_log": {
+        "title": "Zapiši njegu",
+        "body": "Novi unosi dokazuju pravi rad. Zadaci u Tokeniziraj traže zapise o fazi, vodi i prihrani."
+      },
+      "tokenise_nav": {
+        "title": "Tokeniziraj",
+        "body": "Kad je dnevnik spreman, zapečati fazu u token biljke na Devnetu."
+      },
+      "seal_stage": {
+        "title": "Zapečati fazu",
+        "body": "Odaberi biljku iz dnevnika i zapečati sljedeću fazu. Red za kovanje kuje / ažurira NFT na Devnetu."
+      },
+      "market_nav": {
+        "title": "Tržnica",
+        "body": "Objavi zapečaćenu biljku kao ponudu — Trenutna prodaja ili Ulog posvajanja — da je posvojitelji podupru s $GROWTOO."
+      },
+      "market_list": {
+        "title": "Objavi ponudu",
+        "body": "Odaberi zapečaćenu biljku, postavi cijenu i vrstu ponude, pa objavi. Tvoje ponude pojavljuju se pod Moje ponude."
+      },
+      "chain_optional": {
+        "title": "Tokeniziraj ostaje izborno",
+        "body": "Pečaćenje na lancu i Tržnica ostaju izvan navigacije dok ih ne otključaš u Profilu. Besplatan dnevnik radi bez novčanika."
+      }
+    },
+    "plants": {
+      "add_plant": {
+        "title": "Nova biljka",
+        "body": "Ime, sorta i faza pokreću dnevnik. Fazu možeš mijenjati kako uzgoj napreduje."
+      },
+      "journal": {
+        "title": "Dnevnik njege",
+        "body": "Zapisuj zalijevanje, prihranu i bilješke o fazi. Zadaci u Tokeniziraj čitaju taj trag prije pečaćenja."
+      },
+      "plants_heading": {
+        "title": "Tvoje biljke",
+        "body": "Svaka biljka je živi zapis. Ako je popis prazan, kreni s + Nova biljka."
+      },
+      "weather": {
+        "title": "Vrijeme (neobavezno)",
+        "body": "Postavi grad za 7-dnevnu prognozu — korisno za vanjsko planiranje. Preskoči ako uzgajaš unutra."
+      }
+    },
+    "adoptGrower": {
+      "seal": {
+        "title": "Zapečati fazu",
+        "body": "Poveži biljku iz dnevnika i zapečati trenutnu fazu. Dovršavanje zadataka uzgajivača otključava gumb za kovanje."
+      },
+      "trail": {
+        "title": "Trag koji slijedi",
+        "body": "Faze od sjemena do berbe svaka kuju nagradu na Devnetu kad ih zapečatiš."
+      },
+      "sealed": {
+        "title": "Zapečaćene biljke",
+        "body": "Tvoji tokeni slijeću ovdje. Kad je jedan spreman, objavi ga na Tržnici."
+      }
+    },
+    "adoptAdopter": {
+      "guide": {
+        "title": "Moj vrt",
+        "body": "Posvojene biljke i napredak uloga žive ovdje nakon namire ulaganja s Tržnice."
+      },
+      "summary": {
+        "title": "Stanja",
+        "body": "Vidi koliko si biljaka posvojio i stanje svog testnog $GROWTOO."
+      },
+      "cards": {
+        "title": "Kartice biljaka",
+        "body": "Otvori karticu za fazu, otključavanje njege i povijest. Ako je vrt prazan, pregledaj Tržnicu."
+      }
+    },
+    "marketGrower": {
+      "list_form": {
+        "title": "Objavi ponudu",
+        "body": "Odaberi zapečaćenu biljku, izaberi Trenutnu prodaju ili Ulog posvajanja, postavi cijenu u $GROWTOO pa objavi."
+      },
+      "offer_type": {
+        "title": "Vrste ponuda",
+        "body": "Trenutna prodaja plaća ti u cijelosti pri kupnji. Ulog posvajanja: pola sad, pola kad mjeseci njege ispune uvjete."
+      },
+      "my_offers": {
+        "title": "Moje ponude",
+        "body": "Ovdje prati aktivne, posvojene i otkazane objave — uključujući zahtjev za berbu kad je spreman."
+      },
+      "open_board": {
+        "title": "Otvorena tržnica",
+        "body": "Aktualne ponude drugih uzgajivača. Korisno da vidiš kako ploča izgleda posvojiteljima."
+      }
+    },
+    "marketAdopter": {
+      "faucet": {
+        "title": "Testna slavina",
+        "body": "Preuzmi besplatni Devnet $GROWTOO jednom dnevno prije ulaganja."
+      },
+      "guide": {
+        "title": "Kako posvajanje radi",
+        "body": "Trenutna prodaja ili Ulog posvajanja, pa prati biljku u Mom vrtu nakon namire."
+      },
+      "board": {
+        "title": "Aktualne ponude",
+        "body": "Dodirni Uloži na kartici. Poveži Devnet novčanik kad te zatraži."
+      }
+    }
+  },
+  "market": {
+    "offer": "Ponuda",
+    "aPlant": "biljku",
+    "settlementPending": "Namira u tijeku",
+    "settlementPendingBody": "Radnici u oblaku automatski aktiviraju escrow i namiruju kupnje/otkaze približno svakih 5 minuta. „Pokušaj ponovno” požuruje oboje.",
+    "retryNow": "Pokušaj ponovno",
+    "retrying": "Pokušavam…",
+    "retrySent": "Ponovni pokušaj poslan escrow i namirnim radnicima. Status bi se trebao ažurirati u roku minute ako lanac potvrdi.",
+    "stuckActivating": "Aktiviram escrow…",
+    "stuckSettling": "Ulaganje se namiruje…",
+    "stuckCancelling": "Otkazujem…",
+    "statusPreparing": "Pripremam objavu…",
+    "statusActive": "Otvoreno za ulaganje",
+    "statusSold": "Posvojeno",
+    "statusCancelled": "Otkazano",
+    "statusFailed": "Nije uspjelo",
+    "reasonUnconfirmed": "Kovanje još nije potvrđeno na Devnetu",
+    "reasonFailed": "Kovanje nije uspjelo — pokušaj ponovno u Tokeniziraj",
+    "reasonPending": "Kovanje je još u redu",
+    "reasonListed": "Već objavljeno",
+    "reasonNoMint": "Još nema Devnet kovanja — otvori Tokeniziraj",
+    "nftInVault": "Ovaj NFT već je zaključan u trezoru tržnice na lancu. Prvo otkaži tu objavu, pa objavi ponovno.",
+    "nftInEscrow": "Ovaj NFT već je u escrowu vrućeg novčanika. Osvježi Tržnicu — možda se još aktivira.",
+    "ownerHint": "Vlasnik na lancu je {owner}, a ti si povezao {connected}.",
+    "walletMissingNft": "Ovaj povezani novčanik ne drži taj NFT.",
+    "walletMissingNftHint": "Otvori Tokeniziraj, potvrdi „Iskovano na devnetu”, poveži novčanik koji je primio kovanje (ili ponovi kovanje), pa pokušaj objaviti ponovno.",
+    "walletMissingNftOwning": "Ovaj povezani novčanik ne drži taj NFT. Potvrdi kovanje u Tokeniziraj, pa poveži novčanik koji ga posjeduje.",
+    "walletModuleFailed": "Modul Solana novčanika se nije učitao. Osvježi i pokušaj ponovno.",
+    "purposeSign": "potpisivanje",
+    "purposePost": "objavu ponude (držanje tokena biljke)",
+    "purposeInvest": "ulaganje (plaćanje u $GROWTOO)",
+    "purposeCancel": "otkazivanje ponude (povrat NFT-a)",
+    "purposeBonus": "preuzimanje mjesečnog bonusa platforme",
+    "purposeFaucet": "preuzimanje testne $GROWTOO slavine",
+    "reconnectToSign": "Ponovno poveži proširenje novčanika za {purpose}. Račun je povezan, ali Phantom/Solflare nije prijavljen u ovoj kartici.",
+    "watchOnlyCannot": "Novčanici samo za praćenje ne mogu {purpose}. Poveži Phantom ili Solflare.",
+    "connectFirstTo": "Prvo poveži Phantom ili Solflare za {purpose}.",
+    "signInToPost": "Prijavi se za objavu ponude biljke.",
+    "growerOnlyPost": "Samo računi uzgajivača mogu objavljivati ponude biljaka.",
+    "signInToInvest": "Prijavi se za ulaganje.",
+    "adopterOnlyInvest": "Prebaci se na račun posvojitelja za ulaganje u ponude biljaka.",
+    "offerGone": "Ponuda više ne postoji.",
+    "offerClosed": "Ova ponuda više nije otvorena za ulaganje.",
+    "paymentReviewTitle": "Plaćanje treba pregled",
+    "paymentReviewBody": "Tvoje plaćanje od {amount} $GROWTOO za „{plant}” nije se vezalo na ponudu. Zadrži ovu referencu: {signature}",
+    "investDoneTitle": "Ulaganje dovršeno",
+    "investDoneBody": "Posvojio si „{plant}” za {amount} $GROWTOO.",
+    "investSentTitle": "Ulaganje poslano",
+    "investSentBody": "Plaćeno {amount} $GROWTOO za „{plant}”. NFT se namiruje kroz red.",
+    "activatedListings_one": "Aktivirana 1 objava. Osvježi ako status zaostaje.",
+    "activatedListings_few": "Aktivirane {count} objave. Osvježi ako status zaostaje.",
+    "activatedListings_other": "Aktivirano {count} objava. Osvježi ako status zaostaje.",
+    "settledCounts": "Namireno: {sold} prodaja i {cancelled} otkaza. Osvježi ako status zaostaje.",
+    "badgeFlower": "Cvijet",
+    "badgeSeed": "Sjeme",
+    "badgeFlowerToken": "Token cvijeta",
+    "badgeSeedToken": "Token sjemena",
+    "badgeAdoptStake": "Ulog posvajanja",
+    "badgeInstantSale": "Trenutna prodaja",
+    "stakeBadgeTitle": "Punu cijenu plaćaš sad. Pola uzgajivaču pri namiri; pola zaključano do njege pri berbi.",
+    "instantBadgeTitle": "Puna cijena uzgajivaču; token biljke prelazi pri kupnji.",
+    "chainDetails": "Detalji na lancu",
+    "settleWord": "namiri",
+    "escrowWord": "escrow",
+    "redemptionWord": "otkup",
+    "explainStake": "Plaćaš <strong>{total}</strong> sad · <strong>{immediate}</strong> uzgajivaču pri {settle} · <strong>{locked}</strong> zaključano do njege pri berbi. Token nakon namire.",
+    "explainInstant": "Plaćaš <strong>{total} $GROWTOO</strong> i u ovom toku dobivaš token biljke.",
+    "journalEmpty": "Trag iz dnevnika je povezan — otvori nakon posvajanja da prati zapise njege.",
+    "priceStakeSale": "Ulog / prodaja",
+    "priceWasListed": "Bilo objavljeno po",
+    "priceAsk": "Tražena cijena",
+    "investStake": "Posvoji · ulog",
+    "investBuy": "Posvoji · kupi",
+    "careEscrowLabel": "Njega {escrow}",
+    "showDetails": "Prikaži detalje objave",
+    "practiceStakeNote": "Samo vježbeni ulog — fizički {redemption} dolazi poslije. Zaključana polovica je $GROWTOO, ne dostava berbe.",
+    "rowBatch": "Serija",
+    "rowGrower": "Uzgajivač",
+    "rowListingPda": "PDA objave",
+    "youSuffix": "(ti)",
+    "yourInvestment": "tvoje ulaganje",
+    "cancelBtn": "Otkaži",
+    "claimLockedBtn": "Preuzmi zaključani ulog ($GROWTOO)",
+    "redemptionLater": "Fizički otkup berbe — dolazi poslije. Ovaj zahtjev namiruje samo zaključani $GROWTOO.",
+    "claimQueued": "Zahtjev je u redu — čeka radnika za posvajanje (~5 min).",
+    "reachHarvest": "Dođi do faze berbe u dnevniku da preuzmeš zaključanu polovicu $GROWTOO.",
+    "signInNotice": "Prijavi se za korištenje tržnice.",
+    "needsDeploy": "Tržnica traži $GROWTOO mint i kolekciju sjemena na devnetu. Do tada su ponude ispod samo za čitanje.",
+    "adopterNotice": "Uloži $GROWTOO da posvojiš zapečaćenu biljku uzgajivača. Novčanik povezuješ kad dodirneš Uloži na otvorenoj ponudi.",
+    "chooseSealed": "Odaberi zapečaćenu biljku",
+    "seedOption": "Sjeme № {no} — {name}",
+    "noneReady": "Nema tokena biljaka spremnih za objavu",
+    "hintAlmost": "Skoro pa gotovo — dovrši pečaćenje u Tokeniziraj (ako je nešto palo, koristi Pokušaj ponovno), pa se vrati ovamo.",
+    "hintNothingSealed": "Još nema ničega zapečaćenog za objavu. Prvo zapečati fazu u Tokeniziraj — pa je objavi ovdje.",
+    "emptyBoardLead": "Na ploči nema aktualnih ponuda",
+    "emptyBoardBody": "Zapečati biljku u Tokeniziraj, pa je objavi ovdje.",
+    "ctaSealStage": "Zapečati fazu u Tokeniziraj",
+    "emptyOpenLead": "Trenutno nema otvorenih ponuda",
+    "emptyOpenBody": "Kad uzgajivač objavi ponudu, pojavi se ovdje s gumbom Uloži. Do tada postavi novčanik pod Moj vrt.",
+    "ctaOpenGarden": "Otvori Moj vrt",
+    "emptyMineLead": "Još nema objavljenih ponuda",
+    "emptyMineBody": "Odaberi zapečaćenu biljku iznad i objavi svoju ponudu.",
+    "emptyMineBodySeal": "Prvo zapečati fazu u Tokeniziraj, pa je objavi ovdje.",
+    "ctaPostOffer": "Objavi ponudu",
+    "stakeReceivedBody": "Posvojitelj je uložio {amount} $GROWTOO na „{plant}” (50 % zaključano do mjesečne njege).",
+    "investReceivedBody": "Posvojitelj je uložio {amount} $GROWTOO u „{plant}”.",
+    "newInvestment": "Novo ulaganje na tržnici",
+    "hintStakeMode": "Posvojitelj sad plaća punu traženu cijenu. Pola stiže tebi pri namiri; pola se otključava dok zapisuješ njegu do berbe.",
+    "hintInstantMode": "Punu traženu cijenu dobivaš pri kupnji. Objava zaključava NFT u trezoru programa na lancu — ponuda odmah ide uživo.",
+    "done": "Gotovo.",
+    "claiming": "Preuzimam…",
+    "investing": "Ulažem…",
+    "cancelling": "Otkazujem…",
+    "holdingToken": "Držim token za objavu…",
+    "postToMarket": "Objavi na tržnicu",
+    "faucetQueued": "Testna slavina u redu: +{amount} $GROWTOO. Kovanje obično stigne u nekoliko minuta.",
+    "faucetQueueBody": "Red kuje $GROWTOO na tvoj Devnet novčanik…",
+    "faucetAlready": "Današnju Devnet slavinu si već preuzeo ({day}). Pokušaj nakon UTC ponoći.",
+    "confirmInvestProgram": "Token biljke dobivaš u ovoj transakciji na Solana Devnetu.",
+    "confirmInvestStake": "Ulog posvajanja: puna cijena sad. 50 % uzgajivaču pri namiri; 50 % zaključano do mjesečne njege pri berbi (sve ili ništa). Token dolazi kad se namira dovrši.\n\nFizički otkup berbe dolazi poslije — na Devnetu nema dostave.",
+    "confirmInvestLegacy": "Token biljke dobivaš kad se namira dovrši.\n\nFizički otkup berbe dolazi poslije — nije dostupan na ovoj testnoj mreži.",
+    "confirmInvestTitle": "Uložiti {amount} $GROWTOO u „{plant}”?",
+    "confirmInvestCta": "Uloži",
+    "confirmClaimTitle": "Preuzeti zaključani ulog ($GROWTOO)?",
+    "confirmClaimBody": "Ako svaki mjesec njege ispuni uvjete (≥12 dana njege po mjesecu), zaključanih 50 % otpušta se tebi. Inače se vraća posvojitelju (sve ili ništa).\n\nOvo nije fizički otkup berbe — to dolazi poslije.",
+    "confirmClaimCta": "Preuzmi zaključani ulog",
+    "confirmCancelTitle": "Otkazati ovu ponudu?",
+    "confirmCancelBody": "Token biljke vraća se u tvoj novčanik. Posvojitelji više neće vidjeti ovu ponudu.",
+    "confirmCancelCta": "Otkaži ponudu",
+    "investOkNow": "Ulaganje dovršeno. Token biljke je u tvom novčaniku.",
+    "investOkQueued": "Ulaganje poslano. Biljka se pojavljuje u Mom vrtu kad se namira dovrši.",
+    "claimQueuedOk": "Zahtjev za berbu je u redu. Zaključani ulog namiruje se u sljedećem prolazu reda.",
+    "cancelOkNow": "Ponuda otkazana. Biljka je natrag u tvom novčaniku.",
+    "cancelOkQueued": "Otkaz zatražen. Biljka se vraća nakon namire.",
+    "postedStake": "Ponuda s ulogom posvajanja objavljena. 50 % se otključava pri namiri; 50 % zaključano do mjesečne njege pri berbi.",
+    "postedProgram": "Ponuda je uživo. Biljka je zaključana u trezoru programa — posvojitelji mogu odmah ulagati.",
+    "postedLegacy": "Ponuda objavljena. Posvojitelji mogu ulagati kad escrow potvrdi.",
+    "needToken": "Odaberi token biljke za objavu.",
+    "needPrice": "Upiši cijenu ulaganja u $GROWTOO.",
+    "assetGone": "Imovina nije nađena ili je već objavljena.",
+    "signInHarvest": "Prijavi se za preuzimanje berbe.",
+    "growerOnlyHarvest": "Samo uzgajivači mogu preuzimati uloge berbe.",
+    "listingNotFound": "Objava nije nađena.",
+    "notYourListing": "Nije tvoja objava.",
+    "notStakeListing": "Nije objava s ulogom posvajanja.",
+    "careNotActive": "Ulog njege nije aktivan.",
+    "claimAlreadyPending": "Za ovaj ulog već je u obradi zahtjev za berbu.",
+    "claimAlreadySettled": "Ulog berbe za ovu objavu već je namiren.",
+    "signInBonus": "Prijavi se za preuzimanje bonusa platforme.",
+    "growerOnlyBonus": "Samo uzgajivači mogu preuzeti bonus platforme.",
+    "bonusAlready": "Za {month} si već preuzeo (ili imaš zahtjev u obradi).",
+    "signInFaucet": "Prijavi se za preuzimanje testnog $GROWTOO.",
+    "adopterOnlyFaucet": "Prebaci se na račun posvojitelja za korištenje testne slavine.",
+    "ctaOpenMarket": "Otvori tržnicu",
+    "ctaBrowseMarket": "Pregledaj tržnicu"
+  },
+  "trail": {
+    "seed": "Sjeme",
+    "germination": "Klij.",
+    "seedling": "Sadn.",
+    "vegetative": "Veget.",
+    "flowering": "Cvijet",
+    "harvest": "Berba"
+  },
+  "token": {
+    "signInBeforeWallet": "Prijavi se u svoj growtoo račun prije povezivanja novčanika.",
+    "walletModuleFailed": "Modul Solana novčanika se nije učitao. Osvježi stranicu i pokušaj ponovno.",
+    "linkFailed": "Povezivanje računa nije uspjelo.",
+    "linkedToWallet": "Račun je povezan s ovim novčanikom",
+    "linkedToOther": "Račun je povezan s drugim novčanikom ({address})",
+    "linkAccount": "Poveži račun",
+    "walletConnected": "Novčanik je povezan.",
+    "adoptedPlant": "Posvojena biljka",
+    "seedRwa": "Seed RWA",
+    "needSeedName": "Ime sjemena je obavezno.",
+    "linkPlantBeforeMint": "Poveži biljku iz dnevnika prije kovanja.",
+    "linkPlantBeforeSeed": "Poveži biljku iz dnevnika prije kovanja tokena sjemena.",
+    "tokenNotFound": "Token nije nađen.",
+    "plantNotFound": "Biljka iz dnevnika nije nađena.",
+    "alreadyGrown": "Ova biljka je već posve izrasla.",
+    "completeQuests": "Prvo dovrši zadatke iz dnevnika uzgajivača.",
+    "mintQueueRefused": "Red za kovanje nije prihvatio zahtjev.",
+    "mintRequestFailed": "Zahtjev za kovanje na Devnetu nije uspio.",
+    "growthQueueRefused": "Red za kovanje rasta nije prihvatio zahtjev.",
+    "growthRequestFailed": "Zahtjev za kovanje rasta na Devnetu nije uspio.",
+    "stageSavedLocally": "Faza je spremljena lokalno. Kovanje na lancu čeka da se iskuje seed NFT — po potrebi koristi Pokušaj ponovno.",
+    "trailComplete": "Trag je dovršen · berba zapečaćena",
+    "nextSeal": "Sljedeće pečaćenje → {stage} (+{reward} $GROWTOO)",
+    "harvestPlus": "Berba +{reward}",
+    "trailAhead": "Trag koji slijedi",
+    "trailChartAria": "Nagrade po fazama od sjemena do berbe",
+    "trailFoot": "Svaka zapečaćena faza donosi $GROWTOO — do {max} do berbe. Testna mreža; bez novčane vrijednosti.",
+    "sealedStage": "Zapečaćeno: {stage}",
+    "logCareToSeal": "Zapiši njegu za pečaćenje → {stage}",
+    "sealTo": "Zapečati → {stage} (+{reward})",
+    "sealStageAction": "Zapečati fazu {stage} · +{reward} $GROWTOO",
+    "stageSetNote": "Faza postavljena iz Tokeniziraj za {stage}",
+    "percentGrown": "{stage} · {pct} % izraslo",
+    "growerLevelAria": "Razina uzgajivača",
+    "levelShort": "Raz. {level}",
+    "xpAmount": "{xp} XP",
+    "growerProfileHint": "Tjedni napredak vidiš samo ti. Mjesečna njega otključava zaključani ulog posvajanja; rang raste s njegom i kovanjima.",
+    "stubTitle": "Pokvaren zapis metapodataka",
+    "stubBody": "Ovaj mint je ponovno iskovan kao {link}. Koristi <em>Spali</em> da ukloniš ovu karticu — prazan Collectible u Phantomu sakrij ako se još prikazuje.",
+    "replacesStubTitle": "Zamjenjuje pokvaren mint",
+    "replacesStubBody": "Stariji NFT s praznim metapodacima {link} možda još stoji u Collectiblesima tvog novčanika — možeš ga sakriti; ova kartica je aktualna."
+  },
+  "role": {
+    "grower": "Uzgajivač",
+    "adopter": "Posvojitelj"
+  },
+  "nav": {
+    "garden": "Vrt",
+    "stories": "Priče",
+    "growlog": "Zapis uzgoja",
+    "measurements": "Mjerenja",
+    "admin": "Administracija",
+    "today": "Danas",
+    "myGarden": "Moj vrt"
+  },
+  "weather": {
+    "today": "Danas",
+    "coachHead": "Savjetnik · što to znači za tvoj uzgoj",
+    "askCoach": "Pitaj savjetnika o vremenu",
+    "dayCount_one": "1 dan · za planiranje uzgoja",
+    "dayCount_few": "{count} dana · za planiranje uzgoja",
+    "dayCount_other": "{count} dana · za planiranje uzgoja",
+    "loading": "Učitavam prognozu…",
+    "unavailable": "Prognoza nije dostupna: {reason}",
+    "unknownCity": "Nepoznat grad",
+    "noData": "Nema podataka prognoze.",
+    "addCity": "Dodaj grad iznad za prognozu na {days} dana. Neobavezno — preskoči ako uzgajaš unutra.",
+    "loadFailed": "Nije moguće učitati prognozu. Provjeri vezu i naziv grada.",
+    "swipeHint": "Pomakni za sva {days} dana →"
+  },
+  "report": {
+    "todayPrefix": "Danas · {date}"
+  },
+  "bonus": {
+    "claimed": "Preuzeto <strong>{amount} $GROWTOO</strong> ovaj mjesec.",
+    "startHint": "Zapiši zalijevanje ili prihranu da pokreneš ovomjesečni bonus.",
+    "about": "Otprilike <strong>{amount} $GROWTOO</strong> ako preuzmeš sad (najviše {cap}).",
+    "careDays": "Dani njege (voda ili prihrana)",
+    "feedingDays": "Dani prihrane",
+    "storiesPublished": "Objavljene priče",
+    "qualifyingWeeks": "Tjedni s 5+ dana njege",
+    "alreadyCounted": "Danas je već zabilježeno. Dodatni zapisi danas ne donose više tokena.",
+    "addCareDay": "Zapiši zalijevanje ili prihranu danas da dodaš dan njege.",
+    "inQueue": "Zahtjev je u redu za nagrade."
+  },
+  "today": {
+    "quiet": "U vrtu je mirno — zapiši zalijevanje da trag ostane topao.",
+    "logWatering": "Zapiši zalijevanje",
+    "logFeeding": "Zapiši prihranu",
+    "writeStory": "Napiši priču",
+    "askCoach": "Pitaj savjetnika",
+    "firstPlant": "Dodaj svoju prvu biljku — savjetnik će odatle držati trag njege urednim.",
+    "addPlant": "Dodaj biljku"
+  },
+  "signInFirst": "Prvo se prijavi.",
+  "sync": {
+    "tooLarge": "Spremljeno na ovom uređaju, ali preveliko za sigurnosnu kopiju u oblaku ({used} KB od {budget} KB). Fotografije zauzimaju najviše prostora — ukloni jednu veliku da se kopiranje nastavi.",
+    "rejected": "Spremljeno na ovom uređaju, ali je sigurnosna kopija u oblaku odbijena ({reason}). Pokušat će ponovno nakon tvoje sljedeće izmjene.",
+    "unknownError": "nepoznata greška",
+    "keepsFailing": "Spremljeno na ovom uređaju, ali sigurnosna kopija u oblaku stalno pada. Provjeri vezu — pokušat će ponovno nakon tvoje sljedeće izmjene."
+  },
+  "readOnly": {
+    "generic": "Pregled je samo za čitanje — uređivanje nije dopušteno.",
+    "sharedPlant": "Ova biljka dolazi iz zajedničke knjižnice superadmina — možeš je vidjeti, ali ne uređivati.",
+    "sharedEntry": "Ovaj unos dolazi iz zajedničke knjižnice — ne može se uređivati.",
+    "hybrid": "Svoje biljke i unose možeš uređivati. Biljke iz zajedničke knjižnice superadmina samo su za pregled.",
+    "database": "Pregled baze samo za čitanje — biljke, dnevnik i alati bez uređivanja.",
+    "wholeDb": "Pregled cijele baze superadmina samo za čitanje — biljke se ne mogu uređivati.",
+    "sharedPlants": "Pregled zajedničkih biljaka samo za čitanje — uređivanje nije dopušteno.",
+    "hybridPlants": "Svoje biljke i unose možeš dodavati i uređivati. Biljke iz zajedničke knjižnice superadmina samo su za pregled."
+  },
+  "intent": {
+    "collect": {
+      "hero": "Skupljaj posvojene biljke i prati svaku fazu rasta u svom vrtu.",
+      "empty": "Pregledaj tržnicu da posvojiš prvu biljku i počneš zbirku.",
+      "market": "Nađi otvorene ponude biljaka i podupri ih s $GROWTOO kad budeš spreman.",
+      "strip": "Preuzmi testni $GROWTOO, pregledaj tržnicu i skupi prvu biljku.",
+      "label": "Skupi vrt"
+    },
+    "earn": {
+      "hero": "Vježbaj uloge i otključavanje berbe na testnoj imovini — bez novčane vrijednosti.",
+      "empty": "Podupri otvorenu ponudu da počneš pratiti rast i njegu do berbe na testnoj mreži.",
+      "market": "Uloži testni $GROWTOO u zahtjeve uzgajivača — prati mjesečno otključavanje prema berbi.",
+      "strip": "Preuzmi testni $GROWTOO, uloži u aktualnu ponudu, pa prati mjesečno otključavanje u Mom vrtu.",
+      "label": "Vježbaj uloge"
+    },
+    "support": {
+      "hero": "Prati trag iz dnevnika prave biljke. Podupiranje s $GROWTOO je izborno.",
+      "empty": "Pregledaj tržnicu i podupri uzgoj s $GROWTOO kad budeš spreman.",
+      "market": "Uloži $GROWTOO da posvojiš token biljke uzgajivača. Novčanik povezuješ kad dodirneš Uloži.",
+      "strip": "Preuzmi testni $GROWTOO, pa uloži u aktualnu ponudu biljke.",
+      "label": "Podupri uzgajivače"
+    }
+  },
+  "account": {
+    "member": "član growtooa",
+    "focus": "Fokus",
+    "wallet": "Novčanik",
+    "notLinked": "Nije povezan",
+    "view": "Prikaz",
+    "adopted": "Posvojeno",
+    "setup": "Postava",
+    "rankXp": "Rang · XP",
+    "outdoor": "Vani",
+    "indoor": "Unutra",
+    "updateLogo": "Promijeni logo / fotografiju",
+    "removePhoto": "Ukloni fotografiju",
+    "uploading": "Učitavam…",
+    "imageBad": "Slika je prevelika ili nečitljiva.",
+    "logoSaved": "Logo spremljen.",
+    "photoFailed": "Nije moguće spremiti fotografiju.",
+    "notVerified": "E-mail još nije potvrđen — savjetnik ostaje na lokalnim pomagačima dok ne potvrdiš.",
+    "verifyHint": "Traži <em>Potvrdi svoj e-mail · growtoo</em> (provjeri i Spam / Promocije).",
+    "resendVerify": "Pošalji potvrdu ponovno",
+    "alreadyConfirmed": "Već sam potvrdio",
+    "sending": "Šaljem…",
+    "alreadyVerified": "Već potvrđeno — osvježavam…",
+    "sentTo": "Poslano na {email}. Provjeri pristiglo i Spam za „Potvrdi svoj e-mail · growtoo\".",
+    "yourInbox": "tvoj sandučić",
+    "tooManySends": "Previše poslanih — pričekaj nekoliko minuta pa pokušaj ponovno.",
+    "verifySendFailed": "Nije moguće poslati e-mail za potvrdu.",
+    "advancedHint": "Napredni prikaz pokazuje mint adrese, linkove na explorer i PDA-ove objava na karticama.",
+    "simpleHint": "Jednostavni prikaz skriva mint adrese i ID-ove na lancu — samo biljka · faza · cijena.",
+    "detailLevel": "Razina detalja",
+    "replayTour": "Ponovi vodič",
+    "checking": "Provjeravam…",
+    "verified": "E-mail potvrđen — savjetnik otključan.",
+    "stillUnverified": "Još nije potvrđeno. Otvori link iz growtoo e-maila pa dodirni ponovno.",
+    "refreshFailed": "Nije moguće osvježiti status potvrde."
+  },
+  "pot": {
+    "p15dcl": "1,5 dcl",
+    "p5l": "5 L",
+    "p30l": "30 L",
+    "p10dcl": "10 dcl",
+    "p15l": "1,5 L",
+    "field": "Na polju"
+  },
+  "unlock": {
+    "title": "Otključati Tokeniziraj i Tržnicu?",
+    "body": "Ovo dodaje izborne alate na lancu: pečaćenje faza na Devnetu i objavu ponuda. Tvoj dnevnik ostaje besplatan i radi bez novčanika.",
+    "confirm": "Otključaj",
+    "cancel": "Ne sada",
+    "fallback": "Otključati Tokeniziraj i Tržnicu?\n\nIzborni alati na lancu. Tvoj dnevnik ostaje besplatan bez novčanika."
+  },
+  "docTitle": {
+    "adopter": "growtoo – Posvoji i prati",
+    "grower": "growtoo – Dnevnik uzgoja"
+  },
+  "entry": {
+    "saveFullStorage": "Nije moguće spremiti unos (pohrana je puna ili blokirana). Skrati bilješku ili ukloni stare fotografije.",
+    "saveFailedStorage": "Nije moguće spremiti unos. Lokalna pohrana je možda puna.",
+    "saveRetry": "Unos nije spremljen. Pokušaj ponovno.",
+    "viaTools": "preko Alata",
+    "measurement": "Mjerenje",
+    "logFailed": "Nije moguće zapisati unos.",
+    "watered": "Zaliveno",
+    "stageTransitionLabel": "Prijelaz faze",
+    "fieldLocationLabel": "Lokacija na polju",
+    "plantingLocationLabel": "Lokacija sadnje",
+    "to": "Na: {stage}",
+    "from": "Iz: {stage}",
+    "choosePlantFirst": "Odaberi biljku prije spremanja zapisa.",
+    "coachLabel": "Coach",
+    "delete": "Obriši",
+    "deleteAria": "Obriši zapis",
+    "deleteBody": "Ukloniti ovaj zapis iz traga uzgoja?\n\nMožeš vratiti nekoliko sekundi nakon.",
+    "deleteConfirm": "Obriši zapis",
+    "deleteFallback": "Obrisati ovaj zapis u dnevniku?\n\nTvoj trag uzgoja je važan — možeš vratiti nekoliko sekundi nakon.",
+    "deleteTitle": "Obrisati zapis u dnevniku?",
+    "deletedUndo": "Zapis obrisan — vraćanje dostupno",
+    "humidity": "Vlaga: {value}",
+    "pests": "Štetnici: {value}",
+    "plantAge": "Starost biljke: {value}",
+    "plantCondition": "Stanje biljke: {value}",
+    "restored": "Zapis vraćen",
+    "saveFailed": "Zapis u dnevnik nije spremljen.",
+    "soilQuality": "Kvaliteta tla: {value}",
+    "stressorsLabel": "Stresori",
+    "subphaseTransitionLabel": "Prijelaz podfaze",
+    "temperature": "Temperatura: {value}",
+    "transplantingLabel": "Presađivanje",
+    "vpd": "VPD: {value}",
+    "loggedForPlants_one": "{type} zapisano za 1 biljku",
+    "loggedForPlants_few": "{type} zapisano za {count} biljke",
+    "loggedForPlants_other": "{type} zapisano za {count} biljaka"
+  },
+  "coachBrief": {
+    "nothingUrgent": "Ništa nije hitno",
+    "keepLogging": "Nastavi zapisivati njegu — savjetnik koristi tvoj ritam i prognozu za sljedeći poticaj.",
+    "reminder": "Podsjetnik",
+    "draftLog": "Skiciraj zapis",
+    "askFirst": "Prvo pitaj",
+    "openCoach": "Otvori savjetnika",
+    "label": "Savjetnik"
+  },
+  "plants": {
+    "logCare": "Zapiši njegu",
+    "logCareOn": "Zapiši njegu · {date}",
+    "rowsTapForAll": " redova · dodirni za sve",
+    "selectedCount_one": "Biljke · 1 odabrana",
+    "selectedCount_few": "Biljke · {count} odabrane",
+    "selectedCount_other": "Biljke · {count} odabranih",
+    "noWateringYet": "još nije zalijevano",
+    "wateredToday": "zaliveno danas",
+    "daysSinceWater": "{count} d od zalijevanja",
+    "newPlant": "+ Nova biljka",
+    "noWateringLog": "Još nema zapisa zalijevanja",
+    "deleteTitle": "Obrisati ovu biljku?",
+    "deleteConfirm": "Obriši biljku",
+    "restored": "Biljka vraćena",
+    "emptyLead": "Još nema biljaka",
+    "emptyBody": "Dodaj prvu biljku da pokreneš dnevnik uzgoja.",
+    "deletedUndo": "Biljka obrisana — možeš vratiti",
+    "updated": "Biljka ažurirana",
+    "added": "Biljka dodana — {name}",
+    "mintUnavailable": "Kovanje još nije dostupno.",
+    "connectWalletFirst": "Prvo poveži Devnet novčanik, pa kuj iz Tokeniziraj.",
+    "mintStarted": "Kovanje tokena biljke pokrenuto za {name}",
+    "deleteBody": "Obrisati „{name}\" i njezin trag u dnevniku?\n\nTvoja povijest uzgoja je dokaz — možeš vratiti nekoliko sekundi nakon.",
+    "deleteBodyShort": "Obrisati „{name}\" i njezin trag u dnevniku?\n\nMožeš vratiti nekoliko sekundi nakon.",
+    "mintNotStarted": "Biljka je spremljena, ali kovanje na lancu nije pokrenuto. Pokušaj u Tokeniziraj → napredno.",
+    "nameRequired": "Ime biljke je obavezno.",
+    "notFound": "Biljka nije pronađena.",
+    "wateredOn": "Zalijevano {date}"
+  },
+  "growlog": {
+    "dayWeek": "{day}. dan ({week}. tjedan)",
+    "updated": "Ažurirano {when}",
+    "publicViews_one": "1 javni pregled",
+    "publicViews_few": "{count} javna pregleda",
+    "publicViews_other": "{count} javnih pregleda",
+    "noTransitions": "Još nema zabilježenih prijelaza. Promijeni fazu u „Uredi biljku\" — unos u dnevnik se stvara sam.",
+    "startStage": "Početak: {stage}",
+    "subphases": "Podfaze (posude)",
+    "stageHistory": "Povijest prijelaza faza",
+    "subphaseHistory": "Povijest podfaza (posude / polje)",
+    "wkGrow": " tj. uzgoja",
+    "photoHint": "Fotografije su u bočnoj traci i u nedavnim fotografijama ispod.",
+    "tokenRemaining": "Token biljke povezan na lancu — ova biljka može zaraditi još do <strong>{remaining} $GROWTOO</strong> u nagradama za faze do berbe (najviše {total} kroz sve faze).",
+    "tokenDone": "Token biljke povezan na lancu — faza berbe je dovršena. Nagrade za faze ovog tokena su iscrpljene.",
+    "tokenOptional": "Ako iskuješ izborni token biljke, nagrade za faze mogu do berbe iznositi najviše <strong>{total} $GROWTOO</strong> (samo testna mreža).",
+    "noEntries": "Na vremenskoj traci nema unosa. Dodaj bilješke u Dnevniku.",
+    "noPhotos": "Nema fotografija",
+    "editPlant": "Uredi biljku",
+    "fieldLabel": "Polje:",
+    "ofLight": "{hours} svjetla",
+    "plantingLabel": "Sadnja:",
+    "weeks_one": "1 tjedan",
+    "weeks_few": "{count} tjedna",
+    "weeks_other": "{count} tjedana"
+  },
+  "garden": {
+    "emptyTitle": "Još nema posvojenih biljaka",
+    "emptyBody": "Pregledaj tržnicu za otvorene ponude, pa uloži testni $GROWTOO kad budeš spreman."
+  },
+  "metric": {
+    "growBalance": "Stanje $GROWTOO",
+    "gardenProgress": "Napredak vrta",
+    "solanaWallet": "Solana novčanik",
+    "growOverview": "Pregled uzgoja",
+    "journalActivity": "Aktivnost u dnevniku",
+    "activeStages": "Aktivne faze",
+    "tokenPortfolio": "Portfelj tokena",
+    "plantTokens": "Tokeni biljaka",
+    "stillGrowing": "Još rastu",
+    "harvested": "Obrano",
+    "inGrowth": "U rastu",
+    "network": "Mreža",
+    "testNetwork": "testna mreža",
+    "account": "Račun",
+    "linked": "Povezan",
+    "individualPlants": "Pojedinačne biljke",
+    "plantsInBatch": "Biljke u seriji",
+    "last7Days": "Zadnjih 7 dana",
+    "plantProfiles": "Profili biljaka",
+    "noPlants": "Nema biljaka",
+    "action": "Radnja",
+    "followTrails": "Prati tragove biljaka",
+    "profile": "Profil",
+    "browse": "Pregledaj",
+    "nextStep": "Sljedeći korak",
+    "readyToSign": "Spremno za potpis",
+    "optionalTokenise": "Izborno — za Tokeniziraj"
+  },
+  "photo": {
+    "noDimensions": "Nije moguće pročitati dimenzije slike.",
+    "stillTooLarge": "Fotografija je i nakon sažimanja prevelika. Pokušaj s manjom slikom.",
+    "loadFailed": "Nije moguće učitati tu sliku. Pokušaj s JPG ili PNG.",
+    "uploadWarning": "Fotografija je spremljena na ovom uređaju, ali se nije mogla poslati ({reason}). Ulazi u veličinu tvoje sigurnosne kopije.",
+    "unknownReason": "nepoznato",
+    "formatUnsupported": "Koristi JPG ili PNG fotografiju (neki formati s mobitela, npr. HEIC, nisu podržani).",
+    "couldNotLoad": "Nije moguće učitati fotografiju.",
+    "preparing": "Priprema fotografije…",
+    "readFailed": "Fotografija nije učitana."
+  },
+  "toast": {
+    "undo": "Vrati"
+  },
+  "env": {
+    "outdoor": "vani",
+    "indoor": "unutra"
+  },
+  "dash": {
+    "noEntriesLead": "Još nema unosa",
+    "noEntriesBody": "Dodaj biljku i pokreni dnevnik."
+  },
+  "form": {
+    "save": "Spremi",
+    "savePlant": "Spremi biljku",
+    "editPlant": "Uredi biljku",
+    "newPlant": "Nova biljka",
+    "selectPlant": "-- Odaberi biljku --",
+    "allPlants": "Sve biljke"
+  },
+  "note": {
+    "growStarted": "Uzgoj započet — faza: {stage}",
+    "subphase": "Podfaza: {value}",
+    "stageTransition": "Prijelaz faze: {from} → {to}",
+    "fieldLocation": "Lokacija na polju: {value}.",
+    "plantingLocation": "Lokacija sadnje: {value}.",
+    "subphaseTransition": "Prijelaz podfaze: {from} → {to}"
+  },
+  "journal": {
+    "newEntry": "+ Novi unos",
+    "emptyBody": "Zapiši zalijevanje, prihranu ili bilješku da pokreneš trag."
+  },
+  "activity": {
+    "claimOnTokenise": "Preuzmi u Tokeniziraj"
+  },
+  "dashboard": {
+    "chartEnvironment": "Okoliš (temperatura, vlaga, pH)",
+    "chartWatering": "Zalijevanje"
+  },
+  "media": {
+    "loadError": "Greška pri učitavanju.",
+    "photoAlt": "Fotografija",
+    "remove": "Ukloni"
+  },
+  "tools": {
+    "ageShort": "Starost: {value}",
+    "allPlants": "Sve biljke",
+    "chartEmpty": "Nema podataka za graf.",
+    "conditionShort": "Stanje: {value}",
+    "deleteConfirm": "Obrisati ovaj zapis iz Alata?\n\nMožeš vratiti nekoliko sekundi nakon.",
+    "deletedUndo": "Zapis iz Alata obrisan — vraćanje dostupno",
+    "environmentReading": "Mjerenje okoliša",
+    "listEmpty": "Još nema zapisa. Dodaj prvi.",
+    "mirrorFailed": "Spremljeno u Alatima, ali trag u dnevniku nije osvježen.",
+    "noteVia": "{note} (preko Alata)",
+    "plantFallback": "Biljka",
+    "plantLabel": "Biljka: {name}",
+    "selectPlant": "-- Odaberi biljku --",
+    "soilShort": "Tlo: {value}",
+    "stressorNote": "Bilješka o stresorima",
+    "tempShort": "Temp: {value}",
+    "transplant": "Presađivanje",
+    "wateringLogged": "Zalijevanje zapisano preko Alata"
+  },
+  "video": {
+    "formatUnsupported": "Koristi MP4 ili WebM video (ova vrsta datoteke nije podržana).",
+    "tooLarge": "Video je prevelik (najviše {mb} MB za lokalnu pohranu)."
+  },
+  "write": {
+    "cannotAddEntry": "Za ovu biljku ne možeš dodati zapis.",
+    "cannotEditPlant": "Ovu biljku ne možeš uređivati.",
+    "disabled": "Za ovaj račun pisanje je onemogućeno."
+  }
+}

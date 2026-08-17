@@ -1,0 +1,1877 @@
+{
+  "account": {
+    "adopted": "Adopted",
+    "advancedHint": "Advanced shows mint addresses, explorer links, and listing PDAs on cards.",
+    "alreadyConfirmed": "I already verified",
+    "alreadyVerified": "Already verified — refreshing…",
+    "checking": "Checking…",
+    "detailLevel": "Detail level",
+    "focus": "Focus",
+    "imageBad": "Image too large or unreadable.",
+    "indoor": "Indoor",
+    "logoSaved": "Logo saved.",
+    "member": "growtoo member",
+    "notLinked": "Not linked",
+    "notVerified": "Email not verified yet — live AI coach stays on local helpers until you confirm.",
+    "outdoor": "Outdoor",
+    "photoFailed": "Could not save photo.",
+    "rankXp": "Rank · XP",
+    "refreshFailed": "Could not refresh verification status.",
+    "removePhoto": "Remove photo",
+    "replayTour": "Replay tour",
+    "resendVerify": "Resend verification",
+    "sending": "Sending…",
+    "sentTo": "Sent to {email}. Check inbox and Spam for “Verify your email · growtoo”.",
+    "setup": "Setup",
+    "simpleHint": "Simple hides mint addresses and chain IDs — plant · stage · ask only.",
+    "stillUnverified": "Still unverified. Open the link in the growtoo email, then tap again.",
+    "tooManySends": "Too many sends — wait a few minutes, then try again.",
+    "updateLogo": "Update logo / photo",
+    "uploading": "Uploading…",
+    "verified": "Email verified — live coach unlocked.",
+    "verifyHint": "Look for <em>Verify your email · growtoo</em> (also check Spam / Promotions).",
+    "verifySendFailed": "Could not send verification email.",
+    "view": "View",
+    "wallet": "Wallet",
+    "yourInbox": "your inbox"
+  },
+  "activity": {
+    "claimOnTokenise": "Claim on Tokenise"
+  },
+  "activity-reward-card": {
+    "p": "This month’s $GROWTOO"
+  },
+  "admin": {
+    "accessDenied": "Access denied — you do not have admin privileges.",
+    "accessSaved": "Access saved.",
+    "activeAccess": "Active access",
+    "allPlants": "All plants",
+    "allPlantsHint": "View the entire plant database",
+    "colEmail": "Email",
+    "colLastLogin": "Last login",
+    "colLogins": "Logins",
+    "colRole": "Role",
+    "confirmDelete": "Delete {label}?",
+    "confirmRevoke": "Remove access for this user?",
+    "delete": "Delete",
+    "deleteWarning": "This cannot be undone from the admin tools.",
+    "edit": "Edit",
+    "inSummary": "In summary",
+    "individualLogins": "Individual logins",
+    "journalHint": "Notes and entries",
+    "loadingReport": "Loading report…",
+    "loginsToday": "Logins today",
+    "loginsWeek": "Logins in the last 7 days",
+    "needPlantSelection": "Select at least one plant or enable \"All plants\".",
+    "newAccess": "New access",
+    "noAccessYet": "No access granted yet.",
+    "noLogins": "No logins in the selected period.",
+    "noPlantsInDb": "You have no plants in the database — add them in Plants & journal.",
+    "noRecorded": "No recorded logins for this period. Logins are tracked from the next user sign-in.",
+    "plantCount": "{count} plants",
+    "plantCount_one": "1 plant",
+    "readOnly": "Read-only view of the superadmin database — editing is not allowed.",
+    "remove": "Remove",
+    "removeFailed": "Removal failed.",
+    "roleLimited": "Admin / superadmin roles are limited to supadmin@dnevnik.live and admin@dnevnik.live.",
+    "saveAccess": "Save access",
+    "saveFailed": "Saving failed. Check your Firestore rules.",
+    "selectUser": "— select a user —",
+    "summaryByUser": "Summary by user",
+    "thisRecord": "this record",
+    "thisUser": "this user",
+    "tools": "Tools",
+    "toolsHint": "Data from Tools",
+    "uniqueUsers": "Unique users",
+    "user": "User",
+    "view": "View"
+  },
+  "admin-entries": {
+    "h3": "Journal",
+    "p": "Manage entries"
+  },
+  "admin-plants": {
+    "h3": "Plants",
+    "p": "View and edit plants"
+  },
+  "admin-report-refresh": {
+    "button": "↻ Refresh"
+  },
+  "admin-sharing-section": {
+    "h3": "Share plants and tools",
+    "p": "Pick a user and what to share. Access is read-only."
+  },
+  "admin-system": {
+    "h3": "Settings",
+    "p": "System settings"
+  },
+  "admin-tenant": {
+    "h3": "Tenants",
+    "p": "View tenants"
+  },
+  "admin-user-report": {
+    "button": "Today",
+    "button2": "7 days",
+    "h3": "Login tracking",
+    "p": "Who signed in to the app and when, daily or weekly.",
+    "p2": "Open the Admin panel to load the report."
+  },
+  "admin-users": {
+    "h3": "Users",
+    "p": "Manage users"
+  },
+  "adopt-garden-section": {
+    "h2": "Sealed plants",
+    "h22": "My adopted plants"
+  },
+  "adopt-market-cta": {
+    "h2": "Ready to adopt?",
+    "p": "Browse open offers and stake $GROWTOO. Settled plants appear in My adopted plants above."
+  },
+  "adopt-open-market": {
+    "button": "Open market"
+  },
+  "adopt-seed-form": {
+    "label": "Plant from your journal",
+    "p": "Strain, batch and dates come from the journal — nothing to re-enter."
+  },
+  "adopt-seed-plant": {
+    "option": "Choose a plant from your journal"
+  },
+  "adopt-seed-section": {
+    "p": "Seal a stage"
+  },
+  "adopter-guide": {
+    "h3": "How to adopt a plant",
+    "p": "Open offers are sealed plant tokens with a journal trail behind them.",
+    "p2": "Phantom or Solflare on Devnet — tap the wallet pill in the header when you are ready to invest.",
+    "p3": "Instant sale moves the plant token to you now. Adopt stake: half now, half unlocks as the grower keeps logging care.",
+    "p4": "Adopted plants land in this garden. Watch stages and monthly unlock status.",
+    "p5": "Test network only — $GROWTOO has no monetary value. You’re learning the trust flow before real stakes exist.",
+    "strong": "Browse the market",
+    "strong2": "Connect a test-network wallet",
+    "strong3": "Back with $GROWTOO",
+    "strong4": "Follow progress here"
+  },
+  "adopter-guide-market": {
+    "button": "Browse market"
+  },
+  "adopter-guide-wallet": {
+    "button": "Connect wallet"
+  },
+  "app-boot-line": {
+    "p": "Opening your journal…"
+  },
+  "app-boot-retry": {
+    "button": "Try again"
+  },
+  "app-boot-stalled": {
+    "a": "Back to sign in",
+    "p": "This is taking longer than it should — your connection may have dropped, or a script failed to load. Your journal entries are safe."
+  },
+  "app-confirm-cancel": {
+    "button": "Cancel"
+  },
+  "app-confirm-ok": {
+    "button": "Confirm"
+  },
+  "app-confirm-title": {
+    "h2": "Confirm"
+  },
+  "art": {
+    "stageAria": "{stage} stage"
+  },
+  "blog": {
+    "bioLabel": "Short bio",
+    "bioPlaceholder": "Where you grow, what you share…",
+    "catDaybook": "Field note",
+    "catLook": "Looking at my plants",
+    "catProblem": "Plant problem",
+    "catProduct": "Made from my plants",
+    "catTip": "Tips & tricks",
+    "catVisit": "Visited other growers",
+    "confirmDelete": "Delete this story?",
+    "couldNotSave": "Could not save.",
+    "deleted": "Story deleted",
+    "draftSaved": "Draft saved.",
+    "editStory": "Edit story",
+    "empty": "No stories yet. Share a tip, a plant look, or a problem you solved.",
+    "enablePublicProfile": "Enable public profile",
+    "loadFailed": "Could not load stories. Check Firestore rules / connection.",
+    "loading": "Loading…",
+    "needBody": "Write a short body.",
+    "needCategory": "Pick a category.",
+    "needSlug": "Slug needs at least 3 characters.",
+    "needTitle": "Add a title.",
+    "newStory": "New story",
+    "noPlantLink": "No plant link",
+    "photoFormat": "Use a JPG or PNG photo.",
+    "photoLarge": "Photo is large — consider a smaller image for faster loads.",
+    "preview": "Preview",
+    "profileDisabled": "Public profile disabled.",
+    "profileDisabledHint": "Enable a <strong>public grower profile</strong> in Account (slug + bio) so published stories show your name on <a href=\"https://journal.growto.live/\" target=\"_blank\" rel=\"noopener\">journal.growto.live</a>.",
+    "profileLive": "Public profile live at {link}. Manage it in Account.",
+    "profileSaveFailed": "Could not save public profile",
+    "profileSaved": "Public profile saved",
+    "profileSavedAttribution": "Public profile saved. Stories will attribute to journal.growto.live/g/{slug}",
+    "publicProfileHint": "Required to publish Stories on growto.live/journal.",
+    "publicProfileTitle": "Public journal profile",
+    "published": "Published",
+    "publishedMsg": "Published — live on the public journal shortly.",
+    "saveFailed": "Could not save story.",
+    "saveFirst": "Save the story first.",
+    "savePublicProfile": "Save public profile",
+    "saving": "Saving…",
+    "signInToManage": "Sign in to manage stories.",
+    "signInToPublish": "Sign in to publish stories.",
+    "slugLabel": "Profile URL slug",
+    "slugPlaceholder": "e.g. luka-zagreb",
+    "slugTooShort": "Pick a slug of at least 3 characters.",
+    "unpublished": "Unpublished",
+    "unpublishedMsg": "Unpublished — removed from the public journal.",
+    "untitled": "Untitled",
+    "viewLive": "View live"
+  },
+  "blog-composer": {
+    "p": "Title, category, body, and an optional cover photo. Publish when ready."
+  },
+  "blog-composer-title": {
+    "h3": "Write a story"
+  },
+  "blog-cover-clear": {
+    "button": "Clear photo"
+  },
+  "blog-form": {
+    "span": "Add photo"
+  },
+  "blog-new": {
+    "button": "+ Write a story"
+  },
+  "blog-publish": {
+    "button": "Publish"
+  },
+  "blog-save-draft": {
+    "button": "Save draft"
+  },
+  "blog-unpublish": {
+    "button": "Unpublish"
+  },
+  "bonus": {
+    "about": "About <strong>{amount} $GROWTOO</strong> if you claim now (cap {cap}).",
+    "addCareDay": "Log watering or feeding today to add a care day.",
+    "alreadyCounted": "Today is already counted. Extra logs today do not add more tokens.",
+    "careDays": "Care days (water or feed)",
+    "claimed": "Claimed <strong>{amount} $GROWTOO</strong> this month.",
+    "feedingDays": "Feeding days",
+    "inQueue": "Claim is in the rewards queue.",
+    "qualifyingWeeks": "Weeks with 5+ care days",
+    "startHint": "Log watering or feeding to start this month’s bonus.",
+    "storiesPublished": "Stories published"
+  },
+  "bottom-nav-coach": {
+    "span": "Coach"
+  },
+  "bottom-nav-log": {
+    "span": "Log"
+  },
+  "btn-account": {
+    "button": "<span class=\"header-avatar-mark\" aria-hidden=\"true\">G</span>"
+  },
+  "btn-add-entry": {
+    "button": "+ New entry",
+    "button2": "+ New entry for this plant"
+  },
+  "btn-add-plant": {
+    "button": "+ New plant"
+  },
+  "btn-coach-growlog": {
+    "button": "Coach"
+  },
+  "btn-edit-plant": {
+    "button": "✎ Edit plant"
+  },
+  "btn-logout": {
+    "button": "Log out"
+  },
+  "btn-logout-sheet": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Log out</strong> <span>End this session</span> </span>"
+  },
+  "btn-unlock-chain": {
+    "button": "<span class=\"more-nav-copy\"> <strong>Unlock Tokenise &amp; Market</strong> <span>Optional on-chain path — seal stages &amp; list asks</span> </span>"
+  },
+  "calendar": {
+    "feedDue": "Feed due",
+    "feedingDue": "feeding due",
+    "fromForecast": "° from your forecast",
+    "hasLogs": "has logs",
+    "logThisDay": "Log this day",
+    "logged": "Logged",
+    "noLogs": "No logs yet",
+    "noLogsToday": "No logs on this day.",
+    "openDay": "Open {date}",
+    "stacksLogged": "{count} stacks logged",
+    "stacksLogged_one": "1 stack logged",
+    "today": "Today",
+    "waterDue": "Water due",
+    "wateringDue": "watering due"
+  },
+  "camera": {
+    "askCoach": "Ask coach",
+    "blocked": "Camera permission blocked — use Gallery, or allow camera for growto.live.",
+    "captureFailed": "Could not capture frame.",
+    "captureGeneric": "Capture failed.",
+    "close": "Close",
+    "closeAria": "Close camera",
+    "coachPrompt": "Please look at this plant photo and help me diagnose what you see. Cite what is visible, then suggest the next journal log if needed.",
+    "encodeFailed": "Could not encode image.",
+    "flip": "Flip",
+    "flipAria": "Flip camera",
+    "frameHint": "Frame the plant, then shoot",
+    "gallery": "Gallery",
+    "loadFailed": "Could not load that image.",
+    "logToJournal": "Log to journal",
+    "needPlant": "Add a plant in the journal first, then log a photo.",
+    "notFound": "No camera found — use Gallery.",
+    "notReady": "Camera not ready.",
+    "openFailed": "Could not open camera — use Gallery.",
+    "openPhotoFailed": "Could not open that photo.",
+    "photoNote": "Photo log from plant camera",
+    "preparing": "Preparing photo…",
+    "processFailed": "Could not process image.",
+    "readFailed": "Could not read image.",
+    "retake": "Retake",
+    "reviewHint": "Save a journal log or send to the coach",
+    "saveLogFailed": "Could not save photo log.",
+    "saving": "Saving photo…",
+    "shotAlt": "Captured plant photo",
+    "shutterAria": "Take photo",
+    "starting": "Starting camera…",
+    "title": "Plant camera",
+    "tooLarge": "Photo is still too large. Try again.",
+    "unsupported": "Camera not supported here — use Gallery.",
+    "usePhotoFailed": "Could not use photo.",
+    "waitPreview": "Wait for the preview, then try again."
+  },
+  "chain": {
+    "devnetNotice": "Connect a Solana wallet on the test network (Devnet). Seed NFTs mint via the cloud queue; $GROWTOO rewards settle on-chain. Test assets only.",
+    "devnetNoticeFallback": "Connect a Solana wallet on the test network. Plant tokens and $GROWTOO rewards still use local simulation until full on-chain deploy.",
+    "networkLabel": "Solana · devnet",
+    "walletName": "Solana wallet"
+  },
+  "coach": {
+    "action": "Action",
+    "activityEmpty": "No coach actions yet. Reminders, drafts, and confirmations will show up here.",
+    "activityTitle": "Coach activity",
+    "alwaysOnBadge": "always on",
+    "approvalHint": "Always requires your confirmation.",
+    "askForecast": "Based on the forecast, what should I change about watering and feeding over the next few days?",
+    "askForecastCity": "Based on the forecast for {city}, what should I change about watering and feeding over the next few days?",
+    "askPlantNext": "What should I do next for \"{plant}\" in stage {stage}? Include tokenisation tips.",
+    "briefEmpty": "Add a plant when you are ready — Coach will help keep the care trail tidy.",
+    "briefLastWater": "{plant} · {stage}. Last watering {days} ago across the garden.",
+    "briefNoWater": "{plants} in the journal. Log a watering when you can — Coach uses that pace for weather tips.",
+    "briefSteady": "Looking steady — watering logged today. {plant} is in {stage}.",
+    "classAdvisory": "Advisory only",
+    "classAlwaysOn": "Always on",
+    "classApproval": "Needs your approval",
+    "classDraft": "Draft & confirm",
+    "days": "{count} days",
+    "days_one": "1 day",
+    "draftHint": "Coach prepares it, you approve with one tap.",
+    "growing": "growing",
+    "heatCheckMessage": "{plant}: ~{temp}°C coming {day}, and watering was {days} ago. Check moisture today.",
+    "heatCheckPrompt": "Help me decide if \"{plant}\" needs water before the heat.",
+    "heatCheckTitle": "Heat check",
+    "heatPaceMessage": "Warm spell around {day} (~{temp}°C). {plant} is already {since} since water — your usual gap is about {gap}. Worth watering today.",
+    "heatPacePrompt": "Heat is coming and \"{plant}\" is past my usual watering pace. Should I water today, and what should I watch for?",
+    "heatPaceTitle": "Heat + watering pace",
+    "justNow": "just now",
+    "leadPlant": "Lead plant",
+    "loggedFeeding": "Logged a feeding note",
+    "loggedJournal": "Logged a journal note",
+    "loggedVia": "Logged via Grower Coach",
+    "loggedWatering": "Logged a watering note",
+    "noteFeeding": "Feeding logged for {plant}. Watch leaf colour over the next few days — yellowing needs a human look, not an auto-fix.",
+    "noteStage": "Stage update recorded. Keep logging care so the trail stays clear.",
+    "noteVia": "{note} (via Grower Coach)",
+    "noteWaterHeat": "Noted — with ~{temp}°C around {day}, check moisture sooner than usual (often within a day).",
+    "noteWaterNext": "Noted — next watering often lands around {days} for {plant}, depending on pot size and heat.",
+    "plants": "{count} plants",
+    "plants_one": "1 plant",
+    "railDue": "{plant} is due for watering",
+    "railDueHeat": "{plant} is due for watering — heat wave {day}",
+    "railEmpty": "Add a plant when you are ready — Coach will keep the care trail tidy.",
+    "railFirstWater": "{plant} is waiting for a first watering.",
+    "railOverdue": "{plant} is due for watering — last care {days} ago.",
+    "railStage": "{plant} may be ready to move stage — take a look when you can.",
+    "railSteady": "{plant} looks steady — watering logged today.",
+    "railYesterday": "{plant} · last watering yesterday.",
+    "setDraftEntries": "Draft journal entries",
+    "setEditDelete": "Edit or delete entries",
+    "setMintList": "Mint or list on market",
+    "setReminders": "Watering & feeding reminders",
+    "setSuggestStages": "Suggest stage transitions",
+    "setWeatherNudges": "Weather-based care nudges",
+    "settingsSub": "Choose what your coach can do on its own.",
+    "settingsTitle": "Coach settings",
+    "stagePaceMessage": "{plant} has been in {stage} for {days}. Many similar grows move on around day {typical} — take a look when you can (your call).",
+    "stagePacePrompt": "Plant \"{plant}\" has been in {stage} for {days}. What signs should I check before changing stage?",
+    "stagePaceTitle": "Stage pace check",
+    "stageUnknown": "unknown",
+    "wxColdNight": "Cold night — down to {temp}° on {day}. Move sensitive pots under cover or indoors.",
+    "wxHeatWarning": "Heat warning — {temp}° on {day}. Water early morning or after sunset, never in full midday sun.",
+    "wxNoRain": "No real rain in the forecast. Outdoor pots dry out fastest — check them daily.",
+    "wxRain": "Rain likely {day} ({chance}%). Hold off watering and feeding — nutrients wash straight through.",
+    "wxSwing": "Wide day/night swing ({low}–{high}°). Expect slower growth; avoid heavy feeding until it settles.",
+    "wxWarmSpell": "Warm spell up to {temp}° ({day}). Check soil moisture a finger deep before watering.",
+    "yourGrow": "Your grow",
+    "yourPlant": "your plant"
+  },
+  "coachBrief": {
+    "askFirst": "Ask first",
+    "draftLog": "Draft log",
+    "keepLogging": "Keep logging care — Coach uses your pace and the forecast for the next nudge.",
+    "label": "Coach",
+    "nothingUrgent": "Nothing urgent",
+    "openCoach": "Open Coach",
+    "reminder": "Reminder"
+  },
+  "confirm": {
+    "body": "Continue?",
+    "cancel": "Cancel",
+    "ok": "Confirm",
+    "title": "Confirm"
+  },
+  "cryptoMode": {
+    "advanced": "Advanced",
+    "continue": "Continue",
+    "showAdvanced": "Show advanced details",
+    "simple": "Simple",
+    "useSimple": "Use simple view"
+  },
+  "daily": {
+    "adoptedUpdated": "{count} adopted plants updated",
+    "adoptedUpdated_one": "1 adopted plant moved a stage",
+    "adopterLead": "Claim test $GROWTOO, then invest in a live plant offer.",
+    "awayDays": "{count} days",
+    "awayDays_one": "1 day",
+    "awayFor": "Away for {time}.",
+    "awayHours": "{count} hours",
+    "awayHours_one": "1 hour",
+    "awayMinute": "about a minute",
+    "awayMinutes": "{count} minutes",
+    "awayMinutes_one": "about a minute",
+    "awayShort": "a short while",
+    "bonusClaimed": "claimed {amount} $GROWTOO",
+    "bonusKicker": "Activity bonus",
+    "bonusLead": "About {amount} $GROWTOO from this month’s watering, feeding, and stories. Claim on Tokenise.",
+    "bonusPending": "claim pending · ~{amount} $GROWTOO",
+    "bonusReady": "~{amount} $GROWTOO ready to claim",
+    "careDays": "{count} care days this month",
+    "careDays_one": "1 care day this month",
+    "careProgressed": "Care progressed on {count} stakes",
+    "careProgressed_one": "Care progressed on 1 of your stakes",
+    "careSynced": "Care progress synced on {count} stakes",
+    "careSynced_one": "Care progress synced on 1 stake",
+    "ctaClaim": "Claim on Tokenise",
+    "ctaContinue": "Continue",
+    "ctaFaucet": "Open faucet",
+    "ctaGarden": "My garden",
+    "ctaJournal": "Open journal",
+    "ctaMarket": "Browse market",
+    "ctaMarketShort": "Market",
+    "ctaTokenise": "Tokenise",
+    "firstPath": "Here’s your first-minute path.",
+    "growerLead": "Log watering or feeding to earn $GROWTOO. Claim the month on Tokenise.",
+    "harvestReady": "A stake is harvest-ready — grower can claim locked $GROWTOO",
+    "harvestSettled": "{count} harvest stakes settled",
+    "harvestSettled_one": "1 harvest stake settled",
+    "inboxUpdates": "{count} inbox updates",
+    "inboxUpdates_one": "1 inbox update",
+    "journalLogs": "{count} journal logs since last visit",
+    "journalLogs_one": "1 journal log since last visit",
+    "newOffers": "{count} new offers on the market",
+    "newOffers_one": "1 new offer on the market",
+    "noGains": "No new gains yet — pick a next step below.",
+    "plantsUpdated": "{count} plants updated",
+    "plantsUpdated_one": "1 plant stage moved",
+    "rewardClaimed": "Bonus minted",
+    "rewardDefault": "Grower reward",
+    "rewardFeeding": "Feeding counted",
+    "rewardLeadClaimed": "Activity bonus landed in your wallet (test network).",
+    "rewardLeadLogged": "Logged for today. Extra logs today do not add more tokens.",
+    "rewardStage": "Stage logged",
+    "rewardStory": "Story published",
+    "rewardWatering": "Watering counted",
+    "sentToWallet": "+{amount} $GROWTOO sent to your Devnet wallet",
+    "stakeMany": "{count} new adopt stakes on your offers",
+    "stakeMany_one": "1 new adopt stake on your offers",
+    "stakeOne": "Someone adopted one of your plants",
+    "stakesLanded": "{count} new stakes landed in your garden",
+    "stakesLanded_one": "1 new stake landed in your garden",
+    "startHere": "Start here",
+    "titleAway": "While you were away",
+    "titleStatus": "Daily status",
+    "titleWelcome": "Welcome to growtoo",
+    "unread": "{count} unread",
+    "unread_one": "1 unread",
+    "weekUnlocked": "5-day week unlocked · extra $GROWTOO on this month’s claim",
+    "whenYouClaim": "~{amount} $GROWTOO when you claim",
+    "xpGain": "+{count} grower XP"
+  },
+  "daily-start-kicker": {
+    "p": "Start here"
+  },
+  "daily-status-continue": {
+    "button": "Dismiss"
+  },
+  "daily-status-next": {
+    "button": "Continue"
+  },
+  "daily-status-overlay": {
+    "p": "Daily status",
+    "p2": "Next step"
+  },
+  "daily-status-title": {
+    "h2": "While you were away"
+  },
+  "dash": {
+    "noEntriesBody": "Add a plant and start your journal.",
+    "noEntriesLead": "No entries yet"
+  },
+  "dashboard": {
+    "chartEnvironment": "Environment (temperature, humidity, pH)",
+    "chartWatering": "Watering"
+  },
+  "dashboard-charts-section": {
+    "h2": "Overview from Tools"
+  },
+  "dashboard-seals-section": {
+    "h2": "Your plants"
+  },
+  "dashboard-today-card": {
+    "p": "Today"
+  },
+  "docTitle": {
+    "adopter": "growtoo – Adopt & track",
+    "grower": "growtoo – Grow journal"
+  },
+  "entry": {
+    "choosePlantFirst": "Choose a plant before saving the entry.",
+    "coachLabel": "Coach",
+    "delete": "Delete",
+    "deleteAria": "Delete entry",
+    "deleteBody": "Remove this entry from your grow trail?\n\nYou can undo for a few seconds after.",
+    "deleteConfirm": "Delete entry",
+    "deleteFallback": "Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.",
+    "deleteTitle": "Delete journal entry?",
+    "deletedUndo": "Entry deleted — undo available",
+    "fieldLocationLabel": "Field location",
+    "from": "From: {stage}",
+    "humidity": "Humidity: {value}",
+    "logFailed": "Could not log entry.",
+    "loggedForPlants": "Logged {type} for {count} plants",
+    "loggedForPlants_one": "Logged {type} for 1 plant",
+    "measurement": "Measurement",
+    "pests": "Pests: {value}",
+    "plantAge": "Plant age: {value}",
+    "plantCondition": "Plant condition: {value}",
+    "plantingLocationLabel": "Planting location",
+    "restored": "Entry restored",
+    "saveFailed": "Could not save journal entry.",
+    "saveFailedStorage": "Could not save journal entry. Local storage may be full.",
+    "saveFullStorage": "Could not save journal entry (storage full or blocked). Try a shorter note or remove old photos.",
+    "saveRetry": "Entry did not save. Please try again.",
+    "soilQuality": "Soil quality: {value}",
+    "stageTransitionLabel": "Stage transition",
+    "stressorsLabel": "Stressors",
+    "subphaseTransitionLabel": "Sub-phase transition",
+    "temperature": "Temperature: {value}",
+    "to": "To: {stage}",
+    "transplantingLabel": "Transplanting",
+    "viaTools": "via Tools",
+    "vpd": "VPD: {value}",
+    "watered": "Watered"
+  },
+  "entry-extra-faza": {
+    "h4": "Stage / milestone",
+    "p": "Updates the locations on the selected plant's profile (outdoor grow)."
+  },
+  "entry-extra-presadjivanje": {
+    "h4": "Transplanting"
+  },
+  "entry-extra-stresori": {
+    "h4": "Stressors"
+  },
+  "entry-photo-camera": {
+    "button": "Take photo"
+  },
+  "entry-plants-multi": {
+    "p": "Plants",
+    "p2": "Same strain rows can share one entry."
+  },
+  "entry-type": {
+    "option": "General",
+    "option2": "Watering",
+    "option3": "Feeding",
+    "option4": "Environment",
+    "option5": "Transplanting",
+    "option6": "Stressors",
+    "option7": "Stage / milestone",
+    "option8": "Other"
+  },
+  "entryType": {
+    "entry": "Entry",
+    "environment": "Environment",
+    "feeding": "Feeding",
+    "general": "General",
+    "other": "Other",
+    "stage": "Stage",
+    "stageTransition": "Stage (transition)",
+    "stressors": "Stressors",
+    "subphase": "Sub-phase",
+    "subphasePot": "Sub-phase (pot / field)",
+    "transplanting": "Transplanting",
+    "watering": "Watering"
+  },
+  "env": {
+    "indoor": "indoor",
+    "outdoor": "outdoor"
+  },
+  "escrow": {
+    "alreadyLocked": "This NFT is already locked in the market escrow vault. Cancel that listing (or wait for settle) before posting again.",
+    "confirmTimeout": "Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: {signature}. Refresh and check whether the NFT / listing already moved before trying again.",
+    "expired": "Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try again.",
+    "insufficient": "Not enough $GROWTOO in this wallet for that ask price on Devnet. Top up and try again.",
+    "missingNft": "This connected wallet does not hold that NFT. Switch to the wallet that received the mint, or cancel an existing escrow listing if the NFT is already locked in the market vault.",
+    "missingNftShort": "This connected wallet does not hold that NFT (MissingNft). Connect the wallet that owns it, then try again.",
+    "needMore": "Not enough $GROWTOO for this ask. Need {need}, wallet has {have} on Devnet.",
+    "needsTokenAccount": "Your wallet still needs a $GROWTOO token account funded on Devnet. Claim the adopter test faucet on Market, then try Invest again.",
+    "noGrowtoo": "This wallet has no $GROWTOO yet on Devnet. Claim the test faucet on Market (adopter), then Invest again.",
+    "notActive": "That on-chain listing is not active. Refresh the market and try again.",
+    "sellerMismatch": "Connected wallet is not the seller on this listing."
+  },
+  "form": {
+    "allPlants": "All plants",
+    "editPlant": "Edit plant",
+    "newPlant": "New plant",
+    "save": "Save",
+    "savePlant": "Save plant",
+    "selectPlant": "-- Select a plant --"
+  },
+  "form-entry": {
+    "button": "Cancel",
+    "button2": "Save",
+    "span": "(optional)"
+  },
+  "form-plant": {
+    "button": "Cancel"
+  },
+  "garden": {
+    "emptyBody": "Browse the market for open offers, then invest with test $GROWTOO when you are ready.",
+    "emptyTitle": "No adopted plants yet"
+  },
+  "growlog": {
+    "dayWeek": "Day {day} (week {week})",
+    "editPlant": "Edit plant",
+    "fieldLabel": "Field:",
+    "noEntries": "No entries in the timeline. Add notes in the Journal.",
+    "noPhotos": "No photos",
+    "noTransitions": "No transitions recorded yet. Change the stage in &quot;Edit plant&quot; — a journal entry will be created.",
+    "ofLight": "{hours} of light",
+    "photoHint": "Photos are in the sidebar and in the recent photos below.",
+    "plantingLabel": "Planting:",
+    "publicViews": "{count} public views",
+    "publicViews_one": "1 public view",
+    "stageHistory": "Stage transition history",
+    "startStage": "Start: {stage}",
+    "subphaseHistory": "Sub-phase history (pots / field)",
+    "subphases": "Sub-phases (pots)",
+    "tokenDone": "On-chain plant token linked — harvest stage complete. Stage rewards for this token are done.",
+    "tokenOptional": "If you mint an optional plant token, stage rewards can total up to <strong>{total} $GROWTOO</strong> by harvest (test network only).",
+    "tokenRemaining": "On-chain plant token linked — this plant can still earn up to <strong>{remaining} $GROWTOO</strong> in stage rewards by harvest (up to {total} total across all stages).",
+    "updated": "Updated {when}",
+    "weeks": "{count} weeks",
+    "weeks_one": "1 week",
+    "wkGrow": " wk grow"
+  },
+  "growlog-back": {
+    "button": "← Back to plants"
+  },
+  "growlog-view-all": {
+    "button": "View all photos"
+  },
+  "h1": "Journal",
+  "intent": {
+    "collect": {
+      "empty": "Browse the market to adopt your first plant and grow your collection.",
+      "hero": "Collect adopted plants and follow each growth stage in your garden.",
+      "label": "Collect a garden",
+      "market": "Find open plant offers and back them with $GROWTOO when you’re ready.",
+      "strip": "Claim test $GROWTOO, browse the market, and collect your first plant."
+    },
+    "earn": {
+      "empty": "Back an open offer to start following growth and harvest care on the test network.",
+      "hero": "Practice stakes and harvest unlocks on test assets — no monetary value.",
+      "label": "Practice stakes",
+      "market": "Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.",
+      "strip": "Claim test $GROWTOO, stake on a live offer, then watch monthly unlock in My garden."
+    },
+    "support": {
+      "empty": "Browse the market and back a grow with $GROWTOO when you are ready.",
+      "hero": "Follow a real plant’s journal trail. Backing with $GROWTOO is optional.",
+      "label": "Support growers",
+      "market": "Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.",
+      "strip": "Claim test $GROWTOO, then invest in a live plant offer."
+    }
+  },
+  "journal": {
+    "emptyBody": "Log watering, feeding, or a note to start the trail.",
+    "newEntry": "+ New entry"
+  },
+  "journal-plant-filter": {
+    "option": "All plants"
+  },
+  "journal-view-toggle": {
+    "button": "List",
+    "button2": "Month"
+  },
+  "log-sheet-add": {
+    "button": "Add a plant"
+  },
+  "log-sheet-feed": {
+    "button": "Log feeding"
+  },
+  "log-sheet-full": {
+    "button": "Full journal entry"
+  },
+  "log-sheet-hint": {
+    "p": "Tap rows to select. Same strain stacks can log together."
+  },
+  "log-sheet-plant": {
+    "p": "Plants"
+  },
+  "log-sheet-title": {
+    "strong": "Log care"
+  },
+  "log-sheet-water": {
+    "button": "Log watering"
+  },
+  "market": {
+    "aPlant": "a plant",
+    "activatedListings": "Activated {count} listings. Refresh if status lags.",
+    "activatedListings_one": "Activated 1 listing. Refresh if status lags.",
+    "adopterNotice": "Invest $GROWTOO to adopt a grower’s sealed plant. Connect your wallet when you tap Invest on an open offer.",
+    "adopterOnlyFaucet": "Switch to an adopter account to use the test faucet.",
+    "adopterOnlyInvest": "Switch to an adopter account to invest in plant offers.",
+    "assetGone": "Asset not found or already listed.",
+    "badgeAdoptStake": "Adopt stake",
+    "badgeFlower": "Flower",
+    "badgeFlowerToken": "Flower token",
+    "badgeInstantSale": "Instant sale",
+    "badgeSeed": "Seed",
+    "badgeSeedToken": "Seed token",
+    "bonusAlready": "You already claimed (or have a pending claim) for {month}.",
+    "cancelBtn": "Cancel",
+    "cancelOkNow": "Offer cancelled. The plant is back in your wallet.",
+    "cancelOkQueued": "Cancel requested. The plant returns after settlement.",
+    "cancelling": "Cancelling…",
+    "careEscrowLabel": "Care {escrow}",
+    "careNotActive": "Care stake is not active.",
+    "chainDetails": "Chain details",
+    "chooseSealed": "Choose a sealed plant",
+    "claimAlreadyPending": "A harvest claim is already pending for this stake.",
+    "claimAlreadySettled": "Harvest stake already settled for this listing.",
+    "claimLockedBtn": "Claim locked stake ($GROWTOO)",
+    "claimQueued": "Claim queued — waiting for the adopt worker (~5 min).",
+    "claimQueuedOk": "Harvest claim queued. Locked stake settles after the next adopt queue pass.",
+    "claiming": "Claiming…",
+    "confirmCancelBody": "The plant token returns to your wallet. Adopters will no longer see this ask.",
+    "confirmCancelCta": "Cancel offer",
+    "confirmCancelTitle": "Cancel this offer?",
+    "confirmClaimBody": "If every monthly care month qualifies (≥12 care days each), the locked 50% releases to you. Otherwise it refunds to the adopter (all-or-nothing).\n\nThis is not physical harvest redemption — that is coming later.",
+    "confirmClaimCta": "Claim locked stake",
+    "confirmClaimTitle": "Claim locked stake ($GROWTOO)?",
+    "confirmInvestCta": "Invest",
+    "confirmInvestLegacy": "You will receive the plant token when settlement completes.\n\nPhysical harvest redemption is coming later — not available on this test network.",
+    "confirmInvestProgram": "You will receive the plant token in this transaction on Solana Devnet.",
+    "confirmInvestStake": "Adopt stake: full price now. 50% to the grower on settle; 50% locked until monthly care at harvest (all-or-nothing). Token arrives when settlement completes.\n\nPhysical harvest redemption is coming later — no delivery on Devnet.",
+    "confirmInvestTitle": "Invest {amount} $GROWTOO in “{plant}”?",
+    "connectFirstTo": "Connect Phantom or Solflare first to {purpose}.",
+    "ctaBrowseMarket": "Browse market",
+    "ctaOpenGarden": "Open My garden",
+    "ctaOpenMarket": "Open market",
+    "ctaPostOffer": "Post an offer",
+    "ctaSealStage": "Seal a stage on Tokenise",
+    "done": "Done.",
+    "emptyBoardBody": "Seal a plant on Tokenise, then post it here.",
+    "emptyBoardLead": "No live offers on the board",
+    "emptyMineBody": "Pick a sealed plant above and post your ask.",
+    "emptyMineBodySeal": "Seal a stage on Tokenise first, then list it here.",
+    "emptyMineLead": "No offers posted yet",
+    "emptyOpenBody": "When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.",
+    "emptyOpenLead": "No open offers right now",
+    "escrowWord": "escrow",
+    "explainInstant": "Pay <strong>{total} $GROWTOO</strong> and receive the plant token in this flow.",
+    "explainStake": "Pay <strong>{total}</strong> now · <strong>{immediate}</strong> to grower on {settle} · <strong>{locked}</strong> locked until harvest care. Token after settlement.",
+    "faucetAlready": "You already claimed today’s Devnet faucet ({day}). Try again after UTC midnight.",
+    "faucetQueueBody": "Queue is minting $GROWTOO to your Devnet wallet…",
+    "faucetQueued": "Test faucet queued: +{amount} $GROWTOO. Mint usually lands within a few minutes.",
+    "growerOnlyBonus": "Only growers can claim the platform bonus.",
+    "growerOnlyHarvest": "Only growers can claim harvest stakes.",
+    "growerOnlyPost": "Only grower accounts can post plant offers.",
+    "hintAlmost": "Almost there — finish sealing on Tokenise (use Retry if something failed), then come back here.",
+    "hintInstantMode": "You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.",
+    "hintNothingSealed": "Nothing sealed to list yet. Seal a stage on Tokenise first — then post it here.",
+    "hintStakeMode": "Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.",
+    "holdingToken": "Holding token for listing…",
+    "instantBadgeTitle": "Full price to grower; plant token transfers on buy.",
+    "investBuy": "Adopt · buy",
+    "investDoneBody": "You adopted \"{plant}\" for {amount} $GROWTOO.",
+    "investDoneTitle": "Investment complete",
+    "investOkNow": "Investment complete. The plant token is in your wallet.",
+    "investOkQueued": "Investment submitted. The plant appears in My garden when settlement finishes.",
+    "investReceivedBody": "An adopter invested {amount} $GROWTOO in \"{plant}\".",
+    "investSentBody": "Paid {amount} $GROWTOO for \"{plant}\". NFT settles via queue.",
+    "investSentTitle": "Investment submitted",
+    "investStake": "Adopt · stake",
+    "investing": "Investing…",
+    "journalEmpty": "Journal trail linked — open after adopt to follow care logs.",
+    "listingNotFound": "Listing not found.",
+    "needPrice": "Enter an invest price in $GROWTOO.",
+    "needToken": "Choose a plant token to post.",
+    "needsDeploy": "Marketplace needs the $GROWTOO mint and seed collection on devnet. Offers below are read-only until then.",
+    "newInvestment": "New market investment",
+    "nftInEscrow": "This NFT is already in the hot-wallet escrow. Refresh Market — it may still be activating.",
+    "nftInVault": "This NFT is already locked in the on-chain market vault. Cancel that listing first, then post again.",
+    "noneReady": "No plant tokens ready to list",
+    "notStakeListing": "Not an adopt-stake listing.",
+    "notYourListing": "Not your listing.",
+    "offer": "Offer",
+    "offerClosed": "This offer is no longer open for investment.",
+    "offerGone": "Offer no longer exists.",
+    "ownerHint": "On-chain owner is {owner}, but you connected {connected}.",
+    "paymentReviewBody": "Your {amount} $GROWTOO payment for \"{plant}\" did not attach to the offer. Keep this reference: {signature}",
+    "paymentReviewTitle": "Payment needs review",
+    "postToMarket": "Post to market",
+    "postedLegacy": "Offer posted. Adopters can invest once escrow confirms.",
+    "postedProgram": "Offer is live. The plant is locked in the program vault — adopters can invest now.",
+    "postedStake": "Adopt-stake offer posted. 50% unlocks on settle; 50% locked until monthly harvest care.",
+    "practiceStakeNote": "Practice stake only — physical {redemption} coming later. Locked half is $GROWTOO, not a harvest delivery.",
+    "priceAsk": "Ask price",
+    "priceStakeSale": "Stake / sale",
+    "priceWasListed": "Was listed at",
+    "purposeBonus": "claim platform monthly bonus",
+    "purposeCancel": "cancel offer (reclaim NFT)",
+    "purposeFaucet": "claim test $GROWTOO faucet",
+    "purposeInvest": "invest ($GROWTOO payment)",
+    "purposePost": "post an offer (hold the plant token)",
+    "purposeSign": "sign",
+    "reachHarvest": "Reach harvest stage in the journal to claim the locked $GROWTOO half.",
+    "reasonFailed": "Mint failed — Retry mint on Tokenise",
+    "reasonListed": "Already listed",
+    "reasonNoMint": "No Devnet mint yet — open Tokenise",
+    "reasonPending": "Mint still pending in queue",
+    "reasonUnconfirmed": "Mint not confirmed on Devnet yet",
+    "reconnectToSign": "Reconnect your wallet extension to {purpose}. The account is linked, but Phantom/Solflare is not signed in for this tab.",
+    "redemptionLater": "Physical harvest redemption — coming later. This claim only settles the locked $GROWTOO.",
+    "redemptionWord": "redemption",
+    "retryNow": "Retry now",
+    "retrySent": "Retry sent to escrow + settle workers. Status should update within a minute if the chain confirms.",
+    "retrying": "Retrying…",
+    "rowBatch": "Batch",
+    "rowGrower": "Grower",
+    "rowListingPda": "Listing PDA",
+    "seedOption": "Seed № {no} — {name}",
+    "settleWord": "settle",
+    "settledCounts": "Settled {sold} sales and {cancelled} cancels. Refresh if status lags.",
+    "settlementPending": "Settlement pending",
+    "settlementPendingBody": "Cloud workers auto-activate escrow and settle buys/cancels about every 5 minutes. Retry now nudges both.",
+    "showDetails": "Show listing details",
+    "signInBonus": "Sign in to claim the platform bonus.",
+    "signInFaucet": "Sign in to claim test $GROWTOO.",
+    "signInHarvest": "Sign in to claim harvest.",
+    "signInNotice": "Sign in to use the market.",
+    "signInToInvest": "Sign in to invest.",
+    "signInToPost": "Sign in to post a plant offer.",
+    "stakeBadgeTitle": "You pay full price now. Half to grower on settle; half locked until harvest care.",
+    "stakeReceivedBody": "An adopter staked {amount} $GROWTOO on \"{plant}\" (50% locked until monthly care).",
+    "statusActive": "Open for investment",
+    "statusCancelled": "Cancelled",
+    "statusFailed": "Failed",
+    "statusPreparing": "Preparing listing…",
+    "statusSold": "Adopted",
+    "stuckActivating": "Activating escrow…",
+    "stuckCancelling": "Cancelling…",
+    "stuckSettling": "Investment settling…",
+    "walletMissingNft": "This connected wallet does not hold that NFT.",
+    "walletMissingNftHint": "Open Tokenise, confirm “Minted on devnet”, connect the wallet that received the mint (or Retry mint), then try posting again.",
+    "walletMissingNftOwning": "This connected wallet does not hold that NFT. Confirm mint on Tokenise, then connect the owning wallet.",
+    "walletModuleFailed": "Solana wallet module failed to load. Refresh and try again.",
+    "watchOnlyCannot": "Watch-only wallets cannot {purpose}. Connect Phantom or Solflare.",
+    "youSuffix": "(you)",
+    "yourInvestment": "your investment"
+  },
+  "market-adopter-guide": {
+    "h3": "Adopting on this board",
+    "li": "<strong>Open market</strong> lists live grower asks you can invest in.",
+    "li2": "Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.",
+    "li3": "<strong>Instant sale</strong>: full price to the grower at purchase. Done.",
+    "li4": "<strong>Adopt stake</strong>: half now, half unlocks as the grower keeps logging care.",
+    "li5": "After it settles, track the plant under <strong>My garden</strong>.",
+    "span": "Turning a harvest-stage token into a real harvest share. Coming later — not available on Devnet. Claim locked stake only unlocks escrowed $GROWTOO."
+  },
+  "market-asset-select": {
+    "option": "Choose a sealed plant"
+  },
+  "market-go-tokenise": {
+    "button": "Seal a stage on Tokenise"
+  },
+  "market-list-form": {
+    "button": "Post to market",
+    "label": "Asset",
+    "label2": "Asking price",
+    "legend": "How the adopter pays you",
+    "span": "Instant sale",
+    "span2": "Full price to you at purchase. Done.",
+    "span3": "Adopt stake",
+    "span4": "Half now, half unlocks as you keep logging care."
+  },
+  "market-list-section": {
+    "p": "List a sealed plant"
+  },
+  "market-open-hint": {
+    "p": "<span class=\"adopter-only\">Live asks from growers. Back a plant with $GROWTOO when you’re ready — then follow it in My garden.</span> <span class=\"grower-only\">Public board: other growers’ open asks (yours appear under My offers).</span>"
+  },
+  "market-redemption-note": {
+    "p": "Physical harvest redemption — coming later",
+    "p2": "Devnet practice: invest → care trail → <strong>Claim locked stake ($GROWTOO)</strong>. No physical delivery on this test network. $GROWTOO has no monetary value."
+  },
+  "market-settlement-select": {
+    "option": "Instant sale",
+    "option2": "Adopt stake"
+  },
+  "market-stake-hint": {
+    "p": "You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately."
+  },
+  "media": {
+    "loadError": "Error while loading.",
+    "photoAlt": "Photo",
+    "remove": "Remove"
+  },
+  "meta": {
+    "title": "growtoo · Grow journal"
+  },
+  "metric": {
+    "account": "Account",
+    "action": "Action",
+    "activeStages": "Active stages",
+    "browse": "Browse",
+    "followTrails": "Follow plant trails",
+    "gardenProgress": "Garden progress",
+    "growBalance": "$GROWTOO balance",
+    "growOverview": "Grow overview",
+    "harvested": "Harvested",
+    "inGrowth": "In growth",
+    "individualPlants": "Individual plants",
+    "journalActivity": "Journal activity",
+    "last7Days": "Last 7 days",
+    "linked": "Linked",
+    "network": "Network",
+    "nextStep": "Next step",
+    "noPlants": "No plants",
+    "optionalTokenise": "Optional — for Tokenise",
+    "plantProfiles": "Plant profiles",
+    "plantTokens": "Plant tokens",
+    "plantsInBatch": "Plants in batch",
+    "profile": "Profile",
+    "readyToSign": "Ready to sign",
+    "solanaWallet": "Solana wallet",
+    "stillGrowing": "Still growing",
+    "testNetwork": "test network",
+    "tokenPortfolio": "Token portfolio"
+  },
+  "modal-entry": {
+    "h2": "New entry"
+  },
+  "modal-plant-title": {
+    "h2": "New plant"
+  },
+  "more-nav-coach": {
+    "span": "<strong>Coach</strong> <span>Ask what to log, care for, or check on adopted plants</span>"
+  },
+  "more-nav-overlay": {
+    "a": "<span class=\"more-nav-copy\"> <strong>Market</strong> <span>Browse live plant asks</span> </span>",
+    "a2": "<span class=\"more-nav-copy\"> <strong>My garden</strong> <span>Adopted plants &amp; stakes</span> </span>",
+    "a3": "<span class=\"more-nav-copy\"> <strong>Journal</strong> <span>Plants &amp; care logs</span> </span>",
+    "a4": "<span class=\"more-nav-copy\"> <strong>Stories</strong> <span>Public tips, plant looks &amp; field notes</span> </span>",
+    "a5": "<span class=\"more-nav-copy\"> <strong>Tokenise</strong> <span>Seal stages on Devnet</span> </span>",
+    "a6": "<span class=\"more-nav-copy\"> <strong>Market</strong> <span>List sealed plants</span> </span>",
+    "a7": "<span class=\"more-nav-copy\"> <strong>Privacy Policy</strong> <span>How we handle your data</span> </span>",
+    "a8": "<span class=\"more-nav-copy\"> <strong>Terms of Service</strong> <span>Rules for using growtoo</span> </span>",
+    "button": "Light",
+    "button2": "Dark",
+    "button3": "Auto",
+    "span": "<strong>Measurements</strong> <span>Charts for water, feed, and environment</span>",
+    "span2": "<strong>Admin</strong> <span>Platform controls</span>",
+    "span3": "<strong>Appearance</strong> <span>Dark is the growtoo default</span>"
+  },
+  "more-nav-title": {
+    "strong": "Profile"
+  },
+  "nav": {
+    "admin": "Admin Panel",
+    "garden": "Garden",
+    "growlog": "Grow log",
+    "measurements": "Measurements",
+    "myGarden": "My garden",
+    "stories": "Stories",
+    "today": "Today"
+  },
+  "note": {
+    "fieldLocation": "Field location: {value}.",
+    "growStarted": "Grow started — stage: {stage}",
+    "plantingLocation": "Planting location: {value}.",
+    "stageTransition": "Stage transition: {from} → {to}",
+    "subphase": "Sub-phase: {value}",
+    "subphaseTransition": "Sub-phase transition: {from} → {to}"
+  },
+  "notif": {
+    "bellAria": "Inbox",
+    "bellAriaUnread": "Inbox, {count} unread",
+    "bellAriaUnread_one": "Inbox, 1 unread",
+    "bonusBody": "+{amount} $GROWTOO for {month}.",
+    "bonusFailed": "Platform bonus failed",
+    "bonusFailedBody": "Try claiming again next month window.",
+    "bonusMinted": "Platform bonus minted",
+    "careMonthToast": "{plant} · monthly care {hit}/{need} days",
+    "careReminder": "Care reminder",
+    "careReminderBody": "A plant needs attention.",
+    "careSettledBody": "\"{plant}\" monthly care settled · {status}.",
+    "careWeekToast": "{plant} · weekly care {hit}/{need} days",
+    "claimBody": "Stake settlement finished · {status}.",
+    "claimFailed": "Harvest claim failed",
+    "claimFailedBody": "Check journal care months and retry.",
+    "claimRefunded": "Harvest claim refunded",
+    "claimReleased": "Harvest claim released",
+    "count": "{count} notifications",
+    "count_one": "1 notification",
+    "demo": {
+      "activeBody": "You hold \"Batch B-2026-07\". Locked half unlocks when monthly care qualifies at harvest.",
+      "activeTitle": "Adopt stake active",
+      "bonusBody": "+18 $GROWTOO for this month (plants, weeks, flower).",
+      "deliveredBody": "\"OG Kush\" is in your garden.",
+      "deliveredTitle": "NFT delivered",
+      "growthBody": "Northern Lights → vegetative · +35 $GROWTOO",
+      "investBody": "You adopted \"Northern Lights\" for 80 $GROWTOO.",
+      "investTitle": "Investment complete",
+      "journalBody": "Northern Lights · Watering — Morning feed complete.",
+      "journalTitle": "Journal log saved",
+      "monthBody": "OG Kush hit 12/12 care days · harvest unlock path.",
+      "monthTitle": "Monthly care qualified",
+      "releasedBody": "Locked $GROWTOO for \"Batch B-2026-07\" released to you.",
+      "seedBody": "Northern Lights is on-chain.",
+      "settledBody": "\"Batch B-2026-07\" monthly care settled · released.",
+      "stakeBody": "An adopter staked 100 $GROWTOO on \"Batch B-2026-07\" (50% locked until monthly care).",
+      "stakeTitle": "New adopt stake",
+      "updateBody": "Grower is documenting care on your adopted plant — unlock status updates at harvest.",
+      "updateTitle": "Monthly care update",
+      "weekBody": "OG Kush hit 5/5 care days · this week (grower progress).",
+      "weekTitle": "Weekly care qualified"
+    },
+    "emptyBody": "Care reminders, stake updates, and journal confirmations show up here — so nothing slips mid-cycle.",
+    "emptyLead": "Inbox is clear",
+    "example": "example",
+    "examplesLoaded": "Loaded {count} example notifications",
+    "examplesLoaded_one": "Loaded 1 example notification",
+    "faucetBody": "+{amount} $GROWTOO sent to your Devnet wallet.",
+    "faucetClaimed": "Test $GROWTOO claimed",
+    "faucetFailed": "Test faucet failed",
+    "faucetFailedBody": "Retry the faucet claim from Market.",
+    "growerUnlocked": "Grower unlocked full stake",
+    "growthFailed": "Growth mint failed",
+    "growthFailedBody": "Journal proof or queue error.",
+    "growthMinted": "Growth stage minted",
+    "growthMintedBody": "{plant} → {stage}",
+    "justNow": "just now",
+    "loadExamples": "Load examples",
+    "lockedRefunded": "Locked stake refunded",
+    "logged": "Logged {type}",
+    "loggedForPlant": "Logged {type} for {plant}",
+    "nextStage": "next",
+    "now": "now",
+    "plantLower": "plant",
+    "reconnectBody": "Signing out (or switching accounts) ends the browser wallet session — normal for Phantom/Solflare. Your account stays linked to {pubkey}. Tap Reconnect to invest, mint, or list RWAs.",
+    "reconnectTitle": "Reconnect your Solana wallet",
+    "reconnectToast": "Wallet session ended — reconnect {pubkey} to sign.",
+    "rewardBonusMinted": "Activity bonus minted",
+    "rewardCareDay": "Care day counted",
+    "seedFailed": "Seed mint failed",
+    "seedFailedBody": "Check the Tokenise queue.",
+    "seedMinted": "Seed NFT minted",
+    "seedMintedBody": "{plant} is on-chain.",
+    "sentToWallet": "+{amount} $GROWTOO sent to your wallet",
+    "stakeRefunded": "Harvest stake refunded",
+    "stakeRefundedBody": "Locked $GROWTOO for \"{plant}\" returned to the adopter.",
+    "stakeReleased": "Harvest stake released",
+    "stakeReleasedBody": "Locked $GROWTOO for \"{plant}\" released to you.",
+    "tagline": "Stay on top of logs, stakes & rewards",
+    "thisMonth": "this month",
+    "thisMonthAmount": "~{amount} $GROWTOO this month",
+    "unreadOfTotal": "{unread} unread · {total} total",
+    "update": "Update"
+  },
+  "notif-mark-all": {
+    "button": "Mark read"
+  },
+  "notif-panel": {
+    "div": "<strong id=\"notif-panel-title\">Inbox</strong> <span class=\"notif-panel-sub\" id=\"notif-panel-sub\"></span>"
+  },
+  "photo": {
+    "couldNotLoad": "Could not load photo.",
+    "formatUnsupported": "Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).",
+    "loadFailed": "Could not load that image. Try JPG or PNG.",
+    "noDimensions": "Could not read image dimensions.",
+    "preparing": "Preparing photo…",
+    "readFailed": "Could not load photo.",
+    "stillTooLarge": "Photo is still too large after compression. Try a smaller image.",
+    "unknownReason": "unknown",
+    "uploadWarning": "Photo saved on this device, but could not be uploaded ({reason}). It counts against your cloud backup size."
+  },
+  "plainLang": {
+    "adoptStake": "Half now, half unlocks as the grower keeps logging care through harvest.",
+    "bondingCurve": "An automatic price formula some crypto projects use. growtoo does not use one — growers set their own ask price.",
+    "collectionAuthority": "The operator key that currently updates token metadata and settles Devnet deals. A centralized MVP trust point — see Risks.",
+    "escrow": "A temporary hold: your plant token sits safely with the market until someone invests or you cancel — like a middle shelf, not a permanent transfer.",
+    "growtoo": "Test-network reward tokens with no monetary value. Used to practice investing and stage rewards on Devnet.",
+    "instantSale": "Full price to the grower at purchase. Done — no care lock.",
+    "plantToken": "A digital certificate on Solana’s test network linked to one journal plant. Optional — your journal works without it.",
+    "redemption": "Turning a harvest-stage token into a real harvest share. Coming later — not available on Devnet. Claim locked stake only unlocks escrowed $GROWTOO.",
+    "rwa": "“Real-world asset” token — here it just means a plant token linked to a real journal trail on the test network. Not a stock or cash.",
+    "settlement": "When the deal finishes: payment is confirmed and the plant token moves to the adopter (or returns to you if you cancel).",
+    "whatDoes": "What does {term} mean?"
+  },
+  "plant-btn-next": {
+    "button": "Set next pot size"
+  },
+  "plant-btn-to": {
+    "button": "Set outdoor / field"
+  },
+  "plant-environment-type": {
+    "option": "Indoor",
+    "option2": "Outdoor"
+  },
+  "plant-form-advanced": {
+    "p": "When you <strong>change the stage</strong> and save, a journal entry is added with the transition date (below) and the photo from this form if one was uploaded."
+  },
+  "plant-form-back": {
+    "button": "Back"
+  },
+  "plant-form-create": {
+    "p": "Save now, or add optional details next — photo, environment, notes."
+  },
+  "plant-form-next": {
+    "button": "Add details"
+  },
+  "plant-form-step": {
+    "p": "Optional — skip anytime and edit later from the plant page."
+  },
+  "plant-form-submit": {
+    "button": "Save plant"
+  },
+  "plant-mint-toggle": {
+    "span": "Also seal this on-chain (optional) <span class=\"field-hint plant-mint-toggle-hint\"> Creates a test-network plant token linked to this journal plant. Needs a connected Devnet wallet. Stage rewards can total up to <strong>225 $GROWTOO</strong> by harvest. </span>"
+  },
+  "plant-stage": {
+    "option": "Germination",
+    "option2": "Seedling",
+    "option3": "Vegetative",
+    "option4": "Flowering",
+    "option5": "Drying"
+  },
+  "plant-subphase": {
+    "option": "Not selected",
+    "option2": "1.5 dcl",
+    "option3": "5 L",
+    "option4": "30 L",
+    "option5": "In the field"
+  },
+  "plant-subphase-actions": {
+    "p": "Optional transplant shortcuts — they only change the fields above; tap <strong>Save</strong> to apply.",
+    "p2": "From a pot you can bump to a bigger size or move outdoors, then fill field location if needed."
+  },
+  "plant-wizard-progress": {
+    "div": "<span class=\"plant-wizard-step is-active\" data-wizard-label=\"1\">1 · Basics</span> <span class=\"plant-wizard-step\" data-wizard-label=\"2\">2 · Details</span>"
+  },
+  "plantRank": {
+    "elite": "Elite",
+    "label": "Care level {tier} · {title}",
+    "legendary": "Legendary",
+    "proven": "Proven",
+    "rising": "Rising",
+    "sprout": "Sprout"
+  },
+  "plants": {
+    "added": "Plant added — {name}",
+    "connectWalletFirst": "Connect a Devnet wallet first, then mint from Tokenise.",
+    "daysSinceWater": "{count}d since water",
+    "deleteBody": "Delete \"{name}\" and its journal trail?\n\nYour grow history is evidence — you can undo for a few seconds after.",
+    "deleteBodyShort": "Delete \"{name}\" and its journal trail?\n\nYou can undo for a few seconds after.",
+    "deleteConfirm": "Delete plant",
+    "deleteTitle": "Delete this plant?",
+    "deletedUndo": "Plant deleted — undo available",
+    "emptyBody": "Add your first plant to start a grow journal.",
+    "emptyLead": "No plants yet",
+    "logCare": "Log care",
+    "logCareOn": "Log care · {date}",
+    "mintNotStarted": "Plant saved, but on-chain mint did not start. Try Tokenise → advanced.",
+    "mintStarted": "Plant token mint started for {name}",
+    "mintUnavailable": "Minting is not available yet.",
+    "nameRequired": "Plant name is required.",
+    "newPlant": "+ New plant",
+    "noWateringLog": "No watering log yet",
+    "noWateringYet": "no watering yet",
+    "notFound": "Plant not found.",
+    "restored": "Plant restored",
+    "rowsTapForAll": " rows · tap for all",
+    "selectedCount": "Plants · {count} selected",
+    "selectedCount_one": "Plants · 1 selected",
+    "updated": "Plant updated",
+    "wateredOn": "Watered {date}",
+    "wateredToday": "watered today"
+  },
+  "plants-open-stories": {
+    "button": "Write a story"
+  },
+  "plants-weather": {
+    "div": "Loading forecast…"
+  },
+  "plants-weather-refresh": {
+    "button": "Refresh"
+  },
+  "plants-weather-widget": {
+    "h3": "Weather forecast",
+    "p": "3 days · for grow planning"
+  },
+  "platform-bonus-section": {
+    "h2": "Activity bonus",
+    "p": "Test $GROWTOO for watering, feeding, published stories, and 5-day care weeks — claimed once per calendar month to your Devnet wallet. Distinct days count, not extra logs on the same day. Use tokens later on the market (test network only). Growers only."
+  },
+  "pot": {
+    "field": "In the field",
+    "p10dcl": "10 dcl",
+    "p15dcl": "1.5 dcl",
+    "p15l": "1.5 L",
+    "p30l": "30 L",
+    "p5l": "5 L"
+  },
+  "profile-type-badge": {
+    "span": "Grower"
+  },
+  "quests": {
+    "choosePlant": "Choose a journal plant",
+    "choosePlantHint": "RWA seeds must be tied to a real plant in your journal",
+    "feeding": "Log feeding / nutrients",
+    "feedingHint": "Add a Feeding entry or Tools → Feeding for this plant",
+    "feedingOptional": "Log feeding (optional for germination)",
+    "head": "Grower quests",
+    "headReady": "Next action · Quests ready",
+    "linkPlant": "Link a journal plant",
+    "linkPlantHint": "Mint/link from Adopt with a plant from Plants & journal",
+    "monthProgress": "Log care on {need} distinct days this month ({hit}/{need}).",
+    "monthQualifies": "Month qualifies for harvest unlock ({hit}/{need} days).",
+    "proofComplete": "Journal proof complete — ready to mint.",
+    "proofMissing": "Complete grower quests first: {list}",
+    "seedReady": "Plant linked — ready to mint seed.",
+    "stageLogged": "Log growth stage in journal",
+    "stageLoggedHint": "Update plant stage or add a Stage (transition) journal entry",
+    "watering": "Log watering for this stage",
+    "wateringHint": "Add a Watering entry or Tools → Watering for this plant",
+    "weekProgress": "Weekly progress: {hit}/{need} care days (grower only).",
+    "weekStrong": "Strong week — {hit}/{need} care days (grower progress)."
+  },
+  "rank": {
+    "active": "Active grower",
+    "aria": "Grower rank {tier}, {title}, {xp} XP. Open profile.",
+    "chip": "Rank {tier}",
+    "dedicated": "Dedicated grower",
+    "eliteCultivator": "Elite cultivator",
+    "label": "Grower rank {tier} · {title}",
+    "master": "Master grower",
+    "new": "New grower",
+    "seasoned": "Seasoned grower"
+  },
+  "readOnly": {
+    "database": "Read-only database view — plants, journal and tools without editing.",
+    "generic": "View is read-only — editing is not allowed.",
+    "hybrid": "You can edit your own plants and entries. Plants from the superadmin shared library are view-only.",
+    "hybridPlants": "You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.",
+    "sharedEntry": "This entry comes from a shared library — it cannot be edited.",
+    "sharedPlant": "This plant comes from the superadmin shared library — you can view it, but not edit it.",
+    "sharedPlants": "Read-only view of shared plants — editing is not allowed.",
+    "wholeDb": "Read-only view of the entire superadmin database — plants cannot be edited."
+  },
+  "report": {
+    "todayPrefix": "Today · {date}"
+  },
+  "reward-earn-continue": {
+    "button": "Dismiss"
+  },
+  "reward-earn-next": {
+    "button": "Continue"
+  },
+  "reward-earn-overlay": {
+    "p": "Reward",
+    "p2": "This month"
+  },
+  "reward-earn-title": {
+    "h2": "Care day counted"
+  },
+  "role": {
+    "adopter": "Adopter",
+    "grower": "Grower"
+  },
+  "seal-stage-submit": {
+    "button": "Seal seed stage · +0 $GROWTOO"
+  },
+  "seedChain": {
+    "growthNeedsPlant": "Growth mint requires a linked journal plant.",
+    "needPlant": "Link a journal plant before minting a seed RWA.",
+    "needPlantRetry": "Link a journal plant before retrying the seed mint.",
+    "notMinted": "Seed NFT is not minted on devnet yet."
+  },
+  "sidebar-coach-btn": {
+    "span": "Coach"
+  },
+  "sidebar-log-btn": {
+    "span": "Log"
+  },
+  "signInFirst": "Sign in first.",
+  "span2": "Journal",
+  "span3": "Stories",
+  "span4": "Market",
+  "span5": "Admin",
+  "span6": "Journal",
+  "span7": "Market",
+  "stack": {
+    "countTitle": "{count} plants in this stack",
+    "countTitle_one": "1 plant in this stack",
+    "plant": "Plant",
+    "plants": "Plants",
+    "tapToOpen": "Tap to open stack"
+  },
+  "stage": {
+    "drying": "Drying / harvest",
+    "dryingShort": "Drying",
+    "flowering": "Flowering",
+    "germination": "Germination",
+    "growing": "Growing",
+    "harvest": "Harvest",
+    "seed": "Seed",
+    "seedling": "Seedling",
+    "vegetative": "Vegetative"
+  },
+  "statusRail": {
+    "adoptedByBuyer": "Adopted by buyer.",
+    "approveTheBuyIn": "Approve the buy in your wallet.",
+    "ariaLabel": "Process status",
+    "buyFailedOnDevnet": "Buy failed on Devnet.",
+    "buyerPaidSettlingNft": "Buyer paid — settling NFT…",
+    "claimFailedCheckCare": "Claim failed — check care months and retry.",
+    "claimed": "Claimed",
+    "completeGrowtooPaymentIn": "Complete $GROWTOO payment in your wallet.",
+    "confirmed": "Confirmed",
+    "confirmingOnChainBuy": "Confirming on-chain buy…",
+    "escrow": "Escrow",
+    "investmentFailedCheckPayment": "Investment failed. Check payment and try again.",
+    "listingFailed": "Listing failed.",
+    "live": "Live",
+    "lockedReleased": "Locked $GROWTOO released to the grower.",
+    "lockedReturned": "Locked $GROWTOO returned to the adopter.",
+    "mintDone": "Minted on Devnet.",
+    "mintFailed": "Devnet mint failed.",
+    "mintQueueWorking": "Mint queue working on Devnet…",
+    "mintRequested": "Devnet mint requested…",
+    "minted": "Minted",
+    "minting": "Minting",
+    "nftIsInYour": "NFT is in your wallet.",
+    "nftReady": "NFT ready",
+    "offerCancelled": "Offer cancelled.",
+    "openForInvestment": "Open for investment.",
+    "payGrowtoo": "Pay $GROWTOO",
+    "paymentSeenSale": "Payment seen — releasing NFT from escrow…",
+    "paymentSeenStake": "Payment seen — settling 50% to grower, locking 50%…",
+    "queue": "Queue",
+    "queued": "Queued",
+    "queuedAdoptWorkerValidates": "Queued — adopt worker validates care months next pass (~5 min).",
+    "refunded": "Refunded",
+    "released": "Released",
+    "returningNftToGrower": "Returning NFT to grower…",
+    "settling": "Settling",
+    "signBuy": "Sign buy",
+    "sold": "Sold",
+    "step": "Step",
+    "waitingForNftIn": "Waiting for NFT in escrow…"
+  },
+  "sync": {
+    "keepsFailing": "Saved on this device, but the cloud backup keeps failing. Check your connection — it will try again after your next change.",
+    "rejected": "Saved on this device, but the cloud backup was rejected ({reason}). It will try again after your next change.",
+    "tooLarge": "Saved on this device, but too large to back up to the cloud ({used} KB of {budget} KB). Photos take up most of the space — remove a large one to resume cloud backup.",
+    "unknownError": "unknown error"
+  },
+  "toast": {
+    "undo": "Undo"
+  },
+  "today": {
+    "addPlant": "Add a plant",
+    "askCoach": "Ask coach",
+    "firstPlant": "Add your first plant — Coach will keep the care trail tidy from there.",
+    "logFeeding": "Log feeding",
+    "logWatering": "Log watering",
+    "quiet": "Your garden is quiet — log a watering to keep the trail warm.",
+    "writeStory": "Write a story"
+  },
+  "token": {
+    "adoptedPlant": "Adopted plant",
+    "alreadyGrown": "This plant is already fully grown.",
+    "completeQuests": "Complete grower journal quests first.",
+    "growerLevelAria": "Grower level",
+    "growerProfileHint": "Weekly progress is private to you. Monthly care unlocks the locked adopt stake; ranks rise with care + mints.",
+    "growthQueueRefused": "Growth mint queue did not accept the request.",
+    "growthRequestFailed": "Devnet growth mint request failed.",
+    "harvestPlus": "Harvest +{reward}",
+    "levelShort": "Lv {level}",
+    "linkAccount": "Link account",
+    "linkFailed": "Account link failed.",
+    "linkPlantBeforeMint": "Link a journal plant before minting.",
+    "linkPlantBeforeSeed": "Link a journal plant before minting a seed token.",
+    "linkedToOther": "Account linked to a different wallet ({address})",
+    "linkedToWallet": "Account linked to this wallet",
+    "logCareToSeal": "Log care to seal → {stage}",
+    "mintQueueRefused": "Mint queue did not accept the request.",
+    "mintRequestFailed": "Devnet mint request failed.",
+    "needSeedName": "Seed name is required.",
+    "nextSeal": "Next seal → {stage} (+{reward} $GROWTOO)",
+    "percentGrown": "{stage} · {pct}% grown",
+    "plantNotFound": "Journal plant not found.",
+    "replacesStubBody": "Earlier empty-metadata NFT {link} may still sit in your wallet Collectibles — safe to hide; this card is the live one.",
+    "replacesStubTitle": "Replaces stub mint",
+    "sealStageAction": "Seal {stage} stage · +{reward} $GROWTOO",
+    "sealTo": "Seal → {stage} (+{reward})",
+    "sealedStage": "Sealed {stage}",
+    "seedRwa": "Seed RWA",
+    "signInBeforeWallet": "Sign in to your growtoo account before connecting a wallet.",
+    "stageSavedLocally": "Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.",
+    "stageSetNote": "Stage set from Tokenise for {stage}",
+    "stubBody": "This mint was reminted as {link}. Use <em>Burn</em> to remove this card — hide the empty Collectible in Phantom if it still shows.",
+    "stubTitle": "Broken metadata stub",
+    "tokenNotFound": "Token not found.",
+    "trailAhead": "The trail ahead",
+    "trailChartAria": "Stage rewards from seed to harvest",
+    "trailComplete": "Trail complete · harvest sealed",
+    "trailFoot": "Each sealed stage earns $GROWTOO — up to {max} by harvest. Test network; no monetary value.",
+    "walletConnected": "Wallet connected.",
+    "walletModuleFailed": "Solana wallet module failed to load. Refresh the page and try again.",
+    "xpAmount": "{xp} XP"
+  },
+  "tool-environment-plant": {
+    "option": "-- Select a plant --"
+  },
+  "tool-feeding-plant": {
+    "option": "-- Select a plant --"
+  },
+  "tool-graphs-plant": {
+    "option": "All plants"
+  },
+  "tool-stressors-plant": {
+    "option": "-- Select a plant --"
+  },
+  "tool-transplant-plant": {
+    "option": "-- Select a plant --"
+  },
+  "tool-watering-value2": {
+    "option": "-- Select a plant --"
+  },
+  "toolbox-form-environment": {
+    "button": "Add"
+  },
+  "toolbox-form-feeding": {
+    "button": "Add"
+  },
+  "toolbox-form-stressors": {
+    "button": "Add"
+  },
+  "toolbox-form-transplant": {
+    "button": "Add"
+  },
+  "toolbox-form-watering": {
+    "button": "Add"
+  },
+  "toolbox-journal-bridge": {
+    "p": "Measurements stay here for charts. Each Add also writes a matching note to that plant’s <strong>Journal</strong> trail — one care story."
+  },
+  "toolbox-panel-environment": {
+    "h3": "Environment",
+    "h4": "Chart: Temperature, humidity and pH"
+  },
+  "toolbox-panel-feeding": {
+    "h3": "Feeding",
+    "h4": "Feeding history"
+  },
+  "toolbox-panel-graphs": {
+    "h3": "All charts overview",
+    "h4": "Watering",
+    "h42": "Environment (temperature, humidity, pH)"
+  },
+  "toolbox-panel-soil": {
+    "a": "↗ Full window",
+    "h3": "Soil moisture",
+    "p": "Sensor data · source <a href=\"http://164.92.208.95/latest.json\" target=\"_blank\" rel=\"noreferrer\">164.92.208.95</a> · refreshes every 2 s"
+  },
+  "toolbox-panel-stressors": {
+    "h3": "Stressors"
+  },
+  "toolbox-panel-transplant": {
+    "h3": "Transplanting"
+  },
+  "toolbox-panel-watering": {
+    "h3": "Watering",
+    "h4": "Chart: Amount by date"
+  },
+  "tools": {
+    "ageShort": "Age: {value}",
+    "allPlants": "All plants",
+    "chartEmpty": "No data for the chart.",
+    "conditionShort": "Condition: {value}",
+    "deleteConfirm": "Delete this Tools log?\n\nYou can undo for a few seconds after.",
+    "deletedUndo": "Tools log deleted — undo available",
+    "environmentReading": "Environment reading",
+    "listEmpty": "No entries yet. Add the first one.",
+    "mirrorFailed": "Saved in Tools, but journal trail did not update.",
+    "noteVia": "{note} (via Tools)",
+    "plantFallback": "Plant",
+    "plantLabel": "Plant: {name}",
+    "selectPlant": "-- Select a plant --",
+    "soilShort": "Soil: {value}",
+    "stressorNote": "Stressor note",
+    "tempShort": "Temp: {value}",
+    "transplant": "Transplant",
+    "wateringLogged": "Watering logged via Tools"
+  },
+  "tour": {
+    "adoptAdopter": {
+      "cards": {
+        "body": "Open a card for stage, care unlock, and history. Browse Market if the garden is empty.",
+        "title": "Plant cards"
+      },
+      "guide": {
+        "body": "Adopted plants and stake progress live here after Market invest settles.",
+        "title": "My garden"
+      },
+      "summary": {
+        "body": "See how many plants you’ve adopted and your test $GROWTOO balance.",
+        "title": "Balances"
+      }
+    },
+    "adoptGrower": {
+      "seal": {
+        "body": "Link a journal plant and seal the current stage. Completing grower quests unlocks the mint button.",
+        "title": "Seal a stage"
+      },
+      "sealed": {
+        "body": "Your tokens land here. When one is ready, list it on Market.",
+        "title": "Sealed plants"
+      },
+      "trail": {
+        "body": "Stages from seed → harvest each mint a reward on Devnet when you seal them.",
+        "title": "The trail ahead"
+      }
+    },
+    "adopterFull": {
+      "faucet": {
+        "body": "Use the free Devnet faucet once a day. These tokens have no monetary value — they only practice investing.",
+        "title": "Claim test $GROWTOO"
+      },
+      "garden_board": {
+        "body": "Adopted plants and balances show up in My garden. Explore at your pace — tap ? on a tab anytime for a shorter tour.",
+        "title": "Track what you backed"
+      },
+      "garden_nav": {
+        "body": "After a stake settles, follow the plant here — stage progress and care unlock live on the card.",
+        "title": "My garden"
+      },
+      "market_board": {
+        "body": "Open offers show plant · stage · ask. Tap Invest when you’re ready (wallet may prompt).",
+        "title": "Browse live asks"
+      },
+      "start_strip": {
+        "body": "After you sign in, this strip is your short path: faucet, market, then garden.",
+        "title": "Start here"
+      }
+    },
+    "back": "Back",
+    "finish": "Finish",
+    "growerFull": {
+      "chain_optional": {
+        "body": "Seal-on-chain and Market stay out of the nav until you unlock them from Profile. The free journal works without a wallet.",
+        "title": "Tokenise stays optional"
+      },
+      "journal_log": {
+        "body": "New entries prove real work. Quests on Tokenise look for stage, water, and feed logs.",
+        "title": "Log care"
+      },
+      "journal_nav": {
+        "body": "This is home — your plants, Today, and the care diary (list or month). Log watering here.",
+        "title": "Journal"
+      },
+      "market_list": {
+        "body": "Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.",
+        "title": "List an offer"
+      },
+      "market_nav": {
+        "body": "Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.",
+        "title": "Market"
+      },
+      "plants_list": {
+        "body": "Create a plant, then log watering, feeding, and stage changes — that trail unlocks Tokenise later.",
+        "title": "Add a plant"
+      },
+      "seal_stage": {
+        "body": "Pick a journal plant and seal the next stage. The mint queue mints / updates the NFT on Devnet.",
+        "title": "Seal a stage"
+      },
+      "start_strip": {
+        "body": "Your grower path: log care in the journal first. Tokenise and Market are optional when you want them.",
+        "title": "Start here"
+      },
+      "tokenise_nav": {
+        "body": "When the journal is ready, seal a stage into a plant token on Devnet.",
+        "title": "Tokenise"
+      }
+    },
+    "marketAdopter": {
+      "board": {
+        "body": "Tap Invest on a card. Connect a Devnet wallet when prompted.",
+        "title": "Live asks"
+      },
+      "faucet": {
+        "body": "Claim free Devnet $GROWTOO once a day before you invest.",
+        "title": "Test faucet"
+      },
+      "guide": {
+        "body": "Instant sale vs Adopt stake, then follow the plant in My garden after settle.",
+        "title": "How adopting works"
+      }
+    },
+    "marketGrower": {
+      "list_form": {
+        "body": "Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.",
+        "title": "Post an ask"
+      },
+      "my_offers": {
+        "body": "Track active, adopted, and cancelled listings here — including harvest claim when ready.",
+        "title": "My offers"
+      },
+      "offer_type": {
+        "body": "Instant sale pays you in full at purchase. Adopt stake: half now, half after care months qualify.",
+        "title": "Offer types"
+      },
+      "open_board": {
+        "body": "Other growers’ live asks. Useful to see how the board looks to adopters.",
+        "title": "Open market"
+      }
+    },
+    "next": "Next",
+    "plants": {
+      "add_plant": {
+        "body": "Name, strain, and stage kick off the journal. You can change stage as the grow advances.",
+        "title": "New plant"
+      },
+      "journal": {
+        "body": "Log watering, feeding, and stage notes. Tokenise quests read this trail before sealing.",
+        "title": "Care journal"
+      },
+      "plants_heading": {
+        "body": "Each plant is a living record. Start with + New plant if the list is empty.",
+        "title": "Your plants"
+      },
+      "weather": {
+        "body": "Set a city for a 7-day forecast — handy for outdoor planning. Skip if you grow indoors.",
+        "title": "Weather (optional)"
+      }
+    },
+    "skip": "Skip tour",
+    "stepCounter": "Step {n} / {total}"
+  },
+  "trail": {
+    "flowering": "Flower",
+    "germination": "Germ.",
+    "harvest": "Harvest",
+    "seed": "Seed",
+    "seedling": "Seedl.",
+    "vegetative": "Veget."
+  },
+  "tx": {
+    "confirmTimeout": "Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: {signature}. Refresh and check whether the offer/NFT already moved before trying again.",
+    "expired": "Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try posting again.",
+    "failedOnChain": "Transaction failed on-chain: {reason}",
+    "mintNotDeployed": "$GROWTOO mint is not deployed yet.",
+    "missingBalance": "This connected wallet does not have enough of that token for the transfer. Check the balance on Devnet and try again.",
+    "missingNft": "This connected wallet does not hold that Seed NFT. Switch to the wallet that received the mint (or transfer the NFT here), then try again.",
+    "walletNotConnected": "Wallet not connected."
+  },
+  "unlock": {
+    "body": "This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.",
+    "cancel": "Not now",
+    "confirm": "Unlock",
+    "fallback": "Unlock Tokenise & Market?\n\nOptional on-chain tools. Your journal stays free without a wallet.",
+    "title": "Unlock Tokenise & Market?"
+  },
+  "video": {
+    "formatUnsupported": "Use an MP4 or WebM video (this file type isn’t supported here).",
+    "tooLarge": "Video too large (max {mb} MB for local storage)."
+  },
+  "view-admin": {
+    "h2": "Admin Panel"
+  },
+  "view-adopt": {
+    "button": "Tokenise",
+    "button2": "Market",
+    "button3": "Simple",
+    "button4": "Advanced"
+  },
+  "view-blog": {
+    "h2": "Stories",
+    "h3": "Your stories",
+    "p": "Share tips, plant looks, problems, grower visits, and products from your plants on the public journal."
+  },
+  "view-danas": {
+    "div": "<span class=\"danas-title\">Water the plants</span> <span class=\"danas-desc\">3 plants need watering</span>",
+    "div2": "<span class=\"danas-title\">Check moisture</span> <span class=\"danas-desc\">Check the soil in the pots</span>",
+    "div3": "<span class=\"danas-title\">Add a note</span> <span class=\"danas-desc\">Write down any changes</span>"
+  },
+  "view-dashboard": {
+    "h2": "Recent notes"
+  },
+  "view-growlog": {
+    "h3": "Grow log photos",
+    "h32": "Strain",
+    "h33": "Grow stages",
+    "h34": "Environment",
+    "h35": "Seed-to-harvest trail",
+    "h36": "Recent photos",
+    "p": "Journal entries and photos in order — the documentation trail for this plant."
+  },
+  "view-market": {
+    "button": "Tokenise",
+    "button2": "Market",
+    "button3": "Simple",
+    "button4": "Advanced",
+    "h2": "My offers",
+    "h22": "<span class=\"adopter-only\">Plants you can adopt</span> <span class=\"grower-only\">Open market</span>",
+    "p": "Your posted contracts: active, adopted, or cancelled."
+  },
+  "view-plants": {
+    "h2": "My plants",
+    "h22": "Journal"
+  },
+  "view-toolbox": {
+    "h3": "Watering",
+    "h32": "Feeding",
+    "h33": "Environment",
+    "h34": "Transplanting",
+    "h35": "Stressors",
+    "h36": "Soil moisture",
+    "h37": "Charts",
+    "p": "Log when you watered your plant.",
+    "p2": "Track nutrients and doses.",
+    "p3": "Temperature, humidity, pH.",
+    "p4": "Log transplant details.",
+    "p5": "Record stress conditions and pests.",
+    "p6": "Live soil moisture sensor (Greenhouse).",
+    "p7": "Visualize growth and measurements."
+  },
+  "wallet": {
+    "addressChars": "That address contains invalid characters.",
+    "addressLength": "Enter a valid Solana address (32–44 characters, base58).",
+    "addressNotKey": "That address is not a valid Solana public key. Paste the full address (usually 43–44 characters).",
+    "addressNotKeyCheck": "That address is not a valid Solana public key. Check you pasted the full address (usually 43–44 characters).",
+    "alreadyLinked": "A different wallet is already linked to this account. Disconnect and contact support to change it.",
+    "approveIn": "Approve the connection in {wallet}…",
+    "badSignatureFormat": "Wallet signature format not recognized.",
+    "close": "Close",
+    "connectCancelled": "Connection cancelled in {wallet}.",
+    "connectFailed": "Wallet connection failed.",
+    "connectFailedUnlock": "Wallet connection failed. Unlock your wallet extension and try again.",
+    "connecting": "Connecting…",
+    "connectionFailed": "Connection failed.",
+    "emptySignature": "Wallet returned an empty signature.",
+    "footNeedWallet": "Need a wallet? <a href=\"https://solana.com/solutions/wallets\" target=\"_blank\" rel=\"noopener noreferrer\">Browse Solana wallets</a>",
+    "generic": "Something went wrong.",
+    "genericConsole": "Something went wrong. Open the browser console (F12) for details.",
+    "genericName": "Wallet",
+    "genericNameLower": "wallet",
+    "install": "Install",
+    "installExtension": "Install the {wallet} extension, refresh this page, then connect again.",
+    "installFirst": "Install {wallet} first.",
+    "installHint": "Install Phantom or Solflare, then refresh this page.",
+    "installRefresh": "Install the wallet, refresh, then connect again.",
+    "invalidAddress": "Invalid Solana wallet address.",
+    "invalidAddressShort": "Invalid address.",
+    "libraryTimeout": "Wallet library load timed out.",
+    "linkFailed": "Wallet link failed ({status})",
+    "linkTimeout": "Wallet link service timed out. Try again.",
+    "manualLabel": "Solana address",
+    "manualNote": "Watch-only cannot mint or sign. Prefer Phantom/Solflare.",
+    "manualToggle": "Enter address manually (watch-only)",
+    "noAccount": "{wallet} connected but no account was returned.",
+    "noAccountAvailable": "Wallet account not available.",
+    "noConnect": "{wallet} is installed but does not support connect().",
+    "noConnectShort": "{wallet} does not support connect.",
+    "noExtension": "No wallet extension in this browser.",
+    "noPublicKey": "{wallet} connected but no public key was returned.",
+    "noResponseExtension": "{wallet} did not respond within {seconds}s. Unlock the extension and try again.",
+    "noResponsePopup": "{wallet} did not respond. Unlock the extension, click the {wallet} icon in the toolbar if a popup is blocked, then try again.",
+    "noResponseUnlock": "{wallet} did not respond within {seconds}s. Unlock {wallet}, allow the popup, then try again.",
+    "noSignAll": "{wallet} does not support signAllTransactions.",
+    "noSignMessage": "{wallet} does not support signMessage.",
+    "noSignTransaction": "{wallet} does not support signTransaction.",
+    "notAvailable": "{wallet} is not available in this browser tab.",
+    "notFound": "No Solana wallet found. Install Phantom, Solflare, or another wallet, then refresh.",
+    "notFoundShort": "Wallet not found.",
+    "notInstalled": "Not installed",
+    "openApp": "Open app",
+    "openInApp": "Open this site inside the {wallet} in-app browser, then connect again.",
+    "phoneHint": "On phones, open this site inside Phantom or Solflare’s in-app browser.",
+    "pickerLede": "Choose Phantom or Solflare (Devnet).",
+    "pickerTitle": "Connect wallet",
+    "profileTimeout": "Firestore timed out loading your profile. Check your connection and try again.",
+    "saveFailed": "Could not save wallet link. Refresh and try again, or contact support.",
+    "selectionCancelled": "Wallet selection cancelled.",
+    "signInFirst": "Sign in to your growtoo account before linking a wallet.",
+    "signNoResponse": "Wallet did not respond to the sign request. Unlock the extension and try again.",
+    "signatureCancelled": "Signature cancelled in wallet. Tap Link account and approve the message to finish.",
+    "timedOut": "Request timed out.",
+    "useAddress": "Use this address",
+    "watchOnlyCannotSign": "Watch-only address cannot sign. Install Phantom or Solflare to mint or transfer."
+  },
+  "weather": {
+    "addCity": "Add a city above for a {days}-day forecast. Optional — skip if you grow indoors.",
+    "askCoach": "Ask Coach about the weather",
+    "coachHead": "Coach · what this means for your grow",
+    "dayCount": "{count} days · for grow planning",
+    "dayCount_one": "1 day · for grow planning",
+    "loadFailed": "Could not load the forecast. Check your connection and the city name.",
+    "loading": "Loading forecast…",
+    "noData": "No forecast data available.",
+    "swipeHint": "Swipe for all {days} days →",
+    "today": "Today",
+    "unavailable": "Forecast unavailable: {reason}",
+    "unknownCity": "Unknown city"
+  },
+  "write": {
+    "cannotAddEntry": "Cannot add entry for this plant.",
+    "cannotEditPlant": "Cannot edit this plant.",
+    "disabled": "Writes are disabled for this account."
+  }
+}

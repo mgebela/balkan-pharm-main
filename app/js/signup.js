@@ -66,18 +66,24 @@
     var raw = input || {};
     var profileType = normalizeProfileType(raw.profileType);
     if (!profileType) {
-      return { ok: false, error: 'Choose Grower or Adopter to continue.' };
+      return {
+        ok: false,
+        error: T('common.signup.pickRole', 'Choose Grower or Adopter to continue.'),
+      };
     }
 
     var displayName = trimStr(raw.displayName, 64);
     if (!displayName) {
-      return { ok: false, error: 'Enter a display name.' };
+      return { ok: false, error: T('common.signup.needName', 'Enter a display name.') };
     }
 
     if (!raw.acceptedConsent && !(raw.acceptedAge && raw.acceptedTerms)) {
       return {
         ok: false,
-        error: 'Confirm you are 18+ and agree to the Terms & Privacy Policy.',
+        error: T(
+          'common.signup.needConsent',
+          'Confirm you are 18+ and agree to the Terms & Privacy Policy.'
+        ),
       };
     }
 
@@ -92,7 +98,12 @@
 
     if (profileType === PROFILE_TYPES.grower) {
       var setup = normalizeGrowSetup(raw.growSetup);
-      if (!setup) return { ok: false, error: 'Choose a grow setup (indoor, outdoor, or mixed).' };
+      if (!setup) {
+        return {
+          ok: false,
+          error: T('common.signup.needSetup', 'Choose a grow setup (indoor, outdoor, or mixed).'),
+        };
+      }
       var city = trimStr(raw.homeCity, 80);
       payload.growSetup = setup;
       if (city) payload.homeCity = city;
@@ -106,9 +117,20 @@
       }
     } else {
       var intent = normalizeAdopterIntent(raw.adopterIntent);
-      if (!intent) return { ok: false, error: 'Choose why you’re joining as an adopter.' };
+      if (!intent) {
+        return {
+          ok: false,
+          error: T('common.signup.needIntent', 'Choose why you’re joining as an adopter.'),
+        };
+      }
       if (!raw.acceptedDevnet) {
-        return { ok: false, error: 'Confirm you understand this uses Solana’s test network (no real value).' };
+        return {
+          ok: false,
+          error: T(
+            'common.signup.needDevnet',
+            'Confirm you understand this uses Solana’s test network (no real value).'
+          ),
+        };
       }
       payload.adopterIntent = intent;
       payload.acceptedDevnet = true;
@@ -307,6 +329,7 @@
    */
   async function ensureFirestoreProfile(user, firestoreApi) {
     if (!user || !user.uid || !firestoreApi) {
+      // i18n-ignore — an invariant failure, never shown to a grower.
       throw new Error('Missing user or Firestore for signup profile.');
     }
     var pending = readPending();

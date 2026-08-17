@@ -1,0 +1,63 @@
+{
+  "lang": {
+    "label": "Jezik"
+  },
+  "nav": {
+    "tokenise": "Tokeniziraj",
+    "market": "Tržnica",
+    "faq": "Pitanja",
+    "docs": "Dokumentacija",
+    "menu": "Izbornik",
+    "journal": "Dnevnik"
+  },
+  "brand": {
+    "poweredBy": "Pokreće"
+  },
+  "cta": {
+    "startGrow": "Pokreni uzgoj",
+    "enterAdopter": "Uđi kao posvojitelj",
+    "openJournal": "Otvori dnevnik",
+    "readDocs": "Pročitaj dokumentaciju",
+    "readFaq": "Prvo pročitaj pitanja",
+    "signIn": "Prijava",
+    "verify": "Provjeri →",
+    "browseInApp": "Pregledaj u aplikaciji →"
+  },
+  "footer": {
+    "tagline": "Uzgoji ponovno — dnevnik, savjetnik, dokaz po želji.",
+    "app": "Aplikacija",
+    "how": "Kako radi",
+    "growers": "Uzgajivači",
+    "adopters": "Posvojitelji",
+    "stakes": "Ulozi",
+    "faq": "Pitanja",
+    "risks": "Rizici",
+    "docs": "Dokumentacija",
+    "privacy": "Privatnost",
+    "terms": "Uvjeti",
+    "copy": "© growtoo. Sva prava pridržana."
+  },
+  "trust": {
+    "ageTitle": "Imaš li {age} ili više godina?",
+    "ageBody": "growtoo je dnevnik uzgoja kanabisa i pripadajući alati. Za ulaz moraš imati najmanje {age} godina. Lokalni zakoni i dalje vrijede ondje gdje živiš.",
+    "ageYes": "Imam {age}+",
+    "ageNo": "Nemam {age}",
+    "deniedTitle": "Pristup ograničen",
+    "deniedBody": "Žao nam je — growtoo je samo za odrasle {age}+. Molimo napusti ovu stranicu.",
+    "leave": "Izađi"
+  },
+  "cookies": {
+    "title": "Kolačići i lokalni podaci",
+    "body": "Koristimo nužnu pohranu za prijavu i tvoje postavke dnevnika. Neobavezna analitika pomaže nam poboljšati proizvod. Pogledaj <a href=\"{href}\">Pravila privatnosti</a>.",
+    "acceptAll": "Prihvati sve",
+    "essential": "Samo nužno"
+  },
+  "signup": {
+    "pickRole": "Odaberi Uzgajivač ili Posvojitelj za nastavak.",
+    "needName": "Upiši ime za prikaz.",
+    "needConsent": "Potvrdi da imaš 18+ i prihvaćaš Uvjete i Pravila privatnosti.",
+    "needSetup": "Odaberi način uzgoja (unutra, vani ili mješovito).",
+    "needIntent": "Odaberi zašto se pridružuješ kao posvojitelj.",
+    "needDevnet": "Potvrdi da razumiješ da ovo koristi Solaninu testnu mrežu (bez prave vrijednosti)."
+  }
+}

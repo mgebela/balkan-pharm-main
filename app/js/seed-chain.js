@@ -147,7 +147,7 @@
       const user = currentUser();
       if (!user) return null;
       if (!seed || !seed.plantId) {
-        throw new Error('Link a journal plant before minting a seed RWA.');
+        throw new Error(T('app.seedChain.needPlant', 'Link a journal plant before minting a seed RWA.'));
       }
 
       const linked = window.WalletLink ? WalletLink.getProfile() : {};
@@ -178,7 +178,7 @@
       const failed = this.getMint(failedRequestId);
       const base = Object.assign({}, failed || {}, seed || {});
       if (!base.plantId) {
-        throw new Error('Link a journal plant before retrying the seed mint.');
+        throw new Error(T('app.seedChain.needPlantRetry', 'Link a journal plant before retrying the seed mint.'));
       }
       return this.requestSeedMint({
         name: base.name,
@@ -200,10 +200,10 @@
       const user = currentUser();
       if (!user) return null;
       if (!params || !params.mintAddress) {
-        throw new Error('Seed NFT is not minted on devnet yet.');
+        throw new Error(T('app.seedChain.notMinted', 'Seed NFT is not minted on devnet yet.'));
       }
       if (!params.plantId) {
-        throw new Error('Growth mint requires a linked journal plant.');
+        throw new Error(T('app.seedChain.growthNeedsPlant', 'Growth mint requires a linked journal plant.'));
       }
 
       const linked = window.WalletLink ? WalletLink.getProfile() : {};

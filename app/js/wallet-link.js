@@ -53,15 +53,22 @@
     return typeof pk === 'string' && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(pk);
   }
 
+  /**
+   * The wallet signs this text and functions/link-wallet.js verifies the
+   * signature against the exact same string — it checks for the English
+   * preamble, "Domain: growto.live" and "Cluster: devnet" literally. This is
+   * a protocol message, not copy: translating it would make every signature
+   * fail verification. i18n-ignore, deliberately, for the whole block.
+   */
   function buildLinkMessage(uid, pubkey) {
     return [
-      'Link this Solana wallet to your growtoo account.',
+      'Link this Solana wallet to your growtoo account.', // i18n-ignore
       '',
-      'Domain: growto.live',
-      'UID: ' + uid,
-      'Wallet: ' + pubkey,
-      'Cluster: devnet',
-      'Issued: ' + new Date().toISOString(),
+      'Domain: growto.live', // i18n-ignore
+      'UID: ' + uid, // i18n-ignore
+      'Wallet: ' + pubkey, // i18n-ignore
+      'Cluster: devnet', // i18n-ignore
+      'Issued: ' + new Date().toISOString(), // i18n-ignore
     ].join('\n');
   }
 
@@ -69,7 +76,7 @@
     let timer;
     const timeout = new Promise(function (_, reject) {
       timer = setTimeout(function () {
-        reject(new Error(message || 'Request timed out.'));
+        reject(new Error(message || T('app.wallet.timedOut', 'Request timed out.')));
       }, ms);
     });
     return Promise.race([promise, timeout]).finally(function () {
@@ -81,7 +88,9 @@
 
   function encodeSignature(result) {
     var sig = result && result.signature != null ? result.signature : result;
-    if (!sig) throw new Error('Wallet returned an empty signature.');
+    if (!sig) {
+      throw new Error(T('app.wallet.emptySignature', 'Wallet returned an empty signature.'));
+    }
     if (typeof sig === 'string') return sig;
     var bytes =
       sig instanceof Uint8Array
@@ -92,7 +101,9 @@
             ? Uint8Array.from(sig.data)
             : null;
     if (!bytes || !bytes.length) {
-      throw new Error('Wallet signature format not recognized.');
+      throw new Error(
+      T('app.wallet.badSignatureFormat', 'Wallet signature format not recognized.')
+    );
     }
     var bin = '';
     for (var i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
@@ -101,12 +112,16 @@
 
   async function signLinkMessage(message) {
     const SW = window.SolanaWallet;
+    // i18n-ignore — a loading failure, reported through formatError below.
     if (!SW) throw new Error('Solana wallet module not loaded.');
     const bytes = new TextEncoder().encode(message);
     const result = await withTimeout(
       SW.signMessage(bytes),
       45000,
-      'Wallet did not respond to the sign request. Unlock the extension and try again.'
+      T(
+        'app.wallet.signNoResponse',
+        'Wallet did not respond to the sign request. Unlock the extension and try again.'
+      )
     );
     return encodeSignature(result);
   }
@@ -119,24 +134,31 @@
 
   async function callLinkWallet(body) {
     const token = await getIdToken();
-    if (!token) throw new Error('Sign in to your growtoo account before linking a wallet.');
+    if (!token) {
+      throw new Error(
+        T('app.wallet.signInFirst', 'Sign in to your growtoo account before linking a wallet.')
+      );
+    }
     const res = await withTimeout(
       fetch(linkWalletUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token,
+          Authorization: 'Bearer ' + token, // i18n-ignore — HTTP scheme.
         },
         body: JSON.stringify(body),
       }),
       30000,
-      'Wallet link service timed out. Try again.'
+      T('app.wallet.linkTimeout', 'Wallet link service timed out. Try again.')
     );
     const data = await res.json().catch(function () {
       return {};
     });
     if (!res.ok || !data.ok) {
-      const err = new Error(data.error || 'Wallet link failed (' + res.status + ')');
+      const err = new Error(
+        data.error ||
+          T('app.wallet.linkFailed', 'Wallet link failed ({status})', { status: res.status })
+      );
       err.code = res.status === 401 ? 'auth' : data.code;
       err.status = res.status;
       throw err;
@@ -145,7 +167,7 @@
   }
 
   function normalizeWalletError(err) {
-    if (!err) return 'Something went wrong.';
+    if (!err) return T('app.wallet.generic', 'Something went wrong.');
     if (typeof err === 'string') return err;
     const raw = String(err.message || err.error || '');
     if (
@@ -154,14 +176,23 @@
       /^(cancelled|canceled|user rejected|rejected by user)/i.test(raw.trim()) ||
       /user rejected|request rejected|user cancelled|user canceled/i.test(raw)
     ) {
-      return 'Signature cancelled in wallet. Tap Link account and approve the message to finish.';
+      return T(
+        'app.wallet.signatureCancelled',
+        'Signature cancelled in wallet. Tap Link account and approve the message to finish.'
+      );
     }
     if (err.message) return err.message;
     if (err.code === 'permission-denied') {
-      return 'Could not save wallet link. Refresh and try again, or contact support.';
+      return T(
+        'app.wallet.saveFailed',
+        'Could not save wallet link. Refresh and try again, or contact support.'
+      );
     }
     if (err.code === 'WALLET_NOT_FOUND') {
-      return 'No Solana wallet found. Install Phantom, Solflare, or another wallet, then refresh.';
+      return T(
+        'app.wallet.notFound',
+        'No Solana wallet found. Install Phantom, Solflare, or another wallet, then refresh.'
+      );
     }
     try {
       const details = err.details || err.reason || err.error;
@@ -170,7 +201,10 @@
       // ignore
     }
     console.error('Wallet error', err);
-    return 'Something went wrong. Open the browser console (F12) for details.';
+    return T(
+      'app.wallet.genericConsole',
+      'Something went wrong. Open the browser console (F12) for details.'
+    );
   }
 
   const WalletLink = {
@@ -218,7 +252,10 @@
       const snap = await withTimeout(
         firestore.collection('users').doc(user.uid).get(),
         FIRESTORE_TIMEOUT_MS,
-        'Firestore timed out loading your profile. Check your connection and try again.'
+        T(
+          'app.wallet.profileTimeout',
+          'Firestore timed out loading your profile. Check your connection and try again.'
+        )
       );
       const data = snap.exists ? snap.data() || {} : {};
       cache.uid = user.uid;
@@ -237,10 +274,12 @@
       const opts = options || {};
       const user = firebaseUser();
       if (!user) {
-        throw new Error('Sign in to your growtoo account before linking a wallet.');
+        throw new Error(
+          T('app.wallet.signInFirst', 'Sign in to your growtoo account before linking a wallet.')
+        );
       }
       if (!isValidPubkey(pubkey)) {
-        throw new Error('Invalid Solana wallet address.');
+        throw new Error(T('app.wallet.invalidAddress', 'Invalid Solana wallet address.'));
       }
 
       await WalletLink.loadProfile();
@@ -251,7 +290,10 @@
 
       if (cache.solanaPubkey && cache.solanaPubkey !== pubkey && !opts.force) {
         throw new Error(
-          'A different wallet is already linked to this account. Disconnect and contact support to change it.'
+          T(
+            'app.wallet.alreadyLinked',
+            'A different wallet is already linked to this account. Disconnect and contact support to change it.'
+          )
         );
       }
 

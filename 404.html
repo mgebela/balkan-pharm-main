@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Page not found · growtoo</title>
+  <title data-i18n="notfound.meta.title">Page not found · growtoo</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#0f1a12" />
   <meta property="og:title" content="Page not found · growtoo" />
@@ -25,7 +25,9 @@
       } catch (e) {}
     })();
   </script>
+  <script src="js/i18n.js?v=71748ff1e6" data-i18n-ns="common,notfound"></script>
   <link rel="stylesheet" href="styles/tokens.css?v=20260806t" />
+  <link rel="stylesheet" href="styles/i18n.css?v=20260816a" />
   <style>
     :root {
       --bg: #0f1a12;
@@ -128,12 +130,13 @@
   <main class="miss">
     <img class="miss-mark" src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="56" height="56" />
     <p class="miss-eyebrow">404</p>
-    <h1>This page isn’t in the journal</h1>
-    <p>The link may be old, or the page moved. Head home — or open your private journal if you’re signed in.</p>
-    <div class="miss-actions">
+    <h1 data-i18n="notfound.h1">This page isn’t in the journal</h1>
+    <p data-i18n="notfound.p">The link may be old, or the page moved. Head home — or open your private journal if you’re signed in.</p>
+    <div data-i18n-html="notfound.div" class="miss-actions">
       <a class="btn-primary" href="/">Back to home</a>
       <a class="btn-secondary" href="/app/">Open journal</a>
     </div>
   </main>
+  <div class="lang-switch-floating"><div class="nav-lang" data-i18n-switcher></div></div>
 </body>
 </html>

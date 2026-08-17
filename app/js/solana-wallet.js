@@ -63,7 +63,7 @@
     let timer;
     const timeout = new Promise(function (_, reject) {
       timer = setTimeout(function () {
-        reject(new Error(message || 'Request timed out.'));
+        reject(new Error(message || T('app.wallet.timedOut', 'Request timed out.')));
       }, ms);
     });
     return Promise.race([promise, timeout]).finally(function () {
@@ -80,6 +80,7 @@
         const mod = await withTimeout(
           import(url),
           IMPORT_TIMEOUT_MS,
+          // i18n-ignore — CDN loader diagnostic.
           label + ' load timed out (' + Math.round(IMPORT_TIMEOUT_MS / 1000) + 's).'
         );
         const ms = Math.round(
@@ -92,6 +93,7 @@
         console.warn('[SolanaWallet]', label, 'failed from', url, err && err.message);
       }
     }
+    // i18n-ignore — CDN loader diagnostic.
     throw lastErr || new Error(label + ' failed to load.');
   }
 
@@ -112,11 +114,13 @@
   async function loadWalletStandard() {
     if (standardApi) return standardApi;
     if (standardApiLoading) return standardApiLoading;
+    // i18n-ignore — label used only in loader diagnostics.
     standardApiLoading = importFirst(WALLET_STANDARD_CDNS, 'Wallet Standard')
       .then(function (mod) {
         const getWallets = mod.getWallets || (mod.default && mod.default.getWallets);
         if (typeof getWallets !== 'function') {
-          throw new Error('Wallet Standard failed to load.');
+          // i18n-ignore — CDN loader diagnostic.
+      throw new Error('Wallet Standard failed to load.');
         }
         standardApi = getWallets();
         return standardApi;
@@ -212,22 +216,32 @@
         const url = isMobileBrowser() && deep ? deep : installUrl;
         window.open(url, '_blank', 'noopener,noreferrer');
         throw new Error(
-          name +
-            ' is not available in this browser tab. ' +
+          T('app.wallet.notAvailable', '{wallet} is not available in this browser tab.', {
+            wallet: name,
+          }) +
+            ' ' +
             (isMobileBrowser()
-              ? 'Open this site inside the ' + name + ' in-app browser, then connect again.'
-              : 'Install the ' + name + ' extension, refresh this page, then connect again.')
+              ? T(
+                  'app.wallet.openInApp',
+                  'Open this site inside the {wallet} in-app browser, then connect again.',
+                  { wallet: name }
+                )
+              : T(
+                  'app.wallet.installExtension',
+                  'Install the {wallet} extension, refresh this page, then connect again.',
+                  { wallet: name }
+                ))
         );
       },
       disconnect: async function () {},
       signMessage: async function () {
-        throw new Error('Install ' + name + ' first.');
+        throw new Error(T('app.wallet.installFirst', 'Install {wallet} first.', { wallet: name }));
       },
       signTransaction: async function () {
-        throw new Error('Install ' + name + ' first.');
+        throw new Error(T('app.wallet.installFirst', 'Install {wallet} first.', { wallet: name }));
       },
       signAllTransactions: async function () {
-        throw new Error('Install ' + name + ' first.');
+        throw new Error(T('app.wallet.installFirst', 'Install {wallet} first.', { wallet: name }));
       },
     };
   }
@@ -248,19 +262,22 @@
         }
 
         if (typeof provider.connect !== 'function') {
-          throw new Error(name + ' is installed but does not support connect().');
+          throw new Error(
+          T('app.wallet.noConnect', '{wallet} is installed but does not support connect().', {
+            wallet: name,
+          })
+        );
         }
 
         try {
           await withTimeout(
             Promise.resolve(provider.connect({ onlyIfTrusted: false })),
             CONNECT_TIMEOUT_MS,
-            name +
-              ' did not respond within ' +
-              Math.round(CONNECT_TIMEOUT_MS / 1000) +
-              's. Unlock ' +
-              name +
-              ', allow the popup, then try again.'
+            T(
+              'app.wallet.noResponseUnlock',
+              '{wallet} did not respond within {seconds}s. Unlock {wallet}, allow the popup, then try again.',
+              { wallet: name, seconds: Math.round(CONNECT_TIMEOUT_MS / 1000) }
+            )
           );
         } catch (err) {
           // Some builds reject when already connected — still try to read the key.
@@ -275,7 +292,13 @@
           await sleep(250);
           pk = await readLegacyPublicKey(provider);
         }
-        if (!pk) throw new Error(name + ' connected but no public key was returned.');
+        if (!pk) {
+        throw new Error(
+          T('app.wallet.noPublicKey', '{wallet} connected but no public key was returned.', {
+            wallet: name,
+          })
+        );
+      }
         return pk;
       },
       disconnect: async function () {
@@ -289,7 +312,9 @@
       },
       signMessage: async function (bytes) {
         if (typeof provider.signMessage !== 'function') {
-          throw new Error(name + ' does not support signMessage.');
+          throw new Error(
+          T('app.wallet.noSignMessage', '{wallet} does not support signMessage.', { wallet: name })
+        );
         }
         // Solflare often cancels if display encoding is wrong; try utf8 then bare bytes.
         try {
@@ -306,7 +331,11 @@
       },
       signTransaction: async function (transaction) {
         if (typeof provider.signTransaction !== 'function') {
-          throw new Error(name + ' does not support signTransaction.');
+          throw new Error(
+          T('app.wallet.noSignTransaction', '{wallet} does not support signTransaction.', {
+            wallet: name,
+          })
+        );
         }
         return provider.signTransaction(transaction);
       },
@@ -364,19 +393,27 @@
 
     return {
       id: id,
-      name: wallet.name || 'Wallet',
+      name: wallet.name || T('app.wallet.genericName', 'Wallet'),
       icon: walletIcon(wallet),
       kind: 'standard',
       wallet: wallet,
       connect: async function () {
         const connect = wallet.features && wallet.features['standard:connect'];
         if (!connect || typeof connect.connect !== 'function') {
-          throw new Error((wallet.name || 'Wallet') + ' does not support connect.');
+          throw new Error(
+          T('app.wallet.noConnectShort', '{wallet} does not support connect.', {
+            wallet: wallet.name || T('app.wallet.genericName', 'Wallet'),
+          })
+        );
         }
         await connect.connect();
         account = pickAccount();
         if (!account || !account.address) {
-          throw new Error((wallet.name || 'Wallet') + ' connected but no account was returned.');
+          throw new Error(
+          T('app.wallet.noAccount', '{wallet} connected but no account was returned.', {
+            wallet: wallet.name || T('app.wallet.genericName', 'Wallet'),
+          })
+        );
         }
         const web3 = await loadWeb3();
         return new web3.PublicKey(account.address);
@@ -396,16 +433,26 @@
         const current = pickAccount();
         const signMessage = wallet.features && wallet.features['solana:signMessage'];
         if (!signMessage || typeof signMessage.signMessage !== 'function') {
-          throw new Error((wallet.name || 'Wallet') + ' does not support signMessage.');
+          throw new Error(
+          T('app.wallet.noSignMessage', '{wallet} does not support signMessage.', {
+            wallet: wallet.name || T('app.wallet.genericName', 'Wallet'),
+          })
+        );
         }
-        if (!current) throw new Error('Wallet account not available.');
+        if (!current) {
+          throw new Error(T('app.wallet.noAccountAvailable', 'Wallet account not available.'));
+        }
         return signMessage.signMessage({ account: current, message: bytes });
       },
       signTransaction: async function (transaction) {
         const current = pickAccount();
         const signTx = wallet.features && wallet.features['solana:signTransaction'];
         if (!signTx || typeof signTx.signTransaction !== 'function') {
-          throw new Error((wallet.name || 'Wallet') + ' does not support signTransaction.');
+          throw new Error(
+          T('app.wallet.noSignTransaction', '{wallet} does not support signTransaction.', {
+            wallet: wallet.name || T('app.wallet.genericName', 'Wallet'),
+          })
+        );
         }
         if (!current) throw new Error('Wallet account not available.');
         const out = await signTx.signTransaction({ account: current, transaction: transaction });
@@ -426,7 +473,11 @@
           }
           return out;
         }
-        throw new Error((wallet.name || 'Wallet') + ' does not support signAllTransactions.');
+        throw new Error(
+          T('app.wallet.noSignAll', '{wallet} does not support signAllTransactions.', {
+            wallet: wallet.name || T('app.wallet.genericName', 'Wallet'),
+          })
+        );
       },
     };
   }
@@ -462,15 +513,18 @@
     }
 
     // Legacy providers first — sync and instant (do not wait on CDN).
-    upsert(legacyAdapter('phantom', 'Phantom', getLegacyPhantom(), ''));
-    upsert(legacyAdapter('solflare', 'Solflare', getLegacySolflare(), ''));
-    upsert(legacyAdapter('backpack', 'Backpack', getLegacyBackpack(), ''));
+    /* Wallet brand names, not copy — Phantom is Phantom in every language.
+       i18n-ignore covers the registrations below. */
+    upsert(legacyAdapter('phantom', 'Phantom', getLegacyPhantom(), '')); // i18n-ignore
+    upsert(legacyAdapter('solflare', 'Solflare', getLegacySolflare(), '')); // i18n-ignore
+    upsert(legacyAdapter('backpack', 'Backpack', getLegacyBackpack(), '')); // i18n-ignore
 
     // Wallet Standard with a short budget so Connect never freezes.
     try {
       const api = await withTimeout(
         loadWalletStandard(),
         WALLET_STANDARD_BUDGET_MS,
+        // i18n-ignore — internal discovery diagnostic.
         'Wallet Standard discovery timed out'
       );
       const wallets = api && typeof api.get === 'function' ? api.get() : [];
@@ -482,8 +536,8 @@
     }
 
     // Always offer install / open options when the extension is missing.
-    if (!found.has('phantom')) upsert(installAdapter('phantom', 'Phantom', PHANTOM_INSTALL));
-    if (!found.has('solflare')) upsert(installAdapter('solflare', 'Solflare', SOLFLARE_INSTALL));
+    if (!found.has('phantom')) upsert(installAdapter('phantom', 'Phantom', PHANTOM_INSTALL)); // i18n-ignore
+    if (!found.has('solflare')) upsert(installAdapter('solflare', 'Solflare', SOLFLARE_INSTALL)); // i18n-ignore
 
     return Array.from(found.values()).sort(function (a, b) {
       return adapterRank(b) - adapterRank(a) || a.name.localeCompare(b.name);
@@ -498,6 +552,7 @@
     const bytes = [0];
     for (let i = 0; i < str.length; i += 1) {
       const value = BASE58_ALPHABET.indexOf(str[i]);
+      // i18n-ignore — decoder invariant, wrapped by the callers below.
       if (value < 0) throw new Error('Invalid base58 character');
       let carry = value;
       for (let j = 0; j < bytes.length; j += 1) {
@@ -517,17 +572,22 @@
   function assertValidSolanaAddress(address) {
     const trimmed = String(address || '').trim();
     if (!isValidBase58Address(trimmed)) {
-      throw new Error('Enter a valid Solana address (32–44 characters, base58).');
+      throw new Error(
+        T('app.wallet.addressLength', 'Enter a valid Solana address (32–44 characters, base58).')
+      );
     }
     let bytes;
     try {
       bytes = base58ToBytes(trimmed);
     } catch {
-      throw new Error('That address contains invalid characters.');
+      throw new Error(T('app.wallet.addressChars', 'That address contains invalid characters.'));
     }
     if (!bytes || bytes.length !== 32) {
       throw new Error(
-        'That address is not a valid Solana public key. Paste the full address (usually 43–44 characters).'
+        T(
+          'app.wallet.addressNotKey',
+          'That address is not a valid Solana public key. Paste the full address (usually 43–44 characters).'
+        )
       );
     }
     return trimmed;
@@ -547,7 +607,11 @@
   async function parsePublicKey(address) {
     const trimmed = assertValidSolanaAddress(address);
     try {
-      const web3 = await withTimeout(loadWeb3(), IMPORT_TIMEOUT_MS, 'Wallet library load timed out.');
+      const web3 = await withTimeout(
+        loadWeb3(),
+        IMPORT_TIMEOUT_MS,
+        T('app.wallet.libraryTimeout', 'Wallet library load timed out.')
+      );
       return new web3.PublicKey(trimmed);
     } catch (err) {
       // Watch-only / display still works with a lightweight key stub.
@@ -556,7 +620,10 @@
         return pubkeyStub(trimmed);
       }
       throw new Error(
-        'That address is not a valid Solana public key. Check you pasted the full address (usually 43–44 characters).'
+        T(
+          'app.wallet.addressNotKeyCheck',
+          'That address is not a valid Solana public key. Check you pasted the full address (usually 43–44 characters).'
+        )
       );
     }
   }
@@ -564,7 +631,10 @@
   function manualAdapter(address) {
     function watchOnlyError() {
       return new Error(
-        'Watch-only address cannot sign. Install Phantom or Solflare to mint or transfer.'
+        T(
+          'app.wallet.watchOnlyCannotSign',
+          'Watch-only address cannot sign. Install Phantom or Solflare to mint or transfer.'
+        )
       );
     }
     return {
@@ -589,12 +659,21 @@
   }
 
   function wrapConnectError(err, walletName) {
-    if (!err) return new Error('Wallet connection failed.');
+    if (!err) return new Error(T('app.wallet.connectFailed', 'Wallet connection failed.'));
     if (err.message) return err;
     if (err.code === 4001 || err.code === '4001') {
-      return new Error('Connection cancelled in ' + (walletName || 'wallet') + '.');
+      return new Error(
+        T('app.wallet.connectCancelled', 'Connection cancelled in {wallet}.', {
+          wallet: walletName || T('app.wallet.genericNameLower', 'wallet'),
+        })
+      );
     }
-    return new Error('Wallet connection failed. Unlock your wallet extension and try again.');
+    return new Error(
+      T(
+        'app.wallet.connectFailedUnlock',
+        'Wallet connection failed. Unlock your wallet extension and try again.'
+      )
+    );
   }
 
   function removeWalletPicker() {
@@ -621,7 +700,9 @@
         const badge =
           adapter.kind === 'install'
             ? '<span class="wallet-picker-badge">' +
-              (isMobileBrowser() ? 'Open app' : 'Install') +
+              (isMobileBrowser()
+                ? T('app.wallet.openApp', 'Open app')
+                : T('app.wallet.install', 'Install')) +
               '</span>'
             : '';
         return (
@@ -642,13 +723,21 @@
       const listHtml = hasInstalled
         ? installed.map(itemHtml).join('') +
           (installs.length
-            ? '<p class="wallet-picker-divider">Not installed</p>' + installs.map(itemHtml).join('')
+            ? '<p class="wallet-picker-divider">' +
+              T('app.wallet.notInstalled', 'Not installed') +
+              '</p>' +
+              installs.map(itemHtml).join('')
             : '')
-        : '<p class="wallet-picker-empty">No wallet extension in this browser.</p>' +
+        : '<p class="wallet-picker-empty">' +
+          T('app.wallet.noExtension', 'No wallet extension in this browser.') +
+          '</p>' +
           '<p class="wallet-picker-empty-hint">' +
           (isMobileBrowser()
-            ? 'On phones, open this site inside Phantom or Solflare’s in-app browser.'
-            : 'Install Phantom or Solflare, then refresh this page.') +
+            ? T(
+                'app.wallet.phoneHint',
+                'On phones, open this site inside Phantom or Solflare’s in-app browser.'
+              )
+            : T('app.wallet.installHint', 'Install Phantom or Solflare, then refresh this page.')) +
           '</p>' +
           installs.map(itemHtml).join('');
 
@@ -658,22 +747,41 @@
       overlay.innerHTML =
         '<div class="wallet-picker-card" role="dialog" aria-modal="true" aria-labelledby="wallet-picker-title">' +
         '<header class="wallet-picker-head">' +
-        '<h2 id="wallet-picker-title">Connect wallet</h2>' +
-        '<button type="button" class="wallet-picker-close" aria-label="Close">×</button>' +
+        '<h2 id="wallet-picker-title">' +
+        T('app.wallet.pickerTitle', 'Connect wallet') +
+        '</h2>' +
+        '<button type="button" class="wallet-picker-close" aria-label="' +
+        T('app.wallet.close', 'Close') +
+        '">×</button>' +
         '</header>' +
-        '<p class="wallet-picker-lede">Choose Phantom or Solflare (Devnet).</p>' +
+        '<p class="wallet-picker-lede">' +
+        T('app.wallet.pickerLede', 'Choose Phantom or Solflare (Devnet).') +
+        '</p>' +
         '<div class="wallet-picker-list">' +
         listHtml +
         '</div>' +
-        '<button type="button" class="wallet-picker-manual-toggle">Enter address manually (watch-only)</button>' +
+        '<button type="button" class="wallet-picker-manual-toggle">' +
+        T('app.wallet.manualToggle', 'Enter address manually (watch-only)') +
+        '</button>' +
         '<form class="wallet-picker-manual" hidden>' +
-        '<label class="wallet-picker-manual-label" for="wallet-picker-manual-input">Solana address</label>' +
+        '<label class="wallet-picker-manual-label" for="wallet-picker-manual-input">' +
+        T('app.wallet.manualLabel', 'Solana address') +
+        '</label>' +
         '<input type="text" id="wallet-picker-manual-input" class="wallet-picker-manual-input" placeholder="e.g. 9k1QwNaq…Hfhi" autocomplete="off" spellcheck="false" />' +
         '<p class="wallet-picker-manual-error" id="wallet-picker-manual-error" hidden></p>' +
-        '<p class="wallet-picker-manual-note">Watch-only cannot mint or sign. Prefer Phantom/Solflare.</p>' +
-        '<button type="submit" class="btn btn-primary wallet-picker-manual-submit">Use this address</button>' +
+        '<p class="wallet-picker-manual-note">' +
+        T('app.wallet.manualNote', 'Watch-only cannot mint or sign. Prefer Phantom/Solflare.') +
+        '</p>' +
+        '<button type="submit" class="btn btn-primary wallet-picker-manual-submit">' +
+        T('app.wallet.useAddress', 'Use this address') +
+        '</button>' +
         '</form>' +
-        '<p class="wallet-picker-foot">Need a wallet? <a href="https://solana.com/solutions/wallets" target="_blank" rel="noopener noreferrer">Browse Solana wallets</a></p>' +
+        '<p class="wallet-picker-foot">' +
+        T(
+          'app.wallet.footNeedWallet',
+          'Need a wallet? <a href="https://solana.com/solutions/wallets" target="_blank" rel="noopener noreferrer">Browse Solana wallets</a>'
+        ) +
+        '</p>' +
         '</div>';
 
       let settled = false;
@@ -712,7 +820,7 @@
 
       function onKey(e) {
         if (e.key === 'Escape') {
-          settleReject(new Error('Wallet selection cancelled.'));
+          settleReject(new Error(T('app.wallet.selectionCancelled', 'Wallet selection cancelled.')));
         }
       }
 
@@ -744,7 +852,12 @@
         if (settled) return;
         setPickerBusy(true);
         if (btn) btn.classList.add('wallet-picker-item--pending');
-        showPickerStatus('Approve the connection in ' + adapter.name + '…', false);
+        showPickerStatus(
+          T('app.wallet.approveIn', 'Approve the connection in {wallet}…', {
+            wallet: adapter.name,
+          }),
+          false
+        );
 
         try {
           if (adapter.kind === 'install') {
@@ -754,23 +867,27 @@
           const pk = await withTimeout(
             adapter.connect(),
             CONNECT_TIMEOUT_MS,
-            adapter.name +
-              ' did not respond. Unlock the extension, click the ' +
-              adapter.name +
-              ' icon in the toolbar if a popup is blocked, then try again.'
+            T(
+              'app.wallet.noResponsePopup',
+              '{wallet} did not respond. Unlock the extension, click the {wallet} icon in the toolbar if a popup is blocked, then try again.',
+              { wallet: adapter.name }
+            )
           );
           settleResolve(preconnectedAdapter(adapter, pk));
         } catch (err) {
           setPickerBusy(false);
           if (btn) btn.classList.remove('wallet-picker-item--pending');
-          showPickerStatus((err && err.message) || 'Connection failed.', true);
+          showPickerStatus(
+            (err && err.message) || T('app.wallet.connectionFailed', 'Connection failed.'),
+            true
+          );
         }
       }
 
       overlay.addEventListener('click', function (e) {
         if (e.target === overlay) {
           if (overlay.classList.contains('wallet-picker-modal--busy')) return;
-          settleReject(new Error('Wallet selection cancelled.'));
+          settleReject(new Error(T('app.wallet.selectionCancelled', 'Wallet selection cancelled.')));
           return;
         }
         const btn = e.target.closest('.wallet-picker-item');
@@ -781,7 +898,7 @@
             return a.id === id;
           });
           if (!adapter) {
-            settleReject(new Error('Wallet not found.'));
+            settleReject(new Error(T('app.wallet.notFoundShort', 'Wallet not found.')));
             return;
           }
           if (adapter.kind === 'install') {
@@ -791,7 +908,11 @@
                 settleResolve(adapter);
               })
               .catch(function (err) {
-                showPickerStatus((err && err.message) || 'Install the wallet, refresh, then connect again.', true);
+                showPickerStatus(
+          (err && err.message) ||
+            T('app.wallet.installRefresh', 'Install the wallet, refresh, then connect again.'),
+          true
+        );
               });
             return;
           }
@@ -812,7 +933,7 @@
         }
         if (e.target.closest('.wallet-picker-close')) {
           if (overlay.classList.contains('wallet-picker-modal--busy')) return;
-          settleReject(new Error('Wallet selection cancelled.'));
+          settleReject(new Error(T('app.wallet.selectionCancelled', 'Wallet selection cancelled.')));
         }
       });
 
@@ -835,21 +956,21 @@
         try {
           assertValidSolanaAddress(address);
         } catch (err) {
-          showManualError((err && err.message) || 'Invalid address.');
+          showManualError((err && err.message) || T('app.wallet.invalidAddressShort', 'Invalid address.'));
           return;
         }
 
         const originalLabel = submitBtn ? submitBtn.textContent : '';
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.textContent = 'Connecting…';
+          submitBtn.textContent = T('app.wallet.connecting', 'Connecting…');
         }
 
         // Resolve immediately with manual adapter; connect() validates (no freeze on CDN).
         settleResolve(manualAdapter(address));
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.textContent = originalLabel || 'Use this address';
+          submitBtn.textContent = originalLabel || T('app.wallet.useAddress', 'Use this address');
         }
       });
 
@@ -948,10 +1069,14 @@
         const pk = await withTimeout(
           adapter.connect(),
           CONNECT_TIMEOUT_MS,
-          (adapter.name || 'Wallet') +
-            ' did not respond within ' +
-            Math.round(CONNECT_TIMEOUT_MS / 1000) +
-            's. Unlock the extension and try again.'
+          T(
+            'app.wallet.noResponseExtension',
+            '{wallet} did not respond within {seconds}s. Unlock the extension and try again.',
+            {
+              wallet: adapter.name || T('app.wallet.genericName', 'Wallet'),
+              seconds: Math.round(CONNECT_TIMEOUT_MS / 1000),
+            }
+          )
         );
         publicKey = pk;
         providerName = slugify(adapter.name);
@@ -1002,17 +1127,23 @@
     },
 
     async signTransaction(transaction) {
-      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      if (!activeAdapter || !publicKey) {
+      throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+    }
       return activeAdapter.signTransaction(transaction);
     },
 
     async signAllTransactions(transactions) {
-      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      if (!activeAdapter || !publicKey) {
+      throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+    }
       return activeAdapter.signAllTransactions(transactions);
     },
 
     async signMessage(messageBytes) {
-      if (!activeAdapter || !publicKey) throw new Error('Wallet not connected.');
+      if (!activeAdapter || !publicKey) {
+      throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+    }
       return activeAdapter.signMessage(messageBytes);
     },
   };

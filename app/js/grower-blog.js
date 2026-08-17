@@ -4,13 +4,15 @@
 (function (root) {
   'use strict';
 
+  /* labelKey is resolved in categoryLabel(), not here: this table is built
+     while the page parses, before the dictionary has loaded. */
   var CATEGORIES = [
-    { key: 'tip', label: 'Tips & tricks' },
-    { key: 'look', label: 'Looking at my plants' },
-    { key: 'problem', label: 'Plant problem' },
-    { key: 'visit', label: 'Visited other growers' },
-    { key: 'product', label: 'Made from my plants' },
-    { key: 'daybook', label: 'Field note' },
+    { key: 'tip', labelKey: ['app.blog.catTip', 'Tips & tricks'] },
+    { key: 'look', labelKey: ['app.blog.catLook', 'Looking at my plants'] },
+    { key: 'problem', labelKey: ['app.blog.catProblem', 'Plant problem'] },
+    { key: 'visit', labelKey: ['app.blog.catVisit', 'Visited other growers'] },
+    { key: 'product', labelKey: ['app.blog.catProduct', 'Made from my plants'] },
+    { key: 'daybook', labelKey: ['app.blog.catDaybook', 'Field note'] },
   ];
 
   var publishedThisMonthCache = 0;
@@ -101,7 +103,8 @@
     var found = CATEGORIES.find(function (c) {
       return c.key === key;
     });
-    return found ? found.label : key || 'Field note';
+    if (found) return T(found.labelKey[0], found.labelKey[1]);
+    return key || T('app.blog.catDaybook', 'Field note');
   }
 
   function postsCol(uid) {
@@ -133,14 +136,16 @@
     var plants = getPlants();
     var prev = sel.value;
     sel.innerHTML =
-      '<option value="">No plant link</option>' +
+      '<option value="">' +
+      esc(T('app.blog.noPlantLink', 'No plant link')) +
+      '</option>' +
       plants
         .map(function (p) {
           return (
             '<option value="' +
             esc(p.id) +
             '">' +
-            esc(plantLabel(p) || p.name || 'Plant') +
+            esc(plantLabel(p) || p.name || T('app.stack.plant', 'Plant')) +
             '</option>'
           );
         })
@@ -176,7 +181,7 @@
     var idEl = document.getElementById('blog-edit-id');
     if (idEl) idEl.value = '';
     var titleEl = document.getElementById('blog-composer-title');
-    if (titleEl) titleEl.textContent = 'New story';
+    if (titleEl) titleEl.textContent = T('app.blog.newStory', 'New story');
     setStatus('');
   }
 
@@ -202,7 +207,7 @@
         : '';
     }
     var heading = document.getElementById('blog-composer-title');
-    if (heading) heading.textContent = 'Edit story';
+    if (heading) heading.textContent = T('app.blog.editStory', 'Edit story');
     var composer = document.getElementById('blog-composer');
     if (composer) composer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -229,11 +234,13 @@
   }
 
   function validate(data) {
-    if (!data.title) return 'Add a title.';
-    if (!data.body) return 'Write a short body.';
-    if (!data.slug || data.slug.length < 3) return 'Slug needs at least 3 characters.';
+    if (!data.title) return T('app.blog.needTitle', 'Add a title.');
+    if (!data.body) return T('app.blog.needBody', 'Write a short body.');
+    if (!data.slug || data.slug.length < 3) {
+      return T('app.blog.needSlug', 'Slug needs at least 3 characters.');
+    }
     if (!CATEGORIES.some(function (c) { return c.key === data.category; })) {
-      return 'Pick a category.';
+      return T('app.blog.needCategory', 'Pick a category.');
     }
     return '';
   }
@@ -241,7 +248,7 @@
   async function savePost(status) {
     var uid = currentUid();
     if (!uid) {
-      toast('Sign in to publish stories.', 'warn');
+      toast(T('app.blog.signInToPublish', 'Sign in to publish stories.'), 'warn');
       return;
     }
     var data = readForm();
@@ -268,7 +275,7 @@
       payload.publishedAt = now;
     }
 
-    setStatus('Saving…');
+    setStatus(T('app.blog.saving', 'Saving…'));
     try {
       var col = postsCol(uid);
       if (editingId) {
@@ -286,10 +293,10 @@
       }
       var msg =
         status === 'published'
-          ? 'Published — live on the public journal shortly.'
+          ? T('app.blog.publishedMsg', 'Published — live on the public journal shortly.')
           : status === 'unpublished'
-            ? 'Unpublished — removed from the public journal.'
-            : 'Draft saved.';
+            ? T('app.blog.unpublishedMsg', 'Unpublished — removed from the public journal.')
+            : T('app.blog.draftSaved', 'Draft saved.');
       setStatus(msg, 'ok');
       toast(msg, 'success');
       if (status === 'published' && root.GrowerQuests && typeof GrowerQuests.awardXpOncePerDay === 'function') {
@@ -299,7 +306,7 @@
       await renderList();
     } catch (e) {
       console.error(e);
-      var m = (e && e.message) || 'Could not save story.';
+      var m = (e && e.message) || T('app.blog.saveFailed', 'Could not save story.');
       setStatus(m, 'error');
       toast(m, 'error');
     }
@@ -315,15 +322,25 @@
     if (!list) return;
     var uid = currentUid();
     if (!uid) {
-      list.innerHTML = '<p class="blog-empty">Sign in to manage stories.</p>';
+      list.innerHTML =
+        '<p class="blog-empty">' +
+        esc(T('app.blog.signInToManage', 'Sign in to manage stories.')) +
+        '</p>';
       return;
     }
-    list.innerHTML = '<p class="blog-empty">Loading…</p>';
+    list.innerHTML = '<p class="blog-empty">' + esc(T('app.blog.loading', 'Loading…')) + '</p>';
     try {
       var snap = await postsCol(uid).orderBy('updatedAt', 'desc').limit(50).get();
       if (snap.empty) {
         list.innerHTML =
-          '<p class="blog-empty">No stories yet. Share a tip, a plant look, or a problem you solved.</p>';
+          '<p class="blog-empty">' +
+        esc(
+          T(
+            'app.blog.empty',
+            'No stories yet. Share a tip, a plant look, or a problem you solved.'
+          )
+        ) +
+        '</p>';
         return;
       }
       list.innerHTML = snap.docs
@@ -349,7 +366,7 @@
             '</span>' +
             '</div>' +
             '<h3 class="blog-card-title">' +
-            esc(p.title || 'Untitled') +
+            esc(p.title || T('app.blog.untitled', 'Untitled')) +
             '</h3>' +
             '<p class="blog-card-excerpt">' +
             esc(String(p.body || '').slice(0, 140)) +
@@ -372,7 +389,9 @@
             (publicUrl
               ? '<a class="btn btn-ghost btn-sm" href="' +
                 esc(publicUrl) +
-                '" target="_blank" rel="noopener">View live</a>'
+                '" target="_blank" rel="noopener">' +
+        esc(T('app.blog.viewLive', 'View live')) +
+        '</a>'
               : '') +
             '</div></div></article>'
           );
@@ -381,7 +400,11 @@
     } catch (e) {
       console.error(e);
       list.innerHTML =
-        '<p class="blog-empty">Could not load stories. Check Firestore rules / connection.</p>';
+        '<p class="blog-empty">' +
+        esc(
+          T('app.blog.loadFailed', 'Could not load stories. Check Firestore rules / connection.')
+        ) +
+        '</p>';
     }
   }
 
@@ -399,17 +422,22 @@
     var patch = { status: status, updatedAt: new Date().toISOString() };
     if (status === 'published') patch.publishedAt = patch.updatedAt;
     await postsCol(uid).doc(id).set(patch, { merge: true });
-    toast(status === 'published' ? 'Published' : 'Unpublished', 'success');
+    toast(
+      status === 'published'
+        ? T('app.blog.published', 'Published')
+        : T('app.blog.unpublished', 'Unpublished'),
+      'success'
+    );
     await renderList();
   }
 
   async function deletePost(id) {
     var uid = currentUid();
     if (!uid) return;
-    if (!window.confirm('Delete this story?')) return;
+    if (!window.confirm(T('app.blog.confirmDelete', 'Delete this story?'))) return;
     await postsCol(uid).doc(id).delete();
     if (editingId === id) resetForm();
-    toast('Story deleted', 'success');
+    toast(T('app.blog.deleted', 'Story deleted'), 'success');
     await renderList();
   }
 
@@ -422,7 +450,7 @@
         var file = input.files && input.files[0];
         if (!file) return;
         if (!file.type || file.type.indexOf('image/') !== 0) {
-          toast('Use a JPG or PNG photo.', 'warn');
+          toast(T('app.blog.photoFormat', 'Use a JPG or PNG photo.'), 'warn');
           return;
         }
         var reader = new FileReader();
@@ -430,7 +458,10 @@
           var dataUrl = String(reader.result || '');
           // Soft cap ~450KB string; larger images still allowed but warn.
           if (dataUrl.length > 450000) {
-            toast('Photo is large — consider a smaller image for faster loads.', 'warn');
+            toast(
+      T('app.blog.photoLarge', 'Photo is large — consider a smaller image for faster loads.'),
+      'warn'
+    );
           }
           coverDataUrl = dataUrl;
           var preview = document.getElementById('blog-cover-preview');
@@ -476,7 +507,7 @@
       unpubBtn.dataset.bound = '1';
       unpubBtn.addEventListener('click', function () {
         if (!editingId) {
-          toast('Save the story first.', 'warn');
+          toast(T('app.blog.saveFirst', 'Save the story first.'), 'warn');
           return;
         }
         savePost('unpublished');
@@ -556,15 +587,26 @@
       if (enabled && slug) {
         el.hidden = false;
         el.innerHTML =
-          '<p>Public profile live at <a href="https://journal.growto.live/g/?slug=' +
-          encodeURIComponent(slug) +
-          '" target="_blank" rel="noopener">journal.growto.live/g/' +
-          esc(slug) +
-          '</a>. Manage it in Account.</p>';
+          '<p>' +
+          T('app.blog.profileLive', 'Public profile live at {link}. Manage it in Account.', {
+            link:
+              '<a href="https://journal.growto.live/g/?slug=' +
+              encodeURIComponent(slug) +
+              // i18n-ignore — the public URL, not copy.
+              '" target="_blank" rel="noopener">journal.growto.live/g/' +
+              esc(slug) +
+              '</a>',
+          }) +
+          '</p>';
       } else {
         el.hidden = false;
         el.innerHTML =
-          '<p>Enable a <strong>public grower profile</strong> in Account (slug + bio) so published stories show your name on <a href="https://journal.growto.live/" target="_blank" rel="noopener">journal.growto.live</a>.</p>';
+          '<p>' +
+          T(
+            'app.blog.profileDisabledHint',
+            'Enable a <strong>public grower profile</strong> in Account (slug + bio) so published stories show your name on <a href="https://journal.growto.live/" target="_blank" rel="noopener">journal.growto.live</a>.'
+          ) +
+          '</p>';
       }
     } catch (_) {
       el.hidden = true;
@@ -579,26 +621,42 @@
     var bio = String(p.publicBio || '').trim();
     return (
       '<div class="account-public-profile" id="account-public-profile">' +
-      '<h3 class="account-public-title">Public journal profile</h3>' +
-      '<p class="account-public-hint">Required to publish Stories on growto.live/journal.</p>' +
+      '<h3 class="account-public-title">' +
+      esc(T('app.blog.publicProfileTitle', 'Public journal profile')) +
+      '</h3>' +
+      '<p class="account-public-hint">' +
+      esc(T('app.blog.publicProfileHint', 'Required to publish Stories on growto.live/journal.')) +
+      '</p>' +
       '<label class="account-public-check">' +
       '<input type="checkbox" id="account-public-enabled"' +
       (enabled ? ' checked' : '') +
-      ' /> Enable public profile</label>' +
-      '<label>Profile URL slug' +
-      '<input type="text" id="account-public-slug" maxlength="48" placeholder="e.g. luka-zagreb" value="' +
+      ' /> ' +
+      esc(T('app.blog.enablePublicProfile', 'Enable public profile')) +
+      '</label>' +
+      '<label>' +
+      esc(T('app.blog.slugLabel', 'Profile URL slug')) +
+      '<input type="text" id="account-public-slug" maxlength="48" placeholder="' +
+      esc(T('app.blog.slugPlaceholder', 'e.g. luka-zagreb')) +
+      '" value="' +
       esc(slug) +
       '" /></label>' +
-      '<label>Short bio' +
-      '<textarea id="account-public-bio" maxlength="280" rows="3" placeholder="Where you grow, what you share…">' +
+      '<label>' +
+      esc(T('app.blog.bioLabel', 'Short bio')) +
+      '<textarea id="account-public-bio" maxlength="280" rows="3" placeholder="' +
+      esc(T('app.blog.bioPlaceholder', 'Where you grow, what you share…')) +
+      '">' +
       esc(bio) +
       '</textarea></label>' +
       '<div class="account-profile-actions">' +
-      '<button type="button" class="btn btn-primary btn-sm" id="account-public-save">Save public profile</button>' +
+      '<button type="button" class="btn btn-primary btn-sm" id="account-public-save">' +
+      esc(T('app.blog.savePublicProfile', 'Save public profile')) +
+      '</button>' +
       (enabled && slug
         ? '<a class="btn btn-ghost btn-sm" href="https://journal.growto.live/g/?slug=' +
           encodeURIComponent(slug) +
-          '" target="_blank" rel="noopener">Preview</a>'
+          '" target="_blank" rel="noopener">' +
+          esc(T('app.blog.preview', 'Preview')) +
+          '</a>'
         : '') +
       '</div>' +
       '<p class="account-public-status" id="account-public-status" hidden></p>' +
@@ -622,7 +680,7 @@
       if (enabled && (!slug || slug.length < 3)) {
         if (status) {
           status.hidden = false;
-          status.textContent = 'Pick a slug of at least 3 characters.';
+          status.textContent = T('app.blog.slugTooShort', 'Pick a slug of at least 3 characters.');
         }
         return;
       }
@@ -646,18 +704,22 @@
         if (status) {
           status.hidden = false;
           status.textContent = enabled
-            ? 'Public profile saved. Stories will attribute to journal.growto.live/g/' + slug
-            : 'Public profile disabled.';
+            ? T(
+                'app.blog.profileSavedAttribution',
+                'Public profile saved. Stories will attribute to journal.growto.live/g/{slug}',
+                { slug: slug }
+              )
+            : T('app.blog.profileDisabled', 'Public profile disabled.');
         }
-        toast('Public profile saved', 'success');
+        toast(T('app.blog.profileSaved', 'Public profile saved'), 'success');
         renderPublicProfileBanner();
       } catch (e) {
         console.error(e);
         if (status) {
           status.hidden = false;
-          status.textContent = (e && e.message) || 'Could not save.';
+          status.textContent = (e && e.message) || T('app.blog.couldNotSave', 'Could not save.');
         }
-        toast('Could not save public profile', 'error');
+        toast(T('app.blog.profileSaveFailed', 'Could not save public profile'), 'error');
       }
     });
   }

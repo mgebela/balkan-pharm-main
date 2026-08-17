@@ -1,0 +1,33 @@
+{
+  "default": "en",
+  "fallback": "en",
+  "locales": [
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English",
+      "intl": "en-GB",
+      "dir": "ltr",
+      "flag": "EN",
+      "ogLocale": "en_US"
+    },
+    {
+      "code": "hr",
+      "name": "Croatian",
+      "nativeName": "Hrvatski",
+      "intl": "hr-HR",
+      "dir": "ltr",
+      "flag": "HR",
+      "ogLocale": "hr_HR"
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "nativeName": "Deutsch",
+      "intl": "de-DE",
+      "dir": "ltr",
+      "flag": "DE",
+      "ogLocale": "de_DE"
+    }
+  ]
+}

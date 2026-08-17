@@ -1,0 +1,97 @@
+{
+  "login-form": {
+    "p": "Private journal",
+    "label": "Email",
+    "label2": "Password",
+    "div": "or",
+    "div2": "<a href=\"../index.html\">← Back to home</a>"
+  },
+  "auth-title": {
+    "h1": "Sign in to growtoo"
+  },
+  "auth-lead": {
+    "p": "Welcome back. Your Grower or Adopter workspace opens automatically."
+  },
+  "tab-signin": {
+    "button": "Sign in"
+  },
+  "tab-signup": {
+    "button": "Create account"
+  },
+  "pick-grower": {
+    "button": "<strong>Grower</strong> <span>Free journal first. Optional on-chain proof when you want it.</span>"
+  },
+  "pick-adopter": {
+    "button": "<strong>Adopter</strong> <span>Follow a real plant’s trail. Crypto is optional until you invest.</span>"
+  },
+  "field-display-name": {
+    "label": "Display name"
+  },
+  "password-toggle": {
+    "button": "Show"
+  },
+  "password-hint": {
+    "p": "At least 8 characters. Use a unique password you don’t reuse elsewhere."
+  },
+  "signup-grower-fields": {
+    "p": "Grower setup",
+    "label": "Grow setup",
+    "p2": "Seeds plant defaults and coaching.",
+    "label2": "Home city <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>",
+    "p3": "Only used for the Plants weather forecast — skip if you grow indoors.",
+    "label3": "Grow style <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>"
+  },
+  "grow-setup-choices": {
+    "button": "<strong>Indoor</strong> <span>Tents &amp; rooms</span>",
+    "button2": "<strong>Outdoor</strong> <span>Field &amp; garden</span>",
+    "button3": "<strong>Mixed</strong> <span>Both setups</span>"
+  },
+  "field-profile-photo": {
+    "label": "Profile picture / logo <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>",
+    "p": "Shown on your account — square crop works best. JPEG or PNG."
+  },
+  "profile-photo-clear": {
+    "button": "Remove"
+  },
+  "signup-adopter-fields": {
+    "p": "Adopter setup",
+    "label": "Why you’re here",
+    "span": "I understand this uses Solana’s public test network (Devnet) — assets have no monetary value."
+  },
+  "adopter-intent-choices": {
+    "button": "<strong>Support growers</strong> <span>Follow a real plant’s care trail</span>",
+    "button2": "<strong>Collect a garden</strong> <span>Adopt plant tokens and watch stages</span>",
+    "button3": "<strong>Learn the flow</strong> <span>Practice stakes on test assets (no real value)</span>"
+  },
+  "field-accept-consent": {
+    "span": "I’m <strong>18+</strong> and agree to the <a href=\"../terms/\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a> &amp; <a href=\"../privacy/\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a>."
+  },
+  "submit-btn": {
+    "button": "Sign in"
+  },
+  "google-auth-label": {
+    "span": "Continue with Google"
+  },
+  "meta": {
+    "title": "Sign in · growtoo"
+  },
+  "mode": {
+    "growerCta": "Start your journal free",
+    "growerLead": "Log watering, feeding, and stages. On-chain proof is optional — never required to start.",
+    "adopterLead": "Follow a plant’s journal trail. Test-network stakes are optional and have no monetary value.",
+    "signupTitle": "Create your account",
+    "signupLead": "Growers start with the journal. Adopters follow a plant. Pick your desk.",
+    "googleSignup": "Sign up with Google"
+  },
+  "field": {
+    "namePlaceholder": "How you appear in growtoo",
+    "emailPlaceholder": "you@email.com",
+    "cityPlaceholder": "e.g. Denver",
+    "stylePlaceholder": "e.g. autoflowers, 4 tents"
+  },
+  "aria": {
+    "authMode": "Auth mode",
+    "growSetup": "Grow setup",
+    "adopterIntent": "Adopter intent"
+  }
+}

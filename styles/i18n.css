@@ -1,0 +1,131 @@
+/* ============================================================
+   Language switcher — one look for every page that carries a
+   [data-i18n-switcher] slot (landing, pitch, legal, the app).
+
+   The control is a real <select>: it is one tap on mobile, it
+   is keyboard- and screen-reader-native, and it does not grow
+   a dropdown to maintain when a fourth language is added. The
+   visible face shows the current locale code; the select sits
+   invisibly on top of it and does the work.
+   ============================================================ */
+.lang-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.4rem;
+  min-height: 2rem;
+  padding: 0 0.15rem;
+  border: 0;
+  box-shadow: var(--chip-hairline);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--brass);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  transition: border-color 0.18s ease, color 0.18s ease;
+}
+
+.lang-switch:hover {
+  border-color: rgb(var(--brass-rgb) / 0.45);
+  color: var(--brass-hover);
+}
+
+/* The select covers the whole control so the entire pill is the hit area,
+   while the styled face underneath is what people actually see. */
+.lang-switch-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+}
+
+.lang-switch-select:focus-visible + .lang-switch-face {
+  outline: 2px solid var(--brass);
+  outline-offset: 3px;
+  border-radius: var(--radius-pill);
+}
+
+/* Native option lists are painted by the OS, not the page — they need real
+   colours or they render dark-on-dark in a dark UI. */
+.lang-switch-select option {
+  background: var(--bg-alt, #142018);
+  color: var(--text);
+}
+
+.lang-switch-face {
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.lang-switch-face::after {
+  content: '';
+  width: 0.32rem;
+  height: 0.32rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: translateY(-1px) rotate(45deg);
+  opacity: 0.7;
+}
+
+/* Header placement: sits after the nav links, and stays visible when the
+   links collapse into the mobile menu. */
+.nav-lang {
+  margin-inline-start: 0.5rem;
+}
+
+@media (max-width: 860px) {
+  .nav-lang {
+    margin-inline-start: 0;
+    margin-block-start: 0.75rem;
+  }
+}
+
+/* Pages with no header to hang the control on (sign-in, 404) get it pinned
+   to the top corner instead, clear of the content column. */
+.lang-switch-floating {
+  position: fixed;
+  top: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 40;
+}
+
+.lang-switch-floating .lang-switch {
+  background: var(--bg-alt, #142018);
+}
+
+@media (max-width: 600px) {
+  .lang-switch-floating {
+    top: 0.6rem;
+    inset-inline-end: 0.6rem;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Debug view (?i18n=debug): flags copy that fell back to English. */
+[data-i18n-miss] {
+  outline: 1px dashed rgb(var(--alert-rgb) / 0.8);
+  outline-offset: 2px;
+}

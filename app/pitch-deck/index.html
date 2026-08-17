@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Growtoo — Technical overview</title>
+    <title data-i18n="deck.meta.title">Growtoo — Technical overview</title>
     <meta name="description" content="growto.live — CBD grow journal, AI co-pilot, and harvest-share RWA investing on Solana." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -11,7 +11,9 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
+  <script src="../../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,deck"></script>
     <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="../../styles/i18n.css?v=20260816a" />
   </head>
   <body>
     <div class="bg-gradient" aria-hidden="true"></div>
@@ -28,32 +30,32 @@
                 <path d="M16 11v17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
               </svg>
             </span>
-            <span class="brand-name">Dnevnik<span class="brand-dot">.</span>live</span>
+            <span data-i18n-html="deck.deck.span" class="brand-name">Dnevnik<span class="brand-dot">.</span>live</span>
           </div>
 
-          <h1 class="cover-headline">
+          <h1 data-i18n-html="deck.deck.h1" class="cover-headline">
             The operating system for <span class="grad">modern CBD cultivation.</span>
           </h1>
-          <p class="cover-sub">Journal · AI · Seed RWA · harvest-share investing — one cultivation OS.</p>
-          <p class="slide-remark">
+          <p data-i18n="deck.deck.p" class="cover-sub">Journal · AI · Seed RWA · harvest-share investing — one cultivation OS.</p>
+          <p data-i18n-html="deck.deck.p2" class="slide-remark">
             A technical stack for logging grows, predicting stress, and funding batches through
             <strong>harvest-share RWAs on Solana</strong> — from hobby tents to licensed CBD operations.
           </p>
 
           <div class="cover-meta">
-            <div class="cover-meta-row">
+            <div data-i18n-html="deck.deck.div" class="cover-meta-row">
               <span class="meta-label">Stack</span>
               <span class="meta-value">PWA · Firebase · Solana devnet</span>
             </div>
-            <div class="cover-meta-row">
+            <div data-i18n-html="deck.deck.div2" class="cover-meta-row">
               <span class="meta-label">Scope</span>
               <span class="meta-value">Journal · Adopt · Harvest-share RWA</span>
             </div>
-            <div class="cover-meta-row">
+            <div data-i18n-html="deck.deck.div3" class="cover-meta-row">
               <span class="meta-label">Economics</span>
               <span class="meta-value">Early mint → bigger harvest stake</span>
             </div>
-            <div class="cover-meta-row">
+            <div data-i18n-html="deck.deck.div4" class="cover-meta-row">
               <span class="meta-label">Live</span>
               <span class="meta-value">
                 <a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a>
@@ -61,7 +63,7 @@
             </div>
           </div>
 
-          <div class="cover-footer">
+          <div data-i18n-html="deck.deck.div5" class="cover-footer">
             <span>Technical deck · 2026</span>
             <span>Confidential</span>
           </div>
@@ -73,9 +75,9 @@
       <section class="slide slide--dense" data-title="Why">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">02 · Why</span>
-            <h2>Guesswork. Paper. <span class="grad">Too late.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span2" class="kicker">02 · Why</span>
+            <h2 data-i18n-html="deck.deck.h2">Guesswork. Paper. <span class="grad">Too late.</span></h2>
+            <p data-i18n="deck.deck.p3" class="slide-remark">
               Most growers still decide on memory and forums — losing yield, quality, and repeatability every cycle.
             </p>
           </header>
@@ -84,29 +86,29 @@
               <div class="card-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M8 3.5h11A2.5 2.5 0 0121.5 6v14A2.5 2.5 0 0119 22.5H8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 3.5h3A2.5 2.5 0 017.5 6v14A2.5 2.5 0 015 22.5h-1A2.5 2.5 0 011.5 20V6A2.5 2.5 0 014 3.5h1z" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 9h7M9.5 12.5h7M9.5 16h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
-              <h3>Scattered logs</h3>
-              <p class="card-tagline">No structure between cycles</p>
+              <h3 data-i18n="deck.deck.h3">Scattered logs</h3>
+              <p data-i18n="deck.deck.p4" class="card-tagline">No structure between cycles</p>
             </article>
             <article class="card card--dense">
               <div class="card-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="8" r="2.25" stroke="currentColor" stroke-width="1.5"/><circle cx="18" cy="6" r="2.25" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="18" r="2.25" stroke="currentColor" stroke-width="1.5"/><path d="M7.7 9.4l4.6 6.2M7.7 9.4l9.6-2.6M12.3 15.6l3.2 1.6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </div>
-              <h3>Data, no insight</h3>
-              <p class="card-tagline">Cause &amp; effect stays hidden</p>
+              <h3 data-i18n="deck.deck.h32">Data, no insight</h3>
+              <p data-i18n-html="deck.deck.p5" class="card-tagline">Cause &amp; effect stays hidden</p>
             </article>
             <article class="card card--dense">
               <div class="card-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3.5 21.5 20H2.5L12 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 9v5M12 17h.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg>
               </div>
-              <h3>Late fixes</h3>
-              <p class="card-tagline">Stress seen after damage</p>
+              <h3 data-i18n="deck.deck.h33">Late fixes</h3>
+              <p data-i18n="deck.deck.p6" class="card-tagline">Stress seen after damage</p>
             </article>
           </div>
-          <div class="why-arrow" aria-hidden="true">
+          <div data-i18n-html="deck.deck.div6" class="why-arrow" aria-hidden="true">
             <span>→</span>
             <span class="why-arrow-label">Growtoo</span>
           </div>
-          <div class="chip-row chip-row--center">
+          <div data-i18n-html="deck.deck.div7" class="chip-row chip-row--center">
             <span class="chip">Journal</span>
             <span class="chip">AI Coach</span>
             <span class="chip">Seed RWA</span>
@@ -119,26 +121,26 @@
       <section class="slide slide--dense" data-title="Platform">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">03 · Platform</span>
-            <h2>One OS. <span class="grad">Seed → harvest.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span3" class="kicker">03 · Platform</span>
+            <h2 data-i18n-html="deck.deck.h22">One OS. <span class="grad">Seed → harvest.</span></h2>
+            <p data-i18n="deck.deck.p7" class="slide-remark">
               Structured journaling, AI coaching, and sensor timelines in a single app — built for CBD from day one.
             </p>
           </header>
           <div class="platform-dense">
             <div class="product-mock product-mock--hero">
               <div class="mock-window">
-                <div class="mock-bar"><span></span><span></span><span></span><span class="mock-url">growto.live</span></div>
+                <div data-i18n-html="deck.deck.div8" class="mock-bar"><span></span><span></span><span></span><span class="mock-url">growto.live</span></div>
                 <div class="mock-body">
                   <div class="mock-side">
-                    <div class="mock-logo">Dnevnik<span>.live</span></div>
-                    <ul><li class="active">Plants</li><li>Environments</li><li>AI Coach</li><li>Insights</li></ul>
+                    <div data-i18n-html="deck.deck.div9" class="mock-logo">Dnevnik<span>.live</span></div>
+                    <ul><li data-i18n="deck.deck.li" class="active">Plants</li><li data-i18n="deck.deck.li2">Environments</li><li data-i18n="deck.deck.li3">AI Coach</li><li data-i18n="deck.deck.li4">Insights</li></ul>
                   </div>
                   <div class="mock-main">
                     <div class="mock-row">
-                      <div class="mock-stat"><span class="stat-label">Day</span><span class="stat-value">42</span></div>
-                      <div class="mock-stat"><span class="stat-label">Health</span><span class="stat-value good">92<i>%</i></span></div>
-                      <div class="mock-stat"><span class="stat-label">VPD</span><span class="stat-value">1.21<i>kPa</i></span></div>
+                      <div data-i18n-html="deck.deck.div10" class="mock-stat"><span class="stat-label">Day</span><span class="stat-value">42</span></div>
+                      <div data-i18n-html="deck.deck.div11" class="mock-stat"><span class="stat-label">Health</span><span class="stat-value good">92<i>%</i></span></div>
+                      <div data-i18n-html="deck.deck.div12" class="mock-stat"><span class="stat-label">VPD</span><span class="stat-value">1.21<i>kPa</i></span></div>
                     </div>
                     <div class="mock-chart">
                       <svg viewBox="0 0 600 160" preserveAspectRatio="none" aria-hidden="true">
@@ -147,12 +149,12 @@
                         <path d="M0,120 C60,110 90,80 140,75 C200,68 230,95 280,85 C340,72 370,40 430,38 C490,36 520,55 600,30" fill="none" stroke="#78e08f" stroke-width="2"/>
                       </svg>
                     </div>
-                    <div class="mock-alert"><span class="dot"></span><div><strong>AI Coach</strong><p>VPD optimal · EC watch at next feed</p></div></div>
+                    <div class="mock-alert"><span class="dot"></span><div><strong data-i18n="deck.deck.li3">AI Coach</strong><p data-i18n="deck.deck.p8">VPD optimal · EC watch at next feed</p></div></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="chip-grid chip-grid--6">
+            <div data-i18n-html="deck.deck.div13" class="chip-grid chip-grid--6">
               <span class="chip chip--lg"><strong>Log</strong> plants · cycles</span>
               <span class="chip chip--lg"><strong>Coach</strong> predict · alert</span>
               <span class="chip chip--lg"><strong>Mint</strong> Seed NFT · batch</span>
@@ -169,9 +171,9 @@
         <div class="monitor-deco" aria-hidden="true"><div class="monitor-orb monitor-orb--1"></div><div class="monitor-orb monitor-orb--2"></div></div>
         <div class="slide-inner slide-inner--monitor">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">04 · Monitoring</span>
-            <h2>Meteo + <span class="grad">plant stress</span> → early warnings.</h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span4" class="kicker">04 · Monitoring</span>
+            <h2 data-i18n-html="deck.deck.h23">Meteo + <span class="grad">plant stress</span> → early warnings.</h2>
+            <p data-i18n-html="deck.deck.p9" class="slide-remark">
               Room-level meteo feeds the app timeline today; an on-plant stress device in development closes the loop
               with alerts <strong>before</strong> damage is visible.
             </p>
@@ -190,18 +192,18 @@
             </div>
             <div class="monitor-cards monitor-cards--row">
               <article class="monitor-card monitor-card--meteo monitor-card--compact">
-                <span class="monitor-card-tag monitor-card-tag--live">Live</span>
-                <h3>Meteo station</h3>
-                <ul class="monitor-metrics"><li>Temp · RH · VPD</li><li>Timeline in app</li></ul>
+                <span data-i18n="deck.deck.span5" class="monitor-card-tag monitor-card-tag--live">Live</span>
+                <h3 data-i18n="deck.deck.h34">Meteo station</h3>
+                <ul class="monitor-metrics"><li data-i18n="deck.deck.li5">Temp · RH · VPD</li><li data-i18n="deck.deck.li6">Timeline in app</li></ul>
               </article>
               <article class="monitor-card monitor-card--stress monitor-card--compact">
-                <span class="monitor-card-tag monitor-card-tag--dev">In dev</span>
-                <h3>Stress sensor</h3>
-                <ul class="monitor-metrics"><li>On plant / perimeter</li><li>Push warnings</li></ul>
+                <span data-i18n="deck.deck.span6" class="monitor-card-tag monitor-card-tag--dev">In dev</span>
+                <h3 data-i18n="deck.deck.h35">Stress sensor</h3>
+                <ul class="monitor-metrics"><li data-i18n="deck.deck.li7">On plant / perimeter</li><li data-i18n="deck.deck.li8">Push warnings</li></ul>
               </article>
             </div>
           </div>
-          <div class="monitor-pipeline monitor-pipeline--inline">
+          <div data-i18n-html="deck.deck.div14" class="monitor-pipeline monitor-pipeline--inline">
             <span class="mp-label">Sense</span><span class="mp-arrow">→</span><span class="mp-label">Sync</span><span class="mp-arrow">→</span><span class="mp-label">Warn</span><span class="mp-arrow">→</span><span class="mp-label mp-label--final">Optimize</span>
           </div>
         </div>
@@ -211,22 +213,22 @@
       <section class="slide slide--dense" data-title="AI">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">05 · AI Engine</span>
-            <h2>Cultivation <span class="grad">co-pilot.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span7" class="kicker">05 · AI Engine</span>
+            <h2 data-i18n-html="deck.deck.h24">Cultivation <span class="grad">co-pilot.</span></h2>
+            <p data-i18n-html="deck.deck.p10" class="slide-remark">
               Fuses your logs and sensor streams with agronomic rules — recommendations tuned to <em>your</em> strain and room, not generic blogs.
             </p>
           </header>
           <div class="pipeline pipeline--dense">
-            <div class="pipe-step"><div class="pipe-num">1</div><h3>Ingest</h3><p>Logs · sensors · genetics</p></div>
+            <div class="pipe-step"><div class="pipe-num">1</div><h3 data-i18n="deck.deck.h36">Ingest</h3><p data-i18n="deck.deck.p11">Logs · sensors · genetics</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">2</div><h3>Correlate</h3><p>Strain · room · cycle</p></div>
+            <div class="pipe-step"><div class="pipe-num">2</div><h3 data-i18n="deck.deck.h37">Correlate</h3><p data-i18n="deck.deck.p12">Strain · room · cycle</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">3</div><h3>Predict</h3><p>Stress before visible</p></div>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3 data-i18n="deck.deck.h38">Predict</h3><p data-i18n="deck.deck.p13">Stress before visible</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">4</div><h3>Guide</h3><p>Your grow, not generic</p></div>
+            <div class="pipe-step"><div class="pipe-num">4</div><h3 data-i18n="deck.deck.h39">Guide</h3><p data-i18n="deck.deck.p14">Your grow, not generic</p></div>
           </div>
-          <div class="chip-grid chip-grid--3">
+          <div data-i18n-html="deck.deck.div15" class="chip-grid chip-grid--3">
             <span class="chip chip--lg chip--g">Personalized per cycle</span>
             <span class="chip chip--lg chip--b">Hybrid agronomic + ML</span>
             <span class="chip chip--lg">Privacy-first · local data</span>
@@ -239,9 +241,9 @@
         <div class="passport-deco" aria-hidden="true"><div class="passport-orb passport-orb--1"></div></div>
         <div class="slide-inner slide-inner--passport">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">06 · Seed RWA</span>
-            <h2>Journal proof. <span class="grad">On-chain stake.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span8" class="kicker">06 · Seed RWA</span>
+            <h2 data-i18n-html="deck.deck.h25">Journal proof. <span class="grad">On-chain stake.</span></h2>
+            <p data-i18n-html="deck.deck.p15" class="slide-remark">
               Each grow batch becomes a <strong>Batch NFT</strong> on Solana. Investors mint <strong>Stake NFTs</strong>
               with harvest-share weight; metadata lives on Arweave and evolves with every documented growth stage.
               <strong>Early mint = bigger stake.</strong>
@@ -251,42 +253,42 @@
             <div class="passport-card-wrap passport-card-wrap--sm">
               <div class="passport-card-ring" aria-hidden="true"></div>
               <div class="passport-card">
-                <header class="passport-card-top"><span class="passport-card-label">SEED</span><span class="passport-card-id">B-2026-07</span></header>
+                <header data-i18n-html="deck.deck.header" class="passport-card-top"><span class="passport-card-label">SEED</span><span class="passport-card-id">B-2026-07</span></header>
                 <div class="passport-card-art" aria-hidden="true">
                   <svg class="passport-card-svg" viewBox="0 0 240 200" fill="none">
                     <ellipse cx="120" cy="168" rx="72" ry="14" fill="rgba(120,224,143,0.2)"/>
                     <path d="M120 168V92" stroke="rgba(120,224,143,0.45)" stroke-width="3"/><path d="M120 120c-28-18-52-8-68 22 24-8 48-4 68-10" stroke="#78e08f" stroke-width="2" fill="none"/><circle cx="120" cy="72" r="18" stroke="#c79bff" stroke-width="2" fill="rgba(199,155,255,0.08)"/>
                   </svg>
                 </div>
-                <footer class="passport-card-foot"><span class="passport-card-stage">Flowering</span><span class="passport-card-score">3× weight</span></footer>
+                <footer data-i18n-html="deck.deck.footer" class="passport-card-foot"><span class="passport-card-stage">Flowering</span><span class="passport-card-score">3× weight</span></footer>
               </div>
             </div>
             <div class="passport-dense-mid">
               <div class="passport-journey passport-journey--compact">
                 <ol class="pj-steps">
-                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Seed</span></li>
-                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Germ</span></li>
-                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Veg</span></li>
-                  <li class="pj-step"><span class="pj-dot"></span><span class="pj-name">Flower</span></li>
-                  <li class="pj-step pj-step--final"><span class="pj-dot pj-dot--final"></span><span class="pj-name">Harvest</span></li>
+                  <li data-i18n-html="deck.deck.li9" class="pj-step"><span class="pj-dot"></span><span class="pj-name">Seed</span></li>
+                  <li data-i18n-html="deck.deck.li10" class="pj-step"><span class="pj-dot"></span><span class="pj-name">Germ</span></li>
+                  <li data-i18n-html="deck.deck.li11" class="pj-step"><span class="pj-dot"></span><span class="pj-name">Veg</span></li>
+                  <li data-i18n-html="deck.deck.li12" class="pj-step"><span class="pj-dot"></span><span class="pj-name">Flower</span></li>
+                  <li data-i18n-html="deck.deck.li13" class="pj-step pj-step--final"><span class="pj-dot pj-dot--final"></span><span class="pj-name">Harvest</span></li>
                 </ol>
               </div>
               <div class="passport-rwa passport-rwa--compact">
-                <span class="passport-rwa-tag">Option A</span>
-                <div class="passport-rwa-flow">
+                <span data-i18n="deck.deck.span9" class="passport-rwa-tag">Option A</span>
+                <div data-i18n-html="deck.deck.div16" class="passport-rwa-flow">
                   <span class="rwa-step">Open batch</span><span class="rwa-arrow">→</span><span class="rwa-step">Mint stake</span><span class="rwa-arrow">→</span><span class="rwa-step">Grow</span><span class="rwa-arrow">→</span><span class="rwa-step rwa-step--final">Split harvest</span>
                 </div>
               </div>
-              <div class="chip-grid chip-grid--4">
+              <div data-i18n-html="deck.deck.div17" class="chip-grid chip-grid--4">
                 <span class="chip">Strain · batch</span><span class="chip">Plant ID link</span><span class="chip">COA · journal</span><span class="chip">Solscan txs</span>
               </div>
             </div>
           </div>
           <div class="icon-row icon-row--4">
-            <div class="icon-tile"><span class="icon-tile-glyph" aria-hidden="true">G</span><span>Grower</span></div>
-            <div class="icon-tile icon-tile--b"><span class="icon-tile-glyph" aria-hidden="true">I</span><span>Investor</span></div>
-            <div class="icon-tile icon-tile--o"><span class="icon-tile-glyph" aria-hidden="true">P</span><span>Platform</span></div>
-            <div class="icon-tile icon-tile--p"><span class="icon-tile-glyph" aria-hidden="true">M</span><span>Market</span></div>
+            <div data-i18n-html="deck.deck.div18" class="icon-tile"><span class="icon-tile-glyph" aria-hidden="true">G</span><span>Grower</span></div>
+            <div data-i18n-html="deck.deck.div19" class="icon-tile icon-tile--b"><span class="icon-tile-glyph" aria-hidden="true">I</span><span>Investor</span></div>
+            <div data-i18n-html="deck.deck.div20" class="icon-tile icon-tile--o"><span class="icon-tile-glyph" aria-hidden="true">P</span><span>Platform</span></div>
+            <div data-i18n-html="deck.deck.div21" class="icon-tile icon-tile--p"><span class="icon-tile-glyph" aria-hidden="true">M</span><span>Market</span></div>
           </div>
         </div>
       </section>
@@ -296,25 +298,25 @@
         <div class="adopt-deco" aria-hidden="true"><div class="adopt-orb"></div></div>
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">07 · Harvest-share economics</span>
-            <h2>Fund early. <span class="grad">Own more of the harvest.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span10" class="kicker">07 · Harvest-share economics</span>
+            <h2 data-i18n-html="deck.deck.h26">Fund early. <span class="grad">Own more of the harvest.</span></h2>
+            <p data-i18n-html="deck.deck.p16" class="slide-remark">
               Grower opens a batch · investors mint <strong>Stake NFTs</strong> on Solana · early entry = higher share weight · harvest sales split pro-rata.
             </p>
           </header>
 
           <div class="grid grid-3 economics-roles">
             <article class="card card--dense">
-              <h3>Grower</h3>
-              <p class="card-tagline">Batch · journal · 40–50% share</p>
+              <h3 data-i18n="deck.deck.h310">Grower</h3>
+              <p data-i18n="deck.deck.p17" class="card-tagline">Batch · journal · 40–50% share</p>
             </article>
             <article class="card card--dense">
-              <h3>Investor</h3>
-              <p class="card-tagline">Mint early · trade stake NFTs</p>
+              <h3 data-i18n="deck.deck.h311">Investor</h3>
+              <p data-i18n="deck.deck.p18" class="card-tagline">Mint early · trade stake NFTs</p>
             </article>
             <article class="card card--dense">
-              <h3>Platform</h3>
-              <p class="card-tagline">Vault · market · RWA docs</p>
+              <h3 data-i18n="deck.deck.h312">Platform</h3>
+              <p data-i18n="deck.deck.p19" class="card-tagline">Vault · market · RWA docs</p>
             </article>
           </div>
 
@@ -337,7 +339,7 @@
                 <g transform="translate(160,36)">
                   <rect width="100" height="120" rx="12" fill="rgba(95,182,255,0.08)" stroke="#5fb6ff" stroke-width="1.5"/>
                   <text x="50" y="52" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Vault</text>
-                  <text x="50" y="70" text-anchor="middle" fill="#6f8a7e" font-size="9">Stake NFTs</text>
+                  <text data-i18n="deck.deck.h42" x="50" y="70" text-anchor="middle" fill="#6f8a7e" font-size="9">Stake NFTs</text>
                   <text x="50" y="88" text-anchor="middle" fill="#78e08f" font-size="9" font-weight="600">3× → 1×</text>
                 </g>
                 <path d="M264 96 H292" stroke="#78e08f" stroke-width="2"/>
@@ -350,7 +352,7 @@
                 <path d="M400 96 H428" stroke="#78e08f" stroke-width="2"/>
                 <g transform="translate(432,36)">
                   <rect width="100" height="120" rx="12" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/>
-                  <text x="50" y="58" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Market</text>
+                  <text data-i18n="common.nav.market" x="50" y="58" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="700" font-family="system-ui">Market</text>
                   <text x="50" y="76" text-anchor="middle" fill="#6f8a7e" font-size="9">Flower · COA</text>
                 </g>
                 <path d="M536 96 H564" stroke="#78e08f" stroke-width="2"/>
@@ -361,7 +363,7 @@
                   <text x="50" y="88" text-anchor="middle" fill="#c79bff" font-size="8">Grower · investor · fee</text>
                 </g>
               </svg>
-              <div class="economics-weights">
+              <div data-i18n-html="deck.deck.div22" class="economics-weights">
                 <span class="economics-weight economics-weight--seed"><strong>Seed</strong> 3×</span>
                 <span class="economics-weight economics-weight--growth"><strong>Growth</strong> 2×</span>
                 <span class="economics-weight economics-weight--flower"><strong>Flower</strong> 1.5×</span>
@@ -372,18 +374,18 @@
             <div class="adopt-steps">
               <div class="adopt-step">
                 <span class="adopt-step-num">1</span>
-                <h3>Fund early</h3>
-                <p>Grower opens batch · investors mint Stake NFTs into vault · weight highest at seed round.</p>
+                <h3 data-i18n="deck.deck.h313">Fund early</h3>
+                <p data-i18n="deck.deck.p20">Grower opens batch · investors mint Stake NFTs into vault · weight highest at seed round.</p>
               </div>
               <div class="adopt-step">
                 <span class="adopt-step-num">2</span>
-                <h3>Grow &amp; prove</h3>
-                <p>Journal logs each stage · NFT metadata updates · $GROWTOO rewards mint to holder.</p>
+                <h3 data-i18n-html="deck.deck.h314">Grow &amp; prove</h3>
+                <p data-i18n="deck.deck.p21">Journal logs each stage · NFT metadata updates · $GROWTOO rewards mint to holder.</p>
               </div>
               <div class="adopt-step adopt-step--split">
                 <span class="adopt-step-num">3</span>
-                <h3>Harvest &amp; split</h3>
-                <p>Flower listed on market · vault pays investors by weight · grower cut · platform fee.</p>
+                <h3 data-i18n-html="deck.deck.h315">Harvest &amp; split</h3>
+                <p data-i18n="deck.deck.p22">Flower listed on market · vault pays investors by weight · grower cut · platform fee.</p>
               </div>
             </div>
           </div>
@@ -393,22 +395,22 @@
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><path d="M12 3c2.5 5.5 7 8 13 8-1 7.5-6 13-13 18-7-5-12-10.5-13-18 6 0 10.5-2.5 13-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 11v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>CBD flower lots</h4>
-              <p>Physical harvest on marketplace — proceeds to batch vault.</p>
+              <h4 data-i18n="deck.deck.h4">CBD flower lots</h4>
+              <p data-i18n="deck.deck.p23">Physical harvest on marketplace — proceeds to batch vault.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M12 8v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>Stake NFTs</h4>
-              <p>Trade harvest-share before payout · seed vs flower types.</p>
+              <h4 data-i18n="deck.deck.h42">Stake NFTs</h4>
+              <p data-i18n="deck.deck.p24">Trade harvest-share before payout · seed vs flower types.</p>
             </article>
             <article class="adopt-product">
               <span class="adopt-product-icon" aria-hidden="true">
                 <svg class="deck-icon" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v4l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               </span>
-              <h4>$GROWTOO utility</h4>
-              <p>Stage rewards · marketplace currency · governance.</p>
+              <h4 data-i18n="deck.deck.h43">$GROWTOO utility</h4>
+              <p data-i18n="deck.deck.p25">Stage rewards · marketplace currency · governance.</p>
             </article>
           </div>
         </div>
@@ -418,9 +420,9 @@
       <section class="slide slide--dense" data-title="Stack">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">08 · Full stack</span>
-            <h2>How it <span class="grad">connects.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span11" class="kicker">08 · Full stack</span>
+            <h2 data-i18n-html="deck.deck.h27">How it <span class="grad">connects.</span></h2>
+            <p data-i18n="deck.deck.p26" class="slide-remark">
               Journal, AI, Solana RWAs, and marketplace share one data graph — growers document proof, investors hold stakes, goods trade on the same platform.
             </p>
           </header>
@@ -433,13 +435,13 @@
               <g transform="translate(290,90)"><rect width="120" height="100" rx="16" fill="rgba(199,155,255,0.08)" stroke="#c79bff" stroke-width="1.5"/><text x="60" y="45" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600">Seed NFT</text><text x="60" y="68" text-anchor="middle" fill="#6f8a7e" font-size="9">Mint · metadata</text></g>
               <g transform="translate(425,90)"><rect width="120" height="100" rx="16" fill="rgba(255,184,107,0.08)" stroke="#ffb86b" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#e7f5ee" font-size="12" font-weight="600">$GROWTOO</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Stage rewards</text></g>
               <g transform="translate(560,90)"><rect width="120" height="100" rx="16" fill="rgba(120,224,143,0.06)" stroke="#78e08f" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#b6f4c4" font-size="11" font-weight="600">Batch vault</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Investor stakes</text></g>
-              <g transform="translate(695,90)"><rect width="120" height="100" rx="16" fill="rgba(95,182,255,0.06)" stroke="#5fb6ff" stroke-width="1.5"/><text x="60" y="42" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="600">Market</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Trade · settle</text></g>
+              <g transform="translate(695,90)"><rect width="120" height="100" rx="16" fill="rgba(95,182,255,0.06)" stroke="#5fb6ff" stroke-width="1.5"/><text data-i18n="common.nav.market" x="60" y="42" text-anchor="middle" fill="#e7f5ee" font-size="11" font-weight="600">Market</text><text x="60" y="62" text-anchor="middle" fill="#6f8a7e" font-size="9">Trade · settle</text></g>
             </svg>
           </div>
           <div class="grid grid-3 personas personas--dense">
-            <article class="persona"><div class="persona-tag">Grower</div><h3>Batch + journal</h3></article>
-            <article class="persona persona--mid"><div class="persona-tag">Investor</div><h3>Early stake · trade</h3></article>
-            <article class="persona"><div class="persona-tag">Buyer</div><h3>Flower · COA lots</h3></article>
+            <article class="persona"><div data-i18n="deck.deck.h310" class="persona-tag">Grower</div><h3 data-i18n="deck.deck.h316">Batch + journal</h3></article>
+            <article class="persona persona--mid"><div data-i18n="deck.deck.h311" class="persona-tag">Investor</div><h3 data-i18n="deck.deck.h317">Early stake · trade</h3></article>
+            <article class="persona"><div data-i18n="deck.deck.div25" class="persona-tag">Buyer</div><h3 data-i18n="deck.deck.h318">Flower · COA lots</h3></article>
           </div>
         </div>
       </section>
@@ -448,28 +450,28 @@
       <section class="slide slide--dense" data-title="Momentum">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">09 · Momentum</span>
-            <h2>Live today. <span class="grad">Building next.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span12" class="kicker">09 · Momentum</span>
+            <h2 data-i18n-html="deck.deck.h28">Live today. <span class="grad">Building next.</span></h2>
+            <p data-i18n-html="deck.deck.p27" class="slide-remark">
               <a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a> ships the journal, wallet, Seed NFT minting, growth stages, $GROWTOO rewards, and devnet marketplace.
               Next: batch vault, investor mint rounds, mainnet, and redemption ops.
             </p>
           </header>
           <div class="grid grid-3 traction traction--dense">
-            <div class="t-card"><span class="t-num">M1–M4</span><span class="t-label">Wallet · NFT · market</span></div>
-            <div class="t-card"><span class="t-num">Devnet</span><span class="t-label">Solana · Metaplex</span></div>
-            <div class="t-card"><span class="t-num">RWA</span><span class="t-label">Public docs live</span></div>
+            <div data-i18n-html="deck.deck.div26" class="t-card"><span class="t-num">M1–M4</span><span class="t-label">Wallet · NFT · market</span></div>
+            <div data-i18n-html="deck.deck.div27" class="t-card"><span class="t-num">Devnet</span><span class="t-label">Solana · Metaplex</span></div>
+            <div data-i18n-html="deck.deck.div28" class="t-card"><span class="t-num">RWA</span><span class="t-label">Public docs live</span></div>
           </div>
           <div class="timeline-viz" aria-label="Roadmap">
-            <div class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · adopt · market UI</span></div>
+            <div data-i18n-html="deck.deck.div29" class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · adopt · market UI</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node"><span class="tl-q">Q3</span><span class="tl-title">Batch vault · stake rounds</span></div>
+            <div data-i18n-html="deck.deck.div30" class="tl-node"><span class="tl-q">Q3</span><span class="tl-title">Batch vault · stake rounds</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node"><span class="tl-q">Q4</span><span class="tl-title">Mainnet pilot · redemption</span></div>
+            <div data-i18n-html="deck.deck.div31" class="tl-node"><span class="tl-q">Q4</span><span class="tl-title">Mainnet pilot · redemption</span></div>
             <div class="tl-line" aria-hidden="true"></div>
-            <div class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">EU batches · API</span></div>
+            <div data-i18n-html="deck.deck.div32" class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">EU batches · API</span></div>
           </div>
-          <div class="chip-row chip-row--center">
+          <div data-i18n-html="deck.deck.div33" class="chip-row chip-row--center">
             <span class="chip chip--green">Seed NFT minting</span>
             <span class="chip chip--blue">Growth + $GROWTOO on-chain</span>
             <span class="chip">Marketplace MVP</span>
@@ -482,18 +484,18 @@
       <section class="slide slide--dense" data-title="Team">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span class="kicker">10 · Team</span>
-            <h2>Builders who <span class="grad">grow.</span></h2>
-            <p class="slide-remark">
+            <span data-i18n="deck.deck.span13" class="kicker">10 · Team</span>
+            <h2 data-i18n-html="deck.deck.h29">Builders who <span class="grad">grow.</span></h2>
+            <p data-i18n="deck.deck.p28" class="slide-remark">
               Cultivation science and product engineering in one team — from EU hemp genetics to the platform you see in this deck.
             </p>
           </header>
           <div class="grid team team--founders team--dense">
             <div class="member">
-              <div class="avatar">BI</div>
-              <h3>Bela Ikotić</h3>
-              <p class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
-              <p class="member-short">Growtoo architecture &amp; AI roadmap.</p>
+              <div data-i18n="deck.deck.div34" class="avatar">BI</div>
+              <h3 data-i18n="deck.deck.h319">Bela Ikotić</h3>
+              <p data-i18n-html="deck.deck.p29" class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
+              <p data-i18n-html="deck.deck.p30" class="member-short">Growtoo architecture &amp; AI roadmap.</p>
             </div>
           </div>
         </div>
@@ -502,22 +504,22 @@
       <!-- 10. CLOSE -->
       <section class="slide slide--dense slide--contact" data-title="Close">
         <div class="slide-inner contact contact--dense">
-          <span class="kicker">11 · Close</span>
-          <h2>The <span class="grad">operating system</span> for cultivation.</h2>
-          <p class="slide-remark">
+          <span data-i18n="deck.deck.span14" class="kicker">11 · Close</span>
+          <h2 data-i18n-html="deck.deck.h210">The <span class="grad">operating system</span> for cultivation.</h2>
+          <p data-i18n="deck.deck.p31" class="slide-remark">
             From daily journaling to harvest-share investing and tradeable CBD lots — one OS for growers, investors, and the marketplace.
           </p>
           <div class="vision-points vision-points--dense">
-            <div><strong>Y1</strong> Devnet RWA + EU journal</div>
-            <div><strong>Y2</strong> Batch funding · mainnet pilot</div>
-            <div><strong>Y3</strong> Cultivation OS + harvest market</div>
+            <div data-i18n-html="deck.deck.div35"><strong>Y1</strong> Devnet RWA + EU journal</div>
+            <div data-i18n-html="deck.deck.div36"><strong>Y2</strong> Batch funding · mainnet pilot</div>
+            <div data-i18n-html="deck.deck.div37"><strong>Y3</strong> Cultivation OS + harvest market</div>
           </div>
           <div class="contact-grid">
-            <div><span class="meta-label">Live</span><a class="meta-value" href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></div>
-            <div><span class="meta-label">Docs</span><a class="meta-value" href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
-            <div><span class="meta-label">Contact</span><span class="meta-value">admin@growto.live</span></div>
+            <div data-i18n-html="deck.deck.div38"><span class="meta-label">Live</span><a class="meta-value" href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></div>
+            <div data-i18n-html="deck.deck.div39"><span class="meta-label">Docs</span><a class="meta-value" href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
+            <div data-i18n-html="deck.deck.div40"><span class="meta-label">Contact</span><span class="meta-value">admin@growto.live</span></div>
           </div>
-          <p class="thanks">Thank you.</p>
+          <p data-i18n="deck.deck.p32" class="thanks">Thank you.</p>
         </div>
       </section>
     </main>
@@ -534,6 +536,7 @@
     <!-- Side nav -->
     <nav class="sidenav" aria-label="Slides">
       <ol id="sideNavList"></ol>
+        <div class="nav-lang" data-i18n-switcher></div>
     </nav>
     <button class="menu-btn" id="menuBtn" aria-label="Toggle slide menu">☰</button>
 

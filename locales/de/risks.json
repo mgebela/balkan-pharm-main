@@ -1,0 +1,37 @@
+{
+  "div": "<strong>Solana Devnet</strong> <span>Nur Testmarkt. Seed-NFTs &amp; $GROWTOO haben <em>keinen Geldwert</em>.</span> <a href=\"./\">Risiken</a>",
+  "main-nav": {
+    "nav": "<a href=\"../index.html#adopters\" class=\"nav-link\">Adopter</a> <a href=\"../rwa-docs/\" class=\"nav-link\">Doku</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Anmelden</a>"
+  },
+  "span2": "UMFANG",
+  "h1": "Risiken &amp; Umfang",
+  "p": "Die ehrlichen Grenzen des Devnet-MVP: was es heute heißt, eine Pflanze zu adoptieren — und was nicht.",
+  "div2": "<span>Vor dem Einstieg lesen</span> <span class=\"desk-panel-meta\">DEVNET</span>",
+  "span3": "NETZ",
+  "h2": "Nur Devnet: kein Geldwert",
+  "p2": "Alle Seed-NFTs und <strong>$GROWTOO</strong> bei growtoo liegen heute im <strong>Solana Devnet</strong>. Sie dienen dem Produkttest. Sie sind keine Mainnet-Werte, kein Bargeldäquivalent und haben <strong>keinen Geldwert</strong>.",
+  "ask": {
+    "span": "PREI",
+    "h2": "Wie Preise entstehen",
+    "p": "Es gibt keine Bonding Curve und kein Preis-Orakel. Ein Grower (oder Verkäufer) setzt beim Einstellen einen Preis in <strong>$GROWTOO</strong>. Ein Adopter erfüllt dieses Angebot über den Marktplatz-Escrow. Der letzte Preis auf der Tafel ist das zuletzt eingestellte Angebot (oder eine Beispieltiefe, wenn keine Daten vorliegen)."
+  },
+  "span4": "VERT",
+  "h22": "Vertrauensmodell (zentralisiertes MVP)",
+  "p3": "Eine Collection-Authority steuert derzeit Metadaten-Updates, das Minten der Phasen-Belohnungen und die Escrow-Abwicklung. Der „Nachweis“ einer Phase bedeutet, dass der Betreiber geprüft hat, ob im Journal ein Fortschritt existiert — kein unabhängiges Orakel, keine Foto-Attestierung, kein IoT-Feed. Erfundene Journaleinträge bleiben für Adopter ein reales Restrisiko, bis die Prüfung härter wird.",
+  "span5": "RWA",
+  "h23": "Was „adoptieren“ heute bedeutet",
+  "p4": "Im Devnet heißt adoptieren: einen Test-RWA halten und dem verknüpften Journal folgen. Es entsteht <strong>kein</strong> übertragbarer Rechtstitel an physischem CBD-Pflanzenmaterial, kein Verwahrrecht und kein garantierter Ernteanteil. Die Einlösung in einen echten Ernteanteil ist in der Architektur-Doku beschrieben, bleibt aber ein <strong>simulierter / geplanter</strong> Weg.",
+  "span6": "JUR",
+  "h24": "Regulierung &amp; CBD-Logistik",
+  "p5": "CBD und verwandtes Pflanzenmaterial sind je nach Rechtsraum unterschiedlich reguliert. Jede künftige physische Einlösung müsste lokalem Recht, Lizenzierung, Verwahrung, Versand sowie KYC/AML entsprechen, wo dies gefordert ist. growtoo betreibt derzeit keine lizenzierte Lieferkette. Nichts auf dieser Seite ist Rechts-, Steuer- oder Anlageberatung.",
+  "span7": "AUD",
+  "h25": "Audit &amp; Team",
+  "p6": "Die Mint-Queue-Authority ist ein einzelner operativer Vertrauenspunkt. Ein externes Audit ist vor einem Mainnet-Start geplant — wir behaupten nicht, dass es erledigt ist. Öffentlicher Code und Adressen liegen im offenen Repository und in der <a href=\"../rwa-docs/\">Architektur-Doku</a>.",
+  "p7": "Mehr Details: <a href=\"../rwa-docs/\">RWA-Architektur</a> · <a href=\"https://github.com/mgebela/balkan-pharm-main\">GitHub</a> · <a href=\"../index.html\">Zurück zu growtoo</a>",
+  "p8": "Solana-Devnet-MVP. Token haben keinen Geldwert. Kein Wertpapierangebot und kein Anspruch auf physisches CBD.",
+  "div3": "<a href=\"../privacy/\">Datenschutz</a> <a href=\"../terms/\">AGB</a> <a href=\"../rwa-docs/\">Doku</a> <a href=\"../index.html\">Startseite</a>",
+  "p9": "© growtoo. Alle Rechte vorbehalten.",
+  "meta": {
+    "title": "Risiken &amp; Umfang · growtoo"
+  }
+}

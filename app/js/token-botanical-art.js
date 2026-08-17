@@ -15,7 +15,21 @@
   'use strict';
 
   var STAGE_KEYS = ['seed', 'germination', 'seedling', 'vegetative', 'flowering', 'harvest'];
-  var STAGE_LABELS = ['Seed', 'Germination', 'Seedling', 'Vegetative', 'Flowering', 'Harvest'];
+  /* Parallel to STAGE_KEYS. Resolved through stageLabel() at draw time —
+     this array is built while the page parses, before the dictionary. */
+  var STAGE_LABELS = [
+    ['app.stage.seed', 'Seed'],
+    ['app.stage.germination', 'Germination'],
+    ['app.stage.seedling', 'Seedling'],
+    ['app.stage.vegetative', 'Vegetative'],
+    ['app.stage.flowering', 'Flowering'],
+    ['app.stage.harvest', 'Harvest'],
+  ];
+
+  function stageLabel(stage) {
+    var row = STAGE_LABELS[stage];
+    return row ? T(row[0], row[1]) : T('app.stack.plant', 'Plant');
+  }
 
   var C = {
     bg: '#132016',
@@ -323,7 +337,7 @@
   }
 
   function cardChromeSvg(stage, showLabel) {
-    var label = STAGE_LABELS[stage] || 'Plant';
+    var label = stageLabel(stage);
     var title = stage + 1 + ' · ' + label;
     var brackets =
       '<g fill="none" stroke="' +
@@ -363,9 +377,10 @@
     var animate = !!opts.animate;
     var noBg = !!opts.noBg;
     var showLabel = opts.showLabel !== false && !noBg;
-    var label = STAGE_LABELS[stage] || 'Plant';
+    var label = stageLabel(stage);
 
     var cls =
+      // i18n-ignore — CSS class stem.
       'plant-grow-svg plant-grow-svg--botanical plant-grow-svg--s' +
       stage +
       (hero ? ' plant-grow-svg--hero' : '') +
@@ -391,8 +406,8 @@
         '<svg class="' +
         cls +
         '" viewBox="40 70 120 180" role="img" aria-label="' +
-        esc(label) +
-        ' stage" xmlns="http://www.w3.org/2000/svg">' +
+        esc(T('app.art.stageAria', '{stage} stage', { stage: label })) +
+        '" xmlns="http://www.w3.org/2000/svg">' +
         body +
         '</svg>'
       );
@@ -420,8 +435,8 @@
       ' ' +
       VH +
       '" role="img" aria-label="' +
-      esc(label) +
-      ' stage" xmlns="http://www.w3.org/2000/svg">' +
+      esc(T('app.art.stageAria', '{stage} stage', { stage: label })) +
+      '" xmlns="http://www.w3.org/2000/svg">' +
       body +
       '</svg>'
     );

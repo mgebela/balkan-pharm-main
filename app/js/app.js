@@ -11,6 +11,20 @@
   const STORAGE_ENTRIES = 'dnevnik-live-entries';
   const STORAGE_TOOLBOX = 'dnevnik-live-toolbox';
   const STORAGE_TODAY_STATE = 'dnevnik-live-today-state';
+
+  /**
+   * BCP-47 tag for the reader's language, for Intl formatting.
+   *
+   * Every date and number in this file used to be pinned to en-GB / en-US,
+   * which put "Wed 19 Aug" and "1,234" inside Croatian and German sentences —
+   * including the coach messages that read these labels back.
+   */
+  function intlTag() {
+    var meta = window.I18N && I18N.locales
+      ? I18N.locales.filter(function (l) { return l.code === I18N.locale; })[0]
+      : null;
+    return (meta && meta.intl) || (window.I18N && I18N.locale) || 'en-GB';
+  }
   let plantsSurfaceDirty = true;
 
   // One-time migration from previous storage keys (older branding).
@@ -125,7 +139,7 @@
 
   async function resendVerificationEmail() {
     const user = getFirebaseAuthUser();
-    if (!user) throw new Error('Sign in first.');
+    if (!user) throw new Error(T('app.signInFirst', 'Sign in first.'));
     if (user.emailVerified) return { already: true };
     await user.sendEmailVerification();
     return { sent: true, email: user.email || '' };
@@ -328,6 +342,7 @@
       // pure waste — and this used to resend in a tight loop forever.
       const size = remoteSyncPayloadSize(payload);
       if (size > REMOTE_SYNC_SIZE_BUDGET) {
+        // i18n-ignore — console diagnostic; the grower sees the banner below.
         console.warn(
           'Remote journal sync skipped — payload ' +
             size +
@@ -338,11 +353,14 @@
             ')'
         );
         setRemoteSyncBanner(
-          'Saved on this device, but too large to back up to the cloud (' +
-            Math.round(size / 1024) +
-            ' KB of ' +
-            Math.round(REMOTE_SYNC_SIZE_BUDGET / 1024) +
-            ' KB). Photos take up most of the space — remove a large one to resume cloud backup.'
+          T(
+            'app.sync.tooLarge',
+            'Saved on this device, but too large to back up to the cloud ({used} KB of {budget} KB). Photos take up most of the space — remove a large one to resume cloud backup.',
+            {
+              used: Math.round(size / 1024),
+              budget: Math.round(REMOTE_SYNC_SIZE_BUDGET / 1024),
+            }
+          )
         );
         return;
       }
@@ -357,17 +375,21 @@
         // Permanent rejection. Retrying cannot change the outcome, so stop and
         // say so; the next edit will schedule a fresh attempt.
         setRemoteSyncBanner(
-          'Saved on this device, but the cloud backup was rejected (' +
-            (code || 'unknown error') +
-            '). It will try again after your next change.'
+          T(
+            'app.sync.rejected',
+            'Saved on this device, but the cloud backup was rejected ({reason}). It will try again after your next change.',
+            { reason: code || T('app.sync.unknownError', 'unknown error') }
+          )
         );
         return;
       }
       remoteSyncRetries += 1;
       if (remoteSyncRetries >= REMOTE_SYNC_MAX_ATTEMPTS) {
         setRemoteSyncBanner(
-          'Saved on this device, but the cloud backup keeps failing. ' +
-            'Check your connection — it will try again after your next change.'
+          T(
+            'app.sync.keepsFailing',
+            'Saved on this device, but the cloud backup keeps failing. Check your connection — it will try again after your next change.'
+          )
         );
         remoteSyncRetries = 0;
         return;
@@ -420,6 +442,7 @@
       const failed = plantRes.failed + entryRes.failed;
       const freedKb = Math.round((plantRes.bytesFreed + entryRes.bytesFreed) / 1024);
       if (moved) {
+        // i18n-ignore — console diagnostics for the photo migration pass.
         console.log(
           'Moved ' + moved + ' inline photo(s) to Storage, freeing ~' + freedKb + ' KB'
         );
@@ -429,6 +452,7 @@
           entries: entriesForRemoteSync(getEntries()),
         });
       }
+      // i18n-ignore — console diagnostic.
       if (failed) console.warn(failed + ' photo(s) could not be moved to Storage');
     } catch (err) {
       console.warn('Inline photo migration failed', err);
@@ -616,7 +640,7 @@
   function formatReportDateTime(iso) {
     if (!iso) return '—';
     try {
-      return new Date(iso).toLocaleString('en-GB', {
+      return new Date(iso).toLocaleString(intlTag(), {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
@@ -634,13 +658,13 @@
       const [y, m, d] = dayKey.split('-').map(Number);
       const dt = new Date(y, m - 1, d);
       const today = getLocalDayKey();
-      const label = dt.toLocaleDateString('en-GB', {
+      const label = dt.toLocaleDateString(intlTag(), {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
         year: 'numeric',
       });
-      if (dayKey === today) return `Danas · ${label}`;
+      if (dayKey === today) return T('app.report.todayPrefix', 'Today · {date}', { date: label });
       return label;
     } catch {
       return dayKey;
@@ -766,10 +790,24 @@
 
   function adminGrantBadgesHtml(g) {
     const plantCount =
-      Array.isArray(g.plantIds) && g.plantIds.length > 0 ? g.plantIds.length + ' plants' : 'All plants';
+      Array.isArray(g.plantIds) && g.plantIds.length > 0
+        ? T('app.admin.plantCount', '{count} plants', { count: g.plantIds.length })
+        : T('app.admin.allPlants', 'All plants');
     const parts = [`<span class="admin-grant-badge admin-grant-badge--plants">🌱 ${escapeHtml(plantCount)}</span>`];
-    if (g.shareEntries !== false) parts.push('<span class="admin-grant-badge admin-grant-badge--journal">📓 Journal</span>');
-    if (g.shareToolbox) parts.push('<span class="admin-grant-badge admin-grant-badge--toolbox">🧰 Tools</span>');
+    if (g.shareEntries !== false) {
+      parts.push(
+        '<span class="admin-grant-badge admin-grant-badge--journal">📓 ' +
+          escapeHtml(T('common.nav.journal', 'Journal')) +
+          '</span>'
+      );
+    }
+    if (g.shareToolbox) {
+      parts.push(
+        '<span class="admin-grant-badge admin-grant-badge--toolbox">🧰 ' +
+          escapeHtml(T('app.admin.tools', 'Tools')) +
+          '</span>'
+      );
+    }
     return parts.join('');
   }
 
@@ -790,7 +828,10 @@
 
     adminReportPeriod = period || adminReportPeriod || 'daily';
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Loading report…</p>';
+    panel.innerHTML =
+      '<p class="admin-empty-state admin-loading-state">' +
+      escapeHtml(T('app.admin.loadingReport', 'Loading report…')) +
+      '</p>';
 
     section.querySelectorAll('.admin-report-period').forEach((btn) => {
       btn.classList.toggle('is-active', btn.dataset.period === adminReportPeriod);
@@ -811,13 +852,16 @@
     const usersInPeriod = usersRaw.filter((u) => u.lastLoginAt && u.lastLoginAt >= sinceIso);
     const uniqueUsers = new Set(filteredEvents.map((e) => e.uid || e.email).filter(Boolean));
     const summary = buildLoginUserSummary(filteredEvents, usersInPeriod);
-    const periodLabel = adminReportPeriod === 'daily' ? 'today' : 'in the last 7 days';
+    const loginsLabel =
+      adminReportPeriod === 'daily'
+        ? T('app.admin.loginsToday', 'Logins today')
+        : T('app.admin.loginsWeek', 'Logins in the last 7 days');
 
     const summaryHtml =
       '<div class="admin-report-summary">' +
-      `<div class="admin-report-stat admin-report-stat--logins"><strong>${filteredEvents.length}</strong><span>Logins ${periodLabel}</span></div>` +
-      `<div class="admin-report-stat admin-report-stat--users"><strong>${uniqueUsers.size}</strong><span>Unique users</span></div>` +
-      `<div class="admin-report-stat admin-report-stat--total"><strong>${summary.length}</strong><span>In summary</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--logins"><strong>${filteredEvents.length}</strong><span>${escapeHtml(loginsLabel)}</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--users"><strong>${uniqueUsers.size}</strong><span>${escapeHtml(T('app.admin.uniqueUsers', 'Unique users'))}</span></div>` +
+      `<div class="admin-report-stat admin-report-stat--total"><strong>${summary.length}</strong><span>${escapeHtml(T('app.admin.inSummary', 'In summary'))}</span></div>` +
       '</div>';
 
     const usersTableRows = summary.length
@@ -832,20 +876,39 @@
               '</tr>'
           )
           .join('')
-      : '<tr><td colspan="4" class="admin-empty-state">No logins in the selected period.</td></tr>';
+      : '<tr><td colspan="4" class="admin-empty-state">' +
+        escapeHtml(T('app.admin.noLogins', 'No logins in the selected period.')) +
+        '</td></tr>';
 
     const usersTableHtml =
       '<div class="admin-report-block">' +
-      '<h4 class="admin-subheading">Summary by user</h4>' +
+      '<h4 class="admin-subheading">' +
+      escapeHtml(T('app.admin.summaryByUser', 'Summary by user')) +
+      '</h4>' +
       '<div class="admin-report-table-wrap"><table class="admin-report-table">' +
-      '<thead><tr><th>Email</th><th>Role</th><th>Logins</th><th>Last login</th></tr></thead>' +
+      '<thead><tr>' +
+      '<th>' + escapeHtml(T('app.admin.colEmail', 'Email')) + '</th>' +
+      '<th>' + escapeHtml(T('app.admin.colRole', 'Role')) + '</th>' +
+      '<th>' + escapeHtml(T('app.admin.colLogins', 'Logins')) + '</th>' +
+      '<th>' + escapeHtml(T('app.admin.colLastLogin', 'Last login')) + '</th>' +
+      '</tr></thead>' +
       `<tbody>${usersTableRows}</tbody></table></div></div>`;
 
     let detailHtml = '<div class="admin-report-block admin-report-block--detail">';
-    detailHtml += '<h4 class="admin-subheading">Individual logins</h4>';
+    detailHtml +=
+      '<h4 class="admin-subheading">' +
+      escapeHtml(T('app.admin.individualLogins', 'Individual logins')) +
+      '</h4>';
     if (!filteredEvents.length) {
       detailHtml +=
-        '<p class="admin-empty-state">No recorded logins for this period. Logins are tracked from the next user sign-in.</p>';
+        '<p class="admin-empty-state">' +
+        escapeHtml(
+          T(
+            'app.admin.noRecorded',
+            'No recorded logins for this period. Logins are tracked from the next user sign-in.'
+          )
+        ) +
+        '</p>';
     } else if (adminReportPeriod === 'weekly') {
       const groups = groupLoginEventsByDay(filteredEvents);
       detailHtml += '<div class="admin-report-day-groups">' + groups
@@ -1098,7 +1161,7 @@
       toolbox: localMerged.toolbox || {},
     });
     console.log(
-      'Hybrid user loaded:',
+      'Hybrid user loaded:', // i18n-ignore — console diagnostic.
       (localMerged.plants || []).length,
       'own +',
       sharedPlants.length,
@@ -1110,17 +1173,28 @@
     const plantId = opts && opts.plantId;
     const entryId = opts && opts.entryId;
     if (isAdminReadOnly) {
-      alert(readOnlyBannerMessage || 'View is read-only — editing is not allowed.');
+      alert(
+        readOnlyBannerMessage ||
+          T('app.readOnly.generic', 'View is read-only — editing is not allowed.')
+      );
       return true;
     }
     if (plantId && isSharedPlantId(plantId)) {
       alert(
-        'This plant comes from the superadmin shared library — you can view it, but not edit it.'
+        T(
+          'app.readOnly.sharedPlant',
+          'This plant comes from the superadmin shared library — you can view it, but not edit it.'
+        )
       );
       return true;
     }
     if (entryId && isSharedEntryId(entryId)) {
-      alert('This entry comes from a shared library — it cannot be edited.');
+      alert(
+        T(
+          'app.readOnly.sharedEntry',
+          'This entry comes from a shared library — it cannot be edited.'
+        )
+      );
       return true;
     }
     return false;
@@ -1133,7 +1207,10 @@
   function applySharedLibraryBanner(message) {
     readOnlyBannerMessage =
       message ||
-      'You can edit your own plants and entries. Plants from the superadmin shared library are view-only.';
+      T(
+        'app.readOnly.hybrid',
+        'You can edit your own plants and entries. Plants from the superadmin shared library are view-only.'
+      );
     document.body.classList.remove('admin-readonly');
     document.body.classList.add('shared-library-mode');
     let banner = document.getElementById('shared-library-banner');
@@ -1152,7 +1229,10 @@
     if (!isAdminReadOnly) return;
     readOnlyBannerMessage =
       message ||
-      'Read-only database view — plants, journal and tools without editing.';
+      T(
+        'app.readOnly.database',
+        'Read-only database view — plants, journal and tools without editing.'
+      );
     document.body.classList.add('admin-readonly');
     let banner = document.getElementById('admin-readonly-banner');
     if (!banner) {
@@ -1173,7 +1253,10 @@
     if (!section || !panel || !ownerUid || currentUserRole !== 'superadmin') return;
 
     section.setAttribute('aria-hidden', 'false');
-    panel.innerHTML = '<p class="admin-empty-state admin-loading-state">Loading…</p>';
+    panel.innerHTML =
+      '<p class="admin-empty-state admin-loading-state">' +
+      escapeHtml(T('app.blog.loading', 'Loading…')) +
+      '</p>';
 
     const users = (await listFirestoreUsers()).filter((u) => u.uid !== ownerUid);
     const plants = getPlants();
@@ -1196,7 +1279,11 @@
               '</label>'
           )
           .join('')
-      : '<p class="admin-empty-state">You have no plants in the database — add them in Plants & journal.</p>';
+      : '<p class="admin-empty-state">' +
+        escapeHtml(
+          T('app.admin.noPlantsInDb', 'You have no plants in the database — add them in Plants & journal.')
+        ) +
+        '</p>';
 
     const grantsHtml = grants.length
       ? grants
@@ -1207,42 +1294,72 @@
               '<div class="admin-grant-card-head">' +
               `<div class="admin-grant-user"><span class="admin-grant-avatar" aria-hidden="true">${escapeHtml((email[0] || '?').toUpperCase())}</span>` +
               `<strong class="admin-grant-email">${escapeHtml(email)}</strong></div>` +
-              '<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">Remove</button></div>' +
+              '<button type="button" class="btn btn-ghost btn-sm btn-revoke-grant">' +
+              escapeHtml(T('app.admin.remove', 'Remove')) +
+              '</button></div>' +
               `<div class="admin-grant-badges">${adminGrantBadgesHtml(g)}</div></article>`
             );
           })
           .join('')
-      : '<p class="admin-empty-state">No access granted yet.</p>';
+      : '<p class="admin-empty-state">' +
+        escapeHtml(T('app.admin.noAccessYet', 'No access granted yet.')) +
+        '</p>';
 
     panel.innerHTML =
       '<div class="admin-sharing-layout">' +
       '<div class="admin-sharing-form-card">' +
-      '<h4 class="admin-subheading">New access</h4>' +
+      '<h4 class="admin-subheading">' +
+      escapeHtml(T('app.admin.newAccess', 'New access')) +
+      '</h4>' +
       '<form id="form-sharing-grant" class="admin-sharing-form">' +
-      '<label class="admin-field"><span class="admin-field-label">User</span>' +
-      '<select id="share-viewer-user" class="admin-field-input" required><option value="">— select a user —</option>' +
+      '<label class="admin-field"><span class="admin-field-label">' +
+      escapeHtml(T('app.admin.user', 'User')) +
+      '</span>' +
+      '<select id="share-viewer-user" class="admin-field-input" required><option value="">' +
+      escapeHtml(T('app.admin.selectUser', '— select a user —')) +
+      '</option>' +
       userOptions +
       '</select></label>' +
       '<fieldset class="admin-sharing-plants-fieldset">' +
-      '<legend class="admin-field-label">Plants</legend>' +
+      '<legend class="admin-field-label">' +
+      escapeHtml(T('app.stack.plants', 'Plants')) +
+      '</legend>' +
       '<label class="admin-toggle-tile admin-toggle-tile--wide">' +
       '<input type="checkbox" id="share-all-plants" checked />' +
-      '<span><strong>All plants</strong><small>View the entire plant database</small></span></label>' +
+      '<span><strong>' +
+      escapeHtml(T('app.admin.allPlants', 'All plants')) +
+      '</strong><small>' +
+      escapeHtml(T('app.admin.allPlantsHint', 'View the entire plant database')) +
+      '</small></span></label>' +
       '<div id="share-plants-list" class="admin-plants-pick-list" hidden>' +
       plantChecks +
       '</div></fieldset>' +
       '<div class="admin-toggle-row">' +
       '<label class="admin-toggle-tile">' +
       '<input type="checkbox" id="share-entries" checked />' +
-      '<span><strong>Journal</strong><small>Notes and entries</small></span></label>' +
+      '<span><strong>' +
+      escapeHtml(T('common.nav.journal', 'Journal')) +
+      '</strong><small>' +
+      escapeHtml(T('app.admin.journalHint', 'Notes and entries')) +
+      '</small></span></label>' +
       '<label class="admin-toggle-tile">' +
       '<input type="checkbox" id="share-toolbox" />' +
-      '<span><strong>Tools</strong><small>Data from Tools</small></span></label>' +
+      '<span><strong>' +
+      escapeHtml(T('app.admin.tools', 'Tools')) +
+      '</strong><small>' +
+      escapeHtml(T('app.admin.toolsHint', 'Data from Tools')) +
+      '</small></span></label>' +
       '</div>' +
-      '<button type="submit" class="btn btn-primary admin-sharing-submit">Save access</button>' +
+      '<button type="submit" class="btn btn-primary admin-sharing-submit">' +
+      escapeHtml(T('app.admin.saveAccess', 'Save access')) +
+      '</button>' +
       '</form></div>' +
       '<div class="admin-sharing-grants-card">' +
-      '<h4 class="admin-subheading">Active access <span class="admin-count-badge">' + grants.length + '</span></h4>' +
+      '<h4 class="admin-subheading">' +
+      escapeHtml(T('app.admin.activeAccess', 'Active access')) +
+      ' <span class="admin-count-badge">' +
+      grants.length +
+      '</span></h4>' +
       '<div class="admin-grant-list">' + grantsHtml + '</div></div></div>';
 
     const allPlantsCb = document.getElementById('share-all-plants');
@@ -1264,7 +1381,9 @@
         ? []
         : Array.from(document.querySelectorAll('.share-plant-cb:checked')).map((cb) => cb.value);
       if (!allPlants && plantIds.length === 0) {
-        alert('Select at least one plant or enable "All plants".');
+        alert(
+        T('app.admin.needPlantSelection', 'Select at least one plant or enable "All plants".')
+      );
         return;
       }
       try {
@@ -1276,10 +1395,10 @@
           enabled: true,
         });
         await renderSuperadminSharingPanel();
-        alert('Access saved.');
+        alert(T('app.admin.accessSaved', 'Access saved.'));
       } catch (err) {
         console.error(err);
-        alert('Saving failed. Check your Firestore rules.');
+        alert(T('app.admin.saveFailed', 'Saving failed. Check your Firestore rules.'));
       }
     });
 
@@ -1287,12 +1406,14 @@
       btn.addEventListener('click', async () => {
         const row = btn.closest('.admin-grant-card');
         const viewerUid = row && row.dataset.viewer;
-        if (!viewerUid || !confirm('Remove access for this user?')) return;
+        if (!viewerUid || !confirm(T('app.admin.confirmRevoke', 'Remove access for this user?'))) {
+      return;
+    }
         try {
           await deleteSharedGrant(ownerUid, viewerUid);
           await renderSuperadminSharingPanel();
         } catch (err) {
-          alert('Removal failed.');
+          alert(T('app.admin.removeFailed', 'Removal failed.'));
         }
       });
     });
@@ -1513,31 +1634,33 @@ function getAdopterIntent() {
 }
 
 function adopterIntentCopy() {
+  /* Called at render time, so T() is safe here — unlike the parse-time tables
+     elsewhere in this file. */
   const intent = getAdopterIntent();
   if (intent === 'collect_garden') {
     return {
-      hero: 'Collect adopted plants and follow each growth stage in your garden.',
-      empty: 'Browse the market to adopt your first plant and grow your collection.',
-      market: 'Find open plant offers and back them with $GROWTOO when you’re ready.',
-      strip: 'Claim test $GROWTOO, browse the market, and collect your first plant.',
-      label: 'Collect a garden',
+      hero: T('app.intent.collect.hero', 'Collect adopted plants and follow each growth stage in your garden.'),
+      empty: T('app.intent.collect.empty', 'Browse the market to adopt your first plant and grow your collection.'),
+      market: T('app.intent.collect.market', 'Find open plant offers and back them with $GROWTOO when you’re ready.'),
+      strip: T('app.intent.collect.strip', 'Claim test $GROWTOO, browse the market, and collect your first plant.'),
+      label: T('app.intent.collect.label', 'Collect a garden'),
     };
   }
   if (intent === 'earn_rewards') {
     return {
-      hero: 'Practice stakes and harvest unlocks on test assets — no monetary value.',
-      empty: 'Back an open offer to start following growth and harvest care on the test network.',
-      market: 'Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.',
-      strip: 'Claim test $GROWTOO, stake on a live offer, then watch monthly unlock in My garden.',
-      label: 'Practice stakes',
+      hero: T('app.intent.earn.hero', 'Practice stakes and harvest unlocks on test assets — no monetary value.'),
+      empty: T('app.intent.earn.empty', 'Back an open offer to start following growth and harvest care on the test network.'),
+      market: T('app.intent.earn.market', 'Invest test $GROWTOO in grower asks — follow monthly unlock progress toward harvest.'),
+      strip: T('app.intent.earn.strip', 'Claim test $GROWTOO, stake on a live offer, then watch monthly unlock in My garden.'),
+      label: T('app.intent.earn.label', 'Practice stakes'),
     };
   }
   return {
-    hero: 'Follow a real plant’s journal trail. Backing with $GROWTOO is optional.',
-    empty: 'Browse the market and back a grow with $GROWTOO when you are ready.',
-    market: 'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.',
-    strip: 'Claim test $GROWTOO, then invest in a live plant offer.',
-    label: 'Support growers',
+    hero: T('app.intent.support.hero', 'Follow a real plant’s journal trail. Backing with $GROWTOO is optional.'),
+    empty: T('app.intent.support.empty', 'Browse the market and back a grow with $GROWTOO when you are ready.'),
+    market: T('app.intent.support.market', 'Invest $GROWTOO to adopt a grower’s plant token. Connect your wallet when you tap Invest.'),
+    strip: T('app.intent.support.strip', 'Claim test $GROWTOO, then invest in a live plant offer.'),
+    label: T('app.intent.support.label', 'Support growers'),
   };
 }
 
@@ -1612,9 +1735,14 @@ function renderAccountProfile() {
   } catch {
     /* ignore */
   }
-  const name = readDisplayName() || (email ? email.split('@')[0] : '') || 'growtoo member';
+  const name =
+    readDisplayName() ||
+    (email ? email.split('@')[0] : '') ||
+    T('app.account.member', 'growtoo member');
   const mark = adopter ? 'A' : 'G';
-  const roleLabel = adopter ? 'Adopter' : 'Grower';
+  const roleLabel = adopter
+    ? T('app.role.adopter', 'Adopter')
+    : T('app.role.grower', 'Grower');
   const profilePhoto = readProfilePhoto();
   const avatarHtml = profilePhoto
     ? '<img class="account-profile-avatar-img" src="' +
@@ -1631,15 +1759,6 @@ function renderAccountProfile() {
     /* ignore */
   }
 
-  let cryptoMode = 'simple';
-  try {
-    if (window.GrowtooPlain && typeof GrowtooPlain.getMode === 'function') {
-      cryptoMode = GrowtooPlain.getMode() === 'advanced' ? 'advanced' : 'simple';
-    }
-  } catch {
-    /* ignore */
-  }
-
   let metaRows = '';
   let statsHtml = '';
 
@@ -1651,32 +1770,39 @@ function renderAccountProfile() {
       if (window.PlantToken && typeof PlantToken.getWallet === 'function') {
         const w = PlantToken.getWallet() || {};
         adopted = Array.isArray(w.tokens) ? w.tokens.length : 0;
-        if (w.growthBalance != null) growBal = Number(w.growthBalance).toLocaleString('en-US');
+        if (w.growthBalance != null) growBal = Number(w.growthBalance).toLocaleString(intlTag());
       }
     } catch {
       /* ignore */
     }
     metaRows =
-      '<div class="account-profile-row"><span>Focus</span><strong>' +
-      esc(intentCopy.label || 'Support growers') +
+      '<div class="account-profile-row"><span>' +
+      esc(T('app.account.focus', 'Focus')) +
+      '</span><strong>' +
+      esc(intentCopy.label || T('app.intent.support.label', 'Support growers')) +
       '</strong></div>' +
-      '<div class="account-profile-row"><span>Wallet</span><strong>' +
-      esc(wallet ? shortWalletAddr(wallet) : 'Not linked') +
-      '</strong></div>' +
-      '<div class="account-profile-row"><span>View</span><strong>' +
-      esc(cryptoMode === 'advanced' ? 'Advanced' : 'Simple') +
+      '<div class="account-profile-row"><span>' +
+      esc(T('app.account.wallet', 'Wallet')) +
+      '</span><strong>' +
+      esc(wallet ? shortWalletAddr(wallet) : T('app.account.notLinked', 'Not linked')) +
       '</strong></div>';
     statsHtml =
       '<div class="account-profile-stats">' +
-      '<div class="account-profile-stat"><span>Adopted</span><strong>' +
+      '<div class="account-profile-stat"><span>' +
+      esc(T('app.account.adopted', 'Adopted')) +
+      '</span><strong>' +
       esc(String(adopted)) +
       '</strong></div>' +
+      // i18n-ignore — ticker symbol.
       '<div class="account-profile-stat"><span>$GROWTOO</span><strong>' +
       esc(String(growBal)) +
       '</strong></div>' +
       '</div>';
   } else {
-    const setup = getPreferredGrowEnvironment() === 'outdoor' ? 'Outdoor' : 'Indoor';
+    const setup =
+      getPreferredGrowEnvironment() === 'outdoor'
+        ? T('app.account.outdoor', 'Outdoor')
+        : T('app.account.indoor', 'Indoor');
     let city = '';
     try {
       city = String(localStorage.getItem('dnevnik-live-weather-city') || '').trim();
@@ -1709,21 +1835,26 @@ function renderAccountProfile() {
       /* ignore */
     }
     metaRows =
-      '<div class="account-profile-row"><span>Setup</span><strong>' +
+      '<div class="account-profile-row"><span>' +
+      esc(T('app.account.setup', 'Setup')) +
+      '</span><strong>' +
       esc(setup + (city ? ' · ' + city : '')) +
       '</strong></div>' +
-      '<div class="account-profile-row"><span>Wallet</span><strong>' +
-      esc(wallet ? shortWalletAddr(wallet) : 'Not linked') +
-      '</strong></div>' +
-      '<div class="account-profile-row"><span>View</span><strong>' +
-      esc(cryptoMode === 'advanced' ? 'Advanced' : 'Simple') +
+      '<div class="account-profile-row"><span>' +
+      esc(T('app.account.wallet', 'Wallet')) +
+      '</span><strong>' +
+      esc(wallet ? shortWalletAddr(wallet) : T('app.account.notLinked', 'Not linked')) +
       '</strong></div>';
     statsHtml =
       '<div class="account-profile-stats">' +
-      '<div class="account-profile-stat"><span>Plants</span><strong>' +
+      '<div class="account-profile-stat"><span>' +
+      esc(T('app.stack.plants', 'Plants')) +
+      '</span><strong>' +
       esc(String(plantCount)) +
       '</strong></div>' +
-      '<div class="account-profile-stat"><span>Rank · XP</span><strong>' +
+      '<div class="account-profile-stat"><span>' +
+      esc(T('app.account.rankXp', 'Rank · XP')) +
+      '</span><strong>' +
       esc(rankLabel + (xp !== '—' ? ' · ' + xp : '')) +
       '</strong></div>' +
       '</div>';
@@ -1751,21 +1882,41 @@ function renderAccountProfile() {
     '</div>' +
     (!adopter
       ? '<div class="account-profile-logo-edit">' +
-        '<label class="account-logo-label" for="account-profile-photo-input">Update logo / photo</label>' +
+        '<label class="account-logo-label" for="account-profile-photo-input">' +
+      esc(T('app.account.updateLogo', 'Update logo / photo')) +
+      '</label>' +
         '<input id="account-profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp,image/*" />' +
         (profilePhoto
-          ? '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-photo-clear">Remove photo</button>'
+          ? '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-photo-clear">' +
+            esc(T('app.account.removePhoto', 'Remove photo')) +
+            '</button>'
           : '') +
         '<p class="account-profile-logo-hint" id="account-profile-photo-status" hidden></p>' +
         '</div>'
       : '') +
     (!isCurrentEmailVerified()
       ? '<div class="account-profile-verify" id="account-profile-verify">' +
-        '<p>Email not verified yet — live AI coach stays on local helpers until you confirm.</p>' +
-        '<p class="account-profile-verify-hint">Look for <em>Verify your email · growtoo</em> (also check Spam / Promotions).</p>' +
+        '<p>' +
+      esc(
+        T(
+          'app.account.notVerified',
+          'Email not verified yet — live AI coach stays on local helpers until you confirm.'
+        )
+      ) +
+      '</p>' +
+        '<p class="account-profile-verify-hint">' +
+        T(
+          'app.account.verifyHint',
+          'Look for <em>Verify your email · growtoo</em> (also check Spam / Promotions).'
+        ) +
+        '</p>' +
         '<div class="account-profile-actions account-profile-verify-actions">' +
-        '<button type="button" class="btn btn-primary btn-sm" id="account-resend-verify">Resend verification</button>' +
-        '<button type="button" class="btn btn-ghost btn-sm" id="account-refresh-verify">I already verified</button>' +
+        '<button type="button" class="btn btn-primary btn-sm" id="account-resend-verify">' +
+      esc(T('app.account.resendVerify', 'Resend verification')) +
+      '</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" id="account-refresh-verify">' +
+        esc(T('app.account.alreadyConfirmed', 'I already verified')) +
+        '</button>' +
         '</div>' +
         '<p class="account-profile-verify-status" id="account-verify-status" hidden></p>' +
         '</div>'
@@ -1773,30 +1924,17 @@ function renderAccountProfile() {
     '<div class="account-profile-meta">' +
     metaRows +
     '</div>' +
-    '<p class="account-profile-mode-hint">' +
-    (cryptoMode === 'advanced'
-      ? 'Advanced shows mint addresses, explorer links, and listing PDAs on cards.'
-      : 'Simple hides mint addresses and chain IDs — plant · stage · ask only.') +
-    '</p>' +
     statsHtml +
-    '<div class="account-profile-mode-row">' +
-    '<span class="crypto-mode-status">Detail level</span>' +
-    '<div class="segmented-control" data-crypto-mode-segmented data-active="' +
-    cryptoMode +
-    '">' +
-    '<span class="segmented-thumb" aria-hidden="true"></span>' +
-    '<button type="button" class="segmented-option" data-crypto-mode-btn="simple" role="radio" aria-checked="' +
-    (cryptoMode === 'simple' ? 'true' : 'false') +
-    '">Simple</button>' +
-    '<button type="button" class="segmented-option" data-crypto-mode-btn="advanced" role="radio" aria-checked="' +
-    (cryptoMode === 'advanced' ? 'true' : 'false') +
-    '">Advanced</button>' +
-    '</div>' +
-    '</div>' +
     '<div class="account-profile-actions">' +
-    '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-tour">Replay tour</button>' +
+    '<button type="button" class="btn btn-ghost btn-sm" id="account-profile-tour">' +
+    esc(T('app.account.replayTour', 'Replay tour')) +
+    '</button>' +
     '<button type="button" class="btn btn-primary btn-sm" id="account-profile-primary">' +
-    esc(adopter ? 'Open market' : 'Open journal') +
+    esc(
+      adopter
+        ? T('app.market.ctaOpenMarket', 'Open market')
+        : T('common.cta.openJournal', 'Open the journal')
+    ) +
     '</button>' +
     '</div>' +
     '<div id="account-public-profile-slot"></div>';
@@ -1908,7 +2046,7 @@ function renderAccountProfile() {
       if (!file) return;
       if (photoStatus) {
         photoStatus.hidden = false;
-        photoStatus.textContent = 'Uploading…';
+        photoStatus.textContent = T('app.account.uploading', 'Uploading…');
       }
       try {
         const raw = await new Promise(function (resolve, reject) {
@@ -1921,15 +2059,16 @@ function renderAccountProfile() {
         });
         const resized = await resizeAccountPhoto(raw);
         if (!resized || resized.indexOf('data:image/') !== 0 || resized.length > 220000) {
-          throw new Error('Image too large or unreadable.');
+          throw new Error(T('app.account.imageBad', 'Image too large or unreadable.'));
         }
         await persistProfilePhoto(resized);
-        if (photoStatus) photoStatus.textContent = 'Logo saved.';
+        if (photoStatus) photoStatus.textContent = T('app.account.logoSaved', 'Logo saved.');
         renderAccountProfile();
       } catch (err) {
         if (photoStatus) {
           photoStatus.hidden = false;
-          photoStatus.textContent = (err && err.message) || 'Could not save photo.';
+          photoStatus.textContent =
+          (err && err.message) || T('app.account.photoFailed', 'Could not save photo.');
         }
       }
     });
@@ -1957,25 +2096,34 @@ function renderAccountProfile() {
   if (resendBtn) {
     resendBtn.addEventListener('click', async function () {
       resendBtn.disabled = true;
-      setVerifyStatus('Sending…');
+      setVerifyStatus(T('app.account.sending', 'Sending…'));
       try {
         const result = await resendVerificationEmail();
         if (result && result.already) {
-          setVerifyStatus('Already verified — refreshing…');
+          setVerifyStatus(T('app.account.alreadyVerified', 'Already verified — refreshing…'));
           renderAccountProfile();
           return;
         }
         setVerifyStatus(
-          'Sent to ' +
-            (result.email || email || 'your inbox') +
-            '. Check inbox and Spam for “Verify your email · growtoo”.'
+          T(
+            'app.account.sentTo',
+            'Sent to {email}. Check inbox and Spam for “Verify your email · growtoo”.',
+            { email: result.email || email || T('app.account.yourInbox', 'your inbox') }
+          )
         );
       } catch (err) {
         const code = err && err.code;
         if (code === 'auth/too-many-requests') {
-          setVerifyStatus('Too many sends — wait a few minutes, then try again.', true);
+          setVerifyStatus(
+            T('app.account.tooManySends', 'Too many sends — wait a few minutes, then try again.'),
+            true
+          );
         } else {
-          setVerifyStatus((err && err.message) || 'Could not send verification email.', true);
+          setVerifyStatus(
+            (err && err.message) ||
+              T('app.account.verifySendFailed', 'Could not send verification email.'),
+            true
+          );
         }
       } finally {
         resendBtn.disabled = false;
@@ -1986,20 +2134,27 @@ function renderAccountProfile() {
   if (refreshVerifyBtn) {
     refreshVerifyBtn.addEventListener('click', async function () {
       refreshVerifyBtn.disabled = true;
-      setVerifyStatus('Checking…');
+      setVerifyStatus(T('app.account.checking', 'Checking…'));
       try {
         const ok = await refreshEmailVerifiedStatus();
         if (ok) {
-          setVerifyStatus('Email verified — live coach unlocked.');
+          setVerifyStatus(T('app.account.verified', 'Email verified — live coach unlocked.'));
           renderAccountProfile();
         } else {
           setVerifyStatus(
-            'Still unverified. Open the link in the growtoo email, then tap again.',
+            T(
+            'app.account.stillUnverified',
+            'Still unverified. Open the link in the growtoo email, then tap again.'
+          ),
             true
           );
         }
       } catch (err) {
-        setVerifyStatus((err && err.message) || 'Could not refresh verification status.', true);
+        setVerifyStatus(
+          (err && err.message) ||
+            T('app.account.refreshFailed', 'Could not refresh verification status.'),
+          true
+        );
       } finally {
         refreshVerifyBtn.disabled = false;
       }
@@ -2177,19 +2332,66 @@ async function promptUnlockChain(nextView) {
   const ok =
     window.AppConfirm && typeof AppConfirm.ask === 'function'
       ? await AppConfirm.ask({
-          title: 'Unlock Tokenise & Market?',
+          title: T('app.unlock.title', 'Unlock Tokenise & Market?'),
           body:
-            'This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.',
-          confirmLabel: 'Unlock',
-          cancelLabel: 'Not now',
+            T(
+          'app.unlock.body',
+          'This adds optional on-chain tools: seal stages on Devnet and list asks. Your journal stays free and works without a wallet.'
+        ),
+          confirmLabel: T('app.unlock.confirm', 'Unlock'),
+          cancelLabel: T('app.unlock.cancel', 'Not now'),
         })
       : window.confirm(
+          T(
+          'app.unlock.fallback',
           'Unlock Tokenise & Market?\n\nOptional on-chain tools. Your journal stays free without a wallet.'
+        )
         );
   if (!ok) return false;
   unlockChainPath(nextView || 'adopt');
   return true;
 }
+
+/**
+ * Labels that depend on the profile role, kept in the reader's language.
+ *
+ * The role decides which of two keys an element shows, so this cannot be a
+ * plain data-i18n attribute in the markup. It stamps the chosen key onto the
+ * element, which lets a later language switch keep it right, and it re-runs
+ * once the dictionary lands: app boot regularly wins the race against that
+ * fetch, and without the re-run these labels would stay English for the rest
+ * of the session.
+ */
+function roleKey(type) {
+  return type === PROFILE_TYPES.adopter ? 'app.role.adopter' : 'app.role.grower';
+}
+
+function applyRoleLabels(type) {
+  const adopter = type === PROFILE_TYPES.adopter;
+  document.querySelectorAll('[data-label-grower][data-label-adopter]').forEach((el) => {
+    const label = adopter ? el.dataset.labelAdopter : el.dataset.labelGrower;
+    const key = adopter ? el.dataset.labelAdopterKey : el.dataset.labelGrowerKey;
+    if (!label) return;
+    if (key) el.setAttribute('data-i18n', key);
+    el.textContent = key ? T(key, label) : label;
+  });
+}
+
+/* App boot regularly beats the dictionary fetch, and copy written by JS is
+   not reachable by I18N.apply(). Re-run the pieces that paint text from code
+   once the dictionary lands, so nothing stays stuck in English. */
+document.addEventListener('i18n:ready', function () {
+  if (currentProfileType) applyProfileTypeUI(currentProfileType);
+  if (currentShownView) refreshViewTitle(currentShownView);
+  /* The account panel paints its rows from code too, so it needs the same
+     second pass — its labels are not reachable by I18N.apply(). */
+  try {
+    if (typeof renderAccountProfile === 'function') renderAccountProfile();
+  } catch (e) {
+    /* a panel that is not mounted yet will render in the reader's language
+       when it opens; nothing to do here */
+  }
+});
 
 function applyProfileTypeUI(profileType) {
   const type = normalizeProfileType(profileType) || PROFILE_TYPES.grower;
@@ -2198,14 +2400,12 @@ function applyProfileTypeUI(profileType) {
   document.body.classList.add(type === PROFILE_TYPES.adopter ? 'profile-adopter' : 'profile-grower');
   document.body.dataset.profileType = type;
 
-  document.querySelectorAll('[data-label-grower][data-label-adopter]').forEach((el) => {
-    const label = type === PROFILE_TYPES.adopter ? el.dataset.labelAdopter : el.dataset.labelGrower;
-    if (label) el.textContent = label;
-  });
+  applyRoleLabels(type);
 
   const badge = document.getElementById('profile-type-badge');
   if (badge) {
-    badge.textContent = type === PROFILE_TYPES.adopter ? 'Adopter' : 'Grower';
+    badge.setAttribute('data-i18n', roleKey(type));
+    badge.textContent = T(roleKey(type), type === PROFILE_TYPES.adopter ? 'Adopter' : 'Grower');
     badge.hidden = false;
     badge.className =
       'profile-type-badge profile-type-badge--' +
@@ -2221,8 +2421,8 @@ function applyProfileTypeUI(profileType) {
   if (title) {
     title.textContent =
       type === PROFILE_TYPES.adopter
-        ? 'growtoo – Adopt & track'
-        : 'growtoo – Grow journal';
+        ? T('app.docTitle.adopter', 'growtoo – Adopt & track')
+        : T('app.docTitle.grower', 'growtoo – Grow journal');
   }
 
   if (window.AdoptPlant && typeof window.AdoptPlant.applyProfileType === 'function') {
@@ -2542,7 +2742,10 @@ function initFirebaseSync() {
         remoteSyncReady = false;
         await loadSuperadminDatabaseForAdmin();
         applyAdminReadOnlyUI(
+          T(
+          'app.readOnly.wholeDb',
           'Read-only view of the entire superadmin database — plants cannot be edited.'
+        )
         );
       } else if (currentUserRole === 'viewer') {
         isAdminReadOnly = true;
@@ -2550,7 +2753,7 @@ function initFirebaseSync() {
         await ensureViewerBootstrapGrant(user.uid, user.email || '');
         await loadSharedDatabaseForViewer(user.uid, user.email || '');
         applyAdminReadOnlyUI(
-          'Read-only view of shared plants — editing is not allowed.'
+          T('app.readOnly.sharedPlants', 'Read-only view of shared plants — editing is not allowed.')
         );
       } else {
         isAdminReadOnly = false;
@@ -2559,7 +2762,10 @@ function initFirebaseSync() {
         if (isSharedHybridUser(userEmail)) {
           await loadHybridUserWithSharedReadOnly(user.uid, userEmail);
           applySharedLibraryBanner(
-            'You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.'
+            T(
+          'app.readOnly.hybridPlants',
+          'You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.'
+        )
           );
         } else {
           document.body.classList.remove('shared-library-mode');
@@ -2617,13 +2823,31 @@ function initFirebaseSync() {
 
 
 
+  /* Stage slugs are Croatian in storage (they are data keys, never shown).
+     The English here is the fallback; STAGE_KEYS maps each slug to its
+     dictionary key, resolved by stageName() at render time. */
   const STAGES = {
-    klijanje: 'Germination',
-    sadnica: 'Seedling',
-    vegetativna: 'Vegetative',
-    cvjetanje: 'Flowering',
-    susenje: 'Drying',
+    klijanje: 'Germination', // i18n-ignore
+    sadnica: 'Seedling', // i18n-ignore
+    vegetativna: 'Vegetative', // i18n-ignore
+    cvjetanje: 'Flowering', // i18n-ignore
+    susenje: 'Drying', // i18n-ignore
   };
+
+  const STAGE_KEYS = {
+    klijanje: 'app.stage.germination',
+    sadnica: 'app.stage.seedling',
+    vegetativna: 'app.stage.vegetative',
+    cvjetanje: 'app.stage.flowering',
+    susenje: 'app.stage.dryingShort',
+  };
+
+  /** Translated stage name; falls through to the raw slug for odd values. */
+  function stageName(key) {
+    const en = STAGES[key];
+    if (!en) return key || '';
+    return T(STAGE_KEYS[key], en);
+  }
 
   function canonicalPlantStage(value) {
     const v = String(value == null ? '' : value).trim();
@@ -2639,14 +2863,30 @@ function initFirebaseSync() {
     pot_30l: '30 L',
     pot_10dcl: '10 dcl',
     pot_1_5l: '1.5 L',
-    [SUBPHASE_FIELD]: 'In the field',
+    [SUBPHASE_FIELD]: 'In the field', // i18n-ignore
   };
+
+  const SUBPHASE_KEYS = {
+    pot_1_5dcl: 'app.pot.p15dcl',
+    pot_5l: 'app.pot.p5l',
+    pot_30l: 'app.pot.p30l',
+    pot_10dcl: 'app.pot.p10dcl',
+    pot_1_5l: 'app.pot.p15l',
+    [SUBPHASE_FIELD]: 'app.pot.field',
+  };
+
+  /** Translated pot size / field label. Units differ per locale (1,5 vs 1.5). */
+  function potName(key) {
+    const en = SUBPHASE_POTS[key];
+    if (!en) return key || '';
+    return T(SUBPHASE_KEYS[key], en);
+  }
 
   const SUBPHASE_ORDER = ['pot_1_5dcl', 'pot_5l', 'pot_30l'];
 
   function subphaseLabel(key) {
     if (!key) return '';
-    return SUBPHASE_POTS[key] || key;
+    return potName(key);
   }
 
   function normalizeSubphase(value) {
@@ -2671,15 +2911,34 @@ function initFirebaseSync() {
 
   const ENTRY_TYPE_LABELS = {
     opcenito: 'General',
-    zalijevanje: 'Watering',
-    gnojidba: 'Feeding',
-    okolis: 'Environment',
-    presadjivanje: 'Transplanting',
-    stresori: 'Stressors',
-    ostalo: 'Other',
-    faza: 'Stage (transition)',
-    podfaza: 'Sub-phase (pot / field)',
+    zalijevanje: 'Watering', // i18n-ignore
+    gnojidba: 'Feeding', // i18n-ignore
+    okolis: 'Environment', // i18n-ignore
+    presadjivanje: 'Transplanting', // i18n-ignore
+    stresori: 'Stressors', // i18n-ignore
+    ostalo: 'Other', // i18n-ignore
+    faza: 'Stage (transition)', // i18n-ignore
+    podfaza: 'Sub-phase (pot / field)', // i18n-ignore
   };
+
+  const ENTRY_TYPE_KEYS = {
+    opcenito: 'app.entryType.general',
+    zalijevanje: 'app.entryType.watering',
+    gnojidba: 'app.entryType.feeding',
+    okolis: 'app.entryType.environment',
+    presadjivanje: 'app.entryType.transplanting',
+    stresori: 'app.entryType.stressors',
+    ostalo: 'app.entryType.other',
+    faza: 'app.entryType.stageTransition',
+    podfaza: 'app.entryType.subphasePot',
+  };
+
+  /** Translated journal entry type. */
+  function entryTypeName(key) {
+    const en = ENTRY_TYPE_LABELS[key];
+    if (!en) return key || T('app.entryType.general', 'General');
+    return T(ENTRY_TYPE_KEYS[key], en);
+  }
 
   function isToolboxMirroredEntry(entry) {
     const m = entry && entry.meta;
@@ -2698,7 +2957,8 @@ function initFirebaseSync() {
     if (!isToolboxMirroredEntry(entry)) return '';
     return (
       '<span class="entry-source entry-source--tools" title="Also kept in Tools charts">' +
-      'via Tools</span>'
+      escapeHtml(T('app.entry.viaTools', 'via Tools')) +
+      '</span>'
     );
   }
 
@@ -2716,7 +2976,9 @@ function initFirebaseSync() {
     if (m.ph) parts.push('pH ' + escapeHtml(String(m.ph)));
     if (!parts.length) return '';
     return (
-      '<div class="entry-meta-block"><strong>Measurement</strong><p>' +
+      '<div class="entry-meta-block"><strong>' +
+      escapeHtml(T('app.entry.measurement', 'Measurement')) +
+      '</strong><p>' +
       parts.join(' · ') +
       '</p></div>'
     );
@@ -2788,11 +3050,19 @@ function initFirebaseSync() {
       console.error('Failed to save journal entries locally', err);
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
         DnevnikNotifications.toast(
-          'Could not save journal entry (storage full or blocked). Try a shorter note or remove old photos.',
+          T(
+          'app.entry.saveFullStorage',
+          'Could not save journal entry (storage full or blocked). Try a shorter note or remove old photos.'
+        ),
           'error'
         );
       } else {
-        alert('Could not save journal entry. Local storage may be full.');
+        alert(
+        T(
+          'app.entry.saveFailedStorage',
+          'Could not save journal entry. Local storage may be full.'
+        )
+      );
       }
       return false;
     }
@@ -2801,9 +3071,12 @@ function initFirebaseSync() {
     if (!Array.isArray(reread) || !entriesIdsMatch(list, reread)) {
       console.error('Journal write verification failed — re-read mismatch after setItem');
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-        DnevnikNotifications.toast('Entry did not save. Please try again.', 'error');
+        DnevnikNotifications.toast(
+          T('app.entry.saveRetry', 'Entry did not save. Please try again.'),
+          'error'
+        );
       } else {
-        alert('Entry did not save. Please try again.');
+        alert(T('app.entry.saveRetry', 'Entry did not save. Please try again.'));
       }
       return false;
     }
@@ -2878,7 +3151,9 @@ function initFirebaseSync() {
     if (briefing) {
       head =
         '<div class="danas-coach-brief">' +
-        '<span class="dashboard-coach-brief-label">Coach</span> ' +
+        '<span class="dashboard-coach-brief-label">' +
+      escapeHtml(T('app.coachBrief.label', 'Coach')) +
+      '</span> ' +
         escapeHtml(briefing) +
         '</div>';
     }
@@ -2888,8 +3163,11 @@ function initFirebaseSync() {
         head +
         emptyStateHtml({
           icon: 'coach',
-          lead: 'Nothing urgent',
-          body: 'Keep logging care — Coach uses your pace and the forecast for the next nudge.',
+          lead: T('app.coachBrief.nothingUrgent', 'Nothing urgent'),
+          body: T(
+            'app.coachBrief.keepLogging',
+            'Keep logging care — Coach uses your pace and the forecast for the next nudge.'
+          ),
         });
       return;
     }
@@ -2924,7 +3202,7 @@ function initFirebaseSync() {
             ' />' +
             '<div class="danas-content">' +
             '<span class="danas-title">' +
-            escapeHtml(String(r.title || 'Reminder')) +
+            escapeHtml(String(r.title || T('app.coachBrief.reminder', 'Reminder'))) +
             '</span>' +
             '<span class="danas-desc">' +
             escapeHtml(String(r.message || '')) +
@@ -2933,12 +3211,18 @@ function initFirebaseSync() {
             (canDraft
               ? '<button type="button" class="btn btn-primary btn-sm danas-draft-coach" data-coach-draft="' +
                 escapeHtml(String(r.id || '')) +
-                '">Draft log</button>'
+                '">' +
+      escapeHtml(T('app.coachBrief.draftLog', 'Draft log')) +
+      '</button>'
               : '') +
             '<button type="button" class="link-btn danas-open-coach" data-coach-prompt="' +
             escapeHtml(String(r.prompt || '')) +
             '">' +
-            (canDraft ? 'Ask first' : 'Open Coach') +
+            escapeHtml(
+        canDraft
+          ? T('app.coachBrief.askFirst', 'Ask first')
+          : T('app.coachBrief.openCoach', 'Open Coach')
+      ) +
             '</button>' +
             '</div>' +
             '</div>' +
@@ -2954,17 +3238,40 @@ function initFirebaseSync() {
   const viewTitle = document.querySelector('.view-title');
   const logoutBtn = document.getElementById('btn-logout');
   const MORE_NAV_VIEWS = ['toolbox', 'admin'];
+  /* [dictionary key, English] — resolved in viewTitle(), because this table
+     is built while the page parses, before the dictionary lands. */
   const titles = {
-    dashboard: 'Journal',
-    plants: 'Journal',
-    blog: 'Stories',
-    adopt: 'Tokenise',
-    market: 'Market',
-    growlog: 'Grow log',
-    toolbox: 'Measurements',
-    admin: 'Admin Panel',
-    danas: 'Today',
+    dashboard: ['common.nav.journal', 'Journal'],
+    plants: ['common.nav.journal', 'Journal'],
+    blog: ['app.nav.stories', 'Stories'],
+    adopt: ['common.nav.tokenise', 'Tokenise'],
+    market: ['common.nav.market', 'Market'],
+    growlog: ['app.nav.growlog', 'Grow log'],
+    toolbox: ['app.nav.measurements', 'Measurements'],
+    admin: ['app.nav.admin', 'Admin Panel'],
+    danas: ['app.nav.today', 'Today'],
   };
+
+  function viewTitleFor(id) {
+    const row = titles[id];
+    return row ? T(row[0], row[1]) : '';
+  }
+
+  /** Paint the header title for a view, in the reader's language. */
+  function refreshViewTitle(id) {
+    /* Re-queried rather than reusing the module-level handle: this also runs
+       from the i18n:ready hook, which can fire before that handle was set. */
+    const el = document.querySelector('.view-title');
+    if (!el) return;
+    if (id === 'growlog') return; // shows the plant's own name
+    if (id === 'adopt' && isAdopterProfile()) {
+      el.textContent = T('app.nav.myGarden', 'My garden');
+    } else if (id === 'adopt' && isGrowerProfile()) {
+      el.textContent = T('common.nav.tokenise', 'Tokenise');
+    } else if (titles[id]) {
+      el.textContent = viewTitleFor(id);
+    }
+  }
   let lastChainView = null;
   let currentShownView = null;
 
@@ -3054,7 +3361,7 @@ function initFirebaseSync() {
       const view = document.getElementById('view-growlog');
       if (view) view.classList.add('active');
       const plant = getPlants().find((p) => p.id === extra);
-      if (viewTitle) viewTitle.textContent = plant ? plant.name : 'Growlog';
+      if (viewTitle) viewTitle.textContent = plant ? plant.name : T('app.nav.growlog', 'Grow log');
       document.querySelectorAll('.nav-item[data-view="plants"]').forEach((n) => n.classList.add('active'));
       const moreBtnEarly = document.getElementById('btn-account');
       if (moreBtnEarly) moreBtnEarly.classList.remove('active');
@@ -3093,15 +3400,7 @@ function initFirebaseSync() {
     setMoreNavOpen(false);
     setLogSheetOpen(false);
     if (view) view.classList.add('active');
-    if (viewTitle) {
-      if (id === 'adopt' && isAdopterProfile()) {
-        viewTitle.textContent = 'My garden';
-      } else if (id === 'adopt' && isGrowerProfile()) {
-        viewTitle.textContent = 'Tokenise';
-      } else if (titles[id]) {
-        viewTitle.textContent = titles[id];
-      }
-    }
+    refreshViewTitle(id);
 
     const sameView =
       !force &&
@@ -3201,7 +3500,7 @@ function initFirebaseSync() {
     if (view === "admin") {
       await resolveCurrentUserRole();
       if (!isAdminPanelRole(currentUserRole)) {
-        alert('Access denied — you do not have admin privileges.');
+        alert(T('app.admin.accessDenied', 'Access denied — you do not have admin privileges.'));
         return;
       }
     }
@@ -3335,7 +3634,7 @@ function initFirebaseSync() {
       return (plants || []).map(function (p) {
         return {
           key: String(p.id),
-          name: p.name || 'Plant',
+          name: p.name || T('app.stack.plant', 'Plant'),
           strain: p.strain || '',
           stage: p.stage || '',
           size: Math.max(1, Number(p.count || 1) || 1),
@@ -3360,7 +3659,7 @@ function initFirebaseSync() {
       plantSpecimenNo(specimenNo) +
       '</span>' +
       '<span class="log-sheet-plant-name">' +
-      escapeHtml(p.name || 'Plant') +
+      escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
       '</span>' +
       '</button>'
     );
@@ -3369,14 +3668,14 @@ function initFirebaseSync() {
   function logCareSheetTitle() {
     const ymd = logSheetPendingDate;
     const today = localDateYYYYMMDD();
-    if (!ymd || ymd === today) return 'Log care';
+    if (!ymd || ymd === today) return T('app.plants.logCare', 'Log care');
     let label = ymd;
     if (window.GrowtooCalendar && typeof GrowtooCalendar.formatLong === 'function') {
       label = GrowtooCalendar.formatLong(ymd);
       const year = String(new Date().getFullYear());
       if (label.slice(-5) === ' ' + year) label = label.slice(0, -5);
     }
-    return 'Log care · ' + label;
+    return T('app.plants.logCareOn', 'Log care · {date}', { date: label });
   }
 
   function renderLogSheet() {
@@ -3482,7 +3781,8 @@ function initFirebaseSync() {
           escapeHtml(stageLab) +
           ' · ' +
           g.members.length +
-          ' rows · tap for all</span>' +
+          escapeHtml(T('app.plants.rowsTapForAll', ' rows · tap for all')) +
+      '</span>' +
           '</span>' +
           '<span class="log-sheet-stack-count">×' +
           escapeHtml(String(g.size || g.members.length)) +
@@ -3509,7 +3809,9 @@ function initFirebaseSync() {
     if (labelEl) {
       const n = logSheetSelectedPlantIds.length;
       labelEl.textContent =
-        n > 1 ? 'Plants · ' + n + ' selected' : n === 1 ? 'Plants · 1 selected' : 'Plants';
+        n > 0
+        ? T('app.plants.selectedCount', 'Plants · {count} selected', { count: n })
+        : T('app.stack.plants', 'Plants');
     }
 
     const waterBtn = document.getElementById('log-sheet-water');
@@ -3788,13 +4090,24 @@ function initFirebaseSync() {
     const d = new Date(iso);
     const n = new Date();
     const sec = Math.floor((n - d) / 1000);
-    if (sec < 60) return 'just now';
-    if (sec < 3600) return Math.floor(sec / 60) + ' min ago';
-    if (sec < 86400) return Math.floor(sec / 3600) + ' h ago';
-    if (sec < 604800) return Math.floor(sec / 86400) + ' d ago';
-    if (sec < 2592000) return Math.floor(sec / 604800) + ' weeks ago';
-    if (sec < 31536000) return Math.floor(sec / 2592000) + ' mo. ago';
-    return Math.floor(sec / 31536000) + ' yr. ago';
+    /* Intl words each unit per language, so only "just now" needs a key. */
+    function rel(value, unit) {
+      try {
+        return new Intl.RelativeTimeFormat(intlTag(), {
+          numeric: 'auto',
+          style: 'short',
+        }).format(-value, unit);
+      } catch (e) {
+        return value + ' ' + unit;
+      }
+    }
+    if (sec < 60) return T('app.coach.justNow', 'just now');
+    if (sec < 3600) return rel(Math.floor(sec / 60), 'minute');
+    if (sec < 86400) return rel(Math.floor(sec / 3600), 'hour');
+    if (sec < 604800) return rel(Math.floor(sec / 86400), 'day');
+    if (sec < 2592000) return rel(Math.floor(sec / 604800), 'week');
+    if (sec < 31536000) return rel(Math.floor(sec / 2592000), 'month');
+    return rel(Math.floor(sec / 31536000), 'year');
   }
 
   function formatDayWeek(dateStr, startDateStr) {
@@ -3803,7 +4116,7 @@ function initFirebaseSync() {
     const start = new Date(startDateStr);
     const day = daysBetween(startDateStr, dateStr);
     const week = Math.floor(day / 7);
-    return 'Day ' + day + ' (week ' + week + ')';
+    return T('app.growlog.dayWeek', 'Day {day} (week {week})', { day: day, week: week });
   }
 
   const STAGE_ICONS = {
@@ -3828,7 +4141,10 @@ function initFirebaseSync() {
     const updatedAt = plant.updatedAt || (plant.startDate ? plant.startDate + 'T12:00:00.000Z' : new Date().toISOString());
     const views = plant.views != null ? plant.views : 0;
     const durationWeeks = weeksBetween(startDate, updatedAt.slice(0, 10));
-    const envType = plant.environmentType === 'outdoor' ? 'Outdoor' : 'Indoor';
+    const envType =
+      plant.environmentType === 'outdoor'
+        ? T('app.account.outdoor', 'Outdoor')
+        : T('app.account.indoor', 'Indoor');
     const exposure = plant.exposureHours ? plant.exposureHours + ' h' : '—';
     let plantIsPublic = false;
     try {
@@ -3842,7 +4158,11 @@ function initFirebaseSync() {
       plantIsPublic = false;
     }
 
-    document.getElementById('growlog-updated').textContent = 'Updated ' + timeAgo(updatedAt);
+    document.getElementById('growlog-updated').textContent = T(
+      'app.growlog.updated',
+      'Updated {when}',
+      { when: timeAgo(updatedAt) }
+    );
     const viewsEl = document.getElementById('growlog-views');
     if (viewsEl) {
       // Private un-minted journals shouldn't imply an audience with "0 views".
@@ -3851,13 +4171,15 @@ function initFirebaseSync() {
         viewsEl.textContent = '';
       } else {
         viewsEl.hidden = false;
-        viewsEl.textContent = views + (views === 1 ? ' public view' : ' public views');
+        viewsEl.textContent = T('app.growlog.publicViews', '{count} public views', {
+        count: views,
+      });
       }
     }
 
     document.getElementById('growlog-metrics').innerHTML = `
-      <div class="growlog-metric"><span class="growlog-metric-icon">📅</span> ${durationWeeks} weeks</div>
-      <div class="growlog-metric"><span class="growlog-metric-icon">💧</span> ${STAGES[plant.stage] || plant.stage}</div>
+      <div class="growlog-metric"><span class="growlog-metric-icon">📅</span> ${T('app.growlog.weeks', '{count} weeks', { count: durationWeeks })}</div>
+      <div class="growlog-metric"><span class="growlog-metric-icon">💧</span> ${stageName(plant.stage)}</div>
       <div class="growlog-metric"><span class="growlog-metric-icon">💡</span> ${envType}</div>
     `;
 
@@ -3867,7 +4189,7 @@ function initFirebaseSync() {
       if (e.photo) allPhotos.push(e.photo);
     });
     const photoGrid = document.getElementById('growlog-photo-grid');
-    photoGrid.innerHTML = allPhotos.slice(0, 3).map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">No photos</p>';
+    photoGrid.innerHTML = allPhotos.slice(0, 3).map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">' + escapeHtml(T('app.growlog.noPhotos', 'No photos')) + '</p>';
     document.getElementById('growlog-view-all-photos').style.display = allPhotos.length > 3 ? 'inline-block' : 'none';
 
     document.getElementById('growlog-strain').innerHTML = plant.strain
@@ -3880,8 +4202,8 @@ function initFirebaseSync() {
       .map((s) => {
         const date = stageDates[s] || (s === 'klijanje' ? startDate : null);
         const isCurrent = canonicalPlantStage(plant.stage) === s;
-        const label = STAGES[s] || s;
-        const dateStr = date ? new Date(date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
+        const label = stageName(s);
+        const dateStr = date ? new Date(date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short', year: '2-digit' }) : '—';
         return '<div class="tree-stage-item' + (isCurrent ? ' current' : '') + '"><span class="tree-stage-icon">' + (STAGE_ICONS[s] || '•') + '</span><span class="tree-stage-label">' + label + '</span><span class="tree-stage-date">' + dateStr + '</span></div>';
       })
       .join('');
@@ -3894,7 +4216,7 @@ function initFirebaseSync() {
       .map((k) => {
         const isCurrent =
           plant.subphase === k || (k === SUBPHASE_FIELD && !plant.subphase && plant.environmentType === 'outdoor');
-        const label = SUBPHASE_POTS[k];
+        const label = potName(k);
         const icon = k === SUBPHASE_FIELD ? '🌾' : '🫙';
         return (
           '<div class="tree-stage-item tree-subphase-item' +
@@ -3912,16 +4234,21 @@ function initFirebaseSync() {
     let histHtml;
     if (hist.length === 0) {
       histHtml =
-        '<p class="growlog-empty">No transitions recorded yet. Change the stage in &quot;Edit plant&quot; — a journal entry will be created.</p>';
+        '<p class="growlog-empty">' +
+        T(
+          'app.growlog.noTransitions',
+          'No transitions recorded yet. Change the stage in &quot;Edit plant&quot; — a journal entry will be created.'
+        ) +
+        '</p>';
     } else {
       histHtml = hist
         .slice()
         .reverse()
         .map((h) => {
-          const d = h.date ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+          const d = h.date ? new Date(h.date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
           const line = h.from
-            ? escapeHtml(STAGES[h.from] || h.from) + ' → ' + escapeHtml(STAGES[h.to] || h.to)
-            : 'Start: ' + escapeHtml(STAGES[h.to] || h.to);
+            ? escapeHtml(stageName(h.from)) + ' → ' + escapeHtml(stageName(h.to))
+            : T('app.growlog.startStage', 'Start: {stage}', { stage: escapeHtml(stageName(h.to)) });
           return '<div class="stage-history-item"><span class="stage-history-date">' + d + '</span><span class="stage-history-label">' + line + '</span></div>';
         })
         .join('');
@@ -3933,11 +4260,15 @@ function initFirebaseSync() {
         '<div class="tree-stages growlog-tree-stages">' +
         stageRows +
         '</div>' +
-        '<h4 class="growlog-subsection-title">Sub-phases (pots)</h4>' +
+        '<h4 class="growlog-subsection-title">' +
+      escapeHtml(T('app.growlog.subphases', 'Sub-phases (pots)')) +
+      '</h4>' +
         '<div class="tree-stages tree-subphases">' +
         subRows +
         '</div>' +
-        '<h4 class="growlog-subsection-title">Stage transition history</h4>' +
+        '<h4 class="growlog-subsection-title">' +
+      escapeHtml(T('app.growlog.stageHistory', 'Stage transition history')) +
+      '</h4>' +
         '<div class="stage-history-list">' +
         histHtml +
         '</div>' +
@@ -3949,7 +4280,7 @@ function initFirebaseSync() {
             .reverse()
             .map((h) => {
               const d = h.date
-                ? new Date(h.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+                ? new Date(h.date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short', year: 'numeric' })
                 : '—';
               const fromLab = h.from ? subphaseLabel(h.from) : '—';
               const toLab = subphaseLabel(h.to) || h.to || '—';
@@ -3965,7 +4296,9 @@ function initFirebaseSync() {
             })
             .join('');
           return (
-            '<h4 class="growlog-subsection-title">Sub-phase history (pots / field)</h4>' +
+            '<h4 class="growlog-subsection-title">' +
+      escapeHtml(T('app.growlog.subphaseHistory', 'Sub-phase history (pots / field)')) +
+      '</h4>' +
             '<div class="stage-history-list">' +
             rows +
             '</div>'
@@ -3978,21 +4311,21 @@ function initFirebaseSync() {
       <div class="env-row"><span class="env-icon">💡</span> ${envType}</div>
       ${
         plant.fieldLocation
-          ? '<div class="env-row"><span class="env-icon">📍</span> Field: ' + escapeHtml(plant.fieldLocation) + '</div>'
+          ? '<div class="env-row"><span class="env-icon">📍</span> ' + escapeHtml(T('app.growlog.fieldLabel', 'Field:')) + ' ' + escapeHtml(plant.fieldLocation) + '</div>'
           : ''
       }
       ${
         plant.plantingLocation
-          ? '<div class="env-row"><span class="env-icon">🌱</span> Planting: ' + escapeHtml(plant.plantingLocation) + '</div>'
+          ? '<div class="env-row"><span class="env-icon">🌱</span> ' + escapeHtml(T('app.growlog.plantingLabel', 'Planting:')) + ' ' + escapeHtml(plant.plantingLocation) + '</div>'
           : ''
       }
-      <div class="env-row"><span class="env-icon">🕐</span> ${exposure} of light</div>
+      <div class="env-row"><span class="env-icon">🕐</span> ${T('app.growlog.ofLight', '{hours} of light', { hours: exposure })}</div>
     `;
 
     const heroEl = document.getElementById('growlog-hero');
     if (heroEl) {
       const stageKey = canonicalPlantStage(plant.stage);
-      const stageLabel = STAGES[stageKey] || plant.stage;
+      const stageLabel = stageName(stageKey) || plant.stage;
       const subLab = plant.subphase ? subphaseLabel(plant.subphase) : '';
       const strainHtml = plant.strain
         ? '<p class="growlog-hero-strain"><span class="growlog-hero-strain-icon" aria-hidden="true">🧬</span>' +
@@ -4012,20 +4345,25 @@ function initFirebaseSync() {
           : '') +
         '<span class="growlog-hero-chip">' +
         durationWeeks +
-        ' wk grow</span>' +
+        escapeHtml(T('app.growlog.wkGrow', ' wk grow')) +
+      '</span>' +
         '<span class="growlog-hero-chip growlog-hero-chip--muted">' +
         escapeHtml(envType) +
         '</span>' +
         '</div>' +
         (sharedPlant
           ? ''
-          : '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ Edit plant</button>') +
+          : '<button type="button" class="btn btn-ghost btn-sm growlog-hero-edit" id="growlog-hero-edit">✎ ' + escapeHtml(T('app.growlog.editPlant', 'Edit plant')) + '</button>') +
         '</div>' +
         '<h2 class="growlog-hero-title">' +
         escapeHtml(plant.name) +
         '</h2>' +
         strainHtml +
-        '<p class="growlog-hero-hint">Photos are in the sidebar and in the recent photos below.</p>' +
+        '<p class="growlog-hero-hint">' +
+      escapeHtml(
+        T('app.growlog.photoHint', 'Photos are in the sidebar and in the recent photos below.')
+      ) +
+      '</p>' +
         '</div>';
       const heroEditBtn = document.getElementById('growlog-hero-edit');
       if (heroEditBtn) {
@@ -4054,26 +4392,31 @@ function initFirebaseSync() {
         rewardGoalEl.hidden = false;
         rewardGoalEl.innerHTML =
           remaining > 0
-            ? 'On-chain plant token linked — this plant can still earn up to <strong>' +
-              remaining +
-              ' $GROWTOO</strong> in stage rewards by harvest (up to ' +
-              total +
-              ' total across all stages).'
-            : 'On-chain plant token linked — harvest stage complete. Stage rewards for this token are done.';
+            ? T(
+                'app.growlog.tokenRemaining',
+                'On-chain plant token linked — this plant can still earn up to <strong>{remaining} $GROWTOO</strong> in stage rewards by harvest (up to {total} total across all stages).',
+                { remaining: remaining, total: total }
+              )
+            : T(
+                'app.growlog.tokenDone',
+                'On-chain plant token linked — harvest stage complete. Stage rewards for this token are done.'
+              );
       } else {
         rewardGoalEl.hidden = false;
         rewardGoalEl.innerHTML =
-          'If you mint an optional plant token, stage rewards can total up to <strong>' +
-          total +
-          ' $GROWTOO</strong> by harvest (test network only).';
+          T(
+            'app.growlog.tokenOptional',
+            'If you mint an optional plant token, stage rewards can total up to <strong>{total} $GROWTOO</strong> by harvest (test network only).',
+            { total: total }
+          );
       }
     }
 
     const timelineItems = [];
     entries.slice(0, 20).forEach((e) => {
       const dayWeek = formatDayWeek(e.date, startDate);
-      const dateStr = e.date ? new Date(e.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
-      const typeLabel = ENTRY_TYPE_LABELS[e.type] || e.type || 'General';
+      const dateStr = e.date ? new Date(e.date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short', year: '2-digit' }) : '';
+      const typeLabel = entryTypeName(e.type);
       const noteRaw = displayEntryNote(e.note);
       const note = noteRaw.slice(0, 80) + (noteRaw.length > 80 ? '…' : '');
       const viaTools = entrySourceBadgeHtml(e);
@@ -4092,10 +4435,18 @@ function initFirebaseSync() {
           '</div>'
       );
     });
-    document.getElementById('growlog-timeline').innerHTML = timelineItems.length ? timelineItems.join('') : '<p class="growlog-empty">No entries in the timeline. Add notes in the Journal.</p>';
+    document.getElementById('growlog-timeline').innerHTML = timelineItems.length
+      ? timelineItems.join('')
+      : '<p class="growlog-empty">' +
+        escapeHtml(
+          T('app.growlog.noEntries', 'No entries in the timeline. Add notes in the Journal.')
+        ) +
+        '</p>';
 
     const stripPhotos = allPhotos.slice(0, 8);
-    document.getElementById('growlog-photo-strip').innerHTML = stripPhotos.map((src) => '<img src="' + src + '" alt="" />').join('') || '<p class="growlog-empty">No photos</p>';
+    document.getElementById('growlog-photo-strip').innerHTML =
+      stripPhotos.map((src) => '<img src="' + src + '" alt="" />').join('') ||
+      '<p class="growlog-empty">' + escapeHtml(T('app.growlog.noPhotos', 'No photos')) + '</p>';
 
     document.getElementById('growlog-view-all-photos').onclick = () => {
       document.getElementById('growlog-photo-strip').scrollIntoView({ behavior: 'smooth' });
@@ -4156,13 +4507,25 @@ function initFirebaseSync() {
         : window.AICoach && typeof AICoach.dashboardBriefing === 'function'
           ? AICoach.dashboardBriefing(plants, entries)
           : '';
-    if (todayLine) todayLine.textContent = brief || 'Your garden is quiet — log a watering to keep the trail warm.';
+    if (todayLine) {
+      todayLine.textContent =
+        brief ||
+        T('app.today.quiet', 'Your garden is quiet — log a watering to keep the trail warm.');
+    }
     if (todayActions) {
       todayActions.innerHTML =
-        '<button type="button" class="btn btn-primary btn-tap" id="today-log-water">Log watering</button>' +
-        '<button type="button" class="btn btn-secondary btn-tap" id="today-log-feed">Log feeding</button>' +
-        '<button type="button" class="btn btn-secondary btn-tap" id="today-write-story">Write a story</button>' +
-        '<button type="button" class="btn btn-ghost btn-tap" id="today-ask-coach">Ask coach</button>';
+        '<button type="button" class="btn btn-primary btn-tap" id="today-log-water">' +
+        escapeHtml(T('app.today.logWatering', 'Log watering')) +
+        '</button>' +
+        '<button type="button" class="btn btn-secondary btn-tap" id="today-log-feed">' +
+        escapeHtml(T('app.today.logFeeding', 'Log feeding')) +
+        '</button>' +
+        '<button type="button" class="btn btn-secondary btn-tap" id="today-write-story">' +
+        escapeHtml(T('app.today.writeStory', 'Write a story')) +
+        '</button>' +
+        '<button type="button" class="btn btn-ghost btn-tap" id="today-ask-coach">' +
+        escapeHtml(T('app.today.askCoach', 'Ask coach')) +
+        '</button>';
       const waterBtn = document.getElementById('today-log-water');
       const feedBtn = document.getElementById('today-log-feed');
       const storyBtn = document.getElementById('today-write-story');
@@ -4196,24 +4559,32 @@ function initFirebaseSync() {
     if (sealsEl) {
       sealsEl.innerHTML = plants
         .map(function (p, i) {
-          const stage = STAGES[p.stage] || p.stage || 'Growing';
+          const stage = stageName(p.stage) || T('app.stage.growing', 'Growing');
+          /* environmentType is a stored data value, so the label is resolved
+             here rather than translating the value itself. */
           const env =
             p.environmentType === 'outdoor' || p.fieldLocation
-              ? 'outdoor'
-              : 'indoor';
+              ? T('app.env.outdoor', 'outdoor')
+              : T('app.env.indoor', 'indoor');
           const since = daysSinceLastCare(p.id, entries, ['zalijevanje']);
           const waterLine =
-            since == null ? 'no watering yet' : since === 0 ? 'watered today' : since + 'd since water';
+            since == null
+        ? T('app.plants.noWateringYet', 'no watering yet')
+        : since === 0
+          ? T('app.plants.wateredToday', 'watered today')
+          : T('app.plants.daysSinceWater', '{count}d since water', { count: since });
           const no = plantSpecimenNo(i);
           return (
             '<button type="button" class="shell-card plant-seal-card" data-plant-id="' +
             escapeHtml(p.id) +
             '">' +
             '<span class="plant-seal-mark" aria-hidden="true"></span>' +
-            '<span class="plant-seal-title">Plant <span class="plant-seal-no">№</span> ' +
+            '<span class="plant-seal-title">' +
+      escapeHtml(T('app.stack.plant', 'Plant')) +
+      ' <span class="plant-seal-no">№</span> ' +
             no +
             ' — <em>' +
-            escapeHtml(p.name || 'Plant') +
+            escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
             '</em></span>' +
             '<span class="plant-seal-data">' +
             escapeHtml(stage) +
@@ -4299,7 +4670,7 @@ function initFirebaseSync() {
         walletDisplay = shortSolanaAddr(wallet.address);
       }
       if (wallet.connected) {
-        growBalance = Number(wallet.growthBalance || 0).toLocaleString('en-US');
+        growBalance = Number(wallet.growthBalance || 0).toLocaleString(intlTag());
         tokenCount = wallet.tokens.length;
         const maxStage = PlantToken.maxStageIndex();
         growingCount = wallet.tokens.filter((t) => t.stageIndex < maxStage).length;
@@ -4322,11 +4693,24 @@ function initFirebaseSync() {
         metricsEl.hidden = false;
         metricsEl.innerHTML =
           '<article class="shell-card today-card dashboard-first-run" role="status">' +
-          '<p class="today-card-eyebrow">Today</p>' +
-          '<p class="today-card-line">Add your first plant — Coach will keep the care trail tidy from there.</p>' +
+          '<p class="today-card-eyebrow">' +
+          escapeHtml(T('app.nav.today', 'Today')) +
+          '</p>' +
+          '<p class="today-card-line">' +
+          escapeHtml(
+            T(
+              'app.today.firstPlant',
+              'Add your first plant — Coach will keep the care trail tidy from there.'
+            )
+          ) +
+          '</p>' +
           '<div class="today-card-actions">' +
-          '<button type="button" class="btn btn-primary btn-tap" id="dashboard-add-first-plant">Add a plant</button>' +
-          '<button type="button" class="btn btn-secondary btn-tap" id="dashboard-open-coach-empty">Ask coach</button>' +
+          '<button type="button" class="btn btn-primary btn-tap" id="dashboard-add-first-plant">' +
+          escapeHtml(T('app.today.addPlant', 'Add a plant')) +
+          '</button>' +
+          '<button type="button" class="btn btn-secondary btn-tap" id="dashboard-open-coach-empty">' +
+          escapeHtml(T('app.today.askCoach', 'Ask coach')) +
+          '</button>' +
           '</div>' +
           '</article>';
         const addBtn = document.getElementById('dashboard-add-first-plant');
@@ -4346,10 +4730,23 @@ function initFirebaseSync() {
         metricsEl.hidden = false;
         metricsEl.innerHTML =
           '<div class="dashboard-first-run shell-card" role="status">' +
-          '<p class="dashboard-first-run-eyebrow">My garden</p>' +
-          '<h2 class="dashboard-first-run-title">No adopted plants yet</h2>' +
-          '<p class="dashboard-first-run-body">Browse the market for open offers, then invest with test $GROWTOO when you are ready.</p>' +
-          '<button type="button" class="btn btn-primary" id="dashboard-open-market">Browse market</button>' +
+          '<p class="dashboard-first-run-eyebrow">' +
+          escapeHtml(T('app.nav.myGarden', 'My garden')) +
+          '</p>' +
+          '<h2 class="dashboard-first-run-title">' +
+          escapeHtml(T('app.garden.emptyTitle', 'No adopted plants yet')) +
+          '</h2>' +
+          '<p class="dashboard-first-run-body">' +
+          escapeHtml(
+            T(
+              'app.garden.emptyBody',
+              'Browse the market for open offers, then invest with test $GROWTOO when you are ready.'
+            )
+          ) +
+          '</p>' +
+          '<button type="button" class="btn btn-primary" id="dashboard-open-market">' +
+          escapeHtml(T('app.market.ctaBrowseMarket', 'Browse market')) +
+          '</button>' +
           '</div>';
         const marketBtn = document.getElementById('dashboard-open-market');
         if (marketBtn) marketBtn.addEventListener('click', () => showView('market'));
@@ -4358,36 +4755,36 @@ function initFirebaseSync() {
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
-            label: '$GROWTOO balance',
+            label: T('app.metric.growBalance', '$GROWTOO balance'),
             value: growBalance,
             meta:
-              M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
-              M.row('Still growing', growingCount, 'metric-dot--teal'),
+              M.row(T('app.metric.plantTokens', 'Plant tokens'), tokenCount, 'metric-dot--amber') +
+              M.row(T('app.metric.stillGrowing', 'Still growing'), growingCount, 'metric-dot--teal'),
             modifier: 'amber',
           }) +
             M.card({
-              label: 'Garden progress',
+              label: T('app.metric.gardenProgress', 'Garden progress'),
               value: tokenCount ? growPct + '%' : '0%',
               meta:
-                M.row('Harvested', Math.max(0, tokenCount - growingCount), 'metric-dot--teal') +
-                M.row('In growth', growingCount, 'metric-dot--violet'),
+                M.row(T('app.metric.harvested', 'Harvested'), Math.max(0, tokenCount - growingCount), 'metric-dot--teal') +
+                M.row(T('app.metric.inGrowth', 'In growth'), growingCount, 'metric-dot--violet'),
               modifier: 'teal',
             }) +
             M.card({
-              label: 'Solana wallet',
+              label: T('app.metric.solanaWallet', 'Solana wallet'),
               value: walletDisplay,
               meta:
-                M.row('Network', 'test network', 'metric-dot--teal') +
-                M.row('Account', walletLinked ? 'Linked' : 'Not linked', walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
+                M.row(T('app.metric.network', 'Network'), T('app.metric.testNetwork', 'test network'), 'metric-dot--teal') +
+                M.row(T('app.metric.account', 'Account'), walletLinked ? T('app.metric.linked', 'Linked') : T('app.account.notLinked', 'Not linked'), walletLinked ? 'metric-dot--teal' : 'metric-dot--muted'),
               modifier: 'teal',
               attention: !walletLinked,
             }) +
             M.card({
               label: 'Market',
-              value: 'Browse',
+              value: T('app.metric.browse', 'Browse'),
               meta:
-                M.row('Action', 'Follow plant trails', 'metric-dot--amber') +
-                M.row('Profile', 'Adopter', 'metric-dot--violet'),
+                M.row(T('app.metric.action', 'Action'), T('app.metric.followTrails', 'Follow plant trails'), 'metric-dot--amber') +
+                M.row(T('app.metric.profile', 'Profile'), T('app.role.adopter', 'Adopter'), 'metric-dot--violet'),
               modifier: 'violet',
               attention: true,
             })
@@ -4401,45 +4798,47 @@ function initFirebaseSync() {
         metricsEl.innerHTML = M.panel(
           '',
           M.card({
-            label: 'Grow overview',
-            value: totalPlantCount.toLocaleString('en-US'),
+            label: T('app.metric.growOverview', 'Grow overview'),
+            value: totalPlantCount.toLocaleString(intlTag()),
             meta:
-              M.row('Individual plants', plants.length, 'metric-dot--teal') +
-              M.row('Plants in batch', totalPlantCount, 'metric-dot--blue'),
+              M.row(T('app.metric.individualPlants', 'Individual plants'), plants.length, 'metric-dot--teal') +
+              M.row(T('app.metric.plantsInBatch', 'Plants in batch'), totalPlantCount, 'metric-dot--blue'),
             modifier: 'teal',
           }) +
             M.card({
-              label: 'Journal activity',
-              value: entries.length.toLocaleString('en-US'),
+              label: T('app.metric.journalActivity', 'Journal activity'),
+              value: entries.length.toLocaleString(intlTag()),
               meta:
-                M.row('Last 7 days', entriesWeek, 'metric-dot--blue') +
-                M.row('Plant profiles', plants.length, 'metric-dot--muted'),
+                M.row(T('app.metric.last7Days', 'Last 7 days'), entriesWeek, 'metric-dot--blue') +
+                M.row(T('app.metric.plantProfiles', 'Plant profiles'), plants.length, 'metric-dot--muted'),
               modifier: 'blue',
             }) +
             M.card({
-              label: 'Active stages',
-              value: stageSet.size.toLocaleString('en-US'),
+              label: T('app.metric.activeStages', 'Active stages'),
+              value: stageSet.size.toLocaleString(intlTag()),
               meta:
-                M.row(topStage ? STAGES[topStage] || topStage : 'No plants', topStagePct + '%', 'metric-dot--violet') +
+                M.row(topStage ? stageName(topStage) : T('app.metric.noPlants', 'No plants'), topStagePct + '%', 'metric-dot--violet') +
                 M.row('Outdoor', outdoorCount, 'metric-dot--amber'),
               modifier: 'violet',
             }) +
             M.card({
-              label: 'Token portfolio',
+              label: T('app.metric.tokenPortfolio', 'Token portfolio'),
               value: growBalance,
               meta:
-                M.row('Plant tokens', tokenCount, 'metric-dot--amber') +
-                M.row('Still growing', growingCount, 'metric-dot--teal'),
+                M.row(T('app.metric.plantTokens', 'Plant tokens'), tokenCount, 'metric-dot--amber') +
+                M.row(T('app.metric.stillGrowing', 'Still growing'), growingCount, 'metric-dot--teal'),
               modifier: 'amber',
             }) +
             M.card({
-              label: 'Solana wallet',
-              value: walletLinked ? walletDisplay : 'Not linked',
+              label: T('app.metric.solanaWallet', 'Solana wallet'),
+              value: walletLinked ? walletDisplay : T('app.account.notLinked', 'Not linked'),
               meta:
-                M.row('Network', 'test network', 'metric-dot--teal') +
+                M.row(T('app.metric.network', 'Network'), T('app.metric.testNetwork', 'test network'), 'metric-dot--teal') +
                 M.row(
-                  'Next step',
-                  walletLinked ? 'Ready to sign' : 'Optional — for Tokenise',
+                  T('app.metric.nextStep', 'Next step'),
+                  walletLinked
+                    ? T('app.metric.readyToSign', 'Ready to sign')
+                    : T('app.metric.optionalTokenise', 'Optional — for Tokenise'),
                   walletLinked ? 'metric-dot--teal' : 'metric-dot--amber'
                 ),
               modifier: 'teal',
@@ -4486,16 +4885,16 @@ function initFirebaseSync() {
       if (recent.length === 0) {
         recentEl.innerHTML = emptyStateHtml({
           icon: 'journal',
-          lead: 'No entries yet',
-          body: 'Add a plant and start your journal.',
+          lead: T('app.dash.noEntriesLead', 'No entries yet'),
+          body: T('app.dash.noEntriesBody', 'Add a plant and start your journal.'),
         });
       } else {
         recentEl.innerHTML = recent
           .map((e) => {
             const plant = plants.find((p) => p.id === e.plantId);
             const plantName = escapeHtml(plant ? plant.name : 'Plant');
-            const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-            const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
+            const date = e.date ? new Date(e.date).toLocaleDateString(intlTag()) : '';
+            const typeLabel = escapeHtml(entryTypeName(e.type));
             const viaTools = entrySourceBadgeHtml(e);
             const noteRaw = displayEntryNote(e.note);
             const thumb = e.photo ? '<img src="' + escapeHtml(e.photo) + '" alt="" class="recent-note-thumb" />' : '';
@@ -4524,8 +4923,8 @@ function initFirebaseSync() {
       } else {
         chartsSection.style.display = 'block';
         chartsContainer.innerHTML = '';
-        if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Watering</h4><div id="dashboard-chart-watering"></div></div>';
-        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>Environment (temperature, humidity, pH)</h4><div id="dashboard-chart-environment"></div></div>';
+        if (hasWatering) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>' + escapeHtml(T('app.dashboard.chartWatering', 'Watering')) + '</h4><div id="dashboard-chart-watering"></div></div>';
+        if (hasEnv) chartsContainer.innerHTML += '<div class="dashboard-chart-block"><h4>' + escapeHtml(T('app.dashboard.chartEnvironment', 'Environment (temperature, humidity, pH)')) + '</h4><div id="dashboard-chart-environment"></div></div>';
         if (hasWatering && typeof renderToolboxChart === 'function') renderToolboxChart('watering', document.getElementById('dashboard-chart-watering'));
         if (hasEnv && typeof renderToolboxChart === 'function') renderToolboxChart('environment', document.getElementById('dashboard-chart-environment'));
       }
@@ -4582,7 +4981,7 @@ function initFirebaseSync() {
       // Toast comes from notifyJournalEntry / batch summary.
       return true;
     } catch (err) {
-      const msg = (err && err.message) || 'Could not log entry.';
+      const msg = (err && err.message) || T('app.entry.logFailed', 'Could not log entry.');
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
         DnevnikNotifications.toast(msg, 'error');
       } else {
@@ -4593,7 +4992,7 @@ function initFirebaseSync() {
   }
 
   function quickLogWatering() {
-    return quickLogCare('zalijevanje', 'Watered');
+    return quickLogCare('zalijevanje', T('app.entry.watered', 'Watered'));
   }
 
   function quickLogFeeding() {
@@ -4641,8 +5040,8 @@ function initFirebaseSync() {
       d.getDate() === today.getDate() &&
       d.getMonth() === today.getMonth() &&
       d.getFullYear() === today.getFullYear();
-    if (isToday) return 'Today';
-    return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    if (isToday) return T('app.weather.today', 'Today');
+    return d.toLocaleDateString(intlTag(), { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   async function getWeather(city, containerId) {
@@ -4653,12 +5052,21 @@ function initFirebaseSync() {
     const cityName = String(city || '').trim();
     if (!cityName) {
       weatherDiv.innerHTML =
-        '<p class="plants-weather-empty">Add a city above for a ' +
-        WEATHER_DAYS +
-        '-day forecast. Optional — skip if you grow indoors.</p>';
+        '<p class="plants-weather-empty">' +
+        escapeHtml(
+          T(
+            'app.weather.addCity',
+            'Add a city above for a {days}-day forecast. Optional — skip if you grow indoors.',
+            { days: WEATHER_DAYS }
+          )
+        ) +
+        '</p>';
       return;
     }
-    weatherDiv.innerHTML = '<p class="plants-weather-loading">Loading forecast…</p>';
+    weatherDiv.innerHTML =
+      '<p class="plants-weather-loading">' +
+      escapeHtml(T('app.weather.loading', 'Loading forecast…')) +
+      '</p>';
 
     const url =
       'https://api.weatherapi.com/v1/forecast.json?key=' +
@@ -4678,22 +5086,33 @@ function initFirebaseSync() {
       }
 
       if (!response.ok) {
-        const msg = (data && data.error && data.error.message) || 'HTTP ' + response.status;
+        const msg = (data && data.error && data.error.message) || 'HTTP ' + response.status; // i18n-ignore — status line, not copy
         weatherDiv.innerHTML =
-          '<p class="plants-weather-error">Forecast unavailable: ' + escapeHtml(msg) + '</p>';
+          '<p class="plants-weather-error">' +
+        escapeHtml(T('app.weather.unavailable', 'Forecast unavailable: {reason}', { reason: msg })) +
+        '</p>';
         return;
       }
 
       if (!data || data.error) {
         weatherDiv.innerHTML =
-          '<p class="plants-weather-error">Forecast unavailable: ' +
-          escapeHtml((data && data.error && data.error.message) || 'Unknown city') +
+          '<p class="plants-weather-error">' +
+          escapeHtml(
+            T('app.weather.unavailable', 'Forecast unavailable: {reason}', {
+              reason:
+                (data && data.error && data.error.message) ||
+                T('app.weather.unknownCity', 'Unknown city'),
+            })
+          ) +
           '</p>';
         return;
       }
 
       if (!data.forecast || !Array.isArray(data.forecast.forecastday) || !data.forecast.forecastday.length) {
-        weatherDiv.innerHTML = '<p class="plants-weather-error">No forecast data available.</p>';
+        weatherDiv.innerHTML =
+        '<p class="plants-weather-error">' +
+        escapeHtml(T('app.weather.noData', 'No forecast data available.')) +
+        '</p>';
         return;
       }
 
@@ -4701,7 +5120,14 @@ function initFirebaseSync() {
     } catch (error) {
       console.error('Weather fetch failed', error);
       weatherDiv.innerHTML =
-        '<p class="plants-weather-error">Could not load the forecast. Check your connection and the city name.</p>';
+        '<p class="plants-weather-error">' +
+        escapeHtml(
+          T(
+            'app.weather.loadFailed',
+            'Could not load the forecast. Check your connection and the city name.'
+          )
+        ) +
+        '</p>';
     }
   }
 
@@ -4741,7 +5167,7 @@ function initFirebaseSync() {
       '<path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/>' +
       '<path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/><circle cx="12" cy="6" r="2"/>' +
       '</svg></span>' +
-      'Coach · what this means for your grow' +
+      escapeHtml(T('app.weather.coachHead', 'Coach · what this means for your grow')) +
       '</p>' +
       '<ul class="weather-coach-list">' +
       notes
@@ -4756,7 +5182,9 @@ function initFirebaseSync() {
         })
         .join('') +
       '</ul>' +
-      '<button type="button" class="btn btn-ghost btn-sm weather-coach-ask" id="weather-coach-ask">Ask Coach about the weather</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm weather-coach-ask" id="weather-coach-ask">' +
+      escapeHtml(T('app.weather.askCoach', 'Ask Coach about the weather')) +
+      '</button>' +
       '</div>'
     );
   }
@@ -4773,7 +5201,11 @@ function initFirebaseSync() {
     // Say what we actually got back, not what we asked for.
     const dayCount = days.length;
     const sub = document.getElementById('plants-weather-widget-sub');
-    if (sub) sub.textContent = dayCount + (dayCount === 1 ? ' day' : ' days') + ' · for grow planning';
+    if (sub) {
+      sub.textContent = T('app.weather.dayCount', '{count} days · for grow planning', {
+        count: dayCount,
+      });
+    }
 
     let html =
       '<p class="plants-weather-location">' +
@@ -4825,9 +5257,9 @@ function initFirebaseSync() {
     html += '</div>';
     if (dayCount > 3) {
       html +=
-        '<p class="plants-weather-scroll-hint">Swipe for all ' +
-        dayCount +
-        ' days →</p>';
+        '<p class="plants-weather-scroll-hint">' +
+        escapeHtml(T('app.weather.swipeHint', 'Swipe for all {days} days →', { days: dayCount })) +
+        '</p>';
     }
     html += '</div>' + weatherCoachAdviceHtml(days, city) + '</div>';
     weatherDiv.innerHTML = html;
@@ -4948,10 +5380,11 @@ function initFirebaseSync() {
     console.warn('Journal photo kept inline —', res.error);
     return {
       url: res.url,
-      warning:
-        'Photo saved on this device, but could not be uploaded (' +
-        String(res.error || 'unknown') +
-        '). It counts against your cloud backup size.',
+      warning: T(
+        'app.photo.uploadWarning',
+        'Photo saved on this device, but could not be uploaded ({reason}). It counts against your cloud backup size.',
+        { reason: String(res.error || T('app.photo.unknownReason', 'unknown')) }
+      ),
     };
   }
 
@@ -4976,7 +5409,7 @@ function initFirebaseSync() {
         let w = img.width || 0;
         let h = img.height || 0;
         if (!w || !h) {
-          reject(new Error('Could not read image dimensions.'));
+          reject(new Error(T('app.photo.noDimensions', 'Could not read image dimensions.')));
           return;
         }
         const long = Math.max(w, h);
@@ -4990,7 +5423,7 @@ function initFirebaseSync() {
         canvas.height = h;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error('Could not process image.'));
+          reject(new Error(T('app.camera.processFailed', 'Could not process image.')));
           return;
         }
         ctx.fillStyle = '#0f1a12';
@@ -5005,16 +5438,24 @@ function initFirebaseSync() {
             out = canvas.toDataURL('image/jpeg', quality);
           }
         } catch (err) {
-          reject(err || new Error('Could not encode image.'));
+          reject(err || new Error(T('app.camera.encodeFailed', 'Could not encode image.')));
           return;
         }
         if (!out || out.length > MAX_ENTRY_PHOTO_CHARS) {
-          reject(new Error('Photo is still too large after compression. Try a smaller image.'));
+          reject(
+        new Error(
+          T(
+            'app.photo.stillTooLarge',
+            'Photo is still too large after compression. Try a smaller image.'
+          )
+        )
+      );
           return;
         }
         resolve(out);
       };
-      img.onerror = () => reject(new Error('Could not load that image. Try JPG or PNG.'));
+      img.onerror = () =>
+      reject(new Error(T('app.photo.loadFailed', 'Could not load that image. Try JPG or PNG.')));
       img.src = dataUrl;
     });
   }
@@ -5047,18 +5488,22 @@ function initFirebaseSync() {
     }
     chip.hidden = false;
     chip.innerHTML =
-      '<span class="grower-rank-chip-tier">Rank ' +
-      escapeHtml(String(rank.tier || 1)) +
+      '<span class="grower-rank-chip-tier">' +
+      escapeHtml(T('app.rank.chip', 'Rank {tier}', { tier: rank.tier || 1 })) +
       '</span>' +
       '<span>' +
       escapeHtml(rank.title) +
       '</span>' +
       '<span class="grower-rank-chip-xp">' +
-      escapeHtml(String(xp)) +
-      ' XP</span>';
+      escapeHtml(T('app.token.xpAmount', '{xp} XP', { xp: xp })) +
+      '</span>';
     chip.setAttribute(
       'aria-label',
-      'Grower rank ' + (rank.tier || 1) + ', ' + rank.title + ', ' + xp + ' XP. Open profile.'
+      T('app.rank.aria', 'Grower rank {tier}, {title}, {xp} XP. Open profile.', {
+        tier: rank.tier || 1,
+        title: rank.title,
+        xp: xp,
+      })
     );
   }
 
@@ -5092,46 +5537,63 @@ function initFirebaseSync() {
     const claimedAmt =
       claimed && claimed.status === 'minted' ? Number(claimed.reward || 0) : null;
     if (claimedAmt != null) {
-      line.innerHTML = 'Claimed <strong>' + claimedAmt + ' $GROWTOO</strong> this month.';
+      line.innerHTML = T('app.bonus.claimed', 'Claimed <strong>{amount} $GROWTOO</strong> this month.', {
+        amount: claimedAmt,
+      });
     } else if (preview.reward <= 0) {
-      line.innerHTML = 'Log watering or feeding to start this month’s bonus.';
+      line.innerHTML = T(
+        'app.bonus.startHint',
+        'Log watering or feeding to start this month’s bonus.'
+      );
     } else {
-      line.innerHTML =
-        'About <strong>' +
-        preview.reward +
-        ' $GROWTOO</strong> if you claim now (cap ' +
-        preview.cap +
-        ').';
+      line.innerHTML = T(
+        'app.bonus.about',
+        'About <strong>{amount} $GROWTOO</strong> if you claim now (cap {cap}).',
+        { amount: preview.reward, cap: preview.cap }
+      );
     }
     meter.innerHTML =
-      '<li>Care days (water or feed)<strong>' +
+      '<li>' +
+      escapeHtml(T('app.bonus.careDays', 'Care days (water or feed)')) +
+      '<strong>' +
       (a.careDays || 0) +
       '/20</strong></li>' +
-      '<li>Feeding days<strong>' +
+      '<li>' +
+      escapeHtml(T('app.bonus.feedingDays', 'Feeding days')) +
+      '<strong>' +
       (a.feedingDays || 0) +
       '/8</strong></li>' +
-      '<li>Stories published<strong>' +
+      '<li>' +
+      escapeHtml(T('app.bonus.storiesPublished', 'Stories published')) +
+      '<strong>' +
       (a.publishedStories || 0) +
       '/2</strong></li>' +
-      '<li>Weeks with 5+ care days<strong>' +
+      '<li>' +
+      escapeHtml(T('app.bonus.qualifyingWeeks', 'Weeks with 5+ care days')) +
+      '<strong>' +
       (a.qualifyingWeeks || 0) +
       '/4</strong></li>';
     if (hint) {
       hint.textContent = preview.loggedToday
-        ? 'Today is already counted. Extra logs today do not add more tokens.'
-        : 'Log watering or feeding today to add a care day.';
+        ? T(
+            'app.bonus.alreadyCounted',
+            'Today is already counted. Extra logs today do not add more tokens.'
+          )
+        : T('app.bonus.addCareDay', 'Log watering or feeding today to add a care day.');
     }
     if (actions) {
       if (claimed && (claimed.status === 'minted' || claimed.status === 'pending')) {
         actions.innerHTML =
           claimed.status === 'pending'
-            ? '<p class="activity-reward-hint">Claim is in the rewards queue.</p>'
+            ? '<p class="activity-reward-hint">' +
+              escapeHtml(T('app.bonus.inQueue', 'Claim is in the rewards queue.')) +
+              '</p>'
             : '';
       } else if (preview.reward <= 0) {
         actions.innerHTML = '';
       } else {
         actions.innerHTML =
-          '<button type="button" class="btn btn-secondary btn-tap" id="activity-reward-claim">Claim on Tokenise</button>';
+          '<button type="button" class="btn btn-secondary btn-tap" id="activity-reward-claim">' + escapeHtml(T('app.activity.claimOnTokenise', 'Claim on Tokenise')) + '</button>';
       }
     }
   }
@@ -5164,17 +5626,17 @@ function initFirebaseSync() {
     if (plants.length === 0) {
       list.innerHTML = emptyStateHtml({
         icon: 'plant',
-        lead: 'No plants yet',
-        body: 'Add your first plant to start a grow journal.',
+        lead: T('app.plants.emptyLead', 'No plants yet'),
+        body: T('app.plants.emptyBody', 'Add your first plant to start a grow journal.'),
         ctaId: 'empty-add-plant',
-        ctaLabel: '+ New plant',
+        ctaLabel: T('app.plants.newPlant', '+ New plant'),
       });
       return;
     }
 
     function plantCardHtml(p) {
       const shared = isSharedPlantId(p.id);
-      const stageLabelText = STAGES[p.stage] || p.stage;
+      const stageLabelText = stageName(p.stage);
       const entries = getPlantEntries(p.id) || [];
       const lastWater = entries
         .filter(function (e) {
@@ -5185,8 +5647,10 @@ function initFirebaseSync() {
           return new Date(b.date || b.ts || 0) - new Date(a.date || a.ts || 0);
         })[0];
       const lastWaterLabel = lastWater
-        ? 'Watered ' + new Date(lastWater.date || lastWater.ts).toLocaleDateString('en-GB')
-        : 'No watering log yet';
+        ? T('app.plants.wateredOn', 'Watered {date}', {
+            date: new Date(lastWater.date || lastWater.ts).toLocaleDateString(intlTag()),
+          })
+        : T('app.plants.noWateringLog', 'No watering log yet');
       const photoOverlay = p.photo
         ? `<div class="plant-card-photo-overlay"><strong>${escapeHtml(p.name)}</strong>${escapeHtml(stageLabelText)} · ${escapeHtml(lastWaterLabel)}</div>`
         : '';
@@ -5223,7 +5687,7 @@ function initFirebaseSync() {
             : ''
         }
         <div class="text-muted" style="font-size:0.85rem">Batch: <strong style="color:var(--text)">${Math.max(1, Number(p.count || 1))}</strong> plants</div>
-        ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Since ${new Date(p.startDate).toLocaleDateString('en-GB')}</div>` : ''}
+        ${p.startDate ? `<div class="text-muted" style="font-size:0.85rem">Since ${new Date(p.startDate).toLocaleDateString(intlTag())}</div>` : ''}
         <div class="plant-card-actions">
           <button type="button" class="btn btn-primary btn-growlog">Grow log</button>
           ${
@@ -5352,7 +5816,9 @@ function initFirebaseSync() {
     el.className = 'toast toast--warn toast--undo';
     el.innerHTML =
       '<span class="toast-undo-msg"></span>' +
-      '<button type="button" class="toast-undo-btn">Undo</button>';
+      '<button type="button" class="toast-undo-btn">' +
+      escapeHtml(T('app.toast.undo', 'Undo')) +
+      '</button>';
     el.querySelector('.toast-undo-msg').textContent = message;
     let undone = false;
     let timer = null;
@@ -5387,18 +5853,21 @@ function initFirebaseSync() {
     const ok =
       window.AppConfirm && typeof AppConfirm.ask === 'function'
         ? await AppConfirm.ask({
-            title: 'Delete this plant?',
-            body:
-              'Delete "' +
-              plant.name +
-              '" and its journal trail?\n\nYour grow history is evidence — you can undo for a few seconds after.',
-            confirmLabel: 'Delete plant',
+            title: T('app.plants.deleteTitle', 'Delete this plant?'),
+            body: T(
+              'app.plants.deleteBody',
+              'Delete "{name}" and its journal trail?\n\nYour grow history is evidence — you can undo for a few seconds after.',
+              { name: plant.name }
+            ),
+            confirmLabel: T('app.plants.deleteConfirm', 'Delete plant'),
             danger: true,
           })
         : window.confirm(
-            'Delete "' +
-              plant.name +
-              '" and its journal trail?\n\nYou can undo for a few seconds after.'
+            T(
+              'app.plants.deleteBodyShort',
+              'Delete "{name}" and its journal trail?\n\nYou can undo for a few seconds after.',
+              { name: plant.name }
+            )
           );
     if (!ok) return;
     const removedPlant = JSON.parse(JSON.stringify(plant));
@@ -5412,7 +5881,7 @@ function initFirebaseSync() {
     fillEntryPlantSelect();
     fillJournalPlantFilter();
     if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
-    showUndoToast('Plant deleted — undo available', () => {
+    showUndoToast(T('app.plants.deletedUndo', 'Plant deleted — undo available'), () => {
       setPlants(getPlants().concat([removedPlant]));
       setEntries(getEntries().concat(removedEntries));
       renderPlants();
@@ -5420,7 +5889,9 @@ function initFirebaseSync() {
       fillEntryPlantSelect();
       fillJournalPlantFilter();
       if (typeof fillToolboxPlantSelects === 'function') fillToolboxPlantSelects();
-      if (window.DnevnikNotifications) DnevnikNotifications.toast('Plant restored', 'success');
+      if (window.DnevnikNotifications) {
+        DnevnikNotifications.toast(T('app.plants.restored', 'Plant restored'), 'success');
+      }
     });
   }
 
@@ -5449,7 +5920,7 @@ function initFirebaseSync() {
       if (nextBtn) nextBtn.hidden = true;
       if (createHint) createHint.hidden = true;
       if (mintWrap) mintWrap.hidden = true;
-      if (submitBtn) submitBtn.textContent = 'Save';
+      if (submitBtn) submitBtn.textContent = T('app.form.save', 'Save');
       return;
     }
 
@@ -5466,7 +5937,7 @@ function initFirebaseSync() {
     if (backBtn) backBtn.hidden = plantWizardStep !== 2;
     if (nextBtn) nextBtn.hidden = plantWizardStep !== 1;
     if (submitBtn) {
-      submitBtn.textContent = plantWizardStep === 1 ? 'Save plant' : 'Save plant';
+      submitBtn.textContent = T('app.form.savePlant', 'Save plant');
       submitBtn.hidden = false;
     }
   }
@@ -5500,7 +5971,9 @@ function initFirebaseSync() {
     if (transNote) transNote.value = '';
     const stageAtOpenEl = document.getElementById('plant-stage-at-open');
     document.getElementById('plant-id').value = editId || '';
-    titleEl.textContent = editId ? 'Edit plant' : 'New plant';
+    titleEl.textContent = editId
+      ? T('app.form.editPlant', 'Edit plant')
+      : T('app.form.newPlant', 'New plant');
     document.getElementById('plant-photo').value = '';
     if (editId) {
       const p = getPlants().find((x) => x.id === editId);
@@ -5527,7 +6000,7 @@ function initFirebaseSync() {
         document.getElementById('plant-notes').value = p.notes || '';
         if (p.photo) {
           photoData.value = p.photo;
-          photoPreview.innerHTML = '<img src="' + p.photo + '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+          photoPreview.innerHTML = '<img src="' + p.photo + '" alt="' + escapeHtml(T('app.media.photoAlt', 'Photo')) + '" class="media-thumb" /> <button type="button" class="btn-remove-media">' + escapeHtml(T('app.media.remove', 'Remove')) + '</button>';
           photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
             photoData.value = '';
             photoPreview.innerHTML = '';
@@ -5637,11 +6110,21 @@ function initFirebaseSync() {
     if (!file.type || !file.type.startsWith('image/')) {
       photoData.value = '';
       photoPreview.innerHTML =
-        '<span class="media-error">Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).</span>';
+        '<span class="media-error">' +
+        escapeHtml(
+          T(
+            'app.photo.formatUnsupported',
+            'Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).'
+          )
+        ) +
+        '</span>';
       e.target.value = '';
       return;
     }
-    photoPreview.innerHTML = '<span class="media-loading">Preparing photo…</span>';
+    photoPreview.innerHTML =
+          '<span class="media-loading">' +
+          escapeHtml(T('app.camera.preparing', 'Preparing photo…')) +
+          '</span>';
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
@@ -5652,7 +6135,7 @@ function initFirebaseSync() {
       photoPreview.innerHTML =
         '<img src="' +
         dataUrl +
-        '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+        '" alt="' + escapeHtml(T('app.media.photoAlt', 'Photo')) + '" class="media-thumb" /> <button type="button" class="btn-remove-media">' + escapeHtml(T('app.media.remove', 'Remove')) + '</button>';
       appendPhotoWarning(photoPreview, stored.warning);
       photoPreview.querySelector('.btn-remove-media').addEventListener('click', () => {
         photoData.value = '';
@@ -5663,7 +6146,7 @@ function initFirebaseSync() {
       photoData.value = '';
       photoPreview.innerHTML =
         '<span class="media-error">' +
-        escapeHtml((err && err.message) || 'Could not load photo.') +
+        escapeHtml((err && err.message) || T('app.photo.couldNotLoad', 'Could not load photo.')) +
         '</span>';
       e.target.value = '';
     }
@@ -5700,8 +6183,18 @@ function initFirebaseSync() {
     const plantingLocationVal =
       outdoorCtx && fieldLocationVal && plantingEl ? plantingEl.value.trim() || null : null;
     let locNoteSuffix = '';
-    if (fieldLocationVal) locNoteSuffix += ' Field location: ' + fieldLocationVal + '.';
-    if (plantingLocationVal) locNoteSuffix += ' Planting location: ' + plantingLocationVal + '.';
+    if (fieldLocationVal) {
+          locNoteSuffix +=
+            ' ' +
+            T('app.note.fieldLocation', 'Field location: {value}.', { value: fieldLocationVal });
+        }
+    if (plantingLocationVal) {
+          locNoteSuffix +=
+            ' ' +
+            T('app.note.plantingLocation', 'Planting location: {value}.', {
+              value: plantingLocationVal,
+            });
+        }
 
     let stageHistory = [];
     let stageDates = {};
@@ -5718,7 +6211,9 @@ function initFirebaseSync() {
       const day0 = startDateVal || localDateYYYYMMDD();
       stageHistory.push({ from: null, to: newStage, date: day0 });
       stageDates[newStage] = day0;
-      let note0 = 'Grow started — stage: ' + (STAGES[newStage] || newStage);
+      let note0 = T('app.note.growStarted', 'Grow started — stage: {stage}', {
+        stage: stageName(newStage),
+      });
       if (locNoteSuffix) note0 += locNoteSuffix;
       if (transitionNote) note0 += '. ' + transitionNote;
       journalAdds.push({
@@ -5736,7 +6231,9 @@ function initFirebaseSync() {
       });
       if (newSubphase) {
         subphaseHistory.push({ from: null, to: newSubphase, date: day0 });
-        let subNote = 'Sub-phase: ' + subphaseLabel(newSubphase);
+        let subNote = T('app.note.subphase', 'Sub-phase: {value}', {
+        value: subphaseLabel(newSubphase),
+      });
         if (locNoteSuffix) subNote += locNoteSuffix;
         journalAdds.push({
           id: uuid(),
@@ -5762,7 +6259,10 @@ function initFirebaseSync() {
         stageHistory.push({ from: stageAtOpen, to: newStage, date: td });
         stageDates[newStage] = td;
         const base =
-          'Stage transition: ' + (STAGES[stageAtOpen] || stageAtOpen) + ' → ' + (STAGES[newStage] || newStage);
+          T('app.note.stageTransition', 'Stage transition: {from} → {to}', {
+            from: stageName(stageAtOpen),
+            to: stageName(newStage),
+          });
         const note1 = (transitionNote ? base + '. ' + transitionNote : base) + locNoteSuffix;
         journalAdds.push({
           id: uuid(),
@@ -5791,7 +6291,10 @@ function initFirebaseSync() {
         const fromLab = subAtOpen ? subphaseLabel(subAtOpen) : '—';
         const toLab = newSubphase ? subphaseLabel(newSubphase) : '—';
         let subNote =
-          'Sub-phase transition: ' + fromLab + ' → ' + toLab + (transitionNote ? '. ' + transitionNote : '') + locNoteSuffix;
+          T('app.note.subphaseTransition', 'Sub-phase transition: {from} → {to}', {
+            from: fromLab,
+            to: toLab,
+          }) + (transitionNote ? '. ' + transitionNote : '') + locNoteSuffix;
         journalAdds.push({
           id: uuid(),
           plantId: newId,
@@ -5857,7 +6360,12 @@ function initFirebaseSync() {
     const wantMint = !id && alsoMintEl && alsoMintEl.checked;
     closePlantModal();
     if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-      DnevnikNotifications.toast(id ? 'Plant updated' : 'Plant added — ' + payload.name, 'success');
+      DnevnikNotifications.toast(
+        id
+          ? T('app.plants.updated', 'Plant updated')
+          : T('app.plants.added', 'Plant added — {name}', { name: payload.name }),
+        'success'
+      );
     }
     if (!journalAdds.length) {
       renderPlants();
@@ -5877,7 +6385,11 @@ function initFirebaseSync() {
         console.warn('Optional mint after plant create failed', err);
         if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
           DnevnikNotifications.toast(
-            (err && err.message) || 'Plant saved, but on-chain mint did not start. Try Tokenise → advanced.',
+            (err && err.message) ||
+              T(
+                'app.plants.mintNotStarted',
+                'Plant saved, but on-chain mint did not start. Try Tokenise → advanced.'
+              ),
             'warn'
           );
         }
@@ -5889,7 +6401,7 @@ function initFirebaseSync() {
     if (!plant || !plant.id) return;
     const PT = window.PlantToken;
     if (!PT || typeof PT.importSeed !== 'function') {
-      throw new Error('Minting is not available yet.');
+      throw new Error(T('app.plants.mintUnavailable', 'Minting is not available yet.'));
     }
     const wallet = typeof PT.getWallet === 'function' ? PT.getWallet() : null;
     if (!wallet || !wallet.connected) {
@@ -5898,7 +6410,9 @@ function initFirebaseSync() {
       } else if (window.SolanaWallet && typeof SolanaWallet.connect === 'function') {
         await SolanaWallet.connect();
       } else {
-        throw new Error('Connect a Devnet wallet first, then mint from Tokenise.');
+        throw new Error(
+        T('app.plants.connectWalletFirst', 'Connect a Devnet wallet first, then mint from Tokenise.')
+      );
       }
     }
     await PT.importSeed({
@@ -5908,7 +6422,10 @@ function initFirebaseSync() {
       plantId: plant.id,
     });
     if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-      DnevnikNotifications.toast('Plant token mint started for ' + plant.name, 'success');
+      DnevnikNotifications.toast(
+        T('app.plants.mintStarted', 'Plant token mint started for {name}', { name: plant.name }),
+        'success'
+      );
     }
     if (window.AdoptPlant && typeof AdoptPlant.render === 'function') {
       try {
@@ -5937,7 +6454,9 @@ function initFirebaseSync() {
     if (!sel) return;
     const plants = getPlants();
     sel.innerHTML =
-      '<option value="">-- Select a plant --</option>' +
+      '<option value="">' +
+      escapeHtml(T('app.form.selectPlant', '-- Select a plant --')) +
+      '</option>' +
       plants
         .map(function (p) {
           return '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>';
@@ -5951,7 +6470,8 @@ function initFirebaseSync() {
     const prev = sel.value;
     const plants = getPlants();
     const Stacks = window.GrowtooStacks;
-    let html = '<option value="">All plants</option>';
+    let html =
+      '<option value="">' + escapeHtml(T('app.form.allPlants', 'All plants')) + '</option>';
     if (Stacks && typeof Stacks.groupItems === 'function') {
       const groups = Stacks.groupItems(plants, plantStackAccessors());
       groups.forEach(function (g) {
@@ -5974,7 +6494,7 @@ function initFirebaseSync() {
             escapeHtml(p.id) +
             '">' +
             (Stacks.shouldStack(g) ? '  ' : '') +
-            escapeHtml(p.name || 'Plant') +
+            escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
             '</option>';
         });
       });
@@ -6138,14 +6658,17 @@ function initFirebaseSync() {
     if (!container) return;
     if (entries.length === 0) {
       if (journalViewIsMonth()) {
-        container.innerHTML = '<p class="journal-cal-empty">No logs on this day.</p>';
+        container.innerHTML =
+        '<p class="journal-cal-empty">' +
+        escapeHtml(T('app.calendar.noLogsToday', 'No logs on this day.')) +
+        '</p>';
       } else {
         container.innerHTML = emptyStateHtml({
           icon: 'journal',
           lead: 'No entries yet',
-          body: 'Log watering, feeding, or a note to start the trail.',
+          body: T('app.journal.emptyBody', 'Log watering, feeding, or a note to start the trail.'),
           ctaId: 'empty-add-entry',
-          ctaLabel: '+ New entry',
+          ctaLabel: T('app.journal.newEntry', '+ New entry'),
         });
       }
       return;
@@ -6154,8 +6677,8 @@ function initFirebaseSync() {
     function entryCardHtml(e) {
       const plant = plantById[String(e.plantId)];
       const plantName = escapeHtml(plant ? plant.name : 'Plant');
-      const date = e.date ? new Date(e.date).toLocaleDateString('en-GB') : '';
-      const typeLabel = escapeHtml(ENTRY_TYPE_LABELS[e.type] || e.type || 'General');
+      const date = e.date ? new Date(e.date).toLocaleDateString(intlTag()) : '';
+      const typeLabel = escapeHtml(entryTypeName(e.type));
       const viaTools = entrySourceBadgeHtml(e);
       const noteText = displayEntryNote(e.note);
       const media = [];
@@ -6178,23 +6701,39 @@ function initFirebaseSync() {
         if (e.meta.faza) {
           const m = e.meta.faza;
           const parts = [];
-          if (m.from) parts.push('From: ' + escapeHtml(STAGES[m.from] || m.from));
-          parts.push('To: ' + escapeHtml(STAGES[m.to] || m.to));
+          if (m.from) {
+            parts.push(
+              T('app.entry.from', 'From: {stage}', {
+                stage: escapeHtml(stageName(m.from) || m.from || '—'),
+              })
+            );
+          }
+          parts.push(
+            T('app.entry.to', 'To: {stage}', {
+              stage: escapeHtml(stageName(m.to) || m.to || '—'),
+            })
+          );
           if (parts.length) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Stage transition</strong><ul><li>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.stageTransitionLabel', 'Stage transition')) +
+              '</strong><ul><li>' +
               parts.join('</li><li>') +
               '</li></ul></div>';
           }
           if (e.meta.fieldLocation) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Field location</strong><p>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.fieldLocationLabel', 'Field location')) +
+              '</strong><p>' +
               escapeHtml(e.meta.fieldLocation) +
               '</p></div>';
           }
           if (e.meta.plantingLocation) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.plantingLocationLabel', 'Planting location')) +
+              '</strong><p>' +
               escapeHtml(e.meta.plantingLocation) +
               '</p></div>';
           }
@@ -6202,23 +6741,38 @@ function initFirebaseSync() {
         if (e.meta.podfaza) {
           const m = e.meta.podfaza;
           const parts = [];
-          if (m.from) parts.push('From: ' + escapeHtml(subphaseLabel(m.from)));
-          parts.push('To: ' + escapeHtml(subphaseLabel(m.to) || m.to || '—'));
+          if (m.from)
+            parts.push(
+              escapeHtml(T('app.entry.from', 'From: {stage}', { stage: subphaseLabel(m.from) }))
+            );
+          parts.push(
+            escapeHtml(
+              T('app.entry.to', 'To: {stage}', {
+                stage: subphaseLabel(m.to) || m.to || '—',
+              })
+            )
+          );
           if (parts.length) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Sub-phase transition</strong><ul><li>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.subphaseTransitionLabel', 'Sub-phase transition')) +
+              '</strong><ul><li>' +
               parts.join('</li><li>') +
               '</li></ul></div>';
           }
           if (e.meta.fieldLocation) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Field location</strong><p>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.fieldLocationLabel', 'Field location')) +
+              '</strong><p>' +
               escapeHtml(e.meta.fieldLocation) +
               '</p></div>';
           }
           if (e.meta.plantingLocation) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Planting location</strong><p>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.plantingLocationLabel', 'Planting location')) +
+              '</strong><p>' +
               escapeHtml(e.meta.plantingLocation) +
               '</p></div>';
           }
@@ -6226,12 +6780,25 @@ function initFirebaseSync() {
         if (e.meta.presadjivanje) {
           const m = e.meta.presadjivanje;
           const parts = [];
-          if (m.soilQuality) parts.push('Soil quality: ' + escapeHtml(m.soilQuality));
-          if (m.plantAge) parts.push('Plant age: ' + escapeHtml(m.plantAge));
-          if (m.plantCondition) parts.push('Plant condition: ' + escapeHtml(m.plantCondition));
+          if (m.soilQuality)
+            parts.push(
+              escapeHtml(T('app.entry.soilQuality', 'Soil quality: {value}', { value: m.soilQuality }))
+            );
+          if (m.plantAge)
+            parts.push(
+              escapeHtml(T('app.entry.plantAge', 'Plant age: {value}', { value: m.plantAge }))
+            );
+          if (m.plantCondition)
+            parts.push(
+              escapeHtml(
+                T('app.entry.plantCondition', 'Plant condition: {value}', { value: m.plantCondition })
+              )
+            );
           if (parts.length) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Transplanting</strong><ul><li>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.transplantingLabel', 'Transplanting')) +
+              '</strong><ul><li>' +
               parts.join('</li><li>') +
               '</li></ul></div>';
           }
@@ -6239,13 +6806,23 @@ function initFirebaseSync() {
         if (e.meta.stresori) {
           const m = e.meta.stresori;
           const parts = [];
-          if (m.temperature) parts.push('Temperature: ' + escapeHtml(m.temperature));
-          if (m.humidity) parts.push('Humidity: ' + escapeHtml(m.humidity));
-          if (m.vpd) parts.push('VPD: ' + escapeHtml(m.vpd));
-          if (m.pests) parts.push('Pests: ' + escapeHtml(m.pests));
+          if (m.temperature)
+            parts.push(
+              escapeHtml(T('app.entry.temperature', 'Temperature: {value}', { value: m.temperature }))
+            );
+          if (m.humidity)
+            parts.push(
+              escapeHtml(T('app.entry.humidity', 'Humidity: {value}', { value: m.humidity }))
+            );
+          if (m.vpd)
+            parts.push(escapeHtml(T('app.entry.vpd', 'VPD: {value}', { value: m.vpd })));
+          if (m.pests)
+            parts.push(escapeHtml(T('app.entry.pests', 'Pests: {value}', { value: m.pests })));
           if (parts.length) {
             metaHtml +=
-              '<div class="entry-meta-block"><strong>Stressors</strong><ul><li>' +
+              '<div class="entry-meta-block"><strong>' +
+              escapeHtml(T('app.entry.stressorsLabel', 'Stressors')) +
+              '</strong><ul><li>' +
               parts.join('</li><li>') +
               '</li></ul></div>';
           }
@@ -6267,7 +6844,11 @@ function initFirebaseSync() {
         ' · ' +
         date +
         (deletable
-          ? '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="Delete entry">Delete</button>'
+          ? '<button type="button" class="btn btn-ghost btn-sm btn-delete-entry" aria-label="' +
+            escapeHtml(T('app.entry.deleteAria', 'Delete entry')) +
+            '">' +
+            escapeHtml(T('app.entry.delete', 'Delete')) +
+            '</button>'
           : '') +
         '</div>' +
         '<div class="entry-note">' +
@@ -6280,7 +6861,9 @@ function initFirebaseSync() {
               : '';
           if (!coachNote) return '';
           return (
-            '<p class="entry-coach-note"><span class="entry-coach-note-label">Coach</span> ' +
+            '<p class="entry-coach-note"><span class="entry-coach-note-label">' +
+            escapeHtml(T('app.entry.coachLabel', 'Coach')) +
+            '</span> ' +
             escapeHtml(coachNote) +
             '</p>'
           );
@@ -6291,7 +6874,9 @@ function initFirebaseSync() {
       return deletable
         ? '<div class="journal-swipe">' +
             '<div class="journal-swipe-actions">' +
-            '<button type="button" class="journal-swipe-delete" tabindex="-1" aria-hidden="true">Delete</button>' +
+            '<button type="button" class="journal-swipe-delete" tabindex="-1" aria-hidden="true">' +
+            escapeHtml(T('app.entry.delete', 'Delete')) +
+            '</button>' +
             '</div>' +
             entryHtml +
             '</div>'
@@ -6468,14 +7053,19 @@ function initFirebaseSync() {
     const ok =
       window.AppConfirm && typeof AppConfirm.ask === 'function'
         ? await AppConfirm.ask({
-            title: 'Delete journal entry?',
-            body:
-              'Remove this entry from your grow trail?\n\nYou can undo for a few seconds after.',
-            confirmLabel: 'Delete entry',
+            title: T('app.entry.deleteTitle', 'Delete journal entry?'),
+            body: T(
+              'app.entry.deleteBody',
+              'Remove this entry from your grow trail?\n\nYou can undo for a few seconds after.'
+            ),
+            confirmLabel: T('app.entry.deleteConfirm', 'Delete entry'),
             danger: true,
           })
         : window.confirm(
-            'Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.'
+            T(
+              'app.entry.deleteFallback',
+              'Delete this journal entry?\n\nYour grow trail matters — you can undo for a few seconds after.'
+            )
           );
     if (!ok) return;
     const removed = JSON.parse(JSON.stringify(entry));
@@ -6483,12 +7073,12 @@ function initFirebaseSync() {
     renderJournal();
     renderDashboard();
     if (currentGrowlogPlantId === removed.plantId) renderGrowlog(removed.plantId);
-    showUndoToast('Entry deleted — undo available', () => {
+    showUndoToast(T('app.entry.deletedUndo', 'Entry deleted — undo available'), () => {
       setEntries(getEntries().concat([removed]));
       renderJournal();
       renderDashboard();
       if (currentGrowlogPlantId === removed.plantId) renderGrowlog(removed.plantId);
-      if (window.DnevnikNotifications) DnevnikNotifications.toast('Entry restored', 'success');
+      if (window.DnevnikNotifications) DnevnikNotifications.toast(T('app.entry.restored', 'Entry restored'), 'success');
     });
   }
 
@@ -6615,7 +7205,7 @@ function initFirebaseSync() {
             (selectedSet[id] ? ' checked' : '') +
             ' />' +
             '<span>' +
-            escapeHtml(p.name || 'Plant') +
+            escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
             '</span>' +
             '</label>'
           );
@@ -6656,7 +7246,7 @@ function initFirebaseSync() {
                 (selectedSet[id] ? ' checked' : '') +
                 ' />' +
                 '<span>' +
-                escapeHtml(p.name || 'Plant') +
+                escapeHtml(p.name || T('app.stack.plant', 'Plant')) +
                 '</span>' +
                 '</label>'
               );
@@ -6824,9 +7414,16 @@ function initFirebaseSync() {
           ? CoachCore.getWeatherCity()
           : '';
       AICoach.ask(
-        'Based on the forecast' +
-          (city ? ' for ' + city : '') +
-          ', what should I change about watering and feeding over the next few days?'
+        city
+          ? T(
+              'app.coach.askForecastCity',
+              'Based on the forecast for {city}, what should I change about watering and feeding over the next few days?',
+              { city: city }
+            )
+          : T(
+              'app.coach.askForecast',
+              'Based on the forecast, what should I change about watering and feeding over the next few days?'
+            )
       );
     }
   });
@@ -6840,11 +7437,14 @@ function initFirebaseSync() {
           : null;
         if (plant) {
           AICoach.ask(
-            'What should I do next for "' +
-              plant.name +
-              '" in stage ' +
-              (STAGES[plant.stage] || plant.stage || 'unknown') +
-              '? Include tokenisation tips.'
+            T(
+              'app.coach.askPlantNext',
+              'What should I do next for "{plant}" in stage {stage}? Include tokenisation tips.',
+              {
+                plant: plant.name,
+                stage: stageName(plant.stage) || T('app.coach.stageUnknown', 'unknown'),
+              }
+            )
           );
         }
       }
@@ -6875,7 +7475,7 @@ function initFirebaseSync() {
             previewEl.innerHTML =
               '<img src="' +
               dataUrl +
-              '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+              '" alt="' + escapeHtml(T('app.media.photoAlt', 'Photo')) + '" class="media-thumb" /> <button type="button" class="btn-remove-media">' + escapeHtml(T('app.media.remove', 'Remove')) + '</button>';
             const removeBtn = previewEl.querySelector('.btn-remove-media');
             if (removeBtn) {
               removeBtn.addEventListener('click', function () {
@@ -6889,7 +7489,7 @@ function initFirebaseSync() {
               plantId: (payload && payload.plantId) || plantId,
               type: 'opcenito',
               photo: dataUrl,
-              note: 'Photo log from plant camera',
+              note: T('app.camera.photoNote', 'Photo log from plant camera'),
             });
           }
         },
@@ -6909,11 +7509,21 @@ function initFirebaseSync() {
     if (!file.type || !file.type.startsWith('image/')) {
       dataEl.value = '';
       previewEl.innerHTML =
-        '<span class="media-error">Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).</span>';
+        '<span class="media-error">' +
+        escapeHtml(
+          T(
+            'app.photo.formatUnsupported',
+            'Use a JPG or PNG photo (some phone formats like HEIC aren’t supported here).'
+          )
+        ) +
+        '</span>';
       e.target.value = '';
       return;
     }
-    previewEl.innerHTML = '<span class="media-loading">Preparing photo…</span>';
+    previewEl.innerHTML =
+      '<span class="media-loading">' +
+      escapeHtml(T('app.photo.preparing', 'Preparing photo…')) +
+      '</span>';
     try {
       let dataUrl = await readFileAsDataUrl(file);
       dataUrl = await resizeImageDataUrl(dataUrl, MAX_IMAGE_SIZE);
@@ -6924,7 +7534,7 @@ function initFirebaseSync() {
       previewEl.innerHTML =
         '<img src="' +
         dataUrl +
-        '" alt="Photo" class="media-thumb" /> <button type="button" class="btn-remove-media">Remove</button>';
+        '" alt="' + escapeHtml(T('app.media.photoAlt', 'Photo')) + '" class="media-thumb" /> <button type="button" class="btn-remove-media">' + escapeHtml(T('app.media.remove', 'Remove')) + '</button>';
       appendPhotoWarning(previewEl, stored.warning);
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
@@ -6935,7 +7545,7 @@ function initFirebaseSync() {
       dataEl.value = '';
       previewEl.innerHTML =
         '<span class="media-error">' +
-        escapeHtml((err && err.message) || 'Could not load photo.') +
+        escapeHtml((err && err.message) || T('app.photo.readFailed', 'Could not load photo.')) +
         '</span>';
       e.target.value = '';
     }
@@ -6953,13 +7563,27 @@ function initFirebaseSync() {
     if (!file.type || !file.type.startsWith('video/')) {
       dataEl.value = '';
       previewEl.innerHTML =
-        '<span class="media-error">Use an MP4 or WebM video (this file type isn’t supported here).</span>';
+        '<span class="media-error">' +
+        escapeHtml(
+          T(
+            'app.video.formatUnsupported',
+            'Use an MP4 or WebM video (this file type isn’t supported here).'
+          )
+        ) +
+        '</span>';
       e.target.value = '';
       return;
     }
     const maxBytes = MAX_VIDEO_SIZE_MB * 1024 * 1024;
     if (file.size > maxBytes) {
-      previewEl.innerHTML = '<span class="media-error">Video too large (max ' + MAX_VIDEO_SIZE_MB + ' MB for local storage).</span>';
+      previewEl.innerHTML =
+        '<span class="media-error">' +
+        escapeHtml(
+          T('app.video.tooLarge', 'Video too large (max {mb} MB for local storage).', {
+            mb: MAX_VIDEO_SIZE_MB,
+          })
+        ) +
+        '</span>';
       dataEl.value = '';
       document.getElementById('entry-video').value = '';
       return;
@@ -6967,14 +7591,23 @@ function initFirebaseSync() {
     try {
       const dataUrl = await readFileAsDataUrl(file);
       dataEl.value = dataUrl;
-      previewEl.innerHTML = '<video src="' + dataUrl + '" controls class="media-thumb-video"></video> <button type="button" class="btn-remove-media">Remove</button>';
+      previewEl.innerHTML =
+        '<video src="' +
+        dataUrl +
+        // i18n-ignore — markup only
+        '" controls class="media-thumb-video"></video> <button type="button" class="btn-remove-media">' +
+        escapeHtml(T('app.media.remove', 'Remove')) +
+        '</button>';
       previewEl.querySelector('.btn-remove-media').addEventListener('click', () => {
         dataEl.value = '';
         previewEl.innerHTML = '';
         document.getElementById('entry-video').value = '';
       });
     } catch (err) {
-      previewEl.innerHTML = '<span class="media-error">Error while loading.</span>';
+      previewEl.innerHTML =
+        '<span class="media-error">' +
+        escapeHtml(T('app.media.loadError', 'Error while loading.')) +
+        '</span>';
     }
   });
 
@@ -7037,9 +7670,11 @@ function initFirebaseSync() {
         requireNoteDefault: false,
       });
     } catch (err) {
-      const msg = (err && err.message) || 'Could not save journal entry.';
+      const msg = (err && err.message) || T('app.entry.saveFailed', 'Could not save journal entry.');
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
-        DnevnikNotifications.toast(msg, msg.indexOf('Choose a plant') === 0 ? 'warn' : 'error');
+        // Tone comes off the error code — the message is translated, so matching
+        // its text would only work in English.
+        DnevnikNotifications.toast(msg, err && err.code === 'no-plant' ? 'warn' : 'error');
       } else {
         alert(msg);
       }
@@ -7117,12 +7752,16 @@ function initFirebaseSync() {
     if (tool === 'watering') {
       type = 'zalijevanje';
       const ml = item.value1 != null && String(item.value1).trim() !== '' ? String(item.value1).trim() + ' mL' : '';
-      note = ml ? ml + ' (via Tools)' : 'Watering logged via Tools';
+      note = ml
+        ? T('app.tools.noteVia', '{note} (via Tools)', { note: ml })
+        : T('app.tools.wateringLogged', 'Watering logged via Tools');
       metaExtra = { amountMl: item.value1 || null };
     } else if (tool === 'feeding') {
       type = 'gnojidba';
       const parts = [item.value1, item.value2].filter(Boolean).map(String);
-      note = (parts.length ? parts.join(' — ') : 'Feeding') + ' (via Tools)';
+      note = T('app.tools.noteVia', '{note} (via Tools)', {
+        note: parts.length ? parts.join(' — ') : T('app.entryType.feeding', 'Feeding'),
+      });
       metaExtra = { product: item.value1 || null, detail: item.value2 || null };
     } else if (tool === 'environment') {
       type = 'okolis';
@@ -7130,7 +7769,9 @@ function initFirebaseSync() {
       if (item.value1) bits.push(String(item.value1) + '°C');
       if (item.value2) bits.push(String(item.value2) + '% RH');
       if (item.value3) bits.push('pH ' + String(item.value3));
-      note = (bits.length ? bits.join(' · ') : 'Environment reading') + ' (via Tools)';
+      note = T('app.tools.noteVia', '{note} (via Tools)', {
+        note: bits.length ? bits.join(' · ') : T('app.tools.environmentReading', 'Environment reading'),
+      });
       metaExtra = {
         temperatureC: item.value1 || null,
         humidityPct: item.value2 || null,
@@ -7139,10 +7780,14 @@ function initFirebaseSync() {
     } else if (tool === 'transplant') {
       type = 'presadjivanje';
       const bits = [];
-      if (item.soilQuality) bits.push('Soil: ' + item.soilQuality);
-      if (item.plantAge) bits.push('Age: ' + item.plantAge);
-      if (item.plantCondition) bits.push('Condition: ' + item.plantCondition);
-      note = (bits.length ? bits.join(' · ') : 'Transplant') + ' (via Tools)';
+      if (item.soilQuality)
+        bits.push(T('app.tools.soilShort', 'Soil: {value}', { value: item.soilQuality }));
+      if (item.plantAge) bits.push(T('app.tools.ageShort', 'Age: {value}', { value: item.plantAge }));
+      if (item.plantCondition)
+        bits.push(T('app.tools.conditionShort', 'Condition: {value}', { value: item.plantCondition }));
+      note = T('app.tools.noteVia', '{note} (via Tools)', {
+        note: bits.length ? bits.join(' · ') : T('app.tools.transplant', 'Transplant'),
+      });
       metaExtra = {
         presadjivanje: {
           soilQuality: item.soilQuality || null,
@@ -7153,11 +7798,15 @@ function initFirebaseSync() {
     } else if (tool === 'stressors') {
       type = 'stresori';
       const bits = [];
-      if (item.temperature) bits.push('Temp: ' + item.temperature);
-      if (item.humidity) bits.push('Humidity: ' + item.humidity);
-      if (item.vpd) bits.push('VPD: ' + item.vpd);
-      if (item.pests) bits.push('Pests: ' + item.pests);
-      note = (bits.length ? bits.join(' · ') : 'Stressor note') + ' (via Tools)';
+      if (item.temperature)
+        bits.push(T('app.tools.tempShort', 'Temp: {value}', { value: item.temperature }));
+      if (item.humidity)
+        bits.push(T('app.entry.humidity', 'Humidity: {value}', { value: item.humidity }));
+      if (item.vpd) bits.push(T('app.entry.vpd', 'VPD: {value}', { value: item.vpd }));
+      if (item.pests) bits.push(T('app.entry.pests', 'Pests: {value}', { value: item.pests }));
+      note = T('app.tools.noteVia', '{note} (via Tools)', {
+        note: bits.length ? bits.join(' · ') : T('app.tools.stressorNote', 'Stressor note'),
+      });
       metaExtra = {
         stresori: {
           temperature: item.temperature || null,
@@ -7190,7 +7839,8 @@ function initFirebaseSync() {
       console.warn('Tools → Journal mirror failed', err);
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
         DnevnikNotifications.toast(
-          (err && err.message) || 'Saved in Tools, but journal trail did not update.',
+          (err && err.message) ||
+            T('app.tools.mirrorFailed', 'Saved in Tools, but journal trail did not update.'),
           'warn'
         );
       }
@@ -7244,13 +7894,17 @@ function initFirebaseSync() {
     ['tool-watering-value2', 'tool-feeding-plant', 'tool-environment-plant', 'tool-transplant-plant', 'tool-stressors-plant'].forEach((id) => {
       const sel = document.getElementById(id);
       if (!sel) return;
-      const first = sel.options[0] ? sel.options[0].outerHTML : '<option value="">-- Select a plant --</option>';
+      const first = sel.options[0]
+        ? sel.options[0].outerHTML
+        : '<option value="">' + escapeHtml(T('app.tools.selectPlant', '-- Select a plant --')) + '</option>';
       sel.innerHTML = first + options;
     });
 
     const graphsSel = document.getElementById('tool-graphs-plant');
     if (graphsSel) {
-      const first = graphsSel.options[0] ? graphsSel.options[0].outerHTML : '<option value="">All plants</option>';
+      const first = graphsSel.options[0]
+        ? graphsSel.options[0].outerHTML
+        : '<option value="">' + escapeHtml(T('app.tools.allPlants', 'All plants')) + '</option>';
       graphsSel.innerHTML = first + options;
     }
   }
@@ -7269,14 +7923,17 @@ function initFirebaseSync() {
     const data = getToolboxData()[tool] || [];
     data.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     if (data.length === 0) {
-      listEl.innerHTML = '<p class="toolbox-empty">No entries yet. Add the first one.</p>';
+      listEl.innerHTML =
+        '<p class="toolbox-empty">' +
+        escapeHtml(T('app.tools.listEmpty', 'No entries yet. Add the first one.')) +
+        '</p>';
       return;
     }
     const plants = getPlants();
     const plantById = new Map(plants.map((p) => [p.id, p.name]));
     const plantLabel = (plantId) => {
       if (!plantId) return '—';
-      return plantById.get(plantId) || 'Plant';
+      return plantById.get(plantId) || T('app.tools.plantFallback', 'Plant');
     };
     listEl.innerHTML = data
       .map((item) => {
@@ -7300,18 +7957,51 @@ function initFirebaseSync() {
             escapeHtml(plantLabel(item.plantId));
         } else if (tool === 'transplant') {
           const parts = [];
-          if (item.soilQuality) parts.push('Soil quality: ' + escapeHtml(String(item.soilQuality)));
-          if (item.plantAge) parts.push('Age: ' + escapeHtml(String(item.plantAge)));
-          if (item.plantCondition) parts.push('Condition: ' + escapeHtml(String(item.plantCondition)));
-          parts.push('Plant: ' + escapeHtml(plantLabel(item.plantId)));
+          if (item.soilQuality)
+            parts.push(
+              escapeHtml(
+                T('app.entry.soilQuality', 'Soil quality: {value}', { value: String(item.soilQuality) })
+              )
+            );
+          if (item.plantAge)
+            parts.push(
+              escapeHtml(T('app.tools.ageShort', 'Age: {value}', { value: String(item.plantAge) }))
+            );
+          if (item.plantCondition)
+            parts.push(
+              escapeHtml(
+                T('app.tools.conditionShort', 'Condition: {value}', {
+                  value: String(item.plantCondition),
+                })
+              )
+            );
+          parts.push(
+            escapeHtml(T('app.tools.plantLabel', 'Plant: {name}', { name: plantLabel(item.plantId) }))
+          );
           valuesStr = parts.join(' · ') || '-';
         } else if (tool === 'stressors') {
           const parts = [];
-          if (item.temperature) parts.push('Temperature: ' + escapeHtml(String(item.temperature)));
-          if (item.humidity) parts.push('Humidity: ' + escapeHtml(String(item.humidity)));
-          if (item.vpd) parts.push('VPD: ' + escapeHtml(String(item.vpd)));
-          if (item.pests) parts.push('Pests: ' + escapeHtml(String(item.pests)));
-          parts.push('Plant: ' + escapeHtml(plantLabel(item.plantId)));
+          if (item.temperature)
+            parts.push(
+              escapeHtml(
+                T('app.entry.temperature', 'Temperature: {value}', {
+                  value: String(item.temperature),
+                })
+              )
+            );
+          if (item.humidity)
+            parts.push(
+              escapeHtml(T('app.entry.humidity', 'Humidity: {value}', { value: String(item.humidity) }))
+            );
+          if (item.vpd)
+            parts.push(escapeHtml(T('app.entry.vpd', 'VPD: {value}', { value: String(item.vpd) })));
+          if (item.pests)
+            parts.push(
+              escapeHtml(T('app.entry.pests', 'Pests: {value}', { value: String(item.pests) }))
+            );
+          parts.push(
+            escapeHtml(T('app.tools.plantLabel', 'Plant: {name}', { name: plantLabel(item.plantId) }))
+          );
           valuesStr = parts.join(' · ') || '-';
         } else {
           valuesStr = escapeHtml(String(item.value1 || '')) + (item.value2 ? ' · ' + escapeHtml(String(item.value2)) : '');
@@ -7320,10 +8010,12 @@ function initFirebaseSync() {
           '<div class="toolbox-list-item" data-id="' +
           item.id +
           '"><span class="toolbox-list-date">' +
-          (item.date ? new Date(item.date).toLocaleDateString('en-GB') : '') +
+          (item.date ? new Date(item.date).toLocaleDateString(intlTag()) : '') +
           '</span><span class="toolbox-list-values">' +
           valuesStr +
-          '</span><button type="button" class="toolbox-list-delete" aria-label="Delete">×</button></div>'
+          '</span><button type="button" class="toolbox-list-delete" aria-label="' +
+          escapeHtml(T('app.entry.delete', 'Delete')) +
+          '">×</button></div>'
         );
       })
       .join('');
@@ -7331,7 +8023,15 @@ function initFirebaseSync() {
       btn.addEventListener('click', () => {
         if (blockAdminWrite()) return;
         const id = btn.closest('.toolbox-list-item').dataset.id;
-        if (!confirm('Delete this Tools log?\n\nYou can undo for a few seconds after.')) return;
+        if (
+          !confirm(
+            T(
+              'app.tools.deleteConfirm',
+              'Delete this Tools log?\n\nYou can undo for a few seconds after.'
+            )
+          )
+        )
+          return;
         const data = getToolboxData();
         const removed = (data[tool] || []).find((x) => x.id === id);
         if (!removed) return;
@@ -7341,7 +8041,7 @@ function initFirebaseSync() {
         renderToolboxList(tool);
         const chartEl = document.getElementById('toolbox-chart-' + tool);
         if (chartEl) renderToolboxChart(tool, chartEl);
-        showUndoToast('Tools log deleted — undo available', () => {
+        showUndoToast(T('app.tools.deletedUndo', 'Tools log deleted — undo available'), () => {
           const next = getToolboxData();
           next[tool] = (next[tool] || []).concat([snapshot]);
           setToolboxData(next);
@@ -7376,7 +8076,10 @@ function initFirebaseSync() {
       : sortedAll;
 
     if (sorted.length === 0) {
-      container.innerHTML = '<p class="toolbox-chart-empty">No data for the chart.</p>';
+      container.innerHTML =
+        '<p class="toolbox-chart-empty">' +
+        escapeHtml(T('app.tools.chartEmpty', 'No data for the chart.')) +
+        '</p>';
       return;
     }
     const numVal = (v) => (v === '' || v === null || v === undefined ? 0 : Number(v));
@@ -7388,7 +8091,8 @@ function initFirebaseSync() {
           .map((x) => {
             const val = numVal(x.value1);
             const pct = Math.round((val / max) * 100);
-            const label = x.date ? new Date(x.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+            const label = x.date ? new Date(x.date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short' }) : '';
+            // i18n-ignore — bar units (mL, °C, %, pH) are symbols, not copy
             return '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' + label + '</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill" style="width:' + pct + '%"></div></div><span class="toolbox-bar-value">' + val + ' mL</span></div>';
           })
           .join('') +
@@ -7409,7 +8113,8 @@ function initFirebaseSync() {
             const h = numVal(x.value2);
             const ph = numVal(x.value3);
             const pctT = Math.round((t / maxT) * 100);
-            const label = x.date ? new Date(x.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+            const label = x.date ? new Date(x.date).toLocaleDateString(intlTag(), { day: 'numeric', month: 'short' }) : '';
+            // i18n-ignore — bar units (°C, %, pH) are symbols, not copy
             let row =
               '<div class="toolbox-bar-item"><span class="toolbox-bar-label">' +
               label +
@@ -7425,6 +8130,7 @@ function initFirebaseSync() {
               '</div>';
             if (hasPh && ph > 0 && maxPh >= 1) {
               const pctPh = Math.round((ph / 14) * 100);
+              // i18n-ignore — pH scale label and unit
               row +=
                 '<div class="toolbox-bar-item toolbox-bar-item-ph"><span class="toolbox-bar-label">pH</span><div class="toolbox-bar-track"><div class="toolbox-bar-fill toolbox-bar-fill-ph" style="width:' +
                 pctPh +
@@ -7442,7 +8148,7 @@ function initFirebaseSync() {
       container.innerHTML =
         '<div class="toolbox-timeline-list">' +
         sorted
-          .map((x) => '<div class="toolbox-timeline-item"><span class="toolbox-list-date">' + (x.date ? new Date(x.date).toLocaleDateString('en-GB') : '') + '</span> ' + escapeHtml(String(x.value1 || '')) + (x.value2 ? ' – ' + escapeHtml(String(x.value2)) : '') + '</div>')
+          .map((x) => '<div class="toolbox-timeline-item"><span class="toolbox-list-date">' + (x.date ? new Date(x.date).toLocaleDateString(intlTag()) : '') + '</span> ' + escapeHtml(String(x.value1 || '')) + (x.value2 ? ' – ' + escapeHtml(String(x.value2)) : '') + '</div>')
           .join('') +
         '</div>';
     }
@@ -7614,9 +8320,10 @@ document.addEventListener("click", (e) => {
 
   function createPlantProgrammatic(opts) {
     const o = opts || {};
-    if (blockAdminWrite()) throw new Error('Writes are disabled for this account.');
+    if (blockAdminWrite())
+      throw new Error(T('app.write.disabled', 'Writes are disabled for this account.'));
     const name = String(o.name || '').trim();
-    if (!name) throw new Error('Plant name is required.');
+    if (!name) throw new Error(T('app.plants.nameRequired', 'Plant name is required.'));
     const newId = uuid();
     const stage = canonicalPlantStage(o.stage || 'klijanje');
     const day0 = o.startDate || localDateYYYYMMDD();
@@ -7651,7 +8358,11 @@ document.addEventListener("click", (e) => {
     saveJournalEntry({
       plantId: newId,
       type: 'faza',
-      note: 'Grow started — stage: ' + (STAGES[stage] || stage) + ' (via Grower Coach)',
+      note: T('app.coach.noteVia', '{note} (via Grower Coach)', {
+        note: T('app.note.growStarted', 'Grow started — stage: {stage}', {
+          stage: stageName(stage),
+        }),
+      }),
       date: day0,
       meta: { faza: { from: null, to: stage } },
       source: 'ai-coach',
@@ -7661,10 +8372,11 @@ document.addEventListener("click", (e) => {
   }
 
   function setPlantStageProgrammatic(plantId, stage, note) {
-    if (blockWrite({ plantId: plantId })) throw new Error('Cannot edit this plant.');
+    if (blockWrite({ plantId: plantId }))
+      throw new Error(T('app.write.cannotEditPlant', 'Cannot edit this plant.'));
     const plants = getPlants();
     const idx = plants.findIndex((p) => p && String(p.id) === String(plantId));
-    if (idx < 0) throw new Error('Plant not found.');
+    if (idx < 0) throw new Error(T('app.plants.notFound', 'Plant not found.'));
     const prev = plants[idx];
     const newStage = canonicalPlantStage(stage);
     const oldStage = canonicalPlantStage(prev.stage);
@@ -7683,15 +8395,16 @@ document.addEventListener("click", (e) => {
     });
     plants[idx] = updated;
     setPlants(plants);
-    const base =
-      'Stage transition: ' +
-      (STAGES[oldStage] || oldStage) +
-      ' → ' +
-      (STAGES[newStage] || newStage);
+    const base = T('app.note.stageTransition', 'Stage transition: {from} → {to}', {
+      from: stageName(oldStage),
+      to: stageName(newStage),
+    });
     saveJournalEntry({
       plantId: String(plantId),
       type: 'faza',
-      note: (note ? base + '. ' + String(note) : base) + ' (via Grower Coach)',
+      note: T('app.coach.noteVia', '{note} (via Grower Coach)', {
+        note: note ? base + '. ' + String(note) : base,
+      }),
       date: td,
       meta: { faza: { from: oldStage, to: newStage } },
       source: 'ai-coach',
@@ -7717,19 +8430,29 @@ document.addEventListener("click", (e) => {
    *   silent?: boolean
    * }} opts
    */
+  /* Carries a code so callers can pick a tone without matching translated text. */
+  function noPlantError() {
+    const err = new Error(
+      T('app.entry.choosePlantFirst', 'Choose a plant before saving the entry.')
+    );
+    err.code = 'no-plant';
+    return err;
+  }
+
   function saveJournalEntry(opts) {
     const o = opts || {};
     const plantId = o.plantId || null;
-    if (blockWrite({ plantId: plantId })) throw new Error('Cannot add entry for this plant.');
-    if (!plantId) throw new Error('Choose a plant before saving the entry.');
+    if (blockWrite({ plantId: plantId }))
+      throw new Error(T('app.write.cannotAddEntry', 'Cannot add entry for this plant.'));
+    if (!plantId) throw noPlantError();
     const plant = getPlants().find((p) => p && String(p.id) === String(plantId));
-    if (!plant) throw new Error('Plant not found.');
+    if (!plant) throw new Error(T('app.plants.notFound', 'Plant not found.'));
 
     const type = String(o.type || o.entryType || 'opcenito').trim() || 'opcenito';
     // Modal may save an empty General note; coach/quick-log omit note → default copy.
     let note = '';
     if (o.note === undefined || o.note === null) {
-      note = o.requireNoteDefault === false ? '' : 'Logged via Grower Coach';
+      note = o.requireNoteDefault === false ? '' : T('app.coach.loggedVia', 'Logged via Grower Coach');
     } else {
       note = String(o.note).trim();
     }
@@ -7750,12 +8473,12 @@ document.addEventListener("click", (e) => {
 
     const next = getEntries().concat([entry]);
     if (!setEntries(next)) {
-      throw new Error('Could not save journal entry.');
+      throw new Error(T('app.entry.saveFailed', 'Could not save journal entry.'));
     }
     // Second confirm: field-level match after an independent storage re-read.
     const landed = verifyEntryLanded(entry);
     if (!landed) {
-      throw new Error('Entry did not save. Please try again.');
+      throw new Error(T('app.entry.saveRetry', 'Entry did not save. Please try again.'));
     }
 
     if (window.GrowerQuests && typeof GrowerQuests.awardXpOncePerDay === 'function') {
@@ -7824,7 +8547,7 @@ document.addEventListener("click", (e) => {
     const o = opts || {};
     const plants = loggablePlants();
     const ids = normalizeSelectedPlantIds(plantIds || [], plants.length ? plants : getPlants());
-    if (!ids.length) throw new Error('Choose a plant before saving the entry.');
+    if (!ids.length) throw noPlantError();
 
     const landed = [];
     ids.forEach(function (id) {
@@ -7844,10 +8567,9 @@ document.addEventListener("click", (e) => {
 
     if (!o.silent && window.DnevnikNotifications) {
       try {
-        const typeLabel =
-          typeof ENTRY_TYPE_LABELS !== 'undefined' && ENTRY_TYPE_LABELS[o.type]
-            ? ENTRY_TYPE_LABELS[o.type]
-            : o.type || 'Entry';
+        const typeLabel = ENTRY_TYPE_LABELS[o.type]
+          ? entryTypeName(o.type)
+          : o.type || T('app.entryType.entry', 'Entry');
         if (ids.length === 1) {
           const plant = getPlants().find(function (p) {
             return p && String(p.id) === String(ids[0]);
@@ -7857,7 +8579,10 @@ document.addEventListener("click", (e) => {
           }
         } else if (typeof DnevnikNotifications.toast === 'function') {
           DnevnikNotifications.toast(
-            'Logged ' + typeLabel + ' for ' + ids.length + ' plants',
+            T('app.entry.loggedForPlants', 'Logged {type} for {count} plants', {
+              type: typeLabel,
+              count: ids.length,
+            }),
             'success'
           );
         }

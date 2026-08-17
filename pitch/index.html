@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>growtoo — Which deck?</title>
+    <title data-i18n="pitch.meta.title">growtoo — Which deck?</title>
     <meta name="description" content="Pick the growtoo deck that matches the room: grower, adopter, investor, or due diligence." />
     <link rel="canonical" href="https://growto.live/pitch/" />
     <meta name="robots" content="noindex" />
@@ -13,8 +13,10 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,pitch"></script>
     <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260806a" />
     <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260806a" />
+  <link rel="stylesheet" href="../styles/i18n.css?v=20260816a" />
     <style>
       html { scroll-snap-type: none; }
       .chooser { max-width: var(--maxw); margin: 0 auto; padding: 80px 40px 100px; }
@@ -45,73 +47,74 @@
 
     <main class="chooser">
       <header class="chooser-head">
-        <span class="kicker">growtoo · decks</span>
-        <h1>Which room are you <span class="grad">walking into?</span></h1>
-        <p class="slide-remark">
+        <span data-i18n="pitch.span" class="kicker">growtoo · decks</span>
+        <h1 data-i18n-html="pitch.h1">Which room are you <span class="grad">walking into?</span></h1>
+        <p data-i18n="pitch.p" class="slide-remark">
           Five decks, same product, different order of arguments. Every one opens with the spoken line that
           matches it and closes with a single sentence to end on.
         </p>
+      <div class="nav-lang" data-i18n-switcher></div>
       </header>
 
       <div class="chooser-grid">
         <a class="deck-card" href="grower/">
-          <span class="who">Growers · communities · expos</span>
-          <h2>Grower deck</h2>
-          <p>
+          <span data-i18n="pitch.span2" class="who">Growers · communities · expos</span>
+          <h2 data-i18n="pitch.h2">Grower deck</h2>
+          <p data-i18n="pitch.p2">
             Journal only. The problem, what you get today, a day in the app, and one low-key slide on optional
             proof. Crypto never leads.
           </p>
-          <p class="open-line">“It’s a free journal for cannabis growers — all in one place.”</p>
-          <p class="len">7 slides · 5–7 min</p>
+          <p data-i18n="pitch.p3" class="open-line">“It’s a free journal for cannabis growers — all in one place.”</p>
+          <p data-i18n="pitch.p4" class="len">7 slides · 5–7 min</p>
         </a>
 
         <a class="deck-card" href="adopter/">
-          <span class="who">Plant followers · RWA-curious</span>
-          <h2>Adopter deck</h2>
-          <p>
+          <span data-i18n="pitch.span3" class="who">Plant followers · RWA-curious</span>
+          <h2 data-i18n="pitch.h22">Adopter deck</h2>
+          <p data-i18n="pitch.p5">
             What adoption actually is, how to follow a grow, four real transactions to open, and an honest
             limits slide before any ask.
           </p>
-          <p class="open-line">“Own the story of a real plant.”</p>
-          <p class="len">7 slides · 6–8 min</p>
+          <p data-i18n="pitch.p6" class="open-line">“Own the story of a real plant.”</p>
+          <p data-i18n="pitch.p7" class="len">7 slides · 6–8 min</p>
         </a>
 
         <a class="deck-card" href="investor/">
-          <span class="who">Investors · partners</span>
-          <h2>Investor deck</h2>
-          <p>
+          <span data-i18n="pitch.span4" class="who">Investors · partners</span>
+          <h2 data-i18n="pitch.h23">Investor deck</h2>
+          <p data-i18n="pitch.p8">
             The gap in RWA, why journal-first is the strategy, the built stack, an honest live/devnet/mocked
             table, economics, timing, roadmap, team.
           </p>
-          <p class="open-line">“Everyone tokenises a promise. We tokenise a paper trail.”</p>
-          <p class="len">10 slides · 10–12 min</p>
+          <p data-i18n="pitch.p9" class="open-line">“Everyone tokenises a promise. We tokenise a paper trail.”</p>
+          <p data-i18n="pitch.p10" class="len">10 slides · 10–12 min</p>
         </a>
 
         <a class="deck-card" href="skeptic/">
-          <span class="who">Skeptics · due diligence</span>
-          <h2>Due diligence deck</h2>
-          <p>
+          <span data-i18n="pitch.span5" class="who">Skeptics · due diligence</span>
+          <h2 data-i18n="pitch.h24">Due diligence deck</h2>
+          <p data-i18n="pitch.p11">
             Limits first: what we don’t claim, who you have to trust today, where that trust moves, the risk
             list, and how to verify everything yourself.
           </p>
-          <p class="open-line">“Check it. Don’t trust it.”</p>
-          <p class="len">8 slides · 8–10 min</p>
+          <p data-i18n="pitch.p12" class="open-line">“Check it. Don’t trust it.”</p>
+          <p data-i18n="pitch.p13" class="len">8 slides · 8–10 min</p>
         </a>
 
         <a class="deck-card" href="superteam/">
-          <span class="who">Superteam Balkan · grants</span>
-          <h2>Superteam deck</h2>
-          <p>
+          <span data-i18n="pitch.span6" class="who">Superteam Balkan · grants</span>
+          <h2 data-i18n="pitch.h25">Superteam deck</h2>
+          <p data-i18n="pitch.p14">
             For a Solana-native room. The gamification is the mint gate, the adopter stake, what is actually
             on devnet with addresses, why this needs a chain at all — and a status slide that says what is not
             done.
           </p>
-          <p class="open-line">“You can’t buy your way to a mint here.”</p>
-          <p class="len">12 slides · 10–12 min</p>
+          <p data-i18n="pitch.p15" class="open-line">“You can’t buy your way to a mint here.”</p>
+          <p data-i18n="pitch.p16" class="len">12 slides · 10–12 min</p>
         </a>
       </div>
 
-      <p class="footnote">
+      <p data-i18n-html="pitch.p17" class="footnote">
         Full technical deck: <a href="/app/pitch-deck/">Growtoo — technical overview</a> ·
         Live product: <a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a><br />
         Keyboard in every deck: <strong>→ / ←</strong> to move, <strong>F</strong> for fullscreen,

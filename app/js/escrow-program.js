@@ -30,7 +30,10 @@
 
   function programId(web3) {
     const id = cfg().escrowProgramId;
-    if (!id) throw new Error('Escrow program id is not configured.');
+    if (!id) {
+      // i18n-ignore — a deploy misconfiguration, not grower-facing.
+      throw new Error('Escrow program id is not configured.');
+    }
     return new web3.PublicKey(id);
   }
 
@@ -87,7 +90,10 @@
 
   function friendlyExpiredError() {
     return new Error(
-      'Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try again.'
+      T(
+        'app.escrow.expired',
+        'Wallet approval took too long and the Solana transaction expired. Approve within about a minute, then try again.'
+      )
     );
   }
 
@@ -97,14 +103,24 @@
     const blob = msg + '\n' + logs;
     if (/MissingNft|6003|0x1773/i.test(blob)) {
       return new Error(
-        'This connected wallet does not hold that NFT. Switch to the wallet that received the mint, or cancel an existing escrow listing if the NFT is already locked in the market vault.'
+        T(
+          'app.escrow.missingNft',
+          'This connected wallet does not hold that NFT. Switch to the wallet that received the mint, or cancel an existing escrow listing if the NFT is already locked in the market vault.'
+        )
       );
     }
     if (/ListingNotActive|6000/i.test(blob)) {
-      return new Error('That on-chain listing is not active. Refresh the market and try again.');
+      return new Error(
+        T(
+          'app.escrow.notActive',
+          'That on-chain listing is not active. Refresh the market and try again.'
+        )
+      );
     }
     if (/SellerMismatch/i.test(blob)) {
-      return new Error('Connected wallet is not the seller on this listing.');
+      return new Error(
+        T('app.escrow.sellerMismatch', 'Connected wallet is not the seller on this listing.')
+      );
     }
     if (
       /expected this account to be already initialized|AccountNotInitialized|AccountOwnedByWrongProgram/i.test(
@@ -112,12 +128,18 @@
       )
     ) {
       return new Error(
-        'Your wallet still needs a $GROWTOO token account funded on Devnet. Claim the adopter test faucet on Market, then try Invest again.'
+        T(
+          'app.escrow.needsTokenAccount',
+          'Your wallet still needs a $GROWTOO token account funded on Devnet. Claim the adopter test faucet on Market, then try Invest again.'
+        )
       );
     }
     if (/insufficient|0x1\b|custom program error: 0x1/i.test(blob)) {
       return new Error(
-        'Not enough $GROWTOO in this wallet for that ask price on Devnet. Top up and try again.'
+        T(
+          'app.escrow.insufficient',
+          'Not enough $GROWTOO in this wallet for that ask price on Devnet. Top up and try again.'
+        )
       );
     }
     if (/simulation failed|SendTransactionError/i.test(msg) && logs) {
@@ -129,9 +151,11 @@
 
   function friendlyConfirmTimeoutError(signature) {
     const err = new Error(
-      'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: ' +
-        signature +
-        '. Refresh and check whether the NFT / listing already moved before trying again.'
+      T(
+        'app.escrow.confirmTimeout',
+        'Transaction was sent but confirmation timed out on the public Devnet RPC. Signature: {signature}. Refresh and check whether the NFT / listing already moved before trying again.',
+        { signature: signature }
+      )
     );
     err.signature = signature;
     return err;
@@ -164,7 +188,11 @@
       const status = await readSignatureStatus(connection, signature);
       if (status) {
         if (status.err) {
-          throw new Error('Transaction failed on-chain: ' + JSON.stringify(status.err));
+          throw new Error(
+            T('app.tx.failedOnChain', 'Transaction failed on-chain: {reason}', {
+              reason: JSON.stringify(status.err),
+            })
+          );
         }
         const conf = status.confirmationStatus;
         if (conf === 'confirmed' || conf === 'finalized' || status.confirmations != null) {
@@ -185,7 +213,9 @@
 
   async function sendSignedTx(buildTx) {
     const SW = window.SolanaWallet;
-    if (!SW || !SW.isConnected()) throw new Error('Wallet not connected.');
+    if (!SW || !SW.isConnected()) {
+        throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+      }
 
     const web3 = await loadWeb3();
     const connection = await SW.getConnection();
@@ -238,11 +268,17 @@
     const vaultHeld = await window.SplTransfer.getRawBalanceOf(listing.toBase58(), mint.toBase58());
     if (vaultHeld >= 1n) {
       throw new Error(
-        'This NFT is already locked in the market escrow vault. Cancel that listing (or wait for settle) before posting again.'
+        T(
+          'app.escrow.alreadyLocked',
+          'This NFT is already locked in the market escrow vault. Cancel that listing (or wait for settle) before posting again.'
+        )
       );
     }
     throw new Error(
-      'This connected wallet does not hold that NFT (MissingNft). Connect the wallet that owns it, then try again.'
+      T(
+        'app.escrow.missingNftShort',
+        'This connected wallet does not hold that NFT (MissingNft). Connect the wallet that owns it, then try again.'
+      )
     );
   }
 
@@ -305,7 +341,10 @@
     const exists = await accountExists(connection, buyerGrow);
     if (!exists) {
       throw new Error(
-        'This wallet has no $GROWTOO yet on Devnet. Claim the test faucet on Market (adopter), then Invest again.'
+        T(
+          'app.escrow.noGrowtoo',
+          'This wallet has no $GROWTOO yet on Devnet. Claim the test faucet on Market (adopter), then Invest again.'
+        )
       );
     }
     const bal = await connection.getTokenAccountBalance(buyerGrow, 'confirmed');
@@ -313,11 +352,11 @@
     const need = Number(priceWhole || 0);
     if (ui < need) {
       throw new Error(
-        'Not enough $GROWTOO for this ask. Need ' +
-          need +
-          ', wallet has ' +
-          ui +
-          ' on Devnet.'
+        T(
+          'app.escrow.needMore',
+          'Not enough $GROWTOO for this ask. Need {need}, wallet has {have} on Devnet.',
+          { need: need, have: ui }
+        )
       );
     }
     return { buyerGrow, growMint, decimals };
@@ -387,7 +426,9 @@
 
     async listNft(mintAddress, priceWhole) {
       const SW = window.SolanaWallet;
-      if (!SW || !SW.isConnected()) throw new Error('Wallet not connected.');
+      if (!SW || !SW.isConnected()) {
+        throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+      }
       const web3 = await loadWeb3();
       const seller = new web3.PublicKey(SW.getPublicKey());
       const mint = new web3.PublicKey(mintAddress);
@@ -413,8 +454,11 @@
 
     async buyListing(listing) {
       const SW = window.SolanaWallet;
-      if (!SW || !SW.isConnected()) throw new Error('Wallet not connected.');
+      if (!SW || !SW.isConnected()) {
+        throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+      }
       if (!listing || !listing.mintAddress || !listing.sellerPubkey) {
+        // i18n-ignore — malformed data, surfaced only in diagnostics.
         throw new Error('Listing is missing mint or seller pubkey.');
       }
       const web3 = await loadWeb3();
@@ -451,8 +495,11 @@
 
     async cancelListing(listing) {
       const SW = window.SolanaWallet;
-      if (!SW || !SW.isConnected()) throw new Error('Wallet not connected.');
+      if (!SW || !SW.isConnected()) {
+        throw new Error(T('app.tx.walletNotConnected', 'Wallet not connected.'));
+      }
       if (!listing || !listing.mintAddress) {
+        // i18n-ignore — malformed data, surfaced only in diagnostics.
         throw new Error('Listing is missing mint address.');
       }
       const web3 = await loadWeb3();

@@ -1,0 +1,97 @@
+{
+  "login-form": {
+    "p": "Privates Journal",
+    "label": "E-Mail",
+    "label2": "Passwort",
+    "div": "oder",
+    "div2": "<a href=\"../index.html\">← Zurück zur Startseite</a>"
+  },
+  "auth-title": {
+    "h1": "Bei growtoo anmelden"
+  },
+  "auth-lead": {
+    "p": "Willkommen zurück. Dein Grower- oder Adopter-Arbeitsbereich öffnet sich automatisch."
+  },
+  "tab-signin": {
+    "button": "Anmelden"
+  },
+  "tab-signup": {
+    "button": "Konto erstellen"
+  },
+  "pick-grower": {
+    "button": "<strong>Grower</strong> <span>Erst das kostenlose Journal. On-Chain-Nachweis, wenn du willst.</span>"
+  },
+  "pick-adopter": {
+    "button": "<strong>Adopter</strong> <span>Folge der Spur einer echten Pflanze. Krypto ist optional, bis du investierst.</span>"
+  },
+  "field-display-name": {
+    "label": "Anzeigename"
+  },
+  "password-toggle": {
+    "button": "Zeigen"
+  },
+  "password-hint": {
+    "p": "Mindestens 8 Zeichen. Nimm ein eigenes Passwort, das du nirgends sonst nutzt."
+  },
+  "signup-grower-fields": {
+    "p": "Grower-Einrichtung",
+    "label": "Grow-Setup",
+    "p2": "Legt Standardwerte für Pflanzen und Coaching fest.",
+    "label2": "Wohnort <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>",
+    "p3": "Wird nur für die Wettervorhersage unter Pflanzen genutzt — überspring es, wenn du indoor growst.",
+    "label3": "Grow-Stil <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>"
+  },
+  "grow-setup-choices": {
+    "button": "<strong>Indoor</strong> <span>Zelte &amp; Räume</span>",
+    "button2": "<strong>Outdoor</strong> <span>Feld &amp; Garten</span>",
+    "button3": "<strong>Gemischt</strong> <span>Beides</span>"
+  },
+  "field-profile-photo": {
+    "label": "Profilbild / Logo <span style=\"font-weight:500;color:var(--text-muted)\">(optional)</span>",
+    "p": "Erscheint in deinem Konto — quadratischer Zuschnitt passt am besten. JPEG oder PNG."
+  },
+  "profile-photo-clear": {
+    "button": "Entfernen"
+  },
+  "signup-adopter-fields": {
+    "p": "Adopter-Einrichtung",
+    "label": "Warum du hier bist",
+    "span": "Mir ist klar, dass hier das öffentliche Testnetz von Solana (Devnet) läuft — die Werte haben keinen Geldwert."
+  },
+  "adopter-intent-choices": {
+    "button": "<strong>Grower unterstützen</strong> <span>Der Pflegespur einer echten Pflanze folgen</span>",
+    "button2": "<strong>Einen Garten sammeln</strong> <span>Pflanzen-Token adoptieren und Phasen verfolgen</span>",
+    "button3": "<strong>Den Ablauf lernen</strong> <span>Einsätze mit Testwerten üben (ohne echten Wert)</span>"
+  },
+  "field-accept-consent": {
+    "span": "Ich bin <strong>18+</strong> und stimme den <a href=\"../terms/\" target=\"_blank\" rel=\"noopener noreferrer\">AGB</a> &amp; der <a href=\"../privacy/\" target=\"_blank\" rel=\"noopener noreferrer\">Datenschutzerklärung</a> zu."
+  },
+  "submit-btn": {
+    "button": "Anmelden"
+  },
+  "google-auth-label": {
+    "span": "Weiter mit Google"
+  },
+  "meta": {
+    "title": "Anmelden · growtoo"
+  },
+  "mode": {
+    "growerCta": "Journal kostenlos starten",
+    "growerLead": "Notiere Gießen, Düngen und Phasen. Der On-Chain-Nachweis ist optional — für den Start nie nötig.",
+    "adopterLead": "Folge der Journalspur einer Pflanze. Testnetz-Einsätze sind optional und haben keinen Geldwert.",
+    "signupTitle": "Konto erstellen",
+    "signupLead": "Grower starten mit dem Journal. Adopter folgen einer Pflanze. Wähl deinen Tisch.",
+    "googleSignup": "Mit Google registrieren"
+  },
+  "field": {
+    "namePlaceholder": "So erscheinst du in growtoo",
+    "emailPlaceholder": "du@email.com",
+    "cityPlaceholder": "z. B. Berlin",
+    "stylePlaceholder": "z. B. Autoflower, 4 Zelte"
+  },
+  "aria": {
+    "authMode": "Anmeldemodus",
+    "growSetup": "Grow-Setup",
+    "adopterIntent": "Adopter-Absicht"
+  }
+}

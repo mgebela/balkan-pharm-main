@@ -17,8 +17,10 @@
       'https://endpoints.omniatech.io/v1/sol/devnet/public',
       'https://api.devnet.solana.com',
     ],
-    networkLabel: 'Solana · devnet',
-    walletName: 'Solana wallet',
+    /* Read through T() at use time — this object is built at parse time,
+       before the dictionary lands. */
+    networkLabel: ['app.chain.networkLabel', 'Solana · devnet'],
+    walletName: ['app.chain.walletName', 'Solana wallet'],
     walletDownloadUrl: 'https://solana.com/solutions/wallets',
 
     // Deployed addresses (devnet) — filled in after chain/deploy scripts run.
@@ -53,8 +55,10 @@
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues',
     linkWalletUrl:
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/linkWallet',
-    devnetNotice:
+    devnetNotice: [
+      'app.chain.devnetNotice',
       'Connect a Solana wallet on the test network (Devnet). Seed NFTs mint via the cloud queue; $GROWTOO rewards settle on-chain. Test assets only.',
+    ],
     explorerAddress: function (address) {
       return 'https://solscan.io/account/' + encodeURIComponent(address) + '?cluster=devnet';
     },

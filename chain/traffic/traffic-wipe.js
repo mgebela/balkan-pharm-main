@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Wipe traffic batch: Auth users, user docs / app state, marketListings.
- * Only deletes documents tagged trafficAgent + trafficBatch.
+ * Wipe all synthetic traffic agents and the data they created.
+ * Deletes Auth users, user docs / app state, market listings, public journal,
+ * and related sim docs tagged trafficAgent / trafficBatch / traffic_listing_.
  *
  * Usage (from chain/): npm run traffic:wipe
  */
@@ -15,109 +16,151 @@ import {
 } from './helpers.js';
 import { TRAFFIC_BATCH } from './personas.js';
 
+async function tryDeleteQuery(db, query, label) {
+  try {
+    return await deleteQueryInChunks(db, query, label);
+  } catch (err) {
+    console.warn(`${label} wipe skipped`, err.message || err);
+    return 0;
+  }
+}
+
+async function deleteByIdPrefix(db, collection, prefix, label) {
+  const snap = await db.collection(collection).limit(500).get();
+  const doomed = snap.docs.filter((d) => String(d.id).startsWith(prefix));
+  if (!doomed.length) return 0;
+  const batch = db.batch();
+  doomed.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+  console.log(`  … deleted ${doomed.length} ${label} by id prefix ${prefix}`);
+  return doomed.length;
+}
+
+async function collectAgentUsers(db) {
+  const byId = new Map();
+  const addSnap = (snap) => {
+    snap.docs.forEach((d) => {
+      const data = d.data() || {};
+      const email = String(data.email || '');
+      if (data.trafficAgent === true || email.startsWith('traffic+')) {
+        byId.set(d.id, d);
+      }
+    });
+  };
+
+  try {
+    addSnap(await db.collection('users').where('trafficAgent', '==', true).get());
+  } catch (err) {
+    console.warn('users trafficAgent query skipped', err.message || err);
+  }
+  try {
+    addSnap(await db.collection('users').where('trafficBatch', '==', TRAFFIC_BATCH).get());
+  } catch (err) {
+    console.warn('users trafficBatch query skipped', err.message || err);
+  }
+
+  const creds = readCredsFile();
+  if (creds && Array.isArray(creds.accounts)) {
+    for (const account of creds.accounts) {
+      if (!account || !account.uid || byId.has(account.uid)) continue;
+      const ref = db.collection('users').doc(account.uid);
+      const doc = await ref.get();
+      if (doc.exists) byId.set(doc.id, doc);
+      else byId.set(account.uid, { id: account.uid, ref, data: () => ({ email: account.email || '' }) });
+    }
+  }
+
+  return [...byId.values()];
+}
+
+async function deleteUserTree(db, uid) {
+  for (const sub of ['app', 'notifications', 'growerPosts']) {
+    const snap = await db.collection('users').doc(uid).collection(sub).limit(400).get();
+    if (snap.empty) continue;
+    const batch = db.batch();
+    snap.docs.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  }
+
+  const rewards = await db
+    .collection('platformRewards')
+    .where('uid', '==', uid)
+    .limit(50)
+    .get()
+    .catch(() => null);
+  if (rewards && !rewards.empty) {
+    const batch = db.batch();
+    rewards.docs.forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  }
+}
+
 async function main() {
   const { db } = initTraffic();
-  console.log(`Traffic wipe · batch ${TRAFFIC_BATCH}`);
+  console.log(`Traffic wipe · all agents (batch tag ${TRAFFIC_BATCH})`);
 
-  // Listings first
-  const listingsDeleted = await deleteQueryInChunks(
-    db,
-    db.collection('marketListings').where('trafficBatch', '==', TRAFFIC_BATCH),
-    'marketListings'
-  );
+  const listingsDeleted =
+    (await tryDeleteQuery(
+      db,
+      db.collection('marketListings').where('trafficAgent', '==', true),
+      'marketListings(agent)'
+    )) +
+    (await tryDeleteQuery(
+      db,
+      db.collection('marketListings').where('trafficBatch', '==', TRAFFIC_BATCH),
+      'marketListings(batch)'
+    ));
 
-  let journalDeleted = 0;
-  try {
-    journalDeleted = await deleteQueryInChunks(
+  const journalDeleted =
+    (await tryDeleteQuery(
+      db,
+      db.collection('publicJournalPosts').where('trafficAgent', '==', true),
+      'publicJournalPosts(agent)'
+    )) +
+    (await tryDeleteQuery(
       db,
       db.collection('publicJournalPosts').where('trafficBatch', '==', TRAFFIC_BATCH),
-      'publicJournalPosts'
-    );
-  } catch (err) {
-    console.warn('publicJournalPosts wipe skipped', err.message || err);
-  }
+      'publicJournalPosts(batch)'
+    ));
 
-  let profilesDeleted = 0;
-  try {
-    profilesDeleted = await deleteQueryInChunks(
+  const profilesDeleted =
+    (await tryDeleteQuery(
+      db,
+      db.collection('publicGrowerProfiles').where('trafficAgent', '==', true),
+      'publicGrowerProfiles(agent)'
+    )) +
+    (await tryDeleteQuery(
       db,
       db.collection('publicGrowerProfiles').where('trafficBatch', '==', TRAFFIC_BATCH),
-      'publicGrowerProfiles'
-    );
-  } catch (err) {
-    console.warn('publicGrowerProfiles wipe skipped', err.message || err);
-  }
+      'publicGrowerProfiles(batch)'
+    ));
 
-  let claimsDeleted = 0;
-  try {
-    claimsDeleted = await deleteQueryInChunks(
-      db,
-      db.collection('publicSlugClaims').where('trafficBatch', '==', TRAFFIC_BATCH),
-      'publicSlugClaims'
-    );
-  } catch (err) {
-    console.warn('publicSlugClaims wipe skipped', err.message || err);
-  }
+  const claimsDeleted = await tryDeleteQuery(
+    db,
+    db.collection('publicSlugClaims').where('trafficBatch', '==', TRAFFIC_BATCH),
+    'publicSlugClaims'
+  );
 
-  // adoptStakes mirrors (if any were written by care sync)
-  let stakesDeleted = 0;
-  try {
-    stakesDeleted = await deleteQueryInChunks(
-      db,
-      db.collection('adoptStakes').where('trafficBatch', '==', TRAFFIC_BATCH),
-      'adoptStakes'
-    );
-  } catch {
-    // Collection may lack the field / index — fall through to uid-based cleanup below
-  }
+  let stakesDeleted = await tryDeleteQuery(
+    db,
+    db.collection('adoptStakes').where('trafficBatch', '==', TRAFFIC_BATCH),
+    'adoptStakes'
+  );
+  stakesDeleted += await deleteByIdPrefix(db, 'adoptStakes', 'traffic_listing_', 'adoptStakes');
+  const harvestDeleted = await deleteByIdPrefix(db, 'harvestClaims', 'traffic_listing_', 'harvestClaims');
 
-  const usersSnap = await db
-    .collection('users')
-    .where('trafficBatch', '==', TRAFFIC_BATCH)
-    .get();
-
-  const userDocs = usersSnap.docs.filter((d) => (d.data() || {}).trafficAgent === true);
-
+  const userDocs = await collectAgentUsers(db);
   console.log(`Users tagged: ${userDocs.length}`);
 
   for (const userDoc of userDocs) {
     const uid = userDoc.id;
     const email = (userDoc.data() || {}).email || '';
-
-    // Subcollections under users/{uid}
-    const appSnap = await db.collection('users').doc(uid).collection('app').get();
-    if (!appSnap.empty) {
-      const batch = db.batch();
-      appSnap.docs.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
+    await deleteUserTree(db, uid);
+    try {
+      await userDoc.ref.delete();
+    } catch (err) {
+      console.warn(`… user doc ${uid}: ${err.message || err}`);
     }
-
-    const notifSnap = await db
-      .collection('users')
-      .doc(uid)
-      .collection('notifications')
-      .limit(400)
-      .get();
-    if (!notifSnap.empty) {
-      const batch = db.batch();
-      notifSnap.docs.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
-    }
-
-    const postsSnap = await db
-      .collection('users')
-      .doc(uid)
-      .collection('growerPosts')
-      .limit(400)
-      .get();
-    if (!postsSnap.empty) {
-      const batch = db.batch();
-      postsSnap.docs.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
-    }
-
-    await userDoc.ref.delete();
-
     try {
       await deleteAuthUser(uid);
       console.log(`✔ deleted Auth ${email || uid}`);
@@ -126,29 +169,15 @@ async function main() {
     }
   }
 
-  // Orphan adoptStakes by listing id prefix if index missing
-  if (!stakesDeleted) {
-    const prefix = 'traffic_listing_';
-    const allActive = await db.collection('adoptStakes').limit(500).get();
-    const doomed = allActive.docs.filter((d) => String(d.id).startsWith(prefix));
-    if (doomed.length) {
-      const batch = db.batch();
-      doomed.forEach((d) => batch.delete(d.ref));
-      await batch.commit();
-      stakesDeleted = doomed.length;
-    }
-  }
-
   if (fs.existsSync(CREDS_PATH)) {
     fs.unlinkSync(CREDS_PATH);
     console.log(`✔ removed ${CREDS_PATH}`);
   } else {
-    const creds = readCredsFile();
-    if (!creds) console.log('… no creds file');
+    console.log('… no creds file');
   }
 
   console.log(
-    `Done · listings ${listingsDeleted} · journal ${journalDeleted} · profiles ${profilesDeleted} · claims ${claimsDeleted} · adoptStakes ${stakesDeleted} · users ${userDocs.length}`
+    `Done · listings ${listingsDeleted} · journal ${journalDeleted} · profiles ${profilesDeleted} · claims ${claimsDeleted} · adoptStakes ${stakesDeleted} · harvestClaims ${harvestDeleted} · users ${userDocs.length}`
   );
 }
 

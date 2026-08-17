@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>growtoo: Grow it again. Exactly.</title>
-  <meta name="description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
+  <title data-i18n="landing.meta.title">growtoo: Grow it again. Exactly.</title>
+  <meta name="description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <link rel="canonical" href="https://growto.live/" />
   <meta name="theme-color" content="#0f1a12" />
 
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="growtoo" />
   <meta property="og:url" content="https://growto.live/" />
-  <meta property="og:title" content="growtoo: Grow it again. Exactly." />
-  <meta property="og:description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
+  <meta property="og:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Grow it again. Exactly." />
+  <meta property="og:description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -20,8 +20,8 @@
   <meta property="og:locale" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="growtoo: Grow it again. Exactly." />
-  <meta name="twitter:description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
+  <meta name="twitter:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Grow it again. Exactly." />
+  <meta name="twitter:description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
   <meta name="twitter:image:alt" content="growtoo — grow it again. Journal, coach, optional proof." />
 
@@ -41,9 +41,11 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles/tokens.css?v=20260806t" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260813c" />
+  <script src="js/i18n.js?v=71748ff1e6" data-i18n-ns="common,landing"></script>
+  <link rel="stylesheet" href="styles/tokens.css?v=20260817p" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260817p" />
   <link rel="stylesheet" href="styles/trust-gates.css?v=20260731c" />
+  <link rel="stylesheet" href="styles/i18n.css?v=20260817p" />
   <link rel="icon" href="images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="images/growtoo-mark-brass.png?v=20260731a" />
   <script type="application/ld+json">
@@ -145,7 +147,7 @@
           <span class="logo-word">growtoo</span>
         </a>
         <a href="https://solana.com" target="_blank" rel="noopener noreferrer" class="powered-by-solana powered-by-solana--header">
-          <span class="powered-by-solana-label">Powered by</span>
+          <span class="powered-by-solana-label" data-i18n="common.brand.poweredBy">Powered by</span>
           <span class="solana-badge-mark" aria-hidden="true">
             <svg viewBox="0 0 397.7 311.7" width="16" height="12" focusable="false">
               <defs>
@@ -162,16 +164,17 @@
           <strong>Solana</strong>
         </a>
       </div>
-      <button type="button" class="nav-toggle" aria-label="Menu" aria-expanded="false">
+      <button type="button" class="nav-toggle" data-i18n-attr="aria-label:common.nav.menu" aria-label="Menu" aria-expanded="false">
         <span class="nav-toggle-bar"></span>
         <span class="nav-toggle-bar"></span>
         <span class="nav-toggle-bar"></span>
       </button>
       <nav class="nav nav--catalog" id="main-nav">
-        <a href="app/" class="nav-link">Tokenise</a>
-        <a href="#stakes" class="nav-link">Market</a>
-        <a href="#faq" class="nav-link nav-link--more">FAQ</a>
-        <a href="rwa-docs/" class="nav-link nav-link--more">Docs</a>
+        <a href="app/" class="nav-link" data-i18n="common.nav.tokenise">Tokenise</a>
+        <a href="#stakes" class="nav-link" data-i18n="common.nav.market">Market</a>
+        <a href="#faq" class="nav-link nav-link--more" data-i18n="common.nav.faq">FAQ</a>
+        <a href="rwa-docs/" class="nav-link nav-link--more" data-i18n="common.nav.docs">Docs</a>
+        <div class="nav-lang" data-i18n-switcher></div>
       </nav>
     </div>
   </header>
@@ -206,21 +209,21 @@
       </div>
       <div class="container hero-catalog-inner">
         <div class="hero-catalog-copy">
-          <p class="hero-eyebrow">Est. harvest 2026 · Solana</p>
-          <h1 class="hero-headline">Grow it again. Exactly.</h1>
-          <p class="hero-sub">
+          <p class="hero-eyebrow" data-i18n="landing.hero.eyebrow">Est. harvest 2026 · Solana</p>
+          <h1 class="hero-headline" data-i18n="landing.hero.headline">Grow it again. Exactly.</h1>
+          <p class="hero-sub" data-i18n-html="landing.hero.sub">
             Next cycle starts from this one — not from memory.
             The <a class="hero-journal-mark" href="https://journal.growto.live/" aria-label="Read the journals">journal</a> is the feature: watering, feeding, stages, photos, and a coach that reads the log.
           </p>
-          <ul class="hero-feature-row" aria-label="What you get">
-            <li>Coach</li>
-            <li>Reminders</li>
-            <li>Optional proof</li>
+          <ul class="hero-feature-row" data-i18n-attr="aria-label:landing.hero.featuresLabel" aria-label="What you get">
+            <li data-i18n="landing.hero.featureCoach">Coach</li>
+            <li data-i18n="landing.hero.featureReminders">Reminders</li>
+            <li data-i18n="landing.hero.featureProof">Optional proof</li>
           </ul>
           <div class="hero-cta-row">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg">Start a grow</a>
-            <a href="https://journal.growto.live/" class="hero-journals-link">Read the <em>journals</em></a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="hero-cta-link btn-link--quiet">Follow a plant</a>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary btn-lg" data-i18n="common.cta.startGrow">Start a grow</a>
+            <a href="https://journal.growto.live/" class="hero-journals-link" data-i18n-html="landing.hero.readJournals">Read the <em>journals</em></a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="hero-cta-link btn-link--quiet" data-i18n="landing.hero.followPlant">Follow a plant</a>
           </div>
         </div>
       </div>
@@ -234,11 +237,11 @@
               </svg>
             </span>
             <div class="hero-specimen-copy">
-              <p class="hero-specimen-title">Seed <span class="hero-specimen-no">№</span> 0041 — <em>CBD Auto</em></p>
-              <p class="hero-specimen-tx">sealed · tx 6TDm7g…saTD</p>
+              <p class="hero-specimen-title" data-i18n-html="landing.hero.specimenTitle">Seed <span class="hero-specimen-no">№</span> 0041 — <em>CBD Auto</em></p>
+              <p class="hero-specimen-tx" data-i18n="landing.hero.specimenTx">sealed · tx 6TDm7g…saTD</p>
             </div>
           </div>
-          <a href="#proof" class="hero-specimen-verify">Verify →</a>
+          <a href="#proof" class="hero-specimen-verify" data-i18n="common.cta.verify">Verify →</a>
         </div>
       </div>
     </section>
@@ -246,9 +249,9 @@
     <section id="proof" class="section desk-section desk-section--proof">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag desk-tag--verify">How it works</span>
-          <h2>Log it. Prove it. Keep going.</h2>
-          <p class="section-lead">
+          <span class="desk-tag desk-tag--verify" data-i18n="common.footer.how">How it works</span>
+          <h2 data-i18n="landing.proof.title">Log it. Prove it. Keep going.</h2>
+          <p class="section-lead" data-i18n="landing.proof.lead">
             The journal keeps the run findable. Minting a checkable trail is optional — only when you want it.
           </p>
         </div>
@@ -257,16 +260,16 @@
           <li class="proof-step proof-step--primary">
             <div class="proof-clip proof-clip--grow" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Care log</span>
-                <button type="button" class="clip-tap" tabindex="-1">Log watering</button>
-                <p class="clip-log"><span class="clip-check">✓</span> Watering · just now</p>
-                <p class="clip-reminder clip-reminder--fade">Reminder cleared</p>
+                <span class="clip-ui-label" data-i18n="landing.proof.clip1Label">Care log</span>
+                <button type="button" class="clip-tap" tabindex="-1" data-i18n="landing.proof.clip1Button">Log watering</button>
+                <p class="clip-log" data-i18n-html="landing.proof.clip1Log"><span class="clip-check">✓</span> Watering · just now</p>
+                <p class="clip-reminder clip-reminder--fade" data-i18n="landing.proof.clip1Reminder">Reminder cleared</p>
               </div>
-              <p class="clip-caption">Seconds to log. Months later, still there.</p>
+              <p class="clip-caption" data-i18n="landing.proof.clip1Caption">Seconds to log. Months later, still there.</p>
             </div>
             <span class="proof-num" aria-hidden="true">01</span>
-            <h3>Log it.</h3>
-            <p>
+            <h3 data-i18n="landing.proof.step1Title">Log it.</h3>
+            <p data-i18n="landing.proof.step1Body">
               The journal holds watering, feeding, stages, and photos as they happen —
               with reminders and a coach that reads the same log, so week nine still has week two.
             </p>
@@ -274,16 +277,16 @@
           <li class="proof-step proof-step--verify">
             <div class="proof-clip proof-clip--verify" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Optional proof</span>
-                <p class="clip-quest"><span class="clip-tick">✓</span> Log growth stage in journal</p>
-                <p class="clip-mint">Mint confirmed</p>
-                <p class="clip-tx">tx <code>6TDm7g…saTD</code></p>
+                <span class="clip-ui-label" data-i18n="landing.hero.featureProof">Optional proof</span>
+                <p class="clip-quest" data-i18n-html="landing.proof.clip2Quest"><span class="clip-tick">✓</span> Log growth stage in journal</p>
+                <p class="clip-mint" data-i18n="landing.proof.clip2Mint">Mint confirmed</p>
+                <p class="clip-tx" data-i18n-html="landing.proof.clip2Tx">tx <code>6TDm7g…saTD</code></p>
               </div>
-              <p class="clip-caption clip-caption--verify">Verified on Solana. Open the tx yourself.</p>
+              <p class="clip-caption clip-caption--verify" data-i18n="landing.proof.clip2Caption">Verified on Solana. Open the tx yourself.</p>
             </div>
             <span class="proof-num" aria-hidden="true">02</span>
-            <h3>Prove it.</h3>
-            <p>
+            <h3 data-i18n="landing.proof.step2Title">Prove it.</h3>
+            <p data-i18n="landing.proof.step2Body">
               Optional: mint each completed stage (germination through harvest) as an on-chain update
               linked to the journal entry. Every mint has a transaction anyone can check.
             </p>
@@ -291,15 +294,15 @@
           <li class="proof-step proof-step--trade">
             <div class="proof-clip proof-clip--trade" aria-hidden="true">
               <div class="clip-frame">
-                <span class="clip-ui-label">Your trail</span>
-                <p class="clip-quest"><span class="clip-tick">✓</span> Seed → flower trail intact</p>
-                <p class="clip-mint">Same evidence forever</p>
+                <span class="clip-ui-label" data-i18n="landing.proof.clip3Label">Your trail</span>
+                <p class="clip-quest" data-i18n-html="landing.proof.clip3Quest"><span class="clip-tick">✓</span> Seed → flower trail intact</p>
+                <p class="clip-mint" data-i18n="landing.proof.clip3Mint">Same evidence forever</p>
               </div>
-              <p class="clip-caption">Your documentation becomes the asset.</p>
+              <p class="clip-caption" data-i18n="landing.proof.clip3Caption">Your documentation becomes the asset.</p>
             </div>
             <span class="proof-num" aria-hidden="true">03</span>
-            <h3>Keep going.</h3>
-            <p>
+            <h3 data-i18n="landing.proof.step3Title">Keep going.</h3>
+            <p data-i18n="landing.proof.step3Body">
               Your care log stays with the plant. Later, others can follow that same trail —
               once there’s real grower supply to back.
             </p>
@@ -308,9 +311,9 @@
 
         <div id="trail" class="trail-proof">
           <div class="example-plant-head">
-            <span class="desk-tag desk-tag--verify">Checkable plants</span>
-            <h3>Four plants. Open the transactions yourself.</h3>
-            <p>
+            <span class="desk-tag desk-tag--verify" data-i18n="landing.trail.tag">Checkable plants</span>
+            <h3 data-i18n="landing.trail.title">Four plants. Open the transactions yourself.</h3>
+            <p data-i18n="landing.trail.body">
               Real mint records on Solana’s public test network (Devnet) — not a ticker demo.
               Each link opens the explorer so you can verify the trail yourself.
             </p>
@@ -337,7 +340,7 @@
             </div>
           </figure>
 
-          <ul class="trail-grid" aria-label="Example plant mint trails">
+          <ul class="trail-grid" data-i18n-attr="aria-label:landing.trail.gridLabel" aria-label="Example plant mint trails">
             <li class="trail-card">
               <span class="trail-card-seal" aria-hidden="true">
                 <svg viewBox="0 0 40 40" width="28" height="28" focusable="false">
@@ -345,9 +348,9 @@
                   <path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="trail-card-name">Seed <span class="hero-specimen-no">№</span> 0001 — <em>CBD Auto</em></p>
-              <p class="trail-card-meta">sealed · 15 Jul · tx 31H6…5emD</p>
-              <a class="trail-card-verify" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">Verify →</a>
+              <p class="trail-card-name" data-i18n-html="landing.trail.card1Name">Seed <span class="hero-specimen-no">№</span> 0001 — <em>CBD Auto</em></p>
+              <p class="trail-card-meta" data-i18n="landing.trail.card1Meta">sealed · 15 Jul · tx 31H6…5emD</p>
+              <a class="trail-card-verify" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer" data-i18n="common.cta.verify">Verify →</a>
             </li>
             <li class="trail-card">
               <span class="trail-card-seal" aria-hidden="true">
@@ -356,9 +359,9 @@
                   <path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="trail-card-name">Seed <span class="hero-specimen-no">№</span> 0002 — <em>Gold Bloom</em></p>
-              <p class="trail-card-meta">sealed · 19 Jul · tx 2xds…nozH</p>
-              <a class="trail-card-verify" href="https://explorer.solana.com/tx/2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH?cluster=devnet" target="_blank" rel="noopener noreferrer">Verify →</a>
+              <p class="trail-card-name" data-i18n-html="landing.trail.card2Name">Seed <span class="hero-specimen-no">№</span> 0002 — <em>Gold Bloom</em></p>
+              <p class="trail-card-meta" data-i18n="landing.trail.card2Meta">sealed · 19 Jul · tx 2xds…nozH</p>
+              <a class="trail-card-verify" href="https://explorer.solana.com/tx/2xdsLNoRcPmSdPhjbutv5zTme4R3UyLSjnqx7yz9WaUR5GvMaaBdyanpxF8MgikyeNCCHqX4Bo1pU5yMA7hinozH?cluster=devnet" target="_blank" rel="noopener noreferrer" data-i18n="common.cta.verify">Verify →</a>
             </li>
             <li class="trail-card">
               <span class="trail-card-seal" aria-hidden="true">
@@ -367,9 +370,9 @@
                   <path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="trail-card-name">Seed <span class="hero-specimen-no">№</span> 0003 — <em>Charlotte’s Web</em></p>
-              <p class="trail-card-meta">sealed · 15 Jul · tx 4wPz…QZDv</p>
-              <a class="trail-card-verify" href="https://explorer.solana.com/tx/4wPzcmqEZMt4eBTUURAYq59TCwHmmidz9A28YTYwZ8PvcVkrzY7w5T5bZ8PX33meGJcbHSyy2wbgmE1Nf9c3QZDv?cluster=devnet" target="_blank" rel="noopener noreferrer">Verify →</a>
+              <p class="trail-card-name" data-i18n-html="landing.trail.card3Name">Seed <span class="hero-specimen-no">№</span> 0003 — <em>Charlotte’s Web</em></p>
+              <p class="trail-card-meta" data-i18n="landing.trail.card3Meta">sealed · 15 Jul · tx 4wPz…QZDv</p>
+              <a class="trail-card-verify" href="https://explorer.solana.com/tx/4wPzcmqEZMt4eBTUURAYq59TCwHmmidz9A28YTYwZ8PvcVkrzY7w5T5bZ8PX33meGJcbHSyy2wbgmE1Nf9c3QZDv?cluster=devnet" target="_blank" rel="noopener noreferrer" data-i18n="common.cta.verify">Verify →</a>
             </li>
             <li class="trail-card">
               <span class="trail-card-seal" aria-hidden="true">
@@ -378,45 +381,45 @@
                   <path d="M20 27 V15 M20 15 C17 12 15 14 15 16.5 C15 19 18 20 20 22 C22 20 25 19 25 16.5 C25 14 23 12 20 15 Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" />
                 </svg>
               </span>
-              <p class="trail-card-name">Seed <span class="hero-specimen-no">№</span> 0004 — <em>Harlequin</em></p>
-              <p class="trail-card-meta">sealed · 15 Jul · tx 2ku2…BRqu</p>
-              <a class="trail-card-verify" href="https://explorer.solana.com/tx/2ku2UhinDShq7Qdtr8EdQy7J5VZJdjuLRJ4U23S2Fuxcv6RaQrD1Viqaj2W2BeUXj1iu9eRMtW9ekWKTz6TqBRqu?cluster=devnet" target="_blank" rel="noopener noreferrer">Verify →</a>
+              <p class="trail-card-name" data-i18n-html="landing.trail.card4Name">Seed <span class="hero-specimen-no">№</span> 0004 — <em>Harlequin</em></p>
+              <p class="trail-card-meta" data-i18n="landing.trail.card4Meta">sealed · 15 Jul · tx 2ku2…BRqu</p>
+              <a class="trail-card-verify" href="https://explorer.solana.com/tx/2ku2UhinDShq7Qdtr8EdQy7J5VZJdjuLRJ4U23S2Fuxcv6RaQrD1Viqaj2W2BeUXj1iu9eRMtW9ekWKTz6TqBRqu?cluster=devnet" target="_blank" rel="noopener noreferrer" data-i18n="common.cta.verify">Verify →</a>
             </li>
           </ul>
 
           <article class="example-plant">
             <div class="example-plant-head">
-              <span class="desk-tag desk-tag--verify">Full trail · CBD Auto #1</span>
-              <h3>Stage by stage on one plant</h3>
-              <p>
+              <span class="desk-tag desk-tag--verify" data-i18n="landing.trail.exampleTag">Full trail · CBD Auto #1</span>
+              <h3 data-i18n="landing.trail.exampleTitle">Stage by stage on one plant</h3>
+              <p data-i18n="landing.trail.exampleBody">
                 Mint, transfer, and art update are separate checkable steps. Harvest redemption
                 (turning a finished plant token into its real-world counterpart) is still on the roadmap.
               </p>
             </div>
             <ol class="example-timeline">
               <li>
-                <span>Seed minted</span><time>15 Jul</time>
+                <span data-i18n="landing.trail.step1">Seed minted</span><time data-i18n="landing.trail.step1Date">15 Jul</time>
                 <a class="verify-code" href="https://explorer.solana.com/tx/31H6pcgmgnYVMVviBwEVD5nHKDGPi3sxMTdpP9DqRbta9DD3hjzxnbWyZFkPq9hByg89g9GVRFgCD8H5J6Nv5emD?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 31H6…5emD</a>
               </li>
               <li>
-                <span>Transferred</span><time>17 Jul</time>
+                <span data-i18n="landing.trail.step2">Transferred</span><time data-i18n="landing.trail.step2Date">17 Jul</time>
                 <a class="verify-code" href="https://explorer.solana.com/tx/38euYG8aPr82fQEbNy5bNkRcXb7khZ2GC6Fvk7acZgbaCWEMQcEcBL1iGR6SJgGdLRMb3tVqwrfdGtusd4bjwyzn?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 38eu…wyzn</a>
               </li>
               <li>
-                <span>Art updated</span><time>17 Jul</time>
+                <span data-i18n="landing.trail.step3">Art updated</span><time data-i18n="landing.trail.step2Date">17 Jul</time>
                 <a class="verify-code" href="https://explorer.solana.com/tx/3TWuswDMsrc6KGWWpdGR91GaUPvRqD5wDu4tnf9ooj3nfFEjF9osiadP7usjd84T4vEKh2tCuTmJhdnmi7dbmMWh?cluster=devnet" target="_blank" rel="noopener noreferrer">tx · 3TWu…bMWh</a>
               </li>
-              <li><span>Stage advances</span><time>ongoing</time><span class="example-pending">Logged in journal, minted in Tokenise</span></li>
-              <li><span>Harvest</span><time>planned</time><span class="example-pending">Redemption path (roadmap)</span></li>
+              <li><span data-i18n="landing.trail.step4">Stage advances</span><time data-i18n="landing.trail.step4Date">ongoing</time><span class="example-pending" data-i18n="landing.trail.step4Note">Logged in journal, minted in Tokenise</span></li>
+              <li><span data-i18n="landing.trail.step5">Harvest</span><time data-i18n="landing.trail.step5Date">planned</time><span class="example-pending" data-i18n="landing.trail.step5Note">Redemption path (roadmap)</span></li>
             </ol>
           </article>
         </div>
 
         <div class="proof-fork" id="join">
-          <p class="proof-fork-lead">Pick your desk</p>
+          <p class="proof-fork-lead" data-i18n="landing.trail.forkLead">Pick your desk</p>
           <div class="proof-fork-row">
-            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start a grow</a>
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter">Enter as Adopter</a>
+            <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary" data-i18n="common.cta.startGrow">Start a grow</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter" data-i18n="common.cta.enterAdopter">Enter as Adopter</a>
           </div>
         </div>
       </div>
@@ -446,33 +449,33 @@
               </g>
             </svg>
           </div>
-          <figcaption>Real grows. Real care logs. The journal is the feature.</figcaption>
+          <figcaption data-i18n="landing.growers.photoCaption">Real grows. Real care logs. The journal is the feature.</figcaption>
         </figure>
         <div class="audience-grid">
         <div class="audience-copy">
-          <span class="desk-tag desk-tag--journal">For cannabis growers</span>
-          <h2>The journal that remembers the grow.</h2>
-          <p>
+          <span class="desk-tag desk-tag--journal" data-i18n="landing.growers.tag">For cannabis growers</span>
+          <h2 data-i18n="landing.growers.title">The journal that remembers the grow.</h2>
+          <p data-i18n="landing.growers.body1">
             Notes in a notebook, photos in the camera roll, the rest in your head — then week nine
             and nobody can reconstruct what happened. The journal is the trail: watering, feeding,
             stages, photos. A coach that reads it. Reminders so care doesn’t slip.
           </p>
-          <p>
+          <p data-i18n="landing.growers.body2">
             Free, no wallet, no crypto knowledge. Optional stage proof is there when you want a trail
             others can check — not the reason to sign up.
           </p>
           <ul class="audience-bullets">
-            <li>Journal: watering, feeding, stages, photos — still there next cycle</li>
-            <li>Coach and reminders on the same log, not a separate notebook</li>
-            <li>Weather planning for outdoor and mixed grows</li>
-            <li>Built where few tools target cannabis growers yet</li>
+            <li data-i18n="landing.growers.bullet1">Journal: watering, feeding, stages, photos — still there next cycle</li>
+            <li data-i18n="landing.growers.bullet2">Coach and reminders on the same log, not a separate notebook</li>
+            <li data-i18n="landing.growers.bullet3">Weather planning for outdoor and mixed grows</li>
+            <li data-i18n="landing.growers.bullet4">Built where few tools target cannabis growers yet</li>
           </ul>
-          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Open the journal</a>
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary" data-i18n="common.cta.openJournal">Open the journal</a>
         </div>
         <div class="audience-panel desk-panel desk-panel--journal">
           <div class="desk-panel-bar">
-            <span>What you get today</span>
-            <span class="desk-panel-meta">$0 · No wallet</span>
+            <span data-i18n="landing.growers.panelBar">What you get today</span>
+            <span class="desk-panel-meta" data-i18n="landing.growers.panelMeta">$0 · No wallet</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
@@ -480,8 +483,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><path d="M12 20V10"/><path d="M12 10c-2.2-3.2-5.5-4-8-3.5 1.2 2.8 3.8 4.2 8 3.5z"/><path d="M12 9c2-3 5.2-3.8 8-3.2-1 2.8-3.5 4.2-8 3.2z"/></svg>
               </span>
               <div>
-                <h3>Any scale</h3>
-                <p>One plant or a room. Indoor, outdoor, or mixed.</p>
+                <h3 data-i18n="landing.growers.spec1Title">Any scale</h3>
+                <p data-i18n="landing.growers.spec1Body">One plant or a room. Indoor, outdoor, or mixed.</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -489,8 +492,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
               </span>
               <div>
-                <h3>The journal</h3>
-                <p>Stages and care in one place, easy to grow from again.</p>
+                <h3 data-i18n="landing.growers.spec2Title">The journal</h3>
+                <p data-i18n="landing.growers.spec2Body">Stages and care in one place, easy to grow from again.</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -498,8 +501,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/><path d="M16.2 7.2A7 7 0 118.5 18"/></svg>
               </span>
               <div>
-                <h3>What’s next</h3>
-                <p>Coach and reminders. Always asks before acting.</p>
+                <h3 data-i18n="landing.growers.spec3Title">What’s next</h3>
+                <p data-i18n="landing.growers.spec3Body">Coach and reminders. Always asks before acting.</p>
               </div>
             </div>
           </div>
@@ -527,36 +530,36 @@
               </g>
             </svg>
           </div>
-          <figcaption>Watch the grow. Check the trail. No yield promises required.</figcaption>
+          <figcaption data-i18n="landing.adopters.photoCaption">Watch the grow. Check the trail. No yield promises required.</figcaption>
         </figure>
         <div class="audience-grid audience-grid--flip">
         <div class="audience-copy">
-          <span class="desk-tag desk-tag--adopter">For plant followers</span>
-          <h2>Own the story of a real plant.</h2>
-          <p>
+          <span class="desk-tag desk-tag--adopter" data-i18n="landing.adopters.tag">For plant followers</span>
+          <h2 data-i18n="landing.adopters.title">Own the story of a real plant.</h2>
+          <p data-i18n="landing.adopters.body1">
             This isn’t a trading terminal. It’s a low-barrier way to back a grow you can actually watch:
             care logs, stage changes, and checkable updates tied to one plant’s life.
           </p>
-          <p>
+          <p data-i18n="landing.adopters.body2">
             If you’re curious about real-world assets (RWAs: tokens tied to something physical, here a plant)
             and want something tangible — not another fund wrapper — start with the evidence trail.
             Test-network assets have no monetary value; use them to learn the trust flow before real stakes exist.
           </p>
           <ul class="audience-bullets audience-bullets--verify">
-            <li>“I can watch this plant grow” beats yield promises</li>
-            <li>Open the journal entry and the transaction yourself</li>
-            <li>Same trail the grower sees — no hidden side channel</li>
-            <li>FAQ and risks are for the due-diligence reader. Start there if you’re skeptical</li>
+            <li data-i18n="landing.adopters.bullet1">“I can watch this plant grow” beats yield promises</li>
+            <li data-i18n="landing.adopters.bullet2">Open the journal entry and the transaction yourself</li>
+            <li data-i18n="landing.adopters.bullet3">Same trail the grower sees — no hidden side channel</li>
+            <li data-i18n="landing.adopters.bullet4">FAQ and risks are for the due-diligence reader. Start there if you’re skeptical</li>
           </ul>
           <div class="adopter-cta-row">
-            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter">Enter as Adopter</a>
-            <a href="#faq" class="btn btn-ghost">Read the FAQ first</a>
+            <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter" data-i18n="common.cta.enterAdopter">Enter as Adopter</a>
+            <a href="#faq" class="btn btn-ghost" data-i18n="common.cta.readFaq">Read the FAQ first</a>
           </div>
         </div>
         <div class="audience-panel desk-panel desk-panel--adopter">
           <div class="desk-panel-bar">
-            <span>What you follow</span>
-            <span class="desk-panel-meta desk-panel-meta--verify">One plant</span>
+            <span data-i18n="landing.adopters.panelBar">What you follow</span>
+            <span class="desk-panel-meta desk-panel-meta--verify" data-i18n="landing.adopters.panelMeta">One plant</span>
           </div>
           <div class="desk-spec-list">
             <div class="desk-spec">
@@ -564,8 +567,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-6 4-9 8-9-1 5-4 8-8 9z"/><path d="M12 21c0-6-4-9-8-9 1 5 4 8 8 9z"/><path d="M12 21V11"/><path d="M12 11c1.5-3 3-4.5 5.5-5"/></svg>
               </span>
               <div>
-                <h3>Plant story</h3>
-                <p>Seed to harvest, with dates you can read.</p>
+                <h3 data-i18n="landing.adopters.spec1Title">Plant story</h3>
+                <p data-i18n="landing.adopters.spec1Body">Seed to harvest, with dates you can read.</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -573,8 +576,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.2 8.2-7 10-3.8-1.8-7-5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
               </span>
               <div>
-                <h3>Checkable proof</h3>
-                <p>Explorer links when a stage is minted.</p>
+                <h3 data-i18n="landing.adopters.spec2Title">Checkable proof</h3>
+                <p data-i18n="landing.adopters.spec2Body">Explorer links when a stage is minted.</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -582,8 +585,8 @@
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3"/><path d="M12 18v3"/><path d="M5 8l2 1.5"/><path d="M17 14.5L19 16"/><path d="M5 16l2-1.5"/><path d="M17 9.5L19 8"/><circle cx="12" cy="12" r="4"/></svg>
               </span>
               <div>
-                <h3>Early access</h3>
-                <p>Practice following a plant token before real-money stakes.</p>
+                <h3 data-i18n="landing.adopters.spec3Title">Early access</h3>
+                <p data-i18n="landing.adopters.spec3Body">Practice following a plant token before real-money stakes.</p>
               </div>
             </div>
           </div>
@@ -595,41 +598,41 @@
     <section id="stakes" class="section desk-section desk-section--stakes">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag desk-tag--adopter">Optional · test network</span>
-          <h2>Live stakes, when you’re ready</h2>
-          <p class="section-lead">
+          <span class="desk-tag desk-tag--adopter" data-i18n="landing.stakes.tag">Optional · test network</span>
+          <h2 data-i18n="landing.stakes.title">Live stakes, when you’re ready</h2>
+          <p class="section-lead" data-i18n="landing.stakes.lead">
             After the journal, adopters can back open grower asks on Solana’s public test network (Devnet).
             Test assets only — $GROWTOO has no monetary value.
           </p>
         </div>
 
         <div class="stakes-desk" id="stakes-desk" data-state="loading" aria-busy="true">
-          <aside class="stakes-panel stakes-panel--open" aria-label="Available stakes">
-            <p class="stakes-panel-label">Available stakes</p>
-            <p class="stakes-panel-meta" id="stakes-open-meta">Fetching live offers…</p>
+          <aside class="stakes-panel stakes-panel--open" data-i18n-attr="aria-label:landing.stakes.openAria" aria-label="Available stakes">
+            <p class="stakes-panel-label" data-i18n="landing.stakes.openLabel">Available stakes</p>
+            <p class="stakes-panel-meta" id="stakes-open-meta" data-i18n="landing.stakes.openMeta">Fetching live offers…</p>
             <div class="stakes-list-skeleton" id="stakes-open-skeleton" aria-hidden="true">
               <span class="stakes-skel-row"></span>
               <span class="stakes-skel-row"></span>
               <span class="stakes-skel-row"></span>
             </div>
             <ol class="stakes-list" id="stakes-open-list" hidden></ol>
-            <p class="stakes-empty" id="stakes-open-empty" hidden>No open stakes right now. Growers can post from the Market desk.</p>
-            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter">Browse in app →</a>
+            <p class="stakes-empty" id="stakes-open-empty" hidden data-i18n="landing.stakes.openEmpty">No open stakes right now. Growers can post from the Market desk.</p>
+            <a class="stakes-panel-cta" href="dnevnik/?mode=signup&type=adopter" data-i18n="common.cta.browseInApp">Browse in app →</a>
           </aside>
 
-          <aside class="stakes-panel stakes-panel--chart" aria-label="Already staked">
-            <p class="stakes-panel-label">Already staked</p>
+          <aside class="stakes-panel stakes-panel--chart" data-i18n-attr="aria-label:landing.stakes.chartAria" aria-label="Already staked">
+            <p class="stakes-panel-label" data-i18n="landing.stakes.chartAria">Already staked</p>
             <div class="stakes-kpis">
               <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Contracts</span>
+                <span class="stakes-kpi-label" data-i18n="landing.stakes.kpiContracts">Contracts</span>
                 <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-count" aria-label="Loading"></strong>
               </div>
               <div class="stakes-kpi">
-                <span class="stakes-kpi-label">$GROWTOO in</span>
+                <span class="stakes-kpi-label" data-i18n="landing.stakes.kpiIn">$GROWTOO in</span>
                 <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-value" aria-label="Loading"></strong>
               </div>
               <div class="stakes-kpi">
-                <span class="stakes-kpi-label">Open ask</span>
+                <span class="stakes-kpi-label" data-i18n="landing.stakes.kpiOpen">Open ask</span>
                 <strong class="stakes-kpi-value stakes-kpi-value--pending" id="stakes-kpi-open" aria-label="Loading"></strong>
               </div>
             </div>
@@ -639,18 +642,18 @@
                 <span class="stakes-mix-fill stakes-mix-fill--open" id="stakes-mix-open"></span>
               </div>
               <div class="stakes-mix-legend">
-                <span><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
-                <span><i class="stakes-dot stakes-dot--open"></i> Open</span>
+                <span data-i18n-html="landing.stakes.legendStaked"><i class="stakes-dot stakes-dot--staked"></i> Staked</span>
+                <span data-i18n-html="landing.stakes.legendOpen"><i class="stakes-dot stakes-dot--open"></i> Open</span>
               </div>
             </div>
-            <div class="stakes-bars stakes-bars--pending" id="stakes-bars" role="img" aria-label="Staked contracts by size"></div>
-            <p class="stakes-panel-note" id="stakes-updated">Fetching live board…</p>
+            <div class="stakes-bars stakes-bars--pending" id="stakes-bars" role="img" data-i18n-attr="aria-label:landing.stakes.barsAria" aria-label="Staked contracts by size"></div>
+            <p class="stakes-panel-note" id="stakes-updated" data-i18n="landing.stakes.updated">Fetching live board…</p>
           </aside>
         </div>
 
         <aside class="founding-banner founding-banner--inline">
-          <strong>Early growers help shape what ships next.</strong>
-          <p>
+          <strong data-i18n="landing.stakes.foundingTitle">Early growers help shape what ships next.</strong>
+          <p data-i18n="landing.stakes.foundingBody">
             Journal (and optionally mint) on the test network now. Early growers get a Founding Grower
             recognition badge we intend to carry to the live network, plus early access before features go public.
           </p>
@@ -660,22 +663,22 @@
 
     <section id="status" class="section desk-section desk-section--status">
       <div class="container status-block">
-        <span class="desk-tag">Where we are right now</span>
-        <h2>Solana test network: real system, test assets</h2>
-        <p>
+        <span class="desk-tag" data-i18n="landing.status.tag">Where we are right now</span>
+        <h2 data-i18n="landing.status.title">Solana test network: real system, test assets</h2>
+        <p data-i18n="landing.status.body">
           growtoo runs on Solana’s public test network (Devnet) while we build toward the live network (mainnet).
           Your plants, journal entries, and grow data are real. The tokens are test assets with no monetary value yet.
           Every mint, transfer, and trade you see is a real transaction on that test network, so you can verify
           exactly how the system works before real value is on the line.
         </p>
-        <p class="builder-voice">
+        <p class="builder-voice" data-i18n-html="landing.status.quote">
           “We started with the journal because documentation is the asset. Tokens only matter if
           the grow behind them is real.”
           <span class="builder-voice-attr">— growtoo team</span>
         </p>
         <p class="status-links">
-          <a href="rwa-docs/">Read the architecture docs →</a>
-          <a href="risks/">Risks &amp; scope →</a>
+          <a href="rwa-docs/" data-i18n="landing.status.linkDocs">Read the architecture docs →</a>
+          <a href="risks/" data-i18n-html="landing.status.linkRisks">Risks &amp; scope →</a>
         </p>
       </div>
     </section>
@@ -683,37 +686,37 @@
     <section id="faq" class="section desk-section desk-section--faq">
       <div class="container">
         <div class="desk-header">
-          <span class="desk-tag">Questions people actually ask</span>
-          <h2>Straight answers before you start</h2>
-          <p class="section-lead">Start with the grow. Crypto details come later — only if you want them.</p>
+          <span class="desk-tag" data-i18n="landing.faq.tag">Questions people actually ask</span>
+          <h2 data-i18n="landing.faq.title">Straight answers before you start</h2>
+          <p class="section-lead" data-i18n="landing.faq.lead">Start with the grow. Crypto details come later — only if you want them.</p>
         </div>
         <div class="faq-list">
           <details class="faq-item" open>
-            <summary>Do I need to know anything about crypto to use this?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q1">Do I need to know anything about crypto to use this?</summary>
+            <p data-i18n="landing.faq.a1">
               No. The journal, coach, and reminders are free and work with no wallet at all. A Solana wallet
               (Phantom or Solflare) is only needed if you want to mint or adopt on the test network.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Is this only for licensed commercial growers?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q2">Is this only for licensed commercial growers?</summary>
+            <p data-i18n="landing.faq.a2">
               No. growtoo is for cannabis growers (a plant or a few, or a full room), including places where
               cultivation rules are opening up. Always follow the law where you grow; growtoo is a
               documentation tool, not legal advice.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Who verifies that a journal entry is real, not fabricated?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q3">Who verifies that a journal entry is real, not fabricated?</summary>
+            <p data-i18n-html="landing.faq.a3">
               Today, the platform operator reviews journal progress before minting. The live-network roadmap
               moves this toward stronger attestations so no single party has to be trusted forever.
               Details live in the <a href="rwa-docs/">trust model docs</a>.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Is this legal? What happens with an actual harvest?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q4">Is this legal? What happens with an actual harvest?</summary>
+            <p data-i18n-html="landing.faq.a4">
               Redemption converts a harvest-stage token into its real-world counterpart, subject to
               applicable regulation in the grower’s jurisdiction. Today redemption is specified but still
               mocked on the test network, not a live fulfillment pipeline. Read
@@ -721,31 +724,31 @@
             </p>
           </details>
           <details class="faq-item">
-            <summary>Why build on a test network instead of going live with real money?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q5">Why build on a test network instead of going live with real money?</summary>
+            <p data-i18n="landing.faq.a5">
               So the system (journal proof, minting, escrow, redemption) can be battle-tested in the open
               first. Growers and adopters can see exactly how it works before anything real is at stake.
               “Devnet” is Solana’s public test network — same tools, no real value.
             </p>
           </details>
           <details class="faq-item">
-            <summary>Is $GROWTOO worth anything right now?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q6">Is $GROWTOO worth anything right now?</summary>
+            <p data-i18n="landing.faq.a6">
               No. It’s a test-network token with no monetary value. It exists so the optional
               mint → verify → adopt flow can be tested publicly before real value is on the line.
             </p>
           </details>
           <details class="faq-item">
-            <summary>What happens to my $GROWTOO when the live network launches?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q7">What happens to my $GROWTOO when the live network launches?</summary>
+            <p data-i18n="landing.faq.a7">
               Test-network $GROWTOO is for practicing the flow and should not be treated as transferable monetary
               balance. Early-grower recognition (the Founding Grower badge) is intended to carry forward;
               exact migration rules will be published before launch.
             </p>
           </details>
           <details class="faq-item">
-            <summary>When does the live network launch?</summary>
-            <p>
+            <summary data-i18n="landing.faq.q8">When does the live network launch?</summary>
+            <p data-i18n-html="landing.faq.a8">
               Targeting after the harvest redemption flow ships (roadmap milestone M5 in the docs).
               See the architecture notes in our
               <a href="rwa-docs/">docs</a>. We publish milestones, not a vague “soon.”
@@ -757,16 +760,16 @@
 
     <section id="start" class="section desk-section desk-section--close">
       <div class="container close-block">
-        <h2>Grow it again. The journal keeps it.</h2>
-        <p>
+        <h2 data-i18n="landing.close.title">Grow it again. The journal keeps it.</h2>
+        <p data-i18n="landing.close.body">
           The journal is the trail. Coach and reminders sit on it. Minting, trading, and adopting are optional.
         </p>
         <div class="close-cta-row">
-          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary">Start a grow</a>
-          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter">Enter as Adopter</a>
-          <a href="rwa-docs/" class="btn btn-ghost">Read the docs</a>
+          <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary" data-i18n="common.cta.startGrow">Start a grow</a>
+          <a href="dnevnik/?mode=signup&type=adopter" class="btn btn-secondary btn-adopter" data-i18n="common.cta.enterAdopter">Enter as Adopter</a>
+          <a href="rwa-docs/" class="btn btn-ghost" data-i18n="common.cta.readDocs">Read the docs</a>
         </div>
-        <p class="join-signin">
+        <p class="join-signin" data-i18n-html="landing.close.signin">
           Already have an account? <a href="dnevnik/">Sign in</a>
         </p>
       </div>
@@ -778,24 +781,24 @@
       <div class="footer-grid">
         <div>
           <strong class="footer-brand">growtoo</strong>
-          <p>Grow it again — journal, coach, optional proof.</p>
+          <p data-i18n="common.footer.tagline">Grow it again — journal, coach, optional proof.</p>
         </div>
         <div class="footer-links">
-          <a href="dnevnik/">App</a>
-          <a href="#proof">How it works</a>
-          <a href="#growers">Growers</a>
-          <a href="#adopters">Adopters</a>
-          <a href="#stakes">Stakes</a>
-          <a href="#faq">FAQ</a>
-          <a href="risks/">Risks</a>
-          <a href="rwa-docs/">Docs</a>
-          <a href="privacy/">Privacy</a>
-          <a href="terms/">Terms</a>
+          <a href="dnevnik/" data-i18n="common.footer.app">App</a>
+          <a href="#proof" data-i18n="common.footer.how">How it works</a>
+          <a href="#growers" data-i18n="common.footer.growers">Growers</a>
+          <a href="#adopters" data-i18n="common.footer.adopters">Adopters</a>
+          <a href="#stakes" data-i18n="common.footer.stakes">Stakes</a>
+          <a href="#faq" data-i18n="common.nav.faq">FAQ</a>
+          <a href="risks/" data-i18n="common.footer.risks">Risks</a>
+          <a href="rwa-docs/" data-i18n="common.nav.docs">Docs</a>
+          <a href="privacy/" data-i18n="common.footer.privacy">Privacy</a>
+          <a href="terms/" data-i18n="common.footer.terms">Terms</a>
         </div>
       </div>
       <p class="footer-powered">
         <a href="https://solana.com" target="_blank" rel="noopener noreferrer" class="powered-by-solana">
-          <span>Powered by</span>
+          <span data-i18n="common.brand.poweredBy">Powered by</span>
           <span class="solana-badge-mark" aria-hidden="true">
             <svg viewBox="0 0 397.7 311.7" width="18" height="14" focusable="false">
               <defs>
@@ -812,7 +815,7 @@
           <strong>Solana</strong>
         </a>
       </p>
-      <p class="footer-copy">© growtoo. All rights reserved.</p>
+      <p class="footer-copy" data-i18n="common.footer.copy">© growtoo. All rights reserved.</p>
     </div>
   </footer>
 
@@ -838,8 +841,8 @@
       if (window.growtooInitAppCheckCompat) window.growtooInitAppCheckCompat();
     })();
   </script>
-  <script src="js/landing-market.js?v=20260802a"></script>
-  <script src="js/site-trust.js?v=20260802a"></script>
+  <script src="js/landing-market.js?v=20260817a"></script>
+  <script src="js/site-trust.js?v=20260817a"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

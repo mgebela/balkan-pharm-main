@@ -184,7 +184,14 @@ if (readOnly) {
   document.body.classList.add("admin-readonly");
   const banner = document.createElement("div");
   banner.className = "admin-readonly-banner";
-  banner.textContent = "Read-only view of the superadmin database — editing is not allowed.";
+  /* This runs at module top level, before the dictionary has loaded, so the
+     T() call would freeze in English. The data-i18n attribute lets the i18n
+     runtime translate it as soon as the dictionary lands. */
+  banner.setAttribute("data-i18n", "app.admin.readOnly");
+  banner.textContent = T(
+    "app.admin.readOnly",
+    "Read-only view of the superadmin database — editing is not allowed."
+  );
   document.body.insertBefore(banner, document.body.firstChild);
   if (addBtn) addBtn.style.display = "none";
 }
@@ -241,7 +248,7 @@ async function loadData() {
         const viewBtn = document.createElement("button");
         viewBtn.type = "button";
         viewBtn.className = "btn btn-ghost btn-sm view-btn";
-        viewBtn.textContent = "View";
+        viewBtn.textContent = T("app.admin.view", "View");
         viewBtn.onclick = () => {
           const page = document.body.dataset.page;
           const merged = deepMerge(structuredClone(schemas[page]), data);
@@ -252,7 +259,7 @@ async function loadData() {
         const editBtn = document.createElement("button");
         editBtn.type = "button";
         editBtn.className = "btn btn-ghost btn-sm edit-btn";
-        editBtn.textContent = "Edit";
+        editBtn.textContent = T("app.admin.edit", "Edit");
         editBtn.onclick = () => {
           editId = docSnap.id;
           const page = document.body.dataset.page;
@@ -262,17 +269,17 @@ async function loadData() {
         const deleteBtn = document.createElement("button");
         deleteBtn.type = "button";
         deleteBtn.className = "btn btn-ghost btn-sm delete-btn";
-        deleteBtn.textContent = "Delete";
+        deleteBtn.textContent = T("app.admin.delete", "Delete");
         deleteBtn.onclick = async () => {
           const label =
             page === "users"
-              ? String(data.email || "this user")
-              : "this " + page.replace(/s$/, "");
+              ? String(data.email || T("app.admin.thisUser", "this user"))
+              : T("app.admin.thisRecord", "this record");
           if (
             !confirm(
-              "Delete " +
-                label +
-                "?\n\nThis cannot be undone from the admin tools."
+              T("app.admin.confirmDelete", "Delete {label}?", { label: label }) +
+                "\n\n" +
+                T("app.admin.deleteWarning", "This cannot be undone from the admin tools.")
             )
           ) {
             return;
@@ -384,7 +391,10 @@ function openModal(data, readOnly = false) {
         !isAllowedAdminEmail(targetEmail)
       ) {
         alert(
-          'Admin / superadmin roles are limited to supadmin@dnevnik.live and admin@dnevnik.live.'
+          T(
+            'app.admin.roleLimited',
+            'Admin / superadmin roles are limited to supadmin@dnevnik.live and admin@dnevnik.live.'
+          )
         );
         return;
       }

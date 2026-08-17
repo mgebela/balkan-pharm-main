@@ -88,13 +88,17 @@
   }
 
   function formatAway(ms) {
-    if (!Number.isFinite(ms) || ms <= 0) return 'a short while';
+    if (!Number.isFinite(ms) || ms <= 0) return T('app.daily.awayShort', 'a short while');
     const mins = Math.round(ms / 60000);
-    if (mins < 60) return mins <= 1 ? 'about a minute' : mins + ' minutes';
+    if (mins < 60) {
+      return mins <= 1
+        ? T('app.daily.awayMinute', 'about a minute')
+        : T('app.daily.awayMinutes', '{count} minutes', { count: mins });
+    }
     const hours = Math.round(mins / 60);
-    if (hours < 36) return hours === 1 ? '1 hour' : hours + ' hours';
+    if (hours < 36) return T('app.daily.awayHours', '{count} hours', { count: hours });
     const days = Math.round(hours / 24);
-    return days === 1 ? '1 day' : days + ' days';
+    return T('app.daily.awayDays', '{count} days', { count: days });
   }
 
   function parseTime(v) {
@@ -137,10 +141,12 @@
           icon: '✦',
           text:
             notes.length === 1
-              ? (notes[0].title || '1 inbox update')
-              : notes.length +
-                ' inbox updates' +
-                (unread ? ' · ' + unread + ' unread' : ''),
+              ? notes[0].title ||
+                T('app.daily.inboxUpdates', '{count} inbox updates', { count: 1 })
+              : T('app.daily.inboxUpdates', '{count} inbox updates', { count: notes.length }) +
+                (unread
+                  ? ' · ' + T('app.daily.unread', '{count} unread', { count: unread })
+                  : ''),
           view: 'adopt',
         });
       }
@@ -173,7 +179,7 @@
       if (n) {
         gains.push({
           icon: '§',
-          text: n === 1 ? '1 journal log since last visit' : n + ' journal logs since last visit',
+          text: T('app.daily.journalLogs', '{count} journal logs since last visit', { count: n }),
           view: 'plants',
         });
       }
@@ -192,7 +198,7 @@
       if (staged) {
         gains.push({
           icon: '❧',
-          text: staged === 1 ? '1 plant stage moved' : staged + ' plants updated',
+          text: T('app.daily.plantsUpdated', '{count} plants updated', { count: staged }),
           view: 'plants',
         });
       }
@@ -213,9 +219,7 @@
         gains.push({
           icon: '★',
           text:
-            '+' +
-            xpGain +
-            ' grower XP' +
+            T('app.daily.xpGain', '+{count} grower XP', { count: xpGain }) +
             (rank && rank.title ? ' · ' + rank.title : ''),
           view: 'plants',
         });
@@ -236,15 +240,23 @@
       if (preview.reward > 0 || (a.careDays || 0) > 0) {
         const statusBit =
           claimed && claimed.status === 'minted'
-            ? 'claimed ' + (claimed.reward || preview.reward) + ' $GROWTOO'
+            ? T('app.daily.bonusClaimed', 'claimed {amount} $GROWTOO', {
+                amount: claimed.reward || preview.reward,
+              })
             : claimed && claimed.status === 'pending'
-              ? 'claim pending · ~' + preview.reward + ' $GROWTOO'
-              : '~' + preview.reward + ' $GROWTOO ready to claim';
+              ? T('app.daily.bonusPending', 'claim pending · ~{amount} $GROWTOO', {
+                  amount: preview.reward,
+                })
+              : T('app.daily.bonusReady', '~{amount} $GROWTOO ready to claim', {
+                  amount: preview.reward,
+                });
         gains.push({
           icon: '◎',
           text:
-            (a.careDays || 0) +
-            ' care days this month · ' +
+            T('app.daily.careDays', '{count} care days this month', {
+              count: a.careDays || 0,
+            }) +
+            ' · ' +
             statusBit,
           view: 'adopt',
         });
@@ -277,28 +289,28 @@
           icon: '◎',
           text:
             newStakes === 1
-              ? 'Someone adopted one of your plants'
-              : newStakes + ' new adopt stakes on your offers',
+              ? T('app.daily.stakeOne', 'Someone adopted one of your plants')
+              : T('app.daily.stakeMany', '{count} new adopt stakes on your offers', {
+                  count: newStakes,
+                }),
           view: 'market',
         });
       }
       if (careTicks) {
         gains.push({
           icon: '◷',
-          text:
-            careTicks === 1
-              ? 'Care progress synced on 1 stake'
-              : 'Care progress synced on ' + careTicks + ' stakes',
+          text: T('app.daily.careSynced', 'Care progress synced on {count} stakes', {
+            count: careTicks,
+          }),
           view: 'market',
         });
       }
       if (harvestSettled) {
         gains.push({
           icon: '✧',
-          text:
-            harvestSettled === 1
-              ? '1 harvest stake settled'
-              : harvestSettled + ' harvest stakes settled',
+          text: T('app.daily.harvestSettled', '{count} harvest stakes settled', {
+            count: harvestSettled,
+          }),
           view: 'market',
         });
       }
@@ -333,10 +345,9 @@
       if (stageMoved) {
         gains.push({
           icon: '❧',
-          text:
-            stageMoved === 1
-              ? '1 adopted plant moved a stage'
-              : stageMoved + ' adopted plants updated',
+          text: T('app.daily.adoptedUpdated', '{count} adopted plants updated', {
+            count: stageMoved,
+          }),
           view: 'adopt',
         });
       }
@@ -371,37 +382,37 @@
       if (newSettles) {
         gains.push({
           icon: '◎',
-          text:
-            newSettles === 1
-              ? '1 new stake landed in your garden'
-              : newSettles + ' new stakes landed in your garden',
+          text: T('app.daily.stakesLanded', '{count} new stakes landed in your garden', {
+            count: newSettles,
+          }),
           view: 'adopt',
         });
       }
       if (careTicks) {
         gains.push({
           icon: '◷',
-          text:
-            careTicks === 1
-              ? 'Care progressed on 1 of your stakes'
-              : 'Care progressed on ' + careTicks + ' stakes',
+          text: T('app.daily.careProgressed', 'Care progressed on {count} stakes', {
+            count: careTicks,
+          }),
           view: 'adopt',
         });
       }
       if (harvestReady && myStakes) {
         gains.push({
           icon: '✧',
-          text: 'A stake is harvest-ready — grower can claim locked $GROWTOO',
+          text: T(
+            'app.daily.harvestReady',
+            'A stake is harvest-ready — grower can claim locked $GROWTOO'
+          ),
           view: 'adopt',
         });
       }
       if (openNew) {
         gains.push({
           icon: '◇',
-          text:
-            openNew === 1
-              ? '1 new offer on the market'
-              : openNew + ' new offers on the market',
+          text: T('app.daily.newOffers', '{count} new offers on the market', {
+            count: openNew,
+          }),
           view: 'market',
         });
       }
@@ -474,24 +485,37 @@
           ? GrowtooProfile.adopterIntentCopy()
           : null;
       return {
-        kicker: 'Start here',
+        kicker: T('app.daily.startHere', 'Start here'),
         lead:
           (copy && (copy.strip || copy.hero)) ||
-          'Claim test $GROWTOO, then invest in a live plant offer.',
+          T('app.daily.adopterLead', 'Claim test $GROWTOO, then invest in a live plant offer.'),
         actions: [
-          { id: 'daily-cta-faucet', label: 'Open faucet', view: 'market', primary: true },
-          { id: 'daily-cta-market', label: 'Browse market', view: 'market' },
-          { id: 'daily-cta-garden', label: 'My garden', view: 'adopt' },
+          {
+            id: 'daily-cta-faucet',
+            label: T('app.daily.ctaFaucet', 'Open faucet'),
+            view: 'market',
+            primary: true,
+          },
+          { id: 'daily-cta-market', label: T('app.daily.ctaMarket', 'Browse market'), view: 'market' },
+          { id: 'daily-cta-garden', label: T('app.daily.ctaGarden', 'My garden'), view: 'adopt' },
         ],
       };
     }
     return {
-      kicker: 'Start here',
-      lead: 'Log watering or feeding to earn $GROWTOO. Claim the month on Tokenise.',
+      kicker: T('app.daily.startHere', 'Start here'),
+      lead: T(
+        'app.daily.growerLead',
+        'Log watering or feeding to earn $GROWTOO. Claim the month on Tokenise.'
+      ),
       actions: [
-        { id: 'daily-cta-journal', label: 'Open journal', view: 'plants', primary: true },
-        { id: 'daily-cta-tokenise', label: 'Tokenise', view: 'adopt' },
-        { id: 'daily-cta-list', label: 'Market', view: 'market' },
+        {
+          id: 'daily-cta-journal',
+          label: T('app.daily.ctaJournal', 'Open journal'),
+          view: 'plants',
+          primary: true,
+        },
+        { id: 'daily-cta-tokenise', label: T('app.daily.ctaTokenise', 'Tokenise'), view: 'adopt' },
+        { id: 'daily-cta-list', label: T('app.daily.ctaMarketShort', 'Market'), view: 'market' },
       ],
     };
   }
@@ -511,14 +535,20 @@
     const preview = GrowerQuests.previewPlatformReward({ publishedStories: stories });
     if (!preview || preview.reward <= 0) return null;
     return {
-      kicker: 'Activity bonus',
-      lead:
-        'About ' +
-        preview.reward +
-        ' $GROWTOO from this month’s watering, feeding, and stories. Claim on Tokenise.',
+      kicker: T('app.daily.bonusKicker', 'Activity bonus'),
+      lead: T(
+        'app.daily.bonusLead',
+        'About {amount} $GROWTOO from this month’s watering, feeding, and stories. Claim on Tokenise.',
+        { amount: preview.reward }
+      ),
       actions: [
-        { id: 'daily-cta-tokenise', label: 'Claim on Tokenise', view: 'adopt', primary: true },
-        { id: 'daily-cta-journal', label: 'Open journal', view: 'plants' },
+        {
+          id: 'daily-cta-tokenise',
+          label: T('app.daily.ctaClaim', 'Claim on Tokenise'),
+          view: 'adopt',
+          primary: true,
+        },
+        { id: 'daily-cta-journal', label: T('app.daily.ctaJournal', 'Open journal'), view: 'plants' },
       ],
     };
   }
@@ -557,7 +587,8 @@
         return (
           '<button type="button" class="btn ' +
           (a.primary ? 'btn-primary' : 'btn-ghost') +
-          ' btn-sm daily-start-cta" data-view="' +
+          // i18n-ignore — class names and a data attribute, not copy.
+      ' btn-sm daily-start-cta" data-view="' +
           esc(a.view) +
           '" id="' +
           esc(a.id) +
@@ -608,15 +639,15 @@
 
     if (title) {
       title.textContent = opts.gains.length
-        ? 'While you were away'
+        ? T('app.daily.titleAway', 'While you were away')
         : opts.firstVisit
-          ? 'Welcome to growtoo'
-          : 'Daily status';
+          ? T('app.daily.titleWelcome', 'Welcome to growtoo')
+          : T('app.daily.titleStatus', 'Daily status');
     }
     if (away) {
       away.textContent = opts.firstVisit
-        ? 'Here’s your first-minute path.'
-        : 'Away for ' + formatAway(opts.awayMs) + '.';
+        ? T('app.daily.firstPath', 'Here’s your first-minute path.')
+        : T('app.daily.awayFor', 'Away for {time}.', { time: formatAway(opts.awayMs) });
     }
     list.innerHTML = opts.gains.length
       ? opts.gains
@@ -633,7 +664,9 @@
             );
           })
           .join('')
-      : '<li class="daily-status-gain daily-status-gain--quiet"><span>No new gains yet — pick a next step below.</span></li>';
+      : '<li class="daily-status-gain daily-status-gain--quiet"><span>' +
+        esc(T('app.daily.noGains', 'No new gains yet — pick a next step below.')) +
+        '</span></li>';
 
     const step = growerBonusStep() || nextStep(opts.adopter);
     const primary = step.actions.find(function (a) {
@@ -663,43 +696,54 @@
   function rewardCopy(detail) {
     const d = detail || {};
     const titles = {
-      watering: 'Watering counted',
-      feeding: 'Feeding counted',
-      stageLogged: 'Stage logged',
-      story_published: 'Story published',
-      claimed: 'Bonus minted',
+      watering: T('app.daily.rewardWatering', 'Watering counted'),
+      feeding: T('app.daily.rewardFeeding', 'Feeding counted'),
+      stageLogged: T('app.daily.rewardStage', 'Stage logged'),
+      story_published: T('app.daily.rewardStory', 'Story published'),
+      claimed: T('app.daily.rewardClaimed', 'Bonus minted'),
     };
     const preview = d.preview || {};
     const a = preview.activity || {};
     const lines = [];
-    if (d.xp) lines.push({ icon: '★', text: '+' + d.xp + ' grower XP' });
+    if (d.xp) {
+      lines.push({ icon: '★', text: T('app.daily.xpGain', '+{count} grower XP', { count: d.xp }) });
+    }
     if (d.kind === 'claimed') {
       lines.push({
         icon: '◎',
-        text: '+' + (d.claimed || preview.reward || 0) + ' $GROWTOO sent to your Devnet wallet',
+        text: T('app.daily.sentToWallet', '+{amount} $GROWTOO sent to your Devnet wallet', {
+          amount: d.claimed || preview.reward || 0,
+        }),
       });
     } else {
       lines.push({
         icon: '◎',
         text:
-          (a.careDays || 0) +
-          ' care days this month · ~' +
-          (preview.reward || 0) +
-          ' $GROWTOO when you claim',
+          T('app.daily.careDays', '{count} care days this month', { count: a.careDays || 0 }) +
+          ' · ' +
+          T('app.daily.whenYouClaim', '~{amount} $GROWTOO when you claim', {
+            amount: preview.reward || 0,
+          }),
       });
     }
     if (d.weekComplete && d.kind !== 'claimed') {
       lines.push({
         icon: '◷',
-        text: '5-day week unlocked · extra $GROWTOO on this month’s claim',
+        text: T(
+          'app.daily.weekUnlocked',
+          '5-day week unlocked · extra $GROWTOO on this month’s claim'
+        ),
       });
     }
     return {
-      title: titles[d.kind] || 'Grower reward',
+      title: titles[d.kind] || T('app.daily.rewardDefault', 'Grower reward'),
       lead:
         d.kind === 'claimed'
-          ? 'Activity bonus landed in your wallet (test network).'
-          : 'Logged for today. Extra logs today do not add more tokens.',
+          ? T('app.daily.rewardLeadClaimed', 'Activity bonus landed in your wallet (test network).')
+          : T(
+              'app.daily.rewardLeadLogged',
+              'Logged for today. Extra logs today do not add more tokens.'
+            ),
       lines: lines,
       claimable: d.kind !== 'claimed' && (preview.reward || 0) > 0,
     };
@@ -735,7 +779,9 @@
       })
       .join('');
     if (nextBtn) {
-      nextBtn.textContent = copy.claimable ? 'Claim on Tokenise' : 'Continue';
+      nextBtn.textContent = copy.claimable
+        ? T('app.daily.ctaClaim', 'Claim on Tokenise')
+        : T('app.daily.ctaContinue', 'Continue');
       nextBtn.dataset.view = copy.claimable ? 'adopt' : '';
     }
     overlay.hidden = false;

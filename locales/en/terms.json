@@ -1,0 +1,39 @@
+{
+  "main-nav": {
+    "nav": "<a href=\"../privacy/\" class=\"nav-link\">Privacy</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Sign in</a>"
+  },
+  "span2": "LEGAL",
+  "h1": "Terms of Service",
+  "p": "Last updated: 29 July 2026. By creating an account or using growtoo you agree to these terms. This is a product draft for an early-access / Devnet MVP — have counsel review before relying on it commercially.",
+  "div": "<span>Agreement</span> <span class=\"desk-panel-meta\">18+</span>",
+  "span3": "AGE",
+  "h2": "Eligibility",
+  "p2": "You must be at least <strong>18 years old</strong> and legally allowed to use cultivation-related information services where you live. You are responsible for complying with local law. growtoo does not encourage illegal activity.",
+  "span4": "SVC",
+  "h22": "The service",
+  "p3": "growtoo provides a digital grow journal and optional Solana <strong>Devnet</strong> features (plant tokens, test $GROWTOO, marketplace flows). Journal features can be used without a wallet. Devnet assets have <strong>no monetary value</strong>. See <a href=\"../risks/\">Risks &amp; scope</a>.",
+  "span5": "ACCT",
+  "h23": "Accounts",
+  "p4": "Keep your credentials secure. You are responsible for activity under your account. We may suspend accounts for abuse, fraud, or risk to other users. Email verification may be required to keep full access.",
+  "span6": "CONTENT",
+  "h24": "Your content",
+  "p5": "You retain rights to journal content you create. You grant us a licence to host, display, and process it to run the service (including optional sharing features you enable). Do not upload unlawful, infringing, or harmful content. Do not fabricate logs to deceive adopters on the marketplace.",
+  "span7": "CHAIN",
+  "h25": "Blockchain &amp; wallets",
+  "p6": "Wallet connections and on-chain transactions are irreversible network operations you authorize. We do not custody your keys. Test-network tokens are for experimentation only and are not securities, cash, or a claim on physical harvest unless a future licensed product expressly says so.",
+  "span8": "DISCLAIM",
+  "h26": "Disclaimers",
+  "p7": "The service is provided “as is.” Cultivation advice (including Coach) is informational, not agronomic, medical, or legal advice. We do not guarantee uptime, data permanence, or marketplace outcomes. To the fullest extent allowed by law, we are not liable for indirect or consequential losses.",
+  "span9": "LAW",
+  "h27": "Governing law",
+  "p8": "These terms are governed by the laws of Croatia / the European Union consumer protections that mandatorily apply to you, without prejudice to rights you cannot waive. Disputes should first be raised at <a href=\"mailto:hello@growto.live\">hello@growto.live</a>.",
+  "span10": "CHG",
+  "h28": "Changes",
+  "p9": "We may update these terms as the product evolves. Continued use after a posted update constitutes acceptance of the revised terms for future use. Material changes may also be called out in-app or by email.",
+  "p10": "<a href=\"../privacy/\">Privacy Policy</a> · <a href=\"../risks/\">Risks</a> · <a href=\"../index.html\">Back to growtoo</a>",
+  "div2": "<a href=\"../privacy/\">Privacy</a> <a href=\"../terms/\">Terms</a> <a href=\"../risks/\">Risks</a>",
+  "p11": "© growtoo. All rights reserved.",
+  "meta": {
+    "title": "Terms of Service · growtoo"
+  }
+}

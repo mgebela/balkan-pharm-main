@@ -25,17 +25,21 @@
 
   const PLANT_STAGE_ORDER = ['klijanje', 'sadnica', 'vegetativna', 'cvjetanje', 'susenje'];
 
+  /* stage id → [dictionary key, English]. The label is resolved on read,
+     not here: this table is built while the page parses, before the
+     dictionary has loaded. */
   const PLANT_STAGE_LABELS = {
-    klijanje: 'Germination',
-    sadnica: 'Seedling',
-    vegetativna: 'Vegetative',
-    cvjetanje: 'Flowering',
-    susenje: 'Drying / harvest',
+    klijanje: ['app.stage.germination', 'Germination'],
+    sadnica: ['app.stage.seedling', 'Seedling'],
+    vegetativna: ['app.stage.vegetative', 'Vegetative'],
+    cvjetanje: ['app.stage.flowering', 'Flowering'],
+    susenje: ['app.stage.drying', 'Drying / harvest'],
   };
 
   function plantStageLabel(stageKey) {
     if (!stageKey) return '';
-    return PLANT_STAGE_LABELS[stageKey] || String(stageKey);
+    const row = PLANT_STAGE_LABELS[stageKey];
+    return row ? T(row[0], row[1]) : String(stageKey);
   }
 
   const QUEST_XP = {
@@ -217,8 +221,8 @@
     const linkOk = !!plant;
     items.push({
       id: 'linkPlant',
-      label: 'Link a journal plant',
-      hint: 'Mint/link from Adopt with a plant from Plants & journal',
+      label: T('app.quests.linkPlant', 'Link a journal plant'),
+      hint: T('app.quests.linkPlantHint', 'Mint/link from Adopt with a plant from Plants & journal'),
       ok: linkOk,
       xp: QUEST_XP.linkPlant,
       action: 'plants',
@@ -232,9 +236,12 @@
     items.push({
       id: 'stageLogged',
       label:
-        'Log growth stage in journal' +
+        T('app.quests.stageLogged', 'Log growth stage in journal') +
         (requiredStageLabel ? ' (' + requiredStageLabel + ')' : ''),
-      hint: 'Update plant stage or add a Stage (transition) journal entry',
+      hint: T(
+        'app.quests.stageLoggedHint',
+        'Update plant stage or add a Stage (transition) journal entry'
+      ),
       ok: !!stageCheck.ok,
       xp: QUEST_XP.stageLogged,
       action: plantId ? 'growlog:' + plantId : 'plants',
@@ -246,8 +253,8 @@
       : { ok: false, ids: [] };
     items.push({
       id: 'watering',
-      label: 'Log watering for this stage',
-      hint: 'Add a Watering entry or Tools → Watering for this plant',
+      label: T('app.quests.watering', 'Log watering for this stage'),
+      hint: T('app.quests.wateringHint', 'Add a Watering entry or Tools → Watering for this plant'),
       ok: !!water.ok,
       xp: QUEST_XP.watering,
       action: plantId ? 'growlog:' + plantId : 'toolbox',
@@ -261,8 +268,10 @@
       : { ok: false, ids: [] };
     items.push({
       id: 'feeding',
-      label: feedingRequired ? 'Log feeding / nutrients' : 'Log feeding (optional for germination)',
-      hint: 'Add a Feeding entry or Tools → Feeding for this plant',
+      label: feedingRequired
+        ? T('app.quests.feeding', 'Log feeding / nutrients')
+        : T('app.quests.feedingOptional', 'Log feeding (optional for germination)'),
+      hint: T('app.quests.feedingHint', 'Add a Feeding entry or Tools → Feeding for this plant'),
       ok: feedingRequired ? !!feed.ok : true,
       optional: !feedingRequired,
       xp: QUEST_XP.feeding,
@@ -287,8 +296,10 @@
       xpEarned: xpEarned,
       missing: missing,
       message: ready
-        ? 'Journal proof complete — ready to mint.'
-        : 'Complete grower quests first: ' + missing.join(', '),
+        ? T('app.quests.proofComplete', 'Journal proof complete — ready to mint.')
+        : T('app.quests.proofMissing', 'Complete grower quests first: {list}', {
+            list: missing.join(', '),
+          }),
     };
   }
 
@@ -298,8 +309,11 @@
     const items = [
       {
         id: 'linkPlant',
-        label: 'Choose a journal plant',
-        hint: 'RWA seeds must be tied to a real plant in your journal',
+        label: T('app.quests.choosePlant', 'Choose a journal plant'),
+        hint: T(
+          'app.quests.choosePlantHint',
+          'RWA seeds must be tied to a real plant in your journal'
+        ),
         ok: !!plant,
         xp: QUEST_XP.linkPlant,
         action: 'plants',
@@ -312,8 +326,8 @@
       plantName: plant ? plant.name : null,
       items: items,
       message: ready
-        ? 'Plant linked — ready to mint seed.'
-        : 'Link a journal plant before minting a seed RWA.',
+        ? T('app.quests.seedReady', 'Plant linked — ready to mint seed.')
+        : T('app.seedChain.needPlant', 'Link a journal plant before minting a seed RWA.'),
     };
   }
 
@@ -345,11 +359,11 @@
 
   function levelFromXp(total) {
     const t = Number(total || 0);
-    if (t >= 500) return { level: 5, title: 'Master grower' };
-    if (t >= 300) return { level: 4, title: 'Seasoned grower' };
-    if (t >= 150) return { level: 3, title: 'Dedicated grower' };
-    if (t >= 60) return { level: 2, title: 'Active grower' };
-    return { level: 1, title: 'New grower' };
+    if (t >= 500) return { level: 5, title: T('app.rank.master', 'Master grower') };
+    if (t >= 300) return { level: 4, title: T('app.rank.seasoned', 'Seasoned grower') };
+    if (t >= 150) return { level: 3, title: T('app.rank.dedicated', 'Dedicated grower') };
+    if (t >= 60) return { level: 2, title: T('app.rank.active', 'Active grower') };
+    return { level: 1, title: T('app.rank.new', 'New grower') };
   }
 
   function awardXp(reason, amount) {
@@ -579,8 +593,14 @@
       minDays: need,
       weekKey: weekKey || isoWeekKey(Date.now()),
       message: ok
-        ? 'Strong week — ' + daysHit + '/' + need + ' care days (grower progress).'
-        : 'Weekly progress: ' + daysHit + '/' + need + ' care days (grower only).',
+        ? T('app.quests.weekStrong', 'Strong week — {hit}/{need} care days (grower progress).', {
+            hit: daysHit,
+            need: need,
+          })
+        : T('app.quests.weekProgress', 'Weekly progress: {hit}/{need} care days (grower only).', {
+            hit: daysHit,
+            need: need,
+          }),
     };
   }
 
@@ -600,8 +620,15 @@
       minDays: need,
       monthKey: key,
       message: ok
-        ? 'Month qualifies for harvest unlock (' + daysHit + '/' + need + ' days).'
-        : 'Log care on ' + need + ' distinct days this month (' + daysHit + '/' + need + ').',
+        ? T('app.quests.monthQualifies', 'Month qualifies for harvest unlock ({hit}/{need} days).', {
+            hit: daysHit,
+            need: need,
+          })
+        : T(
+            'app.quests.monthProgress',
+            'Log care on {need} distinct days this month ({hit}/{need}).',
+            { hit: daysHit, need: need }
+          ),
     };
   }
 
@@ -616,7 +643,7 @@
         results: [],
         qualifyingMonthKeys: [],
         qualifyingWeekKeys: [],
-        errors: ['Invalid adoptedAt'],
+        errors: ['Invalid adoptedAt'], // i18n-ignore — internal validation code.
       };
     }
     const monthKeys = enumerateMonthKeys(fromMs, toMs);
@@ -661,21 +688,26 @@
       Number(o.qualifyingMonths || 0) * 25 +
       Math.min(40, Math.floor(Number(o.careDaysTotal || 0) / 3));
     let tier = 1;
-    let title = 'Sprout';
+    let title = T('app.plantRank.sprout', 'Sprout');
     if (score >= 160) {
       tier = 5;
-      title = 'Legendary';
+      title = T('app.plantRank.legendary', 'Legendary');
     } else if (score >= 120) {
       tier = 4;
-      title = 'Elite';
+      title = T('app.plantRank.elite', 'Elite');
     } else if (score >= 80) {
       tier = 3;
-      title = 'Proven';
+      title = T('app.plantRank.proven', 'Proven');
     } else if (score >= 40) {
       tier = 2;
-      title = 'Rising';
+      title = T('app.plantRank.rising', 'Rising');
     }
-    return { tier: tier, title: title, score: score, label: 'Care level ' + tier + ' · ' + title };
+    return {
+      tier: tier,
+      title: title,
+      score: score,
+      label: T('app.plantRank.label', 'Care level {tier} · {title}', { tier: tier, title: title }),
+    };
   }
 
   function computeGrowerRank(opts) {
@@ -686,21 +718,26 @@
       Number(o.seedsMinted || 0) * 10 +
       Number(o.growthMints || 0) * 8;
     let tier = 1;
-    let title = 'New grower';
+    let title = T('app.rank.new', 'New grower');
     if (score >= 200) {
       tier = 5;
-      title = 'Elite cultivator';
+      title = T('app.rank.eliteCultivator', 'Elite cultivator');
     } else if (score >= 140) {
       tier = 4;
-      title = 'Master grower';
+      title = T('app.rank.master', 'Master grower');
     } else if (score >= 90) {
       tier = 3;
-      title = 'Seasoned grower';
+      title = T('app.rank.seasoned', 'Seasoned grower');
     } else if (score >= 45) {
       tier = 2;
-      title = 'Active grower';
+      title = T('app.rank.active', 'Active grower');
     }
-    return { tier: tier, title: title, score: score, label: 'Grower rank ' + tier + ' · ' + title };
+    return {
+      tier: tier,
+      title: title,
+      score: score,
+      label: T('app.rank.label', 'Grower rank {tier} · {title}', { tier: tier, title: title }),
+    };
   }
 
   function plantRankForToken(token, listing) {
@@ -903,7 +940,9 @@
       '">' +
       '<div class="grower-quest-head">' +
       '<strong>' +
-      (quest.ready ? 'Next action · Quests ready' : 'Grower quests') +
+      (quest.ready
+        ? T('app.quests.headReady', 'Next action · Quests ready')
+        : T('app.quests.head', 'Grower quests')) +
       '</strong>' +
       '<span>' +
       quest.done +

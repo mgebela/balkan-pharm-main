@@ -1,0 +1,37 @@
+{
+  "div": "<strong>Solana Devnet</strong> <span>Samo testno tržište. Seed NFT-ovi i $GROWTOO <em>nemaju novčanu vrijednost</em>.</span> <a href=\"./\">Rizici</a>",
+  "main-nav": {
+    "nav": "<a href=\"../index.html#adopters\" class=\"nav-link\">Posvojitelji</a> <a href=\"../rwa-docs/\" class=\"nav-link\">Dokumentacija</a> <a href=\"../dnevnik/\" class=\"btn btn-primary\">Prijava</a>"
+  },
+  "span2": "OPSEG",
+  "h1": "Rizici i opseg",
+  "p": "Poštene granice Devnet MVP-a: što danas znači posvojiti biljku, a što ne znači.",
+  "div2": "<span>Pročitaj prije nego sjedneš za stol</span> <span class=\"desk-panel-meta\">DEVNET</span>",
+  "span3": "MREŽ",
+  "h2": "Samo Devnet: bez novčane vrijednosti",
+  "p2": "Svi Seed NFT-ovi i <strong>$GROWTOO</strong> na growtoou danas žive na <strong>Solana Devnetu</strong>. Služe za testiranje proizvoda. Nisu mainnet imovina, nisu ekvivalent gotovine i <strong>nemaju novčanu vrijednost</strong>.",
+  "ask": {
+    "span": "CIJ",
+    "h2": "Kako nastaju cijene",
+    "p": "Nema bonding krivulje ni cjenovnog orakla. Uzgajivač (ili prodavatelj) pri objavi postavlja traženu cijenu u <strong>$GROWTOO</strong>. Posvojitelj tu ponudu ispunjava kroz escrow tržnice. Zadnja cijena na ploči je najnovija objavljena tražena cijena (ili uzorak dubine kad je traka prazna)."
+  },
+  "span4": "POVJ",
+  "h22": "Model povjerenja (centralizirani MVP)",
+  "p3": "Jedan autoritet kolekcije trenutno kontrolira izmjene metapodataka, kovanje nagrada za faze i namiru escrowa. „Dokaz” faze znači da je operater provjerio postoji li pomak u dnevniku — ne neovisni orakl, potvrdu fotografije ili IoT signal. Izmišljeni unosi u dnevnik stvaran su preostali rizik za posvojitelje dok se provjera ne pooštri.",
+  "span5": "RWA",
+  "h23": "Što danas znači „posvojiti”",
+  "p4": "Na Devnetu posvojiti znači držati testnu RWA imovinu i pratiti povezani dnevnik. To <strong>ne</strong> stvara prenosivo pravno vlasništvo nad fizičkim CBD biljnim materijalom, prava skrbništva ni zajamčenu isplatu berbe. Otkup u stvarni udio u berbi opisan je u arhitekturnoj dokumentaciji, ali je i dalje <strong>simuliran / planiran</strong> put.",
+  "span6": "ZAK",
+  "h24": "Regulativa i CBD logistika",
+  "p5": "CBD i srodni biljni materijal različito su regulirani po jurisdikcijama. Svaki budući fizički otkup morao bi biti usklađen s lokalnim zakonom, licenciranjem, skrbništvom, otpremom te KYC/AML zahtjevima gdje se traže. growtoo trenutno ne vodi licencirani lanac isporuke. Ništa na ovoj stranici nije pravni, porezni ni investicijski savjet.",
+  "span7": "REV",
+  "h25": "Revizija i tim",
+  "p6": "Autoritet reda za kovanje jedinstvena je operativna točka povjerenja. Neovisna revizija planirana je prije bilo kakvog pokretanja na mainnetu — ne tvrdimo da je obavljena. Javni kod i adrese nalaze se u otvorenom repozitoriju i <a href=\"../rwa-docs/\">arhitekturnoj dokumentaciji</a>.",
+  "p7": "Više detalja: <a href=\"../rwa-docs/\">RWA arhitektura</a> · <a href=\"https://github.com/mgebela/balkan-pharm-main\">GitHub</a> · <a href=\"../index.html\">Natrag na growtoo</a>",
+  "p8": "Solana Devnet MVP. Tokeni nemaju novčanu vrijednost. Nije ponuda vrijednosnih papira ni potraživanje nad fizičkim CBD-om.",
+  "div3": "<a href=\"../privacy/\">Privatnost</a> <a href=\"../terms/\">Uvjeti</a> <a href=\"../rwa-docs/\">Dokumentacija</a> <a href=\"../index.html\">Početna</a>",
+  "p9": "© growtoo. Sva prava pridržana.",
+  "meta": {
+    "title": "Rizici i opseg · growtoo"
+  }
+}

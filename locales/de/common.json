@@ -1,0 +1,63 @@
+{
+  "lang": {
+    "label": "Sprache"
+  },
+  "nav": {
+    "tokenise": "Tokenisieren",
+    "market": "Markt",
+    "faq": "FAQ",
+    "docs": "Doku",
+    "menu": "Menü",
+    "journal": "Journal"
+  },
+  "brand": {
+    "poweredBy": "Powered by"
+  },
+  "cta": {
+    "startGrow": "Grow starten",
+    "enterAdopter": "Als Adopter einsteigen",
+    "openJournal": "Journal öffnen",
+    "readDocs": "Doku lesen",
+    "readFaq": "Erst die FAQ lesen",
+    "signIn": "Anmelden",
+    "verify": "Prüfen →",
+    "browseInApp": "In der App ansehen →"
+  },
+  "footer": {
+    "tagline": "Bau es wieder an — Journal, Coach, Nachweis auf Wunsch.",
+    "app": "App",
+    "how": "So funktioniert’s",
+    "growers": "Grower",
+    "adopters": "Adopter",
+    "stakes": "Einsätze",
+    "faq": "FAQ",
+    "risks": "Risiken",
+    "docs": "Doku",
+    "privacy": "Datenschutz",
+    "terms": "AGB",
+    "copy": "© growtoo. Alle Rechte vorbehalten."
+  },
+  "trust": {
+    "ageTitle": "Bist du {age} oder älter?",
+    "ageBody": "growtoo ist ein Journal für den Cannabisanbau samt zugehöriger Werkzeuge. Für den Zutritt musst du mindestens {age} Jahre alt sein. Die Gesetze an deinem Wohnort gelten weiterhin.",
+    "ageYes": "Ich bin {age}+",
+    "ageNo": "Ich bin unter {age}",
+    "deniedTitle": "Zugang beschränkt",
+    "deniedBody": "Sorry — growtoo ist nur für Erwachsene ab {age}. Bitte verlasse diese Seite.",
+    "leave": "Verlassen"
+  },
+  "cookies": {
+    "title": "Cookies &amp; lokale Daten",
+    "body": "Wir nutzen notwendigen Speicher für die Anmeldung und deine Journal-Einstellungen. Optionale Analytik hilft uns, das Produkt zu verbessern. Siehe <a href=\"{href}\">Datenschutzerklärung</a>.",
+    "acceptAll": "Alle akzeptieren",
+    "essential": "Nur notwendige"
+  },
+  "signup": {
+    "pickRole": "Wähle Grower oder Adopter, um fortzufahren.",
+    "needName": "Gib einen Anzeigenamen ein.",
+    "needConsent": "Bestätige, dass du 18+ bist und den AGB & der Datenschutzerklärung zustimmst.",
+    "needSetup": "Wähle ein Grow-Setup (indoor, outdoor oder gemischt).",
+    "needIntent": "Wähle, warum du als Adopter dabei bist.",
+    "needDevnet": "Bestätige, dass hier das Solana-Testnetz läuft (ohne echten Wert)."
+  }
+}
