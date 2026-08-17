@@ -6210,3 +6210,158 @@ body.journal-paper .footer a:hover {
   color: #3d6a38;
 }
 
+/* Landing only — same light journal, more pigment so it does not wash out. */
+body.landing-page {
+  --bg: #e7f0e2;
+  --bg-alt: #ffffff;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-active: #d7e8ce;
+  --surface-rgb: 231 240 226;
+  --surface-deep-rgb: 205 224 196;
+  --surface-raised-rgb: 255 255 255;
+  --text: #122418;
+  --text-muted: #2a4536;
+  --text-faint: #2a4536;
+  --text-rgb: 18 36 24;
+  --ink-rgb: 42 69 54;
+  --green: #2f542c;
+  --green-light: #3d6a38;
+  --accent: #2f542c;
+  --accent-hover: #244220;
+  --border: #9fc094;
+  --desk-line: #9fc094;
+  --shadow-rgb: 36 68 40;
+  background: #e7f0e2;
+  color: #122418;
+}
+
+html:has(body.landing-page) {
+  background-color: #e7f0e2;
+}
+
+body.landing-page .header {
+  background: rgb(231 240 226 / 0.92);
+  border-bottom-color: #9fc094;
+}
+
+body.landing-page .logo,
+body.landing-page .logo-word,
+body.landing-page .nav-toggle {
+  color: #244220;
+}
+
+body.landing-page .hero--catalog {
+  background:
+    radial-gradient(ellipse 62% 72% at 90% 36%, rgb(111 148 87 / 0.42) 0%, transparent 64%),
+    radial-gradient(ellipse 48% 42% at 6% 88%, rgb(61 106 56 / 0.16) 0%, transparent 70%),
+    linear-gradient(165deg, #f2f8ee 0%, #e4f0de 42%, #cfe3c4 100%);
+  border-bottom-color: #9fc094;
+}
+
+body.landing-page .hero-catalog-etch {
+  color: #2f542c;
+}
+
+body.landing-page .hero-etch-svg {
+  opacity: 0.72;
+}
+
+body.landing-page .hero--catalog .hero-eyebrow {
+  color: #8a6418;
+}
+
+body.landing-page .hero--catalog .hero-headline {
+  color: #122418;
+  font-weight: 500;
+}
+
+body.landing-page .hero--catalog .hero-sub,
+body.landing-page .hero-journals-link {
+  color: #2a4536;
+}
+
+body.landing-page .hero-journal-mark,
+body.landing-page .hero-journals-link em {
+  color: #2f542c;
+}
+
+body.landing-page .hero-feature-row li {
+  color: #244220;
+  background: #d4e8cc;
+  border: 1px solid #9fc094;
+  border-radius: 999px;
+  padding: 0.32rem 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+body.landing-page .btn-primary,
+body.landing-page .nav .btn-primary,
+body.landing-page .hero--catalog .btn-primary {
+  background: #2f542c;
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgb(47 84 44 / 0.28);
+}
+
+body.landing-page .btn-primary:hover,
+body.landing-page .nav .btn-primary:hover {
+  background: #244220;
+  box-shadow: 0 12px 26px rgb(36 66 32 / 0.34);
+}
+
+body.landing-page .hero-specimen {
+  background: #1e3a22;
+  border-top-color: #1e3a22;
+}
+
+body.landing-page .hero-specimen-title {
+  color: #f3faf0;
+}
+
+body.landing-page .hero-specimen-tx {
+  color: #b8d4b0;
+}
+
+body.landing-page .hero-specimen-seal,
+body.landing-page .hero-specimen-verify {
+  color: #e0c56a;
+}
+
+body.landing-page .hero-specimen-verify:hover {
+  color: #f3de9a;
+}
+
+body.landing-page .desk-header h2,
+body.landing-page .close-block h2,
+body.landing-page .status-block h2,
+body.landing-page .section h2,
+body.landing-page .footer-brand {
+  color: #122418;
+}
+
+body.landing-page .desk-tag {
+  color: #8a6418;
+}
+
+body.landing-page .desk-section--proof,
+body.landing-page .desk-section--stakes,
+body.landing-page .desk-section--alt,
+body.landing-page .desk-section--journal,
+body.landing-page .desk-section--adopter,
+body.landing-page .section-alt,
+body.landing-page .footer,
+body.landing-page .desk-footer {
+  background: #d7e8ce;
+}
+
+body.landing-page .desk-panel,
+body.landing-page .stakes-panel,
+body.landing-page .proof-step,
+body.landing-page .status-block,
+body.landing-page .desk-seat,
+body.landing-page .feature-card,
+body.landing-page .faq-item[open] {
+  border-color: #9fc094;
+  box-shadow: 0 16px 40px rgb(36 68 40 / 0.12);
+}
+
