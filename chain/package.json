@@ -36,7 +36,8 @@
     "traffic:seed": "node traffic/traffic-seed.js",
     "traffic:day": "node traffic/traffic-day.js",
     "traffic:wipe": "node traffic/traffic-wipe.js",
-    "traffic:journal": "node traffic/traffic-journal.js"
+    "traffic:journal": "node traffic/traffic-journal.js",
+    "journal:editorial": "node traffic/publish-editorial-journal.js"
   },
   "dependencies": {
     "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
