@@ -15,12 +15,13 @@
 
   const COACH_URL = 'https://coachchat-zwul5y4amq-ew.a.run.app';
 
+  /* [dictionary key, English] — resolved at render time; i18n may not be ready at parse. */
   const STAGE_LABELS = {
-    klijanje: 'Germination',
-    sadnica: 'Seedling',
-    vegetativna: 'Vegetative',
-    cvjetanje: 'Flowering',
-    susenje: 'Drying',
+    klijanje: ['app.stage.germination', 'Germination'],
+    sadnica: ['app.stage.seedling', 'Seedling'],
+    vegetativna: ['app.stage.vegetative', 'Vegetative'],
+    cvjetanje: ['app.stage.flowering', 'Flowering'],
+    susenje: ['app.stage.dryingShort', 'Drying'],
   };
 
   const STAGE_ALIASES = {
@@ -44,11 +45,16 @@
 
   const STAGE_ORDER = ['klijanje', 'sadnica', 'vegetativna', 'cvjetanje', 'susenje'];
   const SUBPHASE_LABELS = {
-    pot_1_5dcl: '1.5 dcl pot',
-    pot_5l: '5 L pot',
-    pot_30l: '30 L pot',
-    na_polju: 'In the field',
+    pot_1_5dcl: ['app.coach.subphasePot15dcl', '1.5 dcl pot'],
+    pot_5l: ['app.coach.subphasePot5l', '5 L pot'],
+    pot_30l: ['app.coach.subphasePot30l', '30 L pot'],
+    na_polju: ['app.pot.field', 'In the field'],
   };
+
+  function coachStageLabel(stageKey) {
+    const row = STAGE_LABELS[stageKey];
+    return row ? T(row[0], row[1]) : stageKey || T('app.coach.stageUnknown', 'unknown');
+  }
 
   const STAGE_PLAYBOOK = {
     klijanje: {
@@ -143,56 +149,70 @@
    * keyboard on open hid this row and left the user staring at a blank
    * text field with no idea what to ask.
    */
-  const COACH_CAPABILITIES = [
-    {
-      id: 'today',
-      label: 'Today',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>',
-      text:
-        'What should I do next for my current plants?',
-    },
-    {
-      id: 'care',
-      label: 'Log care',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s5 5.5 5 9a5 5 0 01-10 0c0-3.5 5-9 5-9z"/></svg>',
-      text:
-        'Log watering for my current plant.',
-    },
-    {
-      id: 'diagnose',
-      label: 'Diagnose',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
-      text:
-        'Something looks wrong with my plant. Attach a leaf photo with + for a better read, then ask what you need and help me diagnose it.',
-    },
-    {
-      id: 'weather',
-      label: 'Weather',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17a4 4 0 010-8 5.5 5.5 0 0110.5 1.5A3.5 3.5 0 1117.5 17z"/></svg>',
-      text:
-        'What does the weather forecast mean for my grow over the next few days?',
-    },
-    {
-      id: 'stage',
-      label: 'Stage',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg>',
-      text:
-        'Help me update my plant to the next growth stage.',
-    },
-    {
-      id: 'tokenise',
-      label: 'Tokenise',
-      icon:
-        '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h5M9.5 14h5"/></svg>',
-      text:
-        'Mint a seed or the next growth stage for my linked plant if journal proof is ready.',
-    },
-  ];
+  const COACH_CAP_ICONS = {
+    today:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>',
+    care:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s5 5.5 5 9a5 5 0 01-10 0c0-3.5 5-9 5-9z"/></svg>',
+    diagnose:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+    weather:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17a4 4 0 010-8 5.5 5.5 0 0110.5 1.5A3.5 3.5 0 1117.5 17z"/></svg>',
+    stage:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg>',
+    tokenise:
+      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h5M9.5 14h5"/></svg>',
+  };
+
+  function coachCapabilities() {
+    return [
+      {
+        id: 'today',
+        label: T('app.nav.today', 'Today'),
+        icon: COACH_CAP_ICONS.today,
+        text: T('app.coach.capTodayPrompt', 'What should I do next for my current plants?'),
+      },
+      {
+        id: 'care',
+        label: T('app.plants.logCare', 'Log care'),
+        icon: COACH_CAP_ICONS.care,
+        text: T('app.coach.capCarePrompt', 'Log watering for my current plant.'),
+      },
+      {
+        id: 'diagnose',
+        label: T('app.coach.capDiagnose', 'Diagnose'),
+        icon: COACH_CAP_ICONS.diagnose,
+        text: T(
+          'app.coach.capDiagnosePrompt',
+          'Something looks wrong with my plant. Attach a leaf photo with + for a better read, then ask what you need and help me diagnose it.'
+        ),
+      },
+      {
+        id: 'weather',
+        label: T('app.coach.capWeather', 'Weather'),
+        icon: COACH_CAP_ICONS.weather,
+        text: T(
+          'app.coach.capWeatherPrompt',
+          'What does the weather forecast mean for my grow over the next few days?'
+        ),
+      },
+      {
+        id: 'stage',
+        label: T('app.entryType.stage', 'Stage'),
+        icon: COACH_CAP_ICONS.stage,
+        text: T('app.coach.capStagePrompt', 'Help me update my plant to the next growth stage.'),
+      },
+      {
+        id: 'tokenise',
+        label: T('app.daily.ctaTokenise', 'Tokenise'),
+        icon: COACH_CAP_ICONS.tokenise,
+        text: T(
+          'app.coach.capTokenisePrompt',
+          'Mint a seed or the next growth stage for my linked plant if journal proof is ready.'
+        ),
+      },
+    ];
+  }
 
   // Keep coach photos small — large data-URLs make the live request fragile
   // (slow mobile upload / localStorage quota) and we only need leaf detail.
@@ -273,6 +293,8 @@
   }
 
   function detectCoachLocale(message) {
+    const ui = window.I18N && I18N.locale;
+    if (ui === 'hr') return 'hr';
     const t = String(message || '');
     if (/[čćžšđČĆŽŠĐ]/.test(t)) return 'hr';
     if (
@@ -309,18 +331,18 @@
   async function onCoachFileSelected(file) {
     if (!file) return;
     if (!String(file.type || '').startsWith('image/')) {
-      setStatus('Choose an image file (JPG or PNG).');
+      setStatus(T('app.coach.chooseImage', 'Choose an image file (JPG or PNG).'));
       return;
     }
-    setStatus('Preparing photo…');
+    setStatus(T('app.coach.preparingPhoto', 'Preparing photo…'));
     try {
       const raw = await readFileAsDataUrl(file);
       pendingImage = await resizeCoachImageDataUrl(raw, MAX_COACH_IMAGE_EDGE);
       syncAttachPreview();
-      setStatus('Photo attached — add a note and send.');
+      setStatus(T('app.coach.photoAttached', 'Photo attached — add a note and send.'));
     } catch (err) {
       clearPendingImage();
-      setStatus((err && err.message) || 'Could not attach that photo.');
+      setStatus((err && err.message) || T('app.coach.photoFail', 'Could not attach that photo.'));
     }
   }
 
@@ -571,7 +593,8 @@
   }
 
   function subphaseLabel(subphase) {
-    return SUBPHASE_LABELS[subphase] || subphase || 'not set';
+    const row = SUBPHASE_LABELS[subphase];
+    return row ? T(row[0], row[1]) : subphase || T('app.coach.subphaseUnset', 'not set');
   }
 
   function readDismissedReminders() {
@@ -664,9 +687,9 @@
     (plants || []).forEach(function (plant) {
       if (!plant || !plant.id) return;
       const stage = plant.stage || '';
-      const stageLabel = STAGE_LABELS[stage] || stage || 'Unknown stage';
+      const stageName = coachStageLabel(stage) || T('app.coach.unknownStage', 'Unknown stage');
       const subphase = plant.subphase || '';
-      const plantName = plant.name || 'Plant';
+      const plantName = plant.name || T('app.stack.plant', 'Plant');
       const transplantAt = lastCareDateMs(plant.id, entries, toolbox, 'transplant');
       const wateringAt = lastCareDateMs(plant.id, entries, toolbox, 'watering');
       const feedingAt = lastCareDateMs(plant.id, entries, toolbox, 'feeding');
@@ -681,16 +704,17 @@
           pushReminder(list, {
             id: 'pot-up-5l:' + plant.id,
             plantId: plant.id,
-            title: 'Pot-up check: 1.5 dcl → 5 L',
-            message:
-              plantName +
-              ' is in ' +
-              subphaseLabel(subphase) +
-              '. Roots may be ready for a bigger pot — confirm transplant timing.',
-            prompt:
-              'For plant "' +
-              plantName +
-              '", should I move from 1.5 dcl pot to 5 L now? Give me a quick checklist, then log transplant if ready.',
+            title: T('app.coach.nudgePotUp15Title', 'Pot-up check: 1.5 dcl → 5 L'),
+            message: T(
+              'app.coach.nudgePotUp15Msg',
+              '{plant} is in {subphase}. Roots may be ready for a bigger pot — confirm transplant timing.',
+              { plant: plantName, subphase: subphaseLabel(subphase) }
+            ),
+            prompt: T(
+              'app.coach.nudgePotUp15Prompt',
+              'For plant "{plant}", should I move from 1.5 dcl pot to 5 L now? Give me a quick checklist, then log transplant if ready.',
+              { plant: plantName }
+            ),
           });
         }
       }
@@ -700,14 +724,17 @@
           pushReminder(list, {
             id: 'pot-up-30l:' + plant.id,
             plantId: plant.id,
-            title: 'Pot-up check: 5 L → 30 L',
-            message:
-              plantName +
-              ' has been in 5 L long enough to review root space and water cadence before moving to 30 L.',
-            prompt:
-              'Review plant "' +
-              plantName +
-              '" for transplant from 5 L to 30 L. What signs should I confirm today?',
+            title: T('app.coach.nudgePotUp30Title', 'Pot-up check: 5 L → 30 L'),
+            message: T(
+              'app.coach.nudgePotUp30Msg',
+              '{plant} has been in 5 L long enough to review root space and water cadence before moving to 30 L.',
+              { plant: plantName }
+            ),
+            prompt: T(
+              'app.coach.nudgePotUp30Prompt',
+              'Review plant "{plant}" for transplant from 5 L to 30 L. What signs should I confirm today?',
+              { plant: plantName }
+            ),
           });
         }
       }
@@ -719,18 +746,17 @@
             id: 'tent-to-field:' + plant.id,
             plantId: plant.id,
             severity: 'info',
-            title: 'Tent → field transition review',
-            message:
-              plantName +
-              ' is still indoor in ' +
-              subphaseLabel(subphase) +
-              ' during ' +
-              stageLabel +
-              '. Decide if it should move to field conditions.',
-            prompt:
-              'Should plant "' +
-              plantName +
-              '" move from grow tent to field this week? Give me transition steps and risk checks.',
+            title: T('app.coach.nudgeTentTitle', 'Tent → field transition review'),
+            message: T(
+              'app.coach.nudgeTentMsg',
+              '{plant} is still indoor in {pot} during {stage}. Decide if it should move to field conditions.',
+              { plant: plantName, pot: subphaseLabel(subphase), stage: stageName }
+            ),
+            prompt: T(
+              'app.coach.nudgeTentPrompt',
+              'Should plant "{plant}" move from grow tent to field this week? Give me transition steps and risk checks.',
+              { plant: plantName }
+            ),
           });
         }
       }
@@ -740,16 +766,22 @@
           id: 'watering:' + plant.id,
           plantId: plant.id,
           severity: 'urgent',
-          title: 'Watering reminder',
+          title: T('app.coach.nudgeWaterTitle', 'Watering reminder'),
           message:
-            plantName +
-            ' has no recent watering log' +
-            (sinceWatering == null ? '' : ' for ' + sinceWatering + ' days') +
-            '.',
-          prompt:
-            'Check watering status for "' +
-            plantName +
-            '" and help me log watering if needed.',
+            sinceWatering == null
+              ? T('app.coach.nudgeWaterMsgNone', '{plant} has no recent watering log.', {
+                  plant: plantName,
+                })
+              : T(
+                  'app.coach.nudgeWaterMsgDays',
+                  '{plant} has no recent watering log for {days} days.',
+                  { plant: plantName, days: sinceWatering }
+                ),
+          prompt: T(
+            'app.coach.nudgeWaterPrompt',
+            'Check watering status for "{plant}" and help me log watering if needed.',
+            { plant: plantName }
+          ),
         });
       }
 
@@ -758,16 +790,24 @@
           id: 'feeding:' + plant.id,
           plantId: plant.id,
           severity: 'info',
-          title: 'Nutrient check',
+          title: T('app.coach.nudgeFeedTitle', 'Nutrient check'),
           message:
-            plantName +
-            (sinceFeeding == null
-              ? ' has no feeding log yet for this stage.'
-              : ' last feeding was ' + sinceFeeding + ' days ago.'),
-          prompt:
-            'Review feeding for "' +
-            plantName +
-            '" and help me log nutrients if needed.',
+            sinceFeeding == null
+              ? T(
+                  'app.coach.nudgeFeedMsgNone',
+                  '{plant} has no feeding log yet for this stage.',
+                  { plant: plantName }
+                )
+              : T(
+                  'app.coach.nudgeFeedMsgDays',
+                  '{plant} last feeding was {days} days ago.',
+                  { plant: plantName, days: sinceFeeding }
+                ),
+          prompt: T(
+            'app.coach.nudgeFeedPrompt',
+            'Review feeding for "{plant}" and help me log nutrients if needed.',
+            { plant: plantName }
+          ),
         });
       }
     });
@@ -838,7 +878,7 @@
       return String(action.name);
     }
     if (ref && !looksLikePlantId(ref)) return String(ref);
-    return 'your plant';
+    return T('app.coach.yourPlant', 'your plant');
   }
 
   function enrichAction(action) {
@@ -990,7 +1030,7 @@
           name: p.name,
           strain: p.strain || null,
           stage: p.stage || null,
-          stageLabel: STAGE_LABELS[p.stage] || p.stage || null,
+          stageLabel: coachStageLabel(p.stage) || p.stage || null,
           environmentType: p.environmentType || null,
           startDate: p.startDate || null,
         },
@@ -1125,7 +1165,7 @@
               name: focus.name,
               strain: focus.strain || null,
               stage: focus.stage || null,
-              stageLabel: STAGE_LABELS[focus.stage] || focus.stage || null,
+              stageLabel: coachStageLabel(focus.stage) || focus.stage || null,
               environmentType: focus.environmentType || null,
             },
             plantTimingFields(focus)
@@ -1156,11 +1196,16 @@
   }
 
   function actionLabel(action) {
-    if (!action || !action.type) return 'Unknown action';
+    if (!action || !action.type) return T('app.coach.unknownAction', 'Unknown action');
     const name = plantLabel(action.plantId, action);
     switch (action.type) {
       case 'create_plant':
-        return 'Create plant “' + (action.name && !looksLikePlantId(action.name) ? action.name : 'Untitled') + '”';
+        return T('app.coach.actCreate', 'Create plant “{name}”', {
+          name:
+            action.name && !looksLikePlantId(action.name)
+              ? action.name
+              : T('app.coach.untitled', 'Untitled'),
+        });
       case 'add_entry': {
         var et = action.entryType || 'entry';
         var etLabel =
@@ -1168,21 +1213,21 @@
             typeof DnevnikNotifications.entryTypeLabel === 'function' &&
             DnevnikNotifications.entryTypeLabel(et)) ||
           et;
-        return 'Log ' + etLabel + ' for “' + name + '”';
+        return T('app.coach.actLog', 'Log {type} for “{plant}”', { type: etLabel, plant: name });
       }
       case 'set_stage':
-        return (
-          'Set “' +
-          name +
-          '” → ' +
-          (STAGE_LABELS[action.stage] || action.stage || '?')
-        );
+        return T('app.coach.actStage', 'Set “{plant}” → {stage}', {
+          plant: name,
+          stage: coachStageLabel(action.stage) || action.stage || '?',
+        });
       case 'import_seed':
-        return 'Mint seed token for “' + name + '”';
+        return T('app.coach.actMintSeed', 'Mint seed token for “{plant}”', { plant: name });
       case 'mint_growth':
-        return 'Mint next growth stage' + (name !== 'your plant' ? ' for “' + name + '”' : '');
+        return name && name !== T('app.coach.yourPlant', 'your plant')
+          ? T('app.coach.actMintGrowth', 'Mint next growth stage for “{plant}”', { plant: name })
+          : T('app.coach.actMintGrowthBare', 'Mint next growth stage');
       case 'link_plant':
-        return 'Link token to “' + name + '”';
+        return T('app.coach.actLink', 'Link token to “{plant}”', { plant: name });
       default:
         return String(action.type);
     }
@@ -1253,7 +1298,12 @@
           stage: stage,
           note: 'Updated via Grower Coach',
         });
-        reply = (reply ? reply + '\n' : '') + 'I can move “' + plant.name + '” to ' + (STAGE_LABELS[stage] || stage) + '.';
+        reply =
+          (reply ? reply + '\n' : '') +
+          T('app.coach.localMoveStage', 'I can move “{plant}” to {stage}.', {
+            plant: plant.name,
+            stage: coachStageLabel(stage) || stage,
+          });
       }
     }
 
@@ -1390,8 +1440,10 @@
         environmentType: action.environmentType,
         notes: action.notes,
       });
-      resultMsg =
-        'Created plant “' + plant.name + '” (' + (STAGE_LABELS[plant.stage] || plant.stage) + ').';
+      resultMsg = T('app.coach.resultCreated', 'Created plant “{name}” ({stage}).', {
+        name: plant.name,
+        stage: coachStageLabel(plant.stage) || plant.stage,
+      });
     } else if (type === 'add_entry') {
       if (!DJ || typeof DJ.addEntry !== 'function') throw new Error('Journal API unavailable');
       const plant = resolvePlant(action.plantId);
@@ -1407,15 +1459,20 @@
           typeof DnevnikNotifications.entryTypeLabel === 'function' &&
           DnevnikNotifications.entryTypeLabel(entry.type)) ||
         entry.type;
-      resultMsg = 'Logged ' + typeLabel + ' for “' + plant.name + '”.';
+      resultMsg = T('app.coach.resultLogged', 'Logged {type} for “{plant}”.', {
+        type: typeLabel,
+        plant: plant.name,
+      });
     } else if (type === 'set_stage') {
       if (!DJ || typeof DJ.setPlantStage !== 'function') throw new Error('Journal API unavailable');
       const plant = resolvePlant(action.plantId);
       if (!plant) throw new Error('Plant not found for stage change');
       const stage = resolveStage(action.stage) || action.stage;
       const updated = DJ.setPlantStage(plant.id, stage, action.note);
-      resultMsg =
-        'Updated “' + updated.name + '” → ' + (STAGE_LABELS[updated.stage] || updated.stage) + '.';
+      resultMsg = T('app.coach.resultStage', 'Updated “{plant}” → {stage}.', {
+        plant: updated.name,
+        stage: coachStageLabel(updated.stage) || updated.stage,
+      });
     } else if (type === 'import_seed') {
       if (!PT || typeof PT.importSeed !== 'function') throw new Error('Token API unavailable');
       const plant = resolvePlant(action.plantId);
@@ -1470,7 +1527,7 @@
   async function runPendingActions() {
     if (!pendingActions.length || busy) return;
     busy = true;
-    setStatus('Running actions…');
+    setStatus(T('app.coach.runningActions', 'Running actions…'));
     // Clear confirm UI on the last assistant message while running.
     for (let i = history.length - 1; i >= 0; i--) {
       if (history[i].role === 'assistant' && history[i].actions) {
@@ -1489,20 +1546,20 @@
           dismissReminder(action.draftFrom);
         }
       } catch (err) {
-        results.push('✗ ' + (err && err.message ? err.message : 'Action failed'));
+        results.push('✗ ' + (err && err.message ? err.message : T('app.coach.actionFailed', 'Action failed')));
       }
     }
     pendingActions = [];
     history.push({
       role: 'assistant',
-      content: 'Done:\n' + results.join('\n'),
+      content: T('app.coach.donePrefix', 'Done:') + '\n' + results.join('\n'),
       at: Date.now(),
       source: 'actions',
     });
     saveHistory();
     renderMessages();
     busy = false;
-    setStatus('Ready to help');
+    setStatus(T('app.coach.ready', 'Ready to help'));
   }
 
   function cancelPendingActions() {
@@ -1515,13 +1572,13 @@
     }
     history.push({
       role: 'assistant',
-      content: 'No problem — nothing was changed. Ask anytime.',
+      content: T('app.coach.cancelled', 'No problem — nothing was changed. Ask anytime.'),
       at: Date.now(),
       source: 'actions',
     });
     saveHistory();
     renderMessages();
-    setStatus('Ready to help');
+    setStatus(T('app.coach.ready', 'Ready to help'));
   }
 
   function localReply(message, context) {
@@ -1686,6 +1743,91 @@
     }
   }
 
+  function coachTitleText() {
+    return isAdopter()
+      ? T('app.coach.titleAdopter', 'Adopter coach')
+      : T('app.coach.titleGrower', 'Grower coach');
+  }
+
+  function renderCapabilities() {
+    const el = document.getElementById('ai-coach-capabilities');
+    if (!el) return;
+    el.setAttribute('aria-label', T('app.coach.capsAria', 'What the coach can do'));
+    el.innerHTML = coachCapabilities()
+      .map(function (c) {
+        return (
+          '<button type="button" class="ai-coach-cap" data-prompt="' +
+          esc(c.text) +
+          '" title="' +
+          esc(c.text) +
+          '">' +
+          c.icon +
+          '<span>' +
+          esc(c.label) +
+          '</span></button>'
+        );
+      })
+      .join('');
+  }
+
+  function applyCoachChrome() {
+    const fabLabel = document.querySelector('#ai-coach-fab .ai-coach-fab-label');
+    if (fabLabel) fabLabel.textContent = T('app.coachBrief.label', 'Coach');
+    const title = document.getElementById('ai-coach-title');
+    if (title) title.textContent = coachTitleText();
+    const status = document.getElementById('ai-coach-status');
+    if (status && !busy && !listening && !pendingActions.length) {
+      status.textContent = T('app.coach.ready', 'Ready to help');
+    }
+    const backdrop = document.getElementById('ai-coach-backdrop');
+    if (backdrop) backdrop.setAttribute('aria-label', T('app.coach.close', 'Close coach'));
+    const clearBtn = document.getElementById('ai-coach-clear');
+    if (clearBtn) {
+      const clear = T('app.coach.clear', 'Clear conversation');
+      clearBtn.setAttribute('title', clear);
+      clearBtn.setAttribute('aria-label', clear);
+    }
+    const closeBtn = document.getElementById('ai-coach-close');
+    if (closeBtn) closeBtn.setAttribute('aria-label', T('app.coach.close', 'Close coach'));
+    const tabs = document.querySelector('.ai-coach-tabs');
+    if (tabs) tabs.setAttribute('aria-label', T('app.coach.tabsAria', 'Coach sections'));
+    const chatTab = document.querySelector('[data-coach-tab="chat"]');
+    if (chatTab) chatTab.textContent = T('app.coach.tabChat', 'Chat');
+    const settingsTab = document.querySelector('[data-coach-tab="settings"]');
+    if (settingsTab) settingsTab.textContent = T('app.settings.title', 'Settings');
+    const thumb = document.getElementById('ai-coach-attach-thumb');
+    if (thumb) thumb.setAttribute('alt', T('app.coach.photoAlt', 'Attached plant photo'));
+    const remove = document.getElementById('ai-coach-attach-remove');
+    if (remove) {
+      remove.textContent = T('app.media.remove', 'Remove');
+      remove.setAttribute('aria-label', T('app.coach.removePhoto', 'Remove photo'));
+    }
+    const msgLabel = document.querySelector('#ai-coach-form .visually-hidden');
+    if (msgLabel) msgLabel.textContent = T('app.coach.messageLabel', 'Message');
+    const input = document.getElementById('ai-coach-input');
+    if (input) input.setAttribute('placeholder', T('app.coach.placeholder', 'Ask your coach…'));
+    const attach = document.getElementById('ai-coach-attach');
+    if (attach) {
+      attach.setAttribute('title', T('app.coach.takePhoto', 'Take photo'));
+      attach.setAttribute('aria-label', T('app.coach.openCamera', 'Open plant camera'));
+    }
+    const mic = document.getElementById('ai-coach-mic');
+    if (mic) {
+      mic.setAttribute('title', T('app.coach.speak', 'Speak'));
+      mic.setAttribute('aria-label', T('app.coach.voiceInput', 'Voice input'));
+    }
+    const send = document.getElementById('ai-coach-send');
+    if (send) send.setAttribute('aria-label', T('app.coach.send', 'Send'));
+    const foot = document.querySelector('.ai-coach-foot');
+    if (foot) {
+      foot.textContent = T(
+        'app.coach.foot',
+        'Routine nudges can run quietly. Journal drafts need your tap. Minting and plant-health calls stay with you.'
+      );
+    }
+    renderCapabilities();
+  }
+
   function ensureDom() {
     if (document.getElementById('ai-coach-root')) return;
     const root = document.createElement('div');
@@ -1756,24 +1898,11 @@
       '<path d="M5 12h12"/><path d="M13 6l6 6-6 6"/>' +
       '</svg></button>' +
       '</div></form>' +
-      '<div class="ai-coach-capabilities" id="ai-coach-capabilities" role="group" aria-label="What the coach can do">' +
-      COACH_CAPABILITIES.map(function (c) {
-        return (
-          '<button type="button" class="ai-coach-cap" data-prompt="' +
-          esc(c.text) +
-          '" title="' +
-          esc(c.text) +
-          '">' +
-          c.icon +
-          '<span>' +
-          esc(c.label) +
-          '</span></button>'
-        );
-      }).join('') +
-      '</div>' +
-      '<p class="ai-coach-foot">Routine nudges can run quietly. Journal drafts need your tap. Minting and plant-health calls stay with you.</p>' +
+      '<div class="ai-coach-capabilities" id="ai-coach-capabilities" role="group" aria-label="What the coach can do"></div>' +
+      '<p class="ai-coach-foot"></p>' +
       '</div></aside>';
     document.body.appendChild(root);
+    applyCoachChrome();
 
 
     document.getElementById('ai-coach-fab').addEventListener('click', toggle);
@@ -1814,7 +1943,7 @@
     if (removeAttach) {
       removeAttach.addEventListener('click', function () {
         clearPendingImage();
-        setStatus('Photo removed');
+        setStatus(T('app.coach.photoRemoved', 'Photo removed'));
       });
     }
     document.getElementById('ai-coach-capabilities').addEventListener('click', function (e) {
@@ -1835,7 +1964,7 @@
       const patch = {};
       patch[toggle] = !!e.target.checked;
       CoachCore.setPermissions(patch);
-      setStatus('Settings saved');
+      setStatus(T('app.coach.settingsSaved', 'Settings saved'));
       // Refresh activity + toggles so state stays honest
       setCoachTab('settings');
     });
@@ -1899,29 +2028,31 @@
 
   async function resendCoachVerification(btn) {
     if (!window.GrowtooEmailVerify || typeof GrowtooEmailVerify.resend !== 'function') {
-      setStatus('Resend unavailable — open Account and try there.');
+      setStatus(T('app.coach.resendUnavailable', 'Resend unavailable — open Account and try there.'));
       return;
     }
     if (btn) btn.disabled = true;
-    setStatus('Sending verification email…');
+    setStatus(T('app.coach.sendingVerify', 'Sending verification email…'));
     try {
       const result = await GrowtooEmailVerify.resend();
       if (result && result.already) {
-        setStatus('Already verified — live coach unlocked.');
+        setStatus(T('app.coach.alreadyVerifiedStatus', 'Already verified — live coach unlocked.'));
         clearVerifyFlags();
         return;
       }
       setStatus(
-        'Verification sent' +
-          (result && result.email ? ' to ' + result.email : '') +
-          ' — check inbox & Spam.'
+        result && result.email
+          ? T('app.coach.verifySentTo', 'Verification sent to {email} — check inbox & Spam.', {
+              email: result.email,
+            })
+          : T('app.coach.verifySent', 'Verification sent — check inbox & Spam.')
       );
     } catch (err) {
       const code = err && err.code;
       if (code === 'auth/too-many-requests') {
-        setStatus('Too many sends — wait a few minutes.');
+        setStatus(T('app.coach.tooManySends', 'Too many sends — wait a few minutes.'));
       } else {
-        setStatus((err && err.message) || 'Could not resend verification.');
+        setStatus((err && err.message) || T('app.coach.resendFailed', 'Could not resend verification.'));
       }
     } finally {
       if (btn) btn.disabled = false;
@@ -1930,18 +2061,18 @@
 
   async function refreshCoachVerification(btn) {
     if (!window.GrowtooEmailVerify || typeof GrowtooEmailVerify.refresh !== 'function') {
-      setStatus('Refresh unavailable — reopen the app after verifying.');
+      setStatus(T('app.coach.refreshUnavailable', 'Refresh unavailable — reopen the app after verifying.'));
       return;
     }
     if (btn) btn.disabled = true;
-    setStatus('Checking verification…');
+    setStatus(T('app.coach.checkingVerify', 'Checking verification…'));
     try {
       const ok = await GrowtooEmailVerify.refresh();
       if (ok) {
-        setStatus('Email verified — try the coach again.');
+        setStatus(T('app.coach.emailVerified', 'Email verified — try the coach again.'));
         clearVerifyFlags();
       } else {
-        setStatus('Still unverified — open the email link, then tap again.');
+        setStatus(T('app.coach.stillUnverified', 'Still unverified — open the email link, then tap again.'));
       }
     } catch (err) {
       setStatus((err && err.message) || 'Could not refresh verification.');
@@ -1987,7 +2118,7 @@
 
   function setStatus(text) {
     const el = document.getElementById('ai-coach-status');
-    if (el) el.textContent = text || 'Ready to help';
+    if (el) el.textContent = text || T('app.coach.ready', 'Ready to help');
   }
 
   function clearChat() {
@@ -1999,7 +2130,7 @@
     clearComposerDraft();
     clearPendingImage();
     renderMessages();
-    setStatus('Fresh chat');
+    setStatus(T('app.coach.freshChat', 'Fresh chat'));
     const input = document.getElementById('ai-coach-input');
     if (input) {
       input.value = '';
@@ -2061,7 +2192,7 @@
         ? CoachCore.resolveActionMode(action.type)
         : 'draft';
     if (mode === 'advise') {
-      ask(reminder.prompt || 'What should I check before logging care?');
+      ask(reminder.prompt || T('app.coach.advisePrompt', 'What should I check before logging care?'));
       return false;
     }
     const readyAction = enrichAction(action);
@@ -2070,11 +2201,14 @@
     history.push({
       role: 'assistant',
       content:
-        'Draft ready for “' +
-        plantName +
-        '”.\n\n' +
+        T('app.coach.draftReady', 'Draft ready for “{plant}”.', { plant: plantName }) +
+        '\n\n' +
         humanizeCoachText(reminder.message) +
-        '\n\nNothing is saved until you confirm — one tap applies it to the journal trail.',
+        '\n\n' +
+        T(
+          'app.coach.draftWait',
+          'Nothing is saved until you confirm — one tap applies it to the journal trail.'
+        ),
       at: Date.now(),
       source: 'local',
       actions: [readyAction],
@@ -2084,8 +2218,10 @@
         kind: 'draft',
         actionType: readyAction.type,
         tier: 'draft',
-        title: 'Drafted entry — ' + plantName,
-        body: 'Waiting on your approval — ' + actionLabel(readyAction),
+        title: T('app.coach.draftedEntry', 'Drafted entry — {plant}', { plant: plantName }),
+        body: T('app.coach.waitingApproval', 'Waiting on your approval — {action}', {
+          action: actionLabel(readyAction),
+        }),
         plantId: readyAction.plantId,
         status: 'pending',
       });
@@ -2094,7 +2230,7 @@
     openPanel();
     setCoachTab('chat');
     renderMessages();
-    setStatus('Confirm draft below');
+    setStatus(T('app.coach.confirmDraft', 'Confirm draft below'));
     return true;
   }
 
@@ -2104,8 +2240,12 @@
     return (
       '<div class="ai-coach-reminders">' +
       '<div class="ai-coach-reminders-head">' +
-      '<strong>Smart reminders</strong>' +
-      '<span>Care logs + weather when available</span>' +
+      '<strong>' +
+      esc(T('app.coach.remindersTitle', 'Smart reminders')) +
+      '</strong>' +
+      '<span>' +
+      esc(T('app.coach.remindersSub', 'Care logs + weather when available')) +
+      '</span>' +
       '</div>' +
       '<div class="ai-coach-reminder-list">' +
       list
@@ -2128,7 +2268,9 @@
             '</h4>' +
             '<button type="button" class="ai-coach-reminder-dismiss" data-reminder-dismiss="' +
             esc(r.id) +
-            '" aria-label="Dismiss reminder">×</button>' +
+            '" aria-label="' +
+            esc(T('app.coach.dismissReminder', 'Dismiss reminder')) +
+            '">×</button>' +
             '</div>' +
             '<p>' +
             esc(r.message) +
@@ -2137,12 +2279,18 @@
             (canDraft
               ? '<button type="button" class="btn btn-primary btn-sm" data-coach-draft="' +
                 esc(r.id) +
-                '">Draft log</button>'
+                '">' +
+                esc(T('app.coachBrief.draftLog', 'Draft log')) +
+                '</button>'
               : '') +
             '<button type="button" class="btn btn-ghost btn-sm ai-coach-reminder-action" data-coach-prompt="' +
             esc(r.prompt) +
             '">' +
-            (canDraft ? 'Ask first' : 'Plan this now') +
+            esc(
+              canDraft
+                ? T('app.coachBrief.askFirst', 'Ask first')
+                : T('app.coach.planNow', 'Plan this now')
+            ) +
             '</button>' +
             '</div>' +
             '</article>'
@@ -2160,8 +2308,15 @@
     const trustHtml = trustSeen
       ? ''
       : '<div class="ai-coach-trust" id="ai-coach-trust">' +
-        '<strong>Graduated help</strong>' +
-        'Routine nudges can surface on their own. Drafts wait for your tap. Minting and plant-health calls stay with you.' +
+        '<strong>' +
+        esc(T('app.coach.trustTitle', 'Graduated help')) +
+        '</strong>' +
+        esc(
+          T(
+            'app.coach.trustBody',
+            'Routine nudges can surface on their own. Drafts wait for your tap. Minting and plant-health calls stay with you.'
+          )
+        ) +
         '</div>';
     if (!trustSeen && typeof localStorage !== 'undefined') {
       try {
@@ -2171,9 +2326,20 @@
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
-      '<p class="ai-coach-empty-kicker">Grow coach</p>' +
-      '<h3>What needs attention?</h3>' +
-      '<p>A low-key grow buddy — care pace, weather, and plain-language next steps. Not a feature pitch.</p>' +
+      '<p class="ai-coach-empty-kicker">' +
+      esc(T('app.coach.titleShort', 'Grow coach')) +
+      '</p>' +
+      '<h3>' +
+      esc(T('app.coach.emptyTitle', 'What needs attention?')) +
+      '</h3>' +
+      '<p>' +
+      esc(
+        T(
+          'app.coach.emptyBody',
+          'A low-key grow buddy — care pace, weather, and plain-language next steps. Not a feature pitch.'
+        )
+      ) +
+      '</p>' +
       '</div>' +
       trustHtml +
       reminderCardsHtml(reminders) +
@@ -2183,9 +2349,13 @@
 
   function typingHtml() {
     return (
-      '<div class="ai-coach-bubble ai-coach-bubble--assistant ai-coach-bubble--typing" aria-label="Coach is thinking">' +
+      '<div class="ai-coach-bubble ai-coach-bubble--assistant ai-coach-bubble--typing" aria-label="' +
+      esc(T('app.coach.thinkingAria', 'Coach is thinking')) +
+      '">' +
       '<span class="ai-coach-typing"><i></i><i></i><i></i></span>' +
-      '<span>Thinking…</span>' +
+      '<span>' +
+      esc(T('app.coach.thinking', 'Thinking…')) +
+      '</span>' +
       '</div>'
     );
   }
@@ -2210,9 +2380,14 @@
           body +=
             '<img class="ai-coach-bubble-photo" src="' +
             esc(m.image) +
-            '" alt="Attached plant photo" />';
+            '" alt="' +
+            esc(T('app.coach.photoAlt', 'Attached plant photo')) +
+            '" />';
         } else if (m.role === 'user' && m.hasImage) {
-          body += '<p class="ai-coach-bubble-photo-note">Photo attached</p>';
+          body +=
+            '<p class="ai-coach-bubble-photo-note">' +
+            esc(T('app.coach.photoNote', 'Photo attached')) +
+            '</p>';
         }
         body +=
           '<p>' +
@@ -2222,7 +2397,7 @@
           const tiers = m.actions.map(function (a) {
             return window.CoachCore && typeof CoachCore.actionClassLabel === 'function'
               ? CoachCore.actionClassLabel(a.type)
-              : 'Draft & confirm';
+              : T('app.coach.classDraft', 'Draft & confirm');
           });
           const uniqueTier = tiers.filter(function (t, i) {
             return tiers.indexOf(t) === i;
@@ -2240,7 +2415,9 @@
             (highStakes ? ' ai-coach-confirm--high' : '') +
             '">' +
             '<p class="ai-coach-confirm-title">' +
-            (highStakes ? 'Confirm required — this touches the trail / chain' : 'Draft ready — confirm to save') +
+            (highStakes
+              ? T('app.coach.confirmHigh', 'Confirm required — this touches the trail / chain')
+              : T('app.coach.confirmDraftTitle', 'Draft ready — confirm to save')) +
             '</p>' +
             '<p class="ai-coach-confirm-tier">' +
             esc(uniqueTier.join(' · ')) +
@@ -2254,23 +2431,33 @@
             '</ul>' +
             '<div class="ai-coach-action-bar">' +
             '<button type="button" class="btn btn-primary btn-sm" data-coach-run>' +
-            (highStakes ? 'Yes, confirm' : 'Save to journal') +
+            (highStakes
+              ? T('app.coach.yesConfirm', 'Yes, confirm')
+              : T('app.coach.saveJournal', 'Save to journal')) +
             '</button>' +
-            '<button type="button" class="btn btn-ghost btn-sm" data-coach-cancel>Not now</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-coach-cancel>' +
+            T('app.unlock.cancel', 'Not now') +
+            '</button>' +
             '</div></div>';
         }
         body += '</div>';
         if (m.role === 'assistant' && m.source) {
           body +=
             '<span class="ai-coach-meta">' +
-            (m.source === 'gemini' ? 'Live coach' : 'Local helper') +
+            (m.source === 'gemini'
+              ? T('app.coach.liveMeta', 'Live coach')
+              : T('app.coach.localMeta', 'Local helper')) +
             '</span>';
         }
         if (m.role === 'assistant' && m.needsVerify) {
           body +=
             '<div class="ai-coach-verify-bar">' +
-            '<button type="button" class="btn btn-primary btn-sm" data-coach-resend-verify>Resend verification email</button>' +
-            '<button type="button" class="btn btn-ghost btn-sm" data-coach-refresh-verify>I already verified</button>' +
+            '<button type="button" class="btn btn-primary btn-sm" data-coach-resend-verify>' +
+            T('app.coach.resendVerify', 'Resend verification email') +
+            '</button>' +
+            '<button type="button" class="btn btn-ghost btn-sm" data-coach-refresh-verify>' +
+            T('app.coach.alreadyVerified', 'I already verified') +
+            '</button>' +
             '</div>';
         }
         return '<div class="' + cls + '">' + body + '</div>';
@@ -2314,12 +2501,12 @@
       restoreComposerDraft();
       setStatus(
         busy
-          ? 'Thinking…'
+          ? T('app.coach.thinking', 'Thinking…')
           : listening
-            ? 'Listening…'
+            ? T('app.coach.listeningShort', 'Listening…')
             : pendingActions.length
-              ? 'Confirm actions below'
-              : 'Ready to help'
+              ? T('app.coach.confirmActions', 'Confirm actions below')
+              : T('app.coach.ready', 'Ready to help')
       );
       // Deliberately not focusing the input: on mobile that throws the
       // keyboard up over the capability row and the conversation. The user
@@ -2357,7 +2544,7 @@
       mic.classList.remove('is-listening');
       mic.setAttribute('aria-pressed', 'false');
     }
-    if (!busy) setStatus('Ready to help');
+    if (!busy) setStatus(T('app.coach.ready', 'Ready to help'));
     if (recognition) {
       try {
         recognition.stop();
@@ -2409,7 +2596,7 @@
       };
     }
     listening = true;
-    setStatus('Listening… speak now');
+    setStatus(T('app.coach.listening', 'Listening… speak now'));
     const mic = document.getElementById('ai-coach-mic');
     if (mic) {
       mic.classList.add('is-listening');
@@ -2495,7 +2682,7 @@
     const sendText =
       text ||
       (image
-        ? 'Please look at this plant photo and help me diagnose what you see.'
+        ? T('app.coach.photoDiagnose', 'Please look at this plant photo and help me diagnose what you see.')
         : '');
     const input = document.getElementById('ai-coach-input');
     // Captured before the field is disabled below — disabling drops focus, so
@@ -2519,7 +2706,11 @@
     history.push(userTurn);
     typing = true;
     busy = true;
-    setStatus(image ? 'Looking at your photo…' : 'Thinking…');
+    setStatus(
+      image
+        ? T('app.coach.lookingPhoto', 'Looking at your photo…')
+        : T('app.coach.thinking', 'Thinking…')
+    );
     renderMessages();
     saveHistory();
 
@@ -2594,7 +2785,9 @@
 
     typing = false;
     actions = (actions || []).map(enrichAction).filter(actionPlantAvailable);
-    reply = humanizeCoachText(reply || 'Ready when you are — try a suggestion below.');
+    reply = humanizeCoachText(
+      reply || T('app.coach.readyWhen', 'Ready when you are — try a suggestion below.')
+    );
     pendingActions = actions.slice();
     history.push({
       role: 'assistant',
@@ -2607,7 +2800,11 @@
     saveHistory();
     renderMessages();
     busy = false;
-    setStatus(actions.length ? 'Confirm actions below' : 'Ready to help');
+    setStatus(
+      actions.length
+        ? T('app.coach.confirmActions', 'Confirm actions below')
+        : T('app.coach.ready', 'Ready to help')
+    );
     if (sendBtn) {
       sendBtn.disabled = false;
       sendBtn.classList.remove('is-pending');
@@ -2660,9 +2857,7 @@
     if (fab) fab.hidden = true;
     document.body.classList.remove('coach-fab-visible');
     const title = document.getElementById('ai-coach-title');
-    if (title) {
-      title.textContent = isAdopter() ? 'Adopter coach' : 'Grower coach';
-    }
+    if (title) title.textContent = coachTitleText();
     if (!show) close();
     else syncAccountChatScope();
   }
@@ -2673,6 +2868,12 @@
     boundChatUid = currentAuthUid();
     applyVisibility();
     renderMessages();
+    if (window.I18N && typeof I18N.whenReady === 'function') {
+      I18N.whenReady(function () {
+        applyCoachChrome();
+        if (open) renderMessages();
+      });
+    }
     try {
       if (window.firebase && firebase.auth) {
         firebase.auth().onAuthStateChanged(function () {
@@ -2696,7 +2897,7 @@
     pendingImage = url;
     ensureDom();
     syncAttachPreview();
-    setStatus('Photo attached — add a note or Ask coach.');
+    setStatus(T('app.coach.photoAttachedAsk', 'Photo attached — add a note or Ask coach.'));
     return true;
   }
 

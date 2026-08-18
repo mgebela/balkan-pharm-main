@@ -12,30 +12,25 @@
   <meta property="og:url" content="https://growto.live/dnevnik/" />
   <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="theme-color" content="#0f1a12" />
+  <meta name="theme-color" content="#f5faf3" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
-  <script src="../js/i18n.js?v=71748ff1e6" data-i18n-ns="common,signin"></script>
+  <script src="../js/i18n.js?v=a6db21df9a" data-i18n-ns="common,signin"></script>
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260802a" />
   <script>
-    /* Appearance, before first paint. Dark is the unthemed state, so this
-       only ever ADDS data-theme="light" — never removes a flash of dark.
-       Deliberately inline and dependency-free: a deferred script cannot
-       beat first paint, and a wrong first paint is the whole problem. */
+    /* Paper first paint — same growtoo sage journal as landing / app. */
     (function () {
+      document.documentElement.setAttribute('data-theme', 'light');
       try {
-        var p = localStorage.getItem('growtoo:appearance') || 'dark';
-        var light = p === 'light' ||
-          (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
-        if (light) document.documentElement.setAttribute('data-theme', 'light');
+        var p = localStorage.getItem('growtoo:appearance') || 'light';
         window.__growtooTheme = { pref: p };
-      } catch (e) { /* blocked storage: dark, which is the default anyway */ }
+      } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="../styles/tokens.css?v=20260806t" />
+  <link rel="stylesheet" href="../styles/tokens.css?v=20260818a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260816a" />
   <style>
     :root {
@@ -495,9 +490,65 @@
       text-transform: uppercase;
       color: var(--brass);
     }
+    body.journal-paper {
+      background: #f5faf3;
+    }
+    body.journal-paper::before {
+      display: none;
+    }
+    body.journal-paper .login-etch {
+      color: #c5d9be;
+      opacity: 0.7;
+    }
+    body.journal-paper .login-card {
+      background: #ffffff;
+      box-shadow: 0 12px 32px rgb(61 106 56 / 0.1);
+    }
+    body.journal-paper .login-brand-word,
+    body.journal-paper .login-eyebrow,
+    body.journal-paper .role-fields-title,
+    body.journal-paper .btn-text,
+    body.journal-paper .check-row a,
+    body.journal-paper .password-toggle {
+      color: var(--green);
+    }
+    body.journal-paper .auth-tabs {
+      background: #eaf6e6;
+    }
+    body.journal-paper .auth-tab.is-active,
+    body.journal-paper button[type="submit"],
+    body.journal-paper button[type="submit"].submit--grower,
+    body.journal-paper button[type="submit"].submit--adopter {
+      background: var(--green);
+      border-color: var(--green);
+      color: #ffffff;
+    }
+    body.journal-paper button[type="submit"]:hover,
+    body.journal-paper button[type="submit"].submit--grower:hover,
+    body.journal-paper button[type="submit"].submit--adopter:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+    body.journal-paper input,
+    body.journal-paper textarea,
+    body.journal-paper select {
+      background: #ffffff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    body.journal-paper input:focus,
+    body.journal-paper textarea:focus,
+    body.journal-paper select:focus {
+      border-color: var(--green);
+    }
+    body.journal-paper .profile-option.is-selected,
+    body.journal-paper .choice-option.is-selected {
+      border-color: var(--green);
+      background: #eaf6e6;
+    }
   </style>
 </head>
-<body>
+<body class="journal-paper">
   <svg class="login-etch" viewBox="0 0 200 280" fill="none" aria-hidden="true">
     <path stroke="currentColor" stroke-width="1.1" d="M100 268V48"/>
     <path stroke="currentColor" stroke-width="1" d="M100 88c-28-18-48-20-62-12M100 88c28-18 48-20 62-12M100 128c-32-14-52-8-66 6M100 128c32-14 52-8 66 6M100 168c-26-10-44-4-54 10M100 168c26-10 44-4 54 10"/>

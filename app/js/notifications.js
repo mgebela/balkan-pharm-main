@@ -61,7 +61,8 @@
     const map = readDedup();
     const k = dedupKey(type, key);
     const at = map[k];
-    if (at && Date.now() - Number(at) < DEDUP_TTL_MS) return true;
+    const ttl = type === 'wallet_reconnect' ? 7 * 24 * 60 * 60 * 1000 : DEDUP_TTL_MS;
+    if (at && Date.now() - Number(at) < ttl) return true;
     map[k] = Date.now();
     // prune
     const cutoff = Date.now() - DEDUP_TTL_MS;
@@ -81,6 +82,61 @@
       }
     });
     renderBell();
+  }
+
+  /* [dictionary key, English] — resolved at render time. */
+  var NOTIF_TYPE_LABELS = {
+    wallet_reconnect: ['app.notif.type.wallet_reconnect', 'Wallet reconnect'],
+    seed_mint: ['app.notif.type.seed_mint', 'Seed mint'],
+    growth_mint: ['app.notif.type.growth_mint', 'Growth mint'],
+    harvest_claim: ['app.notif.type.harvest_claim', 'Harvest claim'],
+    sale_settled: ['app.notif.type.sale_settled', 'Sale settled'],
+    stake_received: ['app.notif.type.stake_received', 'Stake received'],
+    platform_bonus: ['app.notif.type.platform_bonus', 'Platform bonus'],
+    test_faucet: ['app.notif.type.test_faucet', 'Test faucet'],
+    activity_reward: ['app.notif.type.activity_reward', 'Activity reward'],
+    care_due: ['app.notif.type.care_due', 'Care due'],
+    journal_entry: ['app.notif.type.journal_entry', 'Journal entry'],
+    care_week: ['app.notif.type.care_week', 'Weekly care'],
+    care_month: ['app.notif.type.care_month', 'Monthly care'],
+    system: ['app.notif.type.system', 'System'],
+  };
+
+  function notifTypeLabel(type) {
+    const key = String(type || '').trim();
+    if (!key) return '';
+    const row = NOTIF_TYPE_LABELS[key];
+    return row ? T(row[0], row[1]) : key.replace(/_/g, ' ');
+  }
+
+  function displayNotifCopy(n) {
+    if (!n) return { title: '', body: '' };
+    if (n.type === 'wallet_reconnect') {
+      const pk = shortPubkey((n.meta && n.meta.pubkey) || '');
+      return {
+        title: T('app.notif.reconnectTitle', 'Reconnect your Solana wallet'),
+        body: T(
+          'app.notif.reconnectBody',
+          'Signing out (or switching accounts) ends the browser wallet session — normal for Phantom/Solflare. Your account stays linked to {pubkey}. Tap Reconnect to invest, mint, or list RWAs.',
+          { pubkey: pk || '…' }
+        ),
+      };
+    }
+    return {
+      title: n.title || T('app.notif.update', 'Update'),
+      body: n.body || '',
+    };
+  }
+
+  function visibleInboxItems(list) {
+    const seen = {};
+    return (list || []).filter(function (n) {
+      if (!n || n.type !== 'wallet_reconnect') return true;
+      const key = (n.meta && (n.meta.key || n.meta.pubkey)) || 'wallet_reconnect';
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
   }
 
   function unreadCount() {
@@ -203,9 +259,10 @@
       return;
     }
     list.innerHTML =
-      items
+      visibleInboxItems(items)
         .map(function (n) {
-          const typeLabel = n.type ? String(n.type).replace(/_/g, ' ') : '';
+          const copy = displayNotifCopy(n);
+          const typeLabel = notifTypeLabel(n.type);
           return (
             '<button type="button" class="notif-item' +
             (n.read ? '' : ' notif-item--unread') +
@@ -214,10 +271,10 @@
             '">' +
             '<span class="notif-item-dot" aria-hidden="true"></span>' +
             '<span class="notif-item-title">' +
-            esc(n.title || T('app.notif.update', 'Update')) +
+            esc(copy.title) +
             '</span>' +
             '<span class="notif-item-body">' +
-            esc(n.body || '') +
+            esc(copy.body) +
             '</span>' +
             '<span class="notif-item-meta">' +
             '<span class="notif-chip">' +
@@ -999,7 +1056,7 @@
       },
       {
         type: 'seed_mint',
-        title: 'Seed NFT minted',
+        title: T('app.notif.seedMinted', 'Seed NFT minted'),
         body: T('app.notif.demo.seedBody', 'Northern Lights is on-chain.'),
         createdAt: iso(180),
         meta: { key: 'demo:seed', demo: true },
@@ -1007,7 +1064,7 @@
       },
       {
         type: 'growth_mint',
-        title: 'Growth stage minted',
+        title: T('app.notif.growthMinted', 'Growth stage minted'),
         body: T('app.notif.demo.growthBody', 'Northern Lights → vegetative · +35 $GROWTOO'),
         createdAt: iso(200),
         meta: { key: 'demo:growth', demo: true },
@@ -1015,7 +1072,7 @@
       },
       {
         type: 'platform_bonus',
-        title: 'Platform bonus minted',
+        title: T('app.notif.bonusMinted', 'Platform bonus minted'),
         body: T('app.notif.demo.bonusBody', '+18 $GROWTOO for this month (plants, weeks, flower).'),
         createdAt: iso(360),
         meta: { key: 'demo:platform', demo: true },
@@ -1023,7 +1080,7 @@
       },
       {
         type: 'harvest_claim',
-        title: 'Harvest stake released',
+        title: T('app.notif.stakeReleased', 'Harvest stake released'),
         body: T('app.notif.demo.releasedBody', 'Locked $GROWTOO for "Batch B-2026-07" released to you.'),
         createdAt: iso(500),
         meta: { key: 'demo:harvest', demo: true },
@@ -1049,7 +1106,7 @@
       },
       {
         type: 'sale_settled',
-        title: 'Grower unlocked full stake',
+        title: T('app.notif.growerUnlocked', 'Grower unlocked full stake'),
         body: T('app.notif.demo.settledBody', '"Batch B-2026-07" monthly care settled · released.'),
         createdAt: iso(120),
         meta: { key: 'demo:unlock', demo: true },
