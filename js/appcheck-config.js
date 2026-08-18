@@ -66,4 +66,47 @@
       console.warn('App Check init skipped', err);
     }
   };
+
+  /**
+   * Headers for Cloud Function fetch() calls: JSON + optional App Check +
+   * Firebase ID token. Safe when App Check is off or the user is signed out.
+   * @param {Object=} extra Extra header fields.
+   * @return {Promise<Object>}
+   */
+  window.growtooFunctionHeaders = function (extra) {
+    var headers = Object.assign({'Content-Type': 'application/json'}, extra || {});
+    function withAppCheck() {
+      try {
+        if (!window.GROWTOO_APPCHECK_SITE_KEY) return Promise.resolve();
+        if (!window.firebase || !window.firebase.appCheck) return Promise.resolve();
+        return window.firebase
+            .appCheck()
+            .getToken(false)
+            .then(function (result) {
+              if (result && result.token) {
+                headers['X-Firebase-AppCheck'] = result.token;
+              }
+            })
+            .catch(function () {
+              /* monitor mode — missing token is logged server-side */
+            });
+      } catch (err) {
+        return Promise.resolve();
+      }
+    }
+    function withAuth() {
+      try {
+        if (window.firebase && firebase.auth && firebase.auth().currentUser) {
+          return firebase.auth().currentUser.getIdToken().then(function (token) {
+            if (token) headers.Authorization = 'Bearer ' + token;
+            return headers;
+          });
+        }
+      } catch (err) {
+        /* ignore */
+      }
+      return Promise.resolve(headers);
+    }
+    return withAppCheck().then(withAuth);
+  };
 })();

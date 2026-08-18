@@ -19,6 +19,7 @@ const {
   persistHealth,
 } = require('./tx-health');
 const {kickChainQueues, becamePending} = require('./kick-chain-queues');
+const {requireOpsOrSignedIn, opsAllowsForce} = require('./ops-http-guard');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {syncMarketPublicTape} = require('./market-public-tape');
 const {
@@ -62,6 +63,37 @@ function allowReconcileRequest(req) {
   entry.count += 1;
   reconcileHits.set(ip, entry);
   return entry.count <= max;
+}
+
+/**
+ * Auth gate for HTTP ops pings. Scheduler onSchedule handlers skip this.
+ * OPTIONS is answered here so CORS preflight does not need a token.
+ * @return {Promise<boolean>} false when the response was already sent.
+ */
+async function gateOpsHttp(req, res, label) {
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return false;
+  }
+  if (!allowReconcileRequest(req)) {
+    res.status(429).json({ok: false, error: 'Too many requests'});
+    return false;
+  }
+  try {
+    const auth = await requireOpsOrSignedIn(req);
+    if (auth.kind !== 'ops') {
+      await verifyAppCheck(req, label);
+    }
+    req.growtooOpsAuth = auth;
+    return true;
+  } catch (err) {
+    res.status(err.status || 401).json({
+      ok: false,
+      error: (err && err.message) || 'Unauthorized',
+      code: err.code || 'ops_unauthorized',
+    });
+    return false;
+  }
 }
 
 const COACH_SYSTEM = `You are the growtoo Grower Coach — a practical CBD/hemp cultivation and tokenisation assistant that can PROPOSE app actions.
@@ -215,6 +247,7 @@ exports.linkWallet = onRequest(
  *   - App market view auto-ping
  *
  * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow
+ * Auth: Firebase ID token (app) or X-Growtoo-Ops: GROWTOO_OPS_SECRET (CI).
  */
 exports.reconcileMarketEscrow = onRequest(
     {
@@ -226,10 +259,7 @@ exports.reconcileMarketEscrow = onRequest(
       maxInstances: 2,
     },
     async (req, res) => {
-      if (!allowReconcileRequest(req)) {
-        res.status(429).json({ok: false, error: 'Too many reconcile requests'});
-        return;
-      }
+      if (!(await gateOpsHttp(req, res, 'reconcileMarketEscrow'))) return;
       try {
         // Optional: set Cloud Run env SOLANA_RPC_URL to a Helius/QuickNode Devnet URL.
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
@@ -265,6 +295,7 @@ exports.reconcileMarketEscrowSchedule = onSchedule(
  * Uses fee-payer + escrow (+ mint authority for legacy holdings).
  *
  * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/settleMarketQueue
+ * Auth: Firebase ID token (app) or X-Growtoo-Ops: GROWTOO_OPS_SECRET (CI).
  */
 exports.settleMarketQueue = onRequest(
     {
@@ -276,10 +307,7 @@ exports.settleMarketQueue = onRequest(
       maxInstances: 2,
     },
     async (req, res) => {
-      if (!allowReconcileRequest(req)) {
-        res.status(429).json({ok: false, error: 'Too many settle requests'});
-        return;
-      }
+      if (!(await gateOpsHttp(req, res, 'settleMarketQueue'))) return;
       try {
         const result = await settleMarketPending();
         res.json(result);
@@ -309,6 +337,8 @@ exports.settleMarketQueueSchedule = onSchedule(
  * Used when a mint is queued so Devnet pickup is ~1–2 min instead of GH cron drift.
  *
  * POST/GET https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues
+ * Auth: Firebase ID token (app) or X-Growtoo-Ops: GROWTOO_OPS_SECRET (CI).
+ * `force` is ignored unless the ops secret is used.
  */
 exports.kickChainQueues = onRequest(
     {
@@ -320,15 +350,13 @@ exports.kickChainQueues = onRequest(
       maxInstances: 4,
     },
     async (req, res) => {
-      if (!allowReconcileRequest(req)) {
-        res.status(429).json({ok: false, error: 'Too many kick requests'});
-        return;
-      }
+      if (!(await gateOpsHttp(req, res, 'kickChainQueues'))) return;
       try {
         const body = req.method === 'GET' ? req.query : req.body || {};
         const result = await kickChainQueues({
           source: String(body.source || 'http'),
-          force: body.force === true || body.force === '1',
+          force: opsAllowsForce(req.growtooOpsAuth) &&
+            (body.force === true || body.force === '1'),
         });
         res.status(result.ok ? 200 : 500).json(result);
       } catch (err) {
@@ -850,10 +878,7 @@ exports.verifyTxHealth = onRequest(
       maxInstances: 2,
     },
     async (req, res) => {
-      if (!allowReconcileRequest(req)) {
-        res.status(429).json({ok: false, error: 'Too many requests'});
-        return;
-      }
+      if (!(await gateOpsHttp(req, res, 'verifyTxHealth'))) return;
       try {
         setPreferredRpc(process.env.SOLANA_RPC_URL || '');
         const body = req.method === 'GET' ? req.query : req.body || {};

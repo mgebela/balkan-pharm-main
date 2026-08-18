@@ -95,6 +95,53 @@ async function loadGrowthHistory(mintAddress) {
     .map((d) => ({ stage: d.stage, reward: d.reward, ts: d.mintedAt, signature: d.signature }));
 }
 
+async function walletHoldsMint(owner, mintAddress) {
+  if (!owner || !mintAddress) return false;
+  const urls = [];
+  const preferred = String(process.env.SOLANA_RPC_URL || '').trim();
+  if (preferred) urls.push(preferred);
+  urls.push('https://api.devnet.solana.com');
+  let lastErr = null;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getTokenAccountsByOwner',
+          params: [
+            owner,
+            { mint: mintAddress },
+            { encoding: 'jsonParsed', commitment: 'confirmed' },
+          ],
+        }),
+      });
+      const json = await res.json();
+      if (json.error) {
+        lastErr = new Error(json.error.message || JSON.stringify(json.error));
+        continue;
+      }
+      const values = (json.result && json.result.value) || [];
+      return values.some((a) => {
+        const amount =
+          a &&
+          a.account &&
+          a.account.data &&
+          a.account.data.parsed &&
+          a.account.data.parsed.info &&
+          a.account.data.parsed.info.tokenAmount &&
+          a.account.data.parsed.info.tokenAmount.uiAmount;
+        return Number(amount) > 0;
+      });
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+  throw lastErr || new Error('Could not verify NFT ownership');
+}
+
 async function processDoc(doc) {
   const data = doc.data();
   const stage = stageByKey(data.stage);
@@ -131,7 +178,34 @@ async function processDoc(doc) {
       `  journal proof ok · plant ${proof.summary.plantName || plantId} · water ${proof.summary.wateringCount} · feed ${proof.summary.feedingCount}`
     );
 
-    const recipient = publicKey(data.recipient || seed.recipient || umi.identity.publicKey);
+    const mintedDup = await db
+      .collection('growthMints')
+      .where('mintAddress', '==', data.mintAddress)
+      .where('status', '==', 'minted')
+      .get();
+    if (mintedDup.docs.some((d) => d.id !== doc.id && d.data().stage === data.stage)) {
+      throw new Error('This growth stage was already minted for this seed NFT.');
+    }
+    const pendingDup = await db
+      .collection('growthMints')
+      .where('mintAddress', '==', data.mintAddress)
+      .where('status', '==', 'pending')
+      .get();
+    if (pendingDup.docs.some((d) => d.id !== doc.id && d.data().stage === data.stage)) {
+      throw new Error('A growth mint for this stage is already pending.');
+    }
+
+    const userSnap = await db.collection('users').doc(data.uid).get();
+    const linkedPk = String((userSnap.exists && userSnap.data().solanaPubkey) || '');
+    const holder = linkedPk || data.recipient || seed.recipient || '';
+    if (!holder) {
+      throw new Error('No linked Solana wallet to receive the $GROWTOO reward.');
+    }
+    if (!(await walletHoldsMint(holder, data.mintAddress))) {
+      throw new Error('Linked wallet does not hold this seed NFT on-chain.');
+    }
+
+    const recipient = publicKey(holder);
     const reward = stage.reward;
 
     // 1. New stage metadata on Arweave.

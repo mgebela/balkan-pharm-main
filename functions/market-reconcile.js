@@ -9,7 +9,7 @@ const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 
 const ESCROW_ADDRESS =
   process.env.MARKET_ESCROW_ADDRESS ||
-  'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';
+  'EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD';
 const LEGACY_ESCROW_ADDRESS =
   process.env.MARKET_LEGACY_ESCROW_ADDRESS ||
   'F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3';

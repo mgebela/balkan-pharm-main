@@ -5,7 +5,51 @@ Console:
 https://console.firebase.google.com/project/balpha-9dab9/authentication/emails
 
 Sender display name is already set via API to: growtoo
-(From address stays noreply@… unless you add custom SMTP.)
+(From address stays noreply@balpha-9dab9.firebaseapp.com until the custom
+domain below is verified and applied.)
+
+------------------------------------------------------------
+0) Google sign-in still says “balpha-9dab9” in mail / popup
+------------------------------------------------------------
+The site code cannot rename this. Project ID stays balpha-9dab9 forever.
+
+A) Gmail “new sign-in” / Google popup (“Continue to balpha-9dab9…”)
+   This is Google OAuth branding, not Firebase templates.
+
+   1. Open:
+      https://console.cloud.google.com/auth/branding?project=balpha-9dab9
+      (older UI: APIs & Services → OAuth consent screen)
+   2. App name: growtoo
+   3. Support email + privacy: https://growto.live/privacy/
+      Terms: https://growto.live/terms/
+   4. App domain: growto.live  ·  logo: images/growtoo-mark-brass.png
+   5. Save / publish. Unverified apps often still show the project id or
+      balpha-9dab9.firebaseapp.com until Google brand verification.
+
+   Do not change firebaseConfig.authDomain to growto.live until
+   https://growto.live/__/auth/handler is served (Netlify does not, Firebase
+   Hosting would). Changing it now breaks Google sign-in.
+
+B) Firebase verify / reset mail still From: …@balpha-9dab9.firebaseapp.com
+   Custom domain growto.live was started 2026-08-03 and is still IN_PROGRESS
+   (DNS not finished). Finish it:
+
+   1. https://console.firebase.google.com/project/balpha-9dab9/authentication/emails
+   2. Edit a template → Customize domain → growto.live
+   3. Add the TXT + CNAME records Firebase shows at your DNS host
+   4. Wait for green “Verification complete” → Apply custom domain
+   5. After apply, From becomes growtoo <noreply@growto.live> and action
+      links leave balpha-9dab9.firebaseapp.com
+
+C) %APP_NAME% in default subjects (“… for %APP_NAME%”)
+   Firebase project display name is still “balpha”. Set public-facing name:
+
+   https://console.firebase.google.com/project/balpha-9dab9/settings/general
+   Public-facing name → growtoo
+   (If the field is missing: Authentication → Sign-in method → Google → enable,
+   then it appears.)
+
+   Then paste the growtoo subjects in sections 1–3 below.
 
 Subjects + HTML bodies must be pasted in the Console
 (API returns EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED for subject;

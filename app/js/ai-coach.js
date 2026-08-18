@@ -2644,13 +2644,22 @@
     };
     if (imageDataUrl) payload.image = imageDataUrl;
     let res;
+    let headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + token,
+    };
+    if (typeof window.growtooFunctionHeaders === 'function') {
+      try {
+        headers = await window.growtooFunctionHeaders();
+        if (!headers.Authorization) headers.Authorization = 'Bearer ' + token;
+      } catch (_) {
+        /* keep bearer-only */
+      }
+    }
     try {
       res = await fetch(COACH_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token,
-        },
+        headers: headers,
         body: JSON.stringify(payload),
       });
     } catch (netErr) {

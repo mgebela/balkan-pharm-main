@@ -1023,24 +1023,9 @@
     await ref.delete();
   }
 
-  async function ensureViewerBootstrapGrant(viewerUid, email) {
-    const normalized = (email || '').toLowerCase();
-    if (!SHARED_HYBRID_ACCESS_EMAILS.includes(normalized)) return;
-    const superIds = await findSuperadminUserIds();
-    if (!superIds.length) return;
-    const ownerUid = superIds[0];
-    const ref = getSharedGrantsRef(ownerUid, viewerUid);
-    if (!ref) return;
-    const snap = await ref.get();
-    if (snap.exists) return;
-    await saveSharedGrant(ownerUid, viewerUid, {
-      viewerEmail: email,
-      plantIds: [],
-      shareEntries: true,
-      shareToolbox: true,
-      enabled: true,
-      fullAccess: true,
-    });
+  async function ensureViewerBootstrapGrant() {
+    // Grants are created only by the owner or superadmin (firestore.rules).
+    // Hybrid emails wait for the sharing panel — viewers must not self-grant.
   }
 
   async function loadSuperadminDatabaseFull() {

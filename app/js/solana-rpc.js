@@ -48,6 +48,22 @@
     return /429|Too Many Requests|rate limit|capacity|503/i.test(String(msg || ''));
   }
 
+  function isGrowtooRpc(url) {
+    return /cloudfunctions\.net\/solanaRpc|\/solanaRpc(\?|$)/.test(String(url || ''));
+  }
+
+  async function rpcHeaders(url) {
+    const base = { 'Content-Type': 'application/json' };
+    if (!isGrowtooRpc(url) || typeof window.growtooFunctionHeaders !== 'function') {
+      return base;
+    }
+    try {
+      return await window.growtooFunctionHeaders();
+    } catch (_) {
+      return base;
+    }
+  }
+
   async function rpc(method, params, options) {
     const opts = options || {};
     const urls = endpoints();
@@ -59,7 +75,7 @@
       try {
         const res = await fetch(url, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: await rpcHeaders(url),
           body: JSON.stringify({
             jsonrpc: '2.0',
             id: 1,

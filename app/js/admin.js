@@ -73,8 +73,6 @@ function esc(value) {
 }
 
 onAuthStateChanged(auth, async (user) => {
-  console.log("AUTH:", user);
-
   if (!user) {
     window.location.href = "../index.html";
     return;

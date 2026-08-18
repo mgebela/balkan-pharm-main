@@ -18,7 +18,9 @@ The code is already in place and **inert**. Nothing changes until step 2.
 | Sign-in (modular SDK) | `dnevnik/index.html` | same |
 | Admin (modular SDK) | `app/js/admin.js` + 5 admin pages | same |
 | Server verification | `functions/user-guards.js` → `verifyAppCheck()` | monitor mode |
-| Endpoints verified | `coachChat`, `analyzeGrowFrames`, `solanaRpc` | monitor mode |
+| Endpoints verified | `coachChat`, `analyzeGrowFrames`, `solanaRpc`, `linkWallet` | monitor mode |
+| Client Function headers | `window.growtooFunctionHeaders()` | ID token + App Check when the site key is set |
+| HTTP ops (settle/reconcile/kick) | Firebase ID token **or** `GROWTOO_OPS_SECRET` | required after Functions deploy |
 
 Every client init is wrapped in try/catch. App Check must never be the reason
 the app fails to start.

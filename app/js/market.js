@@ -303,11 +303,19 @@
     if (reconcileTimer) clearTimeout(reconcileTimer);
     reconcileTimer = setTimeout(function () {
       lastReconcileAt = Date.now();
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: 'app-market', count: pending.length }),
-      })
+      const ping = function (headers) {
+        return fetch(url, {
+          method: 'POST',
+          headers: headers || { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source: 'app-market', count: pending.length }),
+        });
+      };
+      const ready =
+        typeof window.growtooFunctionHeaders === 'function'
+          ? window.growtooFunctionHeaders()
+          : Promise.resolve({ 'Content-Type': 'application/json' });
+      ready
+        .then(ping)
         .then(function (res) {
           return res.json().catch(function () {
             return null;
@@ -340,11 +348,19 @@
     if (settleTimer) clearTimeout(settleTimer);
     settleTimer = setTimeout(function () {
       lastSettleAt = Date.now();
-      fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: 'app-market', count: pending.length }),
-      })
+      const ping = function (headers) {
+        return fetch(url, {
+          method: 'POST',
+          headers: headers || { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source: 'app-market', count: pending.length }),
+        });
+      };
+      const ready =
+        typeof window.growtooFunctionHeaders === 'function'
+          ? window.growtooFunctionHeaders()
+          : Promise.resolve({ 'Content-Type': 'application/json' });
+      ready
+        .then(ping)
         .then(function (res) {
           return res.json().catch(function () {
             return null;
@@ -509,19 +525,24 @@
 
     function ping(url, body) {
       if (!url) return Promise.resolve({ ok: false });
-      return fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-        .then(function (res) {
+      const send = function (headers) {
+        return fetch(url, {
+          method: 'POST',
+          headers: headers || { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        }).then(function (res) {
           return res.json().catch(function () {
             return { ok: res.ok };
           });
-        })
-        .catch(function () {
-          return { ok: false };
         });
+      };
+      const ready =
+        typeof window.growtooFunctionHeaders === 'function'
+          ? window.growtooFunctionHeaders()
+          : Promise.resolve({ 'Content-Type': 'application/json' });
+      return ready.then(send).catch(function () {
+        return { ok: false };
+      });
     }
 
     Promise.all([

@@ -812,81 +812,114 @@
           );
           }
         }
-        token.stageIndex += 1;
-        const stage = GROWTH_STAGES[token.stageIndex];
+        return {
+          token: token,
+          stageIndex: token.stageIndex,
+          nextStage: nextStage,
+        };
+      }, 800).then(async (prep) => {
+        const SC = window.SeedChain;
+        const token = prep.token;
+        const nextStage = prep.nextStage;
+        let onchainStatus = 'skipped';
+        let onchainError = '';
+        let growthRequestId = '';
+
+        if (SC && SC.isEnabled()) {
+          const seedMint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
+          if (seedMint && seedMint.mintAddress) {
+            try {
+              const journalProof =
+                window.GrowerQuests && typeof GrowerQuests.buildProof === 'function'
+                  ? GrowerQuests.buildProof(token, nextStage.key)
+                  : null;
+              const requestId = await SC.requestGrowthMint({
+                mintAddress: seedMint.mintAddress,
+                seedMintRequestId: token.mintRequestId,
+                stage: nextStage.key,
+                name: token.name,
+                strain: token.strain || token.name,
+                batch: token.batch,
+                plantId: token.plantId,
+                journalProof: journalProof,
+              });
+              if (!requestId) {
+                throw new Error(
+                  T(
+                    'app.token.growthQueueRefused',
+                    'Growth mint queue did not accept the request.'
+                  )
+                );
+              }
+              growthRequestId = requestId;
+              onchainStatus = 'queued';
+            } catch (err) {
+              console.warn('Devnet growth mint request failed', err);
+              return {
+                token: token,
+                reward: 0,
+                tx: null,
+                targetStage: nextStage.key,
+                onchainStatus: 'failed',
+                onchainError:
+                  (err && err.message) ||
+                  T(
+                    'app.token.growthRequestFailed',
+                    'Devnet growth mint request failed.'
+                  ),
+              };
+            }
+          } else {
+            onchainStatus = 'pending_seed';
+            onchainError = T(
+              'app.token.stageSavedLocally',
+              'Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.'
+            );
+          }
+        }
+
+        const wallet = readWallet();
+        const stored = wallet.tokens.find((t) => t.id === token.id);
+        if (!stored) throw new Error(T('app.token.tokenNotFound', 'Token not found.'));
+        if (stored.stageIndex !== prep.stageIndex) {
+          return {
+            token: stored,
+            reward: 0,
+            tx: null,
+            targetStage: nextStage.key,
+            onchainStatus: onchainStatus,
+            onchainError: onchainError,
+            growthRequestId: growthRequestId,
+          };
+        }
+        stored.stageIndex += 1;
+        const stage = GROWTH_STAGES[stored.stageIndex];
         const tx = mockTxHash();
         wallet.growthBalance = Number(wallet.growthBalance || 0) + stage.reward;
-        token.history.push({
+        stored.history.push({
           ts: Date.now(),
           type: 'growth',
           stage: stage.key,
           amount: stage.reward,
           tx,
         });
+        if (growthRequestId) {
+          if (!stored.growthRequests) stored.growthRequests = {};
+          stored.growthRequests[stage.key] = growthRequestId;
+        }
         writeWallet(wallet);
         if (window.GrowerQuests) {
           GrowerQuests.awardXp('growth_mint_' + stage.key, GrowerQuests.QUEST_XP.mintReady);
         }
-        return { token, reward: stage.reward, tx, targetStage: stage.key };
-      }, 800).then(async (result) => {
-        const SC = window.SeedChain;
-        const token = result.token;
-        if (!SC || !SC.isEnabled()) {
-          result.onchainStatus = 'skipped';
-          return result;
-        }
-        const seedMint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
-        if (!seedMint || !seedMint.mintAddress) {
-          // Local stage advanced; on-chain update waits until seed NFT exists.
-          result.onchainStatus = 'pending_seed';
-          result.onchainError =
-            T(
-              'app.token.stageSavedLocally',
-              'Stage saved locally. On-chain mint waits until the seed NFT is minted — use Retry if needed.'
-            );
-          return result;
-        }
-        try {
-          const stage = GROWTH_STAGES[token.stageIndex];
-          const journalProof =
-            window.GrowerQuests && typeof GrowerQuests.buildProof === 'function'
-              ? GrowerQuests.buildProof(token, stage.key)
-              : null;
-          const requestId = await SC.requestGrowthMint({
-            mintAddress: seedMint.mintAddress,
-            seedMintRequestId: token.mintRequestId,
-            stage: stage.key,
-            name: token.name,
-            strain: token.strain || token.name,
-            batch: token.batch,
-            plantId: token.plantId,
-            journalProof: journalProof,
-          });
-          if (requestId) {
-            const wallet = readWallet();
-            const stored = wallet.tokens.find((t) => t.id === token.id);
-            if (stored) {
-              if (!stored.growthRequests) stored.growthRequests = {};
-              stored.growthRequests[stage.key] = requestId;
-              writeWallet(wallet);
-            }
-            result.growthRequestId = requestId;
-            result.onchainStatus = 'queued';
-          } else {
-            result.onchainStatus = 'failed';
-            result.onchainError = T(
-            'app.token.growthQueueRefused',
-            'Growth mint queue did not accept the request.'
-          );
-          }
-        } catch (err) {
-          console.warn('Devnet growth mint request failed', err);
-          result.onchainStatus = 'failed';
-          result.onchainError =
-            (err && err.message) ||
-            T('app.token.growthRequestFailed', 'Devnet growth mint request failed.');
-        }
-        return result;
+        return {
+          token: stored,
+          reward: stage.reward,
+          tx: tx,
+          targetStage: stage.key,
+          onchainStatus: onchainStatus,
+          onchainError: onchainError,
+          growthRequestId: growthRequestId,
+        };
       });
     },
 

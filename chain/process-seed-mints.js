@@ -31,6 +31,33 @@ async function processDoc(doc) {
   }
   console.log(`Minting ${label}…`);
   try {
+    const plantId = data.plantId || null;
+    if (!plantId) {
+      throw new Error('Seed mint requires a linked journal plantId.');
+    }
+    const stateSnap = await db
+      .collection('users')
+      .doc(data.uid)
+      .collection('app')
+      .doc('state')
+      .get();
+    const plants = (stateSnap.exists && Array.isArray(stateSnap.data().plants))
+      ? stateSnap.data().plants
+      : [];
+    if (!plants.some((p) => p && String(p.id) === String(plantId))) {
+      throw new Error('Plant not found in grower journal — cannot mint seed.');
+    }
+    const samePlant = await db.collection('seedMints').where('plantId', '==', plantId).get();
+    const clash = samePlant.docs.find((d) => {
+      if (d.id === doc.id) return false;
+      const row = d.data() || {};
+      return row.uid === data.uid && (row.status === 'pending' || row.status === 'minted');
+    });
+    if (clash) {
+      throw new Error(
+        'A seed mint for this plant is already ' + (clash.data().status || 'filed') + '.',
+      );
+    }
     const result = await mintSeedNft(
       umi,
       {

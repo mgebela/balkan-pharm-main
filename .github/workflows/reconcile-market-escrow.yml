@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping reconcileMarketEscrow
+        env:
+          OPS_SECRET: ${{ secrets.GROWTOO_OPS_SECRET }}
         run: |
           set -euo pipefail
           URL="${{ secrets.MARKET_RECONCILE_URL }}"
@@ -19,8 +21,13 @@ jobs:
             URL="https://europe-west1-balpha-9dab9.cloudfunctions.net/reconcileMarketEscrow"
           fi
           echo "POST $URL"
+          if [ -z "${OPS_SECRET:-}" ]; then
+            echo "::warning::GROWTOO_OPS_SECRET unset — skipping HTTP ping. Cloud Scheduler still reconciles. Add the secret (same value as Functions env GROWTOO_OPS_SECRET) to restore this backup ping."
+            exit 0
+          fi
           curl -sfS -X POST "$URL" \
             -H 'Content-Type: application/json' \
+            -H "X-Growtoo-Ops: ${OPS_SECRET}" \
             -d '{"source":"github-actions"}' \
             | tee /tmp/reconcile.json
           python3 - <<'PY'

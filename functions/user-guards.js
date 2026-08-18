@@ -45,9 +45,10 @@ class GuardError extends Error {
  * gates email/password accounts that never clicked the verification link.
  *
  * @param {!Object} req Incoming request.
+ * @param {string} [unverifiedMessage] Override the 403 copy (wallet vs AI).
  * @return {Promise<Object>} The decoded ID token.
  */
-async function requireVerifiedUser(req) {
+async function requireVerifiedUser(req, unverifiedMessage) {
   const authHeader = req.headers.authorization || '';
   const match = authHeader.match(/^Bearer (.+)$/i);
   if (!match) {
@@ -69,8 +70,9 @@ async function requireVerifiedUser(req) {
   if (!decoded.email_verified) {
     throw new GuardError(
         403,
-        'Verify your email address to use the AI features. ' +
-      'Check your inbox for the growtoo verification link.',
+        unverifiedMessage ||
+          'Verify your email address to use the AI features. ' +
+            'Check your inbox for the growtoo verification link.',
         'email_unverified',
     );
   }

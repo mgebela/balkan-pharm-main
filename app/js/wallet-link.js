@@ -139,13 +139,15 @@
         T('app.wallet.signInFirst', 'Sign in to your growtoo account before linking a wallet.')
       );
     }
+    const headers =
+      typeof window.growtooFunctionHeaders === 'function'
+        ? await window.growtooFunctionHeaders()
+        : { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
+    if (!headers.Authorization) headers.Authorization = 'Bearer ' + token;
     const res = await withTimeout(
       fetch(linkWalletUrl(), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer ' + token, // i18n-ignore — HTTP scheme.
-        },
+        headers: headers,
         body: JSON.stringify(body),
       }),
       30000,

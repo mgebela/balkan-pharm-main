@@ -6,8 +6,8 @@
 
 const nacl = require('tweetnacl');
 const bs58 = require('bs58');
-const {getAuth} = require('firebase-admin/auth');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+const {requireVerifiedUser, verifyAppCheck, sendGuardError, GuardError} = require('./user-guards');
 
 const MAX_MESSAGE_AGE_MS = 15 * 60 * 1000;
 const DOMAIN_LINE = 'Domain: growto.live';
@@ -130,13 +130,11 @@ async function handleLinkWallet(req, res) {
   }
 
   try {
-    const authHeader = req.headers.authorization || '';
-    const match = authHeader.match(/^Bearer (.+)$/i);
-    if (!match) {
-      res.status(401).json({ok: false, error: 'Missing Authorization Bearer token'});
-      return;
-    }
-    const decoded = await getAuth().verifyIdToken(match[1]);
+    await verifyAppCheck(req, 'linkWallet');
+    const decoded = await requireVerifiedUser(
+        req,
+        'Verify your email address before linking a Solana wallet.',
+    );
     const uid = decoded.uid;
 
     const body = req.body || {};
@@ -218,6 +216,10 @@ async function handleLinkWallet(req, res) {
       walletVerified: !!patch.walletVerified,
     });
   } catch (err) {
+    if (err instanceof GuardError) {
+      sendGuardError('linkWallet', err, res);
+      return;
+    }
     const status = err.status || (err.code === 'auth/id-token-expired' ? 401 : 400);
     console.error('linkWallet', err && err.message);
     res.status(status).json({

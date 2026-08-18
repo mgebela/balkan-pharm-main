@@ -86,7 +86,8 @@ service cloud.firestore {
     function isValidSolanaPubkey(pk) {
       return pk is string
         && pk.size() >= 32
-        && pk.size() <= 44;
+        && pk.size() <= 44
+        && pk.matches('^[1-9A-HJ-NP-Za-km-z]{32,44}$');
     }
 
     function isValidProfileType(t) {
@@ -272,12 +273,6 @@ service cloud.firestore {
       allow create: if signedIn() && (
         request.auth.uid == userId
         || isSuperadmin()
-        // Hybrid bootstrap: viewer may request own grant from a superadmin owner
-        || (
-          request.auth.uid == viewerUid
-          && isPrivilegedRole(userDoc(userId).role)
-          && request.resource.data.viewerUid == viewerUid
-        )
       );
 
       allow update, delete: if signedIn() && (
@@ -374,6 +369,11 @@ service cloud.firestore {
     allow create: if signedIn()
       && request.resource.data.uid == request.auth.uid
       && isValidSolanaPubkey(request.resource.data.sellerPubkey)
+      && (
+        !('solanaPubkey' in callerDoc())
+        || callerDoc().solanaPubkey == ''
+        || request.resource.data.sellerPubkey == callerDoc().solanaPubkey
+      )
       && request.resource.data.mintAddress is string
       && request.resource.data.mintAddress.size() > 0
       && request.resource.data.priceGrow is int

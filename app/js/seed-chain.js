@@ -48,14 +48,24 @@
     const url =
       (window.ChainConfig && window.ChainConfig.mintQueueKickUrl) ||
       'https://europe-west1-balpha-9dab9.cloudfunctions.net/kickChainQueues';
-    try {
+    const body = JSON.stringify({ source: source || 'seed-chain' });
+    function send(headers) {
       fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ source: source || 'seed-chain' }),
+        headers: headers || { 'Content-Type': 'application/json' },
+        body: body,
       }).catch(function () {
         /* ignore — Firestore onWrite + schedule are backups */
       });
+    }
+    try {
+      if (typeof window.growtooFunctionHeaders === 'function') {
+        window.growtooFunctionHeaders().then(send).catch(function () {
+          send({ 'Content-Type': 'application/json' });
+        });
+      } else {
+        send({ 'Content-Type': 'application/json' });
+      }
     } catch (_) {
       /* ignore */
     }

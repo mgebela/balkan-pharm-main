@@ -693,9 +693,18 @@
       });
       const hasInstalled = installed.length > 0;
 
+      function safeWalletIcon(url) {
+        const raw = String(url || '').trim();
+        if (/^https:\/\//i.test(raw) || /^data:image\/(png|jpe?g|gif|webp|svg\+xml);/i.test(raw)) {
+          return raw.replace(/"/g, '');
+        }
+        return '';
+      }
+
       function itemHtml(adapter) {
-        const icon = adapter.icon
-          ? '<img src="' + adapter.icon + '" alt="" class="wallet-picker-icon" />'
+        const iconUrl = safeWalletIcon(adapter.icon);
+        const icon = iconUrl
+          ? '<img src="' + iconUrl + '" alt="" class="wallet-picker-icon" />'
           : '<span class="wallet-picker-icon wallet-picker-icon--fallback" aria-hidden="true">◎</span>';
         const badge =
           adapter.kind === 'install'
