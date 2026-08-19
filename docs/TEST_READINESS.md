@@ -74,9 +74,9 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **App Check** | Site key live (`20260819c`); **monitor mode** — tokens are sent, nothing is rejected | Watch App Check → Metrics for a few days. Do **not** set `APP_CHECK_ENFORCE` yet — see [app-check-rollout.md](app-check-rollout.md) |
 | **Nav (2026-08-13, labels 2026-08-19)** | Primary nav is **Journal · Log · Coach · Tokenise** for growers (4th tab opens the Tokenise pane; Market is the other segment). Adopters see **Market** on that same slot | Any older step that says "tap Market, then Tokenise" or "the Today tab" is stale — see [Nav map](#nav-map-2026-08-13) below |
 | **Market privacy (2026-08-19)** | In-app board reads `marketPublicTape` (on-chain pubkeys only). Full `marketListings` docs are owner/buyer (list) or active (get). Header chip shows **Watch-only** when the session cannot sign | **Ship JS first, then Firestore rules.** Watch-only Invest is disabled. Confirm a second signed-in user cannot list other people's sold history |
-| **Appearance (2026-08-13)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance` | **Untested.** Age gate + cookie banner do not follow it yet |
+| **Appearance (2026-08-13, default 2026-08-19)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance`. **Light is the product default** (same sage paper as landing). Dark stays an explicit choice | **Untested.** Existing `dark` in localStorage is preserved |
 | **Stories + public journal** | Grower blogs in-app; public grower journal served on `journal.growto.live` | **Untested.** Public surface — check what it exposes for a signed-out visitor |
-| **Journal month view** | Month calendar over existing logs and Coach due dates | **Untested.** Now the grower's landing view, so it is on the critical path |
+| **Journal month view** | Month is the Journal landing (List stays if they picked it). Empty trail: one Coach-style next step — **Add a plant** or **Log first watering** | **Untested.** First-run grower should not see a mute calendar |
 
 ---
 
@@ -336,16 +336,15 @@ below has been exercised by a human yet. Test on a phone, not a desktop window
    has not seen the app and ask them to list a plant for sale. Note whether they
    open Tokenise, seal, then find Market on the same screen — and how long it takes.
 
-### H. Appearance / light theme (2026-08-13)
+### H. Appearance / light theme (2026-08-13, default 2026-08-19)
 
-1. Profile → **Appearance** → Light. Whole app repaints; no unstyled flash on
-   the next navigation.
-2. Hard-refresh. Theme survives before Firebase resolves (it is written to
-   `localStorage` under `growtoo:appearance` and painted pre-paint from `<head>`).
-3. Sign in on a second device → theme follows from the user doc.
+1. First visit with no `growtoo:appearance` key: sage paper, same as landing.
+   Profile → Appearance shows **Light** selected. Dark remains an explicit choice.
+2. If `localStorage` already has `dark`, the app stays dark (do not overwrite).
+3. Hard-refresh. Theme survives before Firebase resolves (painted pre-paint from `<head>`).
 4. Set **Auto** → theme tracks the OS. Light and Dark ignore the OS by design.
-5. **Known gap (fixed 2026-08-19, commit `7e3f21b`):** age gate and cookie banner
-   now use paper tokens. Confirm they follow light / dark with the rest of the app.
+5. Age gate and cookie banner use paper tokens (`7e3f21b`). Confirm they follow
+   light / dark with the rest of the app.
 
 ### I. Stories + public journal (2026-08-13)
 
@@ -359,16 +358,18 @@ not just a rendering one.
    wallet addresses, email, or any other grower not opted in.
 5. Unpublish → confirm the public page stops serving it.
 
-### J. Journal month view (2026-08-13)
+### J. Journal month view (2026-08-13, empty trail 2026-08-19)
 
-Now the grower landing view, so a failure here is a first-impression failure.
+Month is the Journal landing (List only if they already picked it).
 
-1. Journal → month grid renders over existing logs with no console errors.
-2. Days with care logs are marked; Coach due dates appear on their days.
-3. Tap a day → that day's entries open.
-4. Page back through months, including one with no entries (expect an empty
-   state, not a blank grid).
-5. Add a log via **Log** → the month view reflects it without a manual refresh.
+1. New grower, no `dnevnik-live-journal-view` key: Journal opens on **Month**.
+2. Empty trail, no plants: strip under the month title — **Add a plant**.
+3. Empty trail, plant with no watering: same strip, Coach headline
+   (“…waiting for a first watering”) + **Log first watering**. Opens the log
+   sheet for today (confirm, do not auto-write).
+4. Once any log exists, the strip goes away; day panel **Log this day** returns.
+5. Days with care logs are marked; Coach due dates appear on their days.
+6. Add a log via **Log** → the month view reflects it without a manual refresh.
 
 ### K. Market privacy + watch-only (2026-08-19)
 

@@ -14,18 +14,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>
-    /* Appearance, before first paint. Dark is the unthemed state, so this
-       only ever ADDS data-theme="light" — never removes a flash of dark.
+    /* Appearance, before first paint. Dark is the unthemed CSS state; light is
+       the product default (same sage paper as landing / sign-in). This only
+       ADDS data-theme="light" — never flashes dark on a first visit.
        Deliberately inline and dependency-free: a deferred script cannot
        beat first paint, and a wrong first paint is the whole problem. */
     (function () {
       try {
-        var p = localStorage.getItem('growtoo:appearance') || 'dark';
+        var p = localStorage.getItem('growtoo:appearance') || 'light';
         var light = p === 'light' ||
           (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (light) document.documentElement.setAttribute('data-theme', 'light');
         window.__growtooTheme = { pref: p };
-      } catch (e) { /* blocked storage: dark, which is the default anyway */ }
+      } catch (e) { /* blocked storage: light, which is the product default */ }
     })();
   </script>
   <script>
@@ -41,7 +42,7 @@
   </script>
   <script src="../js/i18n.js?v=a6db21df9a" data-i18n-ns="common,app" data-i18n-reload></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260817v" />
-  <link rel="stylesheet" href="styles/app.css?v=20260819d" />
+  <link rel="stylesheet" href="styles/app.css?v=20260819f" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260819a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260817p" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
@@ -199,11 +200,11 @@
           </button>
           <div class="settings-panel" id="settings-panel-appearance" hidden>
             <div class="settings-picker" role="radiogroup" data-i18n-attr="aria-label:app.settings.appearance" aria-label="Appearance">
-              <button type="button" class="settings-picker-opt" data-theme-choice="light" role="radio" aria-checked="false">
+              <button type="button" class="settings-picker-opt" data-theme-choice="light" role="radio" aria-checked="true">
                 <span class="settings-picker-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 5 9-10"/></svg></span>
                 <span data-i18n="app.more-nav-overlay.button">Light</span>
               </button>
-              <button type="button" class="settings-picker-opt" data-theme-choice="dark" role="radio" aria-checked="true">
+              <button type="button" class="settings-picker-opt" data-theme-choice="dark" role="radio" aria-checked="false">
                 <span class="settings-picker-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 5 9-10"/></svg></span>
                 <span data-i18n="app.more-nav-overlay.button2">Dark</span>
               </button>
@@ -453,13 +454,13 @@
             <div
               class="segmented-control journal-view-toggle"
               id="journal-view-toggle"
-              data-active="list"
+              data-active="month"
               role="radiogroup"
               aria-label="Journal view"
             >
               <span class="segmented-thumb" aria-hidden="true"></span>
-              <button data-i18n="app.journal-view-toggle.button" type="button" class="segmented-option" data-journal-view="list" role="radio" aria-checked="true">List</button>
-              <button data-i18n="app.journal-view-toggle.button2" type="button" class="segmented-option" data-journal-view="month" role="radio" aria-checked="false">Month</button>
+              <button data-i18n="app.journal-view-toggle.button" type="button" class="segmented-option" data-journal-view="list" role="radio" aria-checked="false">List</button>
+              <button data-i18n="app.journal-view-toggle.button2" type="button" class="segmented-option" data-journal-view="month" role="radio" aria-checked="true">Month</button>
             </div>
           </div>
           <div class="journal-filters">
@@ -1376,7 +1377,7 @@
   <script src="js/sheet-drag.js?v=20260802a"></script>
   <script src="js/app-confirm.js?v=20260817a"></script>
   <script src="js/plant-stacks.js?v=20260817a"></script>
-  <script src="js/journal-calendar.js?v=20260817a"></script>
+  <script src="js/journal-calendar.js?v=20260819f"></script>
   <script src="js/market.js?v=20260819d"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260817a"></script>
@@ -1393,8 +1394,8 @@
   <script src="js/grow-camera.js?v=20260817a"></script>
   <script src="js/ai-coach.js?v=20260819a"></script>
   <script src="js/grower-blog.js?v=20260817a"></script>
-  <script src="js/theme.js?v=20260806t" defer></script>
-  <script src="js/app.js?v=20260819a"></script>
+  <script src="js/theme.js?v=20260819e" defer></script>
+  <script src="js/app.js?v=20260819f"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

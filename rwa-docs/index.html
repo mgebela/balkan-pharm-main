@@ -26,7 +26,7 @@
        grower's choice carries across the whole site. */
     (function () {
       try {
-        var p = localStorage.getItem('growtoo:appearance') || 'dark';
+        var p = localStorage.getItem('growtoo:appearance') || 'light';
         var light = p === 'light' ||
           (p === 'system' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (light) document.documentElement.setAttribute('data-theme', 'light');

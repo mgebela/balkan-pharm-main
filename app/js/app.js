@@ -6706,19 +6706,83 @@ function initFirebaseSync() {
     if (cal) cal.hidden = view !== 'month';
   }
 
+  function plantsForJournalFilter(plants, filterIds) {
+    if (!filterIds || !filterIds.length) return plants || [];
+    const allow = Object.create(null);
+    filterIds.forEach(function (id) {
+      allow[String(id)] = true;
+    });
+    return (plants || []).filter(function (p) {
+      return p && allow[String(p.id)];
+    });
+  }
+
+  function journalMonthNextStep(plants, entries) {
+    if (entries && entries.length) return null;
+    const list = plants || [];
+    if (!list.length) {
+      return {
+        kind: 'add-plant',
+        kicker: T('app.calendar.emptyKicker', 'Journal'),
+        title: T('app.plants.emptyLead', 'No plants yet'),
+        body: T('app.plants.emptyBody', 'Add your first plant to start a grow journal.'),
+        cta: T('app.today.addPlant', 'Add a plant'),
+      };
+    }
+    let title = '';
+    try {
+      if (window.CoachCore && typeof CoachCore.todayHeadline === 'function') {
+        title = CoachCore.todayHeadline(list, entries) || '';
+      }
+    } catch (e) {
+      title = '';
+    }
+    if (!title) {
+      const name = (list[0] && list[0].name) || T('app.stack.plant', 'Plant');
+      title = T('app.coach.railFirstWater', '{plant} is waiting for a first watering.', {
+        plant: name,
+      });
+    }
+    return {
+      kind: 'first-water',
+      kicker: T('app.calendar.emptyKicker', 'Journal'),
+      title: title,
+      body: T(
+        'app.calendar.emptyFirstBody',
+        'One next step — the same cue Coach uses.'
+      ),
+      cta: T('app.calendar.logFirstWater', 'Log first watering'),
+    };
+  }
+
   function renderJournalCalendar(entries, plants, filterIds) {
     const host = document.getElementById('journal-calendar');
     syncJournalViewToggle();
     if (!journalViewIsMonth() || !host || !window.GrowtooCalendar) return;
+    const scoped = plantsForJournalFilter(plants, filterIds);
     GrowtooCalendar.render(host, {
       entries: entries,
       plants: plants,
       filterIds: filterIds,
+      nextStep: journalMonthNextStep(scoped, entries),
       onChange: renderJournal,
       onSelectDay: function (ymd, info) {
         GrowtooCalendar.setSelectedDate(ymd);
         renderJournal();
         if (info && info.log) openLogSheet(null, { date: ymd });
+      },
+      onNextStep: function (kind) {
+        if (kind === 'add-plant') {
+          if (blockAdminWrite()) return;
+          openPlantModal();
+          return;
+        }
+        const ymd =
+          (window.GrowtooCalendar &&
+            typeof GrowtooCalendar.todayYmd === 'function' &&
+            GrowtooCalendar.todayYmd()) ||
+          null;
+        openLogSheet('water', { date: ymd });
       },
     });
   }
@@ -6750,6 +6814,7 @@ function initFirebaseSync() {
     });
 
     renderJournalCalendar(entries, plants, filterIds);
+    const trailEmpty = entries.length === 0;
     if (journalViewIsMonth() && window.GrowtooCalendar) {
       const ymd = GrowtooCalendar.selectedDate();
       entries = entries.filter(function (e) {
@@ -6760,10 +6825,11 @@ function initFirebaseSync() {
     if (!container) return;
     if (entries.length === 0) {
       if (journalViewIsMonth()) {
-        container.innerHTML =
-        '<p class="journal-cal-empty">' +
-        escapeHtml(T('app.calendar.noLogsToday', 'No logs on this day.')) +
-        '</p>';
+        container.innerHTML = trailEmpty
+          ? ''
+          : '<p class="journal-cal-empty">' +
+            escapeHtml(T('app.calendar.noLogsToday', 'No logs on this day.')) +
+            '</p>';
       } else {
         container.innerHTML = emptyStateHtml({
           icon: 'journal',

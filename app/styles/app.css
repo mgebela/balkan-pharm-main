@@ -3291,6 +3291,51 @@ body.profile-grower .grower-rank-chip.grower-only[hidden],
   color: var(--text-muted);
 }
 
+.journal-cal-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.9rem;
+  margin: 0 0 0.7rem;
+  padding: 0.15rem 0.1rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.journal-cal-next-copy {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.journal-cal-next-kicker {
+  margin: 0 0 0.28rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ok-solid);
+}
+
+.journal-cal-next-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.journal-cal-next-body {
+  margin: 0.28rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.journal-cal-next .btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  font-weight: 650;
+}
+
 @media (max-width: 420px) {
   .journal-cal {
     padding: 0.7rem 0.55rem 0.55rem;
@@ -13662,6 +13707,18 @@ body.journal-paper .plant-stack-count {
 #view-plants .segmented-control {
   background: #fff;
   box-shadow: inset 0 0 0 1px rgb(184 212 176 / 0.55);
+}
+
+#view-plants .journal-cal-next-kicker {
+  color: var(--journal-green);
+}
+
+#view-plants .journal-cal-next-title {
+  color: var(--journal-ink);
+}
+
+#view-plants .journal-cal-next-body {
+  color: var(--journal-muted);
 }
 
 #view-plants .empty-state {

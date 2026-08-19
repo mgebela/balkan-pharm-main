@@ -320,10 +320,13 @@
     "button": "<span class=\"more-nav-copy\"> <strong>Unlock Tokenise &amp; Market</strong> <span>Optional on-chain path — seal stages &amp; list asks</span> </span>"
   },
   "calendar": {
+    "emptyFirstBody": "One next step — the same cue Coach uses.",
+    "emptyKicker": "Journal",
     "feedDue": "Feed due",
     "feedingDue": "feeding due",
     "fromForecast": "° from your forecast",
     "hasLogs": "has logs",
+    "logFirstWater": "Log first watering",
     "logThisDay": "Log this day",
     "logged": "Logged",
     "noLogs": "No logs yet",

@@ -77,9 +77,9 @@
   function getView() {
     try {
       var v = localStorage.getItem(STORAGE_VIEW);
-      return v === 'month' ? 'month' : 'list';
+      return v === 'list' ? 'list' : 'month';
     } catch (e) {
-      return 'list';
+      return 'month';
     }
   }
 
@@ -245,6 +245,30 @@
     return cells;
   }
 
+  function nextStepHtml(step) {
+    if (!step || !step.title) return '';
+    return (
+      '<div class="journal-cal-next" role="status">' +
+      '<div class="journal-cal-next-copy">' +
+      (step.kicker
+        ? '<p class="journal-cal-next-kicker">' + escapeHtml(step.kicker) + '</p>'
+        : '') +
+      '<p class="journal-cal-next-title">' +
+      escapeHtml(step.title) +
+      '</p>' +
+      (step.body
+        ? '<p class="journal-cal-next-body">' + escapeHtml(step.body) + '</p>'
+        : '') +
+      '</div>' +
+      '<button type="button" class="btn btn-primary btn-tap" data-cal-next="' +
+      escapeHtml(step.kind || 'log') +
+      '">' +
+      escapeHtml(step.cta || T('app.calendar.logThisDay', 'Log this day')) +
+      '</button>' +
+      '</div>'
+    );
+  }
+
   function formatLong(ymd) {
     var p = parseYmd(ymd);
     if (!p) return ymd;
@@ -282,6 +306,7 @@
       escapeHtml(T('app.calendar.today', 'Today')) +
       '</button>' +
       '</div>' +
+      nextStepHtml(o.nextStep) +
       '<div class="journal-cal-weekdays" aria-hidden="true">' +
       weekdayNames().map(function (w) {
         return '<span>' + w + '</span>';
@@ -365,17 +390,19 @@
       escapeHtml(T('app.calendar.fromForecast', '° from your forecast')) +
       '</span>' +
       '</p>' +
-      '<div class="journal-cal-panel">' +
-      '<div class="journal-cal-panel-head">' +
-      '<strong>' +
-      escapeHtml(formatLong(selectedYmd)) +
-      '</strong>' +
-      '<button type="button" class="btn btn-primary btn-tap" data-cal-log>' +
-      escapeHtml(T('app.calendar.logThisDay', 'Log this day')) +
-      '</button>' +
-      '</div>' +
-      '<p class="journal-cal-panel-hint" id="journal-cal-panel-hint"></p>' +
-      '</div>' +
+      (o.nextStep
+        ? ''
+        : '<div class="journal-cal-panel">' +
+          '<div class="journal-cal-panel-head">' +
+          '<strong>' +
+          escapeHtml(formatLong(selectedYmd)) +
+          '</strong>' +
+          '<button type="button" class="btn btn-primary btn-tap" data-cal-log>' +
+          escapeHtml(T('app.calendar.logThisDay', 'Log this day')) +
+          '</button>' +
+          '</div>' +
+          '<p class="journal-cal-panel-hint" id="journal-cal-panel-hint"></p>' +
+          '</div>') +
       '</div>';
 
     var hint = host.querySelector('#journal-cal-panel-hint');
@@ -434,6 +461,14 @@
       logBtn.addEventListener('click', function () {
         if (typeof o.onSelectDay === 'function') {
           o.onSelectDay(selectedYmd, { log: true });
+        }
+      });
+    }
+    var nextBtn = host.querySelector('[data-cal-next]');
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function () {
+        if (typeof o.onNextStep === 'function') {
+          o.onNextStep(nextBtn.getAttribute('data-cal-next') || 'log');
         }
       });
     }
