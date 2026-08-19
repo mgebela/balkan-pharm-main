@@ -1692,6 +1692,7 @@
     "sealedStage": "Zapečaćeno: {stage}",
     "logCareToSeal": "Zapiši njegu za pečaćenje → {stage}",
     "sealTo": "Zapečati → {stage} (+{reward})",
+    "listOnMarket": "Objavi na Market",
     "sealStageAction": "Zapečati fazu {stage} · +{reward} $GROWTOO",
     "stageSetNote": "Faza postavljena iz Tokeniziraj za {stage}",
     "percentGrown": "{stage} · {pct} % izraslo",

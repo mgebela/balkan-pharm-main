@@ -1795,6 +1795,7 @@
     "retryMintHint": "Queues a new mint to your linked wallet. Connect the same Devnet wallet you want to own the NFT.",
     "retrying": "Retrying…",
     "sealAStage": "Seal a stage",
+    "listOnMarket": "List on Market",
     "sealSeedStage": "Seal seed stage · +0 $GROWTOO",
     "sealStage": "Seal stage",
     "sealStageAction": "Seal {stage} stage · +{reward} $GROWTOO",

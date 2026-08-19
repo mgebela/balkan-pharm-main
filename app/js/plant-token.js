@@ -1626,6 +1626,7 @@
             esc(T('app.token.fullyGrown', 'Fully grown')) +
             '</button>'
           : mintButtonHtml(token, next)) +
+      listMarketButtonHtml(token) +
       '</div>' +
       '<div class="adopt-progress"><div class="adopt-progress-bar" style="width:' + pct + '%"></div></div>' +
       '<div class="adopt-stage-track">' + dots + '</div>' +
@@ -2590,6 +2591,21 @@
           reward: next.reward,
         })
       ) +
+      '</button>'
+    );
+  }
+
+  /** Desk-pass gap: after a seal, listing lives on the other pane. */
+  function listMarketButtonHtml(token) {
+    if (isAdopterUi() || token.adopted) return '';
+    if (!window.Market || typeof Market.listableMintForToken !== 'function') return '';
+    const mint = Market.listableMintForToken(token.id);
+    if (!mint) return '';
+    return (
+      '<button type="button" class="btn btn-secondary btn-sm adopt-list-market-btn" data-mint="' +
+      esc(mint) +
+      '">' +
+      esc(T('app.token.listOnMarket', 'List on Market')) +
       '</button>'
     );
   }
@@ -4382,6 +4398,18 @@
           } catch (_) {
             /* ignore */
           }
+        }
+        return;
+      }
+
+      const listMarketBtn = e.target.closest('.adopt-list-market-btn');
+      if (listMarketBtn) {
+        const mint = listMarketBtn.getAttribute('data-mint');
+        if (window.Market && typeof Market.openListForMint === 'function') {
+          Market.openListForMint(mint);
+        } else {
+          const fallbackNav = document.querySelector('.nav-item[data-view="market"]');
+          if (fallbackNav) fallbackNav.click();
         }
         return;
       }

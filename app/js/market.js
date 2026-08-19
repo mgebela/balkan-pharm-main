@@ -654,6 +654,27 @@
       .filter(Boolean);
   }
 
+  /** Mint address a grower can post from this garden card, or ''. */
+  function listableMintForToken(tokenId) {
+    if (!tokenId) return '';
+    const hit = listableTokens().find(function (o) {
+      return o && o.token && o.token.id === tokenId;
+    });
+    return hit && hit.mintAddress ? hit.mintAddress : '';
+  }
+
+  let pendingListMint = '';
+
+  /** Switch to Market and pre-select this sealed NFT in the list form. */
+  function openListForMint(mintAddress) {
+    pendingListMint = String(mintAddress || '');
+    const marketView = document.getElementById('view-market');
+    const already = !!(marketView && marketView.classList.contains('active'));
+    const marketNav = document.querySelector('.nav-item[data-view="market"]');
+    if (marketNav && !already) marketNav.click();
+    else render();
+  }
+
   /** Garden RWAs that cannot be posted yet (failed / pending mint, or already listed). */
   function unlistableGardenTokens() {
     const PT = window.PlantToken;
@@ -2143,6 +2164,28 @@
         if (current && options.some(function (o) { return o.mintAddress === current; })) {
           sel.value = current;
         }
+        if (pendingListMint) {
+          if (options.some(function (o) { return o.mintAddress === pendingListMint; })) {
+            sel.value = pendingListMint;
+            const section = document.getElementById('market-list-section');
+            if (section && !section.hidden) {
+              try {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } catch (_) {
+                /* ignore */
+              }
+              const price = document.getElementById('market-price-input');
+              if (price) {
+                try {
+                  price.focus();
+                } catch (_) {
+                  /* ignore */
+                }
+              }
+            }
+          }
+          pendingListMint = '';
+        }
 
         const hasListable = options.length > 0;
         sel.disabled = !hasListable;
@@ -2906,6 +2949,8 @@
       syncMyInvestments();
       render();
     },
+    listableMintForToken: listableMintForToken,
+    openListForMint: openListForMint,
     onChange(fn) {
       if (typeof fn === 'function') listeners.add(fn);
       return function () {

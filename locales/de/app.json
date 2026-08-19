@@ -1668,6 +1668,7 @@
     "sealedStage": "Versiegelt: {stage}",
     "logCareToSeal": "Pflege notieren zum Versiegeln → {stage}",
     "sealTo": "Versiegeln → {stage} (+{reward})",
+    "listOnMarket": "Auf Market listen",
     "sealStageAction": "Phase {stage} versiegeln · +{reward} $GROWTOO",
     "stageSetNote": "Phase über Tokenisieren gesetzt für {stage}",
     "percentGrown": "{stage} · {pct} % gewachsen",

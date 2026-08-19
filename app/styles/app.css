@@ -7831,6 +7831,10 @@ body.profile-adopter .adopt-hero-text h2 {
   gap: 0.5rem;
 }
 
+.adopt-token-actions .btn {
+  width: 100%;
+}
+
 .adopt-action-primary {
   width: 100%;
 }
