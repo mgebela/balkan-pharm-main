@@ -1154,32 +1154,43 @@
     );
   }
 
+  function paperNote(opts) {
+    const title = (opts && opts.title) || T('app.readOnly.title', 'Read-only');
+    const body = (opts && opts.body) || '';
+    if (window.AppConfirm && typeof AppConfirm.note === 'function') {
+      AppConfirm.note({ title: title, body: body });
+      return;
+    }
+    alert((title ? title + '\n\n' : '') + body);
+  }
+
   function blockWrite(opts) {
     const plantId = opts && opts.plantId;
     const entryId = opts && opts.entryId;
     if (isAdminReadOnly) {
-      alert(
-        readOnlyBannerMessage ||
-          T('app.readOnly.generic', 'View is read-only — editing is not allowed.')
-      );
+      paperNote({
+        body:
+          readOnlyBannerMessage ||
+          T('app.readOnly.generic', 'View is read-only — editing is not allowed.'),
+      });
       return true;
     }
     if (plantId && isSharedPlantId(plantId)) {
-      alert(
-        T(
+      paperNote({
+        body: T(
           'app.readOnly.sharedPlant',
           'This plant comes from the superadmin shared library — you can view it, but not edit it.'
-        )
-      );
+        ),
+      });
       return true;
     }
     if (entryId && isSharedEntryId(entryId)) {
-      alert(
-        T(
+      paperNote({
+        body: T(
           'app.readOnly.sharedEntry',
           'This entry comes from a shared library — it cannot be edited.'
-        )
-      );
+        ),
+      });
       return true;
     }
     return false;
@@ -3027,12 +3038,13 @@ function initFirebaseSync() {
           'error'
         );
       } else {
-        alert(
-        T(
-          'app.entry.saveFailedStorage',
-          'Could not save journal entry. Local storage may be full.'
-        )
-      );
+        paperNote({
+          title: T('app.entry.saveFailed', 'Could not save journal entry.'),
+          body: T(
+            'app.entry.saveFailedStorage',
+            'Could not save journal entry. Local storage may be full.'
+          ),
+        });
       }
       return false;
     }
@@ -3046,7 +3058,10 @@ function initFirebaseSync() {
           'error'
         );
       } else {
-        alert(T('app.entry.saveRetry', 'Entry did not save. Please try again.'));
+        paperNote({
+          title: T('app.entry.saveFailed', 'Could not save journal entry.'),
+          body: T('app.entry.saveRetry', 'Entry did not save. Please try again.'),
+        });
       }
       return false;
     }
@@ -5014,7 +5029,10 @@ function initFirebaseSync() {
       if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
         DnevnikNotifications.toast(msg, 'error');
       } else {
-        alert(msg);
+        paperNote({
+          title: T('app.entry.logFailed', 'Could not log entry.'),
+          body: msg,
+        });
       }
       return false;
     }
@@ -5705,6 +5723,7 @@ function initFirebaseSync() {
   }
 
   function renderPlants() {
+    syncJournalFreshChrome();
     renderCoachBriefingSurfaces();
     renderGrowerRankChip();
     renderActivityRewardCard();
@@ -6717,18 +6736,16 @@ function initFirebaseSync() {
     });
   }
 
+  function syncJournalFreshChrome() {
+    const view = document.getElementById('view-plants');
+    if (!view) return;
+    view.classList.toggle('view-plants--fresh', getPlants().length === 0);
+  }
+
   function journalMonthNextStep(plants, entries) {
     if (entries && entries.length) return null;
     const list = plants || [];
-    if (!list.length) {
-      return {
-        kind: 'add-plant',
-        kicker: T('app.calendar.emptyKicker', 'Journal'),
-        title: T('app.plants.emptyLead', 'No plants yet'),
-        body: T('app.plants.emptyBody', 'Add your first plant to start a grow journal.'),
-        cta: T('app.today.addPlant', 'Add a plant'),
-      };
-    }
+    if (!list.length) return null;
     let title = '';
     try {
       if (window.CoachCore && typeof CoachCore.todayHeadline === 'function') {
@@ -6757,6 +6774,7 @@ function initFirebaseSync() {
 
   function renderJournalCalendar(entries, plants, filterIds) {
     const host = document.getElementById('journal-calendar');
+    syncJournalFreshChrome();
     syncJournalViewToggle();
     if (!journalViewIsMonth() || !host || !window.GrowtooCalendar) return;
     const scoped = plantsForJournalFilter(plants, filterIds);
@@ -7840,7 +7858,10 @@ function initFirebaseSync() {
         // its text would only work in English.
         DnevnikNotifications.toast(msg, err && err.code === 'no-plant' ? 'warn' : 'error');
       } else {
-        alert(msg);
+        paperNote({
+          title: T('app.entry.saveFailed', 'Could not save journal entry.'),
+          body: msg,
+        });
       }
       return;
     }
@@ -8184,18 +8205,27 @@ function initFirebaseSync() {
       })
       .join('');
     listEl.querySelectorAll('.toolbox-list-delete').forEach((btn) => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         if (blockAdminWrite()) return;
         const id = btn.closest('.toolbox-list-item').dataset.id;
-        if (
-          !confirm(
-            T(
-              'app.tools.deleteConfirm',
-              'Delete this Tools log?\n\nYou can undo for a few seconds after.'
-            )
-          )
-        )
-          return;
+        const ok =
+          window.AppConfirm && typeof AppConfirm.ask === 'function'
+            ? await AppConfirm.ask({
+                title: T('app.tools.deleteTitle', 'Delete this Tools log?'),
+                body: T(
+                  'app.tools.deleteBody',
+                  'Remove this measurement from Tools?\n\nYou can undo for a few seconds after.'
+                ),
+                confirmLabel: T('app.tools.deleteConfirm', 'Delete log'),
+                danger: true,
+              })
+            : window.confirm(
+                T(
+                  'app.tools.deleteBody',
+                  'Delete this Tools log?\n\nYou can undo for a few seconds after.'
+                )
+              );
+        if (!ok) return;
         const data = getToolboxData();
         const removed = (data[tool] || []).find((x) => x.id === id);
         if (!removed) return;

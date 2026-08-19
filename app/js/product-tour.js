@@ -184,6 +184,11 @@
     ];
   }
 
+  function journalIsFresh() {
+    var view = document.getElementById('view-plants');
+    return !!(view && view.classList.contains('view-plants--fresh'));
+  }
+
   function growerFullSteps() {
     var steps = [
       {
@@ -209,7 +214,7 @@
       {
         id: 'plants-list',
         view: 'plants',
-        selectors: ['#btn-add-plant', '#plants-list', '#view-plants'],
+        selectors: ['#btn-add-plant', '#empty-add-plant', '#plants-list', '#view-plants'],
         title: T('app.tour.growerFull.plants_list.title', 'Add a plant'),
         body: T('app.tour.growerFull.plants_list.body', 'Create a plant, then log watering, feeding, and stage changes — that trail unlocks Tokenise later.'),
       },
@@ -269,22 +274,28 @@
       });
     }
 
+    if (journalIsFresh()) {
+      steps = steps.filter(function (s) {
+        return s.id !== 'journal-log';
+      });
+    }
+
     return steps;
   }
 
   function plantsTabSteps() {
-    return [
+    var steps = [
       {
         id: 'plants-heading',
         view: 'plants',
-        selectors: ['#plants-list', '#btn-add-plant', '#view-plants .plants-journal-section'],
+        selectors: ['#plants-list', '#btn-add-plant', '#empty-add-plant', '#view-plants .plants-journal-section'],
         title: T('app.tour.plants.plants_heading.title', 'Your plants'),
         body: T('app.tour.plants.plants_heading.body', 'Each plant is a living record. Start with + New plant if the list is empty.'),
       },
       {
         id: 'add-plant',
         view: 'plants',
-        selectors: ['#btn-add-plant'],
+        selectors: ['#btn-add-plant', '#empty-add-plant'],
         title: T('app.tour.plants.add_plant.title', 'New plant'),
         body: T('app.tour.plants.add_plant.body', 'Name, strain, and stage kick off the journal. You can change stage as the grow advances.'),
       },
@@ -303,6 +314,12 @@
         body: T('app.tour.plants.weather.body', 'Set a city for a 7-day forecast — handy for outdoor planning. Skip if you grow indoors.'),
       },
     ];
+    if (journalIsFresh()) {
+      return steps.filter(function (s) {
+        return s.id !== 'journal' && s.id !== 'weather';
+      });
+    }
+    return steps;
   }
 
   function adoptTabStepsGrower() {

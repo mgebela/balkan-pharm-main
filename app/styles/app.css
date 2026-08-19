@@ -1222,6 +1222,13 @@ body.profile-grower.chain-locked .settings-tile--unlock {
   opacity: 1;
 }
 
+.settings-picker-hint {
+  margin: 0.2rem 0.85rem 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
 .more-nav-item {
   display: none;
   align-items: center;
@@ -13726,6 +13733,15 @@ body.journal-paper .plant-stack-count {
 
 #view-plants .empty-state {
   color: var(--journal-muted);
+}
+
+/* First plant: one empty CTA. Weather, stage chips, Stories, and the
+   empty month grid wait until there is something to journal. */
+#view-plants.view-plants--fresh .plants-weather-widget,
+#view-plants.view-plants--fresh .journal-stage-filters,
+#view-plants.view-plants--fresh .plants-journal-section .toolbar,
+#view-plants.view-plants--fresh .plants-journal-diary {
+  display: none !important;
 }
 
 #view-growlog {

@@ -1189,7 +1189,7 @@
     "button3": "Auto",
     "span": "<strong>Measurements</strong> <span>Charts for water, feed, and environment</span>",
     "span2": "<strong>Admin</strong> <span>Platform controls</span>",
-    "span3": "<strong>Appearance</strong> <span>Dark is the growtoo default</span>"
+    "span3": "<strong>Appearance</strong> <span>Light paper is the growtoo default</span>"
   },
   "more-nav-title": {
     "strong": "Profile"
@@ -1499,6 +1499,7 @@
   "readOnly": {
     "database": "Read-only database view — plants, journal and tools without editing.",
     "generic": "View is read-only — editing is not allowed.",
+    "title": "Read-only",
     "hybrid": "You can edit your own plants and entries. Plants from the superadmin shared library are view-only.",
     "hybridPlants": "You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.",
     "sharedEntry": "This entry comes from a shared library — it cannot be edited.",
@@ -1538,6 +1539,7 @@
   "settings": {
     "admin": "Admin",
     "appearance": "Appearance",
+    "appearanceHint": "Light paper, like the landing. Dark is always available.",
     "goto": "Go to",
     "language": "Language",
     "logout": "Log out",
@@ -1923,7 +1925,9 @@
     "allPlants": "All plants",
     "chartEmpty": "No data for the chart.",
     "conditionShort": "Condition: {value}",
-    "deleteConfirm": "Delete this Tools log?\n\nYou can undo for a few seconds after.",
+    "deleteBody": "Remove this measurement from Tools?\n\nYou can undo for a few seconds after.",
+    "deleteConfirm": "Delete log",
+    "deleteTitle": "Delete this Tools log?",
     "deletedUndo": "Tools log deleted — undo available",
     "environmentReading": "Environment reading",
     "listEmpty": "No entries yet. Add the first one.",
