@@ -31,25 +31,32 @@ A) Gmail “new sign-in” / Google popup (“Continue to balpha-9dab9…”)
    Hosting would). Changing it now breaks Google sign-in.
 
 B) Firebase verify / reset mail still From: …@balpha-9dab9.firebaseapp.com
-   Custom domain growto.live was started 2026-08-03 and is still IN_PROGRESS
-   (DNS not finished). Finish it:
+   Custom domain growto.live was started 2026-08-18 13:29 UTC and is still
+   IN_PROGRESS (checked 2026-08-19). TXT + SPF are live; DKIM is not.
 
+   Live now:
+     TXT  growto.live  firebase=balpha-9dab9
+     TXT  growto.live  v=spf1 include:_spf.firebasemail.com ~all
+
+   Add these in Cloudflare DNS (DNS only / grey cloud — never proxied):
+
+     Type   Name                      Target
+     CNAME  firebase1._domainkey      mail-growto-live.dkim1._domainkey.firebasemail.com
+     CNAME  firebase2._domainkey      mail-growto-live.dkim2._domainkey.firebasemail.com
+
+   If Console shows different hosts, use the Console table, not this guess.
+
+   Then:
    1. https://console.firebase.google.com/project/balpha-9dab9/authentication/emails
-   2. Edit a template → Customize domain → growto.live
-   3. Add the TXT + CNAME records Firebase shows at your DNS host
-   4. Wait for green “Verification complete” → Apply custom domain
-   5. After apply, From becomes growtoo <noreply@growto.live> and action
+   2. Wait for green “Verification complete”
+   3. Click Apply custom domain (waiting alone does not switch From)
+   4. After apply, From becomes growtoo <noreply@growto.live> and action
       links leave balpha-9dab9.firebaseapp.com
 
 C) %APP_NAME% in default subjects (“… for %APP_NAME%”)
-   Firebase project display name is still “balpha”. Set public-facing name:
-
-   https://console.firebase.google.com/project/balpha-9dab9/settings/general
-   Public-facing name → growtoo
-   (If the field is missing: Authentication → Sign-in method → Google → enable,
-   then it appears.)
-
-   Then paste the growtoo subjects in sections 1–3 below.
+   Public-facing name is already GROWTOO (Firebase project displayName).
+   The live templates still use “Verify your email for %APP_NAME%” until you
+   paste the subjects in sections 1–3 in the Console (API cannot set them).
 
 Subjects + HTML bodies must be pasted in the Console
 (API returns EMAIL_TEMPLATE_UPDATE_NOT_ALLOWED for subject;

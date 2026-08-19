@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions --project balpha-9dab9",
-    "test": "node user-guards.test.js && node ops-http-guard.test.js && node coach-context.test.js && node coach-knowledge.test.js"
+    "test": "node user-guards.test.js && node ops-http-guard.test.js && node coach-context.test.js && node coach-knowledge.test.js && node market-public-tape.test.js"
   },
   "dependencies": {
     "@google/genai": "^2.12.0",

@@ -29,6 +29,8 @@ npx firebase-tools deploy --only firestore:rules --project balpha-9dab9
 
 **Napomena:** `firebase login` moraš pokrenuti **u svom terminalu** (interaktivni browser login). Cursor agent ne može autentificirati umjesto tebe.
 
+**Deploy order for `marketListings` (2026-08-19):** ship the new `app/js/market.js` to Netlify **before** publishing these rules. Old clients still query `marketListings` with a global `orderBy('createdAt')`, which `allow list` will deny. After JS is live, deploy `firestore:rules`, then optionally `node chain/backfill-market-public-tape.js` so tape docs include `sellerPubkey`.
+
 ## Što pravila dopuštaju
 
 | Kolekcija | Tko može čitati | Tko može pisati |
@@ -37,6 +39,7 @@ npx firebase-tools deploy --only firestore:rules --project balpha-9dab9
 | `users/{uid}/app/state` | vlasnik, admin, superadmin, korisnik s `sharedGrants` | samo vlasnik |
 | `users/{uid}/sharedGrants/{viewer}` | vlasnik, viewer, superadmin | vlasnik, superadmin |
 | `loginEvents` | superadmin | bilo koji prijavljeni korisnik (svoj `uid`) |
+| `marketListings` | **get:** owner, buyer, or **active** offer (signed-in). **list:** owner / buyer / admin only (sold/cancelled history is party-only). In-app board uses `marketPublicTape`. | owner create; buyer/seller status updates as in rules |
 | `marketPublicTape` | anyone | Admin SDK only |
 | `publicJournalPosts` | anyone | Admin SDK (+ admin hide) |
 | `publicGrowerProfiles` | anyone | Admin SDK only |

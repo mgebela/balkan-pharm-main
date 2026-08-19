@@ -233,7 +233,7 @@
             '.chain-pane-toggle [data-chain-pane="adopt"]',
           ],
           title: T('app.tour.growerFull.tokenise_nav.title', 'Tokenise'),
-          body: T('app.tour.growerFull.tokenise_nav.body', 'When the journal is ready, seal a stage into a plant token on Devnet.'),
+          body: T('app.tour.growerFull.tokenise_nav.body', 'This tab opens Tokenise. When the journal is ready, seal a stage into a plant token on Devnet.'),
         },
         {
           id: 'seal-stage',
@@ -246,11 +246,10 @@
           id: 'market-nav',
           view: null,
           selectors: [
-            '.bottom-nav .nav-item[data-chain-nav]',
-            '.sidebar-nav .nav-item[data-chain-nav]',
+            '.chain-pane-toggle [data-chain-pane="market"]',
           ],
           title: T('app.tour.growerFull.market_nav.title', 'Market'),
-          body: T('app.tour.growerFull.market_nav.body', 'Post a sealed plant as an ask — Instant sale or Adopt stake — for adopters to back with $GROWTOO.'),
+          body: T('app.tour.growerFull.market_nav.body', 'Same tab — switch Tokenise / Market to post an ask. Instant sale or Adopt stake.'),
         },
         {
           id: 'market-list',

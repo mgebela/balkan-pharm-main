@@ -3461,7 +3461,7 @@ function initFirebaseSync() {
     const view = item.dataset.view;
 
     if (item.hasAttribute('data-chain-nav')) {
-      const fallback = isAdopterProfile() ? 'adopt' : 'market';
+      const fallback = isAdopterProfile() ? 'market' : 'adopt';
       const next =
         lastChainView === 'adopt' || lastChainView === 'market' ? lastChainView : fallback;
       showView(next);

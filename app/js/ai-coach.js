@@ -143,77 +143,6 @@
     },
   ];
 
-  /*
-   * What the coach can actually do, shown as a persistent row under the
-   * composer. The panel opens without focusing the input — raising the
-   * keyboard on open hid this row and left the user staring at a blank
-   * text field with no idea what to ask.
-   */
-  const COACH_CAP_ICONS = {
-    today:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M18.4 5.6l-1.7 1.7M7.3 16.7l-1.7 1.7"/></svg>',
-    care:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s5 5.5 5 9a5 5 0 01-10 0c0-3.5 5-9 5-9z"/></svg>',
-    diagnose:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
-    weather:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17a4 4 0 010-8 5.5 5.5 0 0110.5 1.5A3.5 3.5 0 1117.5 17z"/></svg>',
-    stage:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 14c-3.2 0-5-2-5-5 3.2 0 5 2 5 5z"/><path d="M12 12c0-3 1.8-5 5-5 0 3-1.8 5-5 5z"/></svg>',
-    tokenise:
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h5M9.5 14h5"/></svg>',
-  };
-
-  function coachCapabilities() {
-    return [
-      {
-        id: 'today',
-        label: T('app.nav.today', 'Today'),
-        icon: COACH_CAP_ICONS.today,
-        text: T('app.coach.capTodayPrompt', 'What should I do next for my current plants?'),
-      },
-      {
-        id: 'care',
-        label: T('app.plants.logCare', 'Log care'),
-        icon: COACH_CAP_ICONS.care,
-        text: T('app.coach.capCarePrompt', 'Log watering for my current plant.'),
-      },
-      {
-        id: 'diagnose',
-        label: T('app.coach.capDiagnose', 'Diagnose'),
-        icon: COACH_CAP_ICONS.diagnose,
-        text: T(
-          'app.coach.capDiagnosePrompt',
-          'Something looks wrong with my plant. Attach a leaf photo with + for a better read, then ask what you need and help me diagnose it.'
-        ),
-      },
-      {
-        id: 'weather',
-        label: T('app.coach.capWeather', 'Weather'),
-        icon: COACH_CAP_ICONS.weather,
-        text: T(
-          'app.coach.capWeatherPrompt',
-          'What does the weather forecast mean for my grow over the next few days?'
-        ),
-      },
-      {
-        id: 'stage',
-        label: T('app.entryType.stage', 'Stage'),
-        icon: COACH_CAP_ICONS.stage,
-        text: T('app.coach.capStagePrompt', 'Help me update my plant to the next growth stage.'),
-      },
-      {
-        id: 'tokenise',
-        label: T('app.daily.ctaTokenise', 'Tokenise'),
-        icon: COACH_CAP_ICONS.tokenise,
-        text: T(
-          'app.coach.capTokenisePrompt',
-          'Mint a seed or the next growth stage for my linked plant if journal proof is ready.'
-        ),
-      },
-    ];
-  }
-
   // Keep coach photos small — large data-URLs make the live request fragile
   // (slow mobile upload / localStorage quota) and we only need leaf detail.
   const MAX_COACH_IMAGE_EDGE = 640;
@@ -227,6 +156,8 @@
   let recognition = null;
   let listening = false;
   let typing = false;
+  /** Session flag: live coachChat returned quota_exceeded. Resets on reload. */
+  let quotaBlocked = false;
 
   function readFileAsDataUrl(file) {
     return new Promise(function (resolve, reject) {
@@ -767,14 +698,15 @@
           plantId: plant.id,
           severity: 'urgent',
           title: T('app.coach.nudgeWaterTitle', 'Watering reminder'),
+          days: sinceWatering,
           message:
             sinceWatering == null
-              ? T('app.coach.nudgeWaterMsgNone', '{plant} has no recent watering log.', {
+              ? T('app.coach.nudgeWaterMsgNone', '{plant} has no watering log yet.', {
                   plant: plantName,
                 })
               : T(
                   'app.coach.nudgeWaterMsgDays',
-                  '{plant} has no recent watering log for {days} days.',
+                  '{plant} hasn’t been watered in {days} days.',
                   { plant: plantName, days: sinceWatering }
                 ),
           prompt: T(
@@ -1752,22 +1684,135 @@
   function renderCapabilities() {
     const el = document.getElementById('ai-coach-capabilities');
     if (!el) return;
-    el.setAttribute('aria-label', T('app.coach.capsAria', 'What the coach can do'));
-    el.innerHTML = coachCapabilities()
-      .map(function (c) {
-        return (
-          '<button type="button" class="ai-coach-cap" data-prompt="' +
-          esc(c.text) +
-          '" title="' +
-          esc(c.text) +
-          '">' +
-          c.icon +
-          '<span>' +
-          esc(c.label) +
-          '</span></button>'
-        );
-      })
-      .join('');
+    /* Habit CTA lives in the empty state — the chip row read as a demo. */
+    el.hidden = true;
+    el.innerHTML = '';
+  }
+
+  function isEmailVerified() {
+    if (window.GrowtooEmailVerify && typeof GrowtooEmailVerify.isVerified === 'function') {
+      return !!GrowtooEmailVerify.isVerified();
+    }
+    try {
+      const u = window.firebase && firebase.auth && firebase.auth().currentUser;
+      return !!(u && u.emailVerified);
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function currentLiveGate() {
+    try {
+      const u = window.firebase && firebase.auth && firebase.auth().currentUser;
+      if (!u) return '';
+    } catch (e) {
+      return '';
+    }
+    if (!isEmailVerified()) return 'verify';
+    if (quotaBlocked) return 'quota';
+    return '';
+  }
+
+  function pickHabitReminder(reminders) {
+    const list = Array.isArray(reminders) ? reminders : [];
+    const score = function (r) {
+      const id = String((r && r.id) || '');
+      if (id.indexOf('predict-heat-water:') === 0) return 0;
+      if (id.indexOf('watering:') === 0) return 1;
+      if (id.indexOf('feeding:') === 0) return 2;
+      if (draftActionFromReminder(r)) return 3;
+      return 9;
+    };
+    const ranked = list.slice().sort(function (a, b) {
+      return score(a) - score(b);
+    });
+    const top = ranked[0];
+    if (!top || score(top) >= 9) return null;
+    return top;
+  }
+
+  function habitCtaLabel(reminder) {
+    const id = String((reminder && reminder.id) || '');
+    if (id.indexOf('watering:') === 0 || id.indexOf('predict-heat-water:') === 0) {
+      return T('app.coach.habitLogWater', 'Log watering');
+    }
+    if (id.indexOf('feeding:') === 0) {
+      return T('app.coach.habitLogFeed', 'Log feeding');
+    }
+    return T('app.coachBrief.draftLog', 'Draft log');
+  }
+
+  function coachVerifyButtonsHtml() {
+    return (
+      '<button type="button" class="btn btn-primary btn-sm" data-coach-resend-verify>' +
+      T('app.coach.resendVerify', 'Resend verification email') +
+      '</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" data-coach-refresh-verify>' +
+      T('app.coach.alreadyVerified', 'I already verified') +
+      '</button>'
+    );
+  }
+
+  function coachGateHtml(kind) {
+    if (kind === 'verify') {
+      return (
+        '<p class="ai-coach-gate-title">' +
+        esc(T('app.coach.gateVerifyTitle', 'Live coach needs a verified email')) +
+        '</p>' +
+        '<p>' +
+        esc(
+          T(
+            'app.coach.gateVerifyBody',
+            'Journal reminders and draft logs still work. Photo diagnosis waits until you confirm the growtoo email.'
+          )
+        ) +
+        '</p>' +
+        '<div class="ai-coach-gate-actions">' +
+        coachVerifyButtonsHtml() +
+        '</div>'
+      );
+    }
+    if (kind === 'quota') {
+      return (
+        '<p class="ai-coach-gate-title">' +
+        esc(T('app.coach.gateQuotaTitle', 'Today’s live turns are used')) +
+        '</p>' +
+        '<p>' +
+        esc(
+          T(
+            'app.coach.gateQuotaBody',
+            'Resets at 00:00 UTC. I can still draft a watering or feeding log from your journal.'
+          )
+        ) +
+        '</p>'
+      );
+    }
+    return '';
+  }
+
+  function syncCoachGate() {
+    const el = document.getElementById('ai-coach-gate');
+    if (!el) return;
+    const kind = currentLiveGate();
+    if (!kind) {
+      el.hidden = true;
+      el.innerHTML = '';
+      el.removeAttribute('data-gate');
+      return;
+    }
+    el.hidden = false;
+    el.setAttribute('data-gate', kind);
+    el.innerHTML = coachGateHtml(kind);
+  }
+
+  function statusForGate(kind) {
+    if (kind === 'verify') {
+      return T('app.coach.statusVerify', 'Journal helper · verify email for live coach');
+    }
+    if (kind === 'quota') {
+      return T('app.coach.statusQuota', 'Live turns used today · journal helper still here');
+    }
+    return T('app.coach.ready', 'Ready to help');
   }
 
   function applyCoachChrome() {
@@ -1777,7 +1822,7 @@
     if (title) title.textContent = coachTitleText();
     const status = document.getElementById('ai-coach-status');
     if (status && !busy && !listening && !pendingActions.length) {
-      status.textContent = T('app.coach.ready', 'Ready to help');
+      status.textContent = statusForGate(currentLiveGate());
     }
     const backdrop = document.getElementById('ai-coach-backdrop');
     if (backdrop) backdrop.setAttribute('aria-label', T('app.coach.close', 'Close coach'));
@@ -1822,10 +1867,11 @@
     if (foot) {
       foot.textContent = T(
         'app.coach.foot',
-        'Routine nudges can run quietly. Journal drafts need your tap. Minting and plant-health calls stay with you.'
+        'Journal drafts need your tap. Live photo diagnosis needs a verified email.'
       );
     }
     renderCapabilities();
+    syncCoachGate();
   }
 
   function ensureDom() {
@@ -1868,6 +1914,7 @@
       '</nav>' +
       '<div class="ai-coach-tab-panels">' +
       '<div class="ai-coach-tab-panel is-active" data-coach-panel="chat">' +
+      '<div class="ai-coach-gate" id="ai-coach-gate" hidden></div>' +
       '<div class="ai-coach-messages" id="ai-coach-messages" role="log" aria-live="polite"></div>' +
       '</div>' +
       '<div class="ai-coach-tab-panel" data-coach-panel="settings" id="ai-coach-settings-panel" hidden></div>' +
@@ -1946,12 +1993,6 @@
         setStatus(T('app.coach.photoRemoved', 'Photo removed'));
       });
     }
-    document.getElementById('ai-coach-capabilities').addEventListener('click', function (e) {
-      const chip = e.target.closest('.ai-coach-cap');
-      if (!chip) return;
-      const text = chip.getAttribute('data-prompt');
-      if (text) ask(text);
-    });
 
     root.querySelector('.ai-coach-tabs').addEventListener('click', function (e) {
       const tab = e.target.closest('[data-coach-tab]');
@@ -2014,8 +2055,9 @@
       }
       if (e.target.closest('[data-coach-cancel]')) {
         cancelPendingActions();
-        return;
       }
+    });
+    root.addEventListener('click', function (e) {
       if (e.target.closest('[data-coach-resend-verify]')) {
         resendCoachVerification(e.target.closest('[data-coach-resend-verify]'));
         return;
@@ -2038,6 +2080,7 @@
       if (result && result.already) {
         setStatus(T('app.coach.alreadyVerifiedStatus', 'Already verified — live coach unlocked.'));
         clearVerifyFlags();
+        syncCoachGate();
         return;
       }
       setStatus(
@@ -2071,6 +2114,7 @@
       if (ok) {
         setStatus(T('app.coach.emailVerified', 'Email verified — try the coach again.'));
         clearVerifyFlags();
+        syncCoachGate();
       } else {
         setStatus(T('app.coach.stillUnverified', 'Still unverified — open the email link, then tap again.'));
       }
@@ -2088,11 +2132,16 @@
         m.needsVerify = false;
         changed = true;
       }
+      if (m && m.gate === 'verify') {
+        delete m.gate;
+        changed = true;
+      }
     });
     if (changed) {
       saveHistory();
       renderMessages();
     }
+    syncCoachGate();
   }
 
   function syncCoachKeyboardInset() {
@@ -2234,115 +2283,67 @@
     return true;
   }
 
-  function reminderCardsHtml(reminders) {
-    const list = Array.isArray(reminders) ? reminders : [];
-    if (!list.length) return '';
-    return (
-      '<div class="ai-coach-reminders">' +
-      '<div class="ai-coach-reminders-head">' +
-      '<strong>' +
-      esc(T('app.coach.remindersTitle', 'Smart reminders')) +
-      '</strong>' +
-      '<span>' +
-      esc(T('app.coach.remindersSub', 'Care logs + weather when available')) +
-      '</span>' +
-      '</div>' +
-      '<div class="ai-coach-reminder-list">' +
-      list
-        .slice(0, 4)
-        .map(function (r) {
-          const sev = r.severity === 'urgent' ? 'urgent' : 'info';
-          const canDraft = (function () {
-            if (!draftActionFromReminder(r)) return false;
-            if (!window.CoachCore || typeof CoachCore.resolveActionMode !== 'function') return true;
-            return CoachCore.resolveActionMode('add_entry') === 'draft';
-          })();
-          return (
-            '<article class="ai-coach-reminder ai-coach-reminder--' +
-            sev +
-            (r.kind === 'predictive' ? ' ai-coach-reminder--predictive' : '') +
-            '">' +
-            '<div class="ai-coach-reminder-top">' +
-            '<h4>' +
-            esc(r.title) +
-            '</h4>' +
-            '<button type="button" class="ai-coach-reminder-dismiss" data-reminder-dismiss="' +
-            esc(r.id) +
-            '" aria-label="' +
-            esc(T('app.coach.dismissReminder', 'Dismiss reminder')) +
-            '">×</button>' +
-            '</div>' +
-            '<p>' +
-            esc(r.message) +
-            '</p>' +
-            '<div class="ai-coach-reminder-actions">' +
-            (canDraft
-              ? '<button type="button" class="btn btn-primary btn-sm" data-coach-draft="' +
-                esc(r.id) +
-                '">' +
-                esc(T('app.coachBrief.draftLog', 'Draft log')) +
-                '</button>'
-              : '') +
-            '<button type="button" class="btn btn-ghost btn-sm ai-coach-reminder-action" data-coach-prompt="' +
-            esc(r.prompt) +
-            '">' +
-            esc(
-              canDraft
-                ? T('app.coachBrief.askFirst', 'Ask first')
-                : T('app.coach.planNow', 'Plan this now')
-            ) +
-            '</button>' +
-            '</div>' +
-            '</article>'
-          );
-        })
-        .join('') +
-      '</div></div>'
-    );
-  }
-
   function emptyStateHtml(context) {
     const reminders = (context && context.reminders) || [];
-    const trustSeen =
-      typeof localStorage !== 'undefined' && localStorage.getItem('dnevnik-live-coach-trust-seen') === '1';
-    const trustHtml = trustSeen
-      ? ''
-      : '<div class="ai-coach-trust" id="ai-coach-trust">' +
-        '<strong>' +
-        esc(T('app.coach.trustTitle', 'Graduated help')) +
-        '</strong>' +
-        esc(
-          T(
-            'app.coach.trustBody',
-            'Routine nudges can surface on their own. Drafts wait for your tap. Minting and plant-health calls stay with you.'
-          )
-        ) +
-        '</div>';
-    if (!trustSeen && typeof localStorage !== 'undefined') {
+    const plants = (context && context.plants) || [];
+    const habit = isAdopter() ? null : pickHabitReminder(reminders);
+    let title = '';
+    let body = '';
+    if (isAdopter()) {
+      title = T('app.coach.emptyAdopterTitle', 'Follow care on plants you backed');
+      body = T(
+        'app.coach.emptyAdopterBody',
+        'Ask about unlock months, live stage, or a listing — I read the garden snapshot.'
+      );
+    } else if (!plants.length) {
+      title = T(
+        'app.coach.railEmpty',
+        'Add a plant when you are ready — Coach will keep the care trail tidy.'
+      );
+      body = T('app.coach.emptyBody', 'One next step from your journal.');
+    } else if (habit) {
+      title = habit.message;
+      body = T('app.coach.fromJournal', 'From your journal');
+    } else {
+      let headline = '';
       try {
-        localStorage.setItem('dnevnik-live-coach-trust-seen', '1');
-      } catch (e) {}
+        if (window.CoachCore && typeof CoachCore.todayHeadline === 'function') {
+          headline = CoachCore.todayHeadline(getPlants(), getEntries()) || '';
+        }
+      } catch (e) {
+        headline = '';
+      }
+      title = headline || T('app.coach.habitSteadyTitle', 'Looking steady');
+      body = T('app.coach.habitNone', 'Nothing due from the journal. Ask if something looks off.');
     }
+    const canDraft = (function () {
+      if (!habit || !draftActionFromReminder(habit)) return false;
+      if (!window.CoachCore || typeof CoachCore.resolveActionMode !== 'function') return true;
+      return CoachCore.resolveActionMode('add_entry') === 'draft';
+    })();
+    const actionHtml =
+      habit && canDraft
+        ? '<div class="ai-coach-habit-actions">' +
+          '<button type="button" class="btn btn-primary" data-coach-draft="' +
+          esc(habit.id) +
+          '">' +
+          esc(habitCtaLabel(habit)) +
+          '</button></div>'
+        : '';
     return (
       '<div class="ai-coach-empty">' +
       '<div class="ai-coach-empty-hero">' +
       '<p class="ai-coach-empty-kicker">' +
-      esc(T('app.coach.titleShort', 'Grow coach')) +
+      esc(T('app.coachBrief.label', 'Coach')) +
       '</p>' +
       '<h3>' +
-      esc(T('app.coach.emptyTitle', 'What needs attention?')) +
+      esc(title) +
       '</h3>' +
       '<p>' +
-      esc(
-        T(
-          'app.coach.emptyBody',
-          'A low-key grow buddy — care pace, weather, and plain-language next steps. Not a feature pitch.'
-        )
-      ) +
+      esc(body) +
       '</p>' +
       '</div>' +
-      trustHtml +
-      reminderCardsHtml(reminders) +
+      actionHtml +
       '</div>'
     );
   }
@@ -2446,19 +2447,8 @@
             '<span class="ai-coach-meta">' +
             (m.source === 'gemini'
               ? T('app.coach.liveMeta', 'Live coach')
-              : T('app.coach.localMeta', 'Local helper')) +
+              : T('app.coach.localMeta', 'Journal helper')) +
             '</span>';
-        }
-        if (m.role === 'assistant' && m.needsVerify) {
-          body +=
-            '<div class="ai-coach-verify-bar">' +
-            '<button type="button" class="btn btn-primary btn-sm" data-coach-resend-verify>' +
-            T('app.coach.resendVerify', 'Resend verification email') +
-            '</button>' +
-            '<button type="button" class="btn btn-ghost btn-sm" data-coach-refresh-verify>' +
-            T('app.coach.alreadyVerified', 'I already verified') +
-            '</button>' +
-            '</div>';
         }
         return '<div class="' + cls + '">' + body + '</div>';
       })
@@ -2499,6 +2489,7 @@
       else sanitizeChatState();
       renderMessages();
       restoreComposerDraft();
+      syncCoachGate();
       setStatus(
         busy
           ? T('app.coach.thinking', 'Thinking…')
@@ -2506,7 +2497,7 @@
             ? T('app.coach.listeningShort', 'Listening…')
             : pendingActions.length
               ? T('app.coach.confirmActions', 'Confirm actions below')
-              : T('app.coach.ready', 'Ready to help')
+              : statusForGate(currentLiveGate())
       );
       // Deliberately not focusing the input: on mobile that throws the
       // keyboard up over the capability row and the conversation. The user
@@ -2544,7 +2535,7 @@
       mic.classList.remove('is-listening');
       mic.setAttribute('aria-pressed', 'false');
     }
-    if (!busy) setStatus(T('app.coach.ready', 'Ready to help'));
+    if (!busy) setStatus(statusForGate(currentLiveGate()));
     if (recognition) {
       try {
         recognition.stop();
@@ -2715,11 +2706,11 @@
     history.push(userTurn);
     typing = true;
     busy = true;
-    setStatus(
-      image
-        ? T('app.coach.lookingPhoto', 'Looking at your photo…')
-        : T('app.coach.thinking', 'Thinking…')
-    );
+    const context = buildContext();
+    const blocked = currentLiveGate();
+    if (blocked) setStatus(statusForGate(blocked));
+    else if (image) setStatus(T('app.coach.lookingPhoto', 'Looking at your photo…'));
+    else setStatus(T('app.coach.thinking', 'Thinking…'));
     renderMessages();
     saveHistory();
 
@@ -2731,63 +2722,96 @@
     }
     if (input) input.disabled = true;
 
-    const context = buildContext();
     let reply = '';
     let actions = [];
     let source = 'local';
     let needsVerify = false;
-    try {
-      const remote = await askRemote(sendText, context, image || null);
-      reply = remote.reply;
-      actions = remote.actions || [];
-      source = 'gemini';
-      if (image && history.length) {
-        const lastUser = history[history.length - 1];
-        if (lastUser && lastUser.role === 'user') {
-          lastUser.image = image;
-          delete lastUser.hasImage;
-        }
+    let gate = '';
+
+    function applyLocal(lead, kind) {
+      const via = kind || blocked;
+      if (image && via === 'verify') {
+        reply = T(
+          'app.coach.photoNeedsVerify',
+          'Photo diagnosis is the live coach. Verify your email, then send the photo again — I can still draft a journal log from the care trail.'
+        );
+        const habit = pickHabitReminder(context.reminders);
+        const drafted = habit && draftActionFromReminder(habit);
+        actions = drafted ? [drafted] : [];
+        if (habit && habit.message) reply += '\n\n' + habit.message;
+        return;
       }
-      // If model returned advice-only but user clearly asked to act, merge local intents
-      if (!actions.length && !image) {
-        const local = parseLocalIntents(sendText, context);
-        if (local.actions && local.actions.length) {
-          actions = local.actions;
-          if (!reply) reply = local.reply;
-          else reply += '\n\n' + local.reply;
+      const local = localReply(sendText, context);
+      reply = (lead ? lead + '\n\n' : '') + (local.reply || '');
+      actions = local.actions || [];
+    }
+
+    try {
+      if (blocked === 'verify') {
+        needsVerify = true;
+        gate = 'verify';
+        applyLocal('', 'verify');
+      } else if (blocked === 'quota') {
+        gate = 'quota';
+        applyLocal(
+          T(
+            'app.coach.quotaLead',
+            "Today’s live turns are used. They reset at 00:00 UTC."
+          ),
+          'quota'
+        );
+      } else {
+        const remote = await askRemote(sendText, context, image || null);
+        reply = remote.reply;
+        actions = remote.actions || [];
+        source = 'gemini';
+        if (image && history.length) {
+          const lastUser = history[history.length - 1];
+          if (lastUser && lastUser.role === 'user') {
+            lastUser.image = image;
+            delete lastUser.hasImage;
+          }
+        }
+        if (!actions.length && !image) {
+          const local = parseLocalIntents(sendText, context);
+          if (local.actions && local.actions.length) {
+            actions = local.actions;
+            if (!reply) reply = local.reply;
+            else reply += '\n\n' + local.reply;
+          }
         }
       }
     } catch (err) {
-      console.warn('AI coach remote failed, using local knowledge', err);
+      console.warn('AI coach remote failed, using journal helper', err);
       const code = (err && (err.serverCode || err.code)) || '';
-      const status = err && err.status;
       if (code === 'email_unverified') {
         needsVerify = true;
-        reply =
-          'Verify your email to unlock the live coach (including photo diagnosis). ' +
-          'Check inbox/Spam for “Verify your email · growtoo”, then tap I already verified and send the photo again.';
+        gate = 'verify';
+        applyLocal('', 'verify');
       } else if (code === 'auth') {
-        reply = 'Sign in again to use the live coach, then resend your photo.';
+        reply = T(
+          'app.coach.signInAgain',
+          'Sign in again to use the live coach, then send again.'
+        );
       } else if (code === 'image_too_large') {
-        reply = err.message || 'Photo is too large. Retake a closer leaf shot and try again.';
+        reply = err.message || T('app.coach.photoTooLarge', 'Photo is too large. Retake a closer leaf shot and try again.');
       } else if (code === 'quota_exceeded') {
-        reply =
-          (err && err.message) ||
-          'Daily live-coach limit reached. Try again tomorrow, or log care in the journal for now.';
+        quotaBlocked = true;
+        gate = 'quota';
+        applyLocal(
+          T(
+            'app.coach.quotaLead',
+            "Today’s live turns are used. They reset at 00:00 UTC."
+          ),
+          'quota'
+        );
       } else if (image) {
-        reply =
-          'Couldn’t analyze this photo with the live coach yet. ' +
-          (err && err.message ? '(' + err.message + (status ? ' · ' + status : '') + ') ' : '') +
-          'Make sure you’re online, your email is verified, then try Ask coach again.';
+        reply = T(
+          'app.coach.photoLiveSkip',
+          'Couldn’t read this photo with the live coach. Stay online, then try again — or log what you see in the journal.'
+        );
       } else {
-        const local = localReply(sendText, context);
-        reply = local.reply;
-        actions = local.actions || [];
-        reply +=
-          '\n\n(Live coach unavailable' +
-          (err && err.message ? ': ' + err.message : '') +
-          (status ? ' · ' + status : '') +
-          '. Using local helpers for now.)';
+        applyLocal('');
       }
       source = 'local';
     }
@@ -2805,14 +2829,16 @@
       source: source,
       actions: actions.length ? actions : undefined,
       needsVerify: needsVerify,
+      gate: gate || undefined,
     });
     saveHistory();
     renderMessages();
+    syncCoachGate();
     busy = false;
     setStatus(
       actions.length
         ? T('app.coach.confirmActions', 'Confirm actions below')
-        : T('app.coach.ready', 'Ready to help')
+        : statusForGate(currentLiveGate())
     );
     if (sendBtn) {
       sendBtn.disabled = false;
@@ -2887,6 +2913,8 @@
       if (window.firebase && firebase.auth) {
         firebase.auth().onAuthStateChanged(function () {
           syncAccountChatScope();
+          applyCoachChrome();
+          if (open) renderMessages();
         });
       }
     } catch {

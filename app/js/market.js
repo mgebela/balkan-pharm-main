@@ -15,6 +15,8 @@
   let harvestClaims = [];
   let unsubscribe = null;
   let mineUnsub = null;
+  let ownUnsub = null;
+  let tapeUnsub = null;
   let platformUnsub = null;
   let harvestUnsub = null;
   let watchedUid = '';
@@ -22,13 +24,17 @@
   let reconcileTimer = null;
   let lastReconcileAt = 0;
   const HCLAIM_OPT_KEY = 'growtoo-hclaim-optimistic';
-  /** Board window (latest N) + this user's investments (may fall outside the board window). */
+  /** Public tape (no Firebase uids) + this user's full asks/buys. */
   let boardListings = [];
   let mineListings = [];
+  let ownListings = [];
 
   function mergeMarketListings() {
     const byId = Object.create(null);
     boardListings.forEach(function (l) {
+      if (l && l.id) byId[l.id] = l;
+    });
+    ownListings.forEach(function (l) {
       if (l && l.id) byId[l.id] = l;
     });
     mineListings.forEach(function (l) {
@@ -220,19 +226,28 @@
   function startWatch() {
     const user = currentUser();
     const uid = user ? user.uid : '';
-    if (uid === watchedUid && unsubscribe) return;
+    if (uid === watchedUid && (tapeUnsub || unsubscribe)) return;
     if (unsubscribe) {
       unsubscribe();
       unsubscribe = null;
+    }
+    if (tapeUnsub) {
+      tapeUnsub();
+      tapeUnsub = null;
     }
     if (mineUnsub) {
       mineUnsub();
       mineUnsub = null;
     }
+    if (ownUnsub) {
+      ownUnsub();
+      ownUnsub = null;
+    }
     watchedUid = uid;
     listings = [];
     boardListings = [];
     mineListings = [];
+    ownListings = [];
     if (!uid || !firebaseReady()) {
       startPlatformWatch('');
       startHarvestWatch('');
@@ -241,25 +256,42 @@
     }
     startPlatformWatch(uid);
     startHarvestWatch(uid);
-    unsubscribe = firebase
+    tapeUnsub = firebase
       .firestore()
-      .collection('marketListings')
+      .collection('marketPublicTape')
       .orderBy('createdAt', 'desc')
       .limit(100)
       .onSnapshot(
         function (snap) {
           const next = [];
           snap.forEach(function (doc) {
-            next.push(Object.assign({ id: doc.id }, doc.data()));
+            next.push(Object.assign({ id: doc.id, fromTape: true }, doc.data()));
           });
           boardListings = next;
           mergeMarketListings();
         },
         function (err) {
-          console.warn('marketListings watch failed', err);
+          console.warn('marketPublicTape watch failed', err);
         }
       );
-    // Serious adopters can own more investments than fit in the global board window.
+    ownUnsub = firebase
+      .firestore()
+      .collection('marketListings')
+      .where('uid', '==', uid)
+      .limit(200)
+      .onSnapshot(
+        function (snap) {
+          const next = [];
+          snap.forEach(function (doc) {
+            next.push(Object.assign({ id: doc.id }, doc.data()));
+          });
+          ownListings = next;
+          mergeMarketListings();
+        },
+        function (err) {
+          console.warn('marketListings own watch failed', err);
+        }
+      );
     mineUnsub = firebase
       .firestore()
       .collection('marketListings')
@@ -1097,6 +1129,32 @@
     }
   }
 
+  function isWatchOnlySession() {
+    try {
+      return !!(
+        window.SolanaWallet &&
+        typeof SolanaWallet.isWatchOnly === 'function' &&
+        SolanaWallet.isWatchOnly()
+      );
+    } catch (e) {
+      return false;
+    }
+  }
+
+  async function hydrateListingForTrade(listing) {
+    if (!listing || !listing.id) return listing;
+    if (listing.sellerPubkey && listing.mintAddress && !listing.fromTape) return listing;
+    if (!firebaseReady()) return listing;
+    try {
+      const snap = await firebase.firestore().collection('marketListings').doc(listing.id).get();
+      if (!snap.exists) return listing;
+      return Object.assign({}, listing, snap.data(), { id: listing.id, fromTape: false });
+    } catch (err) {
+      console.warn('hydrateListingForTrade failed', listing.id, err);
+      return listing;
+    }
+  }
+
   async function investInListing(listing) {
     const user = currentUser();
     if (!user) throw new Error(T('app.market.signInToInvest', 'Sign in to invest.'));
@@ -1109,6 +1167,7 @@
       );
     }
 
+    listing = await hydrateListingForTrade(listing);
     const SW = await ensureSigningWallet(T('app.market.purposeInvest', 'invest ($GROWTOO payment)'));
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
 
@@ -1300,6 +1359,7 @@
   }
 
   async function cancelListing(listing) {
+    listing = await hydrateListingForTrade(listing);
     const ref = firebase.firestore().collection('marketListings').doc(listing.id);
     if (listing.settlement === 'program') {
       await ensureSigningWallet(T('app.market.purposeCancel', 'cancel offer (reclaim NFT)'));
@@ -1512,6 +1572,17 @@
 
   function enrichListingStory(listing) {
     if (!listing) return listing;
+    const uid = currentUser() ? currentUser().uid : '';
+    const mine = !!(uid && listing.uid && listing.uid === uid);
+    if (!mine) {
+      if (listing.journalSnippets || listing.photo) {
+        const copy = Object.assign({}, listing);
+        delete copy.journalSnippets;
+        delete copy.photo;
+        return copy;
+      }
+      return listing;
+    }
     if (listing.photo || (listing.journalSnippets && listing.journalSnippets.length)) {
       return listing;
     }
@@ -1769,6 +1840,7 @@
       listing.settlement === 'adopt_stake'
         ? T('app.market.investStake', 'Adopt · stake')
         : T('app.market.investBuy', 'Adopt · buy');
+    const watchOnlyInvest = canInvest && isWatchOnlySession();
     const showStory = isAdopterUi() || listing.status === 'active';
     const statusTint =
       listing.status === 'active'
@@ -1811,11 +1883,23 @@
       '</span>' +
       Number(listing.priceGrow).toLocaleString('en-US') +
       ' $GROWTOO</span>' +
-      (canInvest
+      (canInvest && !watchOnlyInvest
         ? '<button type="button" class="btn btn-primary btn-sm market-invest-btn" data-id="' +
           esc(listing.id) +
           '">' +
           esc(investLabel) +
+          '</button>'
+        : '') +
+      (watchOnlyInvest
+        ? '<button type="button" class="btn btn-ghost btn-sm" disabled title="' +
+          esc(
+            T(
+              'app.market.watchOnlyInvest',
+              'Watch-only cannot invest. Connect Phantom or Solflare.'
+            )
+          ) +
+          '">' +
+          esc(T('app.wallet.watchOnly', 'Watch-only')) +
           '</button>'
         : '') +
       (canCancel
@@ -1903,16 +1987,18 @@
               '</code></a>',
             true
           ) +
-          groupedRowHtml(
-            'nft',
-            T('app.market.rowGrower', 'Grower'),
-            '<code>' +
-              esc(shortAddr(listing.sellerPubkey)) +
-              '</code>' +
-              (isMine ? ' ' + esc(T('app.market.youSuffix', '(you)')) : '') +
-              (isBuyer ? ' · ' + esc(T('app.market.yourInvestment', 'your investment')) : ''),
-            false
-          ) +
+          (listing.sellerPubkey
+            ? groupedRowHtml(
+                'nft',
+                T('app.market.rowGrower', 'Grower'),
+                '<code>' +
+                  esc(shortAddr(listing.sellerPubkey)) +
+                  '</code>' +
+                  (isMine ? ' ' + esc(T('app.market.youSuffix', '(you)')) : '') +
+                  (isBuyer ? ' · ' + esc(T('app.market.yourInvestment', 'your investment')) : ''),
+                false
+              )
+            : '') +
           (listing.listingPda
             ? groupedRowHtml(
                 'pda',
@@ -1950,7 +2036,7 @@
         return l.liveStageKey || l.liveStage || l.stage || l.journalStage;
       },
       getSeller: function (l) {
-        return l.uid || '';
+        return l.sellerPubkey || l.uid || '';
       },
       getWeight: function () {
         return 1;

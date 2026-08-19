@@ -1,7 +1,9 @@
 /*
- * Scrubbed public market tape for the landing page (no auth).
- * Mirrors only board-safe fields from marketListings — never uids, wallets,
- * signatures, escrow addresses, journal notes, or photos.
+ * Scrubbed public market tape for the landing page and in-app board (no auth).
+ * Mirrors board-safe + on-chain-public fields from marketListings — never
+ * Firebase uids, payment signatures, journal notes, or photos.
+ * sellerPubkey / listingPda / care escrow are Solana addresses (already on
+ * explorers); the app needs them to invest without reading private listing docs.
  */
 'use strict';
 
@@ -58,10 +60,27 @@ function scrubPublicListing(listing) {
   if (typeof listing.settlement === 'string' && listing.settlement.trim()) {
     out.settlement = listing.settlement.trim().slice(0, 40);
   }
-  // Mint address is already public on Solana explorers; used for ticker links.
   if (typeof listing.mintAddress === 'string' && listing.mintAddress.length >= 32) {
     out.mintAddress = listing.mintAddress;
   }
+  // On-chain public identifiers — not Firebase uids.
+  if (typeof listing.sellerPubkey === 'string' && listing.sellerPubkey.length >= 32) {
+    out.sellerPubkey = listing.sellerPubkey;
+  }
+  if (typeof listing.listingPda === 'string' && listing.listingPda.length >= 32) {
+    out.listingPda = listing.listingPda;
+  }
+  if (typeof listing.careEscrowAddress === 'string' && listing.careEscrowAddress.length >= 32) {
+    out.careEscrowAddress = listing.careEscrowAddress;
+  }
+  const locked = Number(listing.lockedGrow);
+  if (Number.isFinite(locked) && locked >= 0) out.lockedGrow = Math.round(locked);
+  const immediate = Number(listing.immediateGrow);
+  if (Number.isFinite(immediate) && immediate >= 0) out.immediateGrow = Math.round(immediate);
+  const total = Number(listing.totalGrow);
+  if (Number.isFinite(total) && total >= 0) out.totalGrow = Math.round(total);
+  const bps = Number(listing.stakeLockedBps);
+  if (Number.isFinite(bps) && bps >= 0) out.stakeLockedBps = Math.round(bps);
 
   return out;
 }

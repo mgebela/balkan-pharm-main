@@ -50,9 +50,10 @@ expired-token, and `quota_exceeded` into distinct copy and labels replies
 `NotAllowedError`/`PermissionDeniedError` from `NotFoundError`; destructive
 actions use an in-app confirm sheet rather than `window.confirm`; in-flight
 transactions get a persistent status rail. Against: the primary nav collapsed to
-Journal / Log / Coach / Market on **2026-08-13** and **no desk pass has run
-against it**. Tokenise now lives as a pane behind Market, which is a real
-discoverability risk that only human testers can settle — that unknown is the
+Journal / Log / Coach / Tokenise (grower) · Market (adopter) and **no desk
+pass has run against it**. Growers now land on Tokenise from the 4th tab;
+Market is the other segment on that same screen. Whether a first-time grower
+then finds listing unaided is still a human question — that unknown is the
 whole deduction. `view-dashboard` and `view-danas` also remain in the DOM but
 are unreachable (`showView` redirects both to `plants`).
 
@@ -71,7 +72,8 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Coach** | Richer journal snapshot (stage timing, weather, toolbox readings); photo attach; clearer live-failure errors | Diagnose should cite visible symptoms + logged numbers when live |
 | **Plant camera** | Full in-app camera (preview, shutter, Flip, Gallery); **Log to journal** / **Ask coach** / Retake | Coach control uses a **camera** icon (not `+`); Netlify allows `camera=(self)` |
 | **App Check** | Code wired end to end but **inert** — `GROWTOO_APPCHECK_SITE_KEY` is still `''` | Cannot block desk sign-in / coach. There are **no metrics to watch**: the client never mints a token, so the server logs `appcheck_missing` for 100% of traffic. Register the reCAPTCHA Enterprise key first — see [app-check-rollout.md](app-check-rollout.md) |
-| **Nav (2026-08-13)** | Primary nav collapsed to **Journal · Log · Coach · Market**; Today and Tools left the bar, plants merged into Journal, Tokenise became a pane on Market | Any older step that says "tap Tokenise" or "the Today tab" is stale — see [Nav map](#nav-map-2026-08-13) below |
+| **Nav (2026-08-13, labels 2026-08-19)** | Primary nav is **Journal · Log · Coach · Tokenise** for growers (4th tab opens the Tokenise pane; Market is the other segment). Adopters see **Market** on that same slot | Any older step that says "tap Market, then Tokenise" or "the Today tab" is stale — see [Nav map](#nav-map-2026-08-13) below |
+| **Market privacy (2026-08-19)** | In-app board reads `marketPublicTape` (on-chain pubkeys only). Full `marketListings` docs are owner/buyer (list) or active (get). Header chip shows **Watch-only** when the session cannot sign | **Ship JS first, then Firestore rules.** Watch-only Invest is disabled. Confirm a second signed-in user cannot list other people's sold history |
 | **Appearance (2026-08-13)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance` | **Untested.** Age gate + cookie banner do not follow it yet |
 | **Stories + public journal** | Grower blogs in-app; public grower journal served on `journal.growto.live` | **Untested.** Public surface — check what it exposes for a signed-out visitor |
 | **Journal month view** | Month calendar over existing logs and Coach due dates | **Untested.** Now the grower's landing view, so it is on the critical path |
@@ -88,9 +90,10 @@ written before that date may name tabs that no longer exist.
 | Journal tab (`dashboard`) | **Journal** — merged with Plants; `dashboard` and `danas` both redirect to `plants` |
 | Plants tab | folded into **Journal** |
 | Today tab | gone from the bar; its Today card lives on Journal |
-| Tokenise tab | **pane on Market** — tap Market, then the Tokenise segment (`data-chain-nav` / `data-chain-pane`) |
+| Tokenise tab | **4th tab for growers** (label Tokenise / Tokeniziraj / Tokenisieren). First tap opens the Tokenise pane (`adopt`). Market is the other segment on that screen |
+| Market tab | **4th tab for adopters**; growers switch to it with the Tokenise / Market control |
 | Tools | renamed **Measurements**, moved into the More menu |
-| Log · Coach · Market | unchanged in place |
+| Log · Coach | unchanged in place |
 
 Deep links still work: `?view=dashboard` and `?view=danas` resolve to Journal.
 The chain-unlock dialog still fires from any Tokenise/Market entry point, so
@@ -280,7 +283,7 @@ Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loa
 
 ### A. Chain unlock (no silent CTA)
 1. Grower account **without** `chainOptIn` (clear `dnevnik-live-chain-opt-in` or use a fresh grower).
-2. From **START HERE**, tap **Market** (Tokenise is now a pane there — see [Nav map](#nav-map-2026-08-13)).
+2. From **START HERE**, tap **Tokenise** (4th tab, or the START HERE Tokenise chip — see [Nav map](#nav-map-2026-08-13)).
 3. Expect the **Unlock Tokenise & Market?** dialog — not a dead click / silent stay on Plants.
 4. Confirm **Unlock** → lands on Tokenise; **Not now** → stays put.
 
@@ -313,23 +316,25 @@ Hard-refresh (`Cmd+Shift+R`) so `app.js` / `plant-token.js` / CSS cache-bust loa
 2. Expect **Live coach** reply that references the photo (and journal context when present).
 3. Same capture → **Log to journal** → plant timeline shows photo entry.
 
-### G. Nav collapse (2026-08-13) — first desk pass
+### G. Nav collapse (2026-08-13) + Tokenise-first grower tab (2026-08-19) — first desk pass
 
-The bar changed the day before this doc; nothing below has been exercised by a
-human yet. Test on a phone, not a desktop window — the point of the change was
-thumb reach.
+The bar changed on 13 Aug; the 4th-tab label/fallback flipped on 19 Aug. Nothing
+below has been exercised by a human yet. Test on a phone, not a desktop window
+— the point of the change was thumb reach.
 
 1. Grower signs in → lands on **Journal** (not Today, not Plants).
-2. Bar shows exactly **Journal · Log · Coach · Market**. Tools is not in the bar.
-3. Market → **Tokenise** segment switches panes without a full view reload;
-   Market stays highlighted for both panes.
-4. Leave Tokenise, go to Journal, tap **Market** again → returns to the pane you
-   were last on, not always Market.
-5. More menu → **Measurements** opens the old Tools view.
-6. Old deep links `?view=dashboard` and `?view=danas` land on Journal.
-7. **Discoverability check (the real question):** hand the phone to someone who
+2. Bar shows exactly **Journal · Log · Coach · Tokenise**. Tools is not in the bar.
+3. First tap on the 4th tab opens **Tokenise** (not the Market board). The
+   Tokenise / Market segment switches panes without a full view reload; the
+   4th tab stays highlighted for both panes.
+4. Switch to Market, go to Journal, tap **Tokenise** again → returns to Market
+   (last pane), not always Tokenise.
+5. Adopter bar shows **Market** on that same slot; first tap opens the board.
+6. More menu → **Measurements** opens the old Tools view.
+7. Old deep links `?view=dashboard` and `?view=danas` land on Journal.
+8. **Discoverability check (the real question):** hand the phone to someone who
    has not seen the app and ask them to list a plant for sale. Note whether they
-   find Tokenise behind Market unaided, and how long it takes.
+   open Tokenise, seal, then find Market on the same screen — and how long it takes.
 
 ### H. Appearance / light theme (2026-08-13)
 
@@ -339,9 +344,8 @@ thumb reach.
    `localStorage` under `growtoo:appearance` and painted pre-paint from `<head>`).
 3. Sign in on a second device → theme follows from the user doc.
 4. Set **Auto** → theme tracks the OS. Light and Dark ignore the OS by design.
-5. **Known gap:** age gate and cookie banner stay dark in light mode
-   (`styles/trust-gates.css` is untokenised). Confirm whether this is fixed
-   before scoring UI again.
+5. **Known gap (fixed 2026-08-19, commit `7e3f21b`):** age gate and cookie banner
+   now use paper tokens. Confirm they follow light / dark with the rest of the app.
 
 ### I. Stories + public journal (2026-08-13)
 
@@ -365,6 +369,24 @@ Now the grower landing view, so a failure here is a first-impression failure.
 4. Page back through months, including one with no entries (expect an empty
    state, not a blank grid).
 5. Add a log via **Log** → the month view reflects it without a manual refresh.
+
+### K. Market privacy + watch-only (2026-08-19)
+
+**Ship `market.js` / `plant-token.js` to Netlify before deploying the new
+`marketListings` Firestore rules.** Old clients still scan the full listing
+collection; the new `allow list` will break that query.
+
+1. Signed-in adopter on Market: board still shows active offers (from the
+   public tape). Cards do not show another grower's Firebase uid, journal
+   notes, or photos.
+2. After invest, the buyer still sees their own sold/pending rows (buyer
+   query). A *different* signed-in account must not see that sold history.
+3. Paste-address (watch-only) session: header compact chip shows **Watch-only**.
+   Invest is a disabled ghost button, not a signing prompt.
+4. Phantom / Solflare session: Invest still works; hydrate of an active
+   listing at click time still reaches `sellerPubkey`.
+5. Grower's own asks (including cancelled) still appear — they come from
+   `where uid == me`, not the public tape.
 
 ---
 
@@ -397,7 +419,7 @@ Now the grower landing view, so a failure here is a first-impression failure.
 - [ ] **Adopt stake (fresh):** post “Adopt stake” → adopter pays full price → settle 50/50 (existing stakes already prove settle path)  
 - [ ] **Adopt reservation TTL (live):** abandon unpaid `pending-*` and confirm reopen ~15m  
 - [ ] **Monthly care (UI):** log ≥12 distinct care days; Market / adopter garden show live counters  
-- [ ] **Weekly progress:** grower-only on the Tokenise pane (Market → Tokenise); adopters see **Care unlock** panel with month timeline (Jul qualify · Aug 4/12 · …) + path meters + sync-lag state  
+- [ ] **Weekly progress:** grower-only on the Tokenise pane (4th tab → Tokenise); adopters see **Care unlock** panel with month timeline (Jul qualify · Aug 4/12 · …) + path meters + sync-lag state  
 - [ ] **Ranks:** grower rank on the Tokenise pane wallet; plant rank on token cards (both profiles)  
 - [ ] **Harvest claim:** journal at harvest + months qualify → Claim on Market; fail path refunds adopter  
 - [ ] **Notifications:** header bell shows unread; journal log creates toast + inbox item  
@@ -408,14 +430,17 @@ Now the grower landing view, so a failure here is a first-impression failure.
 
 ### Manual — new since 2026-08-06 (never desk-tested)
 
-- [ ] **Nav collapse:** bar is Journal · Log · Coach · Market on a phone; Tokenise reachable as a Market pane  
-- [ ] **Nav memory:** returning to Market restores the last pane (Market vs Tokenise)  
+- [ ] **Nav collapse:** grower bar is Journal · Log · Coach · Tokenise on a phone; Market is the other segment on that screen  
+- [ ] **Nav memory:** returning to the 4th tab restores the last pane (Tokenise vs Market)  
 - [ ] **Nav deep links:** `?view=dashboard` / `?view=danas` land on Journal  
-- [ ] **Nav discoverability:** a first-time user finds Tokenise behind Market unaided  
+- [ ] **Nav discoverability:** a first-time grower finds Tokenise from the bar, then Market on the same screen, unaided  
 - [ ] **Appearance:** light / dark / auto persists across refresh and across devices  
-- [ ] **Appearance gap:** age gate + cookie banner follow the light theme *(known failing)*  
+- [ ] **Appearance gap:** age gate + cookie banner follow the light theme *(painted in `7e3f21b` — confirm on a phone)*  
 - [ ] **Stories:** publish → post renders on `journal.growto.live` signed out  
 - [ ] **Public journal privacy:** no private entries, wallets, emails, or opted-out growers exposed  
+- [ ] **Market tape:** board loads from public tape; no other user's uid / journal / photo on cards  
+- [ ] **Market list rules:** another signed-in account cannot see sold/cancelled history they are not party to  
+- [ ] **Watch-only chip:** paste-address session shows Watch-only on the header chip; Invest is disabled  
 - [ ] **Journal month view:** logs and Coach due dates land on the right days; empty months degrade cleanly  
 - [ ] **Journal month view:** a new log appears without a manual refresh    
 

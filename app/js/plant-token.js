@@ -3741,17 +3741,33 @@
     }
 
     if (compact) {
+      const watchOnly = isWatchOnlyProvider(wallet.provider);
       return (
         '<div class="wallet-controls wallet-controls--compact">' +
-        '<button type="button" class="wallet-status-chip wallet-status-chip--on wallet-status-toggle" title="' +
-        esc(T('app.wallet.connectedTapDisconnect', 'Connected — tap to disconnect')) +
+        '<button type="button" class="wallet-status-chip wallet-status-chip--on' +
+        (watchOnly ? ' wallet-status-chip--watch' : '') +
+        ' wallet-status-toggle" title="' +
+        esc(
+          watchOnly
+            ? T('app.wallet.watchOnlyChip', 'Watch-only — cannot sign. Tap to disconnect.')
+            : T('app.wallet.connectedTapDisconnect', 'Connected — tap to disconnect')
+        ) +
         '" aria-label="' +
-        esc(T('app.wallet.connectedTapDisconnectAria', 'Wallet connected, tap to disconnect')) +
+        esc(
+          watchOnly
+            ? T('app.wallet.watchOnlyChip', 'Watch-only — cannot sign. Tap to disconnect.')
+            : T('app.wallet.connectedTapDisconnectAria', 'Wallet connected, tap to disconnect')
+        ) +
         '">' +
         '<span class="wallet-status-dot" aria-hidden="true"></span>' +
         '<span class="wallet-status-addr">' +
         esc(shortAddr(wallet.address)) +
         '</span>' +
+        (watchOnly
+          ? '<span class="wallet-status-watch">' +
+            esc(T('app.wallet.watchOnly', 'Watch-only')) +
+            '</span>'
+          : '') +
         '</button>' +
         '</div>'
       );

@@ -362,9 +362,21 @@ service cloud.firestore {
   // Program: seller locks NFT into growtoo_escrow PDA; buy/cancel are atomic.
 
   match /marketListings/{listingId} {
-    // Full listing docs (uids, wallets, sigs, journal snippets) — signed-in only.
-    // Landing ticker reads scrubbed `marketPublicTape` (public, field-limited).
-    allow read: if signedIn();
+    // Full docs (Firebase uid, payment sigs, journal leftovers) are not a public
+    // board. List queries are owner/buyer/admin only — the in-app board reads
+    // `marketPublicTape`. Single-doc get of an *active* offer is allowed so
+    // invest can hydrate sellerPubkey / uid at click time.
+    allow get: if signedIn() && (
+      isAdminOrSuper()
+      || resource.data.uid == request.auth.uid
+      || resource.data.buyerUid == request.auth.uid
+      || resource.data.status == 'active'
+    );
+    allow list: if signedIn() && (
+      isAdminOrSuper()
+      || resource.data.uid == request.auth.uid
+      || resource.data.buyerUid == request.auth.uid
+    );
 
     allow create: if signedIn()
       && request.resource.data.uid == request.auth.uid
@@ -522,8 +534,9 @@ service cloud.firestore {
   }
 
   // ── Public market tape (landing page, no auth) ─────────────
-  // Written only by Admin SDK (onMarketListingHealth). Deliberately scrubbed:
-  // name/price/status/stage/mint — never uids, wallets, sigs, journal, photos.
+  // Written only by Admin SDK (onMarketListingHealth). Scrubbed: name/price/
+  // status/stage/mint plus on-chain pubkeys (sellerPubkey, listingPda, escrow).
+  // Never Firebase uids, payment signatures, journal notes, or photos.
 
   match /marketPublicTape/{listingId} {
     allow read: if true;

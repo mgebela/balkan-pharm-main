@@ -2372,6 +2372,21 @@ body.notif-open {
   color: rgb(var(--ink-rgb) / 0.7);
 }
 
+.wallet-status-chip--watch {
+  color: var(--text-muted);
+}
+
+.wallet-status-watch {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0.12rem 0.38rem;
+  border-radius: 999px;
+  background: rgb(var(--forest-rgb) / 0.1);
+}
+
 .wallet-status-dot {
   width: 0.45rem;
   height: 0.45rem;
@@ -9355,11 +9370,8 @@ body.profile-adopter .adopt-hero-text h2 {
   flex-direction: column;
   gap: 0.85rem;
   padding: 0.15rem 0 0.25rem;
-  /* Centre in the scroll area. The starter-card grid used to fill this space;
-     with the capability row under the composer doing that job, top-aligning a
-     short hero just leaves a void beneath it. */
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .ai-coach-empty-hero {
@@ -9656,6 +9668,48 @@ body.profile-adopter .adopt-hero-text h2 {
   margin-top: 0.55rem;
 }
 
+.ai-coach-gate {
+  flex: 0 0 auto;
+  margin: 0.7rem 0.95rem 0;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgb(var(--mint-rgb) / 0.35);
+  background: rgb(var(--surface-raised-rgb) / 0.55);
+  color: var(--coach-ink);
+}
+
+.ai-coach-gate-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+.ai-coach-gate p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--coach-muted);
+}
+
+.ai-coach-gate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.ai-coach-habit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ai-coach-habit-actions .btn {
+  min-height: 44px;
+  font-weight: 650;
+}
+
 .ai-coach-composer {
   border-top: 1px solid var(--coach-line);
   background: rgb(var(--surface-rgb) / 0.96);
@@ -9898,23 +9952,9 @@ body.profile-adopter .adopt-hero-text h2 {
   }
 }
 
-/* ——— Capability row under the composer ———
-   Standing answer to "what can this thing do?", which matters now that the
-   panel opens without focusing the input: the first thing a grower sees is a
-   set of concrete starting points rather than an empty text field. Scrolls
-   horizontally rather than wrapping, so composer height stays predictable. */
+/* Capability chip row retired — daily habit CTA lives in the empty state. */
 .ai-coach-capabilities {
-  display: flex;
-  gap: 0.4rem;
-  margin-top: 0.55rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  /* Bleed to the composer edges so the row reads as scrollable, not clipped. */
-  padding: 0 0.8rem;
-  margin-left: -0.8rem;
-  margin-right: -0.8rem;
+  display: none;
 }
 
 .ai-coach-capabilities::-webkit-scrollbar {
@@ -10441,8 +10481,14 @@ table td {
   flex-direction: column;
 }
 
+.ai-coach-tab-panel[data-coach-panel="chat"].is-active {
+  overflow: hidden;
+}
+
 .ai-coach-tab-panel[data-coach-panel="chat"].is-active .ai-coach-messages {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .coach-perm-panel,
