@@ -71,7 +71,7 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Adopter intro** | **START HERE**, **How to adopt**, **Adopting on this board** (+ faucet block) hide after first adoption | Onboarded adopters see garden/market board, not explainer chrome |
 | **Coach** | Richer journal snapshot (stage timing, weather, toolbox readings); photo attach; clearer live-failure errors | Diagnose should cite visible symptoms + logged numbers when live |
 | **Plant camera** | Full in-app camera (preview, shutter, Flip, Gallery); **Log to journal** / **Ask coach** / Retake | Coach control uses a **camera** icon (not `+`); Netlify allows `camera=(self)` |
-| **App Check** | Code wired end to end but **inert** — `GROWTOO_APPCHECK_SITE_KEY` is still `''` | Cannot block desk sign-in / coach. There are **no metrics to watch**: the client never mints a token, so the server logs `appcheck_missing` for 100% of traffic. Register the reCAPTCHA Enterprise key first — see [app-check-rollout.md](app-check-rollout.md) |
+| **App Check** | Site key live (`20260819c`); **monitor mode** — tokens are sent, nothing is rejected | Watch App Check → Metrics for a few days. Do **not** set `APP_CHECK_ENFORCE` yet — see [app-check-rollout.md](app-check-rollout.md) |
 | **Nav (2026-08-13, labels 2026-08-19)** | Primary nav is **Journal · Log · Coach · Tokenise** for growers (4th tab opens the Tokenise pane; Market is the other segment). Adopters see **Market** on that same slot | Any older step that says "tap Market, then Tokenise" or "the Today tab" is stale — see [Nav map](#nav-map-2026-08-13) below |
 | **Market privacy (2026-08-19)** | In-app board reads `marketPublicTape` (on-chain pubkeys only). Full `marketListings` docs are owner/buyer (list) or active (get). Header chip shows **Watch-only** when the session cannot sign | **Ship JS first, then Firestore rules.** Watch-only Invest is disabled. Confirm a second signed-in user cannot list other people's sold history |
 | **Appearance (2026-08-13)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance` | **Untested.** Age gate + cookie banner do not follow it yet |
@@ -246,11 +246,11 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - Removing CF settle entirely (still required for legacy)
 - Physical harvest redemption — **coming later** (Devnet UX states this clearly; practice path ends at care unlock + Claim locked stake `$GROWTOO`)
 - Native App Store / Play wrappers (Capacitor) — web is mobile-ready; not packaged as store apps yet
-- App Check — **not yet running at all.** `GROWTOO_APPCHECK_SITE_KEY` is empty, so
-  the client mints no token and the server records `appcheck_missing` for every
-  request. Register the reCAPTCHA Enterprise key and let real metrics accumulate
-  *before* considering `APP_CHECK_ENFORCE=true`
-- `solanaRpc` has **no user auth** — with App Check inert it is an open relay to a
+- App Check — **monitor mode.** Site key is live; clients send tokens. Do not
+  set `APP_CHECK_ENFORCE=true` until App Check → Metrics shows almost no
+  `appcheck_missing` / `appcheck_invalid` (a few days of real traffic)
+- `solanaRpc` has **no user auth** — until App Check is *enforced* it is still
+  an open relay to a
   paid RPC provider, throttled only by a per-instance in-memory Map (~180/min/IP
   *per instance*, so the real ceiling scales with instance count)
 - `solanaRpc` upstream `fetch` has **no `AbortSignal`** — a hung provider pins the

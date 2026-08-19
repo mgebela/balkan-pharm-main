@@ -23,8 +23,8 @@
 (function () {
   'use strict';
 
-  // Public reCAPTCHA Enterprise site key. Empty = App Check stays off.
-  window.GROWTOO_APPCHECK_SITE_KEY = '';
+  // Public reCAPTCHA Enterprise site key (growto.live). Empty = App Check stays off.
+  window.GROWTOO_APPCHECK_SITE_KEY = '6LcGIY4tAAAAAFK2amIu2B-QRIWZkcOHARBnvui_';
 
   var host = window.location.hostname;
   var isLocal =

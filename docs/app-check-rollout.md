@@ -6,13 +6,14 @@ Functions and skip the UI entirely — the Firestore rules are then the only thi
 standing there. App Check attests that a request came from our app; the rules
 still decide what that caller may do. The two are complementary.
 
-The code is already in place and **inert**. Nothing changes until step 2.
+The code is already in place. Step 2 (site key) is done; clients send tokens.
+Nothing is rejected until step 4.
 
 ## What is already wired
 
 | Piece | Where | State |
 | --- | --- | --- |
-| Shared client config | `js/appcheck-config.js` | site key empty → no-op |
+| Shared client config | `js/appcheck-config.js` | site key set; monitor mode |
 | Landing (compat SDK) | `index.html` | initialises after `initializeApp` |
 | App (compat SDK) | `app/index.html` | same |
 | Sign-in (modular SDK) | `dnevnik/index.html` | same |
