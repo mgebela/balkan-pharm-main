@@ -192,6 +192,8 @@
     "catVisit": "Visited other growers",
     "confirmDelete": "Delete this story?",
     "couldNotSave": "Could not save.",
+    "deleteBody": "This cannot be undone.",
+    "deleteConfirm": "Delete",
     "deleted": "Story deleted",
     "draftSaved": "Draft saved.",
     "editStory": "Edit story",
@@ -596,6 +598,7 @@
   "confirm": {
     "body": "Continue?",
     "cancel": "Cancel",
+    "gotIt": "OK",
     "ok": "Confirm",
     "title": "Confirm"
   },

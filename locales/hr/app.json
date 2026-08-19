@@ -564,6 +564,7 @@
   "confirm": {
     "title": "Potvrdi",
     "ok": "Potvrdi",
+    "gotIt": "U redu",
     "cancel": "Odustani",
     "body": "Nastaviti?"
   },
@@ -1009,6 +1010,8 @@
     "published": "Objavljeno",
     "unpublished": "Objava povučena",
     "confirmDelete": "Obrisati ovu priču?",
+    "deleteBody": "Ovo se ne može poništiti.",
+    "deleteConfirm": "Obriši",
     "deleted": "Priča obrisana",
     "photoFormat": "Koristi JPG ili PNG fotografiju.",
     "photoLarge": "Fotografija je velika — razmisli o manjoj slici za brže učitavanje.",

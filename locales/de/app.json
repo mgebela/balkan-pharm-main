@@ -564,6 +564,7 @@
   "confirm": {
     "title": "Bestätigen",
     "ok": "Bestätigen",
+    "gotIt": "OK",
     "cancel": "Abbrechen",
     "body": "Fortfahren?"
   },
@@ -991,6 +992,8 @@
     "published": "Veröffentlicht",
     "unpublished": "Zurückgezogen",
     "confirmDelete": "Diese Story löschen?",
+    "deleteBody": "Das lässt sich nicht rückgängig machen.",
+    "deleteConfirm": "Löschen",
     "deleted": "Story gelöscht",
     "photoFormat": "Nimm ein JPG- oder PNG-Foto.",
     "photoLarge": "Das Foto ist groß — ein kleineres Bild lädt schneller.",

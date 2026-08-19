@@ -405,7 +405,14 @@
         });
         return;
       }
-      alert((err && err.message) || T('app.camera.saveLogFailed', 'Could not save photo log.'));
+      if (window.AppConfirm && typeof AppConfirm.note === 'function') {
+        AppConfirm.note({
+          title: T('app.camera.saveLogFailed', 'Could not save photo log.'),
+          body: (err && err.message) || '',
+        });
+      } else {
+        alert((err && err.message) || T('app.camera.saveLogFailed', 'Could not save photo log.'));
+      }
       return;
     }
     if (typeof window.showAppView === 'function') {

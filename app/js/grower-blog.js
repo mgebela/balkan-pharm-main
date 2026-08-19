@@ -434,7 +434,16 @@
   async function deletePost(id) {
     var uid = currentUid();
     if (!uid) return;
-    if (!window.confirm(T('app.blog.confirmDelete', 'Delete this story?'))) return;
+    var ok =
+      window.AppConfirm && typeof AppConfirm.ask === 'function'
+        ? await AppConfirm.ask({
+            title: T('app.blog.confirmDelete', 'Delete this story?'),
+            body: T('app.blog.deleteBody', 'This cannot be undone.'),
+            confirmLabel: T('app.blog.deleteConfirm', 'Delete'),
+            danger: true,
+          })
+        : window.confirm(T('app.blog.confirmDelete', 'Delete this story?'));
+    if (!ok) return;
     await postsCol(uid).doc(id).delete();
     if (editingId === id) resetForm();
     toast(T('app.blog.deleted', 'Story deleted'), 'success');

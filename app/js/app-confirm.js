@@ -1,6 +1,7 @@
 /*
  * In-app confirm sheet — replaces window.confirm for Market / Tokenise flows.
  * Usage: const ok = await AppConfirm.ask({ title, body, confirmLabel, danger });
+ *        await AppConfirm.note({ title, body }); // one-button notice (replaces alert)
  */
 (function () {
   'use strict';
@@ -8,6 +9,7 @@
   let pending = null;
   let bound = false;
   let lastFocus = null;
+  let acknowledge = false;
 
   function els() {
     return {
@@ -25,10 +27,12 @@
     const ui = els();
     if (ui.overlay) ui.overlay.hidden = true;
     document.body.classList.remove('app-confirm-open');
+    const ack = acknowledge;
+    acknowledge = false;
     if (pending) {
       const resolve = pending;
       pending = null;
-      resolve(!!result);
+      resolve(ack ? true : !!result);
     }
     if (lastFocus && typeof lastFocus.focus === 'function') {
       try {
@@ -95,7 +99,8 @@
    *   body?: string,
    *   confirmLabel?: string,
    *   cancelLabel?: string,
-   *   danger?: boolean
+   *   danger?: boolean,
+   *   acknowledge?: boolean
    * }} opts
    * @returns {Promise<boolean>}
    */
@@ -103,8 +108,15 @@
     opts = opts || {};
     bindOnce();
     const ui = els();
+    const isNote = !!opts.acknowledge;
 
     if (!ui.overlay || !ui.ok || !ui.cancel || !ui.title) {
+      if (isNote) {
+        window.alert(
+          (opts.title ? opts.title + '\n\n' : '') + (opts.body || '')
+        );
+        return Promise.resolve(true);
+      }
       const fallback =
         (opts.title ? opts.title + '\n\n' : '') + (opts.body || T('app.confirm.body', 'Continue?'));
       return Promise.resolve(window.confirm(fallback));
@@ -113,14 +125,19 @@
     if (pending) finish(false);
 
     lastFocus = document.activeElement;
+    acknowledge = isNote;
     ui.title.textContent = opts.title || T('app.confirm.title', 'Confirm');
     setBody(ui, opts.body || '');
-    ui.ok.textContent = opts.confirmLabel || T('app.confirm.ok', 'Confirm');
+    ui.ok.textContent =
+      opts.confirmLabel ||
+      (isNote ? T('app.confirm.gotIt', 'OK') : T('app.confirm.ok', 'Confirm'));
     ui.cancel.textContent = opts.cancelLabel || T('app.confirm.cancel', 'Cancel');
-    ui.ok.classList.toggle('btn-danger', !!opts.danger);
-    ui.ok.classList.toggle('btn-primary', !opts.danger);
+    ui.cancel.hidden = isNote;
+    ui.ok.classList.toggle('btn-danger', !!opts.danger && !isNote);
+    ui.ok.classList.toggle('btn-primary', !opts.danger || isNote);
     if (ui.sheet) {
-      ui.sheet.classList.toggle('app-confirm-sheet--danger', !!opts.danger);
+      ui.sheet.classList.toggle('app-confirm-sheet--danger', !!opts.danger && !isNote);
+      ui.sheet.classList.toggle('app-confirm-sheet--note', isNote);
     }
 
     ui.overlay.hidden = false;
@@ -138,5 +155,15 @@
     });
   }
 
-  window.AppConfirm = { ask: ask };
+  function note(opts) {
+    opts = opts || {};
+    return ask({
+      title: opts.title,
+      body: opts.body,
+      confirmLabel: opts.confirmLabel,
+      acknowledge: true,
+    });
+  }
+
+  window.AppConfirm = { ask: ask, note: note };
 })();
