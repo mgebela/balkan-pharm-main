@@ -11,6 +11,10 @@
 const {verifyAppCheck} = require('./user-guards');
 
 const PUBLIC_FALLBACK = 'https://api.devnet.solana.com';
+/** Leave headroom under the Cloud Function's 30s timeout so we return JSON. */
+const UPSTREAM_TIMEOUT_MS = 12000;
+
+let warnedPublicFallback = false;
 
 /** Never proxy these — abuse / faucet / admin. */
 const DENIED = new Set([
@@ -112,7 +116,16 @@ function allowRequest(req) {
 
 function upstreamUrl() {
   const url = (process.env.SOLANA_RPC_URL || '').trim();
+  if (!url && !warnedPublicFallback) {
+    warnedPublicFallback = true;
+    console.warn('solanaRpc SOLANA_RPC_URL unset — using public Devnet fallback');
+  }
   return url || PUBLIC_FALLBACK;
+}
+
+function isUpstreamTimeout(err) {
+  const name = err && err.name;
+  return name === 'TimeoutError' || name === 'AbortError';
 }
 
 function methodOf(body) {
@@ -216,6 +229,7 @@ async function handleSolanaRpc(req, res) {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(body),
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
     const text = await upstream.text();
     res.status(upstream.status);
@@ -223,12 +237,16 @@ async function handleSolanaRpc(req, res) {
     res.set('Cache-Control', 'no-store');
     res.send(text);
   } catch (err) {
-    console.error('solanaRpc upstream', err);
-    res.status(502).json({
+    const timedOut = isUpstreamTimeout(err);
+    if (timedOut) console.warn('solanaRpc upstream timeout', UPSTREAM_TIMEOUT_MS);
+    else console.error('solanaRpc upstream', err);
+    res.status(timedOut ? 504 : 502).json({
       jsonrpc: '2.0',
       error: {
         code: -32000,
-        message: 'Upstream Solana RPC failed: ' + ((err && err.message) || 'unknown'),
+        message: timedOut
+          ? 'Upstream Solana RPC timed out'
+          : 'Upstream Solana RPC failed: ' + ((err && err.message) || 'unknown'),
       },
       id: (body && !Array.isArray(body) && body.id) || null,
     });
@@ -239,6 +257,8 @@ module.exports = {
   handleSolanaRpc,
   isMethodAllowed,
   clientIp,
+  isUpstreamTimeout,
+  UPSTREAM_TIMEOUT_MS,
   DENIED,
   ALLOWED_EXTRA,
 };
