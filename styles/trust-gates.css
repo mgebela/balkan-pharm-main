@@ -1,4 +1,5 @@
-/* Age gate + cookie consent — catalog forest + brass */
+/* Age gate + cookie consent — same sage paper as landing / journal. */
+
 .trust-gate {
   position: fixed;
   inset: 0;
@@ -7,7 +8,7 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgba(6, 14, 10, 0.92);
+  background: rgb(var(--surface-rgb) / 0.92);
 }
 
 .trust-gate[hidden] {
@@ -18,27 +19,28 @@
   width: min(100%, 26rem);
   padding: 1.5rem 1.45rem 1.35rem;
   border-radius: 12px;
-  border: 1px solid rgba(201, 165, 94, 0.22);
-  background: linear-gradient(165deg, rgba(18, 28, 20, 0.98) 0%, rgba(12, 20, 14, 0.99) 100%);
-  color: #f3efe6;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
-  font-family: 'Archivo', system-ui, sans-serif;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: var(--font);
 }
 
-.trust-gate-card h2 {
+.trust-gate-card h2,
+.cookie-banner h2 {
   margin: 0 0 0.55rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-display);
   font-size: 1.35rem;
-  font-weight: 350;
+  font-weight: 600;
   letter-spacing: -0.02em;
-  color: #f3efe6;
+  color: var(--green);
 }
 
-.trust-gate-card p {
+.trust-gate-card p,
+.cookie-banner p {
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: rgba(184, 196, 176, 0.78);
+  color: var(--text-muted);
 }
 
 .trust-gate-actions .btn,
@@ -50,27 +52,33 @@
   min-height: 2.75rem;
   padding: 0.55rem 1rem;
   border-radius: 4px;
-  border: 1px solid rgba(201, 165, 94, 0.4);
+  border: 1px solid var(--border);
   font: inherit;
   font-weight: 650;
   font-size: 0.92rem;
   cursor: pointer;
   text-decoration: none;
-  color: #f3efe6;
+  color: var(--text);
   background: transparent;
+}
+
+.trust-gate-actions .btn:focus-visible,
+.cookie-banner-actions .btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .trust-gate-actions .btn-primary,
 .cookie-banner-actions .btn-primary {
-  background: #c9a55e;
-  border-color: #c9a55e;
-  color: #1a1408;
+  background: var(--brass-fill);
+  border-color: var(--brass-fill);
+  color: var(--brass-ink);
 }
 
 .trust-gate-actions .btn-primary:hover,
 .cookie-banner-actions .btn-primary:hover {
-  background: #d8b872;
-  border-color: #d8b872;
+  background: var(--brass-hover);
+  border-color: var(--brass-hover);
 }
 
 .trust-gate-actions .btn-ghost,
@@ -80,7 +88,7 @@
 
 .trust-gate-actions .btn-ghost:hover,
 .cookie-banner-actions .btn-ghost:hover {
-  background: rgba(201, 165, 94, 0.1);
+  background: var(--card-hover);
 }
 
 .trust-gate-actions .btn {
@@ -105,16 +113,15 @@
   z-index: 9990;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.85rem;
   padding: 0.95rem 1.1rem;
   border-radius: 12px;
-  border: 1px solid rgba(201, 165, 94, 0.22);
-  background: rgba(15, 26, 18, 0.96);
-  color: rgba(184, 196, 176, 0.9);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  font-family: 'Archivo', system-ui, sans-serif;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-muted);
+  font-family: var(--font);
   font-size: 0.88rem;
   line-height: 1.4;
 }
@@ -123,8 +130,18 @@
   display: none !important;
 }
 
+.cookie-banner h2 {
+  font-size: 1.05rem;
+  width: 100%;
+}
+
+.cookie-banner p {
+  margin: 0;
+  flex: 1 1 12rem;
+}
+
 .cookie-banner a {
-  color: #c9a55e;
+  color: var(--green);
   text-underline-offset: 0.18em;
 }
 
@@ -140,5 +157,15 @@
     right: 1.25rem;
     bottom: 1.25rem;
     max-width: 28rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-gate,
+  .trust-gate-card,
+  .cookie-banner,
+  .trust-gate-actions .btn,
+  .cookie-banner-actions .btn {
+    transition: none;
   }
 }
