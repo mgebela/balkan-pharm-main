@@ -12348,6 +12348,9 @@ body.app-confirm-open {
   flex-wrap: wrap;
   gap: 0.45rem;
 }
+body.daily-status-open .daily-start-strip {
+  display: none;
+}
 
 .daily-status-overlay {
   position: fixed;

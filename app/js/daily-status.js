@@ -1,6 +1,7 @@
 /*
  * Role-first start strip + idle-game "while you were away" daily status popup.
- * Compares inbox / journal / market / XP against last-seen (or previous login).
+ * One intro layer per session: the away/welcome sheet OR START HERE, never both
+ * stacked with the Tokenise explainer.
  */
 (function () {
   'use strict';
@@ -8,8 +9,9 @@
   const LAST_SEEN_PREFIX = 'dnevnik-live-status-last-seen:';
   const PREV_LOGIN_PREFIX = 'dnevnik-live-prev-login-at:';
   const SESSION_SHOWN = 'dnevnik-live-status-shown:';
+  const INTRO_LAYER_PREFIX = 'dnevnik-live-intro-layer:';
+  const TOKENISE_EXPLAINER_KEY = 'dnevnik-live-tokenise-explainer-seen';
   const MIN_AWAY_MS = 30 * 60 * 1000; // skip popup if back within 30m
-  const SETTLE_MS = 700;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -475,7 +477,14 @@
     } catch (_) {
       /* ignore */
     }
+    try {
+      localStorage.setItem(TOKENISE_EXPLAINER_KEY, '1');
+    } catch (_) {
+      /* ignore */
+    }
+    if (readIntroLayer(uid, false) === 'strip') writeIntroLayer(uid, false, 'none');
     renderStrip(false);
+    notifyIntroLayer();
   }
 
   function nextStep(adopter) {
@@ -568,6 +577,11 @@
     const lead = document.getElementById('daily-start-lead');
     const actions = document.getElementById('daily-start-actions');
     if (!strip || !actions) return;
+    if (readIntroLayer(currentUid(), adopter) === 'popup') {
+      strip.hidden = true;
+      actions.innerHTML = '';
+      return;
+    }
     // Intro only — hide once the adopter has adopted, or the grower has listed once.
     if (adopter && adopterOnboardingDone()) {
       strip.hidden = true;
@@ -888,6 +902,49 @@
     return SESSION_SHOWN + uid + ':' + (adopter ? 'adopter' : 'grower');
   }
 
+  function introLayerKey(uid, adopter) {
+    return INTRO_LAYER_PREFIX + uid + ':' + (adopter ? 'adopter' : 'grower');
+  }
+
+  function readIntroLayer(uid, adopter) {
+    if (!uid) return '';
+    try {
+      return sessionStorage.getItem(introLayerKey(uid, adopter)) || '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  function writeIntroLayer(uid, adopter, layer) {
+    if (!uid) return;
+    try {
+      sessionStorage.setItem(introLayerKey(uid, adopter), layer);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function notifyIntroLayer() {
+    try {
+      window.dispatchEvent(new CustomEvent('growtoo:intro-layer'));
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  /**
+   * True while this session already used the welcome/away sheet, or START HERE
+   * is the active chrome — Tokenise / garden explainers stay out of the way.
+   */
+  function introOccupied() {
+    const uid = currentUid();
+    const adopter = isAdopter();
+    const layer = readIntroLayer(uid, adopter);
+    if (layer === 'popup' || layer === 'strip') return true;
+    if (!layer && uid && !alreadyShownThisSession(uid, adopter)) return true;
+    return false;
+  }
+
   function alreadyShownThisSession(uid, adopter) {
     try {
       if (sessionStorage.getItem(sessionKey(uid, adopter)) === '1') return true;
@@ -917,7 +974,7 @@
     };
 
     if (!adopter || !window.Market || typeof Market.onChange !== 'function') {
-      setTimeout(finish, SETTLE_MS);
+      finish();
       return;
     }
 
@@ -949,7 +1006,6 @@
     bindStripOnce();
     bindPopupOnce();
     bindRewardOnce();
-    renderStrip(adopter);
 
     // When Market listings sync (or a new offer posts), refresh grower START HERE hide.
     if (!adopter && window.Market && typeof Market.onChange === 'function' && !window.__growtooStripMarketBound) {
@@ -960,7 +1016,7 @@
     }
 
     if (alreadyShownThisSession(uid, adopter)) {
-      // Daily status already handled this session — still offer the tour once.
+      if (readIntroLayer(uid, adopter) !== 'popup') renderStrip(adopter);
       maybeKickTour(adopter, uid);
       return;
     }
@@ -978,6 +1034,8 @@
 
       markShownThisSession(uid, adopter);
       if (showPopupNow) {
+        writeIntroLayer(uid, adopter, 'popup');
+        notifyIntroLayer();
         showPopup({
           adopter: adopter,
           gains: gains,
@@ -985,7 +1043,11 @@
           firstVisit: firstVisit,
         });
       } else {
+        const wouldShowStrip = adopter ? !adopterOnboardingDone() : !growerMarketIntroDone();
+        writeIntroLayer(uid, adopter, wouldShowStrip ? 'strip' : 'none');
         writeLastSeen(uid, now, adopter);
+        renderStrip(adopter);
+        notifyIntroLayer();
         maybeKickTour(adopter, uid);
       }
     });
@@ -999,6 +1061,7 @@
     },
     markGrowerListed: markGrowerListed,
     growerMarketIntroDone: growerMarketIntroDone,
+    introOccupied: introOccupied,
     hide: function () {
       hidePopup(currentUid(), isAdopter());
     },

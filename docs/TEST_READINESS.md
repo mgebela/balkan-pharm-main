@@ -69,6 +69,7 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Google sign-in** | `growto.live` / `www.growto.live` authorized in Firebase Auth | Google popup no longer flashes closed as unauthorized domain |
 | **Email verify** | Live AI (coach / vision) requires verified email; Account + Coach **Resend** / **I already verified** | Unverified accounts fall back to Local helper — verify before coach photo tests |
 | **Adopter intro** | **START HERE**, **How to adopt**, **Adopting on this board** (+ faucet block) hide after first adoption | Onboarded adopters see garden/market board, not explainer chrome |
+| **One intro layer (2026-08-19)** | Welcome / **While you were away** OR **START HERE** per session — never stacked with Tokenise / garden explainers | After ≥30m away: sheet only. Under 30m and not onboarded: START HERE only |
 | **Coach** | Richer journal snapshot (stage timing, weather, toolbox readings); photo attach; clearer live-failure errors | Diagnose should cite visible symptoms + logged numbers when live |
 | **Plant camera** | Full in-app camera (preview, shutter, Flip, Gallery); **Log to journal** / **Ask coach** / Retake | Coach control uses a **camera** icon (not `+`); Netlify allows `camera=(self)` |
 | **App Check** | Site key live (`20260819c`); **monitor mode** — tokens are sent, nothing is rejected | Watch App Check → Metrics for a few days. Do **not** set `APP_CHECK_ENFORCE` yet — see [app-check-rollout.md](app-check-rollout.md) |

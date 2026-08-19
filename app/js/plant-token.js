@@ -2811,10 +2811,18 @@
 
   var TOKENISE_EXPLAINER_KEY = 'dnevnik-live-tokenise-explainer-seen';
 
+  function sessionIntroBusy() {
+    return !!(
+      window.DailyStatus &&
+      typeof DailyStatus.introOccupied === 'function' &&
+      DailyStatus.introOccupied()
+    );
+  }
+
   function renderTokeniseExplainer() {
     const el = document.getElementById('tokenise-explainer');
     if (!el) return;
-    if (isAdopterUi()) {
+    if (isAdopterUi() || sessionIntroBusy()) {
       el.hidden = true;
       return;
     }
@@ -2885,10 +2893,12 @@
     const w = wallet || readWallet() || {};
     const hasWallet = !!(w.connected || w.address || linkedWalletPubkey());
     const introDone = isAdopterUi() && adopterIntroComplete(w);
-    // Intro only — hide garden + market how-tos once a plant is adopted.
+    const sessionIntro = sessionIntroBusy();
+    // Intro only — hide garden + market how-tos once a plant is adopted,
+    // or while START HERE / While you were away already owns this session.
     const guide = document.getElementById('adopter-guide');
     if (guide) {
-      guide.hidden = !isAdopterUi() || introDone;
+      guide.hidden = !isAdopterUi() || introDone || sessionIntro;
       const guideWalletBtn = document.getElementById('adopter-guide-wallet-btn');
       if (guideWalletBtn) {
         guideWalletBtn.hidden = guide.hidden || hasWallet;
@@ -2896,7 +2906,7 @@
     }
     const marketGuide = document.getElementById('market-adopter-guide');
     if (marketGuide) {
-      marketGuide.hidden = !isAdopterUi() || introDone;
+      marketGuide.hidden = !isAdopterUi() || introDone || sessionIntro;
     }
     renderTokeniseExplainer();
   }
@@ -4818,6 +4828,13 @@
       }
     });
   }
+  window.addEventListener('growtoo:intro-layer', function () {
+    try {
+      applyProfileChrome(readWallet());
+    } catch {
+      // ignore
+    }
+  });
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', renderGlobalWalletUI);
   } else {
