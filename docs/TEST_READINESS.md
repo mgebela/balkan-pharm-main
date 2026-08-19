@@ -79,6 +79,7 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Appearance (2026-08-13, default 2026-08-19)** | Light / dark / auto via Profile → Appearance, stored at `growtoo:appearance`. **Light is the product default** (same sage paper as landing). Dark stays an explicit choice | **Untested.** Existing `dark` in localStorage is preserved |
 | **Stories + public journal** | Grower blogs in-app; public grower journal served on `journal.growto.live` | **Untested.** Public surface — check what it exposes for a signed-out visitor |
 | **Journal month view** | Month is the Journal landing (List stays if they picked it). Empty trail: one Coach-style next step — **Add a plant** or **Log first watering** | **Untested.** First-run grower should not see a mute calendar |
+| **Document language (2026-08-19)** | `<html lang>` is stamped from `growtoo:lang` (or the browser) before first paint | Switch Profile → Language to HR: VoiceOver / auto-translate should see `lang="hr"`, calendar dates in Croatian |
 
 ---
 

@@ -11,6 +11,7 @@
      abbreviations and its own capitalisation for free. Monday-first, which
      is what growers here expect and what the grid is built around. */
   function intlTag() {
+    if (window.I18N && I18N.intl) return I18N.intl;
     return (window.I18N && window.I18N.locale) || 'en';
   }
 

@@ -26,6 +26,9 @@
 
   var STORE_KEY = 'growtoo:lang';
   var MANIFEST_FILE = 'locales.json';
+  /* Keep in sync with locales/locales.json — used to stamp <html lang>
+     before the manifest fetch, so VoiceOver / auto-translate are not lied to. */
+  var EARLY_LANGS = { en: 1, hr: 1, de: 1 };
   /* How long first paint may wait for a dictionary before we give up and
      show English. A stale-but-visible page beats a blank one. */
   var PAINT_BUDGET_MS = 600;
@@ -35,6 +38,37 @@
       var all = document.getElementsByTagName('script');
       return all[all.length - 1];
     })();
+
+  /* Stamp <html lang> before the dictionary is in flight. updateChrome()
+     repeats this after boot with dir / og:locale from the manifest. */
+  (function stampLangEarly() {
+    var code = '';
+    var seg = window.location.pathname.split('/')[1] || '';
+    if (EARLY_LANGS[seg]) code = seg;
+    if (!code) {
+      var m = /[?&]lang=([a-zA-Z-]+)/.exec(window.location.search);
+      var q = m ? String(m[1]).toLowerCase().split('-')[0] : '';
+      if (EARLY_LANGS[q]) code = q;
+    }
+    if (!code) {
+      try {
+        var stored = localStorage.getItem(STORE_KEY) || '';
+        if (EARLY_LANGS[stored]) code = stored;
+      } catch (e) {}
+    }
+    if (!code) {
+      var list = window.navigator.languages ||
+        [window.navigator.language || window.navigator.userLanguage || ''];
+      for (var i = 0; i < list.length; i++) {
+        var c = String(list[i] || '').toLowerCase().split('-')[0];
+        if (EARLY_LANGS[c]) {
+          code = c;
+          break;
+        }
+      }
+    }
+    if (EARLY_LANGS[code]) document.documentElement.setAttribute('lang', code);
+  })();
 
   /* /js/i18n.js → /locales/ , and the same for every page depth, because it
      is resolved against the script's own URL rather than the document's. */
