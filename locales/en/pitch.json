@@ -4,8 +4,8 @@
   "p": "Five decks, same product, different order of arguments. Every one opens with the spoken line that matches it and closes with a single sentence to end on.",
   "span2": "Growers · communities · expos",
   "h2": "Grower deck",
-  "p2": "Journal only. The problem, what you get today, a day in the app, and one low-key slide on optional proof. Crypto never leads.",
-  "p3": "“It’s a free journal for cannabis growers — all in one place.”",
+    "p2": "The live desk: journal, log, camera, illness check, coach, stories. Optional proof last. Crypto never leads.",
+    "p3": "“One journal for the grow — tap a log, shoot a leaf, ask the coach.”",
   "p4": "7 slides · 5–7 min",
   "span3": "Plant followers · RWA-curious",
   "h22": "Adopter deck",
@@ -26,7 +26,7 @@
   "h25": "Superteam deck",
   "p14": "For a Solana-native room. The gamification is the mint gate, the adopter stake, what is actually on devnet with addresses, why this needs a chain at all — and a status slide that says what is not done.",
   "p15": "“You can’t buy your way to a mint here.”",
-  "p16": "12 slides · 10–12 min",
+    "p16": "13 slides · 10–12 min",
   "p17": "Full technical deck: <a href=\"/app/pitch-deck/\">Growtoo — technical overview</a> · Live product: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Keyboard in every deck: <strong>→ / ←</strong> to move, <strong>F</strong> for fullscreen, <strong>P</strong> to print or export as PDF, <strong>☰</strong> for the slide list.",
   "meta": {
     "title": "growtoo — Which deck?"

@@ -4,8 +4,8 @@
   "p": "Pet deckova, isti proizvod, drugačiji redoslijed argumenata. Svaki otvara rečenicom koja mu pripada i zatvara jednom rečenicom za kraj.",
   "span2": "Uzgajivači · zajednice · sajmovi",
   "h2": "Deck za uzgajivače",
-  "p2": "Samo dnevnik. Problem, što danas dobivaš, dan u aplikaciji i jedan tihi slajd o izbornom dokazu. Kripto nikad ne vodi.",
-  "p3": "„Besplatan dnevnik za uzgajivače kanabisa — sve na jednom mjestu.”",
+    "p2": "Živi stol: dnevnik, zapis, kamera, provjera bolesti, savjetnik, priče. Dokaz na kraju, ako želiš. Kripto nikad ne vodi.",
+    "p3": "„Jedan dnevnik za uzgoj — zapiši, slikaj list, pitaj savjetnika.”",
   "p4": "7 slajdova · 5–7 min",
   "span3": "Pratitelji biljaka · znatiželjni za RWA",
   "h22": "Deck za posvojitelje",
@@ -26,7 +26,7 @@
   "h25": "Superteam deck",
   "p14": "Za sobu punu Solana ljudi. Gamifikacija je kapija za kovanje, ulog posvojitelja, što je stvarno na devnetu s adresama, zašto je uopće potreban lanac — i slajd statusa koji kaže što nije gotovo.",
   "p15": "„Ovdje se do kovanja ne može doći novcem.”",
-  "p16": "12 slajdova · 10–12 min",
+    "p16": "13 slajdova · 10–12 min",
   "p17": "Cijeli tehnički deck: <a href=\"/app/pitch-deck/\">Growtoo — tehnički pregled</a> · Proizvod uživo: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Tipkovnica u svakom decku: <strong>→ / ←</strong> za kretanje, <strong>F</strong> za cijeli zaslon, <strong>P</strong> za ispis ili izvoz u PDF, <strong>☰</strong> za popis slajdova.",
   "meta": {
     "title": "growtoo — Koji deck?"
