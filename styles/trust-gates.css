@@ -1,4 +1,24 @@
-/* Age gate + cookie consent — same sage paper as landing / journal. */
+/* Age gate + cookie consent — sage paper of their own, not the page theme.
+   First visit from X is the light landing; these must not paint forest-green
+   even if tokens.css is late or html is still the unthemed dark :root. */
+
+.trust-gate,
+.cookie-banner {
+  --trust-paper: #f5faf3;
+  --trust-card: #ffffff;
+  --trust-ink: #1a2c1e;
+  --trust-muted: #3d5648;
+  --trust-green: #3d6a38;
+  --trust-green-hover: #2f542c;
+  --trust-line: #c5d9be;
+  --trust-wash: #eaf6e6;
+  --trust-scrim: rgb(26 44 30 / 0.28);
+  --trust-focus: 0 0 0 2px #ffffff, 0 0 0 4px #3d6a38;
+}
+
+body.trust-gate-locked {
+  overflow: hidden;
+}
 
 .trust-gate {
   position: fixed;
@@ -8,7 +28,7 @@
   align-items: center;
   justify-content: center;
   padding: 1.25rem;
-  background: rgb(var(--surface-rgb) / 0.92);
+  background: var(--trust-scrim);
 }
 
 .trust-gate[hidden] {
@@ -19,20 +39,21 @@
   width: min(100%, 26rem);
   padding: 1.5rem 1.45rem 1.35rem;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text);
-  font-family: var(--font);
+  border: 1px solid var(--trust-line);
+  background: var(--trust-card);
+  color: var(--trust-ink);
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  box-shadow: 0 14px 40px rgb(61 106 56 / 0.16);
 }
 
 .trust-gate-card h2,
 .cookie-banner h2 {
   margin: 0 0 0.55rem;
-  font-family: var(--font-display);
+  font-family: var(--font-display, var(--font, sans-serif));
   font-size: 1.35rem;
   font-weight: 600;
   letter-spacing: -0.02em;
-  color: var(--green);
+  color: var(--trust-green);
 }
 
 .trust-gate-card p,
@@ -40,11 +61,13 @@
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: var(--text-muted);
+  color: var(--trust-muted);
 }
 
 .trust-gate-actions .btn,
-.cookie-banner-actions .btn {
+.cookie-banner-actions .btn,
+.trust-gate-actions a.btn,
+.cookie-banner-actions a.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,43 +75,59 @@
   min-height: 2.75rem;
   padding: 0.55rem 1rem;
   border-radius: 4px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--trust-line);
   font: inherit;
   font-weight: 650;
   font-size: 0.92rem;
   cursor: pointer;
   text-decoration: none;
-  color: var(--text);
-  background: transparent;
+  color: var(--trust-ink);
+  background: var(--trust-card);
+  box-shadow: none;
 }
 
 .trust-gate-actions .btn:focus-visible,
 .cookie-banner-actions .btn:focus-visible {
   outline: none;
-  box-shadow: var(--focus-ring);
+  box-shadow: var(--trust-focus);
 }
 
 .trust-gate-actions .btn-primary,
-.cookie-banner-actions .btn-primary {
-  background: var(--brass-fill);
-  border-color: var(--brass-fill);
-  color: var(--brass-ink);
+.cookie-banner-actions .btn-primary,
+body.journal-paper .trust-gate-actions .btn-primary,
+body.landing-page .trust-gate-actions .btn-primary,
+body.journal-paper .cookie-banner-actions .btn-primary,
+body.landing-page .cookie-banner-actions .btn-primary {
+  background: var(--trust-green);
+  border-color: var(--trust-green);
+  color: #ffffff;
 }
 
 .trust-gate-actions .btn-primary:hover,
-.cookie-banner-actions .btn-primary:hover {
-  background: var(--brass-hover);
-  border-color: var(--brass-hover);
+.cookie-banner-actions .btn-primary:hover,
+body.journal-paper .trust-gate-actions .btn-primary:hover,
+body.landing-page .trust-gate-actions .btn-primary:hover,
+body.journal-paper .cookie-banner-actions .btn-primary:hover,
+body.landing-page .cookie-banner-actions .btn-primary:hover {
+  background: var(--trust-green-hover);
+  border-color: var(--trust-green-hover);
+  color: #ffffff;
 }
 
 .trust-gate-actions .btn-ghost,
-.cookie-banner-actions .btn-ghost {
-  background: transparent;
+.cookie-banner-actions .btn-ghost,
+body.journal-paper .trust-gate-actions .btn-ghost,
+body.landing-page .trust-gate-actions .btn-ghost {
+  background: var(--trust-card);
+  color: var(--trust-green);
+  border-color: var(--trust-line);
 }
 
 .trust-gate-actions .btn-ghost:hover,
-.cookie-banner-actions .btn-ghost:hover {
-  background: var(--card-hover);
+.cookie-banner-actions .btn-ghost:hover,
+body.journal-paper .trust-gate-actions .btn-ghost:hover,
+body.landing-page .trust-gate-actions .btn-ghost:hover {
+  background: var(--trust-wash);
 }
 
 .trust-gate-actions .btn {
@@ -118,12 +157,13 @@
   gap: 0.85rem;
   padding: 0.95rem 1.1rem;
   border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text-muted);
-  font-family: var(--font);
+  border: 1px solid var(--trust-line);
+  background: var(--trust-card);
+  color: var(--trust-muted);
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
   font-size: 0.88rem;
   line-height: 1.4;
+  box-shadow: 0 14px 40px rgb(61 106 56 / 0.16);
 }
 
 .cookie-banner[hidden] {
@@ -141,7 +181,7 @@
 }
 
 .cookie-banner a {
-  color: var(--green);
+  color: var(--trust-green);
   text-underline-offset: 0.18em;
 }
 

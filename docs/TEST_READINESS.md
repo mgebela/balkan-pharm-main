@@ -34,12 +34,10 @@ the **229** tokens in `styles/tokens.css`; light theme is one
 hygiene is real and not decorative — 47 `aria-label`, 33 `role`, 5 `aria-modal`,
 23 `:focus-visible` rules, 45 `min-height` tap-target rules, 9
 `prefers-reduced-motion` blocks, and 2/2 `<img>` tags carry `alt` (icons are
-inline SVG marked `aria-hidden`). Against: **`styles/trust-gates.css` never got
-the light theme** — 144 lines, 21 hardcoded colours, zero tokens, zero
-`data-theme` rules, and zero `prefers-reduced-motion`. It is loaded on all three
-entry points, so in light mode the age gate and cookie banner stay dark over a
-light page. That is the first screen a new visitor sees, which is why it costs a
-full point and a half on its own.
+inline SVG marked `aria-hidden`). Age gate and cookie banner paint their own
+sage paper (2026-08-20) so a first visit from X is not a dark overlay on the
+light landing. Remaining gap: the rest of the first-run desk pass is still
+untested against the 2026-08-13 nav.
 
 **UX — 8.** In favour: the app consistently tells the truth when something
 fails. Chain-locked growers get the **Unlock Tokenise & Market?** dialog instead
@@ -80,6 +78,7 @@ Product / trust work on the live site and app — desk testers should exercise t
 | **Stories + public journal** | Grower blogs in-app; public grower journal served on `journal.growto.live` | **Untested.** Public surface — check what it exposes for a signed-out visitor |
 | **Journal month view** | Month is the Journal landing (List stays if they picked it). Empty trail: one Coach-style next step — **Add a plant** or **Log first watering** | **Untested.** First-run grower should not see a mute calendar |
 | **Document language (2026-08-19)** | `<html lang>` is stamped from `growtoo:lang` (or the browser) before first paint | Switch Profile → Language to HR: VoiceOver / auto-translate should see `lang="hr"`, calendar dates in Croatian |
+| **Age gate / cookies (2026-08-20)** | Overlay and banner use a self-contained sage-paper palette (white card, green CTA) | **Untested.** Incognito growto.live: gate should not be forest-green over the light landing |
 
 ---
 
@@ -261,8 +260,6 @@ node smoke-escrow-program.js --mode cancel --mint <NFT_MINT> --price 1
 - `solanaRpc` falls back to `api.devnet.solana.com` silently when `SOLANA_RPC_URL`
   is unset — the exact public-RPC flakiness the proxy exists to avoid, with no
   alarm. Confirm the env var is set before trusting "→ QuickNode"
-- Light theme misses `styles/trust-gates.css` (age gate + cookie banner) — 21
-  hardcoded colours, no tokens; loaded on landing, sign-in, and app
 - `view-dashboard` and `view-danas` are dead markup — no nav reaches them and
   `showView` redirects both to `plants`
 - Live coach needs **verified email**; Local helper cannot analyze photos
