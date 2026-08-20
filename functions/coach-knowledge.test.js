@@ -42,6 +42,7 @@ const hrCases = [
   ['plijesan na cvjetovima, vlaga je visoka', 'botrytis'],
   ['koliko često zalijevati biljku?', 'water'],
   ['grinje na listovima, što sada?', 'mites'],
+  ['ima li bolest na listovima?', 'pests'],
   ['koje gnojivo za dušik?', 'nitrogen'],
   ['kada je berba?', null],
   ['presađivanje u veći lonac', null],
@@ -72,6 +73,7 @@ const reach = [
   ['what ppfd for flowering', 'light'],
   ['runoff ec is climbing', 'ec|runoff|salt'],
   ['when should I stop defoliating', 'topping|pruning|defoliat|canopy'],
+  ['check this plant photo for illness disease pests mold nutrient deficiency', 'pest|mold|deficien|disease'],
 ];
 for (const [q, pattern] of reach) {
   const r = getRelevantKnowledge(q, null);

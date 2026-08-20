@@ -948,7 +948,7 @@
   "camera": {
     "title": "Kamera za biljke",
     "frameHint": "Uhvati biljku u kadar, pa snimi",
-    "reviewHint": "Spremi zapis u dnevnik ili pošalji savjetniku",
+    "reviewHint": "Spremi zapis u dnevnik ili provjeri biljku na bolest",
     "close": "Zatvori",
     "closeAria": "Zatvori kameru",
     "flip": "Okreni",
@@ -958,7 +958,8 @@
     "shotAlt": "Snimljena fotografija biljke",
     "retake": "Ponovi snimku",
     "logToJournal": "Zapiši u dnevnik",
-    "askCoach": "Pitaj savjetnika",
+    "askCoach": "Provjeri bolest",
+    "checkIllness": "Provjeri bolest",
     "preparing": "Pripremam fotografiju…",
     "starting": "Pokrećem kameru…",
     "saving": "Spremam fotografiju…",
@@ -980,7 +981,7 @@
     "saveLogFailed": "Nije moguće spremiti zapis s fotografijom.",
     "needPlant": "Prvo dodaj biljku u dnevnik, pa zapiši fotografiju.",
     "photoNote": "Zapis s fotografijom iz kamere za biljke",
-    "coachPrompt": "Pogledaj ovu fotografiju biljke i pomozi mi utvrditi što vidiš. Navedi što je vidljivo, pa predloži sljedeći zapis u dnevnik ako treba."
+    "coachPrompt": "Provjeri ovu fotografiju biljke na bolest, štetnike, plijesan, nedostatak hranjiva, mrlje ili žutilo. Navedi samo što je vidljivo, pa daj najviše dvije hipoteze. Predloži jedan zapis u dnevnik koji bi potvrdio prvu hipotezu."
   },
   "blog": {
     "catTip": "Savjeti i trikovi",

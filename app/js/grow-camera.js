@@ -1,5 +1,5 @@
 /*
- * Full in-app plant camera — live preview, shutter, then Log / Ask coach / Retake.
+ * Full in-app plant camera — live preview, shutter, then Log / Check for illness / Retake.
  */
 (function () {
   'use strict';
@@ -158,7 +158,7 @@
       esc(T('app.camera.logToJournal', 'Log to journal')) +
       '</button>' +
       '<button type="button" class="btn btn-primary" id="grow-camera-coach">' +
-      esc(T('app.camera.askCoach', 'Ask coach')) +
+      esc(T('app.camera.checkIllness', 'Check for illness')) +
       '</button>' +
       '</footer>' +
       '<input type="file" id="grow-camera-file" accept="image/*" hidden />';
@@ -226,7 +226,7 @@
     if (flip) flip.hidden = isReview;
     if (sub) {
       sub.textContent = isReview
-        ? T('app.camera.reviewHint', 'Save a journal log or send to the coach')
+        ? T('app.camera.reviewHint', 'Save a journal log, or check the plant for illness')
         : T('app.camera.frameHint', 'Frame the plant, then shoot');
     }
     root.classList.toggle('grow-camera-root--review', isReview);
@@ -445,7 +445,7 @@
         AICoach.ask(
           T(
             'app.camera.coachPrompt',
-            'Please look at this plant photo and help me diagnose what you see. Cite what is visible, then suggest the next journal log if needed.'
+            'Check this plant photo for illness: disease, pests, mold, nutrient deficiency, spots, or yellowing. Describe only what is visible, then give at most two hypotheses. Suggest one journal log that would confirm the top hypothesis.'
           )
         );
       }

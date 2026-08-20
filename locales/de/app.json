@@ -930,7 +930,7 @@
   "camera": {
     "title": "Pflanzenkamera",
     "frameHint": "Pflanze ins Bild holen, dann auslösen",
-    "reviewHint": "Als Journaleintrag speichern oder an den Coach senden",
+    "reviewHint": "Als Journaleintrag speichern oder die Pflanze auf Krankheit prüfen",
     "close": "Schließen",
     "closeAria": "Kamera schließen",
     "flip": "Wechseln",
@@ -940,7 +940,8 @@
     "shotAlt": "Aufgenommenes Pflanzenfoto",
     "retake": "Neu aufnehmen",
     "logToJournal": "Ins Journal notieren",
-    "askCoach": "Coach fragen",
+    "askCoach": "Krankheit prüfen",
+    "checkIllness": "Krankheit prüfen",
     "preparing": "Foto wird vorbereitet…",
     "starting": "Kamera wird gestartet…",
     "saving": "Foto wird gespeichert…",
@@ -962,7 +963,7 @@
     "saveLogFailed": "Der Foto-Eintrag konnte nicht gespeichert werden.",
     "needPlant": "Füge zuerst eine Pflanze im Journal hinzu, dann notiere ein Foto.",
     "photoNote": "Foto-Eintrag aus der Pflanzenkamera",
-    "coachPrompt": "Sieh dir dieses Pflanzenfoto an und hilf mir einzuschätzen, was zu sehen ist. Benenne, was sichtbar ist, und schlage dann den nächsten Journaleintrag vor, falls nötig."
+    "coachPrompt": "Prüfe dieses Pflanzenfoto auf Krankheit, Schädlinge, Schimmel, Nährstoffmangel, Flecken oder Vergilbung. Beschreibe nur, was sichtbar ist, dann höchstens zwei Hypothesen. Schlage einen Journaleintrag vor, der die erste Hypothese bestätigen würde."
   },
   "blog": {
     "catTip": "Tipps & Tricks",

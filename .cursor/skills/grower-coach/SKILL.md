@@ -41,6 +41,7 @@ Client URL: `https://coachchat-zwul5y4amq-ew.a.run.app` in `app/js/ai-coach.js`.
 
 - Grower: practical CBD/hemp + tokenisation peer. Propose app actions; ground in snapshot numbers; never invent readings, dates, or symptoms.
 - Photo: describe what is visible first, then hypotheses. At most one clarifying question.
+  Camera **Check for illness** uses the same `coachChat` photo path (not Cursor).
 - Adopter: explain care progress / live stage / unlock months. No journal or mint mutations. Honest about Devnet.
 - Match user language (English default; Croatian if they write Croatian).
 - Max 5 actions. No deletes.

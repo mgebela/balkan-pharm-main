@@ -85,6 +85,9 @@ const HR_EN_TERMS = {
   štetnici: ['pests', 'pest'], grinje: ['mites', 'spider mites'],
   lisne: ['aphids'], uši: ['aphids'], plijesan: ['mold', 'mould', 'botrytis'],
   buđ: ['mold', 'mould'], trulež: ['rot', 'botrytis'], gljivice: ['fungus', 'fungal'],
+  bolest: ['disease', 'illness', 'pests'], bolesti: ['disease', 'illness'],
+  simptom: ['symptom'], simptomi: ['symptoms'], trips: ['thrips'],
+  tripsi: ['thrips'], tripsa: ['thrips'],
   // practice
   rezidba: ['pruning', 'topping'], orezivanje: ['pruning', 'defoliation'],
   presađivanje: ['transplant', 'repot'], berba: ['harvest'], žetva: ['harvest'],
