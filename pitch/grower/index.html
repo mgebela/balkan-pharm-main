@@ -4,7 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title data-i18n="pitch-grower.meta.title">growtoo — Grower deck</title>
-    <meta name="description" content="growtoo for growers: a free journal for watering, feeding, stages and photos, with optional on-chain proof." />
+    <meta
+      name="description"
+      data-i18n-attr="content:pitch-grower.meta.description"
+      content="growtoo for growers: journal, log, plant camera, illness check, coach, stories, and optional on-chain proof. Free to start — no wallet needed."
+    />
     <link rel="canonical" href="https://growto.live/pitch/grower/" />
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#f5faf3" />
@@ -14,42 +18,91 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-  <script src="../../js/i18n.js?v=20260819i" data-i18n-ns="common,pitch-grower"></script>
+  <script src="../../js/i18n.js?v=20260820c" data-i18n-ns="common,pitch-grower"></script>
     <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260820b" />
-    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260820b" />
+    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260820c" />
   <link rel="stylesheet" href="../../styles/i18n.css?v=20260816a" />
   </head>
   <body>
     <div class="bg-gradient" aria-hidden="true"></div>
     <div class="bg-grid" aria-hidden="true"></div>
 
-    <main id="deck" class="deck deck--dense">
+    <main id="deck" class="deck deck--dense deck--grower">
       <!-- 1. COVER -->
       <section class="slide slide--cover" data-title="Cover">
         <div class="cover">
-          <div class="brand">
-            <span class="brand-mark" aria-hidden="true">
-              <img src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" />
-            </span>
-            <span class="brand-name">growtoo</span>
+          <div class="cover-copy">
+            <div class="brand">
+              <span class="brand-mark" aria-hidden="true">
+                <img src="/images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" />
+              </span>
+              <span class="brand-name">growtoo</span>
+            </div>
+
+            <h1 data-i18n-html="pitch-grower.deck.h1" class="cover-headline">
+              Grow it again. <span class="grad">Exactly.</span>
+            </h1>
+            <p data-i18n="pitch-grower.deck.p" class="cover-sub">
+              One desk for the whole cycle — journal, log, camera, coach. Free. No wallet to start.
+            </p>
+
+            <div data-i18n-html="pitch-grower.deck.div7cover" class="chip-row g-cover-chips">
+              <span class="chip">Journal</span>
+              <span class="chip">Log</span>
+              <span class="chip">Camera</span>
+              <span class="chip">Check for illness</span>
+              <span class="chip">Coach</span>
+              <span class="chip">Stories</span>
+              <span class="chip">Tokenise</span>
+            </div>
+
+            <div class="say">
+              <span data-i18n="pitch-grower.deck.span2" class="say-label">Open with</span>
+              <p data-i18n="pitch-grower.deck.p2">
+                “I built growtoo. One journal for the grow — tap a log, shoot a leaf, ask the coach.
+                When you want it, every stage can be proven publicly.”
+              </p>
+            </div>
+
+            <a
+              class="g-cta"
+              href="https://growto.live/dnevnik/?mode=signup&amp;type=grower"
+              target="_blank"
+              rel="noreferrer"
+              data-i18n="pitch-grower.deck.cta"
+            >Begin your journal</a>
           </div>
 
-          <h1 data-i18n-html="pitch-grower.deck.h1" class="cover-headline">
-            Grow it again. <span class="grad">Exactly.</span>
-          </h1>
-          <p data-i18n="pitch-grower.deck.p" class="cover-sub">The free grow journal — watering, feeding, stages, photos. No wallet needed.</p>
-
-          <div class="say">
-            <span data-i18n="pitch-grower.deck.span2" class="say-label">Open with</span>
-            <p data-i18n="pitch-grower.deck.p2">
-              “I built growtoo. It’s a free journal for cannabis growers — watering, feeding, stages,
-              all in one place. And when a grower wants it, every stage can be proven publicly.”
-            </p>
+          <div class="cover-stage" aria-hidden="true">
+            <div class="g-phone">
+              <div class="g-phone-screen">
+                <div class="g-phone-head">
+                  <strong data-i18n="pitch-grower.deck.phonePlant">Northern Lights</strong>
+                  <span data-i18n="pitch-grower.deck.phoneDay">Day 42 · Flower</span>
+                </div>
+                <div class="g-phone-photo">
+                  <span data-i18n="pitch-grower.deck.phoneShot">Leaf photo</span>
+                </div>
+                <div class="g-phone-coach">
+                  <span data-i18n="pitch-grower.deck.phoneCoachLabel">Coach</span>
+                  <p data-i18n="pitch-grower.deck.phoneCoach">
+                    Older leaves yellowing — likely nitrogen. Log a feeding?
+                  </p>
+                </div>
+                <nav class="g-phone-tabs">
+                  <span data-i18n="pitch-grower.deck.li" class="on">Journal</span>
+                  <span data-i18n="pitch-grower.deck.li2">Log</span>
+                  <span data-i18n="pitch-grower.deck.li3">Coach</span>
+                  <span data-i18n="pitch-grower.deck.li4">Tokenise</span>
+                </nav>
+              </div>
+            </div>
           </div>
 
           <div class="cover-meta">
-            <div data-i18n-html="pitch-grower.deck.div" class="cover-meta-row"><span class="meta-label">For</span><span class="meta-value">Growers · one plant or a full room</span></div>
-            <div data-i18n-html="pitch-grower.deck.div2" class="cover-meta-row"><span class="meta-label">Price</span><span class="meta-value">Free · no wallet · no crypto knowledge</span></div>
+            <div data-i18n-html="pitch-grower.deck.div" class="cover-meta-row"><span class="meta-label">For</span><span class="meta-value">Growers · one plant or a room</span></div>
+            <div data-i18n-html="pitch-grower.deck.div2" class="cover-meta-row"><span class="meta-label">Price</span><span class="meta-value">Free · no wallet to start</span></div>
+            <div data-i18n-html="pitch-grower.deck.divDesk" class="cover-meta-row"><span class="meta-label">Desk</span><span class="meta-value">Journal · Log · Coach · Tokenise</span></div>
             <div data-i18n-html="pitch-grower.deck.div3" class="cover-meta-row"><span class="meta-label">Live</span><span class="meta-value"><a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></span></div>
           </div>
 
@@ -74,13 +127,13 @@
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
             <span data-i18n="pitch-grower.deck.span3" class="kicker">02 · The problem</span>
-            <h2 data-i18n-html="pitch-grower.deck.h2">Three places. <span class="grad">None of them findable.</span></h2>
+            <h2 data-i18n-html="pitch-grower.deck.h2">Four places. <span class="grad">None of them talk.</span></h2>
             <p data-i18n="pitch-grower.deck.p3" class="slide-remark">
-              Most growers keep notes in a notebook, photos in the camera roll, and the rest in their head.
-              Then something goes wrong in week nine and nobody can reconstruct what actually happened.
+              Notes in a notebook, photos in the camera roll, weather in another app, and a yellow leaf
+              you guess at. Week nine, nobody can reconstruct what actually happened.
             </p>
           </header>
-          <div class="grid grid-3 why-cards">
+          <div class="grid grid-2 g-why">
             <article class="card card--dense">
               <h3 data-i18n="pitch-grower.deck.h3">Scattered notes</h3>
               <p data-i18n="pitch-grower.deck.p4" class="card-tagline">Paper, phone, memory — never in one place</p>
@@ -93,17 +146,14 @@
               <h3 data-i18n="pitch-grower.deck.h33">Care that slips</h3>
               <p data-i18n="pitch-grower.deck.p6" class="card-tagline">Feeding missed mid-cycle, noticed too late</p>
             </article>
+            <article class="card card--dense">
+              <h3 data-i18n="pitch-grower.deck.h3d">Yellow leaf, guesswork</h3>
+              <p data-i18n="pitch-grower.deck.p6d" class="card-tagline">Disease, feed, or water — you decide from memory</p>
+            </article>
           </div>
           <div data-i18n-html="pitch-grower.deck.div6" class="why-arrow" aria-hidden="true">
             <span>→</span>
-            <span class="why-arrow-label">One journal</span>
-          </div>
-          <div data-i18n-html="pitch-grower.deck.div7" class="chip-row chip-row--center">
-            <span class="chip">Watering</span>
-            <span class="chip">Feeding</span>
-            <span class="chip">Stages</span>
-            <span class="chip">Photos</span>
-            <span class="chip">Weather</span>
+            <span class="why-arrow-label">One desk</span>
           </div>
         </div>
       </section>
@@ -113,39 +163,61 @@
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
             <span data-i18n="pitch-grower.deck.span4" class="kicker">03 · What you get today</span>
-            <h2 data-i18n-html="pitch-grower.deck.h22">One journal for <span class="grad">the whole grow.</span></h2>
+            <h2 data-i18n-html="pitch-grower.deck.h22">The whole desk. <span class="grad">Live now.</span></h2>
             <p data-i18n="pitch-grower.deck.p7" class="slide-remark">
-              Seconds to log. Months later, still there. Free, and it works without a wallet or any crypto account.
+              Seconds to log. Months later, still there. Works without a wallet. Tokenise is optional.
             </p>
           </header>
-          <div class="grid grid-3">
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h34">Any scale</h3>
-              <p data-i18n="pitch-grower.deck.p8" class="card-tagline">One plant or a room. Indoor, outdoor, or mixed.</p>
+          <div class="g-catalog">
+            <article class="g-tile">
+              <span class="g-tile-k">01</span>
+              <h3 data-i18n="pitch-grower.deck.feat1t">Journal</h3>
+              <p data-i18n="pitch-grower.deck.feat1">Month calendar. Water, feed, stage, and photos on the right plant.</p>
             </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h35">Clear structure</h3>
-              <p data-i18n="pitch-grower.deck.p9" class="card-tagline">Germination → seedling → veg → flowering → drying.</p>
+            <article class="g-tile">
+              <span class="g-tile-k">02</span>
+              <h3 data-i18n="pitch-grower.deck.feat2t">Log</h3>
+              <p data-i18n="pitch-grower.deck.feat2">One tap: watering, feeding, environment, or a stage change.</p>
             </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h36">Plant camera</h3>
-              <p data-i18n="pitch-grower.deck.p10" class="card-tagline">Shoot in the app; the photo lands on the right plant.</p>
+            <article class="g-tile">
+              <span class="g-tile-k">03</span>
+              <h3 data-i18n="pitch-grower.deck.feat3t">Plant camera</h3>
+              <p data-i18n="pitch-grower.deck.feat3">Shoot in the app. The photo lands on that plant — not in the camera roll.</p>
             </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h37">Reminders</h3>
-              <p data-i18n="pitch-grower.deck.p11" class="card-tagline">Watering and feeding due, before it slips.</p>
+            <article class="g-tile">
+              <span class="g-tile-k">04</span>
+              <h3 data-i18n="pitch-grower.deck.feat4t">Check for illness</h3>
+              <p data-i18n="pitch-grower.deck.feat4">Send the leaf to the coach. What is visible first, then two hypotheses.</p>
             </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h38">Weather planning</h3>
-              <p data-i18n="pitch-grower.deck.p12" class="card-tagline">For outdoor and mixed grows.</p>
+            <article class="g-tile">
+              <span class="g-tile-k">05</span>
+              <h3 data-i18n="pitch-grower.deck.feat5t">Coach</h3>
+              <p data-i18n="pitch-grower.deck.feat5">Reads your journal. Suggests the next log. Asks before it acts.</p>
             </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-grower.deck.h39">AI coach</h3>
-              <p data-i18n="pitch-grower.deck.p13" class="card-tagline">Reads your logs, says what’s next. Asks before acting.</p>
+            <article class="g-tile">
+              <span class="g-tile-k">06</span>
+              <h3 data-i18n="pitch-grower.deck.feat6t">Reminders &amp; weather</h3>
+              <p data-i18n="pitch-grower.deck.feat6">Water and feed due, before it slips. Outdoor forecast for mixed grows.</p>
+            </article>
+            <article class="g-tile">
+              <span class="g-tile-k">07</span>
+              <h3 data-i18n="pitch-grower.deck.feat7t">Stories</h3>
+              <p data-i18n="pitch-grower.deck.feat7">Publish a cycle for other growers. The trail stays on the plant.</p>
+            </article>
+            <article class="g-tile">
+              <span class="g-tile-k">08</span>
+              <h3 data-i18n="pitch-grower.deck.feat8t">Tokenise</h3>
+              <p data-i18n="pitch-grower.deck.feat8">Optional. Seal a stage, list an ask, claim a test care bonus.</p>
             </article>
           </div>
+          <div data-i18n-html="pitch-grower.deck.div7" class="chip-row chip-row--center g-extra-chips">
+            <span class="chip">Indoor · outdoor · mixed</span>
+            <span class="chip">Tools · water, feed, climate</span>
+            <span class="chip">English · Hrvatski · Deutsch</span>
+            <span class="chip">Sage paper look</span>
+          </div>
           <p data-i18n="pitch-grower.deck.p14" class="footnote">
-            $0 · no wallet · your journal is yours. growtoo is a documentation tool, not legal advice —
+            $0 to start · your journal is yours. growtoo is a documentation tool, not legal advice —
             always follow the rules where you grow.
           </p>
         </div>
@@ -156,9 +228,10 @@
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
             <span data-i18n="pitch-grower.deck.span5" class="kicker">04 · A day in the app</span>
-            <h2 data-i18n-html="pitch-grower.deck.h23">Log it in <span class="grad">ten seconds.</span></h2>
+            <h2 data-i18n-html="pitch-grower.deck.h23">Log it. Shoot it. <span class="grad">Check it.</span></h2>
             <p data-i18n="pitch-grower.deck.p15" class="slide-remark">
-              Open the plant, tap what you did, done. The reminder clears itself and the coach picks up from there.
+              Open the plant, tap what you did, point the camera at a leaf. The reminder clears.
+              The coach picks up from the same trail.
             </p>
           </header>
           <div class="platform-dense">
@@ -168,7 +241,12 @@
                 <div class="mock-body">
                   <div class="mock-side">
                     <div data-i18n-html="pitch-grower.deck.div9" class="mock-logo">grow<span>too</span></div>
-                    <ul><li data-i18n="pitch-grower.deck.li" class="active">Plants</li><li data-i18n="pitch-grower.deck.li2">Journal</li><li data-i18n="pitch-grower.deck.li3">Coach</li><li data-i18n="pitch-grower.deck.li4">Camera</li></ul>
+                    <ul>
+                      <li data-i18n="pitch-grower.deck.li" class="active">Journal</li>
+                      <li data-i18n="pitch-grower.deck.li2">Log</li>
+                      <li data-i18n="pitch-grower.deck.li3">Coach</li>
+                      <li data-i18n="pitch-grower.deck.li4">Tokenise</li>
+                    </ul>
                   </div>
                   <div class="mock-main">
                     <div class="mock-row">
@@ -176,7 +254,13 @@
                       <div data-i18n-html="pitch-grower.deck.div11" class="mock-stat"><span class="stat-label">Stage</span><span class="stat-value good">Flower</span></div>
                       <div data-i18n-html="pitch-grower.deck.div12" class="mock-stat"><span class="stat-label">Last fed</span><span class="stat-value">3d</span></div>
                     </div>
-                    <div data-i18n="pitch-grower.deck.div13" class="mock-alert">Watering logged · reminder cleared</div>
+                    <div class="mock-alert">
+                      <span class="dot" aria-hidden="true"></span>
+                      <div>
+                        <strong data-i18n="pitch-grower.deck.div13t">Check for illness</strong>
+                        <p data-i18n="pitch-grower.deck.div13">Older leaves yellowing — likely nitrogen. Log a feeding?</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -187,9 +271,9 @@
             <div class="pipe-arrow">→</div>
             <div class="pipe-step"><div class="pipe-num">2</div><h3 data-i18n="pitch-grower.deck.h311">Shoot</h3><p data-i18n="pitch-grower.deck.p17">Photo attaches to the plant</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">3</div><h3 data-i18n="pitch-grower.deck.h312">Ask</h3><p data-i18n="pitch-grower.deck.p18">Coach reads the log, answers</p></div>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3 data-i18n="pitch-grower.deck.h312">Check</h3><p data-i18n="pitch-grower.deck.p18">Illness read from the photo</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">4</div><h3 data-i18n="pitch-grower.deck.h313">Forget it</h3><p data-i18n="pitch-grower.deck.p19">It’s written down for good</p></div>
+            <div class="pipe-step"><div class="pipe-num">4</div><h3 data-i18n="pitch-grower.deck.h313">Keep it</h3><p data-i18n="pitch-grower.deck.p19">Written down for the next cycle</p></div>
           </div>
         </div>
       </section>
@@ -201,12 +285,12 @@
             <span data-i18n="pitch-grower.deck.span6" class="kicker">05 · Optional</span>
             <h2 data-i18n-html="pitch-grower.deck.h24">Proof, only if <span class="grad">you want it.</span></h2>
             <p data-i18n="pitch-grower.deck.p20" class="slide-remark">
-              Most growers never touch this part, and the journal works fine without it. But if you want a record
-              other people can check — a buyer, a partner, or just your future self — each completed stage can be
-              sealed on Solana with a transaction anyone can open.
+              Most growers never touch this part, and the journal works fine without it. When you want
+              a record other people can check — a buyer, a partner, or your future self — seal the stage,
+              list an ask, or share the trail.
             </p>
           </header>
-          <div class="steps-plain">
+          <div class="steps-plain g-proof-steps">
             <div>
               <span class="step-num">01</span>
               <h3 data-i18n="pitch-grower.deck.h314">Log the stage</h3>
@@ -215,12 +299,17 @@
             <div>
               <span class="step-num">02</span>
               <h3 data-i18n="pitch-grower.deck.h315">Seal it</h3>
-              <p data-i18n="pitch-grower.deck.p22">Optional mint tied to that journal entry. Wallet needed only here.</p>
+              <p data-i18n="pitch-grower.deck.p22">Optional mint tied to that journal entry. Wallet only here.</p>
             </div>
             <div>
               <span class="step-num">03</span>
-              <h3 data-i18n="pitch-grower.deck.h316">Share the link</h3>
-              <p data-i18n="pitch-grower.deck.p23">Anyone can open the transaction and check the trail themselves.</p>
+              <h3 data-i18n="pitch-grower.deck.h316">List or share</h3>
+              <p data-i18n="pitch-grower.deck.p23">Post an ask on Market, or send a link anyone can open.</p>
+            </div>
+            <div>
+              <span class="step-num">04</span>
+              <h3 data-i18n="pitch-grower.deck.h317">Care bonus</h3>
+              <p data-i18n="pitch-grower.deck.p23b">Monthly test $GROWTOO for watering, feeding, and stories.</p>
             </div>
           </div>
           <div class="quote">
@@ -250,7 +339,7 @@
             <div data-i18n-html="pitch-grower.deck.div16" class="t-card"><span class="t-num">Voice</span><span class="t-label">Your requests hit the roadmap</span></div>
           </div>
           <div class="timeline-viz" aria-label="What's next">
-            <div data-i18n-html="pitch-grower.deck.div17" class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · camera · coach</span></div>
+            <div data-i18n-html="pitch-grower.deck.div17" class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · camera · coach · tokenise</span></div>
             <div class="tl-line" aria-hidden="true"></div>
             <div data-i18n-html="pitch-grower.deck.div18" class="tl-node"><span class="tl-q">Next</span><span class="tl-title">Deeper insights per cycle</span></div>
             <div class="tl-line" aria-hidden="true"></div>
@@ -270,6 +359,13 @@
             “Start the journal. You’ll want it in month three, and by then it’s too late to start.”
             <span class="closer-attr">Say this, then stop talking</span>
           </p>
+          <a
+            class="g-cta g-cta--lg"
+            href="https://growto.live/dnevnik/?mode=signup&amp;type=grower"
+            target="_blank"
+            rel="noreferrer"
+            data-i18n="pitch-grower.deck.cta"
+          >Begin your journal</a>
           <div class="contact-grid">
             <div data-i18n-html="pitch-grower.deck.div21"><span class="meta-label">Start</span><a class="meta-value" href="https://growto.live/dnevnik/?mode=signup&amp;type=grower" target="_blank" rel="noreferrer">Begin your journal</a></div>
             <div data-i18n-html="pitch-grower.deck.div22"><span class="meta-label">Live</span><a class="meta-value" href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></div>

@@ -226,12 +226,234 @@
   font-weight: 600;
 }
 
+/* ---- Grower deck: split cover, catalog tiles, phone mock ---- */
+.deck--grower .slide--cover {
+  align-items: start;
+  padding-top: 48px;
+  padding-bottom: 88px;
+}
+.deck--grower .cover {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.82fr);
+  grid-template-areas:
+    "copy stage"
+    "meta meta"
+    "switch switch"
+    "foot foot";
+  gap: 22px 40px;
+  align-items: start;
+}
+.deck--grower .cover-copy {
+  grid-area: copy;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.deck--grower .cover-copy .brand { margin-bottom: 4px; }
+.deck--grower .cover-copy .cover-headline { max-width: 14ch; }
+.deck--grower .cover-copy .cover-sub { max-width: 38ch; }
+.deck--grower .cover-copy .say { margin-top: 4px; max-width: none; }
+.deck--grower .cover-stage { grid-area: stage; align-self: center; justify-self: end; width: 100%; max-width: 320px; }
+.deck--grower .cover-meta { grid-area: meta; margin-top: 4px; }
+.deck--grower .deck-switch { grid-area: switch; margin-top: 0; }
+.deck--grower .cover-footer { grid-area: foot; margin-top: 0; }
+
+.g-cover-chips { margin: 2px 0 0; }
+.g-cover-chips .chip { background: var(--panel); }
+
+.g-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  margin-top: 4px;
+  padding: 11px 20px;
+  border-radius: 3px;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: #ffffff;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  border-bottom: 1px solid var(--green);
+}
+.g-cta:hover { background: var(--green-2); border-color: var(--green-2); color: #ffffff; }
+.g-cta--lg { margin-top: 22px; padding: 14px 26px; font-size: 16px; }
+
+.g-phone {
+  background: var(--desk-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 28px;
+  padding: 10px 10px 12px;
+  box-shadow: var(--shadow);
+}
+.g-phone-screen {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+.g-phone-head {
+  padding: 14px 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+.g-phone-head strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink);
+}
+.g-phone-head span {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.g-phone-photo {
+  margin: 12px 14px 0;
+  height: 92px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(70% 80% at 50% 40%, rgb(61 106 56 / 0.16), transparent 70%),
+    var(--wash);
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 12px;
+  color: var(--ink-mute);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.g-phone-coach {
+  margin: 12px 14px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--green);
+  border-radius: var(--r-sm);
+  flex: 1;
+}
+.g-phone-coach span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--green);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.g-phone-coach p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 350;
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.g-phone-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+.g-phone-tabs span {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink-mute);
+  padding: 10px 2px 12px;
+}
+.g-phone-tabs span.on {
+  color: var(--green);
+  box-shadow: inset 0 2px 0 var(--green);
+}
+
+.g-why .card--dense {
+  text-align: left;
+  padding: 22px 22px 20px;
+  border-top: 2px solid var(--green);
+}
+.g-why .card--dense h3 { font-size: 18px; }
+
+.g-catalog {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.g-tile {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 16px 14px;
+  min-height: 0;
+}
+.g-tile-k {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--green);
+  margin-bottom: 8px;
+}
+.g-tile h3 {
+  font-size: 16px;
+  margin: 0 0 6px;
+}
+.g-tile p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-mute);
+}
+.g-extra-chips { margin-top: 16px; }
+
+.deck--grower .g-proof-steps {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.deck--grower .g-proof-steps > div { padding: 20px 18px; }
+.deck--grower .contact--dense .g-cta { margin-bottom: 8px; }
+
 @media (max-width: 900px) {
   .claims,
   .steps-plain,
   .verify-grid { grid-template-columns: 1fr; }
   .status-row { grid-template-columns: 1fr; gap: 6px; }
   .say { flex-direction: column; gap: 8px; }
+  .deck--grower .cover {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "copy"
+      "stage"
+      "meta"
+      "switch"
+      "foot";
+  }
+  .deck--grower .cover-stage { justify-self: center; max-width: 300px; }
+  .deck--grower .cover-copy .cover-headline { max-width: 18ch; }
+  .g-catalog { grid-template-columns: 1fr 1fr; }
+  .deck--grower .g-proof-steps { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 560px) {
+  .g-catalog,
+  .deck--grower .g-proof-steps { grid-template-columns: 1fr; }
+  .g-tile { min-height: 0; }
 }
 
 /* ---- Print / PDF export (P in any deck) ---- */
@@ -241,7 +463,9 @@
   .claim-col,
   .status-table,
   .verify-card,
-  .steps-plain > div {
+  .steps-plain > div,
+  .g-tile,
+  .g-phone {
     box-shadow: none;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
