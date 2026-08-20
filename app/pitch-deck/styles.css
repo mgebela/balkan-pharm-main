@@ -2,33 +2,40 @@
 
 /* ==========================================================
    growtoo — deck system
-   Catalog theme: warm forest + brass, matching styles/landing.css
-   and app/styles/app.css. Token names are kept from the previous
-   theme so every component maps through without rewriting rules.
+   Sage paper (same as landing / journal). Token names are kept
+   from the forest theme so every component maps through.
    ========================================================== */
 
 :root {
-  --bg: #0f1a12;
-  --bg-2: #142018;
-  --panel: rgba(180, 200, 180, 0.05);
-  --panel-strong: rgba(180, 200, 180, 0.09);
-  --border: rgba(201, 165, 94, 0.18);
-  --border-strong: rgba(201, 165, 94, 0.42);
-  --ink: #f3efe6;
-  --ink-dim: rgba(184, 196, 176, 0.9);
-  --ink-mute: #8fa090;
-  /* Accent = brass. --green/--blue/--purple/--orange keep their names
-     so existing rules inherit the catalog palette. */
-  --green: #c9a55e;
-  --green-2: #d8b872;
-  --green-deep: #b08f45;
-  --blue: #b8d4b0;
-  --purple: #cfe0c6;
-  --orange: #a86b4f;
-  --brass-ink: #1a1408;
-  --shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
-  --desk-panel: linear-gradient(180deg, #1a2820 0%, #142018 100%);
-  --desk-line: rgba(201, 165, 94, 0.16);
+  --bg: #f5faf3;
+  --bg-2: #ffffff;
+  --bg-alt: #ffffff;
+  --panel: #ffffff;
+  --panel-strong: #eaf6e6;
+  --border: #c5d9be;
+  --border-strong: #9fc094;
+  --ink: #1a2c1e;
+  --ink-dim: #3d5648;
+  --ink-mute: #3d5648;
+  --text: #1a2c1e;
+  --text-muted: #3d5648;
+  --green: #3d6a38;
+  --green-2: #2f542c;
+  --green-deep: #2a4a28;
+  --blue: #3d6a38;
+  --purple: #4d7d46;
+  --orange: #8d5233;
+  --brass: #6b5420;
+  --brass-hover: #5c4614;
+  --brass-rgb: 107 84 32;
+  --brass-ink: #ffffff;
+  --surface: #eaf6e6;
+  --wash: #eaf6e6;
+  --shadow: 0 14px 40px rgb(61 106 56 / 0.12);
+  --desk-panel: #ffffff;
+  --desk-line: #c5d9be;
+  --chip-hairline: inset 0 0 0 1px #c5d9be;
+  --radius-pill: 999px;
   --r-lg: 20px;
   --r-md: 14px;
   --r-sm: 3px;
@@ -52,7 +59,7 @@ body {
   overflow-x: hidden;
 }
 
-a { color: var(--green); text-decoration: none; border-bottom: 1px solid rgba(201,165,94,0.35); }
+a { color: var(--green); text-decoration: none; border-bottom: 1px solid rgb(61 106 56 / 0.35); }
 a:hover { color: var(--green-2); border-color: var(--green-2); }
 
 /* Display type — Fraunces at catalog weight, like the site's section heads. */
@@ -77,22 +84,21 @@ p { margin: 0; color: var(--ink-dim); }
 
 em { font-style: italic; color: var(--ink); }
 
-/* Background — same warm forest wash the landing hero uses. */
+/* Background — same sage paper wash as the landing. */
 .bg-gradient {
   position: fixed;
   inset: 0;
   z-index: -2;
   background:
-    radial-gradient(900px 480px at 85% -5%, rgba(196, 163, 90, 0.08) 0%, transparent 55%),
-    radial-gradient(700px 420px at 8% 45%, rgba(40, 80, 50, 0.18) 0%, transparent 50%),
-    linear-gradient(165deg, #121c14 0%, #0f1a12 45%, #0c1610 100%);
+    radial-gradient(900px 480px at 85% -5%, rgb(61 106 56 / 0.06) 0%, transparent 55%),
+    linear-gradient(180deg, #f5faf3 0%, #f5faf3 100%);
 }
-/* Ledger ruling rather than a tech grid — brass hairlines on paper. */
+/* Ledger ruling — sage hairlines on paper. */
 .bg-grid {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image:
-    linear-gradient(rgba(201,165,94,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201,165,94,0.04) 1px, transparent 1px);
+    linear-gradient(rgb(61 106 56 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(61 106 56 / 0.05) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
 }
@@ -108,7 +114,7 @@ em { font-style: italic; color: var(--ink); }
   scroll-snap-align: start;
   scroll-snap-stop: always;
   position: relative;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--border);
 }
 .slide-inner {
   width: 100%;
@@ -193,7 +199,7 @@ em { font-style: italic; color: var(--ink); }
   color: var(--green);
   border-radius: 50%;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(196, 163, 90, 0.4);
+  box-shadow: 0 0 0 1px var(--border);
 }
 .brand-mark svg,
 .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
@@ -277,8 +283,8 @@ em { font-style: italic; color: var(--ink); }
   width: 44px; height: 44px;
   display: flex; align-items: center; justify-content: center;
   color: var(--green);
-  background: rgba(201, 165, 94,0.08);
-  border: 1px solid rgba(201, 165, 94,0.2);
+  background: var(--wash);
+  border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 18px;
 }
@@ -316,7 +322,7 @@ em { font-style: italic; color: var(--ink); }
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(400px 200px at 100% 0%, rgba(201, 165, 94,0.08), transparent 70%);
+  background: radial-gradient(400px 200px at 100% 0%, rgb(61 106 56 / 0.08), transparent 70%);
   pointer-events: none;
 }
 .feature-num {
@@ -338,7 +344,7 @@ em { font-style: italic; color: var(--ink); }
 }
 .product-mock { width: 100%; }
 .mock-window {
-  background: var(--desk-panel, linear-gradient(180deg, #142018, #0c1610));
+  background: var(--desk-panel);
   border: 1px solid var(--border-strong);
   border-radius: 18px;
   overflow: hidden;
@@ -349,10 +355,10 @@ em { font-style: italic; color: var(--ink); }
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: rgba(255,255,255,0.03);
+  background: var(--wash);
   border-bottom: 1px solid var(--border);
 }
-.mock-bar > span { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.18); }
+.mock-bar > span { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
 .mock-bar > span:first-child { background: var(--orange); }
 .mock-bar > span:nth-child(2) { background: var(--orange); }
 .mock-bar > span:nth-child(3) { background: var(--green); }
@@ -368,7 +374,7 @@ em { font-style: italic; color: var(--ink); }
 }
 .mock-body { display: grid; grid-template-columns: 180px 1fr; min-height: 320px; }
 .mock-side {
-  background: rgba(255,255,255,0.02);
+  background: var(--wash);
   border-right: 1px solid var(--border);
   padding: 18px 14px;
 }
@@ -385,14 +391,14 @@ em { font-style: italic; color: var(--ink); }
   padding: 7px 10px; border-radius: 8px;
 }
 .mock-side li.active {
-  background: rgba(201, 165, 94,0.12);
+  background: var(--panel-strong);
   color: var(--ink);
-  border: 1px solid rgba(201, 165, 94,0.2);
+  border: 1px solid var(--border);
 }
 .mock-main { padding: 22px; display: flex; flex-direction: column; gap: 18px; }
 .mock-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .mock-stat {
-  background: rgba(255,255,255,0.03);
+  background: var(--wash);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 14px;
@@ -409,7 +415,7 @@ em { font-style: italic; color: var(--ink); }
 .stat-value.good { color: var(--green); }
 .stat-foot { font-size: 12px; color: var(--ink-dim); }
 .mock-chart {
-  background: rgba(255,255,255,0.02);
+  background: var(--wash);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 8px;
@@ -542,11 +548,11 @@ em { font-style: italic; color: var(--ink); }
 }
 .monitor-card--meteo {
   border-top-color: var(--blue);
-  background: linear-gradient(165deg, rgba(184, 212, 176, 0.08), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(165deg, rgba(184, 212, 176, 0.08), var(--wash));
 }
 .monitor-card--stress {
   border-top-color: var(--orange);
-  background: linear-gradient(165deg, rgba(168, 107, 79, 0.08), rgba(255, 255, 255, 0.02));
+  background: linear-gradient(165deg, rgba(168, 107, 79, 0.08), var(--wash));
 }
 .monitor-card-icon {
   width: 44px;
@@ -616,7 +622,7 @@ em { font-style: italic; color: var(--ink); }
   color: var(--ink-mute);
   padding: 6px 10px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wash);
   border: 1px solid var(--border);
 }
 
@@ -806,7 +812,7 @@ em { font-style: italic; color: var(--ink); }
   padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wash);
   color: var(--ink-dim);
 }
 .pp-pill--g {
@@ -867,8 +873,8 @@ em { font-style: italic; color: var(--ink); }
   z-index: 1;
   border-radius: 24px;
   padding: 20px 20px 18px;
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--panel);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
 }
@@ -930,7 +936,7 @@ em { font-style: italic; color: var(--ink); }
   align-items: flex-start;
   padding: 18px 22px;
   border-radius: var(--r-lg);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--wash);
   border: 1px solid var(--border);
   margin-bottom: 20px;
 }
@@ -1017,7 +1023,7 @@ em { font-style: italic; color: var(--ink); }
   top: 52px;
   height: 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--wash);
   overflow: hidden;
 }
 .pj-rail-fill {
@@ -1132,7 +1138,7 @@ em { font-style: italic; color: var(--ink); }
   font-weight: 600;
   padding: 8px 14px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--wash);
   border: 1px solid var(--border);
   color: var(--ink);
 }
@@ -1226,7 +1232,7 @@ em { font-style: italic; color: var(--ink); }
   padding: 10px 14px 10px 16px;
   position: relative;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wash);
   border: 1px solid transparent;
 }
 .passport-list li::before {
@@ -1271,7 +1277,7 @@ em { font-style: italic; color: var(--ink); }
   padding: 18px 20px;
   border: 1px solid var(--border);
   border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--wash);
   align-items: start;
 }
 .passport-fit--styled .fit-card-icon {
@@ -1285,7 +1291,7 @@ em { font-style: italic; color: var(--ink); }
   justify-content: center;
   border-radius: 12px;
   font-size: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wash);
   border: 1px solid var(--border);
 }
 .passport-fit--styled .fit-card-icon .deck-icon {
@@ -1321,8 +1327,8 @@ em { font-style: italic; color: var(--ink); }
 .passport-foot {
   padding: 16px 20px;
   border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: var(--wash);
+  border: 1px dashed var(--border);
 }
 .passport-foot p {
   margin: 0;
@@ -1403,7 +1409,7 @@ em { font-style: italic; color: var(--ink); }
   display: inline-flex; align-self: flex-start;
   font-size: 11px; font-weight: 600; letter-spacing: 0.16em;
   text-transform: uppercase;
-  background: rgba(255,255,255,0.06);
+  background: var(--wash);
   border: 1px solid var(--border-strong);
   color: var(--ink);
   padding: 5px 10px;
@@ -1520,7 +1526,7 @@ em { font-style: italic; color: var(--ink); }
 }
 .comp-row:last-child { border-bottom: none; }
 .comp-head {
-  background: rgba(255,255,255,0.04);
+  background: var(--wash);
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -1730,7 +1736,7 @@ em { font-style: italic; color: var(--ink); }
   position: fixed;
   bottom: 18px; right: 18px;
   display: flex; align-items: center; gap: 10px;
-  background: rgba(10,20,16,0.7);
+  background: #ffffff;
   border: 1px solid var(--border-strong);
   backdrop-filter: blur(10px);
   padding: 8px 12px;
@@ -1738,10 +1744,11 @@ em { font-style: italic; color: var(--ink); }
   z-index: 50;
   font-family: var(--font-mono);
   font-size: 13px;
+  box-shadow: var(--shadow);
 }
 .hud-btn {
   width: 32px; height: 32px;
-  background: rgba(255,255,255,0.05);
+  background: var(--wash);
   border: 1px solid var(--border);
   color: var(--ink);
   border-radius: 50%;
@@ -1750,13 +1757,13 @@ em { font-style: italic; color: var(--ink); }
   font-size: 14px;
   transition: background 0.2s ease;
 }
-.hud-btn:hover { background: rgba(201, 165, 94,0.15); border-color: rgba(201, 165, 94,0.4); }
+.hud-btn:hover { background: var(--panel-strong); border-color: var(--border-strong); }
 .hud-counter { color: var(--ink-dim); padding: 0 6px; }
 #curSlide { color: var(--green); font-weight: 700; }
 
 .progress {
   position: fixed; top: 0; left: 0; right: 0; height: 3px;
-  background: rgba(255,255,255,0.04);
+  background: var(--border);
   z-index: 60;
 }
 #progressBar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--green), var(--blue)); transition: width 0.25s ease; }
@@ -1765,7 +1772,7 @@ em { font-style: italic; color: var(--ink); }
   position: fixed;
   top: 16px; right: 16px;
   width: 40px; height: 40px;
-  background: rgba(10,20,16,0.7);
+  background: #ffffff;
   border: 1px solid var(--border-strong);
   color: var(--ink);
   border-radius: 12px;
@@ -1773,14 +1780,15 @@ em { font-style: italic; color: var(--ink); }
   cursor: pointer;
   z-index: 50;
   backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
 }
-.menu-btn:hover { background: rgba(201, 165, 94,0.15); }
+.menu-btn:hover { background: var(--panel-strong); }
 
 .sidenav {
   position: fixed;
   top: 0; right: 0; bottom: 0;
   width: 300px;
-  background: rgba(7,18,14,0.94);
+  background: #ffffff;
   border-left: 1px solid var(--border-strong);
   backdrop-filter: blur(20px);
   z-index: 49;
@@ -1788,6 +1796,7 @@ em { font-style: italic; color: var(--ink); }
   transform: translateX(100%);
   transition: transform 0.3s ease;
   overflow-y: auto;
+  box-shadow: var(--shadow);
 }
 .sidenav.open { transform: translateX(0); }
 .sidenav ol { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; counter-reset: nav; }
@@ -1808,8 +1817,8 @@ em { font-style: italic; color: var(--ink); }
   letter-spacing: 0.1em;
   width: 28px;
 }
-.sidenav li:hover { background: rgba(255,255,255,0.04); color: var(--ink); }
-.sidenav li.active { background: rgba(201, 165, 94,0.12); color: var(--ink); border: 1px solid rgba(201, 165, 94,0.25); }
+.sidenav li:hover { background: var(--wash); color: var(--ink); }
+.sidenav li.active { background: var(--panel-strong); color: var(--ink); border: 1px solid var(--border-strong); }
 
 /* ===== Responsive ===== */
 @media (max-width: 1024px) {
@@ -1941,7 +1950,7 @@ em { font-style: italic; color: var(--ink); }
   padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wash);
   color: var(--ink-dim);
 }
 .chip strong {
@@ -2065,7 +2074,7 @@ em { font-style: italic; color: var(--ink); }
   color: var(--ink);
   padding: 8px 16px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--wash);
   border: 1px solid var(--border);
 }
 .monitor-pipeline--inline .mp-label--final {
@@ -2118,7 +2127,7 @@ em { font-style: italic; color: var(--ink); }
   text-align: center;
   padding: 12px 8px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--wash);
   border: 1px solid var(--border);
 }
 .tl-node--final {
@@ -2317,7 +2326,7 @@ em { font-style: italic; color: var(--ink); }
   color: var(--ink-dim);
   padding: 8px 6px;
   border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--wash);
   border: 1px solid var(--border);
 }
 .economics-weight strong {
@@ -2454,7 +2463,7 @@ em { font-style: italic; color: var(--ink); }
     print-color-adjust: exact;
   }
   html, body {
-    background: #0f1a12 !important;
+    background: #f5faf3 !important;
     overflow: visible !important;
   }
   * {
@@ -2464,7 +2473,7 @@ em { font-style: italic; color: var(--ink); }
 
   .bg-grid { display: none !important; }
   .bg-gradient {
-    background: #0f1a12 !important;
+    background: #f5faf3 !important;
     opacity: 1 !important;
   }
 
@@ -2525,7 +2534,7 @@ em { font-style: italic; color: var(--ink); }
     display: none !important;
   }
   .passport-card {
-    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid var(--border-strong) !important;
   }
 
   a { color: var(--green); }
