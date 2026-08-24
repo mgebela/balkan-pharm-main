@@ -404,36 +404,39 @@ body.journal-paper .gj-chip--desk {
 }
 
 .gj-shell--post {
-  max-width: 52rem;
+  max-width: 40rem;
   padding-top: 1rem;
 }
 
+.gj-post-article {
+  max-width: 40rem;
+  margin: 0;
+}
+
 .gj-post-cover {
-  margin: 0 0 1.75rem;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1px solid #c5d9be;
-  background: #eaf6e6;
+  margin: 0 0 1.35rem;
+  border-radius: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
 }
 
 .gj-post-cover img {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 3 / 2;
   object-fit: cover;
   display: block;
+  border-radius: 14px;
+  border: 1px solid #c5d9be;
 }
 
 .gj-post-cover figcaption {
   margin: 0;
-  padding: 0.45rem 0.85rem 0.6rem;
+  padding: 0.45rem 0 0;
   font-size: 0.75rem;
+  line-height: 1.4;
   color: #3d5648;
-  background: #ffffff;
-}
-
-.gj-post-inner {
-  max-width: 38rem;
-  margin: 0 auto;
+  background: transparent;
 }
 
 .gj-kicker {
@@ -547,21 +550,12 @@ body.journal-paper .gj-chip--desk {
 
 .gj-post-body p {
   margin: 0 0 1.15rem;
-}
-
-.gj-post-body p:first-child::first-letter {
-  font-family: Fraunces, Georgia, serif;
-  font-size: 3.1rem;
-  float: left;
-  line-height: 0.78;
-  padding: 0.12rem 0.45rem 0 0;
-  color: #3d6a38;
-  font-weight: 500;
+  max-width: none;
 }
 
 .gj-convert {
-  max-width: 38rem;
-  margin: 2.5rem auto 0;
+  max-width: none;
+  margin: 2.25rem 0 0;
   padding: 1.4rem 1.35rem 1.5rem;
   border: 1px solid #c5d9be;
   border-radius: 18px;
@@ -633,8 +627,8 @@ body.journal-paper .gj-chip--desk {
 }
 
 .gj-post-skel {
-  max-width: 38rem;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
 }
 
 .gj-skel {
@@ -670,10 +664,6 @@ body.journal-paper .gj-chip--desk {
 @media (max-width: 640px) {
   .gj-post-cover img {
     aspect-ratio: 4 / 3;
-  }
-
-  .gj-post-body p:first-child::first-letter {
-    font-size: 2.5rem;
   }
 
   .gj-nav-cta {

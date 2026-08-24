@@ -17,13 +17,61 @@
   var SIGNUP_GROWER = 'https://growto.live/dnevnik/?mode=signup&type=grower';
   var SIGNUP_ADOPTER = 'https://growto.live/dnevnik/?mode=signup&type=adopter';
   var OG_FALLBACK = 'https://growto.live/images/og-growtoo.png';
+  var articleLang = '';
+  var articleDict = null;
+
+  function interpolate(str, vars) {
+    if (!vars) return str;
+    return String(str).replace(/\{(\w+)\}/g, function (whole, name) {
+      return Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : whole;
+    });
+  }
+
+  function dictGet(dict, key) {
+    if (!dict || !key) return null;
+    var path = key.indexOf('journal.') === 0 ? key.slice(8) : key;
+    var parts = path.split('.');
+    var cur = dict;
+    for (var i = 0; i < parts.length; i++) {
+      if (cur == null || typeof cur !== 'object') return null;
+      cur = cur[parts[i]];
+    }
+    return typeof cur === 'string' ? cur : null;
+  }
 
   function tx(key, fallback, vars) {
-    if (typeof window.T === 'function') return window.T(key, fallback, vars);
-    if (!vars) return fallback;
-    return String(fallback).replace(/\{(\w+)\}/g, function (_, name) {
-      return Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : _;
-    });
+    var hit = dictGet(articleDict, key);
+    if (hit) return interpolate(hit, vars);
+    if (!articleDict && typeof window.T === 'function') return window.T(key, fallback, vars);
+    return interpolate(fallback, vars);
+  }
+
+  function detectContentLang(post) {
+    var text = String((post && post.title) || '') + '\n' + String((post && post.body) || '');
+    if (/[čćžšđČĆŽŠĐ]/.test(text)) return 'hr';
+    if (/[äöüßÄÖÜ]/.test(text)) return 'de';
+    return 'en';
+  }
+
+  async function loadJournalDict(lang) {
+    var code = lang === 'hr' || lang === 'de' ? lang : 'en';
+    try {
+      var res = await fetch('/locales/' + code + '/journal.json?v=20260824k');
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function stampPostHeader(dict) {
+    if (!dict) return;
+    var notes = document.querySelector('[data-i18n="journal.nav.notes"]');
+    if (notes && dict.nav && dict.nav.notes) notes.textContent = dict.nav.notes;
+    var start = document.querySelector('[data-i18n="journal.nav.start"]');
+    if (start && dict.nav && dict.nav.start) start.textContent = dict.nav.start;
+    var brand = document.querySelector('.gj-post-page [data-i18n-html="journal.a"]');
+    if (brand && dict.a) brand.innerHTML = dict.a;
   }
 
   function esc(s) {
@@ -77,7 +125,8 @@
   function formatDate(iso) {
     if (!iso) return '';
     try {
-      var tag = (window.I18N && I18N.intl) || 'en-GB';
+      var code = articleLang || (window.I18N && I18N.locale) || 'en';
+      var tag = code === 'hr' ? 'hr-HR' : code === 'de' ? 'de-DE' : 'en-GB';
       return new Date(iso).toLocaleDateString(tag, {
         day: 'numeric',
         month: 'short',
@@ -462,6 +511,10 @@
       }
       var author = post.author || {};
       var desk = isDeskAuthor(author);
+      articleLang = detectContentLang(post);
+      articleDict = await loadJournalDict(articleLang);
+      document.documentElement.setAttribute('lang', articleLang);
+      stampPostHeader(articleDict);
       applyPostMeta(post, slug);
 
       var more = [];
@@ -536,7 +589,6 @@
               : '') +
             '</figure>'
           : '') +
-        '<div class="gj-post-inner">' +
         '<p class="gj-kicker">' +
         '<a href="' +
         esc(feedHref(desk ? '' : post.category)) +
@@ -585,7 +637,6 @@
         '</dl>' +
         '<div class="gj-post-body">' +
         parsed.html +
-        '</div>' +
         '</div></article>' +
         convertBand() +
         (more.length
