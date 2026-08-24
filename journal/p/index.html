@@ -8,26 +8,41 @@
   <meta name="robots" content="index,follow" />
   <meta name="theme-color" content="#f5faf3" />
   <link rel="canonical" href="https://journal.growto.live/p/" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="growtoo journal" />
+  <meta property="og:title" content="Story · growtoo journal" />
+  <meta property="og:description" content="A public grower field note on growtoo." />
+  <meta property="og:url" content="https://journal.growto.live/p/" />
+  <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Story · growtoo journal" />
+  <meta name="twitter:description" content="A public grower field note on growtoo." />
+  <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
+  <link rel="icon" href="/images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
+  <link rel="apple-touch-icon" href="/images/growtoo-mark-brass.png?v=20260731a" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>
-    /* Paper first paint — same growtoo sage journal as the app. */
     (function () {
       document.documentElement.setAttribute('data-theme', 'light');
     })();
   </script>
-  <link rel="stylesheet" href="../../styles/tokens.css?v=20260817v" />
+  <script src="/js/i18n.js?v=20260824j" data-i18n-ns="common,journal" data-i18n-reload></script>
+  <link rel="stylesheet" href="/styles/tokens.css?v=20260817v" />
   <link rel="stylesheet" href="/styles/landing.css?v=20260817x" />
-  <link rel="stylesheet" href="/journal/styles/journal.css?v=20260817x" />
+  <link rel="stylesheet" href="/styles/i18n.css?v=20260816a" />
+  <link rel="stylesheet" href="/journal/styles/journal.css?v=20260824j" />
 </head>
-<body class="journal-paper" data-gj-page="post">
-  <div class="gj-shell">
+<body class="journal-paper gj-post-page" data-gj-page="post">
+  <div class="gj-progress" aria-hidden="true"><span></span></div>
+  <div class="gj-shell gj-shell--post">
     <header class="gj-top">
-      <a class="gj-brand" href="/journal/">growtoo <em>journal</em></a>
+      <a data-i18n-html="journal.a" class="gj-brand" href="/journal/">growtoo <em>journal</em></a>
       <nav class="gj-nav" aria-label="Journal">
-        <a href="/journal/">All stories</a>
-        <a href="https://growto.live/dnevnik/">Sign in to write</a>
+        <a data-i18n="journal.nav.notes" href="/journal/">All notes</a>
+        <a data-i18n="journal.nav.start" class="gj-nav-cta" href="https://growto.live/dnevnik/?mode=signup&amp;type=grower">Start a grow</a>
+        <div class="nav-lang" data-i18n-switcher></div>
       </nav>
     </header>
     <div id="gj-post"></div>
@@ -50,6 +65,6 @@
       }
     })();
   </script>
-  <script src="/journal/js/journal-public.js?v=20260806b"></script>
+  <script src="/journal/js/journal-public.js?v=20260824j"></script>
 </body>
 </html>

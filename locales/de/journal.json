@@ -1,10 +1,53 @@
 {
   "a": "growtoo <em>Journal</em>",
   "a2": "Startseite",
-  "a3": "Zum Schreiben anmelden",
+  "a3": "Anmelden",
   "a4": "App öffnen",
   "h1": "Feldnotizen aus dem Garten",
-  "p": "Tipps, Pflanzenbilder, Probleme, Besuche bei Growern und Produkte — veröffentlicht von Growern. Lesen kann jeder; kein Konto nötig.",
+  "p": "Tipps, Pflanzenbilder, Probleme, Besuche bei Growern und Erntenotizen — geschrieben von Growern. Lesen kann jeder; kein Konto nötig.",
+  "nav": {
+    "notes": "Alle Notizen",
+    "start": "Grow starten",
+    "follow": "Pflanze folgen",
+    "signin": "Anmelden"
+  },
+  "cat": {
+    "all": "Alle",
+    "tip": "Tipps & Tricks",
+    "look": "Blick auf meine Pflanzen",
+    "problem": "Pflanzenproblem",
+    "visit": "Andere Grower besucht",
+    "product": "Aus meinen Pflanzen",
+    "daybook": "Feldnotiz"
+  },
+  "post": {
+    "loading": "Notiz wird geöffnet…",
+    "missing": "Diese Notiz hat keine Adresse.",
+    "notFound": "Diese Notiz ist weg oder wurde nie veröffentlicht.",
+    "loadError": "Diese Geschichte konnte nicht geladen werden.",
+    "minRead": "{n} Min. Lesezeit",
+    "deskKicker": "Desk-Artikel",
+    "growerKicker": "Grower-Notiz",
+    "plant": "Pflanze",
+    "published": "Veröffentlicht",
+    "kind": "Art",
+    "deskKind": "Von growtoo desk — keine Grower-Ernte",
+    "growerKind": "Aus einem echten Grow protokolliert",
+    "moreGrower": "Mehr von diesem Grower",
+    "moreNotes": "Weitere Feldnotizen",
+    "ctaEyebrow": "Den nächsten Zyklus behalten",
+    "ctaTitle": "Ein Journal wie dieses starten",
+    "ctaBody": "Gießen, Düngen, Phasen, Fotos — auch nächste Saison noch da. Kostenlos, ohne Wallet.",
+    "ctaGrow": "Grow starten",
+    "ctaFollow": "Pflanze folgen",
+    "share": "Teilen",
+    "photo": "Foto"
+  },
+  "feed": {
+    "loading": "Feldnotizen werden geladen…",
+    "empty": "Noch keine veröffentlichten Stories. Grower teilen hier Tipps, Pflanzenblicke und Erntenotizen — offen für alle, ohne Anmeldung.",
+    "error": "Das Journal konnte nicht geladen werden. Versuch es gleich noch einmal."
+  },
   "meta": {
     "title": "Grower-Journal · growtoo"
   }

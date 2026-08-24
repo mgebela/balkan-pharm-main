@@ -1,10 +1,53 @@
 {
   "a": "growtoo <em>dnevnik</em>",
   "a2": "Početna",
-  "a3": "Prijavi se za pisanje",
+  "a3": "Prijava",
   "a4": "Otvori aplikaciju",
   "h1": "Bilješke s terena",
-  "p": "Savjeti, izgled biljaka, problemi, posjeti uzgajivačima i proizvodi — objavljuju uzgajivači. Svatko može čitati; račun nije potreban.",
+  "p": "Savjeti, izgled biljaka, problemi, posjeti uzgajivačima i bilješke o berbi — pišu uzgajivači. Svatko može čitati; račun nije potreban.",
+  "nav": {
+    "notes": "Sve bilješke",
+    "start": "Započni uzgoj",
+    "follow": "Prati biljku",
+    "signin": "Prijava"
+  },
+  "cat": {
+    "all": "Sve",
+    "tip": "Savjeti",
+    "look": "Izgled mojih biljaka",
+    "problem": "Problem s biljkom",
+    "visit": "Posjet uzgajivačima",
+    "product": "Napravljeno od mojih biljaka",
+    "daybook": "Terenska bilješka"
+  },
+  "post": {
+    "loading": "Otvaram bilješku…",
+    "missing": "Ova bilješka nema adresu.",
+    "notFound": "Bilješka ne postoji ili nije objavljena.",
+    "loadError": "Nisam mogao učitati ovu priču.",
+    "minRead": "{n} min čitanja",
+    "deskKicker": "Desk članak",
+    "growerKicker": "Bilješka uzgajivača",
+    "plant": "Biljka",
+    "published": "Objavljeno",
+    "kind": "Vrsta",
+    "deskKind": "Napisao growtoo desk — nije berba uzgajivača",
+    "growerKind": "Zapis s pravog uzgoja",
+    "moreGrower": "Više od ovog uzgajivača",
+    "moreNotes": "Još terenskih bilješki",
+    "ctaEyebrow": "Sačuvaj sljedeći ciklus",
+    "ctaTitle": "Započni dnevnik kao ovaj",
+    "ctaBody": "Zalijevanje, prihrana, faze, fotografije — tu su i sljedeće sezone. Besplatno, bez novčanika.",
+    "ctaGrow": "Započni uzgoj",
+    "ctaFollow": "Prati biljku",
+    "share": "Podijeli",
+    "photo": "Foto"
+  },
+  "feed": {
+    "loading": "Učitavam terenske bilješke…",
+    "empty": "Još nema objavljenih priča. Uzgajivači ovdje dijele savjete, izgled biljaka i bilješke o berbi — otvoreno za sve, bez prijave.",
+    "error": "Dnevnik se nije mogao učitati. Pokušaj uskoro."
+  },
   "meta": {
     "title": "Dnevnik uzgajivača · growtoo"
   }

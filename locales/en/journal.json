@@ -1,10 +1,53 @@
 {
   "a": "growtoo <em>journal</em>",
   "a2": "Home",
-  "a3": "Sign in to write",
+  "a3": "Sign in",
   "a4": "Open app",
   "h1": "Field notes from the garden",
-  "p": "Tips, plant looks, problems, grower visits, and products — published by growers. Anyone can read; no account needed.",
+  "p": "Tips, plant looks, problems, grower visits, and harvest notes — written by growers. Anyone can read; no account needed.",
+  "nav": {
+    "notes": "All notes",
+    "start": "Start a grow",
+    "follow": "Follow a plant",
+    "signin": "Sign in"
+  },
+  "cat": {
+    "all": "All",
+    "tip": "Tips & tricks",
+    "look": "Looking at my plants",
+    "problem": "Plant problem",
+    "visit": "Visited other growers",
+    "product": "Made from my plants",
+    "daybook": "Field note"
+  },
+  "post": {
+    "loading": "Opening the note…",
+    "missing": "This note has no address.",
+    "notFound": "This note is gone, or it was never published.",
+    "loadError": "Could not load this story.",
+    "minRead": "{n} min read",
+    "deskKicker": "Desk article",
+    "growerKicker": "Grower note",
+    "plant": "Plant",
+    "published": "Published",
+    "kind": "Kind",
+    "deskKind": "Written by growtoo desk — not a grower harvest",
+    "growerKind": "Logged from a real grow",
+    "moreGrower": "More from this grower",
+    "moreNotes": "More field notes",
+    "ctaEyebrow": "Keep the next cycle",
+    "ctaTitle": "Start a journal like this one",
+    "ctaBody": "Watering, feeding, stages, photos — still there next season. Free, no wallet.",
+    "ctaGrow": "Start a grow",
+    "ctaFollow": "Follow a plant",
+    "share": "Share",
+    "photo": "Photo"
+  },
+  "feed": {
+    "loading": "Loading field notes…",
+    "empty": "No published stories yet. Growers share tips, plant looks, and harvest notes here — open to everyone, no sign-in.",
+    "error": "Could not load the journal. Try again shortly."
+  },
   "meta": {
     "title": "Grower journal · growtoo"
   }

@@ -36,6 +36,12 @@
   force = true
 
 [[redirects]]
+  from = "https://journal.growto.live/locales/*"
+  to = "/locales/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "https://journal.growto.live/journal/*"
   to = "/journal/:splat"
   status = 200
