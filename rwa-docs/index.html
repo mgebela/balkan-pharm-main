@@ -370,7 +370,9 @@
           <h3 data-i18n="rwadocs.h32">Trust model (Devnet MVP)</h3>
           <p data-i18n-html="rwadocs.p4">
             On Devnet, one collection authority also controls metadata updates, $GROWTOO minting, and marketplace hold/release.
-            Stage updates only run after matching journal progress exists. Mainnet aims to replace the queue with an on-chain escrow program
+            Stage updates only run after matching journal progress exists. Market listing is a further gate: 14 days since
+            the first watering or feeding log was saved, with care on at least half those days (backdated journal dates do not count).
+            That is process evidence, not proof a physical plant exists. Mainnet aims to replace the queue with an on-chain escrow program
             and stronger attestations — see <a href="../risks/">Risks</a>.
           </p>
 
@@ -424,11 +426,13 @@
 
           <h2 data-i18n="rwadocs.marketplace.h2" id="marketplace">4. Marketplace (Devnet MVP)</h2>
           <ol class="flow">
+            <li data-i18n-html="rwadocs.li15b"><strong>Eligibility:</strong> listing is allowed only after 14 days since the first watering or feeding log was saved, with care on at least half those days. Same-day mint-and-list is blocked. Backdated journal dates do not count.</li>
             <li data-i18n-html="rwadocs.li16"><strong>List:</strong> seller moves the NFT into a marketplace hold; listing goes live with a $GROWTOO ask.</li>
             <li data-i18n-html="rwadocs.li17"><strong>Invest:</strong> buyer pays $GROWTOO (instant sale or adopt-stake split).</li>
             <li data-i18n-html="rwadocs.li18"><strong>Settle:</strong> payment is confirmed; the plant token is released to the buyer. Sellers can cancel live listings.</li>
           </ol>
-          <p data-i18n="rwadocs.p7">
+          <p data-i18n-html="rwadocs.p7">
+            The coverage check uses wall-clock <code>createdAt</code> on watering and feeding logs, not the journal date field — a same-session dump of backdated days counts as one care day.
             Instant sale pays the full ask on buy. Adopt stake locks half until monthly care qualifies at harvest (all-or-nothing).
             Devnet settlement is operator-assisted; mainnet targets a fully on-chain program.
           </p>

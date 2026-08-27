@@ -622,8 +622,66 @@
     return set;
   }
 
+  function journalState() {
+    if (window.ListEligibility && typeof ListEligibility.readLocalState === 'function') {
+      return ListEligibility.readLocalState();
+    }
+    return { plants: [], entries: [], toolbox: {} };
+  }
+
+  function coverageForPlant(plantId) {
+    if (!window.ListEligibility || typeof ListEligibility.evaluateListEligibility !== 'function') {
+      return {
+        ok: false,
+        code: 'no_plant',
+        error: T(
+          'app.market.coverageUnavailable',
+          'Journal trail check is unavailable. Refresh and try again.'
+        ),
+      };
+    }
+    return ListEligibility.evaluateListEligibility(journalState(), plantId);
+  }
+
+  function coverageMessage(result) {
+    if (!result || result.ok) return '';
+    const wait = Math.max(0, (result.minElapsedDays || 14) - (result.elapsedDays || 0));
+    if (result.code === 'too_soon') {
+      return T(
+        'app.market.coverageTooSoon',
+        'Keep logging this plant. Market needs {need} days of journal time (you have {elapsed}). About {wait} more day(s).',
+        {
+          need: result.minElapsedDays,
+          elapsed: result.elapsedDays,
+          wait: wait,
+        }
+      );
+    }
+    if (result.code === 'low_coverage') {
+      return T(
+        'app.market.coverageLow',
+        'Log watering or feeding on at least half the trail ({need} of {elapsed} days). This plant has {have}.',
+        {
+          need: result.requiredCareDays,
+          elapsed: Math.min(result.elapsedDays, 180),
+          have: result.careDays,
+        }
+      );
+    }
+    if (result.code === 'no_logs') {
+      return T(
+        'app.market.coverageNoLogs',
+        'Log watering or feeding over time before listing. A same-day seed mint is not enough.'
+      );
+    }
+    return T(
+      'app.market.coverageNeedPlant',
+      'Link this token to a journal plant and keep a care trail before listing.'
+    );
+  }
+
   // Grower tokens that exist as real devnet NFTs and are not yet listed.
-  function listableTokens() {
+  function mintedUnlistedTokens() {
     const PT = window.PlantToken;
     const SC = window.SeedChain;
     if (!PT || !SC) return [];
@@ -654,6 +712,14 @@
       .filter(Boolean);
   }
 
+  function listableTokens() {
+    return mintedUnlistedTokens().filter(function (o) {
+      const cover = coverageForPlant(o.token && o.token.plantId);
+      o.coverage = cover;
+      return !!(cover && cover.ok);
+    });
+  }
+
   /** Mint address a grower can post from this garden card, or ''. */
   function listableMintForToken(tokenId) {
     if (!tokenId) return '';
@@ -675,7 +741,7 @@
     else render();
   }
 
-  /** Garden RWAs that cannot be posted yet (failed / pending mint, or already listed). */
+  /** Garden RWAs that cannot be posted yet (failed / pending mint, coverage, or already listed). */
   function unlistableGardenTokens() {
     const PT = window.PlantToken;
     const SC = window.SeedChain;
@@ -691,6 +757,12 @@
         const mint = token.mintRequestId ? SC.getMint(token.mintRequestId) : null;
         const mintAddress =
           (mint && mint.mintAddress) || token.mintAddress || null;
+        if (mint && mint.status === 'minted' && mintAddress && !listed.has(mintAddress)) {
+          const cover = coverageForPlant(token.plantId);
+          if (!cover.ok) {
+            return { token: token, reason: coverageMessage(cover), kind: 'coverage' };
+          }
+        }
         let reason = T('app.market.reasonUnconfirmed', 'Mint not confirmed on Devnet yet');
         if (mint && mint.status === 'failed') {
           reason = T('app.market.reasonFailed', 'Mint failed — Retry mint on Tokenise');
@@ -888,6 +960,11 @@
       );
     }
 
+    const cover = coverageForPlant(tokenEntry.token && tokenEntry.token.plantId);
+    if (!cover.ok) {
+      throw new Error(coverageMessage(cover) || cover.error);
+    }
+
     const SW = await ensureSigningWallet(
       T('app.market.purposePost', 'post an offer (hold the plant token)')
     );
@@ -929,6 +1006,11 @@
         escrowSignature: result.signature,
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
+        journalCoverageOk: true,
+        journalCoverage:
+          window.ListEligibility && typeof ListEligibility.snapshot === 'function'
+            ? ListEligibility.snapshot(cover)
+            : { ok: true },
         // Do not embed journal notes or base64 photos on the listing doc —
         // those leak to every signed-in market reader. Card UI uses botanical art
         // + stage label; seller-local enrichListingStory can still fill from device.
@@ -985,6 +1067,11 @@
         escrowSignature,
         cluster: 'devnet',
         createdAt: new Date().toISOString(),
+        journalCoverageOk: true,
+        journalCoverage:
+          window.ListEligibility && typeof ListEligibility.snapshot === 'function'
+            ? ListEligibility.snapshot(cover)
+            : { ok: true },
       };
       if (story && story.journalStage) {
         listing.journalStage = story.journalStage;
@@ -2204,8 +2291,17 @@
         const formExtras = document.querySelectorAll(
           '#market-list-form .market-offer-compare, #market-list-form .market-offer-helper, #market-list-form .seal-stage-label[for="market-price-input"], #market-list-form .market-price-field, #market-list-form button[type="submit"]'
         );
+        const coverageBlocked = blocked.some(function (b) {
+          return b && b.kind === 'coverage';
+        });
         if (hint) {
-          if (!options.length && blocked.length) {
+          if (!options.length && blocked.length && coverageBlocked) {
+            hint.hidden = false;
+            const coverHit = blocked.find(function (b) {
+              return b && b.kind === 'coverage';
+            });
+            hint.textContent = (coverHit && coverHit.reason) || blocked[0].reason;
+          } else if (!options.length && blocked.length) {
             hint.hidden = false;
             hint.textContent = T(
               'app.market.hintAlmost',
@@ -2224,7 +2320,7 @@
         }
         if (emptyCta) emptyCta.hidden = !!options.length;
         if (goTokenise) {
-          goTokenise.hidden = !!options.length;
+          goTokenise.hidden = !!options.length || coverageBlocked;
           if (!goTokenise.dataset.bound) {
             goTokenise.dataset.bound = '1';
             goTokenise.addEventListener('click', function () {
@@ -2256,6 +2352,7 @@
           l.status === 'sale_pending' ||
           l.status === 'escrow_pending';
         if (!live) return false;
+        if (l.journalCoverageOk === false) return false;
         if (isGrowerUi() && uid && l.uid === uid) return false;
         return true;
       });
@@ -2434,7 +2531,7 @@
       } else {
         hint.textContent = T(
           'app.market.hintInstantMode',
-          'You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.'
+          'You’re paid the full asking price at purchase. Eligible plants only — 14 days of care, half those days logged. Posting locks the NFT in the on-chain program vault — the offer then goes live immediately.'
         );
       }
     }
@@ -2950,6 +3047,15 @@
       render();
     },
     listableMintForToken: listableMintForToken,
+    mintedMintForToken: function (tokenId) {
+      if (!tokenId) return '';
+      const hit = mintedUnlistedTokens().find(function (o) {
+        return o && o.token && o.token.id === tokenId;
+      });
+      return hit && hit.mintAddress ? hit.mintAddress : '';
+    },
+    coverageForPlant: coverageForPlant,
+    coverageMessage: coverageMessage,
     openListForMint: openListForMint,
     onChange(fn) {
       if (typeof fn === 'function') listeners.add(fn);

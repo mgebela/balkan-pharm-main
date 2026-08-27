@@ -76,6 +76,14 @@ check('no uid / buyer / photo / journal / sigs / email', leaked.length === 0, le
 console.log('\n[scrubPublicListing rejects unsellable rows]');
 check('null input → null', scrubPublicListing(null) === null);
 check('cancelled → null', scrubPublicListing(Object.assign({}, privateFull, {status: 'cancelled'})) === null);
+check(
+  'journalCoverageOk false → null',
+  scrubPublicListing(Object.assign({}, privateFull, {journalCoverageOk: false})) === null
+);
+check(
+  'journalCoverageOk true still publishes',
+  !!scrubPublicListing(Object.assign({}, privateFull, {journalCoverageOk: true}))
+);
 check('no name → null', scrubPublicListing(Object.assign({}, privateFull, {name: '  '})) === null);
 check('bad price → null', scrubPublicListing(Object.assign({}, privateFull, {priceGrow: 0})) === null);
 

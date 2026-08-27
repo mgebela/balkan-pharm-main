@@ -17,7 +17,7 @@
   },
   "span4": "VERT",
   "h22": "Vertrauensmodell (zentralisiertes MVP)",
-  "p3": "Eine Collection-Authority steuert derzeit Metadaten-Updates, das Minten der Phasen-Belohnungen und die Escrow-Abwicklung. Der „Nachweis“ einer Phase bedeutet, dass der Betreiber geprüft hat, ob im Journal ein Fortschritt existiert — kein unabhängiges Orakel, keine Foto-Attestierung, kein IoT-Feed. Erfundene Journaleinträge bleiben für Adopter ein reales Restrisiko, bis die Prüfung härter wird.",
+  "p3": "Eine Collection-Authority steuert derzeit Metadaten-Updates, das Minten der Phasen-Belohnungen und die Escrow-Abwicklung. Der „Nachweis“ einer Phase bedeutet, dass der Betreiber geprüft hat, ob im Journal ein Fortschritt existiert — kein unabhängiges Orakel, keine Foto-Attestierung, kein IoT-Feed. Die Markt-Listung verlangt zusätzlich 14 vergangene Tage und Gießen oder Düngen an mindestens der Hälfte dieser Tage, gezählt ab dem Speichern des Logs (nicht nachgetragene Daten). Das blockiert Same-Day-Mint-and-List. Es ist weiterhin kein Orakel, dass eine physische Pflanze existiert. Erfundene Journaleinträge bleiben für Adopter ein Restrisiko, bis die Prüfung härter wird.",
   "span5": "RWA",
   "h23": "Was „adoptieren“ heute bedeutet",
   "p4": "Im Devnet heißt adoptieren: einen Test-RWA halten und dem verknüpften Journal folgen. Es entsteht <strong>kein</strong> übertragbarer Rechtstitel an physischem CBD-Pflanzenmaterial, kein Verwahrrecht und kein garantierter Ernteanteil. Die Einlösung in einen echten Ernteanteil ist in der Architektur-Doku beschrieben, bleibt aber ein <strong>simulierter / geplanter</strong> Weg.",

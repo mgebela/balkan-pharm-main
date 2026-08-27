@@ -17,7 +17,7 @@
   },
   "span4": "TRU",
   "h22": "Trust model (centralized MVP)",
-  "p3": "One collection authority currently controls metadata updates, stage reward minting, and escrow settlement. Stage “proof” means the operator checked that a journal advance exists, not an independent oracle, photo attestation, or IoT feed. Fabricated journal entries are a real residual risk for adopters until verification hardens.",
+  "p3": "One collection authority currently controls metadata updates, stage reward minting, and escrow settlement. Stage “proof” means the operator checked that a journal advance exists, not an independent oracle, photo attestation, or IoT feed. Market listing additionally requires 14 days of elapsed time and watering or feeding on at least half those days, counted from when logs were saved (not backdated dates). That blocks same-day mint-and-list farms. It is still not an independent oracle that a physical plant exists. Fabricated journal entries remain a residual risk for adopters until verification hardens.",
   "span5": "RWA",
   "h23": "What “adopting” means today",
   "p4": "On Devnet, adopting means holding a test RWA and following the linked journal. It does <strong>not</strong> create a transferable legal title to physical CBD plant material, custody rights, or a guaranteed harvest payout. Redemption into a real harvest share is specified in architecture docs but is still a <strong>mock / planned</strong> path.",

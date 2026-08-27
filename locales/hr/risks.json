@@ -17,7 +17,7 @@
   },
   "span4": "POVJ",
   "h22": "Model povjerenja (centralizirani MVP)",
-  "p3": "Jedan autoritet kolekcije trenutno kontrolira izmjene metapodataka, kovanje nagrada za faze i namiru escrowa. „Dokaz” faze znači da je operater provjerio postoji li pomak u dnevniku — ne neovisni orakl, potvrdu fotografije ili IoT signal. Izmišljeni unosi u dnevnik stvaran su preostali rizik za posvojitelje dok se provjera ne pooštri.",
+  "p3": "Jedan autoritet kolekcije trenutno kontrolira izmjene metapodataka, kovanje nagrada za faze i poravnanje escrowa. „Dokaz” faze znači da je operater provjerio postoji li pomak u dnevniku — ne neovisni orakl, potvrdu fotografije ili IoT signal. Objava na Marketu dodatno zahtijeva 14 proteklih dana i zalijevanje ili prihranu na barem pola tih dana, brojeno od trenutka spremanja zapisa (ne datumi unatrag). To blokira kovanje i objavu istog dana. I dalje nije orakl da fizička biljka postoji. Izmišljeni unosi u dnevnik ostaju preostali rizik za posvojitelje dok se provjera ne pooštri.",
   "span5": "RWA",
   "h23": "Što danas znači „posvojiti”",
   "p4": "Na Devnetu posvojiti znači držati testnu RWA imovinu i pratiti povezani dnevnik. To <strong>ne</strong> stvara prenosivo pravno vlasništvo nad fizičkim CBD biljnim materijalom, prava skrbništva ni zajamčenu isplatu berbe. Otkup u stvarni udio u berbi opisan je u arhitekturnoj dokumentaciji, ali je i dalje <strong>simuliran / planiran</strong> put.",

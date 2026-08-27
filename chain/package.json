@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Solana devnet deploy scripts for growtoo ($GROWTOO SPL token + seed NFT collection)",
   "scripts": {
-    "test": "node platform-reward-score.test.js",
+    "test": "node platform-reward-score.test.js && node list-eligibility.test.js",
     "create-keypair": "node create-keypair.js",
     "create-role-keypairs": "node create-role-keypairs.js",
     "airdrop": "node airdrop.js",

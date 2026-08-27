@@ -143,7 +143,7 @@
   },
   "adopter-guide": {
     "h3": "How to adopt a plant",
-    "p": "Open offers are sealed plant tokens with a journal trail behind them.",
+    "p": "Open offers are sealed plant tokens with a two-week care trail — 14 days of watering or feeding, at least half those days logged.",
     "p2": "Phantom or Solflare on Devnet — tap the wallet pill in the header when you are ready to invest.",
     "p3": "Instant sale moves the plant token to you now. Adopt stake: half now, half unlocks as the grower keeps logging care.",
     "p4": "Adopted plants land in this garden. Watch stages and monthly unlock status.",
@@ -978,11 +978,17 @@
     "ctaOpenMarket": "Open market",
     "ctaPostOffer": "Post an offer",
     "ctaSealStage": "Seal a stage on Tokenise",
+    "coverageLow": "Log watering or feeding on at least half the trail ({need} of {elapsed} days). This plant has {have}.",
+    "coverageNeedPlant": "Link this token to a journal plant and keep a care trail before listing.",
+    "coverageNoLogs": "Log watering or feeding over time before listing. A same-day seed mint is not enough.",
+    "coverageRule": "Offers need a journal trail: 14 days since the first watering or feeding log, with care on at least half of those days. Same-day mint-and-list is not enough.",
+    "coverageTooSoon": "Keep logging this plant. Market needs {need} days of journal time (you have {elapsed}). About {wait} more day(s).",
+    "coverageUnavailable": "Journal trail check is unavailable. Refresh and try again.",
     "done": "Done.",
-    "emptyBoardBody": "Seal a plant on Tokenise, then post it here.",
+    "emptyBoardBody": "Seal a plant on Tokenise. List after a 14-day care trail.",
     "emptyBoardLead": "No live offers on the board",
     "emptyMineBody": "Pick a sealed plant above and post your ask.",
-    "emptyMineBodySeal": "Seal a stage on Tokenise first, then list it here.",
+    "emptyMineBodySeal": "Seal a stage on Tokenise first, then list it here after a 14-day care trail.",
     "emptyMineLead": "No offers posted yet",
     "emptyOpenBody": "When a grower posts an ask, it shows up here with Invest. Meanwhile, set up your wallet under My garden.",
     "emptyOpenLead": "No open offers right now",
@@ -996,7 +1002,7 @@
     "growerOnlyHarvest": "Only growers can claim harvest stakes.",
     "growerOnlyPost": "Only grower accounts can post plant offers.",
     "hintAlmost": "Almost there — finish sealing on Tokenise (use Retry if something failed), then come back here.",
-    "hintInstantMode": "You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.",
+    "hintInstantMode": "You’re paid the full asking price at purchase. Eligible plants only — 14 days of care, half those days logged. Posting locks the NFT in the on-chain program vault — the offer then goes live immediately.",
     "hintNothingSealed": "Nothing sealed to list yet. Seal a stage on Tokenise first — then post it here.",
     "hintStakeMode": "Adopter pays the full asking price now. Half reaches you on settle; half unlocks as you keep logging care through harvest.",
     "holdingToken": "Holding token for listing…",
@@ -1090,7 +1096,7 @@
   },
   "market-adopter-guide": {
     "h3": "Adopting on this board",
-    "li": "<strong>Open market</strong> lists live grower asks you can invest in.",
+    "li": "<strong>Open market</strong> lists live grower asks you can invest in. Each listed plant already has a two-week care trail.",
     "li2": "Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.",
     "li3": "<strong>Instant sale</strong>: full price to the grower at purchase. Done.",
     "li4": "<strong>Adopt stake</strong>: half now, half unlocks as the grower keeps logging care.",
@@ -1128,7 +1134,7 @@
     "option2": "Adopt stake"
   },
   "market-stake-hint": {
-    "p": "You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately."
+    "p": "You’re paid the full asking price at purchase. Eligible plants only — 14 days of care, half those days logged. Posting locks the NFT in the on-chain program vault — the offer then goes live immediately."
   },
   "media": {
     "loadError": "Error while loading.",
@@ -1621,6 +1627,8 @@
     "settling": "Settling",
     "signBuy": "Sign buy",
     "sold": "Sold",
+    "cancel": "Cancel",
+    "stakeActiveNftAdopted": "Stake active — NFT adopted.",
     "step": "Step",
     "waitingForNftIn": "Waiting for NFT in escrow…"
   },
@@ -1805,6 +1813,7 @@
     "retrying": "Retrying…",
     "sealAStage": "Seal a stage",
     "listOnMarket": "List on Market",
+    "listNeedsTrail": "Journal trail to list",
     "sealSeedStage": "Seal seed stage · +0 $GROWTOO",
     "sealStage": "Seal stage",
     "sealStageAction": "Seal {stage} stage · +{reward} $GROWTOO",
@@ -2010,7 +2019,7 @@
         "title": "Journal"
       },
       "market_list": {
-        "body": "Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.",
+        "body": "Choose a sealed plant that already has a 14-day care trail, set price and offer type, then post. Your offers appear under My offers.",
         "title": "List an offer"
       },
       "market_nav": {
@@ -2050,7 +2059,7 @@
     },
     "marketGrower": {
       "list_form": {
-        "body": "Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.",
+        "body": "Pick a sealed plant with a 14-day care trail, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.",
         "title": "Post an ask"
       },
       "my_offers": {

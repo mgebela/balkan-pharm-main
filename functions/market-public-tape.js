@@ -27,6 +27,9 @@ function scrubPublicListing(listing) {
   if (!listing || typeof listing !== 'object') return null;
   const status = String(listing.status || '');
   if (!PUBLIC_STATUSES.has(status)) return null;
+  // Hide listings the journal-coverage gate rejected. Missing field = older
+  // listings, left on the board (grandfathered).
+  if (listing.journalCoverageOk === false) return null;
 
   const price = Number(listing.priceGrow);
   if (!Number.isFinite(price) || price <= 0) return null;

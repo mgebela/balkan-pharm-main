@@ -6453,6 +6453,9 @@ function initFirebaseSync() {
       stageDates,
       subphaseHistory,
     };
+    if (prev && prev.createdAt) payload.createdAt = prev.createdAt;
+    else if (!id) payload.createdAt = new Date().toISOString();
+
     let next;
     if (id) {
       next = plants.map((p) => (p.id === id ? payload : p));
@@ -8037,7 +8040,8 @@ function initFirebaseSync() {
     if (blockAdminWrite()) return null;
     const data = getToolboxData();
     if (!data[tool]) data[tool] = [];
-    const item = Object.assign({ id: uuid() }, record || {});
+    const item = Object.assign({ id: uuid(), createdAt: new Date().toISOString() }, record || {});
+    if (!item.createdAt) item.createdAt = new Date().toISOString();
     data[tool].push(item);
     setToolboxData(data);
     mirrorToolboxItemToJournal(tool, item);

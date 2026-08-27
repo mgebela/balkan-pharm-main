@@ -37,6 +37,7 @@ import { notifyUser } from './notify-user.js';
 
 const require = createRequire(import.meta.url);
 const { claimPaymentSignature } = require('../functions/used-payment-signatures.js');
+const { evaluateListEligibility, snapshot } = require('../functions/list-eligibility.js');
 
 const db = initFirestore();
 /** Unpaid invest reservations older than this are released back to active. */
@@ -73,6 +74,28 @@ if (ESCROW !== EXPECTED_ESCROW) {
     `Escrow key ${ESCROW} does not match deployed.escrowAddress ${EXPECTED_ESCROW}. Refusing to settle.`
   );
   process.exit(1);
+}
+
+async function loadGrowerAppState(uid) {
+  if (!uid) return { plants: [], entries: [], toolbox: {} };
+  const snap = await db.collection('users').doc(uid).collection('app').doc('state').get();
+  if (!snap.exists) return { plants: [], entries: [], toolbox: {} };
+  const data = snap.data() || {};
+  return {
+    plants: Array.isArray(data.plants) ? data.plants : [],
+    entries: Array.isArray(data.entries) ? data.entries : [],
+    toolbox: data.toolbox && typeof data.toolbox === 'object' ? data.toolbox : {},
+  };
+}
+
+async function assertJournalCoverage(data) {
+  const state = await loadGrowerAppState(data.uid);
+  const result = evaluateListEligibility(state, data.plantId);
+  if (result.ok) return result;
+  const err = new Error(result.error || 'Journal trail is not ready to list.');
+  err.code = result.code;
+  err.coverage = snapshot(result);
+  throw err;
 }
 
 async function walletHoldsNft(ownerAddress, mintAddress) {
@@ -277,12 +300,30 @@ async function processEscrowPending(doc) {
       console.log(`… ${label}: escrow does not hold the NFT yet, skipping`);
       return;
     }
-    await doc.ref.update({
-      status: 'active',
-      activatedAt: new Date().toISOString(),
-      activatedBy: workerId(),
-      error: FieldValue.delete(),
-    });
+    try {
+      const coverage = await assertJournalCoverage(data);
+      await doc.ref.update({
+        status: 'active',
+        activatedAt: new Date().toISOString(),
+        activatedBy: workerId(),
+        journalCoverageOk: true,
+        journalCoverage: snapshot(coverage),
+        error: FieldValue.delete(),
+        lastError: FieldValue.delete(),
+      });
+    } catch (coverErr) {
+      if (coverErr && coverErr.code) {
+        await doc.ref.update({
+          journalCoverageOk: false,
+          journalCoverage: coverErr.coverage || null,
+          lastError: String(coverErr.message || coverErr).slice(0, 240),
+          lastErrorAt: new Date().toISOString(),
+        });
+        console.log(`… ${label}: journal coverage not met, leaving pending`);
+        return;
+      }
+      throw coverErr;
+    }
     console.log(`✔ ${label}: NFT in escrow, listing is live`);
   } catch (err) {
     await fail(doc, label, err);

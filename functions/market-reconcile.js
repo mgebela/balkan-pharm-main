@@ -6,6 +6,7 @@
  * Rotates across public Devnet endpoints; prefer SOLANA_RPC_URL when set.
  */
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
+const {evaluateListEligibility, snapshot} = require('./list-eligibility');
 
 const ESCROW_ADDRESS =
   process.env.MARKET_ESCROW_ADDRESS ||
@@ -85,6 +86,18 @@ async function rpc(method, params) {
   throw lastErr || new Error('All Solana RPC endpoints failed for ' + method);
 }
 
+async function loadGrowerAppState(db, uid) {
+  if (!uid) return {plants: [], entries: [], toolbox: {}};
+  const snap = await db.collection('users').doc(uid).collection('app').doc('state').get();
+  if (!snap.exists) return {plants: [], entries: [], toolbox: {}};
+  const data = snap.data() || {};
+  return {
+    plants: Array.isArray(data.plants) ? data.plants : [],
+    entries: Array.isArray(data.entries) ? data.entries : [],
+    toolbox: data.toolbox && typeof data.toolbox === 'object' ? data.toolbox : {},
+  };
+}
+
 async function escrowHoldsNft(mintAddress) {
   const owners = [ESCROW_ADDRESS];
   if (LEGACY_ESCROW_ADDRESS && LEGACY_ESCROW_ADDRESS !== ESCROW_ADDRESS) {
@@ -158,10 +171,27 @@ async function reconcileEscrowPending() {
 
       const held = await escrowHoldsNft(data.mintAddress);
       if (held) {
+        const coverage = evaluateListEligibility(
+            await loadGrowerAppState(db, data.uid),
+            data.plantId,
+        );
+        if (!coverage.ok) {
+          await doc.ref.update({
+            journalCoverageOk: false,
+            journalCoverage: snapshot(coverage),
+            lastError: String(coverage.error || coverage.code).slice(0, 240),
+            lastErrorAt: new Date().toISOString(),
+          });
+          result.skipped += 1;
+          console.log('coverage-wait', label, doc.id, coverage.code);
+          continue;
+        }
         await doc.ref.update({
           status: 'active',
           activatedAt: new Date().toISOString(),
           activatedBy: 'reconcileMarketEscrow',
+          journalCoverageOk: true,
+          journalCoverage: snapshot(coverage),
           error: FieldValue.delete(),
           lastError: FieldValue.delete(),
         });

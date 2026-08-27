@@ -2598,14 +2598,32 @@
   /** Desk-pass gap: after a seal, listing lives on the other pane. */
   function listMarketButtonHtml(token) {
     if (isAdopterUi() || token.adopted) return '';
-    if (!window.Market || typeof Market.listableMintForToken !== 'function') return '';
-    const mint = Market.listableMintForToken(token.id);
-    if (!mint) return '';
+    if (!window.Market) return '';
+    const listable =
+      typeof Market.listableMintForToken === 'function' ? Market.listableMintForToken(token.id) : '';
+    if (listable) {
+      return (
+        '<button type="button" class="btn btn-secondary btn-sm adopt-list-market-btn" data-mint="' +
+        esc(listable) +
+        '">' +
+        esc(T('app.token.listOnMarket', 'List on Market')) +
+        '</button>'
+      );
+    }
+    const minted =
+      typeof Market.mintedMintForToken === 'function' ? Market.mintedMintForToken(token.id) : '';
+    if (!minted) return '';
+    const cover =
+      typeof Market.coverageForPlant === 'function' ? Market.coverageForPlant(token.plantId) : null;
+    const why =
+      cover && typeof Market.coverageMessage === 'function'
+        ? Market.coverageMessage(cover)
+        : T('app.token.listNeedsTrail', 'Keep a journal trail before listing.');
     return (
-      '<button type="button" class="btn btn-secondary btn-sm adopt-list-market-btn" data-mint="' +
-      esc(mint) +
+      '<button type="button" class="btn btn-ghost btn-sm adopt-list-market-btn is-locked" disabled title="' +
+      esc(why) +
       '">' +
-      esc(T('app.token.listOnMarket', 'List on Market')) +
+      esc(T('app.token.listNeedsTrail', 'Journal trail to list')) +
       '</button>'
     );
   }

@@ -261,7 +261,7 @@
           view: 'market',
           selectors: ['#market-list-section', '#market-mine-grid', '#market-grid'],
           title: T('app.tour.growerFull.market_list.title', 'List an offer'),
-          body: T('app.tour.growerFull.market_list.body', 'Choose the sealed plant, set price and offer type, then post. Your offers appear under My offers.'),
+          body: T('app.tour.growerFull.market_list.body', 'Choose a sealed plant that already has a 14-day care trail, set price and offer type, then post. Your offers appear under My offers.'),
         }
       );
     } else {
@@ -381,7 +381,7 @@
         view: 'market',
         selectors: ['#market-list-section', '#market-list-form'],
         title: T('app.tour.marketGrower.list_form.title', 'Post an ask'),
-        body: T('app.tour.marketGrower.list_form.body', 'Pick a sealed plant, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.'),
+        body: T('app.tour.marketGrower.list_form.body', 'Pick a sealed plant with a 14-day care trail, choose Instant sale or Adopt stake, set the $GROWTOO price, then post.'),
       },
       {
         id: 'offer-type',

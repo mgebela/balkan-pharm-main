@@ -38,7 +38,7 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/i18n.js?v=20260819i" data-i18n-ns="common,landing"></script>
+  <script src="js/i18n.js?v=20260825b" data-i18n-ns="common,landing"></script>
   <link rel="stylesheet" href="styles/tokens.css?v=20260817v" />
   <link rel="stylesheet" href="styles/landing.css?v=20260818a" />
   <link rel="stylesheet" href="styles/trust-gates.css?v=20260820a" />
@@ -249,7 +249,7 @@
           <span class="desk-tag desk-tag--verify" data-i18n="common.footer.how">How it works</span>
           <h2 data-i18n="landing.proof.title">Log it. Prove it. Keep going.</h2>
           <p class="section-lead" data-i18n="landing.proof.lead">
-            The journal keeps the run findable. Minting a checkable trail is optional — only when you want it.
+            The journal keeps the run findable. Minting a checkable trail is optional. Listing on Market waits for a two-week care trail.
           </p>
         </div>
 
@@ -300,8 +300,8 @@
             <span class="proof-num" aria-hidden="true">03</span>
             <h3 data-i18n="landing.proof.step3Title">Keep going.</h3>
             <p data-i18n="landing.proof.step3Body">
-              Your care log stays with the plant. Later, others can follow that same trail —
-              once there’s real grower supply to back.
+              Your care log stays with the plant. Market listing needs 14 days since the first watering or feeding log,
+              with care on at least half those days. Then others can follow that same trail.
             </p>
           </li>
         </ol>
@@ -463,7 +463,8 @@
           <h2 data-i18n="landing.adopters.title">Own the story of a real plant.</h2>
           <p data-i18n="landing.adopters.body1">
             This isn’t a trading terminal. It’s a low-barrier way to back a grow you can actually watch:
-            care logs, stage changes, and checkable updates tied to one plant’s life.
+            care logs, stage changes, and checkable updates tied to one plant’s life. Listed plants already have a
+            two-week care trail — not a same-day mint.
           </p>
           <p data-i18n="landing.adopters.body2">
             If you’re curious about real-world assets (RWAs: tokens tied to something physical, here a plant)
@@ -493,7 +494,7 @@
               </span>
               <div>
                 <h3 data-i18n="landing.adopters.spec1Title">Plant story</h3>
-                <p data-i18n="landing.adopters.spec1Body">Seed to harvest, with dates you can read.</p>
+                <p data-i18n="landing.adopters.spec1Body">Seed to harvest, with dates you can read. Listed plants already have 14 days of logged care.</p>
               </div>
             </div>
             <div class="desk-spec">
@@ -527,6 +528,7 @@
           <h2 data-i18n="landing.stakes.title">Live stakes, when you’re ready</h2>
           <p class="section-lead" data-i18n="landing.stakes.lead">
             After the journal, adopters can back open grower asks on Solana’s public test network (Devnet).
+            Each listed plant has 14 days of watering or feeding logs, with care on at least half those days.
             Test assets only — $GROWTOO has no monetary value.
           </p>
         </div>
@@ -634,8 +636,10 @@
           <details class="faq-item">
             <summary data-i18n="landing.faq.q3">Who verifies that a journal entry is real, not fabricated?</summary>
             <p data-i18n-html="landing.faq.a3">
-              Today, the platform operator reviews journal progress before minting. The live-network roadmap
-              moves this toward stronger attestations so no single party has to be trusted forever.
+              Today, the platform operator reviews journal progress before minting. Market listing is a separate gate:
+              14 days since the first watering or feeding log was saved, with care on at least half those days —
+              backdated dates do not count. That is process evidence, not proof a physical plant exists.
+              The live-network roadmap moves this toward stronger attestations so no single party has to be trusted forever.
               Details live in the <a href="rwa-docs/">trust model docs</a>.
             </p>
           </details>
@@ -679,6 +683,15 @@
               <a href="rwa-docs/">docs</a>. We publish milestones, not a vague “soon.”
             </p>
           </details>
+          <details class="faq-item">
+            <summary data-i18n="landing.faq.q9">Can I mint a plant and list it on Market the same day?</summary>
+            <p data-i18n="landing.faq.a9">
+              You can seal a stage when the journal is ready. Posting to Market needs 14 days since the first
+              watering or feeding log was saved, with care on at least half those days. Same-day mint-and-list
+              is blocked. Backdated journal dates do not count. This is process evidence, not proof a physical
+              plant exists.
+            </p>
+          </details>
         </div>
       </div>
     </section>
@@ -687,7 +700,7 @@
       <div class="container close-block">
         <h2 data-i18n="landing.close.title">Grow it again. The journal keeps it.</h2>
         <p data-i18n="landing.close.body">
-          The journal is the trail. Coach and reminders sit on it. Minting, trading, and adopting are optional.
+          The journal is the trail. Coach and reminders sit on it. Minting is optional. Listing on Market needs 14 days of care.
         </p>
         <div class="close-cta-row">
           <a href="dnevnik/?mode=signup&type=grower" class="btn btn-primary" data-i18n="common.cta.startGrow">Start a grow</a>

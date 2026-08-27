@@ -150,7 +150,9 @@
         steps: steps,
         currentIndex: 3,
         tone: 'ok',
-        caption: L.settlement === 'adopt_stake' ? 'Stake active — NFT adopted.' : 'NFT is in your wallet.',
+        caption: L.settlement === 'adopt_stake'
+          ? T('app.statusRail.stakeActiveNftAdopted', 'Stake active — NFT adopted.')
+          : T('app.statusRail.nftIsInYour', 'NFT is in your wallet.'),
       });
     }
     if (status === 'sale_pending') {
@@ -244,7 +246,7 @@
     const steps = [
       { key: 'escrow', label: T('app.statusRail.escrow', 'Escrow') },
       { key: 'live', label: T('app.statusRail.live', 'Live') },
-      { key: 'end', label: status === 'cancelled' || status === 'cancel_requested' ? 'Cancel' : 'Sold' },
+      { key: 'end', label: status === 'cancelled' || status === 'cancel_requested' ? T('app.statusRail.cancel', 'Cancel') : T('app.statusRail.sold', 'Sold') },
     ];
     const err = String(L.error || L.lastError || '').trim();
 

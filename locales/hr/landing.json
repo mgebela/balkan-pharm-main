@@ -19,7 +19,7 @@
   "proof": {
     "tag": "Kako radi",
     "title": "Zapiši. Dokaži. Nastavi.",
-    "lead": "Dnevnik čuva cijeli ciklus tako da ga poslije možeš pronaći. Kovanje provjerljivog traga je izborno — samo kad ti zatreba.",
+    "lead": "Dnevnik čuva cijeli ciklus tako da ga poslije možeš pronaći. Kovanje provjerljivog traga je izborno. Objava na Marketu čeka dvotjedni trag njege.",
     "clip1Label": "Zapis njege",
     "clip1Button": "Zapiši zalijevanje",
     "clip1Log": "<span class=\"clip-check\">✓</span> Zalijevanje · upravo sad",
@@ -39,7 +39,7 @@
     "clip3Mint": "Isti dokaz zauvijek",
     "clip3Caption": "Tvoja dokumentacija postaje vrijednost.",
     "step3Title": "Nastavi.",
-    "step3Body": "Zapis njege ostaje uz biljku. Poslije i drugi mogu pratiti isti trag — kad bude stvarne ponude uzgajivača koju se može poduprijeti."
+    "step3Body": "Zapis njege ostaje uz biljku. Objava na Marketu treba 14 dana od prvog zapisa zalijevanja ili prihrane, uz njegu na barem pola tih dana. Onda i drugi mogu pratiti isti trag."
   },
   "trail": {
     "tag": "Provjerljive biljke",
@@ -93,7 +93,7 @@
     "photoCaption": "Gledaj uzgoj. Provjeri trag. Bez obećanja prinosa.",
     "tag": "Za pratitelje biljaka",
     "title": "Posvoji priču prave biljke.",
-    "body1": "Ovo nije burzovni terminal. Ovo je jednostavan način da podupreš uzgoj koji stvarno možeš pratiti: zapisi njege, promjene faza i provjerljive nadopune vezane uz život jedne biljke.",
+    "body1": "Ovo nije burzovni terminal. Ovo je jednostavan način da podupreš uzgoj koji stvarno možeš pratiti: zapisi njege, promjene faza i provjerljive nadopune vezane uz život jedne biljke. Objavljene biljke već imaju dvotjedni trag njege — ne kovanje istog dana.",
     "body2": "Ako te zanima stvarna imovina na lancu (RWA: tokeni vezani uz nešto fizičko, ovdje uz biljku) i želiš nešto opipljivo — a ne još jedan fond u omotu — kreni od traga dokaza. Imovina na testnoj mreži nema novčanu vrijednost; služi da naučiš kako povjerenje teče prije nego što ulozi postanu stvarni.",
     "bullet1": "„Mogu gledati kako ova biljka raste” jače je od obećanja prinosa",
     "bullet2": "Otvori unos u dnevniku i transakciju sam",
@@ -102,7 +102,7 @@
     "panelBar": "Što pratiš",
     "panelMeta": "Jedna biljka",
     "spec1Title": "Priča biljke",
-    "spec1Body": "Od sjemena do berbe, s datumima koje možeš pročitati.",
+    "spec1Body": "Od sjemena do berbe, s datumima koje možeš pročitati. Objavljene biljke već imaju 14 dana zapisane njege.",
     "spec2Title": "Provjerljiv dokaz",
     "spec2Body": "Linkovi na explorer čim se faza iskuje.",
     "spec3Title": "Rani pristup",
@@ -111,7 +111,7 @@
   "stakes": {
     "tag": "Izborno · testna mreža",
     "title": "Ulozi uživo, kad budeš spreman",
-    "lead": "Nakon dnevnika, posvojitelji mogu poduprijeti otvorene zahtjeve uzgajivača na Solaninoj javnoj testnoj mreži (Devnet). Samo testna imovina — $GROWTOO nema novčanu vrijednost.",
+    "lead": "Nakon dnevnika, posvojitelji mogu poduprijeti otvorene zahtjeve uzgajivača na Solaninoj javnoj testnoj mreži (Devnet). Svaka objavljena biljka ima 14 dana zapisa zalijevanja ili prihrane, uz njegu na barem pola tih dana. Samo testna imovina — $GROWTOO nema novčanu vrijednost.",
     "openLabel": "Dostupni ulozi",
     "openAria": "Dostupni ulozi",
     "openMeta": "Dohvaćam aktualne ponude…",
@@ -144,7 +144,7 @@
     "q2": "Je li ovo samo za licencirane komercijalne uzgajivače?",
     "a2": "Ne. growtoo je za uzgajivače kanabisa (jedna biljka, njih nekoliko ili cijela soba), uključujući mjesta gdje se pravila uzgoja otvaraju. Uvijek poštuj zakon ondje gdje uzgajaš; growtoo je alat za dokumentaciju, a ne pravni savjet.",
     "q3": "Tko provjerava da je unos u dnevnik stvaran, a ne izmišljen?",
-    "a3": "Danas operater platforme pregledava napredak u dnevniku prije kovanja. Plan za živu mrežu to pomiče prema jačim potvrdama, da se ne mora zauvijek vjerovati jednoj strani. Detalji su u <a href=\"rwa-docs/\">dokumentaciji modela povjerenja</a>.",
+    "a3": "Danas operater platforme pregledava napredak u dnevniku prije kovanja. Objava na Marketu je zaseban filter: 14 dana od prvog spremljenog zapisa zalijevanja ili prihrane, uz njegu na barem pola tih dana — unatrag upisani datumi ne broje se. To je dokaz procesa, ne dokaz da fizička biljka postoji. Plan za živu mrežu to pomiče prema jačim potvrdama, da se ne mora zauvijek vjerovati jednoj strani. Detalji su u <a href=\"rwa-docs/\">dokumentaciji modela povjerenja</a>.",
     "q4": "Je li ovo legalno? Što se događa sa stvarnom berbom?",
     "a4": "Otkup pretvara token u fazi berbe u njegov stvarni ekvivalent, u skladu s propisima u uzgajivačevoj jurisdikciji. Danas je otkup specificiran, ali još simuliran na testnoj mreži — nije živi lanac isporuke. Pročitaj <a href=\"risks/\">Rizike i opseg</a> za poštene granice.",
     "q5": "Zašto graditi na testnoj mreži umjesto odmah krenuti s pravim novcem?",
@@ -154,17 +154,19 @@
     "q7": "Što će biti s mojim $GROWTOO kad krene živa mreža?",
     "a7": "$GROWTOO s testne mreže služi za vježbanje toka i ne treba ga smatrati prenosivim novčanim saldom. Priznanje ranim uzgajivačima (bedž Founding Grower) namjeravamo prenijeti dalje; točna pravila migracije objavit ćemo prije pokretanja.",
     "q8": "Kad kreće živa mreža?",
-    "a8": "Ciljamo nakon što isporučimo tok otkupa berbe (prekretnica M5 u dokumentaciji). Pogledaj arhitekturne bilješke u našoj <a href=\"rwa-docs/\">dokumentaciji</a>. Objavljujemo prekretnice, ne maglovito „uskoro”."
+    "a8": "Ciljamo nakon što isporučimo tok otkupa berbe (prekretnica M5 u dokumentaciji). Pogledaj arhitekturne bilješke u našoj <a href=\"rwa-docs/\">dokumentaciji</a>. Objavljujemo prekretnice, ne maglovito „uskoro”.",
+    "q9": "Mogu li kovati biljku i objaviti je na Marketu isti dan?",
+    "a9": "Fazu možeš zapečatiti čim je dnevnik spreman. Objava na Marketu treba 14 dana od prvog spremljenog zapisa zalijevanja ili prihrane, uz njegu na barem pola tih dana. Kovanje i objava istog dana su blokirani. Datumi unatrag u dnevniku ne broje se. To je dokaz procesa, ne dokaz da fizička biljka postoji."
   },
   "close": {
     "title": "Uzgoji ponovno. Dnevnik to čuva.",
-    "body": "Dnevnik je trag. Savjetnik i podsjetnici stoje na njemu. Kovanje, trgovanje i posvajanje su izborni.",
+    "body": "Dnevnik je trag. Savjetnik i podsjetnici stoje na njemu. Kovanje je izborno. Objava na Marketu treba 14 dana njege.",
     "signin": "Već imaš račun? <a href=\"dnevnik/\">Prijavi se</a>"
   },
   "board": {
     "statusOpen": "Otvoreno",
     "statusActivating": "Aktiviram",
-    "statusSettling": "Namirujem",
+    "statusSettling": "Poravnavam",
     "devnetRwa": "Devnet RWA",
     "sample": "Uzorak",
     "demo": "DEMO",
@@ -178,7 +180,7 @@
     "openAsk": "Otvorena ponuda",
     "listCta": "Objavi →",
     "adoptCta": "Posvoji →",
-    "noStakes": "Još nema namirenih uloga. Kad posvojitelji podupru biljku, ovdje se pojavljuju stupci.",
+    "noStakes": "Još nema poravnatih uloga. Kad posvojitelji podupru biljku, ovdje se pojavljuju stupci.",
     "stake": "Ulog",
     "sampleDepth": "Uzorak dubine · nisu aktualne ponude",
     "clear": "Ploča je prazna",
@@ -187,8 +189,8 @@
     "lastPrintNet": "Zadnji ispis {time} · testna mreža",
     "headlinePreview": "Ovako će izgledati trgovanje",
     "headlineLive": "Aktualni ugovori pravih uzgajivača",
-    "leadPreview": "Ploča se zagrijava — prvi ugovori se upravo postavljaju. Ovo je pretpregled kako će se Seed i Growth RWA-ovi trgovati kad krene.",
-    "leadLive": "Otvoreni Seed i growth ugovori — cijene postavlja prodavatelj u $GROWTOO, namira ide kroz Market escrow.",
+    "leadPreview": "Ploča se zagrijava — prvi ugovori se upravo postavljaju. Ovo je pretpregled kako će se Seed i Growth RWA-ovi trgovati kad krene. Objavljene biljke prvo trebaju 14 dana zapisa zalijevanja ili prihrane.",
+    "leadLive": "Otvoreni Seed i growth ugovori s 14-dnevnim tragom njege — cijene postavlja prodavatelj u $GROWTOO, poravnanje ide kroz Market escrow.",
     "offline": "Feed je nedostupan · prikazujem uzorak",
     "unavailable": "Market je trenutno nedostupan.",
     "loadFailed": "Nije moguće učitati ponude na Marketu. Pokušaj poslije.",

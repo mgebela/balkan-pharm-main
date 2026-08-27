@@ -26,7 +26,7 @@
   "li9": "<strong>$GROWTOO</strong> — fungible SPL reward token (9 decimals). Minted as plants advance stages; used as marketplace currency on Devnet.",
   "li10": "<strong>Mint queue</strong> — mint/settlement requests in Firestore; an authority worker executes them on Devnet. Stand-in for future on-chain programs.",
   "h32": "Trust model (Devnet MVP)",
-  "p4": "On Devnet, one collection authority also controls metadata updates, $GROWTOO minting, and marketplace hold/release. Stage updates only run after matching journal progress exists. Mainnet aims to replace the queue with an on-chain escrow program and stronger attestations — see <a href=\"../risks/\">Risks</a>.",
+  "p4": "On Devnet, one collection authority also controls metadata updates, $GROWTOO minting, and marketplace hold/release. Stage updates only run after matching journal progress exists. Market listing is a further gate: 14 days since the first watering or feeding log was saved, with care on at least half those days (backdated journal dates do not count). That is process evidence, not proof a physical plant exists. Mainnet aims to replace the queue with an on-chain escrow program and stronger attestations — see <a href=\"../risks/\">Risks</a>.",
   "standards": {
     "h2": "2. Token standards"
   },
@@ -56,10 +56,11 @@
   "marketplace": {
     "h2": "4. Marketplace (Devnet MVP)"
   },
+  "li15b": "<strong>Eligibility:</strong> listing is allowed only after 14 days since the first watering or feeding log was saved, with care on at least half those days. Same-day mint-and-list is blocked. Backdated journal dates do not count.",
   "li16": "<strong>List:</strong> seller moves the NFT into a marketplace hold; listing goes live with a $GROWTOO ask.",
   "li17": "<strong>Invest:</strong> buyer pays $GROWTOO (instant sale or adopt-stake split).",
   "li18": "<strong>Settle:</strong> payment is confirmed; the plant token is released to the buyer. Sellers can cancel live listings.",
-  "p7": "Instant sale pays the full ask on buy. Adopt stake locks half until monthly care qualifies at harvest (all-or-nothing). Devnet settlement is operator-assisted; mainnet targets a fully on-chain program.",
+  "p7": "The coverage check uses wall-clock <code>createdAt</code> on watering and feeding logs, not the journal date field — a same-session dump of backdated days counts as one care day. Instant sale pays the full ask on buy. Adopt stake locks half until monthly care qualifies at harvest (all-or-nothing). Devnet settlement is operator-assisted; mainnet targets a fully on-chain program.",
   "redemption": {
     "h2": "5. Redemption (planned)"
   },

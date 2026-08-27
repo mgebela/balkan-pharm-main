@@ -57,7 +57,7 @@
       });
     };
   </script>
-  <script src="../js/i18n.js?v=20260819j" data-i18n-ns="common,app" data-i18n-reload></script>
+  <script src="../js/i18n.js?v=20260825b" data-i18n-ns="common,app" data-i18n-reload></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260817v" />
   <link rel="stylesheet" href="styles/app.css?v=20260819j" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260820a" />
@@ -520,7 +520,7 @@
               <span class="adopter-guide-num">1</span>
               <div>
                 <strong data-i18n="app.adopter-guide.strong">Browse the market</strong>
-                <p data-i18n="app.adopter-guide.p">Open offers are sealed plant tokens with a journal trail behind them.</p>
+                <p data-i18n="app.adopter-guide.p">Open offers are sealed plant tokens with a two-week care trail — 14 days of watering or feeding, at least half those days logged.</p>
               </div>
             </li>
             <li>
@@ -625,7 +625,7 @@
         <section class="adopter-guide adopter-only" id="market-adopter-guide" aria-label="Adopter market guide">
           <h3 data-i18n="app.market-adopter-guide.h3" class="adopter-guide-title">Adopting on this board</h3>
           <ul class="adopter-guide-bullets">
-            <li data-i18n-html="app.market-adopter-guide.li"><strong>Open market</strong> lists live grower asks you can invest in.</li>
+            <li data-i18n-html="app.market-adopter-guide.li"><strong>Open market</strong> lists live grower asks you can invest in. Each listed plant already has a two-week care trail.</li>
             <li data-i18n-html="app.market-adopter-guide.li2">Tap <strong>Invest</strong> on a card — connect wallet if prompted, then confirm the $GROWTOO spend.</li>
             <li data-i18n-html="app.market-adopter-guide.li3"><strong>Instant sale</strong>: full price to the grower at purchase. Done.</li>
             <li data-i18n-html="app.market-adopter-guide.li4"><strong>Adopt stake</strong>: half now, half unlocks as the grower keeps logging care.</li>
@@ -647,6 +647,9 @@
             <select id="market-asset-select" class="seal-stage-select" required>
               <option data-i18n="app.market-asset-select.option" value="">Choose a sealed plant</option>
             </select>
+            <p data-i18n="app.market.coverageRule" class="market-hint" id="market-coverage-rule">
+              Offers need a journal trail: 14 days since the first watering or feeding log, with care on at least half of those days. Same-day mint-and-list is not enough.
+            </p>
             <div class="market-empty-cta grower-only" id="market-empty-cta" hidden>
               <p class="market-hint" id="market-list-hint" hidden></p>
               <button data-i18n="app.market-go-tokenise.button" type="button" class="btn btn-secondary btn-tap" id="market-go-tokenise" hidden>
@@ -674,7 +677,7 @@
               </select>
             </fieldset>
             <p data-i18n="app.market-stake-hint.p" class="market-offer-helper" id="market-stake-hint" data-mode="instant" aria-live="polite">
-              You’re paid the full asking price at purchase. Posting locks the NFT in the on-chain program vault — the offer goes live immediately.
+              You’re paid the full asking price at purchase. Eligible plants only — 14 days of care, half those days logged. Posting locks the NFT in the on-chain program vault — the offer then goes live immediately.
             </p>
 
             <label data-i18n="app.market-list-form.label2" class="seal-stage-label" for="market-price-input">Asking price</label>
@@ -1390,20 +1393,21 @@
   <script src="js/seed-chain.js?v=20260818b"></script>
   <script src="js/spl-transfer.js?v=20260817a"></script>
   <script src="js/escrow-program.js?v=20260817a"></script>
-  <script src="js/status-rail.js?v=20260817a"></script>
+  <script src="js/status-rail.js?v=20260825b"></script>
   <script src="js/plain-lang.js?v=20260817b"></script>
+  <script src="js/list-eligibility.js?v=20260828a"></script>
   <script src="js/sheet-drag.js?v=20260802a"></script>
   <script src="js/app-confirm.js?v=20260819h"></script>
   <script src="js/plant-stacks.js?v=20260817a"></script>
   <script src="js/journal-calendar.js?v=20260819i"></script>
-  <script src="js/market.js?v=20260819d"></script>
+  <script src="js/market.js?v=20260828a"></script>
   <script src="js/metric-ui.js?v=20260729e"></script>
   <script src="js/token-botanical-art.js?v=20260817a"></script>
   <script src="js/plant-botanical-sprites.js?v=20260730d"></script>
   <script src="js/grower-quests.js?v=20260817a"></script>
   <script src="js/notifications.js?v=20260818a"></script>
   <script src="js/signup.js?v=20260817a"></script>
-  <script src="js/plant-token.js?v=20260819g"></script>
+  <script src="js/plant-token.js?v=20260828a"></script>
   <script src="js/daily-status.js?v=20260819g"></script>
   <script src="js/product-tour.js?v=20260819j"></script>
   <script src="js/coach-core.js?v=20260817a"></script>
@@ -1413,7 +1417,7 @@
   <script src="js/ai-coach.js?v=20260819a"></script>
   <script src="js/grower-blog.js?v=20260819h"></script>
   <script src="js/theme.js?v=20260819e" defer></script>
-  <script src="js/app.js?v=20260819j"></script>
+  <script src="js/app.js?v=20260828a"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

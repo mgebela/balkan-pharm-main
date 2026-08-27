@@ -19,7 +19,7 @@
   "proof": {
     "tag": "So funktioniert’s",
     "title": "Notieren. Nachweisen. Weitermachen.",
-    "lead": "Das Journal hält den Durchlauf auffindbar. Einen prüfbaren Nachweis zu minten ist optional — nur wenn du ihn willst.",
+    "lead": "Das Journal hält den Durchlauf auffindbar. Einen prüfbaren Nachweis zu minten ist optional. Die Markt-Listung wartet auf eine zweiwöchige Pflegespur.",
     "clip1Label": "Pflegeprotokoll",
     "clip1Button": "Gießen notieren",
     "clip1Log": "<span class=\"clip-check\">✓</span> Gießen · gerade eben",
@@ -39,7 +39,7 @@
     "clip3Mint": "Derselbe Beleg, dauerhaft",
     "clip3Caption": "Deine Dokumentation wird zum Wert.",
     "step3Title": "Weitermachen.",
-    "step3Body": "Dein Pflegeprotokoll bleibt bei der Pflanze. Später können andere derselben Spur folgen — sobald es echtes Grower-Angebot zu unterstützen gibt."
+    "step3Body": "Dein Pflegeprotokoll bleibt bei der Pflanze. Die Markt-Listung braucht 14 Tage seit dem ersten Gieß- oder Dünge-Log, mit Pflege an mindestens der Hälfte dieser Tage. Danach können andere derselben Spur folgen."
   },
   "trail": {
     "tag": "Prüfbare Pflanzen",
@@ -93,7 +93,7 @@
     "photoCaption": "Sieh dem Grow zu. Prüf die Spur. Ganz ohne Renditeversprechen.",
     "tag": "Für Pflanzen-Follower",
     "title": "Übernimm die Geschichte einer echten Pflanze.",
-    "body1": "Das hier ist kein Trading-Terminal. Es ist ein niedrigschwelliger Weg, einen Grow zu unterstützen, den du wirklich mitverfolgen kannst: Pflegeprotokolle, Phasenwechsel und prüfbare Updates aus dem Leben einer einzelnen Pflanze.",
+    "body1": "Das hier ist kein Trading-Terminal. Es ist ein niedrigschwelliger Weg, einen Grow zu unterstützen, den du wirklich mitverfolgen kannst: Pflegeprotokolle, Phasenwechsel und prüfbare Updates aus dem Leben einer einzelnen Pflanze. Gelistete Pflanzen haben schon eine zweiwöchige Pflegespur — kein Mint am selben Tag.",
     "body2": "Wenn dich Real-World Assets interessieren (RWAs: Token, die an etwas Physisches gebunden sind, hier an eine Pflanze) und du etwas Greifbares willst — keinen weiteren Fondsmantel — dann fang bei der Belegspur an. Testnetz-Werte haben keinen Geldwert; nutze sie, um den Vertrauensablauf zu lernen, bevor es um echte Einsätze geht.",
     "bullet1": "„Ich kann dieser Pflanze beim Wachsen zusehen“ schlägt jedes Renditeversprechen",
     "bullet2": "Öffne den Journaleintrag und die Transaktion selbst",
@@ -102,7 +102,7 @@
     "panelBar": "Dem folgst du",
     "panelMeta": "Eine Pflanze",
     "spec1Title": "Pflanzengeschichte",
-    "spec1Body": "Vom Samen bis zur Ernte, mit lesbaren Daten.",
+    "spec1Body": "Vom Samen bis zur Ernte, mit lesbaren Daten. Gelistete Pflanzen haben schon 14 Tage dokumentierter Pflege.",
     "spec2Title": "Prüfbarer Nachweis",
     "spec2Body": "Explorer-Links, sobald eine Phase gemintet wird.",
     "spec3Title": "Früher Zugang",
@@ -111,7 +111,7 @@
   "stakes": {
     "tag": "Optional · Testnetz",
     "title": "Echte Einsätze, wenn du so weit bist",
-    "lead": "Nach dem Journal können Adopter offene Grower-Anfragen im öffentlichen Testnetz von Solana (Devnet) unterstützen. Nur Testwerte — $GROWTOO hat keinen Geldwert.",
+    "lead": "Nach dem Journal können Adopter offene Grower-Anfragen im öffentlichen Testnetz von Solana (Devnet) unterstützen. Jede gelistete Pflanze hat 14 Tage Gieß- oder Dünge-Logs, mit Pflege an mindestens der Hälfte dieser Tage. Nur Testwerte — $GROWTOO hat keinen Geldwert.",
     "openLabel": "Verfügbare Einsätze",
     "openAria": "Verfügbare Einsätze",
     "openMeta": "Aktuelle Angebote werden geladen…",
@@ -144,7 +144,7 @@
     "q2": "Ist das nur für lizenzierte gewerbliche Grower?",
     "a2": "Nein. growtoo ist für Cannabis-Grower (eine Pflanze, ein paar, oder ein ganzer Raum), auch dort, wo sich die Anbauregeln gerade öffnen. Halte dich immer an das Recht an deinem Ort; growtoo ist ein Dokumentationswerkzeug, keine Rechtsberatung.",
     "q3": "Wer prüft, ob ein Journaleintrag echt und nicht erfunden ist?",
-    "a3": "Heute prüft der Plattformbetreiber den Journalfortschritt vor dem Minten. Die Roadmap fürs Live-Netz führt das zu stärkeren Attestierungen, damit niemandem dauerhaft blind vertraut werden muss. Details stehen in der <a href=\"rwa-docs/\">Doku zum Vertrauensmodell</a>.",
+    "a3": "Heute prüft der Plattformbetreiber den Journalfortschritt vor dem Minten. Die Markt-Listung ist ein eigener Filter: 14 Tage seit dem ersten gespeicherten Gieß- oder Dünge-Log, mit Pflege an mindestens der Hälfte dieser Tage — nachgetragene Daten zählen nicht. Das ist Prozess-Nachweis, kein Beweis, dass eine physische Pflanze existiert. Die Roadmap fürs Live-Netz führt das zu stärkeren Attestierungen, damit niemandem dauerhaft blind vertraut werden muss. Details stehen in der <a href=\"rwa-docs/\">Doku zum Vertrauensmodell</a>.",
     "q4": "Ist das legal? Was passiert mit einer echten Ernte?",
     "a4": "Die Einlösung wandelt ein Token in der Erntephase in sein reales Gegenstück um — im Rahmen der Vorschriften in der Jurisdiktion des Growers. Heute ist die Einlösung spezifiziert, im Testnetz aber noch simuliert und keine echte Lieferkette. Lies <a href=\"risks/\">Risiken &amp; Umfang</a> für die ehrlichen Grenzen.",
     "q5": "Warum im Testnetz bauen, statt gleich mit echtem Geld live zu gehen?",
@@ -154,11 +154,13 @@
     "q7": "Was passiert mit meinem $GROWTOO, wenn das Live-Netz startet?",
     "a7": "Testnetz-$GROWTOO dient dem Üben des Ablaufs und ist nicht als übertragbares Guthaben zu verstehen. Die Anerkennung früher Grower (das Founding-Grower-Abzeichen) soll erhalten bleiben; die genauen Migrationsregeln veröffentlichen wir vor dem Start.",
     "q8": "Wann startet das Live-Netz?",
-    "a8": "Angepeilt, sobald der Ablauf zur Ernte-Einlösung ausgeliefert ist (Roadmap-Meilenstein M5 in der Doku). Die Architekturnotizen stehen in unserer <a href=\"rwa-docs/\">Doku</a>. Wir veröffentlichen Meilensteine, kein vages „bald“."
+    "a8": "Angepeilt, sobald der Ablauf zur Ernte-Einlösung ausgeliefert ist (Roadmap-Meilenstein M5 in der Doku). Die Architekturnotizen stehen in unserer <a href=\"rwa-docs/\">Doku</a>. Wir veröffentlichen Meilensteine, kein vages „bald“.",
+    "q9": "Kann ich eine Pflanze am selben Tag minten und auf dem Market einstellen?",
+    "a9": "Du kannst eine Phase siegeln, sobald das Journal soweit ist. Auf dem Market einstellen geht erst nach 14 Tagen seit dem ersten gespeicherten Gieß- oder Dünge-Log, mit Pflege an mindestens der Hälfte dieser Tage. Minten und am selben Tag listen ist gesperrt. Nachgetragene Journaldaten zählen nicht. Das ist Prozess-Nachweis, kein Beweis, dass eine physische Pflanze existiert."
   },
   "close": {
     "title": "Bau es wieder an. Das Journal behält es.",
-    "body": "Das Journal ist die Spur. Coach und Erinnerungen sitzen darauf. Minten, Handeln und Adoptieren sind optional.",
+    "body": "Das Journal ist die Spur. Coach und Erinnerungen sitzen darauf. Minten ist optional. Auf dem Market einstellen braucht 14 Tage Pflege.",
     "signin": "Schon ein Konto? <a href=\"dnevnik/\">Anmelden</a>"
   },
   "board": {
@@ -187,8 +189,8 @@
     "lastPrintNet": "Letzter Stand {time} · Testnetz",
     "headlinePreview": "So wird der Handel aussehen",
     "headlineLive": "Aktuelle Verträge von echten Growern",
-    "leadPreview": "Die Tafel wärmt sich auf — die ersten Verträge werden gerade eingestellt. Das hier ist eine Vorschau, wie Seed- und Growth-RWAs später gehandelt werden.",
-    "leadLive": "Offene Seed- und Growth-Verträge — Preise setzt der Verkäufer in $GROWTOO, abgewickelt über den Marktplatz-Escrow.",
+    "leadPreview": "Die Tafel wärmt sich auf — die ersten Verträge werden gerade eingestellt. Das hier ist eine Vorschau, wie Seed- und Growth-RWAs später gehandelt werden. Gelistete Pflanzen brauchen zuerst 14 Tage Gieß- oder Dünge-Logs.",
+    "leadLive": "Offene Seed- und Growth-Verträge mit 14-tägiger Pflegespur — Preise setzt der Verkäufer in $GROWTOO, abgewickelt über den Marktplatz-Escrow.",
     "offline": "Feed offline · Beispiel wird gezeigt",
     "unavailable": "Der Markt ist derzeit nicht verfügbar.",
     "loadFailed": "Marktangebote konnten nicht geladen werden. Versuch es später.",

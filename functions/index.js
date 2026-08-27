@@ -22,6 +22,7 @@ const {kickChainQueues, becamePending} = require('./kick-chain-queues');
 const {requireOpsOrSignedIn, opsAllowsForce} = require('./ops-http-guard');
 const {getFirestore, FieldValue} = require('firebase-admin/firestore');
 const {syncMarketPublicTape} = require('./market-public-tape');
+const {applyJournalCoverageOnCreate} = require('./journal-coverage-gate');
 const {
   syncPublicJournalPost,
   syncPublicGrowerProfile,
@@ -777,8 +778,20 @@ exports.onMarketListingHealth = onDocumentWritten(
         : event.data && event.data.before && event.data.before.ref
           ? event.data.before.ref
           : null;
+      let tapeListing = after;
       try {
-        await syncMarketPublicTape(listingId, after);
+        tapeListing = await applyJournalCoverageOnCreate(
+            getFirestore(),
+            listingId,
+            before,
+            after,
+            ref,
+        );
+      } catch (err) {
+        console.error('journalCoverageGate', listingId, err);
+      }
+      try {
+        await syncMarketPublicTape(listingId, tapeListing || after);
       } catch (err) {
         console.error('syncMarketPublicTape', listingId, err);
       }
