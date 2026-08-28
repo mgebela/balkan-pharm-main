@@ -294,7 +294,13 @@
     } catch {
       // ignore
     }
-    return '';
+    try {
+      const raw = localStorage.getItem('dnevnik-live-auth');
+      const parsed = raw ? JSON.parse(raw) : null;
+      return parsed && parsed.uid ? String(parsed.uid) : '';
+    } catch {
+      return '';
+    }
   }
 
   function scopedKey(base) {
@@ -529,13 +535,13 @@
   }
 
   function readDismissedReminders() {
-    const raw = readJson(STORAGE_REMINDER_DISMISS, {});
+    const raw = readJson(scopedKey(STORAGE_REMINDER_DISMISS), {});
     return raw && typeof raw === 'object' ? raw : {};
   }
 
   function saveDismissedReminders(state) {
     try {
-      localStorage.setItem(STORAGE_REMINDER_DISMISS, JSON.stringify(state || {}));
+      localStorage.setItem(scopedKey(STORAGE_REMINDER_DISMISS), JSON.stringify(state || {}));
     } catch {
       // ignore
     }
@@ -1520,20 +1526,12 @@
   function loadHistory() {
     const key = scopedKey(STORAGE_CHAT);
     let saved = readJson(key, null);
-    // Migrate legacy unscoped chat into the signed-in account once.
-    if (!Array.isArray(saved)) {
-      const legacy = readJson(STORAGE_CHAT, []);
-      if (Array.isArray(legacy) && legacy.length && currentAuthUid()) {
-        saved = legacy;
-        try {
-          localStorage.setItem(key, JSON.stringify(legacy.slice(-20)));
-          localStorage.removeItem(STORAGE_CHAT);
-        } catch {
-          // ignore
-        }
-      } else {
-        saved = Array.isArray(legacy) ? legacy : [];
-      }
+    if (!Array.isArray(saved)) saved = [];
+    // Drop leftover unscoped chat so it cannot attach to another account.
+    try {
+      localStorage.removeItem(STORAGE_CHAT);
+    } catch {
+      // ignore
     }
     history = Array.isArray(saved) ? saved.slice(-20) : [];
     sanitizeChatState();

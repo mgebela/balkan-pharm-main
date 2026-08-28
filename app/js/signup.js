@@ -308,13 +308,149 @@
     return doc;
   }
 
+  var ACCOUNT_OWNER_KEY = 'dnevnik-live-account-data-uid';
+  var ACCOUNT_JOURNAL_KEYS = [
+    'dnevnik-live-plants',
+    'dnevnik-live-entries',
+    'dnevnik-live-toolbox',
+    'dnevnik-live-today-state',
+    'dnevnik-live-journal-skill',
+    'dnevnik-live-grower-xp',
+  ];
+  var ACCOUNT_PROFILE_KEYS = [
+    'dnevnik-live-display-name',
+    'dnevnik-live-weather-city',
+    'dnevnik-live-grow-setup',
+    'dnevnik-live-grow-style-note',
+    'dnevnik-live-profile-photo',
+    'dnevnik-live-adopter-intent',
+    'dnevnik-live-public-slug',
+    'dnevnik-live-public-enabled',
+    'dnevnik-live-chain-opt-in',
+  ];
+
+  function allAccountKeys() {
+    return ACCOUNT_JOURNAL_KEYS.concat(ACCOUNT_PROFILE_KEYS);
+  }
+
+  function scopedAccountKey(base, uid) {
+    return String(base || '') + ':' + String(uid || '');
+  }
+
+  function lsGet(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function lsSet(key, val) {
+    try {
+      localStorage.setItem(key, val);
+    } catch (err) {
+      // ignore quota / private mode
+    }
+  }
+
+  function lsRemove(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (err) {
+      // ignore
+    }
+  }
+
+  function snapshotAccountKeys(uid, keys) {
+    if (!uid) return;
+    (keys || allAccountKeys()).forEach(function (key) {
+      var val = lsGet(key);
+      var scoped = scopedAccountKey(key, uid);
+      if (val == null) lsRemove(scoped);
+      else lsSet(scoped, val);
+    });
+  }
+
+  function restoreAccountKeys(uid, keys) {
+    if (!uid) return false;
+    var had = false;
+    (keys || allAccountKeys()).forEach(function (key) {
+      var scoped = lsGet(scopedAccountKey(key, uid));
+      if (scoped == null) lsRemove(key);
+      else {
+        lsSet(key, scoped);
+        had = true;
+      }
+    });
+    return had;
+  }
+
+  function clearAccountKeys(keys) {
+    (keys || allAccountKeys()).forEach(function (key) {
+      lsRemove(key);
+    });
+  }
+
+  function hasScopedKeys(uid, keys) {
+    if (!uid) return false;
+    return (keys || []).some(function (key) {
+      return lsGet(scopedAccountKey(key, uid)) != null;
+    });
+  }
+
+  /**
+   * Bind the unscoped journal/profile cache to this uid so another account
+   * on the same browser cannot see or sync the previous session's plants.
+   */
+  function isolateAccountLocalData(uid) {
+    if (!uid) return { localTrusted: false };
+    var prev = lsGet(ACCOUNT_OWNER_KEY) || '';
+    if (prev === uid) return { localTrusted: true };
+
+    if (prev) {
+      snapshotAccountKeys(prev);
+      restoreAccountKeys(uid);
+      lsSet(ACCOUNT_OWNER_KEY, uid);
+      return { localTrusted: true };
+    }
+
+    // No owner: leftover unscoped journal may belong to a previous account.
+    // Never assign it to the user who just signed in.
+    if (hasScopedKeys(uid, ACCOUNT_JOURNAL_KEYS)) {
+      restoreAccountKeys(uid, ACCOUNT_JOURNAL_KEYS);
+    } else {
+      clearAccountKeys(ACCOUNT_JOURNAL_KEYS);
+    }
+    if (hasScopedKeys(uid, ACCOUNT_PROFILE_KEYS)) {
+      restoreAccountKeys(uid, ACCOUNT_PROFILE_KEYS);
+    } else {
+      clearAccountKeys(ACCOUNT_PROFILE_KEYS);
+    }
+    lsSet(ACCOUNT_OWNER_KEY, uid);
+    return { localTrusted: hasScopedKeys(uid, ACCOUNT_JOURNAL_KEYS) };
+  }
+
+  function persistAccountLocalData(uid) {
+    if (!uid) return;
+    snapshotAccountKeys(uid);
+    lsSet(ACCOUNT_OWNER_KEY, uid);
+  }
+
+  function releaseAccountLocalData(uid) {
+    if (uid) snapshotAccountKeys(uid);
+    clearAccountKeys();
+    lsRemove(ACCOUNT_OWNER_KEY);
+  }
+
   function rememberAuthSession(user) {
+    var uid = (user && user.uid) || '';
+    if (uid) isolateAccountLocalData(uid);
     try {
       localStorage.setItem(
         STORAGE_AUTH,
         JSON.stringify({
           email: (user && user.email) || '',
-          uid: (user && user.uid) || '',
+          uid: uid,
           loggedAt: Date.now(),
         })
       );
@@ -332,6 +468,7 @@
       // i18n-ignore — an invariant failure, never shown to a grower.
       throw new Error('Missing user or Firestore for signup profile.');
     }
+    isolateAccountLocalData(user.uid);
     var pending = readPending();
     var userRef = firestoreApi.collection('users').doc(user.uid);
     var snap = await userRef.get();
@@ -379,6 +516,12 @@
     buildUserProfileDoc: buildUserProfileDoc,
     rememberAuthSession: rememberAuthSession,
     ensureFirestoreProfile: ensureFirestoreProfile,
+    ACCOUNT_OWNER_KEY: ACCOUNT_OWNER_KEY,
+    ACCOUNT_JOURNAL_KEYS: ACCOUNT_JOURNAL_KEYS,
+    ACCOUNT_PROFILE_KEYS: ACCOUNT_PROFILE_KEYS,
+    isolateAccountLocalData: isolateAccountLocalData,
+    persistAccountLocalData: persistAccountLocalData,
+    releaseAccountLocalData: releaseAccountLocalData,
   };
 
   root.GrowtooSignup = api;

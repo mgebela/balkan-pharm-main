@@ -35,8 +35,8 @@ npx firebase-tools deploy --only firestore:rules --project balpha-9dab9
 
 | Kolekcija | Tko može čitati | Tko može pisati |
 |-----------|-----------------|-----------------|
-| `users/{uid}` | vlasnik, admin, superadmin, javni profili admin/superadmin uloga | vlasnik (create/update), superadmin (update/delete) |
-| `users/{uid}/app/state` | vlasnik, admin, superadmin, korisnik s `sharedGrants` | samo vlasnik |
+| `users/{uid}` | vlasnik, admin, superadmin | vlasnik (create/update), superadmin (update/delete) |
+| `users/{uid}/app/state` | vlasnik, admin, superadmin | samo vlasnik |
 | `users/{uid}/sharedGrants/{viewer}` | vlasnik, viewer, superadmin | vlasnik, superadmin |
 | `loginEvents` | superadmin | bilo koji prijavljeni korisnik (svoj `uid`) |
 | `marketListings` | **get:** owner, buyer, or **active** offer (signed-in). **list:** owner / buyer / admin only (sold/cancelled history is party-only). In-app board uses `marketPublicTape`. | owner create; buyer/seller status updates as in rules |

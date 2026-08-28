@@ -136,11 +136,10 @@ service cloud.firestore {
   // ── users ────────────────────────────────────────────────
 
   match /users/{userId} {
-    // Own profile, admin/superadmin, or discover superadmin owner docs (shared library).
+    // Own profile or admin/superadmin. Privileged-role docs are not world-readable.
     allow read: if signedIn() && (
       request.auth.uid == userId
       || isAdminOrSuper()
-      || isPrivilegedRole(resource.data.role)
     );
 
     allow create: if signedIn()
@@ -166,7 +165,6 @@ service cloud.firestore {
       allow read: if signedIn() && (
         request.auth.uid == userId
         || isAdminOrSuper()
-        || hasSharedGrant(userId)
       );
 
       allow write: if signedIn() && request.auth.uid == userId;

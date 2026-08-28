@@ -64,6 +64,25 @@
     }
   })();
 
+  // Bind journal/profile cache to the signed-in uid before any view paints.
+  // Unscoped keys used to survive logout and get merged into the next account.
+  (function bindBootAccountStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_AUTH);
+      const auth = raw ? JSON.parse(raw) : null;
+      const uid = auth && auth.uid ? String(auth.uid) : '';
+      if (
+        uid &&
+        window.GrowtooSignup &&
+        typeof GrowtooSignup.isolateAccountLocalData === 'function'
+      ) {
+        GrowtooSignup.isolateAccountLocalData(uid);
+      }
+    } catch {
+      // ignore
+    }
+  })();
+
   let remoteSyncReady = false;
   let remoteSyncTimer = null;
   let remoteSyncPending = {};
@@ -480,12 +499,44 @@
     }
   }
 
+  function stripForeignJournalRecords(list) {
+    return (list || []).filter(function (item) {
+      return item && item.id && !item._sharedReadOnly;
+    });
+  }
+
+  function ownJournalState(remote) {
+    const r = remote || { plants: [], entries: [], toolbox: {} };
+    return {
+      plants: stripForeignJournalRecords(r.plants),
+      entries: stripForeignJournalRecords(r.entries),
+      toolbox: r.toolbox && typeof r.toolbox === 'object' ? r.toolbox : {},
+      journalSkill: r.journalSkill || null,
+      coachProfile: r.coachProfile || null,
+    };
+  }
+
+  function persistCurrentAccountLocal() {
+    const uid = getFirebaseUserId();
+    if (
+      uid &&
+      window.GrowtooSignup &&
+      typeof GrowtooSignup.persistAccountLocalData === 'function'
+    ) {
+      GrowtooSignup.persistAccountLocalData(uid);
+    }
+  }
+
   function applyRemoteStateToLocal(state) {
     if (!state) return;
-    localStorage.setItem(STORAGE_PLANTS, JSON.stringify(state.plants || []));
-    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(state.entries || []));
+    const plants = stripForeignJournalRecords(state.plants);
+    const entries = stripForeignJournalRecords(state.entries);
+    localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
+    localStorage.setItem(STORAGE_ENTRIES, JSON.stringify(entries));
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(state.toolbox || {}));
     plantsSurfaceDirty = true;
+    sharedReadOnlyPlantIds = new Set();
+    sharedReadOnlyEntryIds = new Set();
     if (state.journalSkill && typeof state.journalSkill === 'object') {
       try {
         localStorage.setItem('dnevnik-live-journal-skill', JSON.stringify(state.journalSkill));
@@ -493,6 +544,7 @@
         // ignore
       }
     }
+    persistCurrentAccountLocal();
   }
 
   /** Merge cloud + device so a slow sync / auth reload cannot erase a just-saved entry. */
@@ -518,8 +570,8 @@
     }
     // Local wins on id collision (device is source of truth for in-session writes).
     return {
-      plants: mergeRecordsById(remoteSafe.plants || [], localPlants),
-      entries: mergeRecordsById(remoteSafe.entries || [], localEntries),
+      plants: stripForeignJournalRecords(mergeRecordsById(remoteSafe.plants || [], localPlants)),
+      entries: stripForeignJournalRecords(mergeRecordsById(remoteSafe.entries || [], localEntries)),
       toolbox: Object.assign({}, remoteSafe.toolbox || {}, localToolbox),
     };
   }
@@ -1198,6 +1250,13 @@
 
   function blockAdminWrite() {
     return blockWrite({});
+  }
+
+  function hideSuperadminSharingPanel() {
+    const section = document.getElementById('admin-sharing-section');
+    if (!section) return;
+    section.hidden = true;
+    section.setAttribute('aria-hidden', 'true');
   }
 
   function applySharedLibraryBanner(message) {
@@ -2718,54 +2777,41 @@ function initFirebaseSync() {
       }
       await recordUserLogin(user, currentUserRole);
 
-      if (currentUserRole === 'admin') {
+      document.body.classList.remove('shared-library-mode');
+      const sharedBanner = document.getElementById('shared-library-banner');
+      if (sharedBanner) sharedBanner.remove();
+
+      if (
+        window.GrowtooSignup &&
+        typeof GrowtooSignup.isolateAccountLocalData === 'function'
+      ) {
+        GrowtooSignup.isolateAccountLocalData(user.uid);
+      }
+
+      // Every signed-in account loads only its own journal. Shared-library
+      // and admin "whole database" dumps used to mix superadmin plants into
+      // other desks (and then sync that mix into Firestore).
+      const remote = await loadRemoteStateIntoLocal(user.uid);
+      const merged = mergeLocalWithRemoteState(ownJournalState(remote));
+
+      if (currentUserRole === 'viewer') {
         isAdminReadOnly = true;
         remoteSyncReady = false;
-        await loadSuperadminDatabaseForAdmin();
+        applyRemoteStateToLocal(merged);
         applyAdminReadOnlyUI(
-          T(
-          'app.readOnly.wholeDb',
-          'Read-only view of the entire superadmin database — plants cannot be edited.'
-        )
-        );
-      } else if (currentUserRole === 'viewer') {
-        isAdminReadOnly = true;
-        remoteSyncReady = false;
-        await ensureViewerBootstrapGrant(user.uid, user.email || '');
-        await loadSharedDatabaseForViewer(user.uid, user.email || '');
-        applyAdminReadOnlyUI(
-          T('app.readOnly.sharedPlants', 'Read-only view of shared plants — editing is not allowed.')
+          T('app.readOnly.generic', 'View is read-only — editing is not allowed.')
         );
       } else {
         isAdminReadOnly = false;
         document.body.classList.remove('admin-readonly');
-        const userEmail = user.email || '';
-        if (isSharedHybridUser(userEmail)) {
-          await loadHybridUserWithSharedReadOnly(user.uid, userEmail);
-          applySharedLibraryBanner(
-            T(
-          'app.readOnly.hybridPlants',
-          'You can add and edit your own plants and entries. Plants from the superadmin shared library are view-only.'
-        )
-          );
-        } else {
-          document.body.classList.remove('shared-library-mode');
-          const remote = await loadRemoteStateIntoLocal(user.uid);
-          const merged = mergeLocalWithRemoteState(remote);
-          applyRemoteStateToLocal(merged);
-          remoteSyncReady = true;
-          // Push merged state so cloud catches up with any offline/local writes.
-          scheduleRemoteSync({
-            plants: plantsForRemoteSync(merged.plants),
-            entries: entriesForRemoteSync(merged.entries),
-            toolbox: merged.toolbox || {},
-          });
-          // Journals written before photos moved to Storage still carry inline
-          // base64 images, which is what pushes the document over the 1 MiB
-          // limit. Lift them out in the background so backup can resume.
-          migrateInlinePhotos();
-        }
-        if (!remoteSyncReady) remoteSyncReady = true;
+        applyRemoteStateToLocal(merged);
+        remoteSyncReady = true;
+        scheduleRemoteSync({
+          plants: plantsForRemoteSync(merged.plants),
+          entries: entriesForRemoteSync(merged.entries),
+          toolbox: merged.toolbox || {},
+        });
+        migrateInlinePhotos();
       }
 
       refreshAllViewsAfterRemoteLoad();
@@ -2978,6 +3024,7 @@ function initFirebaseSync() {
     if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_PLANTS, JSON.stringify(plants));
     plantsSurfaceDirty = true;
+    persistCurrentAccountLocal();
     scheduleRemoteSync({ plants: plantsForRemoteSync(plants) });
   }
 
@@ -3067,6 +3114,7 @@ function initFirebaseSync() {
     }
 
     scheduleRemoteSync({ entries: entriesForRemoteSync(reread) });
+    persistCurrentAccountLocal();
     return true;
   }
 
@@ -3264,9 +3312,22 @@ function initFirebaseSync() {
 
   async function performLogout() {
     const uid =
-      window.firebase && firebase.auth && firebase.auth().currentUser
+      (window.firebase && firebase.auth && firebase.auth().currentUser
         ? firebase.auth().currentUser.uid
-        : '';
+        : '') ||
+      (getStoredAuth() && getStoredAuth().uid) ||
+      '';
+    try {
+      if (
+        uid &&
+        window.GrowtooSignup &&
+        typeof GrowtooSignup.releaseAccountLocalData === 'function'
+      ) {
+        GrowtooSignup.releaseAccountLocalData(uid);
+      }
+    } catch {
+      // ignore
+    }
     try {
       if (window.SolanaWallet && typeof SolanaWallet.disconnect === 'function') {
         await SolanaWallet.disconnect();
@@ -3425,7 +3486,7 @@ function initFirebaseSync() {
     if (id === 'toolbox') renderToolbox();
     if (id === 'admin' && isSuperadminRole(currentUserRole)) {
       renderSuperadminUserReport(adminReportPeriod);
-      renderSuperadminSharingPanel();
+      hideSuperadminSharingPanel();
     }
     if (window.AICoach && typeof window.AICoach.applyVisibility === 'function') {
       window.AICoach.applyVisibility();
@@ -7918,6 +7979,7 @@ function initFirebaseSync() {
   function setToolboxData(data) {
     if (blockAdminWrite()) return;
     localStorage.setItem(STORAGE_TOOLBOX, JSON.stringify(data));
+    persistCurrentAccountLocal();
     scheduleRemoteSync({ toolbox: data || {} });
   }
 

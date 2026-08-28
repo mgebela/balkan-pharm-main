@@ -696,7 +696,7 @@
     <p id="login-status" aria-live="polite"></p>
     <div data-i18n-html="signin.login-form.div2" class="back-link"><a href="../index.html">← Back to home</a></div>
   </form>
-  <script src="../app/js/signup.js?v=20260817a"></script>
+  <script src="../app/js/signup.js?v=20260828b"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
   <script src="../js/appcheck-config.js?v=20260819c"></script>
   <script type="module">
@@ -992,6 +992,9 @@
 
     async function writeWebsiteProfile(user) {
       if (!Signup || !user) return;
+      if (typeof Signup.isolateAccountLocalData === 'function') {
+        Signup.isolateAccountLocalData(user.uid);
+      }
       const pending = Signup.readPending();
       const ref = doc(db, 'users', user.uid);
       const snap = await getDoc(ref);
@@ -1025,6 +1028,9 @@
     function goToApp(user) {
       if (Signup) Signup.rememberAuthSession(user);
       else {
+        if (user && user.uid && window.GrowtooSignup && typeof GrowtooSignup.isolateAccountLocalData === 'function') {
+          GrowtooSignup.isolateAccountLocalData(user.uid);
+        }
         localStorage.setItem(
           'dnevnik-live-auth',
           JSON.stringify({ email: user.email || '', uid: user.uid, loggedAt: Date.now() })
