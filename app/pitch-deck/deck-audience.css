@@ -541,6 +541,14 @@
   margin-top: 22px;
 }
 
+.status-table--2 .status-row {
+  grid-template-columns: 1.8fr 0.6fr;
+}
+
+.funds-list--stack {
+  grid-template-columns: 1fr;
+}
+
 .funds-list li:last-child:nth-child(odd) {
   grid-column: 1 / -1;
 }
