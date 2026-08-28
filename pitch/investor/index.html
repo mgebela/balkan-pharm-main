@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title data-i18n="pitch-investor.meta.title">growtoo — Investor deck</title>
-    <meta name="description" content="growtoo: journal first, proof second. Real-world assets backed by a grower's daily care log on Solana." />
+    <meta name="description" content="growtoo pre-seed: a free grow journal underneath evidence-backed assets. $150–200k validation round on Solana Devnet." />
     <link rel="canonical" href="https://growto.live/pitch/investor/" />
     <meta name="robots" content="noindex" />
     <meta name="theme-color" content="#f5faf3" />
@@ -14,9 +14,9 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,350;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-  <script src="../../js/i18n.js?v=20260820c" data-i18n-ns="common,pitch-investor"></script>
+  <script src="../../js/i18n.js?v=20260828c" data-i18n-ns="common,pitch-investor"></script>
     <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260820b" />
-    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260820c" />
+    <link rel="stylesheet" href="/app/pitch-deck/deck-audience.css?v=20260828c" />
   <link rel="stylesheet" href="../../styles/i18n.css?v=20260816a" />
   </head>
   <body>
@@ -24,7 +24,7 @@
     <div class="bg-grid" aria-hidden="true"></div>
 
     <main id="deck" class="deck deck--dense">
-      <!-- 1. COVER -->
+      <!-- 1. COVER + ASK -->
       <section class="slide slide--cover" data-title="Cover">
         <div class="cover">
           <div class="brand">
@@ -35,22 +35,27 @@
           </div>
 
           <h1 data-i18n-html="pitch-investor.deck.h1" class="cover-headline">
-            Everyone tokenises a promise. <span class="grad">We tokenise a paper trail.</span>
+            Journal first. <span class="grad">Proof second.</span>
           </h1>
-          <p data-i18n="pitch-investor.deck.p" class="cover-sub">A free grow journal underneath a real-world asset — documentation first, token second.</p>
+          <p data-i18n="pitch-investor.deck.p" class="cover-sub">A free grow journal for cannabis growers — plant records, reminders, photos, weather planning, and an AI coach.</p>
+
+          <div data-i18n-html="pitch-investor.deck.divAsk" class="ask-banner">
+            <span class="ask-label">The ask</span>
+            <span class="ask-amount">$150,000–$200,000</span>
+            <span class="ask-meta">Pre-seed · focused validation round</span>
+          </div>
 
           <div class="say">
             <span data-i18n="pitch-investor.deck.span2" class="say-label">Open with</span>
             <p data-i18n="pitch-investor.deck.p2">
-              “Everyone tokenising real-world assets starts with the token. We started with the paperwork,
-              because the paperwork is the asset.”
+              “We started with the paperwork, because the paperwork is the asset.”
             </p>
           </div>
 
           <div class="cover-meta">
-            <div data-i18n-html="pitch-investor.deck.div" class="cover-meta-row"><span class="meta-label">Stack</span><span class="meta-value">PWA · Firebase · Solana devnet</span></div>
-            <div data-i18n-html="pitch-investor.deck.div2" class="cover-meta-row"><span class="meta-label">Scope</span><span class="meta-value">Journal · camera · coach · seal · adopt</span></div>
-            <div data-i18n-html="pitch-investor.deck.div3" class="cover-meta-row"><span class="meta-label">Status</span><span class="meta-value">Public test network, test assets</span></div>
+            <div data-i18n-html="pitch-investor.deck.div" class="cover-meta-row"><span class="meta-label">Status</span><span class="meta-value">Solana Devnet · three early growers</span></div>
+            <div data-i18n-html="pitch-investor.deck.div2" class="cover-meta-row"><span class="meta-label">Product</span><span class="meta-value">Journal · coach · optional proof</span></div>
+            <div data-i18n-html="pitch-investor.deck.div3" class="cover-meta-row"><span class="meta-label">Tokens</span><span class="meta-value">Test assets — no monetary value</span></div>
             <div data-i18n-html="pitch-investor.deck.div4" class="cover-meta-row"><span class="meta-label">Live</span><span class="meta-value"><a href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></span></div>
           </div>
 
@@ -70,310 +75,316 @@
         </div>
       </section>
 
-      <!-- 2. THE GAP -->
-      <section class="slide slide--dense" data-title="The gap">
+      <!-- 2. WHAT + THESIS -->
+      <section class="slide slide--dense" data-title="What it is">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span3" class="kicker">02 · The gap</span>
-            <h2 data-i18n-html="pitch-investor.deck.h2">Beautiful token. <span class="grad">Uploaded PDF underneath.</span></h2>
+            <span data-i18n="pitch-investor.deck.span3" class="kicker">02 · What it is</span>
+            <h2 data-i18n-html="pitch-investor.deck.h2">A journal growers <span class="grad">already need.</span></h2>
             <p data-i18n="pitch-investor.deck.p3" class="slide-remark">
-              Most real-world-asset products are strong at the token layer and weak exactly where it matters:
-              the evidence that the physical thing exists and was handled the way somebody claims.
+              Growtoo is a free grow journal: plant records, reminders, photos, weather planning, and an AI coach.
+              The asset layer is optional — journal-to-proof infrastructure, not a token that leads.
             </p>
           </header>
           <div class="grid grid-3 why-cards">
             <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h3">Evidence is an afterthought</h3>
-              <p data-i18n="pitch-investor.deck.p4" class="card-tagline">A document nobody can re-derive</p>
+              <h3 data-i18n="pitch-investor.deck.h3">Records</h3>
+              <p data-i18n="pitch-investor.deck.p4" class="card-tagline">Plants, feeding, watering, stages</p>
             </article>
             <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h32">One-shot attestation</h3>
-              <p data-i18n="pitch-investor.deck.p5" class="card-tagline">Signed once, never updated again</p>
+              <h3 data-i18n="pitch-investor.deck.h32">Capture</h3>
+              <p data-i18n="pitch-investor.deck.p5" class="card-tagline">Photos, reminders, weather planning</p>
             </article>
             <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h33">Nothing to watch</h3>
-              <p data-i18n="pitch-investor.deck.p6" class="card-tagline">Holders get a number, not a story</p>
+              <h3 data-i18n="pitch-investor.deck.h33">Coach</h3>
+              <p data-i18n="pitch-investor.deck.p6" class="card-tagline">AI that reads the journal, not a blog</p>
             </article>
-          </div>
-          <div data-i18n-html="pitch-investor.deck.div7" class="why-arrow" aria-hidden="true">
-            <span>→</span>
-            <span class="why-arrow-label">Invert the order</span>
           </div>
           <div class="quote">
-            <p data-i18n="pitch-investor.deck.p7">Build the underneath first. The token is the easy part.</p>
+            <p data-i18n="pitch-investor.deck.p7">Journal first, proof second. Growtoo turns a grower's ongoing plant history into structured evidence that can support more trustworthy, evidence-backed assets.</p>
           </div>
         </div>
       </section>
 
-      <!-- 3. ORDER OF OPERATIONS -->
-      <section class="slide slide--dense" data-title="Our order">
+      <!-- 3. PROBLEM -->
+      <section class="slide slide--dense" data-title="The problem">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span4" class="kicker">03 · Order of operations</span>
-            <h2 data-i18n-html="pitch-investor.deck.h22">Journal first. <span class="grad">Proof second.</span></h2>
+            <span data-i18n="pitch-investor.deck.span4" class="kicker">03 · The problem</span>
+            <h2 data-i18n-html="pitch-investor.deck.h22">Hard to log. <span class="grad">Harder to verify.</span></h2>
             <p data-i18n="pitch-investor.deck.p8" class="slide-remark">
-              The journal is a product growers want on its own — free, no wallet: log, camera, illness check, coach.
-              That’s the acquisition channel and the data moat in one. The asset layer only turns on when a grower opts in.
+              Grow tracking is often manual, inconsistent, and difficult for someone outside the grower’s process
+              to verify. That makes adoption, collaboration, and any future investment model harder to trust.
+            </p>
+          </header>
+          <div class="grid grid-3 why-cards">
+            <article class="card card--dense">
+              <h3 data-i18n="pitch-investor.deck.h34">Manual tracking</h3>
+              <p data-i18n="pitch-investor.deck.p9" class="card-tagline">Notes in chats, sheets, and memory</p>
+            </article>
+            <article class="card card--dense">
+              <h3 data-i18n="pitch-investor.deck.h35">Inconsistent history</h3>
+              <p data-i18n="pitch-investor.deck.p10" class="card-tagline">Gaps nobody outside the grow can reconstruct</p>
+            </article>
+            <article class="card card--dense">
+              <h3 data-i18n="pitch-investor.deck.h36">Unverifiable claims</h3>
+              <p data-i18n="pitch-investor.deck.p11" class="card-tagline">A buyer or backer has to take the grower’s word</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. PRODUCT FLOW -->
+      <section class="slide slide--dense" data-title="Product flow">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span data-i18n="pitch-investor.deck.span5" class="kicker">04 · Product flow</span>
+            <h2 data-i18n-html="pitch-investor.deck.h23">Log it. Organise it. <span class="grad">Prove it only if you opt in.</span></h2>
+            <p data-i18n="pitch-investor.deck.p12" class="slide-remark">
+              Growers log plant activity, feeding, watering, growth stages, and photos. Growtoo organises that
+              history into evidence. Selected records can then support optional Solana-based proof —
+              verification-driven tokenisation, not a token for its own sake.
             </p>
           </header>
           <div class="pipeline pipeline--dense">
-            <div class="pipe-step"><div class="pipe-num">1</div><h3 data-i18n="pitch-investor.deck.h34">Journal</h3><p data-i18n="pitch-investor.deck.p9">Logs, in-app photos, illness checks, stages</p></div>
+            <div class="pipe-step"><div class="pipe-num">1</div><h3 data-i18n="pitch-investor.deck.h37">Log</h3><p data-i18n="pitch-investor.deck.p13">Activity, feeding, watering, stages, photos</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">2</div><h3 data-i18n="pitch-investor.deck.h35">Seal</h3><p data-i18n="pitch-investor.deck.p10">Stage minted, linked to the entry</p></div>
+            <div class="pipe-step"><div class="pipe-num">2</div><h3 data-i18n="pitch-investor.deck.h38">Organise</h3><p data-i18n="pitch-investor.deck.p14">A structured plant history other people can read</p></div>
             <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">3</div><h3 data-i18n="pitch-investor.deck.h36">Adopt</h3><p data-i18n="pitch-investor.deck.p11">Backer follows one specific plant</p></div>
-            <div class="pipe-arrow">→</div>
-            <div class="pipe-step"><div class="pipe-num">4</div><h3 data-i18n="pitch-investor.deck.h37">Settle</h3><p data-i18n="pitch-investor.deck.p12">Escrow, then harvest redemption</p></div>
-          </div>
-          <div data-i18n-html="pitch-investor.deck.div8" class="chip-grid chip-grid--3">
-            <span class="chip chip--lg chip--g">Free journal = top of funnel</span>
-            <span class="chip chip--lg chip--b">Continuous evidence, not one PDF</span>
-            <span class="chip chip--lg">Opt-in asset layer</span>
+            <div class="pipe-step"><div class="pipe-num">3</div><h3 data-i18n="pitch-investor.deck.h39">Optional proof</h3><p data-i18n="pitch-investor.deck.p15">Selected records can back a Solana seal</p></div>
           </div>
         </div>
       </section>
 
-      <!-- 4. STACK -->
-      <section class="slide slide--dense" data-title="Stack">
+      <!-- 5. EARLY DATA -->
+      <section class="slide slide--dense" data-title="Early data">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span5" class="kicker">04 · Stack</span>
-            <h2 data-i18n-html="pitch-investor.deck.h23">What’s actually <span class="grad">built.</span></h2>
-            <p data-i18n="pitch-investor.deck.p13" class="slide-remark">
-              A working system, not a design doc: web app, backend with auth and rules, wallet linking,
-              SPL token, seed NFTs, and an on-chain escrow program for the market.
+            <span data-i18n="pitch-investor.deck.span6" class="kicker">05 · Early data</span>
+            <h2 data-i18n-html="pitch-investor.deck.h24">On Devnet. <span class="grad">One week in.</span></h2>
+            <p data-i18n="pitch-investor.deck.p16" class="slide-remark">
+              The product is already being tested on Solana Devnet with three early growers. They have been
+              adding plants and logging activity about three days per week. This is roughly one week of early
+              data — too little for retention claims.
+            </p>
+          </header>
+          <div class="grid grid-3 traction traction--dense">
+            <div data-i18n-html="pitch-investor.deck.div18" class="t-card"><span class="t-num">3</span><span class="t-label">Early growers on Devnet</span></div>
+            <div data-i18n-html="pitch-investor.deck.div19" class="t-card"><span class="t-num">~3</span><span class="t-label">Days per week of logging</span></div>
+            <div data-i18n-html="pitch-investor.deck.div20" class="t-card"><span class="t-num">~1 wk</span><span class="t-label">Of early data — present it as such</span></div>
+          </div>
+          <p data-i18n="pitch-investor.deck.p17" class="footnote">
+            Useful as a signal that people will open the journal. Not a traction chart, not a cohort, not product-market fit.
+          </p>
+        </div>
+      </section>
+
+      <!-- 6. TRUST MODEL -->
+      <section class="slide slide--dense" data-title="Trust model">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span data-i18n="pitch-investor.deck.span7" class="kicker">06 · Trust model</span>
+            <h2 data-i18n-html="pitch-investor.deck.h25">History first. <span class="grad">Marketplace second.</span></h2>
+            <p data-i18n="pitch-investor.deck.p18" class="slide-remark">
+              A plant should become eligible for marketplace treatment only after it has enough documented
+              history. Asset provenance has to be earned in the journal, not declared at mint.
+            </p>
+          </header>
+          <p data-i18n-html="pitch-investor.deck.p19" class="hypothesis">
+            <strong>Hypothesis, not a final rule.</strong> We are testing a coverage threshold — enough watering
+            or feeding days across the trail, currently around half the days after a two-week window. The 50%
+            lifecycle-logging bar is a hypothesis for testing. The exact rule can change with evidence.
+          </p>
+        </div>
+      </section>
+
+      <!-- 7. EVIDENCE-BACKED ASSET -->
+      <section class="slide slide--dense" data-title="The asset">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span data-i18n="pitch-investor.deck.span8" class="kicker">07 · The asset</span>
+            <h2 data-i18n-html="pitch-investor.deck.h26">Evidence-backed. <span class="grad">Not token-first.</span></h2>
+            <p data-i18n="pitch-investor.deck.p20" class="slide-remark">
+              The asset is supported by plant history, grower activity, photos, lifecycle coverage, and
+              potentially grower experience signals. Tokenisation is how that evidence can be referenced —
+              it is not the product by itself.
             </p>
           </header>
           <div class="grid grid-3">
             <article class="card card--dense">
-              <h3 data-i18n="common.footer.app">App</h3>
-              <p data-i18n="pitch-investor.deck.p14" class="card-tagline">PWA · journal, log, camera, illness check, coach, stories</p>
+              <h3 data-i18n="pitch-investor.deck.h314">Plant history</h3>
+              <p data-i18n="pitch-investor.deck.p21" class="card-tagline">Stages, care, time in the journal</p>
             </article>
             <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h39">Backend</h3>
-              <p data-i18n="pitch-investor.deck.p15" class="card-tagline">Firebase auth · Firestore rules · functions</p>
+              <h3 data-i18n-html="pitch-investor.deck.h315">Activity &amp; photos</h3>
+              <p data-i18n="pitch-investor.deck.p22" class="card-tagline">What the grower actually did, when</p>
             </article>
             <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h310">Wallets</h3>
-              <p data-i18n="pitch-investor.deck.p16" class="card-tagline">Phantom · Solflare · watch-only address linking</p>
-            </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h311">Tokens</h3>
-              <p data-i18n="pitch-investor.deck.p17" class="card-tagline">$GROWTOO SPL · seed NFT collection per plant</p>
-            </article>
-            <article class="card card--dense">
-              <h3 data-i18n="common.nav.market">Market</h3>
-              <p data-i18n="pitch-investor.deck.p18" class="card-tagline">Anchor escrow program · asks after a 14-day journal trail · settlement</p>
-            </article>
-            <article class="card card--dense">
-              <h3 data-i18n="common.nav.docs">Docs</h3>
-              <p data-i18n="pitch-investor.deck.p19" class="card-tagline">Public RWA architecture · risks page</p>
+              <h3 data-i18n="pitch-investor.deck.h316">Coverage signals</h3>
+              <p data-i18n="pitch-investor.deck.p23" class="card-tagline">Lifecycle coverage · grower experience (later)</p>
             </article>
           </div>
-          <div data-i18n-html="pitch-investor.deck.div9" class="chip-row chip-row--center">
-            <span class="chip">Solana devnet</span>
-            <span class="chip">Metaplex</span>
-            <span class="chip">Anchor</span>
-            <span class="chip">Firebase</span>
-            <span class="chip">Netlify</span>
+          <div data-i18n-html="pitch-investor.deck.div8" class="chip-grid chip-grid--3 term-row">
+            <span class="chip chip--lg chip--g">Evidence-backed assets</span>
+            <span class="chip chip--lg chip--b">Asset provenance</span>
+            <span class="chip chip--lg">Verification-driven tokenisation</span>
+            <span class="chip chip--lg">Harvest-backed assets</span>
+            <span class="chip chip--lg">Journal-to-proof infrastructure</span>
           </div>
         </div>
       </section>
 
-      <!-- 5. STATUS -->
-      <section class="slide slide--dense" data-title="Status">
+      <!-- 8. USE OF FUNDS -->
+      <section class="slide slide--dense" data-title="Use of funds">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span6" class="kicker">05 · Honest status</span>
-            <h2 data-i18n-html="pitch-investor.deck.h24">Live, devnet, <span class="grad">or still mocked.</span></h2>
-            <p data-i18n="pitch-investor.deck.p20" class="slide-remark">
-              We publish this table rather than let a demo imply more than it should. Anything marked mocked is
-              specified and designed, not shipped.
+            <span data-i18n="pitch-investor.deck.span9" class="kicker">08 · Use of funds</span>
+            <h2 data-i18n-html="pitch-investor.deck.h27">Where <span class="grad">$150–200k</span> goes.</h2>
+            <p data-i18n="pitch-investor.deck.p24" class="slide-remark">
+              A focused validation round: legal path, a scoped Mainnet pilot, and enough growers to see whether
+              the journal sticks.
             </p>
           </header>
-          <div class="status-table">
-            <div data-i18n-html="pitch-investor.deck.div10" class="status-row status-head">
-              <span>Capability</span><span>Status</span><span>How you check it</span>
+          <ul class="funds-list">
+            <li data-i18n-html="pitch-investor.deck.liFund1"><strong>Legal</strong> Entity and regulatory framework for the RWA model</li>
+            <li data-i18n-html="pitch-investor.deck.liFund2"><strong>Chain</strong> Solana Devnet to Mainnet development</li>
+            <li data-i18n-html="pitch-investor.deck.liFund3"><strong>Growers</strong> Acquisition from 3 testers to about 30–50</li>
+            <li data-i18n-html="pitch-investor.deck.liFund4"><strong>Retention</strong> Track and demonstrate 30-day retention</li>
+            <li data-i18n-html="pitch-investor.deck.liFund5"><strong>Model</strong> Test the evidence and eligibility hypothesis</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 9. MILESTONES -->
+      <section class="slide slide--dense" data-title="Milestones">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span data-i18n="pitch-investor.deck.span10" class="kicker">09 · Milestones</span>
+            <h2 data-i18n-html="pitch-investor.deck.h28">What makes the <span class="grad">next conversation easier.</span></h2>
+            <p data-i18n="pitch-investor.deck.p25" class="slide-remark">
+              These are the steps that increase company value — not a promise of returns, a list of proof we can
+              bring to the next round.
+            </p>
+          </header>
+          <div class="timeline-viz" aria-label="Milestones">
+            <div data-i18n-html="pitch-investor.deck.div24" class="tl-node"><span class="tl-q">Legal</span><span class="tl-title">Clarify the legal path for the RWA model</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div data-i18n-html="pitch-investor.deck.div25" class="tl-node"><span class="tl-q">Mainnet</span><span class="tl-title">Launch a properly scoped Mainnet pilot</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div data-i18n-html="pitch-investor.deck.div26" class="tl-node"><span class="tl-q">Usage</span><span class="tl-title">Prove repeat usage and 30-day retention</span></div>
+            <div class="tl-line" aria-hidden="true"></div>
+            <div data-i18n-html="pitch-investor.deck.div27" class="tl-node tl-node--final"><span class="tl-q">Channel</span><span class="tl-title">A reliable acquisition path through the Solana ecosystem</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. INVESTOR PROFILE -->
+      <section class="slide slide--dense" data-title="Who this is for">
+        <div class="slide-inner">
+          <header class="slide-head slide-head--dense">
+            <span data-i18n="pitch-investor.deck.span11" class="kicker">10 · Who this is for</span>
+            <h2 data-i18n-html="pitch-investor.deck.h29">Investors who already <span class="grad">know this kind of risk.</span></h2>
+            <p data-i18n="pitch-investor.deck.p26" class="slide-remark">
+              Crypto-native angels, pre-seed investors, Solana ecosystem funds, and people who understand
+              cannabis, real-world assets, consumer software, or early product risk.
+            </p>
+          </header>
+          <div class="claims profile-grid">
+            <div class="claim-col claim-col--yes">
+              <h3 data-i18n="pitch-investor.deck.h317">Fit</h3>
+              <ul>
+                <li data-i18n="pitch-investor.deck.liFit1">Crypto-native angels and pre-seed funds</li>
+                <li data-i18n="pitch-investor.deck.liFit2">Solana ecosystem funds</li>
+                <li data-i18n="pitch-investor.deck.liFit3">Cannabis, RWA, or consumer-software operators</li>
+                <li data-i18n="pitch-investor.deck.liFit4">Investors who underwrite early product risk</li>
+              </ul>
             </div>
-            <div data-i18n-html="pitch-investor.deck.div11" class="status-row">
-              <span>Grow journal · camera · illness check · coach</span>
-              <span class="tag tag--live">Live</span>
-              <span>Sign up at growto.live, no wallet needed</span>
-            </div>
-            <div data-i18n-html="pitch-investor.deck.div12" class="status-row">
-              <span>Stage minting · seed NFTs</span>
-              <span class="tag tag--devnet">Devnet</span>
-              <span>Explorer links on the landing page</span>
-            </div>
-            <div data-i18n-html="pitch-investor.deck.div13" class="status-row">
-              <span>Adopt a plant · escrow market</span>
-              <span class="tag tag--devnet">Devnet</span>
-              <span>Asks require a two-week care trail · live board on the site</span>
-            </div>
-            <div data-i18n-html="pitch-investor.deck.div14" class="status-row">
-              <span>$GROWTOO value</span>
-              <span class="tag tag--mocked">None</span>
-              <span>Test asset by design — stated on every page</span>
-            </div>
-            <div data-i18n-html="pitch-investor.deck.div15" class="status-row">
-              <span>Harvest redemption</span>
-              <span class="tag tag--mocked">Mocked</span>
-              <span>Specified in the RWA docs, not a fulfillment pipeline</span>
-            </div>
-            <div data-i18n-html="pitch-investor.deck.div16" class="status-row">
-              <span>Trustless attestation</span>
-              <span class="tag tag--planned">Planned</span>
-              <span>Operator reviews today — see the trust model</span>
+            <div class="claim-col claim-col--no">
+              <h3 data-i18n="pitch-investor.deck.h318">Not this round</h3>
+              <ul>
+                <li data-i18n="pitch-investor.deck.liSkip1">Anyone underwriting yield or harvest proceeds</li>
+                <li data-i18n="pitch-investor.deck.liSkip2">Anyone who needs current tokens to have a price</li>
+                <li data-i18n="pitch-investor.deck.liSkip3">Anyone who needs proven retention before writing a cheque</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- 6. ECONOMICS -->
-      <section class="slide slide--dense slide--adopt" data-title="Economics">
-        <div class="adopt-deco" aria-hidden="true"><div class="adopt-orb"></div></div>
+      <!-- 11. HONEST CASE -->
+      <section class="slide slide--dense" data-title="Honest case">
         <div class="slide-inner">
           <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span7" class="kicker">06 · Economics</span>
-            <h2 data-i18n-html="pitch-investor.deck.h25">Back it early. <span class="grad">Own more of the harvest.</span></h2>
-            <p data-i18n="pitch-investor.deck.p21" class="slide-remark">
-              A grower opens a plant or batch for backing, adopters stake in, and earlier entry carries a heavier
-              share weight because it carries more risk. Harvest proceeds split pro-rata.
+            <span data-i18n="pitch-investor.deck.span12" class="kicker">11 · Honest case</span>
+            <h2 data-i18n-html="pitch-investor.deck.h210">A validation round. <span class="grad">Not a return story.</span></h2>
+            <p data-i18n="pitch-investor.deck.p27" class="slide-remark">
+              The round funds the work needed to test whether reliable grower data can become a trusted
+              foundation for future RWA applications. The main risk is still unproven user retention and the
+              legal structure.
             </p>
           </header>
-          <div class="grid grid-3 economics-roles">
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h314">Grower</h3>
-              <p data-i18n="pitch-investor.deck.p22" class="card-tagline">Documents the grow · keeps the majority share</p>
-            </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h315">Adopter</h3>
-              <p data-i18n="pitch-investor.deck.p23" class="card-tagline">Backs early · weight by stage of entry</p>
-            </article>
-            <article class="card card--dense">
-              <h3 data-i18n="pitch-investor.deck.h316">Platform</h3>
-              <p data-i18n="pitch-investor.deck.p24" class="card-tagline">Escrow · market · verification · fee</p>
-            </article>
+          <div class="claims">
+            <div class="claim-col claim-col--yes">
+              <h3 data-i18n="pitch-investor.deck.h319">We say</h3>
+              <ul>
+                <li data-i18n="pitch-investor.deck.liYes1">Evidence-backed assets and asset provenance</li>
+                <li data-i18n="pitch-investor.deck.liYes2">Verification-driven tokenisation on Devnet today</li>
+                <li data-i18n="pitch-investor.deck.liYes3">Harvest-backed assets as a future application, not a live claim</li>
+              </ul>
+            </div>
+            <div class="claim-col claim-col--no">
+              <h3 data-i18n="pitch-investor.deck.h320b">We do not say</h3>
+              <ul>
+                <li data-i18n="pitch-investor.deck.liNo1">Guaranteed yield or guaranteed returns</li>
+                <li data-i18n="pitch-investor.deck.liNo2">Easy ownership of harvest proceeds</li>
+                <li data-i18n="pitch-investor.deck.liNo3">Investment performance, or that current tokens have monetary value</li>
+              </ul>
+            </div>
           </div>
-          <div data-i18n-html="pitch-investor.deck.div17" class="economics-weights">
-            <span class="economics-weight economics-weight--seed"><strong>Seed</strong> 3×</span>
-            <span class="economics-weight economics-weight--growth"><strong>Growth</strong> 2×</span>
-            <span class="economics-weight economics-weight--flower"><strong>Flower</strong> 1.5×</span>
-            <span class="economics-weight economics-weight--late"><strong>Late</strong> 1×</span>
-          </div>
-          <p data-i18n="pitch-investor.deck.p25" class="footnote">
-            Weights are the designed model on devnet, not a live financial instrument. Nothing here is an offer
-            or a return promise; see the risks page.
+          <p data-i18n="pitch-investor.deck.p28" class="footnote">
+            If the journal does not retain growers, the RWA layer has nothing underneath it. That is the test this raise is for.
           </p>
         </div>
       </section>
 
-      <!-- 7. WHY NOW -->
-      <section class="slide slide--dense" data-title="Why now">
-        <div class="slide-inner">
-          <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span8" class="kicker">07 · Why now</span>
-            <h2 data-i18n-html="pitch-investor.deck.h26">Rules opening. <span class="grad">Tooling missing.</span></h2>
-            <p data-i18n="pitch-investor.deck.p26" class="slide-remark">
-              European cultivation rules are loosening, which means more people are being asked to document grows
-              properly — and almost none of them have a decent way to do it. Meanwhile RWA capital keeps looking
-              for assets that aren’t another fund wrapper.
-            </p>
-          </header>
-          <div class="grid grid-3 traction traction--dense">
-            <div data-i18n-html="pitch-investor.deck.div18" class="t-card"><span class="t-num">Demand</span><span class="t-label">Documentation becoming expected</span></div>
-            <div data-i18n-html="pitch-investor.deck.div19" class="t-card"><span class="t-num">Gap</span><span class="t-label">Few tools built for cannabis growers</span></div>
-            <div data-i18n-html="pitch-investor.deck.div20" class="t-card"><span class="t-num">Angle</span><span class="t-label">RWA that a person can actually watch</span></div>
-          </div>
-          <div class="personas--dense grid grid-3">
-            <article class="persona"><div data-i18n="pitch-investor.deck.h314" class="persona-tag">Grower</div><h3 data-i18n="pitch-investor.deck.h317">Journal · camera · seal</h3></article>
-            <article class="persona persona--mid"><div data-i18n="pitch-investor.deck.h315" class="persona-tag">Adopter</div><h3 data-i18n="pitch-investor.deck.h318">Back a plant · verify</h3></article>
-            <article class="persona"><div data-i18n="pitch-investor.deck.div23" class="persona-tag">Buyer</div><h3 data-i18n="pitch-investor.deck.h319">Documented harvest lots</h3></article>
-          </div>
-        </div>
-      </section>
-
-      <!-- 8. ROADMAP -->
-      <section class="slide slide--dense" data-title="Roadmap">
-        <div class="slide-inner">
-          <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span9" class="kicker">08 · Roadmap</span>
-            <h2 data-i18n-html="pitch-investor.deck.h27">Live today. <span class="grad">Building next.</span></h2>
-            <p data-i18n="pitch-investor.deck.p27" class="slide-remark">
-              We publish milestones instead of a vague “soon”. The gate to the live network is the redemption flow,
-              not a marketing date.
-            </p>
-          </header>
-          <div class="timeline-viz" aria-label="Roadmap">
-            <div data-i18n-html="pitch-investor.deck.div24" class="tl-node"><span class="tl-q">Now</span><span class="tl-title">Journal · camera · coach · seal · adopt on devnet</span></div>
-            <div class="tl-line" aria-hidden="true"></div>
-            <div data-i18n-html="pitch-investor.deck.div25" class="tl-node"><span class="tl-q">Next</span><span class="tl-title">Stronger attestations · batch backing</span></div>
-            <div class="tl-line" aria-hidden="true"></div>
-            <div data-i18n-html="pitch-investor.deck.div26" class="tl-node"><span class="tl-q">Then</span><span class="tl-title">Harvest redemption · mainnet pilot</span></div>
-            <div class="tl-line" aria-hidden="true"></div>
-            <div data-i18n-html="pitch-investor.deck.div27" class="tl-node tl-node--final"><span class="tl-q">Y2</span><span class="tl-title">EU batches · documented harvest market</span></div>
-          </div>
-          <div data-i18n-html="pitch-investor.deck.div28" class="chip-row chip-row--center">
-            <span class="chip">Journal is free, always</span>
-            <span class="chip">Asset layer opt-in</span>
-            <span class="chip">Docs public before launch</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- 9. TEAM -->
-      <section class="slide slide--dense" data-title="Team">
-        <div class="slide-inner">
-          <header class="slide-head slide-head--dense">
-            <span data-i18n="pitch-investor.deck.span10" class="kicker">09 · Team</span>
-            <h2 data-i18n-html="pitch-investor.deck.h28">Builders who <span class="grad">ship.</span></h2>
-            <p data-i18n="pitch-investor.deck.p28" class="slide-remark">
-              Product and engineering in one pair of hands, with the whole stack — app, backend, programs, docs —
-              built and deployed rather than outsourced.
-            </p>
-          </header>
+      <!-- 12. TEAM + CLOSE -->
+      <section class="slide slide--dense slide--contact" data-title="Close">
+        <div class="slide-inner contact contact--dense">
+          <span data-i18n="pitch-investor.deck.span13" class="kicker">12 · Close</span>
+          <h2 data-i18n-html="pitch-investor.deck.h212">Documentation <span class="grad">is the asset.</span></h2>
+          <p data-i18n-html="pitch-investor.deck.p33" class="closer">
+            “Journal first, proof second.”
+            <span class="closer-attr">Then show the testers and the risks page</span>
+          </p>
           <div class="grid team team--founders team--dense">
             <div class="member">
               <div data-i18n="pitch-investor.deck.div29" class="avatar">BI</div>
               <h3 data-i18n="pitch-investor.deck.h320">Bela Ikotić</h3>
-              <p data-i18n-html="pitch-investor.deck.p29" class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
-              <p data-i18n-html="pitch-investor.deck.p30" class="member-short">growtoo architecture &amp; AI roadmap.</p>
+              <p data-i18n-html="pitch-investor.deck.p30" class="role">Product · engineering · <a href="https://adverta.io/" target="_blank" rel="noreferrer">Adverta</a></p>
+              <p data-i18n="pitch-investor.deck.p31" class="member-short">growtoo architecture and AI roadmap.</p>
             </div>
           </div>
-          <p data-i18n="pitch-investor.deck.p31" class="footnote">
-            Everything in this deck is checkable today: the app, the transactions, the architecture docs, and the
-            risks page are all public.
-          </p>
-        </div>
-      </section>
-
-      <!-- 10. CLOSE -->
-      <section class="slide slide--dense slide--contact" data-title="Close">
-        <div class="slide-inner contact contact--dense">
-          <span data-i18n="pitch-investor.deck.span11" class="kicker">10 · Close</span>
-          <h2 data-i18n-html="pitch-investor.deck.h29">Documentation <span class="grad">is the asset.</span></h2>
-          <p data-i18n-html="pitch-investor.deck.p32" class="closer">
-            “Everyone else is tokenising a promise. We’re tokenising a paper trail.”
-            <span class="closer-attr">Say this, then stop talking</span>
-          </p>
           <div class="vision-points vision-points--dense">
-            <div data-i18n-html="pitch-investor.deck.div30"><strong>Y1</strong> Devnet proof loop + EU journal</div>
-            <div data-i18n-html="pitch-investor.deck.div31"><strong>Y2</strong> Batch backing · mainnet pilot</div>
-            <div data-i18n-html="pitch-investor.deck.div32"><strong>Y3</strong> Documented harvest market</div>
+            <div data-i18n-html="pitch-investor.deck.div30"><strong>Now</strong> Three growers · Devnet · one week of data</div>
+            <div data-i18n-html="pitch-investor.deck.div31"><strong>This round</strong> Legal path · Mainnet pilot · 30–50 growers · 30-day retention</div>
+            <div data-i18n-html="pitch-investor.deck.div32"><strong>Next conversation</strong> Evidence that the journal holds</div>
           </div>
           <div class="contact-grid">
             <div data-i18n-html="pitch-investor.deck.div33"><span class="meta-label">Live</span><a class="meta-value" href="https://growto.live" target="_blank" rel="noreferrer">growto.live</a></div>
             <div data-i18n-html="pitch-investor.deck.div34"><span class="meta-label">Docs</span><a class="meta-value" href="https://growto.live/rwa-docs/" target="_blank" rel="noreferrer">RWA architecture</a></div>
             <div data-i18n-html="pitch-investor.deck.div35"><span class="meta-label">Contact</span><span class="meta-value">admin@growto.live</span></div>
           </div>
-          <p data-i18n="pitch-investor.deck.p33" class="thanks">Thank you.</p>
+          <p data-i18n="pitch-investor.deck.p32" class="footnote">
+            The app, the Devnet transactions, the architecture docs, and the risks page are public. Check those before the model.
+          </p>
+          <p data-i18n="pitch-investor.deck.p34" class="thanks">Thank you.</p>
         </div>
       </section>
     </main>
 
     <div class="hud" aria-hidden="true">
       <button class="hud-btn" id="prevBtn" aria-label="Previous slide">←</button>
-      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">10</span></span>
+      <span class="hud-counter"><span id="curSlide">1</span> / <span id="totalSlides">12</span></span>
       <button class="hud-btn" id="nextBtn" aria-label="Next slide">→</button>
     </div>
 

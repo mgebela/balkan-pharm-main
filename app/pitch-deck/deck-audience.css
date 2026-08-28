@@ -456,6 +456,101 @@
   .g-tile { min-height: 0; }
 }
 
+/* ---- Investor: the ask on the cover ---- */
+.ask-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 18px;
+  margin-top: 22px;
+  padding: 14px 18px;
+  max-width: 860px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+}
+.ask-banner .ask-label {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.ask-banner .ask-amount {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.4vw, 32px);
+  font-weight: 500;
+  color: var(--ink);
+}
+.ask-banner .ask-meta {
+  font-size: 14px;
+  color: var(--ink-dim);
+}
+
+.hypothesis {
+  margin-top: 22px;
+  padding: 16px 20px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+.hypothesis strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.term-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.funds-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 18px;
+  margin-top: 22px;
+  padding: 0;
+  list-style: none;
+}
+.funds-list li {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px 18px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+.funds-list li strong {
+  display: block;
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.funds-list li:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+/* Cover ask sits above the spoken line */
+.slide--cover .ask-banner {
+  margin-top: 18px;
+  margin-bottom: 4px;
+}
+
 /* ---- Print / PDF export (P in any deck) ---- */
 @media print {
   .deck-switch { display: none !important; }
