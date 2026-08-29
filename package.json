@@ -27,7 +27,13 @@
     "traffic:seed": "npm run traffic:seed --prefix chain",
     "traffic:day": "npm run traffic:day --prefix chain",
     "traffic:wipe": "npm run traffic:wipe --prefix chain",
-    "traffic:journal": "npm run traffic:journal --prefix chain"
+    "traffic:journal": "npm run traffic:journal --prefix chain",
+    "community:daily": "npm run daily --prefix community-agent",
+    "community:discover": "npm run discover --prefix community-agent",
+    "community:drafts": "npm run drafts --prefix community-agent",
+    "community:weekly": "npm run weekly --prefix community-agent",
+    "community:review": "npm run review --prefix community-agent",
+    "community:test": "npm test --prefix community-agent"
   },
   "dependencies": {
     "@solana/web3.js": "^1.98.4"

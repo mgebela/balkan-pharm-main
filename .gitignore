@@ -1,5 +1,6 @@
 node_modules/
 functions/node_modules/
+community-agent/node_modules/
 .DS_Store
 *.local
 app/dev-preview.html
@@ -8,6 +9,7 @@ app/dev-preview.html
 .env
 .env.*
 !.env.example
+!community-agent/.env.example
 chain/.env
 chain/keys/
 functions/.env
