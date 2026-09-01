@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>growtoo Labs — $200k operating raise</title>
+    <meta
+      name="description"
+      content="Raise I: $200,000 for growtoo Labs — the operating company behind a journal-first plant RWA platform on Solana. Not a token sale. Not Raise II."
+    />
+    <link rel="canonical" href="https://growto.live/pitch/labs/" />
+    <meta name="robots" content="noindex" />
+    <meta name="theme-color" content="#f5faf3" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/app/pitch-deck/styles.css?v=20260828f" />
+    <style>
+      html { scroll-snap-type: none; }
+      body { overflow-x: hidden; }
+      .paper {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 56px 28px 96px;
+      }
+      .paper-kicker {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin: 0 0 12px;
+      }
+      .paper h1 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: clamp(32px, 5vw, 46px);
+        line-height: 1.15;
+        margin: 0 0 16px;
+      }
+      .paper .lede {
+        font-size: 18px;
+        color: var(--ink-dim);
+        margin: 0 0 28px;
+      }
+      .meta-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px 24px;
+        padding: 16px 0 8px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 36px;
+      }
+      .meta-grid dt {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink-mute);
+      }
+      .meta-grid dd { margin: 2px 0 0; font-weight: 600; }
+      .raise-pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 20px 0 32px;
+      }
+      .raise-card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        padding: 20px 22px;
+      }
+      .raise-card.this { border-color: var(--green); background: var(--panel-strong); }
+      .raise-card .who {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--green);
+      }
+      .raise-card h3 { font-size: 20px; margin: 8px 0 6px; font-family: var(--font-display); font-weight: 500; }
+      .raise-card p { margin: 0; font-size: 14px; color: var(--ink-dim); }
+      .paper h2 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 26px;
+        margin: 40px 0 12px;
+      }
+      .paper h3 { font-size: 16px; margin: 22px 0 8px; }
+      .paper p, .paper li { font-size: 15.5px; }
+      .paper ul, .paper ol { padding-left: 1.2em; }
+      .paper li { margin: 6px 0; }
+      .steps { counter-reset: step; list-style: none; padding: 0; }
+      .steps li {
+        counter-increment: step;
+        position: relative;
+        padding: 12px 0 12px 56px;
+        border-bottom: 1px solid var(--border);
+      }
+      .steps li::before {
+        content: counter(step, decimal-leading-zero);
+        position: absolute;
+        left: 0;
+        top: 14px;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--green);
+      }
+      .steps strong { display: block; margin-bottom: 4px; }
+      .alloc {
+        display: grid;
+        grid-template-columns: 88px 1fr;
+        gap: 8px 16px;
+        align-items: start;
+        margin: 16px 0 8px;
+      }
+      .alloc .pct {
+        font-family: var(--font-mono);
+        font-size: 18px;
+        color: var(--green);
+        padding-top: 2px;
+      }
+      table.paper-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+        margin: 12px 0 20px;
+      }
+      table.paper-table th,
+      table.paper-table td {
+        text-align: left;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      table.paper-table th {
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-mute);
+        font-weight: 600;
+      }
+      .note {
+        font-size: 13.5px;
+        color: var(--ink-dim);
+        border-left: 3px solid var(--green);
+        padding: 8px 0 8px 14px;
+        margin: 18px 0;
+      }
+      .warn {
+        border-left-color: var(--orange);
+      }
+      .paper footer.paper-end {
+        margin-top: 48px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+        font-size: 13px;
+        color: var(--ink-mute);
+      }
+      .paper a { color: var(--green-2); }
+      .toolbar {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 8px 0 28px;
+        font-size: 13px;
+      }
+      @media (max-width: 700px) {
+        .raise-pair, .meta-grid { grid-template-columns: 1fr; }
+        .paper { padding: 36px 18px 72px; }
+      }
+      @media print {
+        .bg-gradient, .bg-grid, .toolbar { display: none !important; }
+        .paper { padding: 0; max-width: none; }
+        a { text-decoration: none; color: inherit; }
+        .raise-card.this { background: #eaf6e6; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-gradient" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <article class="paper">
+      <p class="paper-kicker">growtoo Labs · confidential proposal · September 2026</p>
+      <h1>Everyone tokenises a promise. We build the paper trail first.</h1>
+      <p class="lede">
+        A journal-first investment platform for living plants on Solana.
+        Raise I funds the operating company. Raise II — a harvest SPV — comes later,
+        after the legal path exists. This paper is Raise I only.
+      </p>
+
+      <p class="toolbar">
+        <a href="https://growto.live">growto.live</a>
+        ·
+        <a href="../investor/">Investor deck</a>
+        ·
+        <a href="https://growto.live/rwa-docs/">RWA docs</a>
+        ·
+        <a href="https://growto.live/risks/">Risks</a>
+        ·
+        Print / Save as PDF from the browser
+      </p>
+
+      <dl class="meta-grid">
+        <div>
+          <dt>This round</dt>
+          <dd>Raise I · Labs · $200,000</dd>
+        </div>
+        <div>
+          <dt>Designed post-money</dt>
+          <dd>$800,000 · 25% of Labs</dd>
+        </div>
+        <div>
+          <dt>Instrument</dt>
+          <dd>Operating company (SAFE / equity — counsel)</dd>
+        </div>
+        <div>
+          <dt>Not this round</dt>
+          <dd>Token sale · harvest SPV · Mainnet money</dd>
+        </div>
+      </dl>
+
+      <h2>Two raises. Same architecture as a collectible RWA desk — different asset.</h2>
+      <p>
+        Jurassic Finance split the work correctly: Labs first (infrastructure, team, legal),
+        specimen SPV second (the thing people actually own). growtoo uses that split.
+        The asset is a living plant with a care trail, not a static fossil.
+        The journal is already live. The first harvest SPV is not.
+      </p>
+
+      <div class="raise-pair">
+        <div class="raise-card this">
+          <div class="who">This paper · Raise I</div>
+          <h3>Labs · $200k</h3>
+          <p>
+            Operating company. Twelve months of runway, legal entity, Mainnet-ready rails,
+            and 30–50 growers who actually keep a journal. No harvest rights sold here.
+          </p>
+        </div>
+        <div class="raise-card">
+          <div class="who">Later · Raise II</div>
+          <h3>First harvest SPV</h3>
+          <p>
+            A separate vehicle, after regulation is scoped. Token holders would receive
+            economic rights to a documented batch — not this round, not on Devnet.
+          </p>
+        </div>
+      </div>
+
+      <h2>What we’re building</h2>
+      <p>
+        growtoo Labs originates plant history, seals completed stages on Solana, and
+        (later) structures harvest SPVs. Authentication today is the journal trail plus
+        an operator check. Custody of a living plant stays with the grower. Ownership
+        of a future harvest share would live in the SPV — only after counsel signs off.
+      </p>
+      <ol class="steps">
+        <li>
+          <strong>Log it — live now</strong>
+          Free grow journal: watering, feeding, stages, photos, illness check, AI coach,
+          weather, stories. No wallet. Indoor, outdoor, or mixed.
+        </li>
+        <li>
+          <strong>Seal it — Solana Devnet</strong>
+          Optional stage-linked plant tokens, $GROWTOO test rewards, on-chain escrow,
+          instant sale or adopt-stake (half now, half as care continues). Listing needs
+          14 days of care, at least half those days logged. Same-day mint-and-list is blocked.
+        </li>
+        <li>
+          <strong>Hold it — Raise II, after legal</strong>
+          Each documented harvest batch as a dedicated SPV with its own token.
+          Holders receive economic rights via the operating agreement.
+          Physical redemption is specified, mocked on Devnet, not a live pipeline.
+        </li>
+      </ol>
+
+      <h2>Why this round is not a token sale</h2>
+      <p>
+        Jurassic could put Labs on a permissionless ICO because the first asset is a
+        museum-grade fossil with off-chain custody. A cannabis-adjacent harvest right
+        cannot be sold that way until an entity and a regulatory path exist.
+        $GROWTOO on Devnet has no monetary value by design. This $200k is cash into
+        Labs so that Raise II is even possible.
+      </p>
+      <p class="note">
+        Nothing in this paper is an offer of securities, a promise of yield, or a claim
+        on physical plant material. Designed economics below are a model, not a live instrument.
+      </p>
+
+      <h2>Use of funds — $200,000</h2>
+      <p>
+        Same shape as a Labs raise: most of it is time, a slice is lawyers, the rest
+        builds the thing Raise II needs.
+      </p>
+      <div class="alloc">
+        <div class="pct">50%</div>
+        <div>
+          <strong>$100,000 — 12 months runway</strong>
+          <p>Product and engineering, grower ops, hosting, coach inference, Solana fees. Monthly operating allowance $8,000. Spend above that needs written approval from the raise lead (or, if a DAO wrapper exists later, a governance proposal).</p>
+        </div>
+        <div class="pct">15%</div>
+        <div>
+          <strong>$30,000 — Legal</strong>
+          <p>Entity formation, IP assignment, RWA / harvest regulatory counsel, terms for a future SPV. Heavier than a collectible SPV because cultivation rules differ by jurisdiction.</p>
+        </div>
+        <div class="pct">35%</div>
+        <div>
+          <strong>$70,000 — Mainnet rails + first cohort</strong>
+          <p>Move mint/escrow from Devnet operator-queue toward a scoped Mainnet pilot, harden attestations, expand from early testers to ~30–50 growers, measure 30-day journal retention. Seed work for Raise II (SPV term sheet, not the acquisition itself).</p>
+        </div>
+      </div>
+      <p class="note">
+        Monthly allowance: <strong>$8,000</strong>. Twelve months × $8k = the runway line.
+        Legal and Mainnet are drawn against their own buckets, not the monthly cap.
+      </p>
+
+      <h2>Why plants</h2>
+      <ul>
+        <li><strong>Evidence is the product.</strong> Most RWA desks tokenise a promise, then scramble for paperwork. growtoo inverts that: the journal is the funnel; the token is optional.</li>
+        <li><strong>Living, not static.</strong> A fossil is authenticated once. A plant accrues a trail every watering. Adopt-stake already pays the grower to keep logging.</li>
+        <li><strong>Recurring origination.</strong> Cycles repeat. Labs does not need a nine-figure specimen every year to have a next SPV.</li>
+        <li><strong>Rules are opening, tooling is not.</strong> Growers still reconstruct week nine from a notebook and a camera roll. Documentation is becoming expected; the desk for it is missing.</li>
+        <li><strong>Universally legible.</strong> “Follow this plant” does not require a DeFi primer. Crypto stays behind a Profile unlock.</li>
+      </ul>
+
+      <h2>How this maps to Jurassic Finance (Raise I)</h2>
+      <table class="paper-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Jurassic Finance Labs</th>
+            <th>growtoo Labs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Raise I</td>
+            <td>$200k operating company</td>
+            <td>$200k operating company</td>
+          </tr>
+          <tr>
+            <td>Raise II</td>
+            <td>First fossil SPV (~$1M / later 660k USDC)</td>
+            <td>First harvest SPV — after legal path</td>
+          </tr>
+          <tr>
+            <td>Underlying</td>
+            <td>Authenticated specimen, museum custody</td>
+            <td>Documented plant, grower custody, journal trail</td>
+          </tr>
+          <tr>
+            <td>On-chain today</td>
+            <td>Labs ICO via MetaDAO; contracts after raise</td>
+            <td>Devnet NFTs, $GROWTOO, escrow program — test value only</td>
+          </tr>
+          <tr>
+            <td>Off-chain today</td>
+            <td>Authentication, insurance, display</td>
+            <td>Live PWA journal, coach, photos, 14-day listing gate</td>
+          </tr>
+          <tr>
+            <td>This round sells</td>
+            <td>Labs governance / treasury</td>
+            <td>Labs equity (or SAFE) — not $GROWTOO, not harvest title</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Jurassic priced Labs at $400k with no product in market. growtoo prices Labs at
+        <strong>$800k post-money</strong> because the desk, the mint gate, and the escrow
+        path already run on Devnet and can be checked. That is still a designed ask, not a
+        priced round.
+      </p>
+
+      <h2>Upside case</h2>
+      <p>
+        We are not selling a 100× venture outcome. We are selling a real operating company
+        with a free top-of-funnel (the journal) and a later origination business (harvest SPVs).
+      </p>
+      <p>
+        A single compliant harvest SPV, once Raise II is legal, generates origination and
+        platform fees for Labs. Growers keep the majority share under the designed model;
+        adopters enter at a stage-weighted stake; Labs takes the market/escrow layer.
+        Five to ten documented batches over two seasons is a realistic pipeline only if
+        growers actually journal — which is why 30-day retention is a Raise I milestone,
+        not a slide-deck vanity metric.
+      </p>
+      <p>
+        The lending market against SPV tokens that Jurassic scheduled for Q4 is
+        <strong>out of scope</strong> for growtoo until harvest rights are real.
+        We will not copy yield onto a test token.
+      </p>
+
+      <h2>What is already built</h2>
+      <table class="paper-table">
+        <thead>
+          <tr><th>Capability</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PWA journal, log, camera, illness check, AI coach, stories</td><td>Live</td></tr>
+          <tr><td>Firebase Auth, Firestore, public journal, Terms / Privacy / Risks</td><td>Live</td></tr>
+          <tr><td>Phantom / Solflare / watch-only wallet link</td><td>Live</td></tr>
+          <tr><td>Stage minting, seed NFTs, adopt-stake, on-chain escrow</td><td>Solana Devnet</td></tr>
+          <tr><td>$GROWTOO</td><td>Test asset — no monetary value</td></tr>
+          <tr><td>Physical harvest redemption</td><td>Specified, mocked</td></tr>
+          <tr><td>Legal entity, Mainnet money, trustless attestation</td><td>This raise</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Public verification: <a href="https://growto.live">growto.live</a>,
+        <a href="https://growto.live/rwa-docs/">architecture</a>,
+        <a href="https://growto.live/risks/">risks</a>,
+        Devnet addresses in the open repository
+        (<code>chain/deployed.devnet.json</code>).
+        Collaboration with SuperteamBLKN is underway; this paper does not claim a Solana Foundation grant or a waitlist number we do not publish.
+      </p>
+
+      <h2>12-month roadmap (Raise I capital)</h2>
+      <table class="paper-table">
+        <thead>
+          <tr><th>When</th><th>What ships</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Now</td>
+            <td>Journal, coach, Devnet seal / market. Early growers on the desk.</td>
+          </tr>
+          <tr>
+            <td>Q4 2026</td>
+            <td>Legal entity. Regulatory memo for harvest SPVs. Stronger attestations on the journal trail.</td>
+          </tr>
+          <tr>
+            <td>H1 2027</td>
+            <td>Scoped Mainnet pilot. 30–50 growers. Report 30-day retention. Term sheet for Raise II.</td>
+          </tr>
+          <tr>
+            <td>Later (Raise II)</td>
+            <td>First harvest SPV, subject to counsel, licensing, and operational custody. Not funded here.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="note">
+        The 14-day / 50% care listing rule is a hypothesis that already runs on Devnet.
+        It is process evidence, not proof a physical plant exists. Fabricated logs remain
+        a residual risk until attestation hardens — that work is in the 35% bucket.
+      </p>
+
+      <h2>Team</h2>
+      <p>
+        <strong>Bela Ikotić</strong> — product and engineering. Building the journal-first
+        product, evidence model, and AI coach. Testing with early growers.
+        Contact: <a href="mailto:bela.ikotic@gmail.com">bela.ikotic@gmail.com</a>
+        · <a href="mailto:admin@growto.live">admin@growto.live</a>
+      </p>
+      <p>
+        This is a single-operator Labs today. Raise I runway is meant to keep that operator
+        shipping and to pay counsel — not to staff a 12-person company. If a second operator
+        is hired, it comes out of the $8k monthly allowance or a written overage, not a silent
+        new line.
+      </p>
+
+      <h2>Operating rules</h2>
+      <h3>Monthly allowance</h3>
+      <p>
+        $8,000 / month from the runway bucket without a new approval. Larger draws from
+        legal or Mainnet buckets still require a written decision log (date, amount, purpose).
+      </p>
+      <h3>Harvest lockup</h3>
+      <p>
+        Labs will not bring a proposal to sell physical harvest rights until Raise II exists
+        and counsel has signed the SPV. No “specimen flip” of a living crop on the back of
+        this $200k.
+      </p>
+      <h3>Emergency</h3>
+      <p>
+        If a listing or mint is at legal or safety risk (seizure, platform abuse, fabricated
+        trail), the operator may freeze or delist first and ratify after. Narrow clause:
+        asset and user protection, not a change to the raise purpose.
+      </p>
+      <h3>Brand and IP</h3>
+      <p>
+        The growtoo name, mark, and product remain with the founder until assigned into the
+        Labs entity formed with this capital. Custom product code developed for Labs is
+        intended to sit in that entity. Open-source libraries, Firebase, and Solana programs
+        stay under their own licenses. Domain: <a href="https://growto.live">growto.live</a>.
+      </p>
+
+      <h2>Designed Labs economics (not live)</h2>
+      <p>
+        If and only if counsel later approves an on-chain Labs token, the intended shape
+        rhymes with a transparent Labs float — not with selling harvest title.
+      </p>
+      <table class="paper-table">
+        <thead>
+          <tr><th>Line</th><th>Designed figure</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Cash this round</td><td>$200,000</td></tr>
+          <tr><td>Post-money (Labs)</td><td>$800,000</td></tr>
+          <tr><td>Investor share of Labs</td><td>25%</td></tr>
+          <tr><td>Founder / operator</td><td>75% at close, subject to counsel</td></tr>
+          <tr><td>$GROWTOO</td><td>Unchanged: Devnet test asset, no value</td></tr>
+          <tr><td>First harvest token</td><td>Raise II only</td></tr>
+        </tbody>
+      </table>
+      <p class="note warn">
+        There is no live ICO, no implied FDV on a ticker, and no permissionless mint of Labs
+        equity. Copying a MetaDAO supply table onto this product before an entity exists
+        would be theatre. We will publish that table if we ever run that mechanism — not before.
+      </p>
+
+      <h2>Risks (read before any wire)</h2>
+      <ul>
+        <li>Single operator and a single Devnet collection authority today.</li>
+        <li>Journal entries can still be fabricated until attestations harden.</li>
+        <li>CBD / cannabis rules vary by country; growtoo is a documentation tool, not a licensed cultivator or broker.</li>
+        <li>Mainnet and physical redemption may slip or never ship if counsel says no.</li>
+        <li>No third-party audit claimed. Audit is planned before Mainnet money, not done.</li>
+        <li>Early-grower counts are small. Retention is a goal of this raise, not a trailing metric we can show at scale.</li>
+      </ul>
+
+      <h2>Close</h2>
+      <p>
+        Jurassic Finance proved that a $200k Labs raise can be told as “build the desk,
+        then buy the specimen.” growtoo is the same sentence with the specimen still in the
+        ground: <strong>build the trail, then sell the harvest — and only if the law allows.</strong>
+      </p>
+      <p>
+        The journal is live. The chain is optional and already testable. The $200k is to
+        make the second raise honest.
+      </p>
+
+      <footer class="paper-end">
+        growtoo Labs · Raise I proposal · September 2026 · not an offer of securities<br />
+        Live: <a href="https://growto.live">growto.live</a>
+        · Deck: <a href="../investor/">pitch/investor</a>
+        · Contact: bela.ikotic@gmail.com
+      </footer>
+    </article>
+  </body>
+</html>
