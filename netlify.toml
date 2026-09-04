@@ -53,6 +53,39 @@
   status = 200
   force = true
 
+# ── shorthand /investor → real deck (people type /hr/investor/) ─
+# Must sit above the /hr/* and /de/* rewrites or /hr/investor/ is
+# rewritten to a missing /investor/ and the 404 catch-all wins.
+[[redirects]]
+  from = "/investor"
+  to = "/pitch/investor/"
+  status = 301
+
+[[redirects]]
+  from = "/investor/"
+  to = "/pitch/investor/"
+  status = 301
+
+[[redirects]]
+  from = "/hr/investor"
+  to = "/hr/pitch/investor/"
+  status = 301
+
+[[redirects]]
+  from = "/hr/investor/"
+  to = "/hr/pitch/investor/"
+  status = 301
+
+[[redirects]]
+  from = "/de/investor"
+  to = "/de/pitch/investor/"
+  status = 301
+
+[[redirects]]
+  from = "/de/investor/"
+  to = "/de/pitch/investor/"
+  status = 301
+
 # ── /hr/*, /de/* → the same files, rendered in that language ─
 # One rule per language, and nothing else: the i18n runtime reads the prefix
 # off the URL, so the page, its assets and its relative links all resolve
