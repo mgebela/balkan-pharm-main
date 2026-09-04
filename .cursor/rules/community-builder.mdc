@@ -1,9 +1,0 @@
----
-description: Use the growtoo community-builder skill for social drafts, queues, and weekly community reports.
-globs: community/**
-alwaysApply: false
----
-
-When editing files under `community/` or `community-agent/`, follow `.cursor/skills/community-builder/SKILL.md` and run the TypeScript agent in `community-agent/`.
-
-Draft only. Queue for human approval. Use claims from `community-agent/config/product-facts.md`. Never publish, mass-DM, scrape private data, invent traction, or claim personal growing experience.
