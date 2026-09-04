@@ -1,7 +1,7 @@
 {
   "span": "growtoo · deckovi",
   "h1": "U koju sobu <span class=\"grad\">ulaziš?</span>",
-  "p": "Pet deckova plus papir Labs runde. Isti proizvod, drugačiji redoslijed argumenata. Svaki deck otvara rečenicom koja mu pripada i zatvara jednom rečenicom za kraj.",
+  "p": "Pet deckova, isti proizvod, drugačiji redoslijed argumenata. Svaki otvara rečenicom koja mu pripada i zatvara jednom rečenicom za kraj.",
   "span2": "Uzgajivači · zajednice · sajmovi",
   "h2": "Deck za uzgajivače",
     "p2": "Živi stol: dnevnik, zapis, kamera, provjera bolesti, savjetnik, priče. Dokaz na kraju, ako želiš. Kripto nikad ne vodi.",
@@ -27,12 +27,7 @@
   "p14": "Za sobu punu Solana ljudi. Gamifikacija je kapija za kovanje, ulog posvojitelja, što je stvarno na devnetu s adresama, zašto je uopće potreban lanac — i slajd statusa koji kaže što nije gotovo.",
   "p15": "„Ovdje se do kovanja ne može doći novcem.”",
     "p16": "13 slajdova · 10–12 min",
-  "span7": "Labs runda · papir 200k $",
-  "h26": "Prijedlog Raise I",
-  "p18": "Dugi papir Labs runde u obliku Jurassic Finance Raise I: operativna tvrtka sada, SPV berbe kasnije. Troškovnik, roadmap, IP, poštene granice.",
-  "p19": "„Sagradi trag. Berbu prodaj tek ako zakon dopusti.”",
-  "p20": "Prijedlog · ispis u PDF",
-  "p17": "Labs papir: <a href=\"/pitch/labs/\">Raise I · 200k $</a> · Cijeli tehnički deck: <a href=\"/app/pitch-deck/\">Growtoo — tehnički pregled</a> · Proizvod uživo: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Tipkovnica u svakom decku: <strong>→ / ←</strong> za kretanje, <strong>F</strong> za cijeli zaslon, <strong>P</strong> za ispis ili izvoz u PDF, <strong>☰</strong> za popis slajdova.",
+  "p17": "Cijeli tehnički deck: <a href=\"/app/pitch-deck/\">Growtoo — tehnički pregled</a> · Proizvod uživo: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Tipkovnica u svakom decku: <strong>→ / ←</strong> za kretanje, <strong>F</strong> za cijeli zaslon, <strong>P</strong> za ispis ili izvoz u PDF, <strong>☰</strong> za popis slajdova.",
   "meta": {
     "title": "growtoo — Koji deck?"
   }

@@ -1,7 +1,7 @@
 {
   "span": "growtoo · decks",
   "h1": "Which room are you <span class=\"grad\">walking into?</span>",
-  "p": "Five decks plus the Labs raise paper. Same product, different order of arguments. Every deck opens with the spoken line that matches it and closes with a single sentence to end on.",
+  "p": "Five decks, same product, different order of arguments. Every one opens with the spoken line that matches it and closes with a single sentence to end on.",
   "span2": "Growers · communities · expos",
   "h2": "Grower deck",
     "p2": "The live desk: journal, log, camera, illness check, coach, stories. Optional proof last. Crypto never leads.",
@@ -27,12 +27,7 @@
   "p14": "For a Solana-native room. The gamification is the mint gate, the adopter stake, what is actually on devnet with addresses, why this needs a chain at all — and a status slide that says what is not done.",
   "p15": "“You can’t buy your way to a mint here.”",
     "p16": "13 slides · 10–12 min",
-  "span7": "Labs raise · $200k paper",
-  "h26": "Raise I proposal",
-  "p18": "Long-form Labs paper in the Jurassic Finance Raise I shape: operating company now, harvest SPV later. Use of funds, roadmap, IP, honest limits.",
-  "p19": "“Build the trail. Then sell the harvest — if the law allows.”",
-  "p20": "Proposal paper · print to PDF",
-  "p17": "Labs raise paper: <a href=\"/pitch/labs/\">$200k Raise I</a> · Full technical deck: <a href=\"/app/pitch-deck/\">Growtoo — technical overview</a> · Live product: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Keyboard in every deck: <strong>→ / ←</strong> to move, <strong>F</strong> for fullscreen, <strong>P</strong> to print or export as PDF, <strong>☰</strong> for the slide list.",
+  "p17": "Full technical deck: <a href=\"/app/pitch-deck/\">Growtoo — technical overview</a> · Live product: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Keyboard in every deck: <strong>→ / ←</strong> to move, <strong>F</strong> for fullscreen, <strong>P</strong> to print or export as PDF, <strong>☰</strong> for the slide list.",
   "meta": {
     "title": "growtoo — Which deck?"
   }

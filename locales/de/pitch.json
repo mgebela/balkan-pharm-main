@@ -1,7 +1,7 @@
 {
   "span": "growtoo · Decks",
   "h1": "In welchen Raum <span class=\"grad\">gehst du?</span>",
-  "p": "Fünf Decks plus das Labs-Raise-Papier. Dasselbe Produkt, andere Reihenfolge der Argumente. Jedes Deck beginnt mit dem passenden gesprochenen Satz und endet mit einem einzigen Satz zum Schluss.",
+  "p": "Fünf Decks, dasselbe Produkt, andere Reihenfolge der Argumente. Jedes beginnt mit dem passenden gesprochenen Satz und endet mit einem einzigen Satz zum Schluss.",
   "span2": "Grower · Communitys · Messen",
   "h2": "Grower-Deck",
     "p2": "Der live Desk: Journal, Log, Kamera, Krankheitscheck, Coach, Stories. Optionaler Nachweis zuletzt. Krypto führt nie.",
@@ -27,12 +27,7 @@
   "p14": "Für einen Solana-nativen Raum. Die Gamification ist das Tor zum Mint, der Adopter-Einsatz, was tatsächlich mit Adressen im Devnet liegt, warum das überhaupt eine Chain braucht — und eine Status-Folie, die sagt, was nicht fertig ist.",
   "p15": "„Hier kann man sich einen Mint nicht kaufen.“",
     "p16": "13 Folien · 10–12 Min",
-  "span7": "Labs-Runde · $200k-Papier",
-  "h26": "Raise-I-Proposal",
-  "p18": "Langer Labs-Text im Jurassic-Finance-Raise-I-Format: Operating Company jetzt, Harvest-SPV später. Mittelverwendung, Roadmap, IP, ehrliche Grenzen.",
-  "p19": "„Baue die Spur. Verkaufe die Ernte erst, wenn das Recht es erlaubt.“",
-  "p20": "Proposal · Druck als PDF",
-  "p17": "Labs-Papier: <a href=\"/pitch/labs/\">$200k Raise I</a> · Vollständiges technisches Deck: <a href=\"/app/pitch-deck/\">Growtoo — technischer Überblick</a> · Produkt live: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Tastatur in jedem Deck: <strong>→ / ←</strong> zum Blättern, <strong>F</strong> für Vollbild, <strong>P</strong> zum Drucken oder als PDF, <strong>☰</strong> für die Folienliste.",
+  "p17": "Vollständiges technisches Deck: <a href=\"/app/pitch-deck/\">Growtoo — technischer Überblick</a> · Produkt live: <a href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a><br /> Tastatur in jedem Deck: <strong>→ / ←</strong> zum Blättern, <strong>F</strong> für Vollbild, <strong>P</strong> zum Drucken oder als PDF, <strong>☰</strong> für die Folienliste.",
   "meta": {
     "title": "growtoo — Welches Deck?"
   }
