@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>growtoo · investor deck · 2026</title>
+  <style>
+    :root {
+      --ink: #1c241c;
+      --muted: #5a665a;
+      --line: #d5ddd4;
+      --paper: #f7f4ee;
+      --card: #fff;
+      --accent: #3d5c3a;
+      --warn: #8a4b2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+    header h1 { font-size: 1.65rem; font-weight: 650; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    header p.meta { margin: 0; color: var(--muted); font-size: 0.92rem; }
+    .banner {
+      margin: 1.25rem 0 1.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--line);
+      background: var(--card);
+      font-size: 0.92rem;
+    }
+    nav.toc { margin: 0 0 2rem; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--line); }
+    nav.toc strong { display: block; margin-bottom: 0.4rem; }
+    nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; gap: 1.5rem; }
+    nav.toc a { color: var(--accent); text-decoration: none; }
+    h2 { font-size: 1.2rem; margin: 2.1rem 0 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+    h3 { font-size: 1.02rem; margin: 1.2rem 0 0.35rem; }
+    p, li { color: var(--ink); }
+    .muted { color: var(--muted); }
+    .say {
+      margin: 0.85rem 0 1rem;
+      padding: 0.7rem 0.9rem;
+      border-left: 3px solid var(--accent);
+      background: var(--card);
+    }
+    .say .label { display: block; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.25rem; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0 1rem; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .card { background: var(--card); border: 1px solid var(--line); padding: 0.85rem 1rem; }
+    .card h3 { margin-top: 0; }
+    .card p { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.92rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; background: var(--card); }
+    th, td { text-align: left; vertical-align: top; padding: 0.42rem 0.55rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 650; background: #eef2ee; }
+    .tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 650;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.15rem 0.4rem;
+      border: 1px solid var(--line);
+      background: #eef2ee;
+    }
+    .tag-live { color: var(--accent); }
+    .tag-devnet { color: #3a5a7a; }
+    .tag-mocked { color: var(--warn); }
+    .tag-planned { color: var(--muted); }
+    .ask {
+      margin: 0.75rem 0 1rem;
+      padding: 1rem 1.1rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+    }
+    .ask .label { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .ask .amount { display: block; font-size: 1.55rem; font-weight: 650; margin: 0.2rem 0; letter-spacing: -0.02em; }
+    ul.tight { margin: 0.35rem 0 0.85rem; padding-left: 1.2rem; }
+    ul.tight li { margin: 0.25rem 0; }
+    footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
+    @media (max-width: 720px) {
+      nav.toc ol { columns: 1; }
+      .grid, .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      nav.toc, .banner, .card, .ask { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      h2 { break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>growtoo investor deck</h1>
+      <p class="meta">Paper-trail raise · confidential · 2026 · live at <a href="https://growto.live/pitch/investor/">growto.live/pitch/investor/</a></p>
+    </header>
+
+    <p class="banner">
+      Journal first. Proof second. Asset layer last.
+      Pre-seed ask: <strong>$150,000–$200,000</strong>.
+      $GROWTOO on Devnet has <strong>no monetary value</strong>. Nothing here is an offer of securities or a promise of yield.
+    </p>
+
+    <nav class="toc">
+      <strong>Contents</strong>
+      <ol>
+        <li><a href="#open">Opening</a></li>
+        <li><a href="#gap">The gap</a></li>
+        <li><a href="#order">Order of operations</a></li>
+        <li><a href="#built">What’s built</a></li>
+        <li><a href="#status">Honest status</a></li>
+        <li><a href="#economics">Economics</a></li>
+        <li><a href="#why">Why now</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#raise">The raise</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#close">Close</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="open">01 · Opening</h2>
+    <p><strong>Everyone tokenises a promise. We build the paper trail first.</strong></p>
+    <p>A free grow journal that turns plant history into evidence-backed, stage-linked proof for future real-world assets.</p>
+    <div class="say">
+      <span class="label">Open with</span>
+      Journal first. Proof second. Asset layer last.
+    </div>
+    <table>
+      <tr><th>Status</th><td>Solana Devnet · early testers</td></tr>
+      <tr><th>Layer</th><td>Journal · proof · optional asset</td></tr>
+      <tr><th>Tokens</th><td>Test assets — no monetary value</td></tr>
+      <tr><th>Live</th><td><a href="https://growto.live">growto.live</a></td></tr>
+    </table>
+
+    <h2 id="gap">02 · The gap</h2>
+    <p><strong>Beautiful token. Weak evidence underneath.</strong></p>
+    <p>Grow data is manual, inconsistent, and difficult for an outside party to verify.</p>
+    <div class="grid">
+      <div class="card">
+        <h3>Evidence is an afterthought</h3>
+        <p>Often added after the token already exists</p>
+      </div>
+      <div class="card">
+        <h3>One-time attestation</h3>
+        <p>A one-time attestation goes stale</p>
+      </div>
+      <div class="card">
+        <h3>A number, not a history</h3>
+        <p>Holders get a number, not a living history</p>
+      </div>
+    </div>
+    <p class="say">The opportunity is to build the evidence layer before the asset layer.</p>
+
+    <h2 id="order">03 · Order of operations</h2>
+    <p><strong>Journal. Verify. Seal. Then adopt.</strong></p>
+    <p>The free journal is the top of funnel. The asset layer is optional.</p>
+    <div class="grid grid-2">
+      <div class="card"><h3>Journal</h3><p>Logs, photos, illness checks, stages, and grower activity.</p></div>
+      <div class="card"><h3>Verify</h3><p>Evidence is organised around the plant’s documented history.</p></div>
+      <div class="card"><h3>Seal</h3><p>A stage-linked proof asset can be minted on Solana Devnet.</p></div>
+      <div class="card"><h3>Adopt</h3><p>A backer follows a specific plant and its evidence trail.</p></div>
+    </div>
+
+    <h2 id="built">04 · What’s built</h2>
+    <p>A working system, not a design doc — labelled honestly on the next section.</p>
+    <table>
+      <tr><th>Layer</th><th>What</th></tr>
+      <tr><td>App</td><td>PWA with journal, log, camera, illness check, coach, and stories</td></tr>
+      <tr><td>Backend</td><td>Firebase Auth, Firestore rules, and functions</td></tr>
+      <tr><td>Wallets</td><td>Phantom, Solflare, and watch-only address linking</td></tr>
+      <tr><td>Proof</td><td>Stage-linked seed NFTs and $GROWTOO test assets on Solana Devnet</td></tr>
+      <tr><td>Market</td><td>Devnet adoption and escrow flows</td></tr>
+      <tr><td>Docs</td><td>Public RWA architecture and risks page</td></tr>
+    </table>
+
+    <h2 id="status">05 · Honest status</h2>
+    <p>Every capability is labelled by status and can be checked through the product or public documentation.</p>
+    <table>
+      <tr><th>Capability</th><th>Status</th></tr>
+      <tr><td>Grow journal, camera, illness check, AI coach, and stories</td><td><span class="tag tag-live">Live</span></td></tr>
+      <tr><td>Stage minting, seed NFTs, plant adoption, and the market desk</td><td><span class="tag tag-devnet">Devnet</span></td></tr>
+      <tr><td>$GROWTOO</td><td><span class="tag tag-mocked">Test asset</span></td></tr>
+      <tr><td>Harvest redemption</td><td><span class="tag tag-mocked">Mocked</span></td></tr>
+      <tr><td>Trustless attestation, stronger verification, and a Mainnet pilot</td><td><span class="tag tag-planned">Planned</span></td></tr>
+    </table>
+    <p class="muted">$GROWTOO has no monetary value by design.</p>
+
+    <h2 id="economics">06 · Economics</h2>
+    <p><strong>Evidence-backed harvest assets.</strong></p>
+    <p>The weights are a designed Devnet model, not a live financial instrument. Nothing in this deck is an offer, a guarantee, or a promise of yield or returns. The legal and regulatory structure will be established before any Mainnet financial model.</p>
+    <div class="grid">
+      <div class="card"><h3>Grower</h3><p>Documents the plant’s history and keeps the majority share under the designed model.</p></div>
+      <div class="card"><h3>Adopter</h3><p>Supports a specific plant, with weighting based on stage of entry.</p></div>
+      <div class="card"><h3>Platform</h3><p>Provides journaling, verification, escrow, settlement, and the market layer.</p></div>
+    </div>
+
+    <h2 id="why">07 · Why now</h2>
+    <p><strong>Documentation is becoming expected. The tooling is still missing.</strong></p>
+    <p>The immediate goal is validation: prove that growers will keep useful records and that the evidence makes a plant more trustworthy to an adopter.</p>
+    <table>
+      <tr><th>Who</th><th>Need</th></tr>
+      <tr><td>Growers</td><td>A simple way to maintain a reliable plant history</td></tr>
+      <tr><td>Adopters</td><td>Evidence they can understand and follow</td></tr>
+      <tr><td>Solana</td><td>Infrastructure for an opt-in proof layer</td></tr>
+    </table>
+
+    <h2 id="roadmap">08 · Roadmap</h2>
+    <p>The proposed 50% lifecycle logging threshold is a hypothesis for marketplace eligibility, not a final rule.</p>
+    <table>
+      <tr><th>When</th><th>What</th></tr>
+      <tr><td>Now</td><td>Free journal, camera, coach, and Devnet proof flows</td></tr>
+      <tr><td>Next</td><td>Legal entity, regulatory framework, stronger attestations, and expanded testing</td></tr>
+      <tr><td>Then</td><td>Mainnet pilot, 30–50 growers, and measurement of 30-day retention</td></tr>
+      <tr><td>Later</td><td>Evidence-backed harvest assets and redemption, subject to the legal model and operational readiness</td></tr>
+    </table>
+
+    <h2 id="raise">09 · The raise</h2>
+    <div class="ask">
+      <span class="label">The raise</span>
+      <span class="amount">$150,000–$200,000</span>
+      <span class="muted">Pre-seed</span>
+    </div>
+    <p>The capital will fund three de-risking milestones. The round is designed to turn an early ecosystem project into a validated, fundable product with measurable user evidence.</p>
+    <ul class="tight">
+      <li><strong>1 · Legal</strong> — Establish the legal entity and regulatory framework for the RWA model.</li>
+      <li><strong>2 · Mainnet</strong> — Move the product from Solana Devnet to a properly scoped Mainnet pilot.</li>
+      <li><strong>3 · Growers</strong> — Expand from early testers to approximately 30–50 growers and demonstrate 30-day retention.</li>
+    </ul>
+
+    <h2 id="team">10 · Team</h2>
+    <p><strong>Bela Ikotić</strong> — product and engineering.</p>
+    <p>Building growtoo’s journal-first product, evidence model, and AI roadmap. Currently testing with early growers and collaborating with SuperteamBLKN.</p>
+    <p class="muted">Contact: bela.ikotic@gmail.com</p>
+
+    <h2 id="close">Close</h2>
+    <p><strong>The asset is only as trustworthy as the history underneath it.</strong></p>
+    <p>growtoo builds that history first.</p>
+    <table>
+      <tr><th>Live</th><td><a href="https://growto.live">growto.live</a></td></tr>
+      <tr><th>Docs</th><td><a href="https://growto.live/rwa-docs/">RWA architecture</a></td></tr>
+      <tr><th>Deck</th><td><a href="https://growto.live/pitch/investor/">/pitch/investor/</a> · shorthand <a href="https://growto.live/hr/investor/">/hr/investor/</a></td></tr>
+      <tr><th>Contact</th><td>bela.ikotic@gmail.com</td></tr>
+    </table>
+    <p>Thank you.</p>
+
+    <footer>
+      Generated from the live investor deck copy (<code>locales/en/pitch-investor.json</code>) on 7 Sep 2026.
+      Confidential. Not an offer of securities. Devnet tokens have no monetary value.
+    </footer>
+  </div>
+</body>
+</html>
