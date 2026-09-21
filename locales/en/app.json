@@ -1527,6 +1527,19 @@
     "p": "Reward",
     "p2": "This month"
   },
+  "retro": {
+    "coachNote": "Coach note:",
+    "day": "Day {n}",
+    "done": "Logged",
+    "fed": "Fed (nutrients)",
+    "notYet": "Not logged yet",
+    "pending": "Not logged",
+    "photo": "Photo taken",
+    "plate": "growtoo terminal · model GJ-50",
+    "stage": "Growth stage",
+    "todaysLog": "Today’s log",
+    "watered": "Watered"
+  },
   "reward-earn-title": {
     "h2": "Care day counted"
   },

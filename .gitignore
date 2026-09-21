@@ -3,6 +3,9 @@ functions/node_modules/
 .DS_Store
 *.local
 app/dev-preview.html
+app/journal-retro.html
+app/journal-retro-preview.html
+.superdesign/tmp/
 
 # Secrets / local env (RPC keys, service accounts)
 .env

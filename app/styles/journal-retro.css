@@ -1,0 +1,648 @@
+/* ============================================================
+   Journal — retro-poster accent layer.
+
+   Borrows the growtoo poster's typography and framing without
+   touching the sage-paper palette, the layout, the card system or
+   the tab bar. Everything here is scoped under body.journal-retro,
+   so it is a toggle: add the class to ship it, drop it to revert.
+
+   Load AFTER app.css. Specificity note: the late #view-plants block
+   in app.css (13085-13760) is the layer that actually paints, and it
+   uses !important for fills. `body.journal-retro #view-plants` (two
+   classes + one id) out-ranks it for everything that is not
+   !important, which is why almost nothing below needs !important.
+   ============================================================ */
+
+body.journal-retro {
+  /* Poster palette, expressed with colours the brand already owns.
+     --retro-gold is the dark theme's --brass-fill; the panel green is
+     a deepened --accent-moss. Nothing new enters the system. */
+  --retro-gold: #c9a55e;
+  --retro-gold-hi: #e8c46a;
+  --retro-gold-line: rgb(201 165 94 / 0.34);
+  --retro-gold-faint: rgb(201 165 94 / 0.16);
+  --retro-panel: #1e332c;
+  --retro-panel-deep: #16261f;
+  --retro-cream: #f4ecd8;
+  --retro-cream-dim: rgb(244 236 216 / 0.62);
+  --retro-ink: #1a2c1e;
+  --retro-muted: #3d5648;
+
+  /* Heavy condensed poster face. Archivo is already the landing
+     page's display family, so this is a width variant of a face the
+     brand uses — not a new typeface. */
+  --font-retro: 'Archivo Narrow', 'Oswald', 'Arial Narrow', Haettenschweiler, var(--font);
+}
+
+/* ---- Shared devices -------------------------------------------- */
+
+/* The poster sets the last word of a headline in gold. Wrap that word
+   in <span class="retro-accent"> in the markup. */
+body.journal-retro .retro-accent {
+  color: var(--retro-gold);
+}
+
+/* Poster paper grain, at the threshold of visible. Sits under the
+   existing 48px graph-paper grid rather than replacing it. */
+body.journal-retro #view-plants {
+  position: relative;
+}
+
+body.journal-retro #view-plants::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.10 0 0 0 0 0.17 0 0 0 0 0.12 0 0 0 0.055 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+body.journal-retro #view-plants > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- 1. Header ------------------------------------------------- */
+
+body.journal-retro .view-title {
+  font-family: var(--font-retro);
+  font-size: 1.32rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  color: var(--retro-ink);
+}
+
+/* The poster's GROWTOO OFFICIAL seal, as a compact gold roundel.
+   Drawn in CSS — no new image asset.
+
+   .main-header is shared by every view, so the seal is hidden by default and
+   revealed only while the Journal view is the active one. */
+body.journal-retro .retro-seal {
+  display: none;
+}
+
+body.journal-retro .main:has(#view-plants.active) .retro-seal {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  width: 3.1rem;
+  height: 3.1rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 2px solid var(--retro-gold);
+  box-shadow: inset 0 0 0 1px var(--retro-gold-faint);
+  background: transparent;
+  color: var(--retro-gold);
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  text-align: center;
+}
+
+body.journal-retro .retro-seal-top,
+body.journal-retro .retro-seal-bottom {
+  font-size: 0.42rem;
+  letter-spacing: 0.1em;
+}
+
+body.journal-retro .retro-seal-star {
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+/* On phones .main-header is a grid with named areas, so the seal needs its
+   own column — otherwise it auto-places into the wallet row and pushes the
+   avatar onto a second line. */
+@media (max-width: 768px) {
+  body.journal-retro .main-header {
+    grid-template-columns: 1fr auto auto auto;
+    grid-template-areas:
+      'title seal notif account'
+      'wallet wallet wallet wallet';
+  }
+
+  body.journal-retro .main-header:has(.app-wallet-bar[hidden]),
+  body.journal-retro .main-header:has(.app-wallet-bar:empty) {
+    grid-template-columns: 1fr auto auto auto;
+    grid-template-areas: 'title seal notif account';
+  }
+
+  body.journal-retro .retro-seal {
+    grid-area: seal;
+    justify-self: end;
+    width: 2.7rem;
+    height: 2.7rem;
+  }
+}
+
+/* ---- 2. Hero --------------------------------------------------- */
+
+body.journal-retro #view-plants .journal-hero-title {
+  font-family: var(--font-retro);
+  font-size: clamp(1.75rem, 7.5vw, 2.5rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  color: var(--retro-ink);
+  margin-bottom: 0.55rem;
+}
+
+/* The poster's hairline rule that stops short of the right edge. */
+body.journal-retro #view-plants .journal-hero-title::after {
+  content: '';
+  display: block;
+  width: 62%;
+  max-width: 15rem;
+  height: 2px;
+  margin-top: 0.6rem;
+  background: var(--retro-gold);
+}
+
+body.journal-retro #view-plants .journal-hero-sub {
+  font-family: var(--font-retro);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  line-height: 1.45;
+  color: var(--retro-muted);
+}
+
+/* ---- 3. Section headings --------------------------------------- */
+
+body.journal-retro #view-plants .section-heading {
+  font-family: var(--font-retro);
+  font-size: 1.28rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  color: var(--retro-ink);
+}
+
+body.journal-retro #view-plants .plants-section-head {
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+body.journal-retro #view-plants .plants-section-head::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 58%;
+  max-width: 13rem;
+  height: 1.5px;
+  background: var(--retro-gold);
+}
+
+/* ---- 4. Eyebrow labels ----------------------------------------- */
+
+body.journal-retro #view-plants .today-card-eyebrow,
+body.journal-retro #view-plants .shell-card-eyebrow {
+  font-family: var(--font-retro);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: var(--retro-gold);
+}
+
+/* ---- 5. Buttons and chips -------------------------------------- */
+
+body.journal-retro #view-plants .btn {
+  font-family: var(--font-retro);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+body.journal-retro #view-plants .journal-stage-filter {
+  font-family: var(--font-retro);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+body.journal-retro #view-plants .segmented-option {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---- 6. Weather panel ------------------------------------------ */
+
+body.journal-retro #view-plants .plants-weather-widget-title {
+  font-family: var(--font-retro);
+  font-size: 1.02rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+body.journal-retro #view-plants .plants-weather-widget-sub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+}
+
+body.journal-retro #view-plants .plants-weather-day-label {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.7rem;
+}
+
+body.journal-retro #view-plants .plants-weather-temp {
+  font-family: var(--font-retro);
+  font-weight: 800;
+  font-size: 1.45rem;
+}
+
+body.journal-retro #view-plants .plants-weather-range,
+body.journal-retro #view-plants .plants-weather-condition {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+}
+
+/* ---- 7. The terminal log panel --------------------------------- */
+/* Replaces the plain Today card body. The poster's CRT screen as a
+   real surface: dark inset, gold rule, one row per care event. */
+
+body.journal-retro .retro-log {
+  border-radius: 16px;
+  border: 1px solid var(--retro-gold);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(255 255 255 / 0.05), transparent 70%),
+    linear-gradient(180deg, var(--retro-panel) 0%, var(--retro-panel-deep) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.35),
+    inset 0 1px 0 rgb(244 236 216 / 0.08);
+  overflow: hidden;
+}
+
+body.journal-retro .retro-log-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 0.9rem 0.6rem;
+  border-bottom: 1px solid var(--retro-gold-line);
+}
+
+body.journal-retro .retro-log-title {
+  margin: 0;
+  font-family: var(--font-retro);
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--retro-gold);
+}
+
+body.journal-retro .retro-log-day {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--retro-gold);
+  white-space: nowrap;
+}
+
+body.journal-retro .retro-log-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0.15rem 0.9rem 0.5rem;
+}
+
+body.journal-retro .retro-log-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid var(--retro-gold-faint);
+}
+
+body.journal-retro .retro-log-row:last-child {
+  border-bottom: 0;
+}
+
+body.journal-retro .retro-log-icon {
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--retro-gold);
+}
+
+body.journal-retro .retro-log-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+body.journal-retro .retro-log-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.journal-retro .retro-log-label {
+  display: block;
+  font-family: var(--font-retro);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  color: var(--retro-cream);
+}
+
+body.journal-retro .retro-log-time {
+  display: block;
+  margin-top: 0.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--retro-cream-dim);
+}
+
+body.journal-retro .retro-log-mark {
+  flex: 0 0 auto;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--retro-gold);
+}
+
+body.journal-retro .retro-log-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Pending rows read as an empty slot waiting to be filled. */
+body.journal-retro .retro-log-row--pending .retro-log-label,
+body.journal-retro .retro-log-row--pending .retro-log-icon {
+  color: var(--retro-cream-dim);
+  opacity: 0.75;
+}
+
+body.journal-retro .retro-log-row--pending .retro-log-mark {
+  border-radius: 50%;
+  border: 1.5px dashed var(--retro-gold-line);
+}
+
+body.journal-retro .retro-log-row--pending .retro-log-mark svg {
+  display: none;
+}
+
+/* The poster's plate: GROWTOO TERMINAL · MODEL GJ-50 */
+body.journal-retro .retro-log-plate {
+  margin: 0;
+  padding: 0.5rem 0.9rem 0.6rem;
+  border-top: 1px solid var(--retro-gold-line);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--retro-cream-dim);
+}
+
+/* app.js still writes the plain brief into .today-card-line and the retro
+   coach note now carries that same sentence, so hide the duplicate rather
+   than changing what app.js renders. */
+body.journal-retro #view-plants .today-card-line {
+  display: none;
+}
+
+body.journal-retro #view-plants .today-card .today-card-actions {
+  margin-top: 1rem;
+}
+
+/* ---- 8. Coach note callout ------------------------------------- */
+
+body.journal-retro .retro-coach {
+  margin-top: 1rem;
+  border: 2px solid var(--retro-ink);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+body.journal-retro .retro-coach-head {
+  padding: 0.42rem 0.8rem;
+  background: var(--retro-ink);
+  font-family: var(--font-retro);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--retro-gold);
+}
+
+body.journal-retro .retro-coach-body {
+  padding: 0.85rem 0.9rem 0.9rem;
+}
+
+body.journal-retro .retro-coach-line {
+  margin: 0;
+  font-family: var(--font-retro);
+  font-size: 1.28rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  line-height: 1.1;
+  color: var(--retro-ink);
+}
+
+/* Gold arrow rule, as under COACH NOTE on the poster. */
+body.journal-retro .retro-coach-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+  color: var(--retro-gold);
+}
+
+body.journal-retro .retro-coach-rule::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 3.2rem;
+  height: 2px;
+  background: currentColor;
+}
+
+body.journal-retro .retro-coach-rule::after {
+  content: '▶';
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+/* ---- 9. Activity reward meter ---------------------------------- */
+
+body.journal-retro #view-plants .activity-reward-line {
+  font-family: var(--font-retro);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--retro-ink);
+}
+
+body.journal-retro #view-plants .activity-reward-meter {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--retro-gold-line);
+}
+
+body.journal-retro #view-plants .activity-reward-meter li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.48rem 0;
+  border-bottom: 1px solid var(--retro-gold-faint);
+  font-family: var(--font-retro);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--retro-muted);
+}
+
+body.journal-retro #view-plants .activity-reward-meter li > :last-child,
+body.journal-retro #view-plants .activity-reward-meter .retro-val {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--retro-ink);
+}
+
+body.journal-retro #view-plants .activity-reward-hint {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--retro-muted);
+}
+
+/* ---- 10. Plant cards ------------------------------------------- */
+
+/* app.css hides the stage-tint bar in this view; the poster's ruled
+   look wants it back, as a flat gold-to-stage hairline. */
+body.journal-retro #view-plants .plant-card::before {
+  display: block;
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--retro-gold), var(--tint) 65%, transparent);
+  opacity: 1;
+  z-index: 2;
+}
+
+body.journal-retro #view-plants .plant-card h3 {
+  font-family: var(--font-retro);
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.005em;
+  color: var(--retro-ink);
+}
+
+body.journal-retro #view-plants .plant-card-byline {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* The TL;DR line is the card's readout — give it the terminal voice. */
+body.journal-retro #view-plants .plant-card-tldr {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--retro-muted);
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--retro-gold-faint);
+}
+
+body.journal-retro #view-plants .subphase-badge {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+/* ---- 11. Journal trail ----------------------------------------- */
+
+body.journal-retro #view-plants .journal-cal-title {
+  font-family: var(--font-retro);
+  font-size: 1.02rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--retro-ink);
+}
+
+body.journal-retro #view-plants .journal-cal-weekdays span {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  color: var(--retro-muted);
+}
+
+body.journal-retro #view-plants .journal-cal-num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+body.journal-retro #view-plants .journal-cal-wx {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+}
+
+body.journal-retro #view-plants .journal-cal-legend {
+  font-family: var(--font-retro);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+body.journal-retro #view-plants .journal-entry .entry-type {
+  font-family: var(--font-retro);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--retro-ink);
+  background: rgb(201 165 94 / 0.2);
+  border: 1px solid var(--retro-gold-line);
+  border-radius: 4px;
+  padding: 0.14rem 0.42rem;
+}
+
+body.journal-retro #view-plants .journal-entry .entry-meta {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.01em;
+}
+
+/* The note itself stays in the reading face — long-form copy is the
+   one place the condensed poster type would cost legibility. */
+body.journal-retro #view-plants .journal-entry .entry-note {
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+}

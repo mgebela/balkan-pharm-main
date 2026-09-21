@@ -541,6 +541,19 @@
     "p": "Nagrada",
     "p2": "Ovaj mjesec"
   },
+  "retro": {
+    "coachNote": "Napomena savjetnika:",
+    "day": "Dan {n}",
+    "done": "Zapisano",
+    "fed": "Prihranjeno",
+    "notYet": "Još nije zapisano",
+    "pending": "Nije zapisano",
+    "photo": "Fotografirano",
+    "plate": "growtoo terminal · model GJ-50",
+    "stage": "Faza rasta",
+    "todaysLog": "Današnji zapis",
+    "watered": "Zaliveno"
+  },
   "reward-earn-title": {
     "h2": "Dan njege je zabilježen"
   },

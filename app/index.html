@@ -12,7 +12,9 @@
   <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Archivo Narrow is the condensed poster face the journal-retro accent
+       layer uses for headings; it degrades to Arial Narrow if it never lands. -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Archivo+Narrow:wght@600;700&display=swap" rel="stylesheet" />
   <script>
     /* Appearance, before first paint. Dark is the unthemed CSS state; light is
        the product default (same sage paper as landing / sign-in). This only
@@ -62,10 +64,13 @@
   <link rel="stylesheet" href="styles/app.css?v=20260819j" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260820a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260817p" />
+  <!-- Must stay last: the retro accent layer overrides the late #view-plants
+       block in app.css. Drop this link and the body class to revert. -->
+  <link rel="stylesheet" href="styles/journal-retro.css?v=20260921a" />
   <link rel="icon" href="../images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
   <link rel="apple-touch-icon" href="../images/growtoo-mark-brass.png?v=20260731a" />
 </head>
-<body class="app-loading journal-paper">
+<body class="app-loading journal-paper journal-retro">
   <div id="app-boot" class="app-boot" role="status" aria-live="polite" aria-busy="true">
     <img src="../images/growtoo-mark-brass.png?v=20260731a" alt="" width="64" height="64" class="app-boot-mark" />
     <p class="app-boot-word">growtoo</p>
@@ -296,6 +301,13 @@
       <header class="main-header">
         <h1 data-i18n="app.span2" class="view-title">Journal</h1>
         <div class="main-header-actions">
+          <!-- Retro accent layer only, and only on the Journal view — CSS in
+               journal-retro.css keys it off .main:has(#view-plants.active). -->
+          <span class="retro-seal" aria-hidden="true">
+            <span class="retro-seal-top">growtoo</span>
+            <span class="retro-seal-star">✦</span>
+            <span class="retro-seal-bottom">official</span>
+          </span>
           <span data-i18n="app.profile-type-badge.span" id="profile-type-badge" class="profile-type-badge" hidden>Grower</span>
           <div id="app-wallet-bar" class="app-wallet-bar" aria-live="polite"></div>
           <div class="notif-wrap" id="notif-wrap">
@@ -393,7 +405,7 @@
 
       <div id="view-plants" class="view active">
         <section class="journal-hero">
-          <h2 data-i18n="app.plants.hero" class="journal-hero-title">Your plants, in one garden</h2>
+          <h2 data-i18n="app.plants.hero" data-retro-accent class="journal-hero-title">Your plants, in one garden</h2>
           <p data-i18n="app.plants.heroSub" class="journal-hero-sub">A light journal of what you grew, watered, and learned.</p>
         </section>
         <div class="view-tour-bar grower-only">
@@ -449,7 +461,7 @@
         </section>
         <section class="plants-journal-section">
           <div class="plants-section-head">
-            <h2 data-i18n="app.view-plants.h2" class="section-heading">My plants</h2>
+            <h2 data-i18n="app.view-plants.h2" data-retro-accent class="section-heading">My plants</h2>
             <button
               type="button"
               class="grower-rank-chip grower-only"
@@ -1417,6 +1429,7 @@
   <script src="js/ai-coach.js?v=20260828b"></script>
   <script src="js/grower-blog.js?v=20260819h"></script>
   <script src="js/theme.js?v=20260819e" defer></script>
+  <script src="js/journal-retro.js?v=20260921a"></script>
   <script src="js/app.js?v=20260828b"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>

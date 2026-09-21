@@ -541,6 +541,19 @@
     "p": "Belohnung",
     "p2": "Diesen Monat"
   },
+  "retro": {
+    "coachNote": "Coach-Hinweis:",
+    "day": "Tag {n}",
+    "done": "Notiert",
+    "fed": "Gedüngt",
+    "notYet": "Noch nicht notiert",
+    "pending": "Nicht notiert",
+    "photo": "Foto gemacht",
+    "plate": "growtoo terminal · model GJ-50",
+    "stage": "Wachstumsphase",
+    "todaysLog": "Heutiges Protokoll",
+    "watered": "Gegossen"
+  },
   "reward-earn-title": {
     "h2": "Pflegetag gezählt"
   },

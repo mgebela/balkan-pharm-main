@@ -4612,10 +4612,16 @@ function initFirebaseSync() {
         : window.AICoach && typeof AICoach.dashboardBriefing === 'function'
           ? AICoach.dashboardBriefing(plants, entries)
           : '';
-    if (todayLine) {
-      todayLine.textContent =
-        brief ||
-        T('app.today.quiet', 'Your garden is quiet — log a watering to keep the trail warm.');
+    const todayCopy =
+      brief ||
+      T('app.today.quiet', 'Your garden is quiet — log a watering to keep the trail warm.');
+    if (todayLine) todayLine.textContent = todayCopy;
+
+    /* Retro accent layer: adds the terminal log and the coach note above the
+       line written just now. Additive and optional — the card is complete
+       without it. */
+    if (window.JournalRetro && typeof JournalRetro.paintTodayCard === 'function') {
+      JournalRetro.paintTodayCard({ plants: plants, entries: entries, brief: todayCopy });
     }
     if (todayActions) {
       todayActions.innerHTML =
