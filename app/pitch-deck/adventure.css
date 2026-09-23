@@ -1,0 +1,377 @@
+@font-face {
+  font-family: "Alkaline";
+  src: url("/fonts/pitch/Alkaline-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alkaline Caps";
+  src: url("/fonts/pitch/Alkaline-MediumCaps.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TT2020";
+  src: url("/fonts/pitch/TT2020Base-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TT2020";
+  src: url("/fonts/pitch/TT2020Base-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Adventure poster for the pitch decks.
+   Alkaline script for the small lines, Alkaline Caps for the headlines, TT2020 for the body. */
+
+:root {
+  --bg: #42714d;
+  --bg-2: #42714d;
+  --bg-alt: #3a6645;
+  --panel: transparent;
+  --panel-strong: transparent;
+  --plate: transparent;
+  --border: rgb(243 231 196 / 0.28);
+  --border-strong: rgb(243 231 196 / 0.45);
+  --ink: #f3e7c4;
+  --ink-dim: #f3e7c4;
+  --ink-mute: rgb(243 231 196 / 0.72);
+  --text: #f3e7c4;
+  --text-muted: rgb(243 231 196 / 0.78);
+  --green: #f3e7c4;
+  --green-2: #d8ad2f;
+  --brass: #d8ad2f;
+  --seal: #d8ad2f;
+  --wash: transparent;
+  --desk-panel: transparent;
+  --desk-line: rgb(243 231 196 / 0.28);
+  --font: "TT2020", ui-monospace, monospace;
+  --font-display: "Alkaline Caps", "Alkaline", Georgia, serif;
+  --poster: #f3e7c4;
+  --sun: #d8ad2f;
+  --field: #42714d;
+}
+
+html,
+body {
+  background: var(--field);
+  color: var(--poster);
+}
+
+.bg-gradient,
+.bg-grid,
+.bg-gradient::before,
+.bg-gradient::after {
+  display: none;
+}
+
+body,
+.deck,
+.chooser,
+.slide,
+.slide p,
+.slide li,
+.slide h3,
+.slide h4,
+.kicker,
+.brand-name,
+.meta-label,
+.meta-value,
+.slide-remark,
+.cover-sub,
+.cover-rule,
+.card-tagline,
+.footnote,
+.say p,
+.deck-switch,
+.cover-footer {
+  color: var(--poster);
+  font-family: var(--font);
+}
+
+h1,
+h2,
+.cover-headline,
+.chooser-head h1,
+.deck-card h2 {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  color: var(--poster);
+}
+
+.cover-headline,
+.chooser-head h1 {
+  font-size: clamp(52px, 7.4vw, 104px);
+  max-width: 9em;
+}
+
+.slide-head h2 {
+  font-size: clamp(40px, 5.4vw, 76px);
+  max-width: 12em;
+  margin-bottom: 18px;
+}
+
+.grad {
+  color: var(--sun);
+  font-style: normal;
+  font-weight: 400;
+}
+
+.kicker,
+.say-label,
+.meta-label {
+  font-family: "Alkaline", Georgia, serif;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 22px;
+  color: var(--sun);
+}
+
+.slide {
+  border-bottom-color: rgb(243 231 196 / 0.18);
+  align-items: center;
+}
+
+.slide-head {
+  margin-bottom: 28px;
+  max-width: 38rem;
+}
+
+.slide-head .lede,
+.slide-remark,
+.cover-sub,
+.card p,
+.g-tile p,
+.feature p,
+.pipe-step p {
+  font-size: 20px;
+  line-height: 1.45;
+  max-width: 36rem;
+  color: var(--poster);
+}
+
+a {
+  color: var(--poster);
+  border-bottom-color: rgb(243 231 196 / 0.45);
+}
+
+/* One column. No tiles, chips, or fake product frames. */
+.chip-row,
+.g-cover-chips,
+.g-extra-chips,
+.chip-grid,
+.g-phone,
+.product-mock,
+.platform-dense,
+.mock-window,
+.card-icon,
+.feature-num,
+.g-tile-k,
+.pipe-num,
+.pipe-arrow,
+.why-arrow,
+.deck-icon,
+.brand-mark {
+  display: none !important;
+}
+
+.grid,
+.grid-2,
+.grid-3,
+.g-catalog,
+.g-why,
+.pipeline,
+.pipeline--dense,
+.feature-grid,
+.cols,
+.cover-meta {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+  grid-template-columns: none !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-top: 8px;
+}
+
+.card,
+.card--dense,
+.g-tile,
+.feature,
+.pipe-step,
+.cover-meta-row,
+.deck-card {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0.7rem 0 !important;
+  border-bottom: 1px solid rgb(243 231 196 / 0.22) !important;
+}
+
+.card h3,
+.g-tile h3,
+.feature h3,
+.pipe-step h3,
+.deck-card h2 {
+  font-family: var(--font-display) !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-size: clamp(26px, 3vw, 40px);
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+  color: var(--poster);
+}
+
+.cover-meta-row::before,
+.cover-meta-row::after,
+.kicker::before,
+.card::before,
+.card::after,
+.g-tile::before,
+.g-tile::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+}
+
+.say {
+  display: block !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0.4rem 0 0 !important;
+  max-width: 36rem !important;
+}
+
+.say p {
+  font-family: var(--font);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.brand {
+  display: block;
+  width: min(280px, 70vw);
+  height: 86px;
+  margin-bottom: 8px;
+  background: url("/images/pitch/growtoo-wordmark.png") left center / contain no-repeat;
+}
+
+.brand-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.g-cta,
+a.g-cta {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 0.75rem 1.15rem;
+  background: var(--poster);
+  color: #234833 !important;
+  border: 0 !important;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: 22px;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  width: auto;
+}
+
+.slide--cover .cover {
+  position: relative;
+  display: block;
+  max-width: 1180px;
+}
+
+.slide--cover .cover-stage {
+  display: none !important;
+}
+
+.cover-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 40rem;
+}
+
+.slide--cover .cover-headline {
+  max-width: 8em;
+}
+
+.cover-footer,
+.deck-switch {
+  margin-top: 22px;
+  font-size: 15px;
+  color: var(--poster);
+}
+
+.hud,
+.progress,
+.menu-btn,
+.sidenav,
+.hud-btn {
+  color: var(--poster);
+}
+
+.hud-btn,
+.menu-btn {
+  background: transparent;
+  border: 1px solid rgb(243 231 196 / 0.4);
+  color: var(--poster);
+}
+
+.chooser {
+  color: var(--poster);
+}
+
+.chooser-grid {
+  display: flex !important;
+  flex-direction: column;
+  gap: 0;
+}
+
+.deck-card .who,
+.deck-card .open-line,
+.deck-card .len,
+.deck-card p {
+  color: var(--poster);
+}
+
+@media (max-width: 900px) {
+  .cover-copy,
+  .slide--cover .cover-headline,
+  .slide--cover .cover-sub,
+  .slide--cover .say,
+  .slide--cover .g-cta {
+    max-width: none;
+  }
+}
