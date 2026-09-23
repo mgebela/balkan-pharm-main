@@ -18,6 +18,11 @@ body.journal-retro {
      --retro-gold is the dark theme's --brass-fill; the panel green is
      a deepened --accent-moss. Nothing new enters the system. */
   --retro-gold: #c9a55e;
+  /* The poster gold is only 2.2:1 on sage paper, so it is used for rules,
+     borders and anything sitting on the dark panel. Gold that has to be READ
+     on a light surface uses this deeper mix instead — 3.5:1, which clears
+     large-text AA while still reading as gold. */
+  --retro-gold-ink: #a87f2e;
   --retro-gold-hi: #e8c46a;
   --retro-gold-line: rgb(201 165 94 / 0.34);
   --retro-gold-faint: rgb(201 165 94 / 0.16);
@@ -39,7 +44,7 @@ body.journal-retro {
 /* The poster sets the last word of a headline in gold. Wrap that word
    in <span class="retro-accent"> in the markup. */
 body.journal-retro .retro-accent {
-  color: var(--retro-gold);
+  color: var(--retro-gold-ink);
 }
 
 /* Poster paper grain, at the threshold of visible. Sits under the
@@ -74,72 +79,6 @@ body.journal-retro .view-title {
   color: var(--retro-ink);
 }
 
-/* The poster's GROWTOO OFFICIAL seal, as a compact gold roundel.
-   Drawn in CSS — no new image asset.
-
-   .main-header is shared by every view, so the seal is hidden by default and
-   revealed only while the Journal view is the active one. */
-body.journal-retro .retro-seal {
-  display: none;
-}
-
-body.journal-retro .main:has(#view-plants.active) .retro-seal {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.05rem;
-  width: 3.1rem;
-  height: 3.1rem;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  border: 2px solid var(--retro-gold);
-  box-shadow: inset 0 0 0 1px var(--retro-gold-faint);
-  background: transparent;
-  color: var(--retro-gold);
-  font-family: var(--font-retro);
-  font-weight: 700;
-  text-transform: uppercase;
-  line-height: 1;
-  text-align: center;
-}
-
-body.journal-retro .retro-seal-top,
-body.journal-retro .retro-seal-bottom {
-  font-size: 0.42rem;
-  letter-spacing: 0.1em;
-}
-
-body.journal-retro .retro-seal-star {
-  font-size: 0.6rem;
-  line-height: 1;
-}
-
-/* On phones .main-header is a grid with named areas, so the seal needs its
-   own column — otherwise it auto-places into the wallet row and pushes the
-   avatar onto a second line. */
-@media (max-width: 768px) {
-  body.journal-retro .main-header {
-    grid-template-columns: 1fr auto auto auto;
-    grid-template-areas:
-      'title seal notif account'
-      'wallet wallet wallet wallet';
-  }
-
-  body.journal-retro .main-header:has(.app-wallet-bar[hidden]),
-  body.journal-retro .main-header:has(.app-wallet-bar:empty) {
-    grid-template-columns: 1fr auto auto auto;
-    grid-template-areas: 'title seal notif account';
-  }
-
-  body.journal-retro .retro-seal {
-    grid-area: seal;
-    justify-self: end;
-    width: 2.7rem;
-    height: 2.7rem;
-  }
-}
-
 /* ---- 2. Hero --------------------------------------------------- */
 
 body.journal-retro #view-plants .journal-hero-title {
@@ -161,7 +100,7 @@ body.journal-retro #view-plants .journal-hero-title::after {
   max-width: 15rem;
   height: 2px;
   margin-top: 0.6rem;
-  background: var(--retro-gold);
+  background: var(--retro-gold-ink);
 }
 
 body.journal-retro #view-plants .journal-hero-sub {
@@ -198,7 +137,7 @@ body.journal-retro #view-plants .plants-section-head::after {
   width: 58%;
   max-width: 13rem;
   height: 1.5px;
-  background: var(--retro-gold);
+  background: var(--retro-gold-ink);
 }
 
 /* ---- 4. Eyebrow labels ----------------------------------------- */
@@ -210,7 +149,7 @@ body.journal-retro #view-plants .shell-card-eyebrow {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.17em;
-  color: var(--retro-gold);
+  color: var(--retro-gold-ink);
 }
 
 /* ---- 5. Buttons and chips -------------------------------------- */
@@ -469,7 +408,7 @@ body.journal-retro .retro-coach-rule {
   align-items: center;
   gap: 0.3rem;
   margin-top: 0.7rem;
-  color: var(--retro-gold);
+  color: var(--retro-gold-ink);
 }
 
 body.journal-retro .retro-coach-rule::before {
@@ -544,7 +483,7 @@ body.journal-retro #view-plants .plant-card::before {
   position: absolute;
   inset: 0 0 auto 0;
   height: 2px;
-  background: linear-gradient(90deg, var(--retro-gold), var(--tint) 65%, transparent);
+  background: linear-gradient(90deg, var(--retro-gold-ink), var(--tint) 65%, transparent);
   opacity: 1;
   z-index: 2;
 }

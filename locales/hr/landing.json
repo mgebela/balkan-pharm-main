@@ -1,11 +1,12 @@
 {
   "meta": {
-    "title": "growtoo: Uzgoji ponovno. Do u detalj.",
-    "description": "Sljedeći ciklus kreće od ovoga — ne iz sjećanja. Dnevnik, savjetnik i podsjetnici na jednom stolu. Dokaz na lancu po želji. Besplatno, bez novčanika."
+    "title": "growtoo: Growers data on chain",
+    "description": "Dani moraju postojati. Sljedeći ciklus kreće od ovoga — ne iz sjećanja. Dnevnik, savjetnik i podsjetnici na jednom stolu. Dokaz na lancu po želji. Besplatno, bez novčanika."
   },
   "hero": {
     "eyebrow": "Očekivana berba 2026. · Solana",
-    "headline": "Uzgoji ponovno. Do u detalj.",
+    "headline": "Growers data on chain",
+    "rule": "Dani moraju postojati.",
     "posterAlt": "List konoplje koji se rastvara u sazviježđe čvorova — briga o biljci postaje provjerljiv trag.",
     "sub": "Sljedeći ciklus kreće od ovoga — ne iz sjećanja. <a class=\"hero-journal-mark\" href=\"https://journal.growto.live/\" aria-label=\"Pročitaj dnevnike\">Dnevnik</a> je ono glavno: zalijevanje, prihrana, faze, fotografije i savjetnik koji čita zapise.",
     "featuresLabel": "Što dobivaš",

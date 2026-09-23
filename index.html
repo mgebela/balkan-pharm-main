@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title data-i18n="landing.meta.title">growtoo: Grow it again. Exactly.</title>
+  <title data-i18n="landing.meta.title">growtoo: Growers data on chain</title>
   <meta name="description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <link rel="canonical" href="https://growto.live/" />
   <meta name="theme-color" content="#f5faf3" />
@@ -11,7 +11,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="growtoo" />
   <meta property="og:url" content="https://growto.live/" />
-  <meta property="og:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Grow it again. Exactly." />
+  <meta property="og:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Growers data on chain" />
   <meta property="og:description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <meta property="og:image" content="https://growto.live/images/og-growtoo.png" />
   <meta property="og:image:width" content="1200" />
@@ -20,14 +20,16 @@
   <meta property="og:locale" content="en_US" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Grow it again. Exactly." />
+  <meta name="twitter:title" data-i18n-attr="content:landing.meta.title" content="growtoo: Growers data on chain" />
   <meta name="twitter:description" data-i18n-attr="content:landing.meta.description" content="Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet." />
   <meta name="twitter:image" content="https://growto.live/images/og-growtoo.png" />
   <meta name="twitter:image:alt" content="growtoo — grow it again. Journal, coach, optional proof." />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <!-- Archivo Narrow is the condensed poster face the landing-retro accent
+       layer uses for headings; body copy stays on Archivo / Fraunces. -->
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=Archivo+Narrow:wght@600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script>
     /* Paper first paint — same growtoo sage journal as the app. */
     (function () {
@@ -38,9 +40,13 @@
       } catch (e) {}
     })();
   </script>
-  <script src="js/i18n.js?v=20260916a" data-i18n-ns="common,landing"></script>
+  <script src="js/i18n.js?v=20260922d" data-i18n-ns="common,landing"></script>
   <link rel="stylesheet" href="styles/tokens.css?v=20260817v" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260916a" />
+  <link rel="stylesheet" href="styles/landing.css?v=20260923a" />
+  <!-- Must stay last among landing sheets: the retro accent layer overrides
+       the late body.landing-page block. Drop this link and the body class
+       to revert. -->
+  <link rel="stylesheet" href="styles/landing-retro.css?v=20260922d" />
   <link rel="stylesheet" href="styles/trust-gates.css?v=20260820a" />
   <link rel="stylesheet" href="styles/i18n.css?v=20260817p" />
   <link rel="icon" href="images/growtoo-mark-brass.png?v=20260731a" type="image/png" />
@@ -53,12 +59,12 @@
         "@type": "WebSite",
         "name": "growtoo",
         "url": "https://growto.live/",
-        "description": "Grow it again. Exactly. Journal, coach, and reminders — optional on-chain proof.",
+        "description": "Growers data on chain. Journal, coach, and reminders — optional on-chain proof.",
         "publisher": {
           "@type": "Organization",
           "name": "growtoo",
           "url": "https://growto.live/",
-          "logo": "https://growto.live/images/growtoo-mark-brass.png"
+          "logo": "https://growto.live/images/growtoo-wordmark.png"
         }
       },
       {
@@ -134,14 +140,13 @@
   }
   </script>
 </head>
-<body class="journal-paper landing-page">
+<body class="journal-paper landing-page journal-retro">
 
   <header class="header header--catalog">
     <div class="container header-inner">
       <div class="header-brand">
         <a href="index.html" class="logo logo--brass" aria-label="growtoo">
-          <img src="images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" class="logo-mark" />
-          <span class="logo-word">growtoo</span>
+          <img src="images/growtoo-wordmark.png?v=20260923a" alt="growtoo" class="logo-wordmark" />
         </a>
         <a href="https://solana.com" target="_blank" rel="noopener noreferrer" class="powered-by-solana powered-by-solana--header">
           <span class="powered-by-solana-label" data-i18n="common.brand.poweredBy">Powered by</span>
@@ -182,7 +187,8 @@
       <div class="container hero-catalog-inner">
         <div class="hero-catalog-copy">
           <p class="hero-eyebrow" data-i18n="landing.hero.eyebrow">Est. harvest 2026 · Solana</p>
-          <h1 class="hero-headline" data-i18n="landing.hero.headline">Grow it again. Exactly.</h1>
+          <h1 class="hero-headline" data-i18n="landing.hero.headline" data-retro-accent>Growers data on chain</h1>
+          <p class="hero-rule" data-i18n="landing.hero.rule" data-retro-accent>The days have to exist.</p>
           <p class="hero-sub" data-i18n-html="landing.hero.sub">
             Next cycle starts from this one — not from memory.
             The <a class="hero-journal-mark" href="https://journal.growto.live/" aria-label="Read the journals">journal</a> is the feature: watering, feeding, stages, photos, and a coach that reads the log.
@@ -233,7 +239,7 @@
       <div class="container">
         <div class="desk-header">
           <span class="desk-tag desk-tag--verify" data-i18n="common.footer.how">How it works</span>
-          <h2 data-i18n="landing.proof.title">Log it. Prove it. Keep going.</h2>
+          <h2 data-i18n="landing.proof.title" data-retro-accent>Log it. Prove it. Keep going.</h2>
           <p class="section-lead" data-i18n="landing.proof.lead">
             The journal keeps the run findable. Minting a checkable trail is optional. Listing on Market waits for a two-week care trail.
           </p>
@@ -295,7 +301,7 @@
         <div id="trail" class="trail-proof">
           <div class="example-plant-head">
             <span class="desk-tag desk-tag--verify" data-i18n="landing.trail.tag">Checkable plants</span>
-            <h3 data-i18n="landing.trail.title">Four plants. Open the transactions yourself.</h3>
+            <h3 data-i18n="landing.trail.title" data-retro-accent>Four plants. Open the transactions yourself.</h3>
             <p data-i18n="landing.trail.body">
               Real mint records on Solana’s public test network (Devnet) — not a ticker demo.
               Each link opens the explorer so you can verify the trail yourself.
@@ -380,7 +386,7 @@
         <div class="audience-grid">
         <div class="audience-copy">
           <span class="desk-tag desk-tag--journal" data-i18n="landing.growers.tag">For cannabis growers</span>
-          <h2 data-i18n="landing.growers.title">The journal that remembers the grow.</h2>
+          <h2 data-i18n="landing.growers.title" data-retro-accent>The journal that remembers the grow.</h2>
           <p data-i18n="landing.growers.body1">
             Notes in a notebook, photos in the camera roll, the rest in your head — then week nine
             and nobody can reconstruct what happened. The journal is the trail: watering, feeding,
@@ -446,7 +452,7 @@
         <div class="audience-grid audience-grid--flip">
         <div class="audience-copy">
           <span class="desk-tag desk-tag--adopter" data-i18n="landing.adopters.tag">For plant followers</span>
-          <h2 data-i18n="landing.adopters.title">Own the story of a real plant.</h2>
+          <h2 data-i18n="landing.adopters.title" data-retro-accent>Own the story of a real plant.</h2>
           <p data-i18n="landing.adopters.body1">
             This isn’t a trading terminal. It’s a low-barrier way to back a grow you can actually watch:
             care logs, stage changes, and checkable updates tied to one plant’s life. Listed plants already have a
@@ -511,7 +517,7 @@
       <div class="container">
         <div class="desk-header">
           <span class="desk-tag desk-tag--adopter" data-i18n="landing.stakes.tag">Optional · test network</span>
-          <h2 data-i18n="landing.stakes.title">Live stakes, when you’re ready</h2>
+          <h2 data-i18n="landing.stakes.title" data-retro-accent>Live stakes, when you’re ready</h2>
           <p class="section-lead" data-i18n="landing.stakes.lead">
             After the journal, adopters can back open grower asks on Solana’s public test network (Devnet).
             Each listed plant has 14 days of watering or feeding logs, with care on at least half those days.
@@ -577,7 +583,7 @@
     <section id="status" class="section desk-section desk-section--status">
       <div class="container status-block">
         <span class="desk-tag" data-i18n="landing.status.tag">Where we are right now</span>
-        <h2 data-i18n="landing.status.title">Solana test network: real system, test assets</h2>
+        <h2 data-i18n="landing.status.title" data-retro-accent>Solana test network: real system, test assets</h2>
         <p data-i18n="landing.status.body">
           growtoo runs on Solana’s public test network (Devnet) while we build toward the live network (mainnet).
           Your plants, journal entries, and grow data are real. The tokens are test assets with no monetary value yet.
@@ -600,7 +606,7 @@
       <div class="container">
         <div class="desk-header">
           <span class="desk-tag" data-i18n="landing.faq.tag">Questions people actually ask</span>
-          <h2 data-i18n="landing.faq.title">Straight answers before you start</h2>
+          <h2 data-i18n="landing.faq.title" data-retro-accent>Straight answers before you start</h2>
           <p class="section-lead" data-i18n="landing.faq.lead">Start with the grow. Crypto details come later — only if you want them.</p>
         </div>
         <div class="faq-list">
@@ -684,7 +690,7 @@
 
     <section id="start" class="section desk-section desk-section--close">
       <div class="container close-block">
-        <h2 data-i18n="landing.close.title">Grow it again. The journal keeps it.</h2>
+        <h2 data-i18n="landing.close.title" data-retro-accent>Grow it again. The journal keeps it.</h2>
         <p data-i18n="landing.close.body">
           The journal is the trail. Coach and reminders sit on it. Minting is optional. Listing on Market needs 14 days of care.
         </p>
@@ -704,7 +710,7 @@
     <div class="container">
       <div class="footer-grid">
         <div>
-          <strong class="footer-brand">growtoo</strong>
+          <strong class="footer-brand"><img src="images/growtoo-wordmark.png?v=20260923a" alt="growtoo" class="logo-wordmark" /></strong>
           <p data-i18n="common.footer.tagline">Grow it again — journal, coach, optional proof.</p>
         </div>
         <div class="footer-links">
@@ -767,6 +773,7 @@
   </script>
   <script src="js/landing-market.js?v=20260817a"></script>
   <script src="js/site-trust.js?v=20260817a"></script>
+  <script src="js/landing-retro.js?v=20260922a"></script>
   <script>
     (function () {
       var toggle = document.querySelector('.nav-toggle');

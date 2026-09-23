@@ -1,9 +1,9 @@
 {
   "deck": {
-    "h1": "Alle tokenisieren ein Versprechen. <span class=\"grad\">Wir bauen zuerst die Aktenspur.</span>",
-    "p": "Ein kostenloses Grow-Journal, das Pflanzengeschichte in evidenzgestützten, phasengebundenen Nachweis für künftige Real-World Assets verwandelt.",
+    "h1": "Die Tage müssen <span class=\"grad\">existieren.</span>",
+    "p": "Alle tokenisieren ein Versprechen. Wir bauen zuerst die Aktenspur.",
     "span2": "Öffnen mit",
-    "p2": "Journal zuerst. Nachweis danach. Asset-Schicht zuletzt.",
+    "p2": "Journal zuerst. Nachweis danach. Asset zuletzt.",
     "div": "<span class=\"meta-label\">Status</span><span class=\"meta-value\">Solana Devnet · frühe Tester</span>",
     "div2": "<span class=\"meta-label\">Schicht</span><span class=\"meta-value\">Journal · Nachweis · optionales Asset</span>",
     "div3": "<span class=\"meta-label\">Token</span><span class=\"meta-value\">Test-Assets — kein Geldwert</span>",

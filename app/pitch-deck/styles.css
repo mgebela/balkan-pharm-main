@@ -204,6 +204,11 @@ em { font-style: italic; color: var(--ink); }
 .brand-mark svg,
 .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .brand-name { color: var(--green); }
+.brand-wordmark {
+  height: 52px;
+  width: auto;
+  display: block;
+}
 .brand-dot { color: var(--green); }
 
 .cover-headline {
@@ -218,6 +223,14 @@ em { font-style: italic; color: var(--ink); }
   font-size: clamp(17px, 1.4vw, 21px);
   color: var(--ink-dim);
   max-width: 760px;
+}
+.cover-rule {
+  margin: 0 0 0.35rem;
+  font-family: var(--font);
+  font-size: clamp(18px, 1.6vw, 24px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--brass, #6b5420);
 }
 
 .cover-meta {

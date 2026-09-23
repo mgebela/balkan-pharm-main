@@ -1,0 +1,249 @@
+/* ============================================================
+   Landing — retro-poster accent layer.
+
+   Same treatment as the Journal: condensed uppercase type, gold last
+   word, hairline rules, letterspaced eyebrows, and a CRT frame on the
+   instrument surfaces (specimen, proof clips, stakes KPIs). Scoped
+   under body.landing-page.journal-retro so dropping the class reverts.
+
+   Load AFTER landing.css. Gold that sits ON LIGHT uses --retro-gold-ink
+   (3.5:1 on sage); the brighter poster gold is for rules and anything
+   on the dark panel.
+   ============================================================ */
+
+body.landing-page.journal-retro {
+  --retro-gold: #c9a55e;
+  --retro-gold-ink: #a87f2e;
+  --retro-gold-line: rgb(201 165 94 / 0.34);
+  --retro-gold-faint: rgb(201 165 94 / 0.16);
+  --retro-panel: #1e332c;
+  --retro-panel-deep: #16261f;
+  --retro-cream: #f4ecd8;
+  --retro-cream-dim: rgb(244 236 216 / 0.62);
+  --retro-ink: #122418;
+  --font-retro: 'Archivo Narrow', 'Oswald', 'Arial Narrow', Haettenschweiler, var(--font);
+}
+
+body.landing-page.journal-retro .retro-accent {
+  color: var(--retro-gold-ink);
+}
+
+/* ---- Headings -------------------------------------------------- */
+
+body.landing-page.journal-retro .hero--catalog .hero-headline,
+body.landing-page.journal-retro .desk-header h2,
+body.landing-page.journal-retro .audience-copy h2,
+body.landing-page.journal-retro .status-block h2,
+body.landing-page.journal-retro .close-block h2,
+body.landing-page.journal-retro .section h2,
+body.landing-page.journal-retro .example-plant-head h3 {
+  font-family: var(--font-retro);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.012em;
+  line-height: 1.05;
+  color: var(--retro-ink);
+}
+
+body.landing-page.journal-retro .hero--catalog .hero-headline {
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  max-width: 11em;
+  font-weight: 800;
+}
+
+body.landing-page.journal-retro .hero-rule {
+  font-family: var(--font-retro);
+  font-size: clamp(1.05rem, 2.4vw, 1.28rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--retro-ink);
+  margin: 0 0 1rem;
+}
+
+body.landing-page.journal-retro .hero--catalog .hero-headline::after,
+body.landing-page.journal-retro .desk-header h2::after,
+body.landing-page.journal-retro .audience-copy h2::after,
+body.landing-page.journal-retro .status-block h2::after,
+body.landing-page.journal-retro .close-block h2::after,
+body.landing-page.journal-retro .example-plant-head h3::after {
+  content: '';
+  display: block;
+  width: 58%;
+  max-width: 14rem;
+  height: 2px;
+  margin-top: 0.65rem;
+  background: var(--retro-gold-ink);
+}
+
+body.landing-page.journal-retro .desk-header h2::after,
+body.landing-page.journal-retro .status-block h2::after,
+body.landing-page.journal-retro .close-block h2::after,
+body.landing-page.journal-retro .example-plant-head h3::after {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ---- Eyebrows / tags ------------------------------------------- */
+
+body.landing-page.journal-retro .hero--catalog .hero-eyebrow,
+body.landing-page.journal-retro .desk-tag {
+  font-family: var(--font-retro);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--retro-gold-ink);
+}
+
+/* ---- Buttons, chips, nav --------------------------------------- */
+
+body.landing-page.journal-retro .btn,
+body.landing-page.journal-retro .nav-link,
+body.landing-page.journal-retro .clip-tap,
+body.landing-page.journal-retro .hero-specimen-verify,
+body.landing-page.journal-retro .trail-card-verify,
+body.landing-page.journal-retro .stakes-panel-cta,
+body.landing-page.journal-retro .hero-feature-row li {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+body.landing-page.journal-retro .hero-journals-link em {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 800;
+  color: var(--retro-gold-ink);
+}
+
+body.landing-page.journal-retro .hero-journal-mark {
+  font-family: var(--font-retro);
+  font-style: normal;
+  font-weight: 800;
+  color: var(--retro-gold-ink);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Long-form stays in the reading face. */
+body.landing-page.journal-retro .hero-sub,
+body.landing-page.journal-retro .section-lead,
+body.landing-page.journal-retro .audience-copy p,
+body.landing-page.journal-retro .proof-step > p,
+body.landing-page.journal-retro .status-block p,
+body.landing-page.journal-retro .close-block p,
+body.landing-page.journal-retro .faq-item p {
+  font-family: var(--font);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ---- Spec cards and proof steps -------------------------------- */
+
+body.landing-page.journal-retro .desk-spec h3,
+body.landing-page.journal-retro .proof-step h3 {
+  font-family: var(--font-retro);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: var(--retro-ink);
+}
+
+body.landing-page.journal-retro .proof-num {
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+  color: var(--retro-gold-ink);
+}
+
+body.landing-page.journal-retro .desk-panel-bar,
+body.landing-page.journal-retro .desk-panel-meta,
+body.landing-page.journal-retro .stakes-panel-label,
+body.landing-page.journal-retro .stakes-kpi-label,
+body.landing-page.journal-retro .clip-ui-label {
+  font-family: var(--font-retro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+body.landing-page.journal-retro .stakes-kpi-value,
+body.landing-page.journal-retro .hero-specimen-tx,
+body.landing-page.journal-retro .clip-tx,
+body.landing-page.journal-retro .trail-card-meta {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+body.landing-page.journal-retro .hero-specimen-title,
+body.landing-page.journal-retro .trail-card-name {
+  font-family: var(--font-retro);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+body.landing-page.journal-retro .logo-word,
+body.landing-page.journal-retro .footer-brand {
+  font-family: var(--font-retro);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ---- Specimen: terminal plate ---------------------------------- */
+
+body.landing-page.journal-retro .hero-specimen-inner {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(255 255 255 / 0.05), transparent 70%),
+    linear-gradient(180deg, var(--retro-panel) 0%, var(--retro-panel-deep) 100%);
+  border: 1px solid var(--retro-gold);
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.35),
+    0 12px 32px rgb(36 68 40 / 0.18);
+}
+
+body.landing-page.journal-retro .hero-specimen-title,
+body.landing-page.journal-retro .hero-specimen-seal {
+  color: var(--retro-cream);
+}
+
+body.landing-page.journal-retro .hero-specimen-tx {
+  color: var(--retro-gold);
+}
+
+body.landing-page.journal-retro .hero-specimen-verify,
+body.landing-page.journal-retro .hero-specimen-verify:hover {
+  color: var(--retro-gold);
+}
+
+/* ---- Proof clips: CRT inset ------------------------------------ */
+
+body.landing-page.journal-retro .clip-frame {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(255 255 255 / 0.05), transparent 70%),
+    linear-gradient(180deg, var(--retro-panel) 0%, var(--retro-panel-deep) 100%);
+  border: 1px solid var(--retro-gold);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.35);
+}
+
+body.landing-page.journal-retro .clip-ui-label,
+body.landing-page.journal-retro .clip-log,
+body.landing-page.journal-retro .clip-quest,
+body.landing-page.journal-retro .clip-mint,
+body.landing-page.journal-retro .clip-reminder {
+  color: var(--retro-cream);
+}
+
+body.landing-page.journal-retro .clip-tx,
+body.landing-page.journal-retro .clip-check,
+body.landing-page.journal-retro .clip-tick {
+  color: var(--retro-gold);
+}
+
+body.landing-page.journal-retro .clip-tap {
+  background: var(--retro-gold-ink);
+  color: #fff;
+  border: 0;
+}

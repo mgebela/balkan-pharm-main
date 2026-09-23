@@ -1,9 +1,9 @@
 {
   "deck": {
-    "h1": "Svi tokeniziraju obećanje. <span class=\"grad\">Mi prvo gradimo papirnati trag.</span>",
-    "p": "Besplatni dnevnik uzgoja koji povijest biljke pretvara u evidencijom podržan, fazama vezan dokaz za buduće imovine iz stvarnog svijeta.",
+    "h1": "Dani moraju <span class=\"grad\">postojati.</span>",
+    "p": "Svi tokeniziraju obećanje. Mi prvo gradimo papirnati trag.",
     "span2": "Otvori s",
-    "p2": "Prvo dnevnik. Onda dokaz. Sloj imovine na kraju.",
+    "p2": "Prvo dnevnik. Onda dokaz. Imovina na kraju.",
     "div": "<span class=\"meta-label\">Status</span><span class=\"meta-value\">Solana Devnet · rani testeri</span>",
     "div2": "<span class=\"meta-label\">Sloj</span><span class=\"meta-value\">Dnevnik · dokaz · neobavezna imovina</span>",
     "div3": "<span class=\"meta-label\">Tokeni</span><span class=\"meta-value\">Testni asseti — nemaju novčanu vrijednost</span>",

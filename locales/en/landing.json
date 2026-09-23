@@ -108,7 +108,8 @@
     "featureReminders": "Reminders",
     "featuresLabel": "What you get",
     "followPlant": "Follow a plant",
-    "headline": "Grow it again. Exactly.",
+    "headline": "Growers data on chain",
+    "rule": "The days have to exist.",
     "posterAlt": "A cannabis leaf dissolving into a constellation of nodes — plant care becoming a checkable trail.",
     "readJournals": "Read the <em>journals</em>",
     "specimenTitle": "Seed <span class=\"hero-specimen-no\">№</span> 0041 — <em>CBD Auto</em>",
@@ -116,8 +117,8 @@
     "sub": "Next cycle starts from this one — not from memory. The <a class=\"hero-journal-mark\" href=\"https://journal.growto.live/\" aria-label=\"Read the journals\">journal</a> is the feature: watering, feeding, stages, photos, and a coach that reads the log."
   },
   "meta": {
-    "description": "Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet.",
-    "title": "growtoo: Grow it again. Exactly."
+    "description": "The days have to exist. Next cycle starts from this one — not from memory. Journal, coach, and reminders on one desk. Optional on-chain proof. Free, no wallet.",
+    "title": "growtoo: Growers data on chain"
   },
   "proof": {
     "clip1Button": "Log watering",

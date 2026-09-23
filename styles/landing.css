@@ -274,6 +274,12 @@ body:has(.devnet-banner) .header {
   color: var(--brass);
 }
 
+.logo-wordmark {
+  height: 52px;
+  width: auto;
+  display: block;
+}
+
 .header-brand {
   display: flex;
   align-items: center;
@@ -2126,13 +2132,8 @@ body:has(.devnet-banner) .header {
   margin-bottom: 0.35rem;
 }
 
-.footer-brand::before {
-  content: '';
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: url('../images/growtoo-logo.png') center / cover no-repeat;
-  box-shadow: 0 0 0 1px rgb(var(--green-glow-rgb) / 0.4);
+.footer-brand .logo-wordmark {
+  height: 40px;
 }
 
 .footer-links {
@@ -2412,6 +2413,10 @@ body:has(.devnet-banner) .header {
 }
 
 @media (max-width: 640px) {
+  .logo-wordmark {
+    height: 34px;
+  }
+
   .header-inner {
     padding: 0.75rem 0;
   }
@@ -6278,6 +6283,14 @@ body.landing-page .hero--catalog .hero-eyebrow {
 body.landing-page .hero--catalog .hero-headline {
   color: #122418;
   font-weight: 500;
+}
+
+body.landing-page .hero-rule {
+  margin: 0 0 0.95rem;
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: #8a6418;
 }
 
 body.landing-page .hero--catalog .hero-sub,

@@ -1,9 +1,9 @@
 {
   "deck": {
-    "h1": "Everyone tokenises a promise. <span class=\"grad\">We build the paper trail first.</span>",
-    "p": "A free grow journal that turns plant history into evidence-backed, stage-linked proof for future real-world assets.",
+    "h1": "The days have to <span class=\"grad\">exist.</span>",
+    "p": "Everyone tokenises a promise. We build the paper trail first.",
     "span2": "Open with",
-    "p2": "Journal first. Proof second. Asset layer last.",
+    "p2": "Journal first. Proof second. Asset last.",
     "div": "<span class=\"meta-label\">Status</span><span class=\"meta-value\">Solana Devnet · early testers</span>",
     "div2": "<span class=\"meta-label\">Layer</span><span class=\"meta-value\">Journal · proof · optional asset</span>",
     "div3": "<span class=\"meta-label\">Tokens</span><span class=\"meta-value\">Test assets — no monetary value</span>",
