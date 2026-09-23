@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+  <circle cx="1148" cy="400" r="168" fill="#c9842a" opacity="0.2"/>
+  <circle cx="1148" cy="400" r="76" fill="#d8ad2f"/>
+  <path fill="#2f5340" d="M0 668 C160 628 300 648 460 620 C620 592 760 642 920 608 C1080 574 1240 620 1440 598 L1440 690 L0 690 Z"/>
+  <path fill="#264536" d="M0 654 C220 632 400 668 580 638 C760 608 980 660 1440 628 L1440 690 L0 690 Z"/>
+  <path fill="#4e8758" d="M-80 900 L40 900 L720 668 Z"/>
+  <path fill="#356348" d="M40 900 L160 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M160 900 L280 900 L720 668 Z"/>
+  <path fill="#356348" d="M280 900 L400 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M400 900 L520 900 L720 668 Z"/>
+  <path fill="#356348" d="M520 900 L640 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M640 900 L760 900 L720 668 Z"/>
+  <path fill="#356348" d="M760 900 L880 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M880 900 L1000 900 L720 668 Z"/>
+  <path fill="#356348" d="M1000 900 L1120 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M1120 900 L1240 900 L720 668 Z"/>
+  <path fill="#356348" d="M1240 900 L1360 900 L720 668 Z"/>
+  <path fill="#4e8758" d="M1360 900 L1520 900 L720 668 Z"/>
+</svg>
