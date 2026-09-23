@@ -204,11 +204,6 @@ em { font-style: italic; color: var(--ink); }
 .brand-mark svg,
 .brand-mark img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .brand-name { color: var(--green); }
-.brand-wordmark {
-  height: 52px;
-  width: auto;
-  display: block;
-}
 .brand-dot { color: var(--green); }
 
 .cover-headline {

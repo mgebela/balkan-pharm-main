@@ -96,8 +96,10 @@
       margin-bottom: 0.95rem;
     }
     .login-brand img {
-      width: min(240px, 72%);
-      height: auto;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.4);
       animation: login-seal-settle 0.85s cubic-bezier(0.22, 0.61, 0.36, 1) both;
     }
     .login-brand-word {
@@ -555,7 +557,8 @@
   </svg>
   <form class="login-card" id="login-form" novalidate>
     <div class="login-brand">
-      <img src="../images/growtoo-wordmark.png?v=20260923a" alt="growtoo" />
+      <img src="../images/growtoo-mark-brass.png?v=20260731a" alt="" width="56" height="56" />
+      <span class="login-brand-word">growtoo</span>
     </div>
     <p data-i18n="signin.login-form.p" class="login-eyebrow">Private journal</p>
     <h1 data-i18n="signin.auth-title.h1" id="auth-title">Sign in to growtoo</h1>

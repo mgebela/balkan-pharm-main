@@ -30,10 +30,10 @@ body.app-loading .app {
 }
 
 .app-boot-mark {
-  width: min(240px, 70vw);
-  height: auto;
-  display: block;
-  margin: 0 auto 0.35rem;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.45);
   animation: app-boot-breathe 2.2s ease-in-out infinite;
 }
 
@@ -677,9 +677,12 @@ body::before {
 }
 
 .sidebar-logo-mark {
-  height: 36px;
-  width: auto;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
   display: block;
+  flex: 0 0 auto;
+  box-shadow: 0 0 0 1px rgb(var(--brass-rgb) / 0.4);
 }
 
 .sidebar-nav {
