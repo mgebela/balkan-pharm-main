@@ -77,7 +77,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("land.svg") center / cover no-repeat;
+  background: url("land.svg?v=20260924b") center / cover no-repeat;
   pointer-events: none;
 }
 
