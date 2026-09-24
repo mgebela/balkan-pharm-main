@@ -17,7 +17,15 @@
 @font-face {
   font-family: "Alkaline Caps Heavy";
   src: url("/fonts/pitch/Alkaline-HeavyCaps.otf") format("opentype");
-  font-weight: 800;
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Alkaline Heavy Caps";
+  src: url("/fonts/pitch/Alkaline-HeavyCaps.otf") format("opentype");
+  font-weight: 400 900;
   font-style: normal;
   font-display: swap;
 }
@@ -47,10 +55,11 @@
   --font: "TT2020", ui-monospace, monospace;
   --font-script: "Alkaline", Georgia, serif;
   --font-display: "Alkaline Caps", "Alkaline", Georgia, serif;
-  --font-title: "Alkaline Caps Heavy", "Alkaline Caps", "Alkaline", Georgia, serif;
-  --title: clamp(30px, 3.2vw + 2vh, 80px);
-  --title-cover: clamp(36px, 4.4vw + 2.8vh, 104px);
-  --stat: clamp(32px, 3.6vw + 2.6vh, 88px);
+  --font-title: "Alkaline Heavy Caps", "Alkaline Caps Heavy";
+  --title: clamp(40px, 4.2vw + 2.6vh, 96px);
+  --title-cover: clamp(48px, 5.6vw + 3.4vh, 124px);
+  --stat: clamp(40px, 4.4vw + 3vh, 100px);
+  --body: clamp(20px, 1.55vw + 0.75vh, 28px);
   --sun-size: clamp(52px, 8vw, 120px);
 }
 
@@ -63,8 +72,8 @@ body {
   background: var(--field);
   color: var(--poster);
   font-family: var(--font);
-  font-size: clamp(16px, 1.1vw + 0.45vh, 21px);
-  line-height: 1.45;
+  font-size: var(--body);
+  line-height: 1.4;
 }
 
 .slide {
@@ -119,15 +128,15 @@ body {
 .slide--cover {
   align-items: flex-start;
   padding-top: clamp(48px, 7vh, 76px);
-  padding-bottom: clamp(200px, 46vh, 400px);
+  padding-bottom: clamp(180px, 38vh, 320px);
 }
 
 .slide--cover::after {
   display: block;
-  height: min(48vh, 460px);
+  height: min(38vh, 360px);
   background-image: url("field.jpg?v=20260924j");
   background-size: cover;
-  background-position: center 68%;
+  background-position: center 78%;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%);
   mask-image: linear-gradient(to bottom, transparent, #000 16%);
 }
@@ -139,6 +148,8 @@ body {
   max-width: 8ch;
   margin-bottom: 16px;
 }
+
+.slide--cover .say { max-width: 40em; }
 
 .slide--cover .mark {
   height: clamp(36px, 5vh, 52px);
@@ -169,7 +180,7 @@ body {
   font-family: var(--font-script);
   font-style: normal;
   font-weight: 400;
-  font-size: 26px;
+  font-size: clamp(26px, 1.6vw + 0.6vh, 34px);
   letter-spacing: 0.01em;
   color: var(--sun);
 }
@@ -178,7 +189,8 @@ h1 {
   margin: 0 0 16px;
   font-family: var(--font-title);
   font-style: normal;
-  font-weight: 800;
+  font-weight: 400;
+  font-synthesis: none;
   font-size: var(--title);
   letter-spacing: 0.01em;
   line-height: 0.9;
@@ -188,19 +200,25 @@ h1 {
 }
 
 .poster--side h1 {
-  font-size: clamp(28px, 3vw + 1.6vh, 72px);
+  font-size: var(--title);
   max-width: 8.4em;
 }
 
 .say {
   margin: 0;
-  max-width: 28rem;
+  max-width: 36em;
+  font-size: var(--body);
+  line-height: 1.4;
   color: var(--poster);
 }
 
 .say--next { margin-top: 10px; }
 
-.quiet { color: var(--mute); margin-top: 22px; }
+.quiet {
+  margin-top: 22px;
+  font-size: var(--body);
+  color: var(--mute);
+}
 
 .bill + .quiet {
   margin-top: 8px;
@@ -229,8 +247,9 @@ a { color: var(--poster); }
   display: block;
   font-family: var(--font-title);
   font-style: normal;
-  font-weight: 800;
-  font-size: clamp(44px, 6vw, 84px);
+  font-weight: 400;
+  font-synthesis: none;
+  font-size: clamp(48px, 6.4vw, 96px);
   line-height: 0.88;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -239,7 +258,7 @@ a { color: var(--poster); }
 .bill span {
   display: block;
   margin-top: 8px;
-  font-size: 20px;
+  font-size: var(--body);
   color: var(--mute);
 }
 
@@ -247,7 +266,7 @@ a { color: var(--poster); }
   margin: 28px 0 0;
   padding: 0;
   list-style: none;
-  max-width: 40rem;
+  max-width: 48rem;
 }
 
 .rows li {
@@ -264,14 +283,16 @@ a { color: var(--poster); }
   font-family: var(--font-display);
   font-style: normal;
   font-weight: 700;
-  font-size: 22px;
-  line-height: 1;
+  font-size: clamp(22px, 1.5vw + 0.4vh, 28px);
+  line-height: 1.15;
   text-transform: uppercase;
 }
 
-.rows--names { max-width: 44rem; }
+.rows li span { font-size: var(--body); }
 
-.rows--names li { grid-template-columns: 16rem 1fr; }
+.rows--names { max-width: 52rem; }
+
+.rows--names li { grid-template-columns: 18rem 1fr; }
 
 .bill--stat b { font-size: var(--stat); }
 
@@ -442,8 +463,8 @@ a { color: var(--poster); }
     gap: 10px;
   }
 
-  .num { top: 16px; left: 16px; font-size: 18px; }
-  .kicker { font-size: 22px; }
+  .num { top: 16px; left: 16px; font-size: 20px; }
+  .kicker { font-size: 26px; }
   .slide::before { inset: 10px; }
   .hud { right: 12px; bottom: 10px; font-size: 13px; }
   .menu-btn { top: 12px; right: 12px; }
