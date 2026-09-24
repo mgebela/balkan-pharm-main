@@ -125,7 +125,7 @@ body {
 .slide--cover::after {
   display: block;
   height: min(48vh, 460px);
-  background-image: url("field.jpg?v=20260924h");
+  background-image: url("field.jpg?v=20260924j");
   background-size: cover;
   background-position: center 68%;
   -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%);
@@ -416,7 +416,7 @@ a { color: var(--poster); }
   .slide--cover::after {
     display: block;
     height: 230px;
-    background-image: url("field.jpg?v=20260924h");
+    background-image: url("field.jpg?v=20260924j");
     background-size: 220% auto;
     background-position: center bottom;
   }
