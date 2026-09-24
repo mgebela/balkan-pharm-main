@@ -48,6 +48,10 @@
   --font-script: "Alkaline", Georgia, serif;
   --font-display: "Alkaline Caps", "Alkaline", Georgia, serif;
   --font-title: "Alkaline Caps Heavy", "Alkaline Caps", "Alkaline", Georgia, serif;
+  --title: clamp(30px, 3.2vw + 2vh, 80px);
+  --title-cover: clamp(36px, 4.4vw + 2.8vh, 104px);
+  --stat: clamp(32px, 3.6vw + 2.6vh, 88px);
+  --sun-size: clamp(52px, 8vw, 120px);
 }
 
 * { box-sizing: border-box; }
@@ -59,25 +63,33 @@ body {
   background: var(--field);
   color: var(--poster);
   font-family: var(--font);
-  font-size: 21px;
+  font-size: clamp(16px, 1.1vw + 0.45vh, 21px);
   line-height: 1.45;
 }
 
 .slide {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   scroll-snap-align: start;
   display: flex;
   align-items: center;
-  padding: 8vh 7vw 28vh;
+  padding: clamp(52px, 7vh, 80px) clamp(20px, 6vw, 80px) clamp(96px, 18vh, 168px);
   overflow: hidden;
+  background-color: var(--field);
+  background-image: radial-gradient(circle closest-side, #e0be05 99%, transparent 100%);
+  background-repeat: no-repeat;
+  background-size: var(--sun-size) var(--sun-size);
+  background-position: calc(100% - clamp(36px, 6vw, 80px)) clamp(56px, 9vh, 92px);
 }
 
 .slide::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: url("land.svg?v=20260924b") center / cover no-repeat;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: min(22vh, 200px);
+  background: url("land.svg?v=20260924c") center bottom / 100% 100% no-repeat;
   pointer-events: none;
 }
 
@@ -105,22 +117,21 @@ body {
 .poster { position: relative; z-index: 1; width: min(1080px, 100%); }
 
 .slide--cover {
-  overflow: hidden;
   align-items: flex-start;
-  padding-top: 8vh;
+  padding-top: clamp(48px, 7vh, 76px);
 }
 
 .slide--cover .poster { width: min(1080px, 100%); }
 
 .slide--cover h1 {
-  font-size: clamp(56px, 8.8vw, 128px);
+  font-size: var(--title-cover);
   max-width: 8ch;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .slide--cover .mark {
-  height: 52px;
-  margin-bottom: 26px;
+  height: clamp(36px, 5vh, 52px);
+  margin-bottom: clamp(16px, 3vh, 26px);
 }
 
 .poster--side {
@@ -153,11 +164,11 @@ body {
 }
 
 h1 {
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   font-family: var(--font-title);
   font-style: normal;
   font-weight: 800;
-  font-size: clamp(48px, 6.4vw, 96px);
+  font-size: var(--title);
   letter-spacing: 0.01em;
   line-height: 0.9;
   text-transform: uppercase;
@@ -166,7 +177,7 @@ h1 {
 }
 
 .poster--side h1 {
-  font-size: clamp(42px, 5.4vw, 80px);
+  font-size: clamp(28px, 3vw + 1.6vh, 72px);
   max-width: 8.4em;
 }
 
@@ -251,7 +262,7 @@ a { color: var(--poster); }
 
 .rows--names li { grid-template-columns: 16rem 1fr; }
 
-.bill--stat b { font-size: clamp(56px, 8vw, 108px); }
+.bill--stat b { font-size: var(--stat); }
 
 .piece { margin: 0; color: #1b3a28; }
 
@@ -376,9 +387,48 @@ a { color: var(--poster); }
 }
 
 @media (max-width: 800px) {
-  .poster--side { grid-template-columns: 1fr; }
+  html { scroll-snap-type: none; }
+
+  .slide {
+    align-items: flex-start;
+    min-height: 100dvh;
+    padding: 64px 20px 120px;
+    background-position: calc(100% - 20px) 72px;
+    --sun-size: 56px;
+  }
+
+  .poster--side {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .rec { width: min(320px, 100%); }
+
+  .rows li,
+  .rows--names li {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px 0;
+  }
+
   .ledger-head,
-  .ledger-row { grid-template-columns: 1fr 1fr; }
+  .ledger-row {
+    grid-template-columns: 1fr 1fr;
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .num { top: 16px; left: 16px; font-size: 18px; }
+  .kicker { font-size: 22px; }
+  .slide::before { inset: 10px; }
+  .hud { right: 12px; bottom: 10px; font-size: 13px; }
+  .menu-btn { top: 12px; right: 12px; }
+}
+
+@media (max-height: 760px) {
+  .slide { padding-bottom: 100px; }
+  .rows li { padding: 10px 0; }
+  .bill li { padding-bottom: 12px; }
 }
 
 .hud {
