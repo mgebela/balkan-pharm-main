@@ -35,11 +35,18 @@
 
   function goTo(i) {
     if (i < 0 || i >= total) return;
-    slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const deck = document.getElementById('deck');
+    const scroller = deck && getComputedStyle(deck).position === 'fixed' ? deck : null;
+    if (scroller) {
+      scroller.scrollTo({ top: slides[i].offsetTop, behavior: 'smooth' });
+    } else {
+      slides[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     setActive(i);
   }
 
   // Detect current slide on scroll
+  const deck = document.getElementById('deck');
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -49,7 +56,10 @@
         }
       });
     },
-    { threshold: 0.55 }
+    {
+      root: deck && getComputedStyle(deck).position === 'fixed' ? deck : null,
+      threshold: 0.55,
+    }
   );
   slides.forEach((s) => observer.observe(s));
 
