@@ -119,6 +119,17 @@ body {
 .slide--cover {
   align-items: flex-start;
   padding-top: clamp(48px, 7vh, 76px);
+  padding-bottom: clamp(200px, 46vh, 400px);
+}
+
+.slide--cover::after {
+  display: block;
+  height: min(48vh, 460px);
+  background-image: url("field.jpg?v=20260924h");
+  background-size: cover;
+  background-position: center 68%;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%);
+  mask-image: linear-gradient(to bottom, transparent, #000 16%);
 }
 
 .slide--cover .poster { width: min(1080px, 100%); }
@@ -397,6 +408,19 @@ a { color: var(--poster); }
     --sun-size: 56px;
   }
 
+  .slide--cover {
+    padding-bottom: 230px;
+    background-image: none;
+  }
+
+  .slide--cover::after {
+    display: block;
+    height: 230px;
+    background-image: url("field.jpg?v=20260924h");
+    background-size: 220% auto;
+    background-position: center bottom;
+  }
+
   .poster--side {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -426,7 +450,7 @@ a { color: var(--poster); }
 }
 
 @media (max-height: 760px) {
-  .slide { padding-bottom: 100px; }
+  .slide:not(.slide--cover) { padding-bottom: 100px; }
   .rows li { padding: 10px 0; }
   .bill li { padding-bottom: 12px; }
 }
