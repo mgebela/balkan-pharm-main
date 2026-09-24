@@ -145,7 +145,7 @@ body {
 
 .slide--cover h1 {
   font-size: var(--title-cover);
-  max-width: 10ch;
+  max-width: 8ch;
   margin-bottom: 16px;
 }
 
