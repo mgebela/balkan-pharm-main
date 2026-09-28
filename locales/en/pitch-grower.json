@@ -101,7 +101,7 @@
     "p27": "“Start the journal. You’ll want it in month three, and by then it’s too late to start.” <span class=\"closer-attr\">Say this, then stop talking</span>",
     "div21": "<span class=\"meta-label\">Start</span><a class=\"meta-value\" href=\"https://growto.live/dnevnik/?mode=signup&amp;type=grower\" target=\"_blank\" rel=\"noreferrer\">Begin your journal</a>",
     "div22": "<span class=\"meta-label\">Live</span><a class=\"meta-value\" href=\"https://growto.live\" target=\"_blank\" rel=\"noreferrer\">growto.live</a>",
-    "div23": "<span class=\"meta-label\">Contact</span><span class=\"meta-value\">admin@growto.live</span>",
+    "div23": "<span class=\"meta-label\">Contact</span><span class=\"meta-value\">admin@dnevnik.live</span>",
     "p28": "It’s free, it takes a minute, and the plant does the rest."
   },
   "meta": {
