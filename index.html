@@ -178,6 +178,7 @@
         <a href="#faq" class="nav-link nav-link--more" data-i18n="common.nav.faq">FAQ</a>
         <a href="rwa-docs/" class="nav-link nav-link--more" data-i18n="common.nav.docs">Docs</a>
         <div class="nav-lang" data-i18n-switcher></div>
+        <a href="dnevnik/" class="btn btn-primary nav-cta" data-i18n="common.cta.signIn">Sign in</a>
       </nav>
     </div>
   </header>
@@ -799,7 +800,7 @@
         if (nav.classList.contains('is-open')) close(); else open();
       });
       overlay.addEventListener('click', close);
-      nav.querySelectorAll('.nav-link').forEach(function (a) {
+      nav.querySelectorAll('.nav-link, .nav-cta').forEach(function (a) {
         a.addEventListener('click', close);
       });
     })();
