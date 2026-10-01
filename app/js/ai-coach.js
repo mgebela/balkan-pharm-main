@@ -1246,7 +1246,12 @@
     }
 
     if (/(?:mint\s+(?:a\s+)?seed|tokenise|tokenize)/i.test(lower)) {
-      const plant = resolvePlant(context.focusPlant && context.focusPlant.id);
+      const named = q.match(/mint\s+(?:a\s+)?seed\s+for\s+(.+?)\s*$/i);
+      const plant =
+        (named && resolvePlant(named[1].replace(/[.“”"']/g, '').trim())) ||
+        resolvePlant(context.focusPlant && context.focusPlant.name) ||
+        resolvePlant(context.focusPlant && context.focusPlant.id) ||
+        resolvePlant(null);
       if (plant) {
         actions.push({
           type: 'import_seed',
@@ -1255,12 +1260,27 @@
           name: plant.name,
           strain: plant.strain || plant.name,
         });
-        reply = (reply ? reply + '\n' : '') + 'I can mint a Seed NFT for “' + plant.name + '” (wallet must be connected).';
+        reply =
+          (reply ? reply + '\n' : '') +
+          'I can mint a Seed NFT for “' +
+          plant.name +
+          '” (wallet must be connected).';
+      } else {
+        reply =
+          (reply ? reply + '\n' : '') +
+          'Which plant should I mint a seed for? Say “mint seed for Gold Bloom” (use the real journal name).';
       }
     }
 
     if (/(?:mint\s+(?:next\s+)?growth|advance\s+(?:the\s+)?(?:token|stage)|grow\s+mint)/i.test(lower)) {
-      const plant = resolvePlant(context.focusPlant && context.focusPlant.id);
+      const named = q.match(
+        /(?:mint\s+(?:next\s+)?growth|grow\s+mint)\s+for\s+(.+?)\s*$/i
+      );
+      const plant =
+        (named && resolvePlant(named[1].replace(/[.“”"']/g, '').trim())) ||
+        resolvePlant(context.focusPlant && context.focusPlant.name) ||
+        resolvePlant(context.focusPlant && context.focusPlant.id) ||
+        resolvePlant(null);
       const token = plant ? findTokenForPlant(plant.id) : null;
       if (token) {
         actions.push({
@@ -1270,13 +1290,26 @@
           plantName: plant.name,
         });
         reply = (reply ? reply + '\n' : '') + 'I can try minting the next growth stage for “' + token.name + '”.';
+      } else if (plant) {
+        reply =
+          (reply ? reply + '\n' : '') +
+          '“' +
+          plant.name +
+          '” has no seed token yet — mint a seed first, then ask for growth.';
       } else {
-        reply = (reply ? reply + '\n' : '') + 'No linked token found — mint a seed first or name the plant.';
+        reply =
+          (reply ? reply + '\n' : '') +
+          'Which plant? Say “mint growth for Gold Bloom” after a seed exists.';
       }
     }
 
     if (actions.length) {
       return { reply: reply || 'Confirm the actions below to apply them.', actions: actions };
+    }
+    // Mint intents that already answered (ask which plant / seed first) must not
+    // fall through into the generic quest blurb — that is the "running in circles" loop.
+    if (reply) {
+      return { reply: reply, actions: [] };
     }
 
     // Advice-only local playbook
@@ -1284,9 +1317,29 @@
     const stageKey = focus && focus.stage ? focus.stage : null;
     const playbook = stageKey && STAGE_PLAYBOOK[stageKey] ? STAGE_PLAYBOOK[stageKey] : null;
     if (/mint|token|\$grow|rwa|nft|quest|unlock/.test(lower)) {
+      const plantName = (focus && focus.name) || 'your plant';
+      const quest = context.mintQuest;
+      if (quest && quest.message) {
+        return {
+          reply:
+            quest.message +
+            (quest.ready
+              ? '\n\nSay “mint growth for ' + plantName + '” when you are ready.'
+              : '\n\nAfter proof is ready, mint from Tokenise, or say “mint seed for ' +
+                plantName +
+                '” / “mint growth for ' +
+                plantName +
+                '”.'),
+          actions: [],
+        };
+      }
       return {
         reply:
-          'Tokenisation needs journal proof: link plant → log stage → log watering → log feeding (from seedling). Then mint from Tokenise, or ask me: “mint seed for My Plant” / “mint growth”.',
+          'Seed mint needs a linked journal plant. Growth mints need journal proof: log stage → watering → feeding (from seedling). Then mint from Tokenise, or say “mint seed for ' +
+          plantName +
+          '” / “mint growth for ' +
+          plantName +
+          '”.',
         actions: [],
       };
     }
