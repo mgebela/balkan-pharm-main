@@ -1903,6 +1903,19 @@
   "toolbox-form-feeding": {
     "button": "Add"
   },
+  "toolbox-form-quality": {
+    "button": "Log checklist"
+  },
+  "toolbox-panel-quality": {
+    "disclaimer": "Practice checklist for grow hygiene and drying (GACP-style). Writes to the journal trail. Not a HACCP certificate, not a licence, not legal advice. Follow the law where you grow.",
+    "legend": "Checks done",
+    "c1": "Tools and surfaces cleaned before harvest",
+    "c2": "Clean, dry harvest containers",
+    "c3": "Crop kept off soil / dirty floor after cut",
+    "c4": "Moved to drying promptly",
+    "c5": "Drying off the ground, thin layer / airflow",
+    "c6": "Checked for mould / foreign matter"
+  },
   "toolbox-form-stressors": {
     "button": "Add"
   },
@@ -1963,7 +1976,14 @@
     "stressorNote": "Stressor note",
     "tempShort": "Temp: {value}",
     "transplant": "Transplant",
-    "wateringLogged": "Watering logged via Tools"
+    "wateringLogged": "Watering logged via Tools",
+    "qualityChecksShort": "Checks: {list}",
+    "qualityHoursShort": "{hours} h drying",
+    "batchShort": "Batch: {id}",
+    "qualityPrefix": "Harvest & drying — {detail}",
+    "qualityLogged": "Harvest & drying checklist logged",
+    "qualityDone": "{n} checks",
+    "qualityNeedCheck": "Tick at least one harvest or drying check."
   },
   "tour": {
     "adoptAdopter": {
@@ -2190,13 +2210,15 @@
     "h35": "Stressors",
     "h36": "Soil moisture",
     "h37": "Charts",
+    "h38": "Harvest & drying",
     "p": "Log when you watered your plant.",
     "p2": "Track nutrients and doses.",
     "p3": "Temperature, humidity, pH.",
     "p4": "Log transplant details.",
     "p5": "Record stress conditions and pests.",
     "p6": "Live soil moisture sensor (Greenhouse).",
-    "p7": "Visualize growth and measurements."
+    "p7": "Visualize growth and measurements.",
+    "p8": "GACP-style hygiene and drying checks on the trail."
   },
   "wallet": {
     "accountLinked": "Account linked",

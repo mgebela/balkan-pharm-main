@@ -61,7 +61,7 @@
   </script>
   <script src="../js/i18n.js?v=20260825b" data-i18n-ns="common,app" data-i18n-reload></script>
   <link rel="stylesheet" href="../styles/tokens.css?v=20260817v" />
-  <link rel="stylesheet" href="styles/app.css?v=20260923a" />
+  <link rel="stylesheet" href="styles/app.css?v=20261005a" />
   <link rel="stylesheet" href="../styles/trust-gates.css?v=20260820a" />
   <link rel="stylesheet" href="../styles/i18n.css?v=20260817p" />
   <!-- Must stay last: the retro accent layer overrides the late #view-plants
@@ -858,6 +858,10 @@
             <h3 data-i18n="app.view-toolbox.h35">Stressors</h3>
             <p data-i18n="app.view-toolbox.p5">Record stress conditions and pests.</p>
           </button>
+          <button type="button" class="toolbox-card toolbox-card-btn" data-tool="quality">
+            <h3 data-i18n="app.view-toolbox.h38">Harvest &amp; drying</h3>
+            <p data-i18n="app.view-toolbox.p8">GACP-style hygiene and drying checks on the trail.</p>
+          </button>
           <button type="button" class="toolbox-card toolbox-card-btn tool-soil-moisture-only admin-super-only" data-tool="soil-moisture" hidden>
             <h3 data-i18n="app.view-toolbox.h36">Soil moisture</h3>
             <p data-i18n="app.view-toolbox.p6">Live soil moisture sensor (Greenhouse).</p>
@@ -928,6 +932,33 @@
               <button data-i18n="app.toolbox-form-watering.button" type="submit" class="btn btn-primary">Add</button>
             </form>
             <div class="toolbox-list" id="toolbox-list-stressors"></div>
+          </div>
+          <div id="toolbox-panel-quality" class="toolbox-panel" data-tool="quality" aria-hidden="true">
+            <h3 data-i18n="app.view-toolbox.h38" class="toolbox-panel-title">Harvest &amp; drying</h3>
+            <p data-i18n="app.toolbox-panel-quality.disclaimer" class="toolbox-journal-bridge">
+              Practice checklist for grow hygiene and drying (GACP-style). Writes to the journal trail.
+              Not a HACCP certificate, not a licence, not legal advice. Follow the law where you grow.
+            </p>
+            <form class="toolbox-form" id="toolbox-form-quality">
+              <label>Date <input type="date" lang="en-GB" id="tool-quality-date" required /></label>
+              <label>Plant <select id="tool-quality-plant" required><option data-i18n="app.tool-watering-value2.option" value="">-- Select a plant --</option></select></label>
+              <fieldset class="toolbox-quality-checks">
+                <legend data-i18n="app.toolbox-panel-quality.legend">Checks done</legend>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-tools" /> <span data-i18n="app.toolbox-panel-quality.c1">Tools and surfaces cleaned before harvest</span></label>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-containers" /> <span data-i18n="app.toolbox-panel-quality.c2">Clean, dry harvest containers</span></label>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-no-soil" /> <span data-i18n="app.toolbox-panel-quality.c3">Crop kept off soil / dirty floor after cut</span></label>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-prompt" /> <span data-i18n="app.toolbox-panel-quality.c4">Moved to drying promptly</span></label>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-off-ground" /> <span data-i18n="app.toolbox-panel-quality.c5">Drying off the ground, thin layer / airflow</span></label>
+                <label class="toolbox-check"><input type="checkbox" id="tool-quality-inspect" /> <span data-i18n="app.toolbox-panel-quality.c6">Checked for mould / foreign matter</span></label>
+              </fieldset>
+              <label>Dry room temp (°C) <input type="number" id="tool-quality-temp" step="0.1" placeholder="e.g. 18" /></label>
+              <label>Dry room humidity (%) <input type="number" id="tool-quality-rh" min="0" max="100" placeholder="e.g. 55" /></label>
+              <label>Drying hours so far <input type="number" id="tool-quality-hours" min="0" step="1" placeholder="e.g. 48" /></label>
+              <label>Batch id <input type="text" id="tool-quality-batch" placeholder="Optional lot / batch" /></label>
+              <label>Note <input type="text" id="tool-quality-note" placeholder="Optional" /></label>
+              <button data-i18n="app.toolbox-form-quality.button" type="submit" class="btn btn-primary">Log checklist</button>
+            </form>
+            <div class="toolbox-list" id="toolbox-list-quality"></div>
           </div>
           <div id="toolbox-panel-soil-moisture" class="toolbox-panel tool-soil-moisture-only" data-tool="soil-moisture" aria-hidden="true">
             <div class="soil-moisture-panel-toolbar">
@@ -1423,7 +1454,7 @@
   <script src="js/grower-blog.js?v=20260819h"></script>
   <script src="js/theme.js?v=20260819e" defer></script>
   <script src="js/journal-retro.js?v=20260921a"></script>
-  <script src="js/app.js?v=20260828b"></script>
+  <script src="js/app.js?v=20261005a"></script>
   <script src="../js/site-trust.js?v=20260817a"></script>
 </body>
 </html>

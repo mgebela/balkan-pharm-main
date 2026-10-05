@@ -325,7 +325,9 @@
     "h36": "Vlaga tla",
     "p6": "Senzor vlage tla uživo (staklenik).",
     "h37": "Grafikoni",
-    "p7": "Prikaži rast i mjerenja."
+    "p7": "Prikaži rast i mjerenja.",
+    "h38": "Berba i sušenje",
+    "p8": "GACP higijena i kontrole sušenja na tragu."
   },
   "toolbox-panel-watering": {
     "h3": "Zalijevanje",
@@ -374,6 +376,19 @@
   },
   "toolbox-form-stressors": {
     "button": "Dodaj"
+  },
+  "toolbox-form-quality": {
+    "button": "Zapiši kontrolnu listu"
+  },
+  "toolbox-panel-quality": {
+    "disclaimer": "Praktična lista za higijenu uzgoja i sušenje (GACP stil). Piše se u trag dnevnika. Nije HACCP certifikat, nije dozvola, nije pravni savjet. Poštuj zakon tamo gdje uzgajaš.",
+    "legend": "Obavljene kontrole",
+    "c1": "Alati i površine očišćeni prije berbe",
+    "c2": "Čiste, suhe posude za berbu",
+    "c3": "Usjev držiš od tla / prljavog poda nakon rezanja",
+    "c4": "Brzo premješteno na sušenje",
+    "c5": "Sušenje iznad tla, tanak sloj / protok zraka",
+    "c6": "Provjera plijesni / stranih tvari"
   },
   "toolbox-panel-soil": {
     "h3": "Vlaga tla",
@@ -2324,7 +2339,14 @@
     "stressorNote": "Bilješka o stresorima",
     "tempShort": "Temp: {value}",
     "transplant": "Presađivanje",
-    "wateringLogged": "Zalijevanje zapisano preko Alata"
+    "wateringLogged": "Zalijevanje zapisano preko Alata",
+    "qualityChecksShort": "Kontrole: {list}",
+    "qualityHoursShort": "{hours} h sušenja",
+    "batchShort": "Serija: {id}",
+    "qualityPrefix": "Berba i sušenje — {detail}",
+    "qualityLogged": "Kontrolna lista berbe i sušenja zapisana",
+    "qualityDone": "{n} kontrola",
+    "qualityNeedCheck": "Označi barem jednu kontrolu berbe ili sušenja."
   },
   "video": {
     "formatUnsupported": "Koristi MP4 ili WebM video (ova vrsta datoteke nije podržana).",

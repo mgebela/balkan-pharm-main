@@ -325,7 +325,9 @@
     "h36": "Bodenfeuchte",
     "p6": "Bodenfeuchtesensor live (Gewächshaus).",
     "h37": "Diagramme",
-    "p7": "Wachstum und Messwerte darstellen."
+    "p7": "Wachstum und Messwerte darstellen.",
+    "h38": "Ernte & Trocknung",
+    "p8": "GACP-Hygiene und Trocknungschecks auf der Spur."
   },
   "toolbox-panel-watering": {
     "h3": "Gießen",
@@ -374,6 +376,19 @@
   },
   "toolbox-form-stressors": {
     "button": "Hinzufügen"
+  },
+  "toolbox-form-quality": {
+    "button": "Checkliste speichern"
+  },
+  "toolbox-panel-quality": {
+    "disclaimer": "Praxis-Checkliste für Anbauhygiene und Trocknung (GACP-Stil). Schreibt in die Journal-Spur. Kein HACCP-Zertifikat, keine Lizenz, keine Rechtsberatung. Beachte das Recht am Anbauort.",
+    "legend": "Erledigte Checks",
+    "c1": "Werkzeuge und Flächen vor der Ernte gereinigt",
+    "c2": "Saubere, trockene Erntebehälter",
+    "c3": "Erntegut nach dem Schnitt nicht auf Erde / schmutzigem Boden",
+    "c4": "Zügig in den Trockenraum gebracht",
+    "c5": "Trocknung über dem Boden, dünne Lage / Luftstrom",
+    "c6": "Auf Schimmel / Fremdkörper geprüft"
   },
   "toolbox-panel-soil": {
     "h3": "Bodenfeuchte",
@@ -2294,7 +2309,14 @@
     "stressorNote": "Notiz zu Stressfaktoren",
     "tempShort": "Temp: {value}",
     "transplant": "Umtopfen",
-    "wateringLogged": "Gießen über Werkzeuge erfasst"
+    "wateringLogged": "Gießen über Werkzeuge erfasst",
+    "qualityChecksShort": "Checks: {list}",
+    "qualityHoursShort": "{hours} h Trocknung",
+    "batchShort": "Charge: {id}",
+    "qualityPrefix": "Ernte & Trocknung — {detail}",
+    "qualityLogged": "Ernte- und Trocknungs-Checkliste erfasst",
+    "qualityDone": "{n} Checks",
+    "qualityNeedCheck": "Markiere mindestens einen Ernte- oder Trocknungscheck."
   },
   "video": {
     "formatUnsupported": "Nutze ein MP4- oder WebM-Video (dieser Dateityp wird hier nicht unterstützt).",

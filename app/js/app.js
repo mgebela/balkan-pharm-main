@@ -8071,6 +8071,41 @@ function initFirebaseSync() {
           pests: item.pests || null,
         },
       };
+    } else if (tool === 'quality') {
+      type = 'opcenito';
+      const checks = Array.isArray(item.checks) ? item.checks : [];
+      const bits = [];
+      if (checks.length)
+        bits.push(
+          T('app.tools.qualityChecksShort', 'Checks: {list}', { list: checks.join(', ') })
+        );
+      if (item.dryTempC != null && String(item.dryTempC).trim() !== '')
+        bits.push(String(item.dryTempC) + '°C');
+      if (item.dryHumidityPct != null && String(item.dryHumidityPct).trim() !== '')
+        bits.push(String(item.dryHumidityPct) + '% RH');
+      if (item.dryHours != null && String(item.dryHours).trim() !== '')
+        bits.push(
+          T('app.tools.qualityHoursShort', '{hours} h drying', { hours: String(item.dryHours) })
+        );
+      if (item.batchId) bits.push(T('app.tools.batchShort', 'Batch: {id}', { id: item.batchId }));
+      if (item.note) bits.push(String(item.note));
+      note = T('app.tools.noteVia', '{note} (via Tools)', {
+        note: bits.length
+          ? T('app.tools.qualityPrefix', 'Harvest & drying — {detail}', {
+              detail: bits.join(' · '),
+            })
+          : T('app.tools.qualityLogged', 'Harvest & drying checklist logged'),
+      });
+      metaExtra = {
+        qualityChecklist: 'harvest_drying',
+        quality: {
+          checks: checks,
+          dryTempC: item.dryTempC || null,
+          dryHumidityPct: item.dryHumidityPct || null,
+          dryHours: item.dryHours || null,
+          batchId: item.batchId || null,
+        },
+      };
     } else {
       return null;
     }
@@ -8123,11 +8158,11 @@ function initFirebaseSync() {
       p.setAttribute('aria-hidden', !open);
     });
     const today = new Date().toISOString().slice(0, 10);
-    ['tool-watering-date', 'tool-feeding-date', 'tool-environment-date', 'tool-transplant-date', 'tool-stressors-date'].forEach((id) => {
+    ['tool-watering-date', 'tool-feeding-date', 'tool-environment-date', 'tool-transplant-date', 'tool-stressors-date', 'tool-quality-date'].forEach((id) => {
       const el = document.getElementById(id);
       if (el && !el.value) el.value = today;
     });
-    if (tool === 'watering' || tool === 'feeding' || tool === 'environment' || tool === 'transplant' || tool === 'stressors') fillToolboxPlantSelects();
+    if (tool === 'watering' || tool === 'feeding' || tool === 'environment' || tool === 'transplant' || tool === 'stressors' || tool === 'quality') fillToolboxPlantSelects();
     if (tool === 'graphs') {
       renderToolboxChart('watering', document.getElementById('overview-chart-watering'));
       renderToolboxChart('environment', document.getElementById('overview-chart-environment'));
@@ -8148,7 +8183,7 @@ function initFirebaseSync() {
   function fillToolboxPlantSelects() {
     const plants = getPlants();
     const options = plants.map((p) => '<option value="' + p.id + '">' + escapeHtml(p.name) + '</option>').join('');
-    ['tool-watering-value2', 'tool-feeding-plant', 'tool-environment-plant', 'tool-transplant-plant', 'tool-stressors-plant'].forEach((id) => {
+    ['tool-watering-value2', 'tool-feeding-plant', 'tool-environment-plant', 'tool-transplant-plant', 'tool-stressors-plant', 'tool-quality-plant'].forEach((id) => {
       const sel = document.getElementById(id);
       if (!sel) return;
       const first = sel.options[0]
@@ -8256,6 +8291,22 @@ function initFirebaseSync() {
             parts.push(
               escapeHtml(T('app.entry.pests', 'Pests: {value}', { value: String(item.pests) }))
             );
+          parts.push(
+            escapeHtml(T('app.tools.plantLabel', 'Plant: {name}', { name: plantLabel(item.plantId) }))
+          );
+          valuesStr = parts.join(' · ') || '-';
+        } else if (tool === 'quality') {
+          const parts = [];
+          const checks = Array.isArray(item.checks) ? item.checks : [];
+          if (checks.length)
+            parts.push(escapeHtml(T('app.tools.qualityDone', '{n} checks', { n: String(checks.length) })));
+          if (item.dryTempC != null && String(item.dryTempC).trim() !== '')
+            parts.push(escapeHtml(String(item.dryTempC) + '°C'));
+          if (item.dryHumidityPct != null && String(item.dryHumidityPct).trim() !== '')
+            parts.push(escapeHtml(String(item.dryHumidityPct) + '% RH'));
+          if (item.dryHours != null && String(item.dryHours).trim() !== '')
+            parts.push(escapeHtml(String(item.dryHours) + ' h'));
+          if (item.batchId) parts.push(escapeHtml(String(item.batchId)));
           parts.push(
             escapeHtml(T('app.tools.plantLabel', 'Plant: {name}', { name: plantLabel(item.plantId) }))
           );
@@ -8518,6 +8569,53 @@ function initFirebaseSync() {
       });
       document.getElementById('toolbox-form-stressors').reset();
       renderToolboxList('stressors');
+    });
+  }
+
+  const qualityForm = document.getElementById('toolbox-form-quality');
+  if (qualityForm) {
+    qualityForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const checkDefs = [
+        ['tool-quality-tools', 'tools_cleaned'],
+        ['tool-quality-containers', 'clean_containers'],
+        ['tool-quality-no-soil', 'off_soil'],
+        ['tool-quality-prompt', 'prompt_to_dry'],
+        ['tool-quality-off-ground', 'dry_off_ground'],
+        ['tool-quality-inspect', 'mould_inspect'],
+      ];
+      const checks = checkDefs
+        .filter(function (row) {
+          const el = document.getElementById(row[0]);
+          return el && el.checked;
+        })
+        .map(function (row) {
+          return row[1];
+        });
+      if (!checks.length) {
+        if (window.DnevnikNotifications && typeof DnevnikNotifications.toast === 'function') {
+          DnevnikNotifications.toast(
+            T('app.tools.qualityNeedCheck', 'Tick at least one harvest or drying check.'),
+            'warn'
+          );
+        }
+        return;
+      }
+      addToolboxRecord('quality', {
+        date: document.getElementById('tool-quality-date').value,
+        plantId: document.getElementById('tool-quality-plant').value.trim() || null,
+        checks: checks,
+        dryTempC: document.getElementById('tool-quality-temp').value.trim() || null,
+        dryHumidityPct: document.getElementById('tool-quality-rh').value.trim() || null,
+        dryHours: document.getElementById('tool-quality-hours').value.trim() || null,
+        batchId: document.getElementById('tool-quality-batch').value.trim() || null,
+        note: document.getElementById('tool-quality-note').value.trim() || null,
+      });
+      document.getElementById('toolbox-form-quality').reset();
+      const todayEl = document.getElementById('tool-quality-date');
+      if (todayEl) todayEl.value = new Date().toISOString().slice(0, 10);
+      fillToolboxPlantSelects();
+      renderToolboxList('quality');
     });
   }
 
