@@ -254,10 +254,18 @@
 
   function fillCategorySelect() {
     var sel = document.getElementById('blog-category');
-    if (!sel || sel.options.length) return;
+    if (!sel) return;
+    var prev = sel.value;
     sel.innerHTML = CATEGORIES.map(function (c) {
-      return '<option value="' + c.key + '">' + esc(c.label) + '</option>';
+      return (
+        '<option value="' +
+        esc(c.key) +
+        '">' +
+        esc(categoryLabel(c.key)) +
+        '</option>'
+      );
     }).join('');
+    if (prev) sel.value = prev;
   }
 
   function setStatus(msg, kind) {
