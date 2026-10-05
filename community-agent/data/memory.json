@@ -1,0 +1,26 @@
+{
+  "conversations": [],
+  "drafts": [
+    {
+      "id": "draft_mtevjapu_r0kqxf",
+      "createdAt": "2026-08-29T21:09:52.770Z",
+      "pillar": "documentation",
+      "reasoning": "Better grow documentation and consistency. Notes split across a notebook, camera roll, and memory do not reconstruct week nine. No conversation cleared the reply bar. Used the next unused content pillar. Invite: soft.",
+      "topic": "documentation",
+      "audience": "Home growers who want a more reliable plant history",
+      "sourceUrls": [],
+      "factualClaims": [
+        "growtoo is a documentation tool, not legal advice. Growers should follow the law where they grow."
+      ],
+      "masterIdea": "Better grow documentation and consistency. Notes split across a notebook, camera roll, and memory do not reconstruct week nine. growtoo is a free grow journal for cannabis growers. An AI coach can read the log and prompt the next check. It should not replace looking at the plant. It’s early. We’re on Solana Devnet, testing with a small group of growers. If you want the log, reminders, and coach in one place, growtoo is free to try: https://growto.live/",
+      "xVersion": "Better grow documentation and consistency. Notes split across a notebook, camera roll, and memory do not reconstruct week nine.",
+      "instagramVersion": "Better grow documentation and consistency. Notes split across a notebook, camera roll, and memory do not reconstruct week nine.\n\ngrowtoo is a free grow journal for cannabis growers. An AI coach can read the log and prompt the next check. It should not replace looking at the plant. It’s early. We’re on Solana Devnet, testing with a small group of growers. If you want the log, reminders, and coach in one place, growtoo is free to try: https://growto.live/\n\ngrowtoo is early — Solana Devnet, small tester group, journal works with no wallet.",
+      "facebookVersion": "Better grow documentation and consistency. Notes split across a notebook, camera roll, and memory do not reconstruct week nine. growtoo is a free grow journal for cannabis growers. An AI coach can read the log and prompt the next check. It should not replace looking at the plant. It’s early. We’re on Solana Devnet, testing with a small group of growers. If you want the log, reminders, and coach in one place, growtoo is free to try: https://growto.live/",
+      "callToAction": "If you want the log, reminders, and coach in one place, growtoo is free to try: https://growto.live/",
+      "riskFlags": [],
+      "approvalStatus": "pending"
+    }
+  ],
+  "people": [],
+  "learnings": []
+}

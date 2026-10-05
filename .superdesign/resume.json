@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "targets": {
+    "/app/#view-plants": {
+      "targetKind": "existing-ui",
+      "projectId": "df990d31-bdcd-4000-99a2-7c1ec53ec30e",
+      "baselineDraftId": "7c55d8bf-0601-4141-b158-4a537d3d86b7",
+      "activeDraftId": "7c55d8bf-0601-4141-b158-4a537d3d86b7",
+      "designSystemPath": ".superdesign/design-system.md",
+      "referenceIds": [
+        "95ebeede-37d1-4a6f-abce-0a51a01b3b65",
+        "images-growtoo-mark-brass.png"
+      ],
+      "brandAssets": {
+        "logo": {
+          "assetKey": "images-growtoo-mark-brass.png",
+          "url": "https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/projects/df990d31-bdcd-4000-99a2-7c1ec53ec30e/brand-assets/images-growtoo-mark-brass.png/growtoo-mark-brass.png",
+          "sourcePath": "images/growtoo-mark-brass.png"
+        }
+      },
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        "app/index.html:126:495",
+        "app/js/app.js:5786:5924",
+        "app/js/app.js:6872:7135",
+        "app/js/journal-calendar.js",
+        "app/styles/app.css:616:724",
+        "app/styles/app.css:1292:1330",
+        "app/styles/app.css:2026:2177",
+        "app/styles/app.css:3544:3676",
+        "app/styles/app.css:3810:3900",
+        "app/styles/app.css:5583:5760",
+        "app/styles/app.css:5890:5930",
+        "app/styles/app.css:11656:11806",
+        "app/styles/app.css:13085:13760",
+        "styles/tokens.css"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "29d2158d0f9f9d9ac4350a3c285560c9e6aaff558f05f04e48a275217423634f",
+        "app/index.html": "c6af04ac861d0635d5e9db49213ee0e6957fbfa8c0f78c9106c65811239ba0bb",
+        "app/js/app.js": "1935d0e23a1ec82f22c018f35baebcc1adf83873e5f103c36ba68acee6f6c7e3",
+        "app/js/journal-calendar.js": "a3e846baa2b05f9f3d124c7cba502d30ac8ed61b0cd6c9abd008dcef34f82e08",
+        "app/styles/app.css": "cbe2c96e5bd2bfdcb09d49fb7585374f1631a127c4b7ef68d48c5a791adb328b",
+        "styles/tokens.css": "b70580b6a516d33e38adb64e185f0887254c26324865d05407c65a0a2de06f7e"
+      },
+      "components": [],
+      "drafts": {
+        "7c55d8bf-0601-4141-b158-4a537d3d86b7": {
+          "title": "growtoo — Journal (mobile)",
+          "visualDirection": "faithful reproduction of the current sage-paper Journal at the <=768px branch — baseline ground truth, no design changes",
+          "currentVersion": 1
+        }
+      },
+      "notes": "Mobile Journal view. The late #view-plants block in app/styles/app.css (13085-13760) overrides the generic .plant-card / .btn rules and is what actually paints: white 22px cards, green pill buttons, no stage-tint bar. Retro-accent branch variations (Direction A 'retype the journal', Direction B 'terminal log') were authored and blocked on zero Superdesign credits — rerun iterate-design-draft --mode branch once credits are topped up.",
+      "updatedAt": "2026-09-21T18:30:00.000Z"
+    }
+  }
+}
