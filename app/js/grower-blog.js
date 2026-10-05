@@ -59,6 +59,105 @@
     });
   }
 
+  function publicStoryUrl(slug) {
+    return 'https://journal.growto.live/p/?slug=' + encodeURIComponent(String(slug || '').trim());
+  }
+
+  function twitterShareHref(url, title) {
+    var q = 'url=' + encodeURIComponent(url);
+    var t = String(title || '').trim();
+    if (t) q += '&text=' + encodeURIComponent(t.slice(0, 200));
+    return 'https://twitter.com/intent/tweet?' + q;
+  }
+
+  function facebookShareHref(url) {
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  }
+
+  function canNativeShare() {
+    return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  }
+
+  async function copyStoryLink(url) {
+    var u = String(url || '').trim();
+    if (!u) return false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(u);
+        return true;
+      }
+    } catch (_) {}
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = u;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function storyShareRowHtml(publicUrl, title) {
+    if (!publicUrl) return '';
+    var safeTitle = String(title || '').trim();
+    var xHref = twitterShareHref(publicUrl, safeTitle);
+    var fbHref = facebookShareHref(publicUrl);
+    var nativeBtn = canNativeShare()
+      ? '<button type="button" class="btn btn-ghost btn-sm blog-share-native" data-story-native-share data-story-share-url="' +
+        esc(publicUrl) +
+        '" data-story-share-title="' +
+        esc(safeTitle) +
+        '">' +
+        esc(T('app.blog.shareNative', 'Share…')) +
+        '</button>'
+      : '';
+    return (
+      '<div class="blog-share" role="group" aria-label="' +
+      esc(T('app.blog.shareLabel', 'Share')) +
+      '">' +
+      '<span class="blog-share-label">' +
+      esc(T('app.blog.shareLabel', 'Share')) +
+      '</span>' +
+      '<a class="blog-share-link blog-share-link--x" href="' +
+      esc(xHref) +
+      '" target="_blank" rel="noopener noreferrer" aria-label="' +
+      esc(T('app.blog.shareX', 'Share on X')) +
+      '">X</a>' +
+      '<a class="blog-share-link blog-share-link--fb" href="' +
+      esc(fbHref) +
+      '" target="_blank" rel="noopener noreferrer" aria-label="' +
+      esc(T('app.blog.shareFacebook', 'Share on Facebook')) +
+      '">Facebook</a>' +
+      '<button type="button" class="btn btn-ghost btn-sm blog-share-copy" data-story-copy-url="' +
+      esc(publicUrl) +
+      '" title="' +
+      esc(T('app.blog.shareInstagramHint', 'Copy link — paste in Instagram story, bio, or DMs.')) +
+      '">' +
+      esc(T('app.blog.shareCopyLink', 'Copy link')) +
+      '</button>' +
+      nativeBtn +
+      '</div>'
+    );
+  }
+
+  function updateComposerShareStrip(title, slug, status) {
+    var strip = document.getElementById('blog-share-strip');
+    if (!strip) return;
+    if (status === 'published' && slug) {
+      strip.hidden = false;
+      strip.innerHTML = storyShareRowHtml(publicStoryUrl(slug), title);
+    } else {
+      strip.hidden = true;
+      strip.innerHTML = '';
+    }
+  }
+
   function db() {
     if (!root.firebase || !firebase.firestore) return null;
     return firebase.firestore();
@@ -183,6 +282,7 @@
     var titleEl = document.getElementById('blog-composer-title');
     if (titleEl) titleEl.textContent = T('app.blog.newStory', 'New story');
     setStatus('');
+    updateComposerShareStrip('', '', '');
   }
 
   function loadPostIntoForm(post) {
@@ -210,6 +310,7 @@
     if (heading) heading.textContent = T('app.blog.editStory', 'Edit story');
     var composer = document.getElementById('blog-composer');
     if (composer) composer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    updateComposerShareStrip(post.title, post.slug, post.status);
   }
 
   function readForm() {
@@ -304,6 +405,11 @@
       }
       await refreshPublishedMonthCount();
       await renderList();
+      if (status === 'published') {
+        updateComposerShareStrip(data.title, data.slug, 'published');
+      } else if (status === 'unpublished' || status === 'draft') {
+        updateComposerShareStrip(data.title, data.slug, status);
+      }
     } catch (e) {
       console.error(e);
       var m = (e && e.message) || T('app.blog.saveFailed', 'Could not save story.');
@@ -348,9 +454,10 @@
           var p = doc.data() || {};
           var id = doc.id;
           var publicUrl =
-            p.status === 'published' && p.slug
-              ? 'https://journal.growto.live/p/?slug=' + encodeURIComponent(p.slug)
-              : '';
+            p.status === 'published' && p.slug ? publicStoryUrl(p.slug) : '';
+          var shareRow = publicUrl
+            ? storyShareRowHtml(publicUrl, p.title || T('app.blog.untitled', 'Untitled'))
+            : '';
           return (
             '<article class="blog-card" data-post-id="' +
             esc(id) +
@@ -393,7 +500,9 @@
         esc(T('app.blog.viewLive', 'View live')) +
         '</a>'
               : '') +
-            '</div></div></article>'
+            '</div>' +
+            shareRow +
+            '</div></article>'
           );
         })
         .join('');
@@ -492,6 +601,40 @@
     }
   }
 
+  function bindStoryShareActions() {
+    var root = document.getElementById('view-blog');
+    if (!root || root.dataset.shareBound === '1') return;
+    root.dataset.shareBound = '1';
+    root.addEventListener('click', function (e) {
+      var copyBtn = e.target.closest('[data-story-copy-url]');
+      if (copyBtn) {
+        e.preventDefault();
+        var url = copyBtn.getAttribute('data-story-copy-url') || '';
+        copyStoryLink(url).then(function (ok) {
+          toast(
+            ok
+              ? T(
+                  'app.blog.shareLinkCopied',
+                  'Link copied — paste on Instagram, X, Facebook, or anywhere.'
+                )
+              : T('app.blog.shareCopyFailed', 'Could not copy link.'),
+            ok ? 'success' : 'warn'
+          );
+        });
+        return;
+      }
+      var nativeBtn = e.target.closest('[data-story-native-share]');
+      if (nativeBtn) {
+        e.preventDefault();
+        var shareUrl = nativeBtn.getAttribute('data-story-share-url') || '';
+        var shareTitle = nativeBtn.getAttribute('data-story-share-title') || '';
+        if (canNativeShare()) {
+          navigator.share({ title: shareTitle, url: shareUrl }).catch(function () {});
+        }
+      }
+    });
+  }
+
   function bindForm() {
     var draftBtn = document.getElementById('blog-save-draft');
     var pubBtn = document.getElementById('blog-publish');
@@ -575,6 +718,7 @@
     fillCategorySelect();
     fillPlantSelect();
     bindCoverInput();
+    bindStoryShareActions();
     bindForm();
     renderList();
     renderPublicProfileBanner();

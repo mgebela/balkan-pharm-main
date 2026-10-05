@@ -41,6 +41,12 @@
     "ctaGrow": "Start a grow",
     "ctaFollow": "Follow a plant",
     "share": "Share",
+    "shareX": "Share on X",
+    "shareFacebook": "Share on Facebook",
+    "copyLink": "Copy link",
+    "shareNative": "Share…",
+    "linkCopied": "Copied",
+    "shareInstagramHint": "Copy link — paste in Instagram story, bio, or DMs.",
     "photo": "Photo"
   },
   "feed": {

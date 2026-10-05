@@ -461,23 +461,85 @@
     onScroll();
   }
 
+  function twitterShareHref(url, title) {
+    var q = 'url=' + encodeURIComponent(url);
+    var t = String(title || '').trim();
+    if (t) q += '&text=' + encodeURIComponent(t.slice(0, 200));
+    return 'https://twitter.com/intent/tweet?' + q;
+  }
+
+  function facebookShareHref(url) {
+    return 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+  }
+
+  function copyPublicUrl(url) {
+    var u = String(url || '').trim();
+    if (!u) return Promise.resolve(false);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(u).then(
+        function () {
+          return true;
+        },
+        function () {
+          return false;
+        }
+      );
+    }
+    return Promise.resolve(false);
+  }
+
+  function shareRowHtml(title, url) {
+    var safeTitle = String(title || '').trim();
+    var native =
+      typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+        ? '<button type="button" class="gj-share gj-share-native" id="gj-share-native">' +
+          esc(tx('journal.post.shareNative', 'Share…')) +
+          '</button>'
+        : '';
+    return (
+      '<div class="gj-share-row" role="group" aria-label="' +
+      esc(tx('journal.post.share', 'Share')) +
+      '">' +
+      '<a class="gj-share-link gj-share-link--x" href="' +
+      esc(twitterShareHref(url, safeTitle)) +
+      '" target="_blank" rel="noopener noreferrer" aria-label="' +
+      esc(tx('journal.post.shareX', 'Share on X')) +
+      '">X</a>' +
+      '<a class="gj-share-link gj-share-link--fb" href="' +
+      esc(facebookShareHref(url)) +
+      '" target="_blank" rel="noopener noreferrer" aria-label="' +
+      esc(tx('journal.post.shareFacebook', 'Share on Facebook')) +
+      '">Facebook</a>' +
+      '<button type="button" class="gj-share-link gj-share-copy" id="gj-share-copy" title="' +
+      esc(tx('journal.post.shareInstagramHint', 'Copy link — paste in Instagram story, bio, or DMs.')) +
+      '">' +
+      esc(tx('journal.post.copyLink', 'Copy link')) +
+      '</button>' +
+      native +
+      '</div>'
+    );
+  }
+
   function bindShare(title, url) {
-    var btn = document.getElementById('gj-share');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      if (navigator.share) {
-        navigator.share({ title: title, url: url }).catch(function () {});
-        return;
-      }
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(function () {
-          btn.textContent = '✓';
+    var copyBtn = document.getElementById('gj-share-copy');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        copyPublicUrl(url).then(function (ok) {
+          if (!ok) return;
+          var prev = copyBtn.textContent;
+          copyBtn.textContent = tx('journal.post.linkCopied', 'Copied');
           setTimeout(function () {
-            btn.textContent = tx('journal.post.share', 'Share');
+            copyBtn.textContent = prev;
           }, 1600);
         });
-      }
-    });
+      });
+    }
+    var nativeBtn = document.getElementById('gj-share-native');
+    if (nativeBtn) {
+      nativeBtn.addEventListener('click', function () {
+        navigator.share({ title: title, url: url }).catch(function () {});
+      });
+    }
   }
 
   async function renderPost() {
@@ -543,7 +605,6 @@
       var kind = desk
         ? tx('journal.post.deskKind', 'Written by growtoo desk — not a grower harvest')
         : tx('journal.post.growerKind', 'Logged from a real grow');
-      var canShare = typeof navigator !== 'undefined' && (navigator.share || navigator.clipboard);
       var postUrl = journalOrigin() + '/p/?slug=' + encodeURIComponent(slug);
       var byHref = author.slug ? growerHref(author.slug) : feedHref('');
 
@@ -626,11 +687,7 @@
         ' · ' +
         esc(tx('journal.post.minRead', '{n} min read', { n: readMins(post.body) })) +
         '</em></span></a>' +
-        (canShare
-          ? '<button type="button" class="gj-share" id="gj-share">' +
-            esc(tx('journal.post.share', 'Share')) +
-            '</button>'
-          : '') +
+        shareRowHtml(post.title || document.title, postUrl) +
         '</div>' +
         '<dl class="gj-facts">' +
         facts.join('') +

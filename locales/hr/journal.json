@@ -41,6 +41,12 @@
     "ctaGrow": "Započni uzgoj",
     "ctaFollow": "Prati biljku",
     "share": "Podijeli",
+    "shareX": "Podijeli na X",
+    "shareFacebook": "Podijeli na Facebooku",
+    "copyLink": "Kopiraj link",
+    "shareNative": "Podijeli…",
+    "linkCopied": "Kopirano",
+    "shareInstagramHint": "Kopiraj link — zalijepi u Instagram story, bio ili poruke.",
     "photo": "Foto"
   },
   "feed": {

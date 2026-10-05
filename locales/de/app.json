@@ -1079,7 +1079,15 @@
     "profileDisabled": "Öffentliches Profil deaktiviert.",
     "profileSaved": "Öffentliches Profil gespeichert",
     "couldNotSave": "Konnte nicht gespeichert werden.",
-    "profileSaveFailed": "Öffentliches Profil konnte nicht gespeichert werden"
+    "profileSaveFailed": "Öffentliches Profil konnte nicht gespeichert werden",
+    "shareLabel": "Teilen",
+    "shareX": "Auf X teilen",
+    "shareFacebook": "Auf Facebook teilen",
+    "shareCopyLink": "Link kopieren",
+    "shareNative": "Teilen…",
+    "shareLinkCopied": "Link kopiert — einfügen auf Instagram, X, Facebook oder überall.",
+    "shareCopyFailed": "Link konnte nicht kopiert werden.",
+    "shareInstagramHint": "Link kopieren — in Instagram-Story, Bio oder DMs einfügen."
   },
   "entryType": {
     "general": "Allgemein",

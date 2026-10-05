@@ -1097,7 +1097,15 @@
     "profileDisabled": "Javni profil isključen.",
     "profileSaved": "Javni profil spremljen",
     "couldNotSave": "Nije moguće spremiti.",
-    "profileSaveFailed": "Nije moguće spremiti javni profil"
+    "profileSaveFailed": "Nije moguće spremiti javni profil",
+    "shareLabel": "Podijeli",
+    "shareX": "Podijeli na X",
+    "shareFacebook": "Podijeli na Facebooku",
+    "shareCopyLink": "Kopiraj link",
+    "shareNative": "Podijeli…",
+    "shareLinkCopied": "Link kopiran — zalijepi na Instagram, X, Facebook ili bilo gdje.",
+    "shareCopyFailed": "Nije moguće kopirati link.",
+    "shareInstagramHint": "Kopiraj link — zalijepi u Instagram story, bio ili poruke."
   },
   "entryType": {
     "general": "Općenito",

@@ -232,7 +232,15 @@
     "unpublished": "Unpublished",
     "unpublishedMsg": "Unpublished — removed from the public journal.",
     "untitled": "Untitled",
-    "viewLive": "View live"
+    "viewLive": "View live",
+    "shareLabel": "Share",
+    "shareX": "Share on X",
+    "shareFacebook": "Share on Facebook",
+    "shareCopyLink": "Copy link",
+    "shareNative": "Share…",
+    "shareLinkCopied": "Link copied — paste on Instagram, X, Facebook, or anywhere.",
+    "shareCopyFailed": "Could not copy link.",
+    "shareInstagramHint": "Copy link — paste in Instagram story, bio, or DMs."
   },
   "blog-composer": {
     "p": "Title, category, body, and an optional cover photo. Publish when ready."
