@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>growtoo · rebuild tech &amp; data room · 3 Sep 2026</title>
+  <style>
+    :root {
+      --ink: #1c241c;
+      --muted: #5a665a;
+      --line: #d5ddd4;
+      --paper: #f7f4ee;
+      --card: #fff;
+      --accent: #3d5c3a;
+      --warn: #8a4b2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+    header h1 { font-size: 1.65rem; font-weight: 650; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+    header p.meta { margin: 0; color: var(--muted); font-size: 0.92rem; }
+    .banner {
+      margin: 1.25rem 0 1.75rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--line);
+      background: var(--card);
+      font-size: 0.92rem;
+    }
+    nav.toc { margin: 0 0 2rem; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--line); }
+    nav.toc strong { display: block; margin-bottom: 0.4rem; }
+    nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; gap: 1.5rem; }
+    nav.toc a { color: var(--accent); text-decoration: none; }
+    nav.toc a:hover { text-decoration: underline; }
+    h2 { font-size: 1.2rem; margin: 2.1rem 0 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+    h3 { font-size: 1.02rem; margin: 1.3rem 0 0.4rem; }
+    p, li { color: var(--ink); }
+    .muted { color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; background: var(--card); }
+    th, td { text-align: left; vertical-align: top; padding: 0.42rem 0.55rem; border-bottom: 1px solid var(--line); }
+    th { font-weight: 650; background: #eef2ee; }
+    code, kbd { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 0.84em; }
+    pre {
+      overflow-x: auto;
+      padding: 0.85rem 1rem;
+      background: #1c241c;
+      color: #e8efe4;
+      font: 12px/1.45 "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .card { background: var(--card); border: 1px solid var(--line); padding: 0.85rem 1rem; }
+    .card h3 { margin-top: 0; }
+    ul.tight li { margin: 0.2rem 0; }
+    .warn { color: var(--warn); }
+    footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
+    @media (max-width: 720px) {
+      nav.toc ol { columns: 1; }
+      .grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; }
+      .wrap { max-width: none; padding: 0; }
+      nav.toc, .banner { break-inside: avoid; }
+      a { color: inherit; text-decoration: none; }
+      h2 { break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>growtoo rebuild packet</h1>
+      <p class="meta">Tech state · languages · data room &nbsp;·&nbsp; 3 September 2026 &nbsp;·&nbsp; internal, not a marketing page</p>
+    </header>
+
+    <p class="banner">
+      This is the current production system at <strong>https://growto.live</strong>.
+      The live app is a vanilla JS PWA-shaped site (no native store build, no service worker / web manifest in repo).
+      Root <code>README.md</code> is stale — it still says “localStorage only, no backend.” Ignore it.
+      Do not treat pitch-deck numbers, mint counts, or fundraising asks as product facts.
+    </p>
+
+    <nav class="toc">
+      <strong>Contents</strong>
+      <ol>
+        <li><a href="#product">Product snapshot</a></li>
+        <li><a href="#live">Live vs mocked vs planned</a></li>
+        <li><a href="#stack">Stack &amp; hosting</a></li>
+        <li><a href="#repo">Repo map</a></li>
+        <li><a href="#i18n">Languages</a></li>
+        <li><a href="#auth">Auth &amp; identity</a></li>
+        <li><a href="#data">Data room</a></li>
+        <li><a href="#functions">Cloud Functions</a></li>
+        <li><a href="#chain">Solana / Devnet</a></li>
+        <li><a href="#app">App surface &amp; modules</a></li>
+        <li><a href="#ops">CI / secrets / ops</a></li>
+        <li><a href="#rebuild">What a rewrite must keep</a></li>
+        <li><a href="#links">Existing public docs</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="product">1. Product snapshot</h2>
+    <p>
+      <strong>growtoo</strong> is a free cannabis / CBD <em>grow journal</em> with reminders, a 3-day weather widget,
+      in-app camera, an AI coach (Gemini), photos, growth-stage tracking, public Stories, and an optional
+      Solana Devnet proof layer (Tokenise + Market). Two desks after signup:
+    </p>
+    <div class="grid">
+      <div class="card">
+        <h3>Grower</h3>
+        <p>Journal is the product. Wallet is optional. Tokenise (seal stages / seed NFT) and listing sit behind <code>chainOptIn</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Adopter</h3>
+        <p>Market / garden desk. Faucet and Invest are adopter-only. Journal plants are empty by default.</p>
+      </div>
+    </div>
+    <p>
+      <code>profileType</code> is <strong>immutable</strong> after create (<code>grower</code> | <code>adopter</code>). Clients cannot flip it; Admin SDK can.
+      Age gate is 18+. Product is a documentation tool, not legal advice. Follow the law where you grow.
+    </p>
+    <table>
+      <tr><th>Live site</th><td><a href="https://growto.live">https://growto.live</a></td></tr>
+      <tr><th>App</th><td><a href="https://growto.live/app/">https://growto.live/app/</a></td></tr>
+      <tr><th>Sign-in</th><td><a href="https://growto.live/dnevnik/">https://growto.live/dnevnik/</a></td></tr>
+      <tr><th>Public journal</th><td><a href="https://journal.growto.live">https://journal.growto.live</a> (also <code>/journal/</code> on apex)</td></tr>
+      <tr><th>GitHub</th><td><a href="https://github.com/mgebela/balkan-pharm-main">mgebela/balkan-pharm-main</a></td></tr>
+      <tr><th>Firebase</th><td><code>balpha-9dab9</code> · Functions region <code>europe-west1</code></td></tr>
+      <tr><th>Chain</th><td>Solana <strong>Devnet only</strong> — test $GROWTOO has no monetary value</td></tr>
+    </table>
+
+    <h2 id="live">2. Live vs mocked vs planned</h2>
+    <table>
+      <tr><th>Live (no wallet)</th><td>Plants, journal, calendar, Log FAB, grow log, camera, illness-check helper, AI Coach (verified email for Gemini; local helper otherwise), reminders, 3-day weather, toolbox/charts, Stories + public journal, inbox, EN/HR/DE, Firebase auth (email + Google), theme (light default).</td></tr>
+      <tr><th>Live (Devnet opt-in)</th><td>Wallet link (Phantom / Solflare, ed25519 via <code>linkWallet</code>), stage seal / seed NFT queue, growth mints, quests gate, test $GROWTOO rewards, activity bonus, rank/XP, market (14-day care trail + ≥50% care days, instant sale vs adopt-stake 50/50, on-chain escrow program), adopter garden, daily faucet.</td></tr>
+      <tr><th>Not live / mocked</th><td>Physical harvest redemption (specified, not a fulfillment pipeline). $GROWTOO monetary value. Mainnet. Trustless attestation that a physical plant exists (on-chain = process evidence from the journal trail).</td></tr>
+      <tr><th>Locked to two emails</th><td>Admin panel and soil-moisture tool: <code>supadmin@dnevnik.live</code>, <code>admin@dnevnik.live</code> only. Firestore <code>role</code> is not enough.</td></tr>
+    </table>
+
+    <h2 id="stack">3. Stack &amp; hosting</h2>
+    <table>
+      <tr><th>Frontend</th><td>Static HTML + CSS design tokens + vanilla JS. No React/Vue/bundler for the app. Firebase JS SDK <strong>compat 12.16.0</strong> from gstatic CDN. Sign-in page uses modular SDK.</td></tr>
+      <tr><th>CSS</th><td><code>styles/tokens.css</code> (229 tokens, light via <code>:root[data-theme=light]</code>). App: <code>app/styles/app.css</code>.</td></tr>
+      <tr><th>Hosting</th><td><strong>Netlify</strong> from <code>main</code> (publish <code>.</code>, no build). GitHub Pages is a secondary mirror only.</td></tr>
+      <tr><th>Backend</th><td>Firebase Auth, Firestore, Storage. Cloud Functions v2 (Node 22). GitHub Actions workers for Solana queues.</td></tr>
+      <tr><th>AI</th><td>Google Gemini <code>gemini-2.0-flash</code> via <code>@google/genai</code>. Secret: <code>GEMINI_API_KEY</code>.</td></tr>
+      <tr><th>Weather</th><td>WeatherAPI.com, 3-day forecast, city string (not GPS). API key is currently in client JS — move server-side on rewrite.</td></tr>
+      <tr><th>Wallets</th><td>Phantom / Solflare. Browser RPC is proxied: <code>solanaRpc</code> CF (QuickNode/Helius secret server-side).</td></tr>
+      <tr><th>On-chain program</th><td>Anchor 0.30.1, <code>programs/growtoo-escrow</code>, program id <code>GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb</code>.</td></tr>
+      <tr><th>App Check</th><td>reCAPTCHA Enterprise site key live, <strong>monitor mode</strong> (<code>APP_CHECK_ENFORCE</code> off). Do not flip enforcement mid-session.</td></tr>
+    </table>
+    <p class="muted">Monolith sizes (approx.): <code>app/js/app.js</code> 8.9k lines · <code>plant-token.js</code> 4.9k · <code>market.js</code> 3.1k · <code>ai-coach.js</code> 3.0k · <code>app/index.html</code> 1.4k.</p>
+
+    <h2 id="repo">4. Repo map</h2>
+<pre>app/                 signed-in product (index.html + js/ + styles/)
+dnevnik/             sign-in / sign-up
+journal/             public grower journal mini-site
+index.html           marketing landing
+locales/             EN / HR / DE dictionaries
+js/                  site chrome (i18n, appcheck, landing-market, trust)
+styles/              tokens + landing CSS
+functions/           Cloud Functions (Node 22)
+chain/               Devnet workers, deploy scripts, traffic seed (gitignored keys/)
+programs/            Anchor escrow program (Rust)
+idl/                 program IDL
+firestore.rules      production rules
+storage.rules        users/{uid}/journal/**
+token-metadata/      $GROWTOO + seed collection JSON/images
+pitch/  risks/  rwa-docs/  terms/  privacy/   public papers
+community/ + community-agent/   social drafts (not product)
+emails/              Firebase Auth email templates
+docs/                this packet + test readiness (excluded from GitHub Pages, not from Netlify)
+</pre>
+    <p>Local chain keys live in <code>chain/keys/</code> (gitignored). Never commit service accounts or Solana keypairs.</p>
+
+    <h2 id="i18n">5. Languages</h2>
+    <p>Three live locales in <code>locales/locales.json</code>:</p>
+    <table>
+      <tr><th>Code</th><th>UI name</th><th>Intl</th><th>URL</th></tr>
+      <tr><td><code>en</code></td><td>English (source of truth)</td><td>en-GB</td><td><code>/</code> (default)</td></tr>
+      <tr><td><code>hr</code></td><td>Hrvatski</td><td>hr-HR</td><td><code>/hr/*</code> rewrite → same HTML</td></tr>
+      <tr><td><code>de</code></td><td>Deutsch</td><td>de-DE</td><td><code>/de/*</code> rewrite → same HTML</td></tr>
+    </table>
+    <ul class="tight">
+      <li>One HTML per page. English stays in markup / <code>T('key', 'English')</code> fallbacks. Missing translation shows English, never a key name.</li>
+      <li>Marketing URLs are indexable per language. The app switches in place via <code>?lang=</code> + <code>localStorage['growtoo:lang']</code> and reloads (<code>data-i18n-reload</code>).</li>
+      <li>Namespaces: <code>common, landing, app, signin, journal, terms, privacy, risks, rwadocs, pitch*</code>. Runtime: <code>js/i18n.js</code>.</li>
+      <li>Croatian plurals use <code>_one / _few / _other</code>. Check: <code>npm run i18n:check</code>.</li>
+      <li>Adding a language: <code>i18n-add-locale.mjs</code> + a Netlify rewrite pair. See <code>locales/README.md</code>.</li>
+      <li><span class="warn">Coach Gemini locale is only <code>en</code> or <code>hr</code></span> in <code>coachChat</code>. German UI falls back to English for live coach copy. Illness-frame analysis uses English or Croatian the same way.</li>
+      <li>Wallet-link challenge message is <strong>not</strong> translated (signature is byte-for-byte).</li>
+      <li>Journal <strong>data keys</strong> stay Croatian internally: stages <code>klijanje → sadnica → vegetativna → cvjetanje → susenje</code>; care types <code>zalijevanje</code>, <code>gnojidba</code>. Labels are translated. Do not branch on displayed text.</li>
+    </ul>
+
+    <h2 id="auth">6. Auth &amp; identity</h2>
+    <ul class="tight">
+      <li>Firebase Auth: email/password + Google. Authorized domains include <code>growto.live</code>.</li>
+      <li>Signup writes <code>users/{uid}</code> with <code>role: 'user'</code> and <code>profileType</code>. Grower extra: <code>growSetup</code> (indoor / outdoor / mixed), <code>homeCity</code>. Adopter extra: <code>adopterIntent</code>, <code>acceptedDevnet</code>.</li>
+      <li>Live Gemini requires <code>email_verified</code> on the ID token. Unverified accounts get a local helper. After admin-verifying an email, the user must sign out/in.</li>
+      <li><code>solanaPubkey</code> / <code>walletVerified</code> are written only by CF <code>linkWallet</code> (Admin SDK) after ed25519 verify. Clients may unlink (delete those fields).</li>
+      <li><code>chainOptIn</code> is a user-profile flag for Tokenise/Market.</li>
+      <li>Admin UI is email-allowlisted, not role-only.</li>
+    </ul>
+
+    <h2 id="data">7. Data room</h2>
+    <p>Primary user journal is <strong>one Firestore document</strong>: <code>users/{uid}/app/state</code>. Local-first: same arrays also live in <code>localStorage</code> (<code>dnevnik-live-plants</code>, <code>-entries</code>, <code>-toolbox</code>). Debounced sync ~500ms. Hard ceiling: Firestore 1 MiB per document. Photos used to be inline base64 and broke backup; they now go to Storage.</p>
+
+    <h3>7.1 <code>users/{uid}</code> profile (typical fields)</h3>
+    <table>
+      <tr><th>Field</th><th>Notes</th></tr>
+      <tr><td>email, displayName, role</td><td>role is <code>user</code> for everyone except the two admin emails</td></tr>
+      <tr><td>profileType</td><td><code>grower</code> \| <code>adopter</code> — immutable via client rules</td></tr>
+      <tr><td>growSetup, homeCity, growStyleNote</td><td>grower</td></tr>
+      <tr><td>adopterIntent, acceptedDevnet</td><td>adopter</td></tr>
+      <tr><td>chainOptIn, chainOptInAt</td><td>unlocks Tokenise / Market</td></tr>
+      <tr><td>solanaPubkey, walletVerified, walletProvider, walletLinkedAt</td><td>CF only</td></tr>
+      <tr><td>publicProfileEnabled, publicSlug, publicBio, profilePhoto</td><td>Stories / journal.growto.live</td></tr>
+      <tr><td>acceptedTerms, acceptedAge</td><td>signup</td></tr>
+    </table>
+
+    <h3>7.2 <code>users/{uid}/app/state</code> blob</h3>
+<pre>{
+  plants: [ /* see plant object */ ],
+  entries: [ /* journal logs */ ],
+  toolbox: { watering: [], feeding: [], environment: [] },
+  journalSkill: { level, title, xp },
+  coachProfile: { ... },
+  plantWallet: { /* adopter tokens, optional */ },
+  updatedAt: ISO-8601
+}</pre>
+    <p><strong>Plant</strong> (ids are strings, often <code>id-{ms}-{rand}</code> or traffic ids). Keep these ids — seed mints and listings point at <code>plantId</code>.</p>
+    <table>
+      <tr><th>id, name, strain, count</th><td>count = plants in a row/cohort</td></tr>
+      <tr><td>stage, subphase</td><td>stage keys above; subphase = pot / field ladder</td></tr>
+      <tr><td>startDate</td><td>grower-facing date; <em>not</em> used for market eligibility</td></tr>
+      <tr><td>createdAt, updatedAt</td><td>eligibility uses createdAt of plant or care logs</td></tr>
+      <tr><td>environmentName, environmentType</td><td>indoor / outdoor</td></tr>
+      <tr><td>fieldLocation, plantingLocation, exposureHours</td><td>outdoor</td></tr>
+      <tr><td>photo</td><td>Storage download URL (or legacy data URI)</td></tr>
+      <tr><td>notes, stageHistory, stageDates, subphaseHistory</td><td></td></tr>
+    </table>
+    <p><strong>Entry</strong></p>
+    <table>
+      <tr><th>id, plantId, date</th><td><code>date</code> is the journal day (YYYY-MM-DD). Market coverage ignores it.</td></tr>
+      <tr><td>type</td><td><code>opcenito | zalijevanje | gnojidba | okolis | presadjivanje | stresori | ostalo | faza | podfaza</code></td></tr>
+      <tr><td>note, photo, video, meta, createdAt, source</td><td>care days = distinct UTC days of zalijevanje/gnojidba <em>createdAt</em></td></tr>
+    </table>
+
+    <h3>7.3 Top-level collections</h3>
+    <table>
+      <tr><th>Collection</th><th>Purpose</th><th>Who writes</th></tr>
+      <tr><td>users/{uid}/growerPosts</td><td>Stories drafts/published</td><td>owner</td></tr>
+      <tr><td>users/{uid}/notifications</td><td>in-app inbox</td><td>owner / buyer notify seller</td></tr>
+      <tr><td>users/{uid}/sharedGrants/{viewerUid}</td><td>admin shared library</td><td>owner / superadmin</td></tr>
+      <tr><td>publicJournalPosts</td><td>public Stories</td><td>Admin SDK (CF mirror)</td></tr>
+      <tr><td>publicGrowerProfiles / publicSlugClaims</td><td>journal.growto.live/g/{slug}</td><td>Admin SDK</td></tr>
+      <tr><td>marketListings</td><td>full listing (uid, sigs). Not a public board list.</td><td>owner create; buyer/seller status</td></tr>
+      <tr><td>marketPublicTape</td><td>scrubbed board (no Firebase uids)</td><td>Admin SDK only</td></tr>
+      <tr><td>seedMints / growthMints</td><td>NFT mint queues</td><td>owner creates pending; GH worker mints</td></tr>
+      <tr><td>platformRewards</td><td>test $GROWTOO + adopter faucet</td><td>client request; worker pays</td></tr>
+      <tr><td>adoptStakes</td><td>stake mirrors</td><td>worker</td></tr>
+      <tr><td>harvestClaims</td><td>locked 50% release request</td><td>owner pending — fulfillment mocked</td></tr>
+      <tr><td>usedPaymentSignatures</td><td>replay guard</td><td>CF on listing write</td></tr>
+      <tr><td>aiUsage</td><td>daily Gemini caps</td><td>CF</td></tr>
+      <tr><td>loginEvents</td><td>admin report</td><td>signed-in self</td></tr>
+      <tr><td>opsHealthEvents</td><td>ops</td><td>privileged</td></tr>
+      <tr><td>plants / entries / tenants</td><td>legacy admin library</td><td>admin only — not the grower journal</td></tr>
+    </table>
+
+    <h3>7.4 Storage</h3>
+    <p><code>users/{uid}/journal/{kind}-{stamp}-{rand}.jpg</code>. Rules: owner read/write. Max ~5&nbsp;MB after compression. If Storage fails, UI may fall back to inline data URI and must then respect the 1&nbsp;MiB state-doc guard.</p>
+
+    <h3>7.5 Market eligibility (keep in sync)</h3>
+    <p>Duplicated in <code>app/js/list-eligibility.js</code> and <code>functions/list-eligibility.js</code>.</p>
+    <ul class="tight">
+      <li>Seed mint: not gated on coverage. Requires a real <code>plantId</code> in the grower’s state.</li>
+      <li>List / escrow activate: ≥ <strong>14 elapsed days</strong> since first care <code>createdAt</code>, and care on ≥ <strong>50%</strong> of min(elapsed, 180) distinct UTC days.</li>
+      <li>Backdated <code>entry.date</code> does not count. Dumping 90 logs in one session is one care day.</li>
+      <li>Listings with <code>journalCoverageOk === false</code> are hidden from the public tape.</li>
+    </ul>
+
+    <h2 id="functions">8. Cloud Functions</h2>
+    <p>All HTTP in <code>europe-west1</code>. Source: <code>functions/index.js</code>. Deploy: <code>npm run deploy:functions</code>.</p>
+    <table>
+      <tr><th>Export</th><th>Role</th></tr>
+      <tr><td>healthCheck</td><td>public ping</td></tr>
+      <tr><td>solanaRpc</td><td>JSON-RPC proxy; strips faucet/admin methods</td></tr>
+      <tr><td>linkWallet</td><td>verify signature, set pubkey on user</td></tr>
+      <tr><td>coachChat</td><td>Gemini chat + optional image; verified email; quota 60/day</td></tr>
+      <tr><td>analyzeGrowFrames</td><td>1–2 JPEG frames; quota 25/day</td></tr>
+      <tr><td>kickChainQueues</td><td>dispatches GitHub <code>chain-queues</code> (PAT)</td></tr>
+      <tr><td>kickChainQueuesSchedule</td><td>every 2 minutes</td></tr>
+      <tr><td>settleMarketQueue (+ schedule)</td><td>sale_pending / cancel</td></tr>
+      <tr><td>reconcileMarketEscrow (+ schedule)</td><td>escrow_pending → active</td></tr>
+      <tr><td>verifyTxHealth</td><td>ops</td></tr>
+      <tr><td>onGrowerPostPublic / onGrowerProfilePublic</td><td>mirror Stories</td></tr>
+      <tr><td>onMarketListingHealth / onSeedMintHealth / onGrowthMintHealth</td><td>tape, coverage gate, queue kick, payment-sig reserve</td></tr>
+    </table>
+    <p>HTTP ops (settle / reconcile / kick) require a Firebase ID token <em>or</em> <code>GROWTOO_OPS_SECRET</code>. Coach/vision/RPC/linkWallet send App Check tokens in monitor mode.</p>
+
+    <h2 id="chain">9. Solana / Devnet</h2>
+    <p>Canonical addresses: <code>chain/deployed.devnet.json</code> and <code>app/js/chain-config.js</code>.</p>
+    <table>
+      <tr><th>$GROWTOO mint</th><td><code>3nReF8GGLdbPc4bmrgWyproVwt9taHb1yGvL5Cekrcqp</code> · 9 decimals</td></tr>
+      <tr><th>Seed collection</th><td><code>79yYy4aSRzJQq9xonvcaTw7DgndoqwPMYDd2MpT8iVZa</code></td></tr>
+      <tr><th>Escrow program</th><td><code>GspPo6doBKoYmD6aCFHgo2q3CEXmWEoZXPpXAJnkjdyb</code></td></tr>
+      <tr><th>Marketplace PDA</th><td><code>2a887xGdhztkvfHn1BdR5xSkXjunzTG1StdTdtrRddAm</code></td></tr>
+      <tr><th>NFT escrow</th><td><code>EmQ4nNB1YVWNKVEiPNYhLgJR2gY1deJoV2L743z945yD</code></td></tr>
+      <tr><th>Care escrow (locked 50%)</th><td><code>C69K4V4921m1jYxjBoBoMYJR2fxYQpnx1w45gNGsL4ZU</code></td></tr>
+      <tr><th>Fee payer</th><td><code>Et1uJZn2GAWFdnKaVTubZYohKNJNB7gEpoQ7EHHKq975</code></td></tr>
+      <tr><th>Mint authority</th><td><code>F6ZEFk81ht6yWKvc5pLYQ5eM6DEKqdN69kbi2hFaMTv3</code> (also legacy escrow)</td></tr>
+    </table>
+    <p>Queue path: app writes <code>seedMints</code> / <code>growthMints</code> / listing status → CF kicks GH Actions → <code>chain/process-*.js</code> with leased workers. Workflow: <code>.github/workflows/chain-queues.yml</code> (every 5 min + dispatch). Settlement mode <code>program</code> = atomic list/buy/cancel on the Anchor program; legacy hot-wallet path still exists for old listings.</p>
+    <p>Offer types: instant sale vs <code>adopt_stake</code> (50% now / 50% locked until harvest claim — claim pipeline not live fulfillment).</p>
+    <p>Traffic agents (<code>chain/traffic/</code>) are UX load personas with synthetic <code>TrafficMint_</code> ids. Chain workers skip those. Do not confuse them with real Devnet mints. They can be wiped with <code>npm run traffic:wipe</code>.</p>
+
+    <h2 id="app">10. App surface &amp; modules</h2>
+    <p>Primary nav (grower): <strong>Journal · Log · Coach · Tokenise</strong> (4th tab; Market is the other segment on that screen). Adopters see Market on that slot. <code>view-dashboard</code> and <code>view-danas</code> still exist in the DOM; <code>showView</code> redirects both to Journal. Tools/charts live under More as Measurements.</p>
+    <table>
+      <tr><th>File</th><th>Owns</th></tr>
+      <tr><td>app/js/app.js</td><td>plants, entries, sync, weather, nav, toolbox, today, profile</td></tr>
+      <tr><td>ai-coach.js + coach-core.js</td><td>coach UI + local helper</td></tr>
+      <tr><td>plant-token.js</td><td>Tokenise, seals, wallet garden</td></tr>
+      <tr><td>market.js</td><td>board, invest, faucet, garden</td></tr>
+      <tr><td>escrow-program.js</td><td>Anchor list/buy/cancel from the browser</td></tr>
+      <tr><td>seed-chain.js</td><td>file mint requests</td></tr>
+      <tr><td>wallet-link.js / solana-wallet.js / solana-rpc.js</td><td>wallet + RPC</td></tr>
+      <tr><td>grow-camera.js / journal-photos.js</td><td>camera + Storage</td></tr>
+      <tr><td>grower-blog.js</td><td>Stories</td></tr>
+      <tr><td>list-eligibility.js</td><td>list gate (client)</td></tr>
+      <tr><td>notifications.js</td><td>inbox</td></tr>
+      <tr><td>signup.js</td><td>role payload</td></tr>
+      <tr><td>admin.js</td><td>allowlisted admin</td></tr>
+    </table>
+    <p>Coach knowledge is curated in <code>functions/coach-knowledge.js</code> + journal snapshot from <code>coach-context.js</code>. It must not claim disease diagnosis or replace looking at the plant.</p>
+
+    <h2 id="ops">11. CI / secrets / ops</h2>
+    <table>
+      <tr><th>Netlify</th><td>Production = <code>main</code>. Rewrites: journal subdomain, <code>/hr/*</code>, <code>/de/*</code>, SPA 404. CSP is baseline only (wallets + Firebase inject).</td></tr>
+      <tr><th>GH: chain-queues</th><td>Secrets: <code>FIREBASE_SERVICE_ACCOUNT_JSON</code>, <code>SOLANA_*_KEY_JSON</code>, <code>SOLANA_RPC_URL</code>, dispatch token for <code>kickChainQueues</code>.</td></tr>
+      <tr><th>GH: chain-health, reconcile-market-escrow</th><td>scheduled health / escrow reconcile</td></tr>
+      <tr><th>GH: deploy-firestore-rules / indexes</th><td>on main</td></tr>
+      <tr><th>GH: deploy.yml</th><td>GitHub Pages mirror — excludes <code>docs/</code> and <code>functions/</code></td></tr>
+      <tr><th>Firebase secrets</th><td><code>GEMINI_API_KEY</code>; ops <code>GROWTOO_OPS_SECRET</code>; RPC URL for <code>solanaRpc</code></td></tr>
+    </table>
+    <p>Desk-test accounts (not traffic, not in git): grower <code>test@growto.live</code>; adopter <code>adopter@growto.live</code>; Luka traffic grower <code>traffic+grower-s@growto.live</code>. Passwords live in gitignored <code>chain/keys/desk-test-accounts.json</code> — do not paste them into this packet or a shared Drive copy.</p>
+
+    <h2 id="rebuild">12. What a rewrite must keep</h2>
+    <ol>
+      <li><strong>Stable Firebase UIDs</strong> and <code>users/{uid}</code> profiles. Do not force a second signup.</li>
+      <li><strong>Plant ids</strong> in the journal blob — they are foreign keys for <code>seedMints.plantId</code>, listings, and growth mints.</li>
+      <li><strong>Care semantics:</strong> eligibility is <code>createdAt</code>, not journal <code>date</code>. Changing that silently rewrites who can list.</li>
+      <li><strong>Split the state blob</strong> if you move to a framework: <code>plants</code> / <code>entries</code> / <code>toolbox</code> as subcollections, with a migration from the existing document. Watch the 1&nbsp;MiB trap and photo URLs.</li>
+      <li><strong>Do not make <code>profileType</code> client-mutable</strong> without a product decision. Two desks are a trust boundary (faucet, invest, Tokenise).</li>
+      <li><strong>Wallet link stays server-verified.</strong> Never let the client set <code>solanaPubkey</code>.</li>
+      <li><strong>Public market board</strong> reads <code>marketPublicTape</code>, not a list of <code>marketListings</code>.</li>
+      <li><strong>Devnet honesty:</strong> no monetary value, no live harvest redemption, on-chain ≠ physical plant.</li>
+      <li><strong>i18n:</strong> keep EN source + HR/DE; keep internal stage/entry keys; add DE to Gemini if the UI stays trilingual.</li>
+      <li><strong>Admin allowlist</strong> stays email-based until you replace it deliberately.</li>
+      <li><strong>Chain workers and the Anchor program can stay</strong> while the UI is rewritten. The fragile part is the 9k-line <code>app.js</code> + localStorage dual-write, not the mint queue.</li>
+      <li><strong>Move WeatherAPI off the client</strong> on rewrite.</li>
+    </ol>
+    <p>Suggested seams if you reshape rather than incinerate: keep Functions + chain queues + Firestore rules as the backend; replace <code>app/</code> with a typed SPA; migrate state; keep <code>locales/</code> key tree.</p>
+
+    <h2 id="links">13. Existing public docs (data room already on the site)</h2>
+    <table>
+      <tr><th>Plant token / RWA architecture</th><td><a href="https://growto.live/rwa-docs/">/rwa-docs/</a></td></tr>
+      <tr><th>Risks (Devnet, no value)</th><td><a href="https://growto.live/risks/">/risks/</a></td></tr>
+      <tr><th>Terms / Privacy</th><td><a href="https://growto.live/terms/">/terms/</a> · <a href="https://growto.live/privacy/">/privacy/</a></td></tr>
+      <tr><th>Pitch chooser</th><td><a href="https://growto.live/pitch/">/pitch/</a> (grower, adopter, investor, skeptic, labs)</td></tr>
+      <tr><th>Firestore rules notes</th><td>repo <code>docs/FIRESTORE_RULES.md</code></td></tr>
+      <tr><th>App Check rollout</th><td>repo <code>docs/app-check-rollout.md</code></td></tr>
+      <tr><th>Desk-test readiness</th><td>repo <code>docs/TEST_READINESS.md</code> (dated Aug 2026 — nav notes still useful)</td></tr>
+      <tr><th>i18n handbook</th><td>repo <code>locales/README.md</code></td></tr>
+      <tr><th>Approved public claims</th><td>repo <code>community-agent/config/product-facts.md</code> (what marketing is allowed to say)</td></tr>
+    </table>
+
+    <footer>
+      Generated from the live repo on 3 Sep 2026 for a rebuild kickoff. If a claim is not in this packet or in <code>product-facts.md</code>, treat it as unverified.
+    </footer>
+  </div>
+</body>
+</html>

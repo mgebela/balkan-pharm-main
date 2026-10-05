@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>growtoo · product specification · 4 Sep 2026</title>
+  <style>
+:root {
+  --ink: #1c241c;
+  --muted: #5a665a;
+  --line: #d5ddd4;
+  --paper: #f7f4ee;
+  --card: #fff;
+  --accent: #3d5c3a;
+  --warn: #8a4b2a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+.wrap { max-width: 880px; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+header h1 { font-size: 1.65rem; font-weight: 650; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+header p.meta { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.banner {
+  margin: 1.25rem 0 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  font-size: 0.92rem;
+}
+nav.toc { margin: 0 0 2rem; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--line); }
+nav.toc strong { display: block; margin-bottom: 0.4rem; }
+nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; gap: 1.5rem; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+h2 { font-size: 1.2rem; margin: 2.1rem 0 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+h3 { font-size: 1.02rem; margin: 1.3rem 0 0.4rem; }
+h4 { font-size: 0.95rem; margin: 1rem 0 0.35rem; }
+p, li { color: var(--ink); }
+.muted { color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; background: var(--card); }
+th, td { text-align: left; vertical-align: top; padding: 0.42rem 0.55rem; border-bottom: 1px solid var(--line); }
+th { font-weight: 650; background: #eef2ee; }
+code, kbd { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 0.84em; }
+ul, ol { margin: 0.35rem 0 0.85rem; padding-left: 1.25rem; }
+ul ul, ol ul, ol ol, ul ol { margin: 0.15rem 0 0.25rem; }
+.status { font-weight: 650; color: var(--accent); }
+.warn { color: var(--warn); }
+footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
+@media print {
+  body { background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  nav.toc, .banner { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  h2, h3 { break-after: avoid; }
+  table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>growtoo product specification</h1>
+      <p class="meta">Why, who, jobs, journeys, requirements · 4 September 2026 · internal, not a marketing page</p>
+    </header>
+    <p class="banner">
+      This is <strong>why the product exists and what it must be</strong>. It is not a screen inventory — that is <code>docs/FEATURE.md</code>. Live site: <a href="https://growto.live">https://growto.live</a>. Do not treat pitch-deck numbers as product facts.
+    </p>
+    <nav class="toc">
+      <strong>Contents</strong>
+      <ol><li><a href="#1-one-line-product">1. One-line product</a></li><li><a href="#2-problem">2. Problem</a></li><li><a href="#3-who-it-is-for">3. Who it is for</a></li><li><a href="#4-product-principles">4. Product principles</a></li><li><a href="#5-what-good-feels-like">5. What “good” feels like</a></li><li><a href="#6-core-loop">6. Core loop</a></li><li><a href="#7-experience-requirements">7. Experience requirements</a></li><li><a href="#8-product-requirements-by-job">8. Product requirements (by job)</a></li><li><a href="#9-trust-legal-and-voice">9. Trust, legal, and voice</a></li><li><a href="#10-scope-boundaries">10. Scope boundaries</a></li><li><a href="#11-open-product-decisions">11. Open product decisions</a></li><li><a href="#12-how-to-use-this-with-the-other-packets">12. How to use this with the other packets</a></li></ol>
+    </nav>
+    <h2 id="1-one-line-product">1. One-line product</h2>
+<p>growtoo is a <strong>free grow journal</strong> so a cannabis / CBD grower can run the next cycle from this one’s trail — not from memory — with an optional checkable proof layer for people who want to follow that trail.</p>
+<p>Promise: <strong>Grow it again. Exactly.</strong></p>
+<h2 id="2-problem">2. Problem</h2>
+<p>A grow lives in four places that do not talk:</p>
+<ol>
+<li>Notes in a notebook or chat.</li>
+<li>Photos in the camera roll, unnamed.</li>
+<li>Weather in another app.</li>
+<li>A yellow leaf decided from memory.</li>
+</ol>
+<p>By week nine, nobody can reconstruct week two. The next cycle starts from zero. Care slips (water, feed) because nothing is due on the plant. If someone later wants to back, buy, or simply believe the grow, there is no trail they can open themselves.</p>
+<p>growtoo’s bet: <strong>documentation is the asset</strong>. Tokens only matter if the grow behind them is real.</p>
+<h2 id="3-who-it-is-for">3. Who it is for</h2>
+<p>Two desks. One account cannot be both on the client. Choose at signup; do not flip later without an explicit product decision.</p>
+<h3 id="grower-primary">Grower (primary)</h3>
+<p>Cannabis / hemp / CBD growers: one plant, a tent, or a room. Indoor, outdoor, or mixed. They may be new or experienced. They do <strong>not</strong> need crypto knowledge to get value.</p>
+<p><strong>Jobs</strong></p>
+<ul>
+<li>Keep watering, feeding, stages, and photos on the right plant.</li>
+<li>Know what to do next today without opening five apps.</li>
+<li>Compare this cycle to the last one.</li>
+<li>Optionally publish a story or seal a stage others can check.</li>
+</ul>
+<p><strong>When we have succeeded for them:</strong> they open Journal, log in seconds, and next season the trail is still there.</p>
+<h3 id="adopter-secondary">Adopter (secondary)</h3>
+<p>People who want to follow a real plant’s story — not a trading terminal. RWA-curious, but the hook is “I can watch this plant grow,” not yield.</p>
+<p><strong>Jobs</strong></p>
+<ul>
+<li>Pick one listed plant that already has a two-week care trail.</li>
+<li>Follow the same logs, photos, and sealed stages the grower recorded.</li>
+<li>Open the transaction themselves. No hidden side channel.</li>
+</ul>
+<p><strong>When we have succeeded for them:</strong> they can explain the plant’s week without asking us to attest it.</p>
+<h3 id="not-for-today">Not for (today)</h3>
+<ul>
+<li>Minors (18+).</li>
+<li>Anyone seeking medical, legal, or investment advice.</li>
+<li>Day traders / yield seekers.</li>
+<li>Licensed fulfillment / physical harvest buyers (redemption is mocked).</li>
+<li>Growers who need growtoo to prove a plant exists in the physical world. It does not.</li>
+</ul>
+<h2 id="4-product-principles">4. Product principles</h2>
+<p>These beat feature requests when they conflict.</p>
+<ol>
+<li><strong>Journal first.</strong> The journal, Log, camera, reminders, and Coach are a complete product with no wallet. Tokenise and Market are optional layers.</li>
+<li><strong>One trail.</strong> Measurements, camera, Coach drafts, and stage changes write the same journal — not a second ledger.</li>
+<li><strong>Seconds to log.</strong> The daily habit is the Log sheet (water / feed). Full entry and Measurements are for when they have more to say.</li>
+<li><strong>Ask before acting.</strong> Coach proposes; the grower confirms. No silent mutations. No deletes from the model.</li>
+<li><strong>Honest about the chain.</strong> Devnet, no monetary value, process evidence not physical proof, harvest redemption not live. Say it on the surface that needs it — not only in <code>/risks/</code>.</li>
+<li><strong>Watch beats yield.</strong> Adopter copy is plant story + checkable trail. Never APY, never “guaranteed harvest.”</li>
+<li><strong>Two desks are a trust boundary.</strong> Faucet and Invest are adopter-only. Mint-from-journal is grower-only. Adopter Coach cannot edit the grower’s log.</li>
+<li><strong>Documentation tool, not oracle.</strong> Coverage gates (14 days, 50% care days, <code>createdAt</code> not backdated <code>date</code>) reduce mint-and-list farms. They do not prove a plant exists.</li>
+<li><strong>Local law stays with the user.</strong> Follow the law where you grow. growtoo is not legal advice.</li>
+<li><strong>Light paper default.</strong> Sage journal look. Dark is opt-in. EN source + HR + DE.</li>
+</ol>
+<h2 id="5-what-good-feels-like">5. What “good” feels like</h2>
+<h3 id="grower-ordinary-day">Grower, ordinary day</h3>
+<p>Open app → Today card or Log → tap watering on the right plant(s) → photo optional → reminder clears. If a leaf looks wrong: camera → Check for illness → at most two hypotheses, then a suggested log. Coach may draft feeding; nothing saves until confirm. Next month, the calendar still shows that day.</p>
+<h3 id="grower-optional-proof">Grower, optional proof</h3>
+<p>Same journal work. Unlock chain when they want it. Seal a stage linked to a real <code>plantId</code>. Listing waits until a two-week care trail exists. Toasts tell queued vs failed. Never “success” the queue refused.</p>
+<h3 id="adopter-first-session">Adopter, first session</h3>
+<p>Sign up, accept Devnet has no value. START HERE once. Browse tape (no Firebase uids). Watch-only until a wallet can sign. After adopt: garden shows that plant’s stage and care — same trail, not a curated recap.</p>
+<p>If any of those three stories needs a wallet, a yield number, or a second notebook, the product has failed the principle.</p>
+<h2 id="6-core-loop">6. Core loop</h2>
+<p><code></code><code> Log care  →  trail exists  →  Coach / reminders use it  →  next cycle starts from the trail ↘ optional: seal stage  →  list only after 14-day care  →  adopter follows </code><code></code></p>
+<p>North-star behaviour (qualitative, no fake KPIs): <strong>care days logged on real plants, week after week.</strong> Mint count is not the north star. Wallet links are not the north star.</p>
+<p>Leading signals a team may instrument later (do not invent current numbers):</p>
+<ul>
+<li>Growers who log watering or feeding in week 2 after signup.</li>
+<li>Plants with a photo on the trail.</li>
+<li>Coach confirms (not just opens).</li>
+<li>Stories published (public journal).</li>
+<li>Listings that pass coverage vs listings attempted too early (trust health).</li>
+</ul>
+<h2 id="7-experience-requirements">7. Experience requirements</h2>
+<p>Must-hold UX, independent of stack.</p>
+<table>
+<thead><tr><th>ID</th><th>Requirement</th></tr></thead>
+<tbody>
+<tr><td>UX-1</td><td>A grower can complete add-plant → log water with no wallet and no verified email.</td></tr>
+<tr><td>UX-2</td><td>Primary nav stays thumbable: Journal · Log · Coach · Tokenise (Market on adopter).</td></tr>
+<tr><td>UX-3</td><td>Log is a sheet, not a page. Water and feed are one tap; full entry is the escape hatch.</td></tr>
+<tr><td>UX-4</td><td>Empty garden offers one next step (add plant or first watering), not a mute calendar.</td></tr>
+<tr><td>UX-5</td><td>Live Coach vs Local helper is labelled. Unverified / quota / expired token have distinct copy.</td></tr>
+<tr><td>UX-6</td><td>Camera permission failures name the cause (blocked / missing / generic) and offer Gallery.</td></tr>
+<tr><td>UX-7</td><td>Destructive actions and Coach writes use in-app confirm, not <code>window.confirm</code>.</td></tr>
+<tr><td>UX-8</td><td>Chain-locked Tokenise/Market opens Unlock, never a dead click.</td></tr>
+<tr><td>UX-9</td><td>Public Stories and market tape never expose emails or Firebase uids.</td></tr>
+<tr><td>UX-10</td><td>One intro layer per session (welcome / while away / START HERE) — never stacked with Tokenise explainers.</td></tr>
+<tr><td>UX-11</td><td>Simple vs Advanced detail: Simple hides mint addresses; Advanced shows explorer links.</td></tr>
+<tr><td>UX-12</td><td>Missing translations show English, never a key name.</td></tr>
+</tbody></table>
+<h2 id="8-product-requirements-by-job">8. Product requirements (by job)</h2>
+<p>Status of today’s implementation lives in the feature spec. This section is the <strong>contract</strong>: a rewrite still has to satisfy these jobs.</p>
+<h3 id="p0-journal-product-no-chain">P0 — Journal product (no chain)</h3>
+<table>
+<thead><tr><th>ID</th><th>Job</th><th>Acceptance</th></tr></thead>
+<tbody>
+<tr><td>P0-1</td><td>Create / edit plants</td><td>Name + stage required. Indoor/outdoor/mixed. Stable plant ids forever.</td></tr>
+<tr><td>P0-2</td><td>Stage model</td><td>Keys <code>klijanje → sadnica → vegetativna → cvjetanje → susenje</code>. Labels translated; keys not.</td></tr>
+<tr><td>P0-3</td><td>Care log</td><td>Water, feed, environment, transplant, stressors, stage, general. <code>date</code> for humans; <code>createdAt</code> for coverage.</td></tr>
+<tr><td>P0-4</td><td>Photos on the plant</td><td>Camera or file → Storage. Not base64 in the journal blob.</td></tr>
+<tr><td>P0-5</td><td>Calendar + list</td><td>Month is default landing. Filter by plant.</td></tr>
+<tr><td>P0-6</td><td>Auth</td><td>Email/password + Google. 18+ + Terms + Privacy at signup. Desk chosen once.</td></tr>
+<tr><td>P0-7</td><td>Sync</td><td>Signed-in journal survives a new browser. Local cache may exist; cloud is source after login.</td></tr>
+<tr><td>P0-8</td><td>i18n</td><td>English source, Croatian, German.</td></tr>
+<tr><td>P0-9</td><td>Age and law</td><td>18+ gate; FAQ/terms: documentation tool, follow local law.</td></tr>
+</tbody></table>
+<h3 id="p1-coach-reminders-weather-stories">P1 — Coach, reminders, weather, stories</h3>
+<table>
+<thead><tr><th>ID</th><th>Job</th><th>Acceptance</th></tr></thead>
+<tbody>
+<tr><td>P1-1</td><td>Reminders</td><td>Derived from journal + weather. Dismissable. Confirm drafts a log; does not auto-write.</td></tr>
+<tr><td>P1-2</td><td>Weather</td><td>3-day city forecast for planning. No GPS unless product reopens it. Key must not live in the client on a rewrite.</td></tr>
+<tr><td>P1-3</td><td>Grower Coach</td><td>Reads journal snapshot. Max 5 proposed actions. Confirm required. No deletes. Advisory only.</td></tr>
+<tr><td>P1-4</td><td>Photo / illness</td><td>Visible facts first, ≤2 hypotheses, no pathogen name without matching signs, never treat from photo alone.</td></tr>
+<tr><td>P1-5</td><td>Live model gate</td><td>Gemini requires verified email. Unverified → local helper. Quotas: chat 60/day, vision 25/day UTC.</td></tr>
+<tr><td>P1-6</td><td>Adopter Coach</td><td>Explains care / stage / unlock. <code>actions</code> always empty.</td></tr>
+<tr><td>P1-7</td><td>Stories</td><td>Draft/publish/delete. Public feed and <code>/g/{slug}</code> without sign-in. Private journal stays private.</td></tr>
+<tr><td>P1-8</td><td>Inbox</td><td>Care due, mint/sale/faucet outcomes, wallet reconnect explained as session end not theft.</td></tr>
+</tbody></table>
+<h3 id="p2-optional-chain-devnet">P2 — Optional chain (Devnet)</h3>
+<table>
+<thead><tr><th>ID</th><th>Job</th><th>Acceptance</th></tr></thead>
+<tbody>
+<tr><td>P2-1</td><td>Opt-in</td><td><code>chainOptIn</code> unlocks Tokenise/Market. Journal works without it.</td></tr>
+<tr><td>P2-2</td><td>Wallet</td><td>Phantom/Solflare Devnet. Pubkey set only after server-verified signature. Client may unlink.</td></tr>
+<tr><td>P2-3</td><td>Seed seal</td><td>Requires real <code>plantId</code>. Not gated on 14-day coverage. Queue → worker; UI distinguishes queued/fail/success.</td></tr>
+<tr><td>P2-4</td><td>Growth seal</td><td>Journal proof: linked plant, stage log, watering; feeding optional only at germination.</td></tr>
+<tr><td>P2-5</td><td>List gate</td><td>14 elapsed days + ≥50% care days on watering/feeding <code>createdAt</code>. Backdates do not count. Failed coverage hidden from tape.</td></tr>
+<tr><td>P2-6</td><td>Offers</td><td>Instant sale vs adopt-stake (50/50 locked).</td></tr>
+<tr><td>P2-7</td><td>Public board</td><td>Reads scrubbed tape only.</td></tr>
+<tr><td>P2-8</td><td>Faucet</td><td>Adopter-only, test $GROWTOO, no value.</td></tr>
+<tr><td>P2-9</td><td>Harvest claim</td><td>May exist as a pending record. Must not claim physical fulfillment.</td></tr>
+<tr><td>P2-10</td><td>Copy</td><td>No monetary value; on-chain ≠ physical plant; no mainnet date.</td></tr>
+</tbody></table>
+<h3 id="p3-admin-narrow">P3 — Admin (narrow)</h3>
+<table>
+<thead><tr><th>ID</th><th>Job</th><th>Acceptance</th></tr></thead>
+<tbody>
+<tr><td>P3-1</td><td>Allowlist</td><td>Only <code>supadmin@dnevnik.live</code> and <code>admin@dnevnik.live</code>. Role field is not enough.</td></tr>
+<tr><td>P3-2</td><td>Growers</td><td>Never see Admin nav.</td></tr>
+</tbody></table>
+<h2 id="9-trust-legal-and-voice">9. Trust, legal, and voice</h2>
+<p><strong>Trust model today (say this internally and on <code>/risks/</code>):</strong> operator-reviewed journal progress plus coverage math. Not an independent oracle, not IoT, not photo attestation as legal proof. Fabricated logs remain a residual risk.</p>
+<p><strong>Legal posture</strong></p>
+<ul>
+<li>Documentation tool, not legal / tax / investment / medical advice.</li>
+<li>CBD/cannabis rules vary by jurisdiction. Future physical redemption would need licensing, custody, shipping, KYC/AML where required. That pipeline does not exist.</li>
+<li>Devnet assets are not securities offers and not title to plant material.</li>
+<li>Users 18+ and legally allowed to use grow-related information services where they live.</li>
+</ul>
+<p><strong>Voice</strong></p>
+<ul>
+<li>Warm, specific, grower-plain. Not a corporate social account. Not a yield pitch.</li>
+<li>Early: small tester group, Devnet, test tokens have no value.</li>
+<li>Coach: practical CBD/hemp peer. Does not replace looking at the plant.</li>
+</ul>
+<p>Approved public phrases live in <code>community-agent/config/product-facts.md</code>. If a claim is not there, in this spec, or in the feature spec, treat it as unverified.</p>
+<h2 id="10-scope-boundaries">10. Scope boundaries</h2>
+<h3 id="in-scope-for-the-current-product">In scope for the current product</h3>
+<ul>
+<li>Web journal (responsive). Free.</li>
+<li>Coach on Gemini with local fallback.</li>
+<li>Optional Solana Devnet proof + market desk for learning the trust flow.</li>
+<li>Public Stories.</li>
+<li>EN / HR / DE.</li>
+</ul>
+<h3 id="out-of-scope-unless-product-reopens">Out of scope unless product reopens</h3>
+<ul>
+<li>Native App Store / Play builds.</li>
+<li>Installable PWA / service worker.</li>
+<li>Mainnet, real $GROWTOO value, published mainnet date.</li>
+<li>Physical harvest shipping or licensed fulfillment.</li>
+<li>Trustless proof a physical plant exists.</li>
+<li>GPS weather.</li>
+<li>Client-mutable desk (<code>profileType</code>).</li>
+<li>Subscription paywall on the journal.</li>
+<li>Using Cursor or any third-party chat as the grower-facing Coach.</li>
+</ul>
+<h3 id="planned-do-not-date">Planned (do not date)</h3>
+<ul>
+<li>Stronger attestations so a single operator is not the forever trust point.</li>
+<li>Mainnet pilot after harvest-redemption design is real — milestone in <code>/rwa-docs/</code>, not “soon.”</li>
+<li>German live-coach locale (UI is already DE; Gemini today is en/hr).</li>
+</ul>
+<h2 id="11-open-product-decisions">11. Open product decisions</h2>
+<p>A new team should not silently pick these.</p>
+<ol>
+<li><strong>May a user ever change Grower ↔ Adopter?</strong> Today: no on the client. Changing it mixes faucet, Invest, and Tokenise.</li>
+<li><strong>When does harvest redemption become a real pipeline?</strong> Legal + ops, not a UI toggle.</li>
+<li><strong>Does Market stay Devnet-only until attestations harden?</strong> Recommended yes.</li>
+<li><strong>Is Stories the public face, or a subset of the private journal?</strong> Today: explicit publish only.</li>
+<li><strong>Rank / XP / activity $GROWTOO</strong> — retention game on test assets, or drop on rewrite? Product call.</li>
+<li><strong>Admin model</strong> — keep two-email allowlist or replace with a designed role system.</li>
+</ol>
+<h2 id="12-how-to-use-this-with-the-other-packets">12. How to use this with the other packets</h2>
+<ul>
+<li>Changing <strong>why / who / copy / gates / honesty</strong> → update this spec first, then feature spec, then code.</li>
+<li>Changing <strong>fields, nav, quotas, collection names</strong> → feature spec.</li>
+<li>Changing <strong>stack, Firestore shape, programs</strong> → rebuild packet.</li>
+<li>Shipping <strong>marketing</strong> → <code>product-facts.md</code> only.</li>
+</ul>
+<p>A rewrite that preserves plant ids, <code>createdAt</code> coverage, desk immutability, server-verified wallets, tape-not-listings, and journal-without-wallet has kept the product even if every screen is new.</p>
+    <footer>
+      Generated from <code>docs/PRODUCT.md</code> on 4 Sep 2026. If a claim is not in this spec, the feature spec, or <code>product-facts.md</code>, treat it as unverified.
+    </footer>
+  </div>
+</body>
+</html>

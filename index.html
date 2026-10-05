@@ -42,7 +42,7 @@
   </script>
   <script src="js/i18n.js?v=20260922d" data-i18n-ns="common,landing"></script>
   <link rel="stylesheet" href="styles/tokens.css?v=20260817v" />
-  <link rel="stylesheet" href="styles/landing.css?v=20260923a" />
+    <link rel="stylesheet" href="styles/landing.css?v=20260928a" />
   <!-- Must stay last among landing sheets: the retro accent layer overrides
        the late body.landing-page block. Drop this link and the body class
        to revert. -->
@@ -149,6 +149,8 @@
           <img src="images/growtoo-mark-brass.png?v=20260731a" alt="" width="40" height="40" class="logo-mark" />
           <span class="logo-word">growtoo</span>
         </a>
+      </div>
+      <div class="header-end">
         <a href="https://solana.com" target="_blank" rel="noopener noreferrer" class="powered-by-solana powered-by-solana--header">
           <span class="powered-by-solana-label" data-i18n="common.brand.poweredBy">Powered by</span>
           <span class="solana-badge-mark" aria-hidden="true">
@@ -161,25 +163,25 @@
               </defs>
               <path fill="url(#solana-g-header)" d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
               <path fill="url(#solana-g-header)" d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-              <path fill="url(#solana-g-header)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
+              <path fill="url(#solana-g-header)" d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6 11.1l-62.7-62.7z"/>
             </svg>
           </span>
           <strong>Solana</strong>
         </a>
+        <button type="button" class="nav-toggle" data-i18n-attr="aria-label:common.nav.menu" aria-label="Menu" aria-expanded="false">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="nav nav--catalog" id="main-nav">
+          <a href="app/" class="nav-link" data-i18n="common.nav.tokenise">Tokenise</a>
+          <a href="#stakes" class="nav-link" data-i18n="common.nav.market">Market</a>
+          <a href="#faq" class="nav-link nav-link--more" data-i18n="common.nav.faq">FAQ</a>
+          <a href="rwa-docs/" class="nav-link nav-link--more" data-i18n="common.nav.docs">Docs</a>
+          <div class="nav-lang" data-i18n-switcher></div>
+          <a href="dnevnik/" class="btn btn-primary nav-cta" data-i18n="common.cta.signIn">Sign in</a>
+        </nav>
       </div>
-      <button type="button" class="nav-toggle" data-i18n-attr="aria-label:common.nav.menu" aria-label="Menu" aria-expanded="false">
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-        <span class="nav-toggle-bar"></span>
-      </button>
-      <nav class="nav nav--catalog" id="main-nav">
-        <a href="app/" class="nav-link" data-i18n="common.nav.tokenise">Tokenise</a>
-        <a href="#stakes" class="nav-link" data-i18n="common.nav.market">Market</a>
-        <a href="#faq" class="nav-link nav-link--more" data-i18n="common.nav.faq">FAQ</a>
-        <a href="rwa-docs/" class="nav-link nav-link--more" data-i18n="common.nav.docs">Docs</a>
-        <div class="nav-lang" data-i18n-switcher></div>
-        <a href="dnevnik/" class="btn btn-primary nav-cta" data-i18n="common.cta.signIn">Sign in</a>
-      </nav>
     </div>
   </header>
   <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 420" preserveAspectRatio="xMidYMax meet">
+  <defs>
+    <g id="canna">
+      <path d="M0 0 V-36" fill="none" stroke="#1b3a28" stroke-width="2" stroke-linecap="round"/>
+      <g transform="translate(0 -36)" fill="#1b3a28">
+        <path transform="rotate(-80)" d="M0 2 C2.4 -6 2.2 -14 0 -20 C-2.2 -14 -2.4 -6 0 2Z"/>
+        <path transform="rotate(-54)" d="M0 2 C3 -10 2.8 -22 0 -32 C-2.8 -22 -3 -10 0 2Z"/>
+        <path transform="rotate(-27)" d="M0 2 C3.4 -14 3.2 -30 0 -44 C-3.2 -30 -3.4 -14 0 2Z"/>
+        <path d="M0 2 C3.6 -18 3.4 -38 0 -56 C-3.4 -38 -3.6 -18 0 2Z"/>
+        <path transform="rotate(27)" d="M0 2 C3.4 -14 3.2 -30 0 -44 C-3.2 -30 -3.4 -14 0 2Z"/>
+        <path transform="rotate(54)" d="M0 2 C3 -10 2.8 -22 0 -32 C-2.8 -22 -3 -10 0 2Z"/>
+        <path transform="rotate(80)" d="M0 2 C2.4 -6 2.2 -14 0 -20 C-2.2 -14 -2.4 -6 0 2Z"/>
+      </g>
+    </g>
+  </defs>
+
+  <g fill="none" stroke="#e0be05" stroke-width="1.15" stroke-linecap="round" opacity="0.28">
+    <path d="M-40 210 C200 196 420 168 700 188 C980 208 1220 226 1480 228"/>
+    <path d="M-40 300 C220 290 460 272 760 286 C1040 300 1260 308 1480 306"/>
+  </g>
+
+  <g fill="none" stroke="#e0be05" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="7" opacity="0.1" d="M120 168 L310 148 L520 172 L740 150 L960 166 L1180 146 L1348 170 L1280 268 L1040 250 L790 274 L540 252 L300 270 L168 256 L120 168"/>
+    <path stroke-width="1.6" opacity="0.92" d="M120 168 L310 148 L520 172 L740 150 L960 166 L1180 146 L1348 170"/>
+    <path stroke-width="1.6" opacity="0.92" d="M168 256 L300 270 L540 252 L790 274 L1040 250 L1280 268"/>
+    <path stroke-width="1.35" opacity="0.75" d="M120 168 L168 256"/>
+    <path stroke-width="1.35" opacity="0.75" d="M520 172 L540 252"/>
+    <path stroke-width="1.35" opacity="0.75" d="M960 166 L1040 250"/>
+    <path stroke-width="1.35" opacity="0.75" d="M1348 170 L1280 268"/>
+    <path stroke-width="1.35" opacity="0.75" d="M310 148 L300 270"/>
+    <path stroke-width="1.35" opacity="0.75" d="M740 150 L790 274"/>
+    <path stroke-width="1.35" opacity="0.75" d="M1180 146 L1040 250"/>
+  </g>
+
+  <g fill="#e0be05">
+    <circle cx="120" cy="168" r="3.2"/>
+    <circle cx="310" cy="148" r="3.2"/>
+    <circle cx="520" cy="172" r="3.2"/>
+    <circle cx="740" cy="150" r="3.2"/>
+    <circle cx="960" cy="166" r="3.2"/>
+    <circle cx="1180" cy="146" r="3.2"/>
+    <circle cx="1348" cy="170" r="3.2"/>
+    <circle cx="168" cy="256" r="3.6"/>
+    <circle cx="300" cy="270" r="3.6"/>
+    <circle cx="540" cy="252" r="3.6"/>
+    <circle cx="790" cy="274" r="3.6"/>
+    <circle cx="1040" cy="250" r="3.6"/>
+    <circle cx="1280" cy="268" r="3.6"/>
+  </g>
+
+  <use href="#canna" transform="translate(120 204) scale(0.78)"/>
+  <use href="#canna" transform="translate(310 184) scale(0.72)"/>
+  <use href="#canna" transform="translate(520 208) scale(0.8)"/>
+  <use href="#canna" transform="translate(740 186) scale(0.74)"/>
+  <use href="#canna" transform="translate(960 202) scale(0.78)"/>
+  <use href="#canna" transform="translate(1180 182) scale(0.7)"/>
+  <use href="#canna" transform="translate(1348 206) scale(0.76)"/>
+
+  <use href="#canna" transform="translate(168 312) scale(1.12)"/>
+  <use href="#canna" transform="translate(300 326) scale(1.22)"/>
+  <use href="#canna" transform="translate(540 308) scale(1.16)"/>
+  <use href="#canna" transform="translate(790 330) scale(1.28)"/>
+  <use href="#canna" transform="translate(1040 306) scale(1.18)"/>
+  <use href="#canna" transform="translate(1280 324) scale(1.24)"/>
+</svg>

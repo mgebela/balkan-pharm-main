@@ -8,8 +8,8 @@
 
 @font-face {
   font-family: "Alkaline Caps";
-  src: url("/fonts/pitch/Alkaline-MediumCaps.otf") format("opentype");
-  font-weight: 400;
+  src: url("/fonts/pitch/Alkaline-BoldCaps.otf") format("opentype");
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
@@ -105,7 +105,7 @@ h2,
 .deck-card h2 {
   font-family: var(--font-display);
   font-style: normal;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 0.92;
   text-transform: uppercase;
@@ -233,7 +233,7 @@ a {
 .deck-card h2 {
   font-family: var(--font-display) !important;
   font-style: normal !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
   font-size: clamp(26px, 3vw, 40px);
   text-transform: uppercase;
   line-height: 1;

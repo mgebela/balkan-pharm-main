@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>growtoo · feature specification · 4 Sep 2026</title>
+  <style>
+:root {
+  --ink: #1c241c;
+  --muted: #5a665a;
+  --line: #d5ddd4;
+  --paper: #f7f4ee;
+  --card: #fff;
+  --accent: #3d5c3a;
+  --warn: #8a4b2a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 15px/1.5 "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+.wrap { max-width: 880px; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+header h1 { font-size: 1.65rem; font-weight: 650; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+header p.meta { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.banner {
+  margin: 1.25rem 0 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+  font-size: 0.92rem;
+}
+nav.toc { margin: 0 0 2rem; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--line); }
+nav.toc strong { display: block; margin-bottom: 0.4rem; }
+nav.toc ol { margin: 0; padding-left: 1.2rem; columns: 2; gap: 1.5rem; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+h2 { font-size: 1.2rem; margin: 2.1rem 0 0.6rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+h3 { font-size: 1.02rem; margin: 1.3rem 0 0.4rem; }
+h4 { font-size: 0.95rem; margin: 1rem 0 0.35rem; }
+p, li { color: var(--ink); }
+.muted { color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 0.5rem 0 1rem; background: var(--card); }
+th, td { text-align: left; vertical-align: top; padding: 0.42rem 0.55rem; border-bottom: 1px solid var(--line); }
+th { font-weight: 650; background: #eef2ee; }
+code, kbd { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 0.84em; }
+ul, ol { margin: 0.35rem 0 0.85rem; padding-left: 1.25rem; }
+ul ul, ol ul, ol ol, ul ol { margin: 0.15rem 0 0.25rem; }
+.status { font-weight: 650; color: var(--accent); }
+.warn { color: var(--warn); }
+footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; }
+@media print {
+  body { background: #fff; }
+  .wrap { max-width: none; padding: 0; }
+  nav.toc, .banner { break-inside: avoid; }
+  a { color: inherit; text-decoration: none; }
+  h2, h3 { break-after: avoid; }
+  table { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>growtoo feature specification</h1>
+      <p class="meta">Product behaviour for a future team &nbsp;·&nbsp; 4 September 2026 &nbsp;·&nbsp; internal, not a marketing page</p>
+    </header>
+    <p class="banner">
+      This is <strong>what the product does</strong> on
+      <a href="https://growto.live">https://growto.live</a>.
+      Stack, Firestore, Functions, and Solana live in the rebuild packet
+      (<code>docs/rebuild/</code>). Root <code>README.md</code> is stale.
+      Do not treat pitch-deck numbers as product facts.
+    </p>
+    <nav class="toc">
+      <strong>Contents</strong>
+      <ol><li><a href="#1-what-growtoo-is">1. What growtoo is</a></li><li><a href="#2-status-legend">2. Status legend</a></li><li><a href="#3-surfaces-a-user-hits">3. Surfaces a user hits</a></li><li><a href="#4-information-architecture-app">4. Information architecture (app)</a></li><li><a href="#5-accounts-onboarding-profile">5. Accounts, onboarding, profile</a></li><li><a href="#6-feature-catalog">6. Feature catalog</a></li><li><a href="#7-cross-cutting-product-rules">7. Cross-cutting product rules</a></li><li><a href="#8-what-is-explicitly-out-of-scope-today">8. What is explicitly out of scope today</a></li><li><a href="#9-suggested-test-matrix-for-a-new-team">9. Suggested test matrix for a new team</a></li><li><a href="#10-related-documents">10. Related documents</a></li></ol>
+    </nav>
+    <h2 id="1-what-growtoo-is">1. What growtoo is</h2>
+<p>growtoo is a <strong>free cannabis / CBD grow journal</strong>. The journal is the product. Reminders, a 3-day weather widget, in-app camera, an AI coach, photos, growth-stage tracking, public Stories, and an optional Solana <strong>Devnet</strong> proof layer (Tokenise + Market) sit on top of that journal.</p>
+<p>It is a <strong>documentation tool</strong>, not legal advice, not a diagnosis service, and not a live-money marketplace. Users must be <strong>18+</strong> and legally allowed to use grow-related information services where they live. Growers must follow the law where they grow.</p>
+<p>Two desks after signup:</p>
+<table>
+<thead><tr><th>Desk</th><th>Job</th><th>Wallet</th></tr></thead>
+<tbody>
+<tr><td><strong>Grower</strong></td><td>Journal plants, log care, coach, Stories. Tokenise / Market only after chain opt-in.</td><td>Optional. Needed only to mint or list on Devnet.</td></tr>
+<tr><td><strong>Adopter</strong></td><td>Market / garden desk. Follow listed plants, invest test $GROWTOO, daily faucet. Journal plants are empty by default.</td><td>Needed to invest / claim faucet.</td></tr>
+</tbody></table>
+<p><code>profileType</code> (<code>grower</code> \| <code>adopter</code>) is <strong>immutable</strong> after create on the client. Do not let users flip desks without an explicit product decision — faucet, Invest, and Tokenise are a trust boundary.</p>
+<h2 id="2-status-legend">2. Status legend</h2>
+<p>Use this in every feature below.</p>
+<table>
+<thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><strong>Live</strong></td><td>Ships to signed-in users on growto.live today.</td></tr>
+<tr><td><strong>Gated</strong></td><td>Live, but behind a flag, allowlist, verified email, or chain opt-in.</td></tr>
+<tr><td><strong>Devnet</strong></td><td>Live on Solana’s public test network. Tokens have <strong>no monetary value</strong>.</td></tr>
+<tr><td><strong>Mocked</strong></td><td>UI / data model exist; fulfillment is not a real pipeline.</td></tr>
+<tr><td><strong>Planned</strong></td><td>Roadmap only. Do not announce dates.</td></tr>
+</tbody></table>
+<p><strong>Not live (do not claim):</strong> mainnet; $GROWTOO as money; trustless proof that a physical plant exists; physical harvest redemption / fulfillment.</p>
+<p>On-chain records on Devnet are <strong>process evidence from the journal trail</strong>, not proof a plant exists.</p>
+<h2 id="3-surfaces-a-user-hits">3. Surfaces a user hits</h2>
+<table>
+<thead><tr><th>Surface</th><th>URL</th><th>Who</th></tr></thead>
+<tbody>
+<tr><td>Marketing landing</td><td><code>/</code> (<code>/hr/</code>, <code>/de/</code>)</td><td>Public</td></tr>
+<tr><td>Sign-in / sign-up</td><td><code>/dnevnik/</code></td><td>Public → Auth</td></tr>
+<tr><td>Signed-in app</td><td><code>/app/</code></td><td>Grower / Adopter / Admin</td></tr>
+<tr><td>Public Stories feed</td><td><code>https://journal.growto.live</code> (also <code>/journal/</code> on apex)</td><td>Public, no account</td></tr>
+<tr><td>Public grower profile</td><td><code>journal.growto.live/g/{slug}</code></td><td>Public</td></tr>
+<tr><td>Public story</td><td><code>journal.growto.live/p/{slug}</code></td><td>Public</td></tr>
+<tr><td>Terms / Privacy / Risks / RWA docs</td><td><code>/terms/</code>, <code>/privacy/</code>, <code>/risks/</code>, <code>/rwa-docs/</code></td><td>Public</td></tr>
+<tr><td>Pitch chooser</td><td><code>/pitch/</code></td><td>Public (grower, adopter, investor, skeptic, labs)</td></tr>
+</tbody></table>
+<p>Languages: <strong>English</strong> (source of truth), <strong>Croatian</strong>, <strong>German</strong>. App switches in place (<code>?lang=</code> + <code>localStorage[&#x27;growtoo:lang&#x27;]</code>). Missing copy falls back to English, never a key name.</p>
+<p>Internal data keys stay Croatian. Do not branch on displayed labels.</p>
+<ul>
+<li>Stages: <code>klijanje</code> → <code>sadnica</code> → <code>vegetativna</code> → <code>cvjetanje</code> → <code>susenje</code></li>
+<li>Care types: <code>zalijevanje</code>, <code>gnojidba</code>, plus <code>opcenito</code>, <code>okolis</code>, <code>presadjivanje</code>, <code>stresori</code>, <code>ostalo</code>, <code>faza</code>, <code>podfaza</code></li>
+</ul>
+<h2 id="4-information-architecture-app">4. Information architecture (app)</h2>
+<p>Primary bottom / sidebar nav is thumb-sized. Older docs that mention a Today tab or a separate Plants tab are stale.</p>
+<h3 id="grower-bar">Grower bar</h3>
+<p><strong>Journal · Log · Coach · Tokenise</strong></p>
+<ul>
+<li><strong>Journal</strong> — plants + calendar / list of entries. Dashboard and Today views still exist in the DOM; navigation redirects both here.</li>
+<li><strong>Log</strong> — FAB / sheet, not a page. Fast watering / feeding; “Full journal entry” opens the entry modal.</li>
+<li><strong>Coach</strong> — overlay panel (grower + adopter).</li>
+<li><strong>Tokenise</strong> — 4th tab. First tap opens Tokenise. Market is the other segment on the same screen.</li>
+</ul>
+<p><strong>More / Profile</strong> (header sheet): Appearance, Language, Stories (mobile), Measurements, Unlock chain, Privacy, Terms, Log out. Admin tile only for two allowlisted emails.</p>
+<h3 id="adopter-bar">Adopter bar</h3>
+<p>Same four slots, but the 4th tab is labelled <strong>Market</strong>. Tokenise / Garden is the other segment. Journal plants are empty by default; Log is grower-only.</p>
+<p>Deep links: <code>?view=dashboard</code> and <code>?view=danas</code> resolve to Journal.</p>
+<h2 id="5-accounts-onboarding-profile">5. Accounts, onboarding, profile</h2>
+<p class="status"><strong>Status: Live</strong></p>
+<h3 id="sign-in">Sign-in</h3>
+<ul>
+<li>Firebase Auth: <strong>email/password</strong> and <strong>Google</strong>.</li>
+<li>Password: at least 8 characters (signup hint).</li>
+<li>Sign-in opens Grower or Adopter workspace from stored <code>profileType</code>. No second role picker.</li>
+</ul>
+<h3 id="sign-up">Sign-up</h3>
+<ol>
+<li>Age gate <strong>18+</strong> + Terms + Privacy (required).</li>
+<li>Choose desk: Grower or Adopter. This is permanent on the client.</li>
+<li>Grower extras:</li>
+<ul>
+<li>Grow setup: <code>indoor</code> / <code>outdoor</code> / <code>mixed</code> (seeds plant defaults and coaching).</li>
+<li>Home city (optional) — weather widget only.</li>
+<li>Grow style note (optional).</li>
+<li>Profile photo / logo (optional).</li>
+</ul>
+<li>Adopter extras:</li>
+<ul>
+<li>Intent: support growers / collect a garden / learn the flow.</li>
+<li>Required checkbox: Devnet assets have no monetary value.</li>
+</ul>
+</ol>
+<h3 id="profile-more-sheet">Profile (More sheet)</h3>
+<ul>
+<li>Display name, profile photo, email verification status.</li>
+<li>Wallet link status (not linked / linked pubkey). Clients may <strong>unlink</strong>. Only Cloud Function <code>linkWallet</code> may <strong>set</strong> <code>solanaPubkey</code> after ed25519 verify. Never let the client write the pubkey.</li>
+<li>Rank · XP chip (growers).</li>
+<li>Detail level: Simple (hide mint addresses) vs Advanced (explorer links, PDAs).</li>
+<li>Appearance: Light (product default) / Dark / Auto. Stored as <code>growtoo:appearance</code>.</li>
+<li>Language: EN / HR / DE.</li>
+<li>Replay product tour.</li>
+<li>Resend verification / “I already verified”.</li>
+</ul>
+<h3 id="email-verification-gate">Email verification gate</h3>
+<p>Live Gemini (Coach + illness-check photos) requires <code>email_verified</code> on the ID token. Unverified accounts get the <strong>local helper</strong> (reminders + draft logs, no live model). After an admin verifies an email, the user must <strong>sign out and in</strong>.</p>
+<h3 id="product-tour">Product tour</h3>
+<p>First-run scripts per view (Journal, Tokenise/Garden). Replay from Profile. Welcome / “While you were away” / adopter START HERE: <strong>one intro layer per session</strong>, never stacked with Tokenise explainers. After ≥30 minutes away, show the return sheet only.</p>
+<h2 id="6-feature-catalog">6. Feature catalog</h2>
+<h3 id="6-1-plants-journal-garden">6.1 Plants (journal garden)</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>CRUD for plants in the grower’s journal.</p>
+<p><strong>Create wizard</strong></p>
+<ol>
+<li>Essentials: name (required), stage.</li>
+<li>Optional details: strain, start date, environment name, indoor/outdoor, photo, notes.</li>
+<li>Outdoor extras: field location, planting location, daily exposure hours.</li>
+<li>Advanced: <code>count</code> (plants in a row/cohort), subphase ladder.</li>
+</ol>
+<p><strong>Subphases (pot / field ladder)</strong></p>
+<p><code>pot_1_5dcl</code> → <code>pot_5l</code> → <code>pot_30l</code> → <code>na_polju</code> (in the field). Quick actions: next pot, to field. Stage and subphase changes write history (<code>stageHistory</code>, <code>subphaseHistory</code>, <code>stageDates</code>) and can emit journal notes.</p>
+<p><strong>Optional on create:</strong> “Also seal this on-chain” — queues a seed mint if chain is unlocked and a Devnet wallet is connected. Not required for journaling.</p>
+<p><strong>List</strong></p>
+<ul>
+<li>Stage filter chips.</li>
+<li>Rank chip in the plants header.</li>
+<li>Empty garden: Coach-style next step — Add a plant or Log first watering. Do not show a mute empty calendar as the first-run state.</li>
+</ul>
+<p><strong>IDs:</strong> plant <code>id</code> is a stable string. Seed mints, growth mints, and market listings foreign-key this id. <strong>Never regenerate plant ids on rewrite.</strong></p>
+<p><code>startDate</code> is grower-facing. Market eligibility does <strong>not</strong> use it (see §6.12).</p>
+<h3 id="6-2-journal-entries">6.2 Journal entries</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>A dated note on one plant (or a same-strain stack).</p>
+<table>
+<thead><tr><th>Field</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>date</code></td><td>Journal day <code>YYYY-MM-DD</code>. Display and calendar. <strong>Not</strong> used for market coverage.</td></tr>
+<tr><td><code>type</code></td><td>See table below.</td></tr>
+<tr><td><code>note</code></td><td>Required on the full entry form.</td></tr>
+<tr><td><code>photo</code> / <code>video</code></td><td>Photo via camera or file. Video optional. Photos go to Storage, not inline in the state blob.</td></tr>
+<tr><td><code>meta</code></td><td>Type-specific extras (transplant, stressors, stage location).</td></tr>
+<tr><td><code>createdAt</code></td><td>Clock time when saved. <strong>This</strong> is what market coverage counts.</td></tr>
+<tr><td><code>source</code></td><td>e.g. log sheet, toolbox, camera, coach action.</td></tr>
+</tbody></table>
+<p><strong>Entry types (internal keys)</strong></p>
+<table>
+<thead><tr><th>Key</th><th>Label</th><th>Extra fields</th></tr></thead>
+<tbody>
+<tr><td><code>opcenito</code></td><td>General</td><td>—</td></tr>
+<tr><td><code>zalijevanje</code></td><td>Watering</td><td>Amount can come from Measurements</td></tr>
+<tr><td><code>gnojidba</code></td><td>Feeding</td><td>Product / dose</td></tr>
+<tr><td><code>okolis</code></td><td>Environment</td><td>Temp / RH / pH</td></tr>
+<tr><td><code>presadjivanje</code></td><td>Transplanting</td><td>Soil, age, condition</td></tr>
+<tr><td><code>stresori</code></td><td>Stressors</td><td>Temp, humidity, VPD, pests</td></tr>
+<tr><td><code>faza</code></td><td>Stage / milestone</td><td>Optional field / planting location</td></tr>
+<tr><td><code>ostalo</code></td><td>Other</td><td>—</td></tr>
+<tr><td><code>podfaza</code></td><td>Sub-phase (system)</td><td>Written on subphase change</td></tr>
+</tbody></table>
+<p><strong>Calendar vs list</strong></p>
+<p>Month view is the Journal landing. List stays if the user picked it. Filter by plant. Due watering / feeding from the calendar also feeds Coach reminders — there is <strong>no separate event store</strong>.</p>
+<p><strong>Care-day rule (must keep):</strong> dumping 90 logs in one session is <strong>one</strong> care day. Backdating <code>entry.date</code> does not create extra coverage. Distinct UTC days of <code>zalijevanje</code> / <code>gnojidba</code> by <code>createdAt</code> count.</p>
+<h3 id="6-3-log-sheet-fab">6.3 Log sheet (FAB)</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>Fast path from the Log tab.</p>
+<ul>
+<li>Multi-select plants. Same-strain stacks can log together.</li>
+<li><strong>Log watering</strong> / <strong>Log feeding</strong> — one tap each.</li>
+<li><strong>Full journal entry</strong> — opens the entry modal with those plants preselected.</li>
+<li>Empty garden: CTA to add a plant.</li>
+</ul>
+<p>This is the primary daily habit. Coach drafts should land here in spirit (confirm-then-write), not invent a second logger.</p>
+<h3 id="6-4-grow-log-per-plant-trail">6.4 Grow log (per-plant trail)</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>Opened from a plant card. Seed-to-harvest documentation page.</p>
+<ul>
+<li>Hero (name, stage, photo).</li>
+<li>Strain, environment, stage timeline.</li>
+<li>Photo grid + recent strip + “view all”.</li>
+<li>Chronological journal trail for that plant.</li>
+<li>Actions: new entry, edit plant, open Coach.</li>
+<li>Optional reward-goal line when chain activity is on.</li>
+</ul>
+<p>This is the “plant passport” a grower (and later an adopter) is meant to read. Listing on Market is supposed to point at this kind of trail, not at a mint timestamp.</p>
+<h3 id="6-5-measurements-toolbox">6.5 Measurements (toolbox)</h3>
+<p class="status"><strong>Status: Live · Grower</strong> (soil moisture: <strong>Gated</strong>, two admin emails)</p>
+<p>Opened from Profile → Measurements. Charts live here; each Add <strong>also writes a matching journal entry</strong> so there is one care story, not two ledgers.</p>
+<table>
+<thead><tr><th>Tool</th><th>Inputs</th><th>Chart</th></tr></thead>
+<tbody>
+<tr><td>Watering</td><td>Date, amount (mL), plant</td><td>Amount by date</td></tr>
+<tr><td>Feeding</td><td>Date, product/dose, note, plant</td><td>Feeding history</td></tr>
+<tr><td>Environment</td><td>Date, °C, humidity %, pH, plant</td><td>Temp / RH / pH</td></tr>
+<tr><td>Transplanting</td><td>Date, soil, age, condition, plant</td><td>List</td></tr>
+<tr><td>Stressors</td><td>Date + stress fields, plant</td><td>List</td></tr>
+<tr><td>Charts</td><td>Overview of the above</td><td>Combined</td></tr>
+<tr><td>Soil moisture</td><td>Live sensor feed</td><td><strong>Admin emails only</strong></td></tr>
+</tbody></table>
+<p>Coach snapshot includes last watering mL, last feed product, last temp/RH. If a reading is missing, Coach should ask the grower to log it rather than invent numbers.</p>
+<h3 id="6-6-weather-3-day">6.6 Weather (3-day)</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>Widget on Journal. City string (not GPS). Prefills from signup <code>homeCity</code>. 3-day forecast for grow planning (heat, watering pace). Coach can answer “what does the forecast mean for my grow?”.</p>
+<p><strong>Rewrite note:</strong> WeatherAPI key is currently in client JS. Move server-side. Do not add GPS unless product asks.</p>
+<h3 id="6-7-plant-camera-illness-check">6.7 Plant camera + illness check</h3>
+<p class="status"><strong>Status: Live · Grower</strong> (live analysis: <strong>Gated</strong> — verified email)</p>
+<p>In-app camera: preview, shutter, Flip, Gallery. After capture:</p>
+<ul>
+<li><strong>Log to journal</strong> — attach photo to a plant entry.</li>
+<li><strong>Check for illness</strong> — sends 1–2 JPEG frames through the same Coach photo path (<code>coachChat</code> / <code>analyzeGrowFrames</code>).</li>
+<li><strong>Retake</strong>.</li>
+</ul>
+<p>Rules the model and UI must keep:</p>
+<ul>
+<li>Describe what is visible first, then at most two hypotheses (pest, disease, deficiency, environment).</li>
+<li>Do not name a pathogen unless the photo shows matching signs.</li>
+<li>Never treat from the photo alone. Suggest one journal log that would confirm the top hypothesis.</li>
+<li>Quota: vision <strong>25/day</strong>. Coach chat <strong>60/day</strong> (UTC). Distinct copy for <code>email_unverified</code>, expired token, <code>quota_exceeded</code>.</li>
+<li>Permission failures: blocked vs no camera vs generic — never a silent fail. Gallery is the fallback.</li>
+</ul>
+<p>Photos: Firebase Storage <code>users/{uid}/journal/…</code>, max ~5 MB after compression. Do not store new photos as base64 in the 1 MiB Firestore state document.</p>
+<h3 id="6-8-reminders-today-card">6.8 Reminders + Today card</h3>
+<p class="status"><strong>Status: Live · Grower</strong></p>
+<p>Derived from journal + toolbox + weather. Not a separate calendar product.</p>
+<p>Typical reminders:</p>
+<ul>
+<li>Watering due (pace from last logs).</li>
+<li>Feeding due.</li>
+<li>Heat check / heat + watering pace when forecast is hot and last water is stale.</li>
+</ul>
+<p>Surfaces: Journal <strong>Today</strong> card, Coach empty state (“one next step”), Coach habit CTAs, Inbox <code>care_due</code>. User can dismiss a reminder id. Confirming a reminder drafts a journal action — <strong>nothing is saved until they tap confirm</strong>.</p>
+<h3 id="6-9-ai-coach">6.9 AI Coach</h3>
+<p class="status"><strong>Status: Live</strong> (local helper always; Gemini <strong>Gated</strong> on verified email)</p>
+<p>Two personalities from <code>profileType</code>:</p>
+<p>| | Grower Coach | Adopter Coach |</p>
+<p>|--|----------------|---------------|</p>
+<p>| Job | Next care step, drafts, photo read, tokenisation tips | Explain care progress, live stage, unlock months |</p>
+<p>| May propose actions | Yes, max 5, user must confirm | <strong>Never</strong> (<code>actions: []</code>) |</p>
+<p>| May mint / edit journal | Only after confirm | No |</p>
+<p><strong>Grower allowed actions</strong> (client confirms, then <code>executeAction</code>):</p>
+<table>
+<thead><tr><th>type</th><th>Does</th></tr></thead>
+<tbody>
+<tr><td><code>create_plant</code></td><td>New plant (name required)</td></tr>
+<tr><td><code>add_entry</code></td><td>Water / feed / general / stage / environment log</td></tr>
+<tr><td><code>set_stage</code></td><td>Stage key on a known plant</td></tr>
+<tr><td><code>import_seed</code></td><td>Mint/link seed for a journal plant</td></tr>
+<tr><td><code>mint_growth</code></td><td>Next growth stage if journal proof exists</td></tr>
+<tr><td><code>link_plant</code></td><td>Attach token to plant</td></tr>
+</tbody></table>
+<p>No deletes. Never invent <code>plantId</code>s that are not in the snapshot unless creating the plant first. Ground in snapshot numbers (days in stage, last water, weather). Do not replace looking at the plant.</p>
+<p><strong>Caps in the UI:</strong> Today, Care, Stage, Diagnose, Weather, Tokenise.</p>
+<p><strong>Local helper</strong> (unverified or quota): still drafts watering/feeding from the journal. Labels replies <strong>Live coach</strong> vs <strong>Local helper</strong>.</p>
+<p><strong>Locales:</strong> Gemini coach copy is <strong>en</strong> or <strong>hr</strong>. German UI falls back to English for live coach. Illness-frame analysis same.</p>
+<p><strong>Voice:</strong> practical CBD/hemp peer, not a doctor, not a lawyer, not a yield salesperson.</p>
+<h3 id="6-10-stories-public-journal">6.10 Stories + public journal</h3>
+<p class="status"><strong>Status: Live · Grower</strong> (public site is unauthenticated)</p>
+<p>In-app <strong>Stories</strong> (sidebar on desktop; Profile on mobile). Grower writes posts that can publish to the public journal.</p>
+<p><strong>Composer:</strong> title (max 120), URL slug, category, body, optional cover photo. Draft / publish / edit / delete (in-app confirm sheet, not <code>window.confirm</code>).</p>
+<p><strong>Categories:</strong> Field note · Looking at my plants · Plant problem · Made from my plants · Tips &amp; tricks · Visited other growers.</p>
+<p><strong>Public profile:</strong> <code>publicProfileEnabled</code>, <code>publicSlug</code>, <code>publicBio</code>, profile photo. Public path <code>journal.growto.live/g/{slug}</code>.</p>
+<p><strong>Public feed:</strong> anyone can read, no sign-in. CTA to start a grow / sign in. Do not leak Firebase uids, emails, or private journal entries onto this surface — only published Stories and opted-in profile fields.</p>
+<p>Mirroring to <code>publicJournalPosts</code> / <code>publicGrowerProfiles</code> is done by Cloud Functions (Admin SDK), not by a public client write.</p>
+<h3 id="6-11-inbox">6.11 Inbox</h3>
+<p class="status"><strong>Status: Live</strong></p>
+<p>Bell in the header. Types include: journal saved, care due, seed/growth mint success or fail, sale settled, stake received, faucet, activity bonus, harvest claim, wallet reconnect.</p>
+<p>Empty state explains the inbox. Mark all read. Demo “load examples” exists for empty desks — do not confuse example rows with production events.</p>
+<p>Wallet reconnect: signing out ends the <strong>browser</strong> wallet session; the account can stay linked to the pubkey. Copy must say that, not “wallet was stolen.”</p>
+<h3 id="6-12-tokenise-optional-chain">6.12 Tokenise (optional chain)</h3>
+<p class="status"><strong>Status: Devnet · Gated on <code>chainOptIn</code> · Grower</strong></p>
+<p>Journal works with <strong>no wallet</strong>. Tokenise / Market sit behind Unlock chain (Profile or first tap on the 4th tab). Dialog: “Unlock Tokenise &amp; Market?” — do not dead-click.</p>
+<p><strong>Wallets:</strong> Phantom or Solflare, Solana <strong>Devnet</strong>. Link is a signed challenge verified by <code>linkWallet</code>. Challenge message is <strong>not</strong> translated (signature is byte-for-byte).</p>
+<p><strong>What Tokenise does</strong></p>
+<ol>
+<li>Pick a <strong>real journal plant</strong> (<code>plantId</code> required). Seed mint is not gated on 14-day coverage.</li>
+<li>Seal seed stage → queue <code>seedMints</code> → GitHub worker mints NFT.</li>
+<li>Later growth seals (<code>growthMints</code>) need <strong>journal proof</strong> (quests): linked plant, stage log, watering this stage; feeding optional only for germination.</li>
+<li>List on Market is a <strong>separate</strong> gate (below).</li>
+</ol>
+<p><strong>Grower quests</strong> (checklist, not a game board): link plant, log stage, log watering, log feeding. Copy: “Journal proof complete — ready to mint.”</p>
+<p><strong>Rank / XP:</strong> New → Active → Dedicated → Seasoned → Master → Elite cultivator. Shown on Journal and Profile. Activity bonus can mint test $GROWTOO for documented care (Devnet, no value).</p>
+<p><strong>Honesty in UI:</strong> mint toasts distinguish <strong>queued</strong> vs <strong>failed</strong>. Never claim on-chain success the queue refused. Test $GROWTOO has no monetary value. Stage rewards copy may mention a harvest total — that is Devnet game points, not money.</p>
+<h3 id="6-13-market">6.13 Market</h3>
+<p class="status"><strong>Status: Devnet · Gated on chain opt-in</strong></p>
+<p>Growers list; adopters browse / invest. Public board reads <strong><code>marketPublicTape</code></strong> (scrubbed: on-chain pubkeys, no Firebase uids). Full <code>marketListings</code> are owner/buyer, not a public collection list.</p>
+<p><strong>List / escrow activate (must stay in sync client + Functions)</strong></p>
+<ul>
+<li>≥ <strong>14 elapsed days</strong> since first care <code>createdAt</code>.</li>
+<li>Care on ≥ <strong>50%</strong> of <code>min(elapsed, 180)</code> distinct UTC days.</li>
+<li>Watering or feeding only.</li>
+<li>Listings with <code>journalCoverageOk === false</code> are <strong>hidden</strong> from the public tape.</li>
+<li>Same-day mint-and-list is blocked.</li>
+</ul>
+<p><strong>Offer types</strong></p>
+<table>
+<thead><tr><th>Type</th><th>Behavior</th></tr></thead>
+<tbody>
+<tr><td>Instant sale</td><td>Plant token moves to buyer now.</td></tr>
+<tr><td>Adopt stake</td><td>50% $GROWTOO now, 50% locked until harvest-claim path.</td></tr>
+</tbody></table>
+<p><strong>Adopter garden:</strong> settled plants appear under My adopted plants. Watch live stage and monthly unlock status. First-run: START HERE + How to adopt; hide after first adoption.</p>
+<p><strong>Invest:</strong> disabled in watch-only (no signing session). Header chip shows Watch-only when the session cannot sign.</p>
+<p><strong>Faucet:</strong> <strong>adopter-only</strong> daily test $GROWTOO. Growers do not get this desk.</p>
+<p><strong>Harvest claim:</strong> UI can file <code>harvestClaims</code> (<code>pending</code>). <strong>Physical redemption is mocked</strong> — not a fulfillment pipeline. Locked 50% release is specified, not a live warehouse / legal redemption flow.</p>
+<p><strong>Copy rules:</strong> no yield promises. “You can watch this plant’s trail” beats APY language. Devnet / sim traffic may appear; Coach and Market must not invent balances.</p>
+<h3 id="6-14-admin">6.14 Admin</h3>
+<p class="status"><strong>Status: Gated — two emails only</strong></p>
+<p><code>supadmin@dnevnik.live</code> and <code>admin@dnevnik.live</code>. Firestore <code>role</code> is <strong>not</strong> enough. Ordinary growers must never see Admin nav.</p>
+<p>Capabilities (read this as “exists today,” not as a multi-tenant SaaS spec):</p>
+<ul>
+<li>User list / login report (today / 7 days).</li>
+<li>Legacy plants / entries / tenants collections (admin library — <strong>not</strong> the grower journal blob).</li>
+<li>Share plants and tools read-only with another user (<code>sharedGrants</code>).</li>
+<li>Hybrid viewers: own journal editable; shared superadmin plants view-only.</li>
+<li>Soil-moisture tool.</li>
+</ul>
+<p>Do not expand admin to “anyone with <code>role: admin</code>” without replacing the email allowlist on purpose.</p>
+<h2 id="7-cross-cutting-product-rules">7. Cross-cutting product rules</h2>
+<p>These are product requirements, not implementation trivia.</p>
+<ol>
+<li><strong>Journal first.</strong> Coach, reminders, Tokenise, and Market are layers. A grower who never opens a wallet must still have a complete product.</li>
+<li><strong>Confirm before mutate.</strong> Coach actions, destructive deletes, listings, and mints use in-app confirm sheets. No silent journal writes from the model.</li>
+<li><strong>Two desks are a trust boundary.</strong> Faucet and Invest are adopter-only. Tokenise mint-from-journal is grower-only. Adopter Coach cannot edit the grower’s log.</li>
+<li><strong>Coverage is <code>createdAt</code>, not <code>date</code>.</strong> Changing that silently rewrites who can list.</li>
+<li><strong>Plant ids are foreign keys.</strong> Preserve them across a rewrite.</li>
+<li><strong>Devnet honesty</strong> in every chain surface: no monetary value, no live harvest redemption, on-chain ≠ physical plant.</li>
+<li><strong>Coach is advisory.</strong> No disease diagnosis-as-fact, no legal advice, no medical claims.</li>
+<li><strong>i18n:</strong> EN source + HR/DE; internal keys stay Croatian; German live-coach fallback is a known gap.</li>
+<li><strong>Light theme is the default.</strong> Dark is opt-in.</li>
+<li><strong>Public market board never lists raw <code>marketListings</code>.</strong> Tape only.</li>
+<li><strong>Wallet pubkey is server-verified.</strong> Client may unlink only.</li>
+<li><strong>Age 18+ and local-law compliance</strong> stay in signup, terms, and marketing FAQ.</li>
+</ol>
+<h2 id="8-what-is-explicitly-out-of-scope-today">8. What is explicitly out of scope today</h2>
+<p>Do not build these as if they were missing bugs unless product reopens them.</p>
+<ul>
+<li>Native iOS / Android store apps (responsive web only; mockups exist under <code>mobile/</code>).</li>
+<li>Service worker / installable PWA (not in repo).</li>
+<li>Mainnet Solana, real $GROWTOO value, or a published mainnet date.</li>
+<li>Physical harvest shipping / licensed fulfillment.</li>
+<li>Trustless attestation that a plant exists in the world.</li>
+<li>GPS weather.</li>
+<li>Client-mutable <code>profileType</code>.</li>
+<li>Cursor / third-party chat as the Grower Coach backend (live Coach is Gemini <code>gemini-2.0-flash</code> via <code>coachChat</code>).</li>
+<li>Subscription billing / SaaS paywall (journal is free).</li>
+</ul>
+<h2 id="9-suggested-test-matrix-for-a-new-team">9. Suggested test matrix for a new team</h2>
+<p>Human desk tests (wallets + verified email). Automated HTTP smoke is listed in <code>docs/TEST_READINESS.md</code>.</p>
+<table>
+<thead><tr><th>#</th><th>Path</th><th>Expect</th></tr></thead>
+<tbody>
+<tr><td>G1</td><td>Sign up grower, skip wallet</td><td>Journal, Log, Coach local helper, weather</td></tr>
+<tr><td>G2</td><td>Verify email</td><td>Live Coach + illness photo</td></tr>
+<tr><td>G3</td><td>Add plant → log water/feed on Log sheet</td><td>Entries on calendar; toolbox mirror if using Measurements</td></tr>
+<tr><td>G4</td><td>Camera → Log to journal</td><td>Photo on grow log, Storage URL not giant state doc</td></tr>
+<tr><td>G5</td><td>Unlock chain, link Phantom Devnet, seal seed</td><td>Queue → minted; toast is queued then success/fail truthfully</td></tr>
+<tr><td>G6</td><td>Try to list before 14/50%</td><td>Blocked; tape hidden</td></tr>
+<tr><td>A1</td><td>Sign up adopter, faucet, browse tape</td><td>No grower journal; Invest watch-only until wallet signs</td></tr>
+<tr><td>A2</td><td>Instant sale vs adopt-stake</td><td>Garden updates; harvest claim remains mocked</td></tr>
+<tr><td>P1</td><td>Public journal signed-out</td><td>Stories + profiles only; no emails/uids</td></tr>
+<tr><td>X1</td><td>Unverified coach photo</td><td>Local helper + verify CTA, not a generic 500</td></tr>
+<tr><td>X2</td><td>Non-admin user</td><td>No Admin nav even if <code>role</code> is wrong</td></tr>
+</tbody></table>
+<h2 id="10-related-documents">10. Related documents</h2>
+<table>
+<thead><tr><th>Doc</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td><a href="rebuild/README.md"><code>docs/rebuild/</code></a></td><td>Tech + data room for a rewrite kickoff</td></tr>
+<tr><td><a href="TEST_READINESS.md"><code>docs/TEST_READINESS.md</code></a></td><td>Desk-test nav map and smoke (nav notes from Aug 2026 still apply)</td></tr>
+<tr><td><a href="FIRESTORE_RULES.md"><code>docs/FIRESTORE_RULES.md</code></a></td><td>Rules intent</td></tr>
+<tr><td><a href="app-check-rollout.md"><code>docs/app-check-rollout.md</code></a></td><td>App Check is <strong>monitor mode</strong> — do not flip enforcement casually</td></tr>
+<tr><td><code>community-agent/config/product-facts.md</code></td><td>What marketing is allowed to say</td></tr>
+<tr><td><code>locales/README.md</code></td><td>How to add a language</td></tr>
+<tr><td>Live: <code>/rwa-docs/</code>, <code>/risks/</code>, <code>/terms/</code>, <code>/privacy/</code></td><td>Trust model and legal</td></tr>
+</tbody></table>
+<p>If a claim is not in this spec, the rebuild packet, or <code>product-facts.md</code>, treat it as unverified.</p>
+    <footer>
+      Generated from <code>docs/FEATURE.md</code> on 4 Sep 2026.
+      If a claim is not in this spec, the rebuild packet, or <code>product-facts.md</code>, treat it as unverified.
+    </footer>
+  </div>
+</body>
+</html>
